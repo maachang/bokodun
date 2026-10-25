@@ -1,0 +1,38 @@
+{
+  // サーバー待受設定
+  "port": 3011,
+  "hostname": "0.0.0.0",
+
+  // リクエストボディ上限サイズ (バイト、デフォルト: 10MB)
+  "maxBodyLength": 10485760,
+
+  // レートリミット設定 (IP単位、過剰アクセス時に 429 応答)
+  "rateLimit": {
+    "enabled": false,
+    "windowMs": 60000,
+    "max": 100,
+    "message": "Too Many Requests"
+  },
+
+  // CORS 設定 (API サーバーとしてクロスオリジンを許可する場合)
+  "cors": {
+    "enabled": false,
+    "origin": "*",
+    "methods": ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    "credentials": false
+  },
+
+  // セキュリティヘッダー (デフォルトで標準ヘッダー自動付与、HTTPS時はHSTS自動付与)
+  "securityHeaders": {
+    "X-Content-Type-Options": "nosniff",
+    "X-Frame-Options": "DENY",
+    "X-XSS-Protection": "1; mode=block",
+    "Referrer-Policy": "strict-origin-when-cross-origin"
+  },
+
+  // 死活監視ヘルスチェックエンドポイント (/healthz)
+  "healthCheck": {
+    "enabled": true,
+    "path": "/healthz"
+  }
+}

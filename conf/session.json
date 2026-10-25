@@ -1,0 +1,14 @@
+{
+  // SQLite セッションDB保存先
+  "dbPath": "./data/session.db",
+  // セッションCookie名
+  "cookieName": "bokodun_sid",
+  // 有効期限 (分)
+  "timeoutMin": 60,
+  // SameSite属性 (Lax / Strict / None)
+  "sameSite": "Lax",
+  // JavaScriptからのアクセス禁止 (XSS保護)
+  "httpOnly": true,
+  // HTTPS通信のみCookie送信 (未指定またはfalseの場合でも、HTTPS接続時は自動的にSecureが付与されます)
+  "secure": false
+}

@@ -1,0 +1,60 @@
+{
+  "id": "grassland",
+  "name": "エメラルド平原 (Grassland)",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "rockymountain",
+  "spawn": {
+    "x": 2,
+    "z": 2,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "grass",
+    "hasCeiling": false,
+    "ambientLight": 7833719,
+    "directionalLight": 16773341,
+    "fogColor": 11064805,
+    "fogNear": 20,
+    "fogFar": 75,
+    "skyColor": 8374251
+  },
+  "legend": {
+    "F": "dense_forest",
+    "B": "barrier",
+    "T": "tree",
+    "R": "rock_wall",
+    "W": "brick_wall",
+    "P": "water",
+    "~": "water_shallow",
+    ".": "sand_tile",
+    "=": "wood_bridge",
+    "C": "cobblestone_path",
+    "M": "magic_circle",
+    "2": "portal"
+  },
+  "enemies": {
+    "S": "slime",
+    "G": "goblin",
+    "K": "skeleton"
+  },
+  "layout": [
+    "FFFFFFFFFFFFFFFF",
+    "F00000000000000F",
+    "F00...~~~~~....F",
+    "F00.PPP===PPP..F",
+    "F00.PPP===PPP..F",
+    "F00...~~~~~....F",
+    "F0S0000C00000S0F",
+    "F00T000C0G000T0F",
+    "F000000C0000000F",
+    "F0000T0M0000T00F",
+    "F0S0000000000S0F",
+    "F00000000000000F",
+    "F00T00000000T00F",
+    "F00000000000200F",
+    "F00000000000000F",
+    "FFFFFFFFFFFFFFFF"
+  ]
+}

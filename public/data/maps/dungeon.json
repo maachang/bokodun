@@ -1,0 +1,57 @@
+{
+  "id": "dungeon",
+  "name": "地下迷宮 (Dungeon)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "grassland",
+  "spawn": {
+    "x": 3,
+    "z": 3,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "ceilingTexture": "brick",
+    "ambientLight": 4473941,
+    "directionalLight": 8947882,
+    "fogColor": 1118486,
+    "fogNear": 5,
+    "fogFar": 26,
+    "skyColor": 1118486
+  },
+  "legend": {
+    "1": "brick_wall",
+    "2": "portal",
+    "D": "dungeon_door",
+    "T": "tree",
+    "^": "spike_trap",
+    "E": "electric_barrier",
+    "M": "magic_circle",
+    "P": "poison_swamp"
+  },
+  "enemies": {
+    "S": "slime",
+    "G": "goblin",
+    "K": "skeleton"
+  },
+  "layout": [
+    "1111111111111111",
+    "1000000100000001",
+    "1011110101111101",
+    "1010010001000101",
+    "1010011111000101",
+    "1010K00M000K0101",
+    "1011110110111101",
+    "1000000110000001",
+    "1111011111101111",
+    "10000D0EE0100001",
+    "1011110EE0111101",
+    "1010000110000101",
+    "1010G001100G0101",
+    "1011111111111101",
+    "1000000000000201",
+    "1111111111111111"
+  ]
+}

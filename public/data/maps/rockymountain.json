@@ -1,0 +1,55 @@
+{
+  "id": "rockymountain",
+  "name": "岩山の頂 (Rocky Mountain)",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "cave",
+  "spawn": {
+    "x": 3,
+    "z": 3,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": false,
+    "ambientLight": 5592422,
+    "directionalLight": 16764074,
+    "fogColor": 6182502,
+    "fogNear": 10,
+    "fogFar": 45,
+    "skyColor": 4011338
+  },
+  "legend": {
+    "1": "rock_jagged",
+    "R": "rock_wall",
+    "W": "brick_wall",
+    "T": "tree",
+    "L": "lava",
+    "I": "ice",
+    "2": "portal"
+  },
+  "enemies": {
+    "S": "slime",
+    "G": "goblin",
+    "K": "skeleton"
+  },
+  "layout": [
+    "1111111111111111",
+    "1000000110000001",
+    "1011100110011101",
+    "1010000000000101",
+    "1010110LL0110101",
+    "10001G0LL0G10001",
+    "1000110000110001",
+    "1100II0000II0011",
+    "1100II0000II0011",
+    "1000110000110001",
+    "10001G0LL0G10001",
+    "1010110LL0110101",
+    "1010000000000101",
+    "1011100110011101",
+    "1000000110000201",
+    "1111111111111111"
+  ]
+}

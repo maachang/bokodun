@@ -1,0 +1,13 @@
+{
+  "name": "bokodun",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "start": "maachang",
+    "build": "mcbuild",
+    "test": "node --test test/*.test.mjs"
+  },
+  "devDependencies": {
+    "acorn": "^8.19.0"
+  }
+}

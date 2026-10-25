@@ -1,0 +1,58 @@
+{
+  "id": "cave",
+  "name": "地底洞窟 (Cavern)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "dungeon",
+  "spawn": {
+    "x": 2,
+    "z": 2,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "ceilingTexture": "mossyStone",
+    "ambientLight": 7837830,
+    "directionalLight": 12308670,
+    "fogColor": 2374955,
+    "fogNear": 10,
+    "fogFar": 45,
+    "skyColor": 2374955
+  },
+  "legend": {
+    "1": "mossy_stone_wall",
+    "R": "rock_jagged",
+    "D": "dungeon_door",
+    "P": "water",
+    "~": "water_shallow",
+    "L": "lava",
+    "S": "spike_trap",
+    "M": "magic_circle",
+    "2": "portal"
+  },
+  "enemies": {
+    "s": "slime",
+    "g": "goblin",
+    "k": "skeleton"
+  },
+  "layout": [
+    "1111111111111111",
+    "1000000100000001",
+    "10s000010000k001",
+    "1000000100000001",
+    "1111D11111000001",
+    "1000000001111101",
+    "100~~~0001000001",
+    "10~PPP~00100s001",
+    "10~PPP~00D000001",
+    "100~~~0001111101",
+    "1000000000000101",
+    "1111110111000101",
+    "1000000100000101",
+    "10k00M010LL00201",
+    "100000010LL00001",
+    "1111111111111111"
+  ]
+}

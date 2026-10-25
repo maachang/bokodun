@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>JHTML Sample - bokodun</title>
+    <script src="/jhtml.browser.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; margin: 40px; background: #f8fafc; color: #1e293b; }
+        .card { background: white; padding: 28px; border-radius: 12px; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1); max-width: 680px; margin: 0 auto; }
+        .box { border: 1px solid #e2e8f0; background: #f8fafc; padding: 16px; border-radius: 8px; margin: 16px 0; }
+        .tag { background: #e0f2fe; color: #0369a1; padding: 2px 8px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; }
+        a { color: #2563eb; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <p><a href="/">&larr; トップ画面へ戻る</a></p>
+        <h1>JHTML サーバーサイドレンダリング</h1>
+        <p>サーバーサイド（<code>.mt.html</code>）で実行され、HTML として出力されます（本番では <code>mcbuild</code> で事前コンパイル可能）。</p>
+
+        <div class="box">
+            <% 
+                const now = new Date().toLocaleString('ja-JP');
+                const fruits = [
+                    { name: 'りんご', price: 150 },
+                    { name: 'みかん', price: 100 },
+                    { name: 'バナナ', price: 200 }
+                ];
+            %>
+            <p><strong>サーバー実行日時:</strong> ${now}</p>
+            <p><strong>クライアント IP:</strong> ${$request.ip} <span class="tag">${$request.protocol}</span></p>
+
+            <h3>アイテム一覧 (ループ展開):</h3>
+            <ul>
+                <% for (const item of fruits) { %>
+                    <li><%= item.name %> - <strong><%= item.price %> 円</strong></li>
+                <% } %>
+            </ul>
+        </div>
+    </div>
+</body>
+</html>

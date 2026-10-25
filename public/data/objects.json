@@ -1,0 +1,150 @@
+{
+  "brick_wall": {
+    "type": "block",
+    "texture": "brick",
+    "solid": true,
+    "description": "ダンジョンのレンガ壁"
+  },
+  "rock_wall": {
+    "type": "block",
+    "texture": "rock",
+    "solid": true,
+    "description": "自然の岩壁"
+  },
+  "mossy_stone_wall": {
+    "type": "block",
+    "texture": "mossyStone",
+    "solid": true,
+    "description": "苔むした緑色の石積み壁（洞窟・地下水路用）"
+  },
+  "rock_jagged": {
+    "type": "block",
+    "texture": "rock",
+    "solid": true,
+    "jagged": true,
+    "description": "岩山などの凹凸のある岩"
+  },
+  "barrier": {
+    "type": "barrier",
+    "solid": true,
+    "visible": false,
+    "description": "マップ外への侵入を防ぐ見えない壁"
+  },
+  "dense_forest": {
+    "type": "dense_forest",
+    "texture": "dense_forest",
+    "solid": true,
+    "description": "立ち入り不可の深い森・生い茂る木々の防壁"
+  },
+  "tree": {
+    "type": "tree",
+    "texture": "tree",
+    "solid": true,
+    "description": "木（樹木）"
+  },
+  "water": {
+    "type": "liquid_tile",
+    "texture": "water",
+    "solid": true,
+    "blocksProjectiles": false,
+    "depth": 0.8,
+    "description": "池・湖の深い水域（深紺色の深水・進入不可だが魔法や矢は通過可能）"
+  },
+  "water_shallow": {
+    "type": "liquid_tile",
+    "texture": "shallowWater",
+    "solid": false,
+    "depth": 0.35,
+    "slowdown": 0.65,
+    "description": "浅瀬（エメラルドグリーンの透き通る水面・歩行可能）"
+  },
+  "sand_tile": {
+    "type": "floor_tile",
+    "texture": "sand",
+    "solid": false,
+    "depth": 0.15,
+    "description": "水辺へ緩やかに下る砂浜・砂地タイル"
+  },
+  "lava": {
+    "type": "liquid_tile",
+    "texture": "lava",
+    "solid": false,
+    "blocksProjectiles": false,
+    "depth": 0.15,
+    "slowdown": 0.7,
+    "damagePerSec": 25,
+    "hazardType": "fire",
+    "description": "煮えたぎる溶岩（継続火炎ダメージ）"
+  },
+  "poison_swamp": {
+    "type": "liquid_tile",
+    "texture": "poisonSwamp",
+    "solid": false,
+    "blocksProjectiles": false,
+    "depth": 0.15,
+    "slowdown": 0.55,
+    "damagePerSec": 8,
+    "hazardType": "poison",
+    "description": "毒の沼地（移動速度低下＆毒継続ダメージ）"
+  },
+  "ice": {
+    "type": "floor_tile",
+    "texture": "ice",
+    "solid": false,
+    "friction": 0.05,
+    "description": "凍結した氷床（摩擦がほぼゼロでツルツル滑る）"
+  },
+  "wood_bridge": {
+    "type": "floor_tile",
+    "texture": "woodBridge",
+    "solid": false,
+    "description": "水路や谷に架かる木製の橋・板張り床"
+  },
+  "cobblestone_path": {
+    "type": "floor_tile",
+    "texture": "cobblestone",
+    "solid": false,
+    "speedBonus": 1.25,
+    "description": "歩きやすい敷石の小道（移動速度25%アップ）"
+  },
+  "magic_circle": {
+    "type": "floor_tile",
+    "texture": "magicCircle",
+    "solid": false,
+    "mpRegenBonus": 25,
+    "description": "神秘の魔法陣（乗っている間MPが急速回復）"
+  },
+  "spike_trap": {
+    "type": "trap_tile",
+    "texture": "spikeTrap",
+    "solid": false,
+    "damage": 20,
+    "description": "床から飛び出るトゲ罠（踏むと大ダメージ）"
+  },
+  "electric_barrier": {
+    "type": "barrier_floor",
+    "texture": "electricBarrier",
+    "solid": false,
+    "damagePerStep": 15,
+    "flashColor": "#06b6d4",
+    "description": "ドラクエ風バリア床（歩くたびに電撃ダメージと画面フラッシュ）"
+  },
+  "pitfall": {
+    "type": "floor_tile",
+    "texture": "pitfall",
+    "solid": false,
+    "description": "ひび割れた崩落床（乗ると崩れ落ちる落とし穴）"
+  },
+  "dungeon_door": {
+    "type": "door",
+    "texture": "door",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "description": "壁間に設置できる重厚な扉（近づいて調べる・前進で開閉）"
+  },
+  "portal": {
+    "type": "portal",
+    "solid": false,
+    "description": "次マップへのポータル"
+  }
+}

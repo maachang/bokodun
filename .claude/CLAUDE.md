@@ -1,0 +1,296 @@
+# bokodun プロジェクト固有の情報
+
+このファイルは Claude Code や agy (Google Antigravity) がセッション開始時に自動的に読み込みます。ここにはプロジェクト固有の事実および maachang フレームワークの利用ルールを記載します。
+
+# プロジェクト概要
+
+このプロジェクトは [maachang](https://github.com/maachang/maachang)（オンプレミス向けの Bun.serve 実行による超最小・高速 Web アプリケーションフレームワーク）を使って構築された Web アプリケーション / API です。
+
+（このプロジェクト「bokodun」が何をするものか、ここに記載する）
+
+# 設計思想: 「ファイル配置 ＝ URL」の直感的な PHP 的アプローチ
+
+- **認知負荷ゼロ**: `public/` 配下のファイル構造がそのまま URL パスに対応するクラシカルな SSR / API 構造。SPA や複雑なルーティング設定、巨大な npm 依存による複雑さを排除しています。
+- **AI Native**: 1〜2 ファイルでバックエンド処理と画面描画が完結するため、AI エージェントが迷わず、コンテキストを浪費せずに迅速な機能開発が可能です。
+- **ゼロ外部依存 ＆ 爆速**: Bun 組み込み機能と SQLite3 (`bun:sqlite`) のみで動作し、ミリ秒起動と単一ファイル運用を実現しています。
+
+# インフラ・HTTPS 運用仕様
+
+- **Nginx リバースプロキシ構成**: オンプレミス本番環境では Nginx を前面に配置して運用します。
+- **無料 SSL 証明書 (Let's Encrypt / Certbot)**:
+  - HTTPS (443) 終端、および HTTP (80) での ACME チャレンジ (HTTP-01) はすべて Nginx 側で一元管理します。
+  - 証明書自動更新時は `nginx -s reload` による無停止反映を行います。
+  - maachang (Bun.serve) 側はローカルポート（HTTP: localhost:3000 等）でリクエストを受け付けます。
+  - クライアント IP 等の取得は Nginx から渡される `X-Forwarded-For` / `X-Real-IP` を利用します。
+
+# 作業領域（.claudeWork）
+
+- プロジェクト直下の `.claudeWork/` は AI 専用の作業領域（Git には一切コミットしない、`.gitignore` 済み）。
+- セッション再起動時の引き継ぎ用メモや、調査結果・設計方針のドラフト置き場として利用する。
+- プロジェクト固有の永続的な仕様は本ファイル（`CLAUDE.md`）に記載する。
+
+# コーディング規約 & AI 開発ルール
+
+- **独断での仕様決定禁止**: 実装を任された際、詳細仕様（データフィルタリング手法、抽出ロジック、制限値、除外基準など）を独断で決定・補完することは禁止。必ずユーザーの承認を得ること。
+- **車輪の再発明の禁止**: maachang が標準提供しているモジュール（`session.js`, `logger.js`, `validate.js` 等）や組み込みヘルパー（`$request`, `$response`, `$db` 等）を優先活用し、独自ライブラリを安易に自作しない。
+- **暗号・セキュリティ乱数の利用ルール（crypto.random 系の義務付け）**: セッションID、CSRFトークン、パスワードソルト、暗号鍵、認証・署名用トークンなどのセキュリティ・暗号化関連用途には、`Math.random()` や非暗号論的乱数生成器（PRNG）の利用を厳禁とする。必ず `crypto.randomBytes()`、`crypto.getRandomValues()`、`crypto.randomUUID()` などの標準 `crypto.random` 系暗号論的疑似乱数（CSPRNG）を使用すること。
+- **外部通信における SSRF（Server-Side Request Forgery）防御の義務付け**:
+  ユーザー入力や外部パラメータから受け取った URL / Webhook 等へ HTTP 通信を行う際は、必ず `$loadLib('http.js')` を用い、`{ safe: true }` または `{ ssrfProtection: true }` を有効化すること。内部ネットワーク（`10.x`, `172.16-31.x`, `192.168.x`）、ループバック（`127.x`, `localhost`）、クラウドメタデータ（`169.254.169.254`）宛の不正アクセスおよび DNS リバインディングを構造的に遮断すること。
+- **認証エンドポイントにおけるブルートフォース＆クレデンシャルスタッフィング対策の義務付け**:
+  ログイン、パスワードリセット、二要素認証等の認証エンドポイントを実装する際は、必ず `$loadLib('lockout.js')` を利用し、`lockout.check(identifier)` によるロック事前検証および `lockout.recordFailure(identifier)` による失敗回数カウント、`lockout.reset(identifier)` による成功時リセットを組み込むこと。同一アカウントに対する総当たりや漏洩リスト攻撃を自動検知して `423 Locked` を返却すること。
+- **APIキー・署名・認証トークン照合におけるタイミング攻撃対策の義務付け**:
+  APIキー、HMAC署名、カスタム認証トークン、暗号ハッシュ文字列を比較する際は、通常の `===` や `==` 演算子での文字列比較を禁止し、必ず `$loadLib('encrypt.js')` の `encrypt.timingSafeEqual(a, b)` を用いて定数時間比較（Constant-time comparison）を行うこと。
+- **ログイン機能・ユーザー別リソースにおける認可不備（BOLA/IDOR）対策の利用必須化**:
+  ログイン機能やユーザー固有データを扱う Web 画面・API を実装する際は、リクエストパラメータ（ID等）の書き換えによる他者データの漏洩・改ざん（BOLA: Broken Object Level Authorization / IDOR: Insecure Direct Object Reference）を徹底排除すること。以下の実装パターンを**利用必須**とする:
+  1. **リクエスト ID 盲信の禁止**: クライアントから渡された `userId` を信用せず、必ずセッション（`$loadLib('session.js')` または `rbac.getUser($request)`）から取得した本人情報を基準とする。
+  2. **DB スコープ強制の利用 (`$db.forUser`)**: ログインユーザー固有のテーブル（注文、履歴、個人設定等）を操作する際は、単体の `SELECT * FROM items WHERE id = ?` をベタ書きせず、`const userDb = $db.forUser(currentUser);` を用いて `userDb.findById(...)` / `userDb.find(...)` / `userDb.updateById(...)` / `userDb.deleteById(...)` を利用すること。これにより `WHERE user_id = ?` が自動強制され、他者データへのアクセスが構造的に遮断される。
+  3. **オブジェクト所有権ガードの利用 (`rbac.ensureOwner` / `rbac.isOwner`)**: リソース取得時や更新・削除処理の前には、`const rbac = $loadLib('rbac.js');` の `if (!await rbac.ensureOwner(resource)) return;` を実行し、本人以外のアクセス（管理者以外）に対して確実に `403 Forbidden` を返却すること。
+- **テーブルスキーマ定義の出力・管理**: データベース（SQLite3 等）のテーブルを作成・変更した場合は、テーブルスキーマ定義（DDL、SQL、テーブル定義書等）を必ず `schema/` ディレクトリ配下に出力・更新して管理すること。実装やクエリ作成時には `schema/` 内の定義を参照すること。
+- **バリデーション定義の出力・管理**: フォーム入力や API リクエストの検証スキーマは、必ず `validates/` ディレクトリ配下にモジュールとして定義・出力すること（例: `validates/login.js`, `validates/user.js`）。ページや API 実装時はこれを `$loadLib` で読み込み、`validate.js` を用いて検証を行うこと。
+- **既存コメントの維持**: 処理内容が変わって意味が通じなくなる場合を除き、既存コメントを削除しない。
+- **言語ルール**: コメントおよびユーザーへの返答・要約・説明文は常に**日本語**で記述する。
+- **バグ修正フロー**: バグやエラーの原因調査を依頼された場合、即座に修正せず、まず原因と修正方針を報告して承認を得てから修正に着手する。
+- **実装状況と設計案の峻別**: 「現状のコードで既に実装されていること」と「改修すれば実現可能な設計上のアイデア」を絶対に混同して回答しない。未実装の機能をあたかも利用可能であるかのように説明してはならない。
+- **エラー発生時の責任転嫁・安易な回答の禁止**: 動作不良やエラーが発生した際、コードの実態（未実装・考慮漏れ）を確認せずに安易に「〇〇をコピーしてください」「〇〇を再設定してください」などユーザー側の運用に責任を押し付ける回答をしない。まずフレームワークやサーバーコード側の実装状態を正確に検証し、何が足りていないのか（コード改修が必要なのか、運用操作が必要なのか）を客観的・正確に説明すること。
+- **フロントエンド DOM 操作 & 画面スクリプトにおける `jhtml.browser.js` の利用義務**:
+  HTML 内で動的 DOM 操作、イベント登録、API 通信、フォーム入出力、要素表示制御、進捗監視（ポーリング等）、モーダル制御、URL クエリ操作を行うクライアントサイドスクリプトを作成・改修する際は、生の `document.getElementById` や生 `fetch`、インライン `onclick`、独自 `escapeHtml` などをベタ書きせず、必ず `<script src="/jhtml.browser.js"></script>` を読み込み、`jhtml.html`, `jhtml.$`, `jhtml.refs`, `jhtml.on`, `jhtml.api`, `jhtml.form`, `jhtml.show/hide`, `jhtml.poll`, `jhtml.modal`, `jhtml.query` などの提供ユーティリティを利用すること。
+- **リファクタリング・共通化・全対応における網羅性の徹底（中途半端な対応・モグラ叩きの禁止）**:
+  「全体を統一」「他にはあるか」「全部対応して」等の指示を受けた際、指摘された特定箇所や特定ファイルのみを局所的に修正して完了とみなすことは厳禁。必ず以下のフローを遵守すること:
+  1. **着手時の全体検索**: 作業前に必ずプロジェクト全体（`public/`, `lib/` 等）に対して `grep` 検索等を実施し、対象ファイル・行・件数を網羅的に洗い出し、リスト化してから作業に着手する。
+  2. **完了前の残存ゼロ検証**: 修正完了後、必ず再度全体検索コマンド（`git grep` 等）を実行し、対象の古いパターンや未対応箇所がプロジェクト内に残っていない（残存件数0、または意図的な除外のみ）ことを機械的に確認・検証する。
+  3. **網羅性の報告**: 報告時にはどのファイルを対象にし、残存確認を実施して全件対応が完了したことを明確に示すこと。
+- **CommonJS 形式**: モジュールやスクリプトは CommonJS 形式（`require` / `module.exports`）で統一する。
+
+# maachang フレームワーク原則 & アーキテクチャ
+
+本プロジェクトは maachang 環境（`${MAACHANG_HOME}`）上で動作します。
+
+- **`${MAACHANG_HOME}/src/index.js`**: Bun.serve によるサーバー起動エントリ。
+- **`${MAACHANG_HOME}/src/router.js`**: ルーティング・静的配信・動的 JS/JHTML 実行・フィルター処理。
+- **`${MAACHANG_HOME}/modules/`**: 共通モジュール群（`session.js`, `logger.js` 等）。
+  - `$loadLib("モジュール名.js")` でフラットにロード可能。
+  - プロジェクト側の `lib/` に同名ファイルがある場合はプロジェクト側が優先される。
+- **`${MAACHANG_HOME}/bin/`**: maachang コマンド群（`initMaachang`, `mkmc`, `maachang`, `mcbuild`）。
+
+---
+
+# グローバルオブジェクト & 組み込みヘルパー
+
+maachang の `*.mt.js` / `*.mt.html` (JHTML) / `filter.mt.js` 内では以下のヘルパーが事前定義なしで利用できます（関数呼び出し `$request()` / `$response()` とオブジェクトアクセス `$request` / `$response` の両対応）。
+
+| ヘルパー | 説明 | 主なメソッド / プロパティ |
+|---|---|---|
+| `$request` / `$request()` | リクエスト情報の取得 | `.path`, `.method`, `.query`, `.body`, `.cookies`, `.ip`, `.ips`, `.protocol`, `.isSecure`, `.host`, `.baseUrl`, `.nonce`（動的CSP暗号乱数）<br>`.getHeader(key)`, `.getQuery(key, def)`, `.getCookie(key, def)` |
+| `$response` / `$response()` | レスポンスの生成・返却 | `.status(code)`, `.contentType(type, charset)`, `.header(key, val)`, `.setCookie(name, val, opt)`, `.deleteCookie(name)`<br>`.json(data, status)`, `.html(str, status)`, `.text(str, status)`, `.download(pathOrBuffer, filename, opts)`, `.file(filePath, opts)`, `.redirect(url, status)`, `.body(val)` |
+| `$include(path, params)` | 別テンプレート/HTMLのインクルード | `${$include("./parts/header.mt.html", { title: "..." })}`<br>（`${$include(...)}` は自動で await 補完） |
+| `$params` | インクルードパラメータの参照 | テンプレートやパーツ内で `${$params.title}` や `${$params.user}` としてアクセス |
+| `$loadLib("name.js")` | モジュールのロード | `lib/` → `validates/` → `${MAACHANG_HOME}/modules/` の順で検索してロード |
+| `$loadConf("conf名")` | 設定 JSON の取得 | `conf/{conf名}.local.json`（ローカル優先）→ `conf/{conf名}.json` を取得 |
+| `$db` | SQLite3 データベース操作 | `bun:sqlite` ラッパー。<br>`$db.get(sql, params)`, `$db.all(sql, params)`, `$db.run(sql, params)`, `$db.exec(sql)`, `$db.transaction(fn)`<br>`$db.forUser(user, options)`: ユーザー/所有者スコープ強制（BOLA/IDOR対策） |
+| `$require(mod)` | 標準ライブラリ require | `crypto`, `path`, `fs` 等の安全な呼び出し |
+
+
+
+---
+
+# 環境変数 & 設定ファイル定義 (`conf/*.json`, `process.env`, `$loadConf`)
+
+- **JS コメント (JSONC) 対応**: すべての `conf/*.json`（`env.json`, `server.json`, `session.json`, `log.json`, カスタム設定）で **JavaScript コメント（`//` 単一行、`/* ... */` 複数行）** および末尾カンマが自由に使用可能です。
+- **環境変数の自動展開**: `conf/env.json` にキー・バリュー形式で定義した設定は、サーバー起動時およびリクエスト実行時に自動的に `process.env` に直接展開されます。
+- **プログラム内からの参照**: スクリプト内（`.mt.js`, `.jhtml`, `lib/` 等）から `process.env.APP_NAME` や `process.env.API_KEY` のように標準の環境変数としてそのまま参照できます。
+- **ローカル環境の上書き (`conf/env.local.json`, `conf/*.local.json`)**:
+  - `conf/{name}.local.json` が存在する場合はローカル値が最優先で上書き適用されます（`.gitignore` 済みのため機密情報や開発用キーの保存に利用）。
+  - 例 (`conf/env.json`):
+    ```json
+    // アプリケーション全体設定
+    {
+      "APP_ENV": "development", // 開発環境
+      /* 外部連携APIエンドポイント */
+      "API_BASE_URL": "https://api.example.com",
+      "DEBUG_MODE": "true",
+    }
+    ```
+
+
+---
+
+# 主要モジュール クイックリファレンス (`$loadLib`)
+
+### 1. `session.js`（SQLite3 セッション管理）
+- **`sessionMod.createSession($response, initialData)`**: セッション新規作成 ＆ Cookie 自動発行。
+- **`sessionMod.getSession($request)`**: セッションデータ取得（有効期限切れ時は自動削除＆`null` 返却）。
+- **`sessionMod.setSession(sid, data)`**: セッションデータ更新。
+- **`sessionMod.deleteSession($request, $response)`**: セッション削除 ＆ Cookie 破棄。
+- **`sessionMod.regenerateSession($request, $response)`**: セッション固定化攻撃対策（ログイン成功時にデータを保持したまま新しいセッションIDとCookieを安全に再発行）。
+- **`sessionMod.cleanExpiredSessions()`**: 期限切れセッションの一括クリーンアップ。
+
+### 2. `logger.js` / `localLog.js`（日別ローテーションロガー）
+- **`logger.info(...)`, `logger.warn(...)`, `logger.error(...)`, `logger.debug(...)`, `logger.trace(...)`**:
+  - `[YYYY-MM-DD HH:mm:ss.SSS] [LEVEL] メッセージ` 形式で標準出力および `./log/{file}.YYYY-MM-DD.log` へ出力。
+- **`logger.setting({ dir, file, level, stdout })`**: ログ設定変更（`conf/log.json` による自動設定にも対応）。
+- **`logger.maskSensitiveData(obj)`**: パスワードやトークン、Bearer ヘッダーなどの機密情報の自動マスキング。
+
+### 3. `dateEx.js`（日付操作・フォーマット・期間判定ユーティリティ）
+- **`DateEx.create(...)` または `DateEx(...)`**: 日付インスタンス生成（文字列、数値、Date、DateEx から生成可能）。
+- **`d.change(mode, val)`**: 日時加減算（`year`, `month`, `week`, `date`, `hours`, `minutes`, `seconds`, `milliseconds`）。
+- **`d.clear(mode)`**: 日時リセット（`date`, `hours` 等）。
+- **`d.toString(mode, format)` / `d.toFormatString(pattern)`**: 日時フォーマット出力（`{yyyy}/{MM}/{dd}({dj}) {hh}:{mm}:{ss}` 等）。
+- **`DateEx.between(date, mode).isBetween(target)`**: 月始・月末などの期間取得および範囲内外判定。
+
+### 4. `password.js` / `jwt.js` / `csrf.js` / `rbac.js` / `lockout.js` / `corsFilter.js`（セキュリティ・認証・認可）
+- **`password.hash(pwd)` / `password.verify(pwd, hashed)`**: PBKDF2-HMAC-SHA256 による安全なパスワードハッシュ化・照合。
+- **`jwt.sign(payload, secret, opt)` / `jwt.verify(token, secret)`**: HS256 による JWT トークン署名・検証。
+- **`jwt.revoke(tokenOrJti, expiresInSec)` / `jwt.isRevoked(tokenOrJti)`**: ログアウト・不正アクセス検知時の JWT 即時トークン失効（Revocation / Blacklist）。
+- **`csrf.generateToken(sid?)` / `csrf.verify(sid?, token?)` / `csrf.verify(req)`**: セッション連携 CSRF トークン生成・検証。
+- **`lockout.check(id, scope)` / `lockout.recordFailure(id, scope)` / `lockout.reset(id, scope)`**: アカウント単位の連続ログイン失敗による一時ロック＆クレデンシャルスタッフィング防御（段階的バックオフ・SQLite永続化/インメモリ対応）。
+- **`rbac.hasRole(user, role)` / `rbac.can(user, permission)` / `rbac.create(config)`**: ロールベース認可（階層継承 `inherits` およびワイルドカード `*` 認可）。
+- **`rbac.isOwner(user, resource)` / `rbac.ensureOwner(resource, opt)`**: リソース所有権の検証＆不一致時403自動返却（BOLA/IDOR対策）。
+- **`corsFilter.apply(options)`**: `filter.mt.js` 等で利用する CORS 制御ヘルパー（許可オリジン判定、OPTIONS プリフライト対応、資格情報ヘッダー付与）。
+
+### 5. `csvReader.js` / `csvWriter.js`（CSV 操作）
+- **`csvWriter.writeCsv(headers, rows)`**: 配列/オブジェクトデータから CSV 文字列を生成。
+- **`csvReader.readCsv(csvString)`**: CSV 文字列をパースして `{ headers, rows }` オブジェクト配列を取得。
+
+### 6. `validate.js`（バリデーション & `validates/` 定義）
+- **`validate.check(data, schema)`**: スキーマ定義に従って JS オブジェクトを検証（戻り値: `{ valid, errors: [{field, rule, message}], data }`）。
+- **スキーマ定義の作成方法 (`validates/{name}.js`)**:
+  ```javascript
+  // validates/user.js
+  module.exports = {
+      name:     { type: 'string', required: true, minLen: 1, maxLen: 50, messages: { required: '名前は必須です' } },
+      email:    { type: 'string', required: true, mail: true },
+      siteUrl:  { type: 'string', url: true },
+      zipCode:  { type: 'string', zip: true },
+      phone:    { type: 'string', tel: true },
+      birthday: { type: 'string', date: true },
+      wakeTime: { type: 'string', time: true },
+      userId:   { type: 'string', alphaNum: true },
+      age:      { type: 'int', range: [0, 150], default: 0 }
+  };
+  ```
+- **ページ・API での利用手順**:
+  ```javascript
+  // public/api/users.mt.js または JHTML 内
+  const validate = $loadLib('validate.js');
+  const userSchema = $loadLib('validates/user.js'); // または $loadLib('user.js')
+
+  const result = validate.check($request.body, userSchema);
+  if (!result.valid) {
+      return $response.json({ errors: result.errors }, 400);
+  }
+  // 検証済み・デフォルト値補完済みデータ: result.data
+  ```
+- **サポート属性・ルール一覧**:
+  - `type`: `'string'` / `'int'` / `'float'` / `'boolean'` / `'date'`
+  - `required`: `true` / `false`（必須チェック）
+  - `minLen` / `maxLen`: 文字列の最小・最大長
+  - `min` / `max`: 数値・日付の最小・最大値
+  - `range`: 範囲検証 (`[min, max]` または `{ min, max }`)
+  - `mail`: メールアドレス形式チェック (`true`)
+  - `url`: URL (`http`/`https`) 形式チェック (`true`)
+  - `zip`: 郵便番号形式チェック (`true`, `123-4567` / `1234567`)
+  - `tel`: 電話番号形式チェック (`true`, 固定/携帯/フリーダイヤル等)
+  - `date`: 日付形式チェック (`true`, `yyyy-MM-dd` / `yyyy/MM/dd` 実在日判定付き)
+  - `time`: 時刻形式チェック (`true`, `HH:mm:ss` / `HH:mm`)
+  - `alphaNum`: 半角英数字チェック (`true`)
+  - `pattern`: 任意正規表現 (`RegExp`)
+  - `enum`: 許可値の配列 (`['user', 'admin']` 等)
+  - `custom`: カスタム検証関数 `(val, allData) => boolean | string` (false またはエラーメッセージ文字列で失敗)
+  - `default`: 未指定時の補完値または生成関数
+  - `messages`: ルール別カスタムエラーメッセージ (`{ required: '...', mail: '...', range: '...' }`)
+
+### 7. `sendSlack.js` / `sendGithub.js` / `multipart.js`（通信・ファイルアップロード・通知）
+- **`sendSlack.send(target, messageOrOptions, options)`**: Slack Incoming Webhook（URL指定）または Bot Token（`#channel` 指定）による通知送信。
+- **`sendSlack.multi(channel)`**: 複数メッセージのバッファリング一括送信オブジェクトの取得。
+- **`sendGithub.createIssue({ owner, repo, token, title, body, labels })`**: GitHub Personal Access Token による Issue 自動起票。
+- **`multipart.parse($request)`**: `multipart/form-data` リクエストボディの生バッファを解析（戻り値: `{ [field]: string | { filename, contentType, data(Buffer) } }`）。DoS保護として `conf/server.json` の `maxBodyLength`（デフォルト: 10MB）が事前に適用されます。
+
+### 8. `format.js` / `encrypt.js` / `http.js`（整形・暗号化・HTTPクライアント）
+- **`format.money(val)` / `format.parseMoney(str)` / `format.toHalfWidth(str)` / `format.bytes(n)` / `format.mask(str)` / `format.truncate(str, len)`**: 日本語業務画面向けフォーマット（金額相互変換・全角半角等）。
+- **`encrypt.encrypt(plain, key)` / `encrypt.decrypt(cipher, key)`**: AES-256-GCM 可逆暗号化・復号（改ざん検知 AuthTag 付き）。
+- **`encrypt.randomToken(len)` / `encrypt.sha256(str)` / `encrypt.hmac(str, key)`**: ランダムトークン・ハッシュ生成。
+- **`encrypt.timingSafeEqual(a, b)`**: APIキー・署名・認証トークン照合用の定数時間文字列比較（タイミング攻撃防止）。
+- **`http.get(url, opt)` / `http.postJson(url, data, opt)` / `http.getJson(url, opt)`**: タイムアウト・リトライ付き HTTP クライアント。`{ safe: true }` または `{ ssrfProtection: true }` 指定により、プライベートIP/クラウドメタデータ/DNSリバインディングを自動遮断する **SSRF 防御** をサポート。
+
+### 9. `fileUtil.js` / `file.js`（ファイル・JSON入出力支援）
+- **`fileUtil.readJson(path, def)` / `fileUtil.writeJson(path, data)`**: JSON の安全な読み書き（親ディレクトリ自動生成）。
+- **`fileUtil.readText(path)` / `fileUtil.writeText(path, text)`**: テキストファイルの読み書き。
+- **`fileUtil.list(dir, { ext, recursive })`**: 拡張子フィルタ・再帰探索付きファイル一覧。
+- **`fileUtil.safeFileName(origName, allowedExts, prefix)`**: アップロードファイル名の安全な生成（拡張子検証・ユニーク名化）。
+
+### 10. `jhtml.browser.js`（フロントエンド・ブラウザ用 JHTML ランタイム）
+- **役割**: ブラウザ側（クライアントサイド）での動的 DOM 構築やテンプレートレンダリング。外部依存ゼロ（Pure JS）。
+- **配置・読み込み方針**: 
+  - HTML 側で `<script src="/jhtml.browser.js"></script>` を読み込むだけで即利用可能。
+  - プロジェクト側の `public/` にファイルがなくても、サーバーがフレームワーク本体（`$MAACHANG_HOME/public/`）から自動フォールバック配信するため、コピーなしで動作する。
+  - プロジェクト側でカスタマイズしたい場合は `public/jhtml.browser.js` を配置すれば優先される。
+- **主な機能**:
+  - `jhtml.html`...``: 自動エスケープ（XSS対策）付きタグ付きテンプレートリテラル。
+  - `jhtml.raw(str)`: 生 HTML の混在出力。
+  - `jhtml.render('template-id', data)`: `<script type="text/jhtml">` テンプレートのブラウザ側コンパイル＆実行。
+  - `jhtml.renderTo('target-id', 'template-id', data)`: レンダリング結果を指定要素の innerHTML に直接反映。
+  - `jhtml.$('id')` / `jhtml.$$('selector')`: 単一・複数 DOM 取得ショートカット。
+  - `jhtml.refs('id1', 'id2', ...)`: 複数要素の一括取得（分割代入で大量の `getElementById` を 1行化）。
+  - `jhtml.on(target, event, [selector], handler)`: 直接イベント登録および動的要素向けのイベント委任。
+  - `jhtml.api`: 自動 JSON パース、Content-Type 付与、ローディング要素連動付き軽量 fetch クライアント (`api.get`, `api.post`, `api.put`, `api.del`)。
+  - `jhtml.form(container)` / `jhtml.form.fill(container, data)`: フォーム入力値のオブジェクト一括取得および一括流し込み。
+  - `jhtml.show` / `jhtml.hide` / `jhtml.toggle` / `jhtml.addClass` / `jhtml.removeClass`: 表示制御およびクラス操作糖衣構文。
+  - `jhtml.state(init, onChange)`: プロパティ更新で画面が連動する極小リアクティブ状態オブジェクト。
+  - `jhtml.format`: バイト数表記 (`format.bytes`)、金額 (`format.money`)、日付 (`format.date`)、省略 (`format.truncate`)。
+  - `jhtml.poll(fn, opts)`: プログレス監視・完了判定付き定期ポーリング。
+  - `jhtml.toast` / `jhtml.alert`: トースト通知およびアラート要素への自動消去メッセージ注入。
+  - `jhtml.storage`: JSON 自動シリアライズ対応 localStorage / sessionStorage ラッパー。
+  - `jhtml.modal`: モーダルダイアログ制御（開閉、ESCキー・背景クリック自動クローズ連動）。
+  - `jhtml.query`: URL クエリパラメータ操作（`get`, `all`, `set`, `remove`, 履歴連動）。
+
+---
+
+# ローカル実行・デプロイ手順
+
+`${MAACHANG_HOME}/bin` に PATH が通っているため、以下のコマンドがそのまま実行できます。
+
+- `maachang`: カレントプロジェクトでローカル開発サーバー起動（デフォルト `http://localhost:3000/`）。
+  - `-p <port>`: ポート番号指定（例: `maachang -p 8080`）
+  - `-h <host>`: バインドホスト指定
+  - `--prod`: 本番モード起動
+- `mcbuild`: 本番デプロイ用にプロジェクト内の JHTML テンプレートを一括で `.jhtml.js` に事前コンパイル。
+- `bun test`: 単体・結合テストの実行。
+
+---
+
+# エラーハンドリング & 運用・終了仕様
+
+- **開発時リッチエラー表示 (`isDev: true`)**:
+  - ブラウザアクセス時はエラー発生行および前後コードをハイライトしたダークテーマ HTML 画面を表示。
+  - API アクセス時は `file`, `line`, `column`, `stack` を含む詳細 JSON を返却。
+- **本番時エラー隠蔽 (`--prod` / `isDev: false`)**:
+  - 内部ファイルパスやコード行を完全に隠蔽した汎用 500 レスポンスを返却。
+- **エラーログ保全**:
+  - 開発・本番問わず必ず `./log/logout.YYYY-MM-DD.log` および標準出力にスタックトレースを記録。
+- **Graceful Shutdown**:
+  - `SIGINT` (Ctrl+C) および `SIGTERM` (systemd / Docker) 受信時に、処理中リクエストの完了を待機し、すべての SQLite 接続を安全にクローズしてから正常終了。
+
+---
+
+# ディレクトリ構成
+
+| ディレクトリ・ファイル | 役割 |
+|---|---|
+| `public/` | Web コンテンツ・動的スクリプト (`*.mt.js` / `*.mt.html` / `*.jhtml`) の配置先 |
+| `public/filter.mt.js` | 共通リクエストフィルター（認証・認可・共通前処理） |
+| `lib/` | プロジェクト固有の `$loadLib()` モジュールの配置先 |
+| `conf/` | 設定 JSON (`server.json`, `session.json`, `env.json`, `log.json` 等) の配置先。<br>`*.local.json` はローカル実行時優先（本番設定の上書き用・Git管理外）。 |
+| `data/` | SQLite3 DB ファイル (`session.db` 等) の配置先 |
+| `schema/` | テーブルスキーマ定義（DDL、SQL、テーブル仕様書）の保存・出力先 |
+| `validates/` | バリデーション定義ファイル（入力検証スキーマ）の保存・配置先 |
+| `log/` | 日別ローテーションログファイルの出力先 |
+| `package.json` | プロジェクト設定・npm scripts (`start`, `build`) |
+| `.claude/CLAUDE.md` | 本ファイル |
+
+# あえてやってないこと
+
+（プロジェクト固有の、あえてやってない事があればこの内容を削除して記載する）
+
+# 未対応・残課題(随時更新)
+
+（プロジェクト固有の、未対応・課題があればこの内容を削除して記載する）
