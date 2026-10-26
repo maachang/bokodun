@@ -25,8 +25,9 @@ export class GameEngine {
             z: 0,
             angle: 0,
             pitch: 0,
-            speed: 6.0,
-            rotSpeed: 2.2,
+            speed: 8.5,
+            runSpeed: 13.0,
+            rotSpeed: 2.8,
             radius: 0.6,
             maxHp: 100,
             hp: 100,
@@ -49,7 +50,8 @@ export class GameEngine {
             left: false,
             right: false,
             turnLeft: false,
-            turnRight: false
+            turnRight: false,
+            sprint: false
         };
 
         this.isPointerLocked = false;
@@ -159,6 +161,7 @@ export class GameEngine {
             slime: RetroTextureGenerator.createSlimeTexture(),
             skeleton: RetroTextureGenerator.createSkeletonTexture(),
             goblin: RetroTextureGenerator.createGoblinTexture(),
+            goblinArcher: RetroTextureGenerator.createGoblinArcherTexture(),
             tree: RetroTextureGenerator.createTreeTexture(),
             forestCanopy: forestCanopyTex,
             denseForest: denseForestTex
@@ -198,6 +201,10 @@ export class GameEngine {
                     this.castFireball();
                     e.preventDefault();
                     break;
+                case 'ShiftLeft':
+                case 'ShiftRight':
+                    this.keys.sprint = true;
+                    break;
             }
         });
 
@@ -223,6 +230,10 @@ export class GameEngine {
                 case 'KeyE':
                     this.keys.turnRight = false;
                     break;
+                case 'ShiftLeft':
+                case 'ShiftRight':
+                    this.keys.sprint = false;
+                    break;
             }
         });
 
@@ -242,7 +253,7 @@ export class GameEngine {
 
         document.addEventListener('mousemove', (e) => {
             if (!this.isPointerLocked) return;
-            const sens = 0.0024;
+            const sens = 0.0026;
             this.player.angle -= e.movementX * sens;
             this.player.pitch -= e.movementY * sens;
             this.player.pitch = Math.max(-0.6, Math.min(0.6, this.player.pitch));
@@ -505,10 +516,34 @@ export class GameEngine {
                         const treeMat = new THREE.SpriteMaterial({ map: this.textures.tree });
                         const tree = new THREE.Sprite(treeMat);
                         tree.center.set(0.5, 0.0);
-                        const scaleVar = 4.0 + ((r * 5 + c * 3) % 4) * 0.4;
-                        tree.scale.set(scaleVar * (440 / 400), scaleVar, 1);
-                        tree.position.set(wx, 0.0, wz);
+                        const scaleVar = 4.8 + ((r * 5 + c * 3) % 4) * 0.5;
+                        tree.scale.set(scaleVar * (899 / 893), scaleVar, 1);
+                        // Sink tree base slightly into grass (-0.08) so trunk roots naturally penetrate the terrain
+                        tree.position.set(wx, -0.08, wz);
                         this.scene.add(tree);
+
+                        // Ground contact shadow under the tree trunk
+                        const shadowCanvas = document.createElement('canvas');
+                        shadowCanvas.width = 32;
+                        shadowCanvas.height = 32;
+                        const sCtx = shadowCanvas.getContext('2d');
+                        const grad = sCtx.createRadialGradient(16, 16, 2, 16, 16, 16);
+                        grad.addColorStop(0, 'rgba(10, 25, 10, 0.65)');
+                        grad.addColorStop(0.5, 'rgba(15, 30, 15, 0.35)');
+                        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                        sCtx.fillStyle = grad;
+                        sCtx.fillRect(0, 0, 32, 32);
+
+                        const shadowTex = new THREE.CanvasTexture(shadowCanvas);
+                        const shadowMat = new THREE.MeshBasicMaterial({
+                            map: shadowTex,
+                            transparent: true,
+                            depthWrite: false
+                        });
+                        const shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), shadowMat);
+                        shadowMesh.rotation.x = -Math.PI / 2;
+                        shadowMesh.position.set(wx, 0.012, wz);
+                        this.scene.add(shadowMesh);
                         if (objDef.solid) {
                             this.colliders.push({
                                 minX: wx - 0.6, maxX: wx + 0.6,
@@ -717,10 +752,14 @@ export class GameEngine {
 
                         // 3. Translucent animated liquid surface below ground level
                         const liquidTex = this.textures[objDef.texture] || (isShallow ? this.textures.shallowWater : this.textures.water);
+                        const isLava = (objDef.texture === 'lava');
+                        const isPoison = (objDef.texture === 'poisonSwamp');
                         const waterMat = new THREE.MeshLambertMaterial({
                             map: liquidTex,
                             transparent: true,
-                            opacity: isShallow ? 0.72 : (objDef.texture === 'lava' ? 0.98 : 0.92)
+                            opacity: isShallow ? 0.72 : (isLava ? 1.0 : 0.92),
+                            emissive: isLava ? 0xff2200 : (isPoison ? 0x220533 : 0x000000),
+                            emissiveIntensity: isLava ? 0.85 : 0.3
                         });
                         const waterGeo = new THREE.PlaneGeometry(tileSize, tileSize);
                         const waterMesh = new THREE.Mesh(waterGeo, waterMat);
@@ -728,6 +767,13 @@ export class GameEngine {
                         waterMesh.position.set(wx, waterSurfaceY, wz);
                         this.scene.add(waterMesh);
                         this.waterMeshes.push(waterMesh);
+
+                        // If lava, add a warm point light so it realistically illuminates dark caves & floors
+                        if (isLava) {
+                            const lavaLight = new THREE.PointLight(0xff4500, 1.4, tileSize * 2.8);
+                            lavaLight.position.set(wx, 0.5, wz);
+                            this.scene.add(lavaLight);
+                        }
 
                         if (objDef.solid) {
                             this.colliders.push({
@@ -896,7 +942,8 @@ export class GameEngine {
             // Rotate move direction by player's view angle
             const sin = Math.sin(this.player.angle);
             const cos = Math.cos(this.player.angle);
-            const moveSpeed = this.player.speed * speedMod;
+            const baseSpeed = this.keys.sprint ? this.player.runSpeed : this.player.speed;
+            const moveSpeed = baseSpeed * speedMod;
             worldMoveX = (moveDir.x * cos + moveDir.z * sin) * moveSpeed * dt;
             worldMoveZ = (-moveDir.x * sin + moveDir.z * cos) * moveSpeed * dt;
 
@@ -1011,12 +1058,17 @@ export class GameEngine {
                     }
                 }
             } else {
-                // Check enemy magic hit player
+                // Check enemy projectile (arrow or magic) hit player
                 const distP = Math.hypot(this.player.x - p.x, this.player.z - p.z);
                 if (distP < this.player.radius + p.radius) {
                     this.playerTakeDamage(p.damage, new THREE.Vector3(p.dirX, 0, p.dirZ));
-                    this.sound.playExplosion();
-                    this.particles.spawnBurst(p.x, p.y, p.z, 0xd946ef, 14, 4.0);
+                    if (p.type === 'arrow') {
+                        this.sound.playArrowHit();
+                        this.particles.spawnBurst(p.x, p.y, p.z, 0xd4d4d8, 8, 2.5);
+                    } else {
+                        this.sound.playExplosion();
+                        this.particles.spawnBurst(p.x, p.y, p.z, 0xd946ef, 14, 4.0);
+                    }
                     p.active = false;
                 }
             }

@@ -17,8 +17,11 @@ export class Monster {
             this.attackPower = enemyDef.attackPower || 10;
             this.exp = enemyDef.exp || 20;
             this.canShoot = !!enemyDef.canShoot;
+            this.shootType = enemyDef.shootType || 'magic';
             this.shootCooldown = enemyDef.shootCooldown || 99999;
             this.shootTimer = this.canShoot ? Math.random() * 2 : 0;
+            this.shootRange = enemyDef.shootRange || 15;
+            this.maxArrowDistance = enemyDef.maxArrowDistance || 13;
             
             const texKey = enemyDef.texture || 'slime';
             this.spriteMat = new THREE.SpriteMaterial({ map: textures[texKey] || textures.slime, transparent: true });
@@ -51,15 +54,18 @@ export class Monster {
                 this.scale = [2.4, 2.5, 1];
                 this.y = 1.25;
             } else {
-                this.name = 'ゴブリン魔導士';
-                this.maxHp = 50;
-                this.hp = 50;
-                this.speed = 1.0;
-                this.attackPower = 12;
+                this.name = 'ゴブリンアーチャー';
+                this.maxHp = 45;
+                this.hp = 45;
+                this.speed = 1.1;
+                this.attackPower = 10;
                 this.exp = 35;
-                this.shootCooldown = 2.5;
+                this.shootCooldown = 2.2;
                 this.shootTimer = Math.random() * 2;
                 this.canShoot = true;
+                this.shootType = 'arrow';
+                this.shootRange = 14;
+                this.maxArrowDistance = 13;
                 this.spriteMat = new THREE.SpriteMaterial({ map: textures.goblin, transparent: true });
                 this.scale = [2.3, 2.6, 1];
                 this.y = 1.3;
@@ -113,17 +119,34 @@ export class Monster {
             }
         }
 
-        // Projectile shooting logic for Goblins
-        if (this.canShoot && dist < 16) {
+        // Projectile shooting logic for Archer / Mage
+        const effectiveShootRange = this.shootRange || 15;
+        if (this.canShoot && dist < effectiveShootRange && dist > 1.2) {
             this.shootTimer -= dt;
             if (this.shootTimer <= 0) {
                 this.shootTimer = this.shootCooldown;
                 const dirX = dx / dist;
                 const dirZ = dz / dist;
-                const proj = new Projectile(this.x, this.z, dirX, dirZ, false, 8, 8);
+
+                const isArrow = (this.shootType === 'arrow');
+                const projSpeed = isArrow ? 12 : 8; // Arrows fly fast
+                const projDmg = isArrow ? 10 : 8;
+                const maxDist = isArrow ? (this.maxArrowDistance || 13) : 0;
+
+                const proj = new Projectile(this.x, this.z, dirX, dirZ, false, projSpeed, projDmg, {
+                    type: this.shootType || 'magic',
+                    maxDistance: maxDist
+                });
                 projectiles.push(proj);
                 if (scene) scene.add(proj.mesh);
-                if (soundFx) soundFx.playShoot(false);
+
+                if (soundFx) {
+                    if (isArrow) {
+                        soundFx.playBowShoot();
+                    } else {
+                        soundFx.playShoot(false);
+                    }
+                }
             }
         }
 
@@ -153,24 +176,60 @@ export class Monster {
 }
 
 export class Projectile {
-    constructor(x, z, dirX, dirZ, isPlayer = false, speed = 9, damage = 10) {
+    constructor(x, z, dirX, dirZ, isPlayer = false, speed = 9, damage = 10, options = {}) {
         this.x = x;
         this.y = 1.3;
         this.z = z;
+        this.startX = x;
+        this.startZ = z;
         this.dirX = dirX;
         this.dirZ = dirZ;
         this.isPlayer = isPlayer;
         this.speed = speed;
         this.damage = damage;
-        this.radius = 0.45;
+        this.type = options.type || (isPlayer ? 'player_fireball' : 'magic');
+        this.maxDistance = options.maxDistance || 0; // 0 means unlimited by distance (timed life)
+        this.radius = (this.type === 'arrow') ? 0.25 : 0.45;
         this.active = true;
-        this.lifeTime = 3.5;
+        this.lifeTime = (this.type === 'arrow') ? 2.0 : 3.5;
         this.trailTimer = 0;
+        this.isDropping = false;
+        this.dropVelocityY = 0;
 
-        // Group containing glowing core and pulsing outer aura
+        // Group containing projectile 3D geometry
         this.mesh = new THREE.Group();
 
-        if (this.isPlayer) {
+        if (this.type === 'arrow') {
+            // Realistic 3D Arrow: Shaft, Metal Tip, and Fletching
+            this.color = 0xd4d4d8;
+            this.trailColor = 0xa1a1aa;
+
+            // Arrow shaft (Cylinder lying horizontally along flight direction)
+            const shaftGeo = new THREE.CylinderGeometry(0.025, 0.025, 0.7, 6);
+            const shaftMat = new THREE.MeshLambertMaterial({ color: 0x8b5a2b });
+            const shaft = new THREE.Mesh(shaftGeo, shaftMat);
+            shaft.rotation.x = Math.PI / 2; // Lie along Z axis
+            this.mesh.add(shaft);
+
+            // Metal arrowhead tip (Cone pointing forward)
+            const tipGeo = new THREE.ConeGeometry(0.06, 0.16, 6);
+            const tipMat = new THREE.MeshLambertMaterial({ color: 0xe4e4e7 });
+            const tip = new THREE.Mesh(tipGeo, tipMat);
+            tip.rotation.x = -Math.PI / 2; // Point forward along -Z
+            tip.position.z = -0.42;
+            this.mesh.add(tip);
+
+            // Fletching feathers at the back
+            const fletchGeo = new THREE.BoxGeometry(0.12, 0.08, 0.14);
+            const fletchMat = new THREE.MeshLambertMaterial({ color: 0xdc2626 }); // Red fletching feathers
+            const fletch = new THREE.Mesh(fletchGeo, fletchMat);
+            fletch.position.z = 0.28;
+            this.mesh.add(fletch);
+
+            // Rotate entire arrow to face heading direction
+            const yaw = Math.atan2(-dirX, -dirZ);
+            this.mesh.rotation.y = yaw;
+        } else if (this.isPlayer) {
             // Player Fireball: Bright Orange Core + Yellow Flame Aura
             this.color = 0xff6600;
             this.trailColor = 0xffaa00;
@@ -210,13 +269,40 @@ export class Projectile {
             return;
         }
 
-        // Movement
+        const traveledDist = Math.hypot(this.x - this.startX, this.z - this.startZ);
+
+        // Arrow ballistic drop / maximum effective range logic
+        if (this.type === 'arrow' && this.maxDistance > 0) {
+            // When reaching 75% of max distance, arrow starts to lose kinetic energy & dip downwards
+            if (traveledDist >= this.maxDistance * 0.75) {
+                this.isDropping = true;
+                this.dropVelocityY += 12 * dt; // Gravity acceleration
+                this.y -= this.dropVelocityY * dt;
+                this.mesh.position.y = this.y;
+
+                // Tilt arrow tip downwards naturally
+                const pitchAngle = Math.min(Math.PI / 3, (this.dropVelocityY / 6));
+                this.mesh.rotation.x = pitchAngle;
+
+                // Hit ground when dropping below Y=0.08
+                if (this.y <= 0.08 || traveledDist >= this.maxDistance) {
+                    this.active = false;
+                    // Spawn small dust / dirt flecks when hitting ground
+                    if (particles) {
+                        particles.spawnBurst(this.x, 0.05, this.z, 0x78716c, 6, 1.5);
+                    }
+                    return;
+                }
+            }
+        }
+
+        // Horizontal Movement
         this.x += this.dirX * this.speed * dt;
         this.z += this.dirZ * this.speed * dt;
         this.mesh.position.x = this.x;
         this.mesh.position.z = this.z;
 
-        // Aura spin
+        // Aura spin for magic/fireball
         if (this.aura) {
             this.aura.rotation.x += dt * 8;
             this.aura.rotation.y += dt * 10;
@@ -224,9 +310,11 @@ export class Projectile {
 
         // Emit particle trail
         this.trailTimer += dt;
-        if (this.trailTimer >= 0.04 && particles) {
+        const trailInterval = (this.type === 'arrow') ? 0.08 : 0.04;
+        if (this.trailTimer >= trailInterval && particles) {
             this.trailTimer = 0;
-            particles.spawnTrail(this.x, this.y, this.z, this.trailColor, 0.09);
+            const trailSize = (this.type === 'arrow') ? 0.04 : 0.09;
+            particles.spawnTrail(this.x, this.y, this.z, this.trailColor, trailSize);
         }
 
         // Check wall collision (skip colliders that do not block projectiles like water/low barriers)
@@ -236,7 +324,9 @@ export class Projectile {
                 this.z >= c.minZ && this.z <= c.maxZ) {
                 this.active = false;
                 if (particles) {
-                    particles.spawnBurst(this.x, this.y, this.z, this.color, 12, 3.5);
+                    const burstCount = (this.type === 'arrow') ? 5 : 12;
+                    const burstSpeed = (this.type === 'arrow') ? 1.5 : 3.5;
+                    particles.spawnBurst(this.x, this.y, this.z, this.color, burstCount, burstSpeed);
                 }
                 break;
             }

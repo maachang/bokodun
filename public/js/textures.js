@@ -229,26 +229,26 @@ export class RetroTextureGenerator {
         canvas.height = 64;
         const ctx = canvas.getContext('2d');
 
-        // Blazing red, dark crust, and searing orange
-        const lavaColors = ['#e63900', '#ff5500', '#ffaa00', '#801500', '#3a0800', '#ffcc00'];
+        // Intense glowing molten lava: deep crimson, vivid magma red, and fiery orange
+        const lavaColors = ['#ff1e00', '#ff3700', '#ff5a00', '#dc2626', '#b91c1c', '#ea580c'];
         for (let x = 0; x < 64; x += 4) {
             for (let y = 0; y < 64; y += 4) {
                 ctx.fillStyle = lavaColors[Math.floor(Math.random() * lavaColors.length)];
                 ctx.fillRect(x, y, 4, 4);
             }
         }
-        // Floating cooled black crusts
-        for (let i = 0; i < 16; i++) {
-            ctx.fillStyle = '#220800';
-            const cx = Math.floor(Math.random() * 56);
-            const cy = Math.floor(Math.random() * 56);
+        // Floating craggy obsidian crust plates
+        for (let i = 0; i < 14; i++) {
+            ctx.fillStyle = '#1c0804';
+            const cx = Math.floor(Math.random() * 54);
+            const cy = Math.floor(Math.random() * 54);
             ctx.fillRect(cx, cy, 6 + Math.floor(Math.random() * 6), 4 + Math.floor(Math.random() * 4));
         }
-        // Glowing veins
-        for (let i = 0; i < 12; i++) {
-            ctx.fillStyle = '#fff4a3';
-            const vx = Math.floor(Math.random() * 62);
-            const vy = Math.floor(Math.random() * 62);
+        // Glowing hot magma cracks & veins (intense searing yellow & white cores)
+        for (let i = 0; i < 20; i++) {
+            ctx.fillStyle = (i % 3 === 0) ? '#ffffff' : '#fef08a';
+            const vx = Math.floor(Math.random() * 60);
+            const vy = Math.floor(Math.random() * 60);
             ctx.fillRect(vx, vy, 2, 2);
         }
 
@@ -761,10 +761,19 @@ export class RetroTextureGenerator {
         return texture;
     }
 
-    // Goblin shooter sprite
+    // Goblin Shaman / Mage sprite
     static createGoblinTexture() {
         const loader = new THREE.TextureLoader();
         const texture = loader.load('/images/enemies/goblin_mage.png?v2=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // Goblin Archer sprite
+    static createGoblinArcherTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/enemies/goblin_archer.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;

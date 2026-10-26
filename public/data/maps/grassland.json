@@ -37,6 +37,7 @@
   "enemies": {
     "S": "slime",
     "G": "goblin",
+    "A": "goblin_archer",
     "K": "skeleton"
   },
   "layout": [
@@ -49,7 +50,7 @@
     "F0S0000C00000S0F",
     "F00T000C0G000T0F",
     "F000000C0000000F",
-    "F0000T0M0000T00F",
+    "F0A00T0M0000T0AF",
     "F0S0000000000S0F",
     "F00000000000000F",
     "F00T00000000T00F",

@@ -135,6 +135,64 @@ export class SoundFX {
         osc.stop(now + 0.22);
     }
 
+    playBowShoot() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        // 1. Bowstring release twang: high triangle snap quickly descending
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.exponentialRampToValueAtTime(110, now + 0.12);
+        gain.gain.setValueAtTime(0.25, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.12);
+
+        // 2. High-speed arrow whoosh
+        const bufferSize = this.ctx.sampleRate * 0.14;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * (1 - i / bufferSize);
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(1600, now);
+        filter.frequency.exponentialRampToValueAtTime(600, now + 0.14);
+        filter.Q.value = 3.0;
+
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.2, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(this.ctx.destination);
+        noise.start(now);
+    }
+
+    playArrowHit() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        // Solid wooden thud / impact sound
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.exponentialRampToValueAtTime(60, now + 0.09);
+        gain.gain.setValueAtTime(0.3, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.09);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.09);
+    }
+
     playExplosion() {
         if (!this.ctx) return;
         const now = this.ctx.currentTime;

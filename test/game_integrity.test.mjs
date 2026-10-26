@@ -71,7 +71,8 @@ test('1. JSON Schema & Integrity Validation', async (t) => {
             'public/images/objects/mossy_cave_rock.jpg',
             'public/images/enemies/slime_char.png',
             'public/images/enemies/skeleton_char.png',
-            'public/images/enemies/goblin_mage.png'
+            'public/images/enemies/goblin_mage.png',
+            'public/images/enemies/goblin_archer.png'
         ];
 
         for (const img of imageFiles) {
