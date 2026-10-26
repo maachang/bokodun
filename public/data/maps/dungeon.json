@@ -29,7 +29,9 @@
     "^": "spike_trap",
     "E": "electric_barrier",
     "M": "magic_circle",
-    "P": "poison_swamp"
+    "P": "poison_swamp",
+    "X": "pop_chomper",
+    "V": "pop_hidden_spikes"
   },
   "enemies": {
     "S": "slime",
@@ -51,7 +53,7 @@
     "1010000110000101",
     "1010G001100G0101",
     "1011111111111101",
-    "1000000000000201",
+    "10000X0VV0000201",
     "1111111111111111"
   ]
 }

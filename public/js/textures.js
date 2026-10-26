@@ -1270,6 +1270,101 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 21. Prince of Persia Steel Chomper Blade Texture
+    static createChomperBladeTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Transparent background
+        ctx.clearRect(0, 0, 64, 64);
+
+        // Razor-sharp crescent steel blade (PoP iconic guillotine teeth)
+        ctx.fillStyle = '#64748b'; // Dark steel base
+        ctx.beginPath();
+        ctx.moveTo(4, 32);
+        ctx.lineTo(60, 4);
+        ctx.lineTo(54, 32);
+        ctx.lineTo(60, 60);
+        ctx.closePath();
+        ctx.fill();
+
+        // Gleaming razor silver edge
+        ctx.fillStyle = '#f8fafc';
+        ctx.beginPath();
+        ctx.moveTo(4, 32);
+        ctx.lineTo(60, 6);
+        ctx.lineTo(56, 12);
+        ctx.lineTo(16, 32);
+        ctx.lineTo(56, 52);
+        ctx.lineTo(60, 58);
+        ctx.closePath();
+        ctx.fill();
+
+        // Blood stains on blade edge (PoP gruesome touch)
+        ctx.fillStyle = '#991b1b';
+        ctx.fillRect(8, 30, 8, 4);
+        ctx.fillRect(18, 22, 6, 3);
+        ctx.fillRect(18, 39, 6, 3);
+        ctx.fillStyle = '#dc2626';
+        ctx.fillRect(10, 31, 4, 2);
+
+        // Heavy iron reinforcement spine
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(52, 6, 8, 52);
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(56, 8, 3, 48);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // 22. PoP Floor Spike Pit Hole Plate Texture
+    static createPoPSpikePlateTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Weathered dungeon flagstone
+        ctx.fillStyle = '#3a3532';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Deep black square holes where long steel spikes shoot out
+        const holes = [
+            [12, 12], [32, 12], [52, 12],
+            [22, 32], [42, 32],
+            [12, 52], [32, 52], [52, 52]
+        ];
+
+        holes.forEach(([hx, hy]) => {
+            // Recessed hole cavity
+            ctx.fillStyle = '#0a0908';
+            ctx.fillRect(hx - 5, hy - 5, 10, 10);
+            ctx.strokeStyle = '#1f1b18';
+            ctx.strokeRect(hx - 5, hy - 5, 10, 10);
+
+            // Glimmer of retracted spike tip resting deep inside
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(hx - 1, hy - 1, 2, 2);
+        });
+
+        // Dried blood marks on stone surface
+        ctx.fillStyle = 'rgba(127, 29, 29, 0.6)';
+        ctx.fillRect(18, 24, 7, 5);
+        ctx.fillRect(38, 44, 9, 4);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
     // Slime sprite: loads real character artwork from sdServer
     static createSlimeTexture() {
         const loader = new THREE.TextureLoader();

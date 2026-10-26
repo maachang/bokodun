@@ -246,5 +246,21 @@
     "radius": 0.5,
     "message": "← 商業区 (道具屋・宿屋) / 中央噴水広場 / 城門 →",
     "description": "街の案内標識"
+  },
+  "pop_chomper": {
+    "type": "chomper",
+    "texture": "chomperBlade",
+    "solid": false,
+    "damage": 50,
+    "cycleDuration": 2.2,
+    "description": "プリンス・オブ・ペルシャ風 チョッパー（挟み込みギロチン刃・タイミングを見極めて通り抜ける）"
+  },
+  "pop_hidden_spikes": {
+    "type": "pop_spikes",
+    "texture": "popSpikePlate",
+    "solid": false,
+    "damage": 35,
+    "cycleDuration": 2.4,
+    "description": "プリンス・オブ・ペルシャ風 飛び出す鉄串罠（周期を見極めて引っ込んだ瞬間に駆け抜ける）"
   }
 }

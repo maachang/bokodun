@@ -67,6 +67,8 @@ export class GameEngine {
         this.waterMeshes = [];
         this.heatHazePlanes = [];
         this.fountains = [];
+        this.chompers = [];
+        this.popSpikes = [];
         this.terrainGrid = [];
         this.doors = [];
         this.signposts = [];
@@ -181,7 +183,9 @@ export class GameEngine {
             innWall: RetroTextureGenerator.createInnWallTexture(),
             cityRoof: RetroTextureGenerator.createCityRoofTexture(),
             pavedRoad: RetroTextureGenerator.createPavedRoadTexture(),
-            fountainWater: RetroTextureGenerator.createFountainWaterTexture()
+            fountainWater: RetroTextureGenerator.createFountainWaterTexture(),
+            chomperBlade: RetroTextureGenerator.createChomperBladeTexture(),
+            popSpikePlate: RetroTextureGenerator.createPoPSpikePlateTexture()
         };
     }
 
@@ -311,6 +315,8 @@ export class GameEngine {
         this.waterMeshes = [];
         this.heatHazePlanes = [];
         this.fountains = [];
+        this.chompers = [];
+        this.popSpikes = [];
         this.terrainGrid = [];
         this.doors = [];
         this.signposts = [];
@@ -775,6 +781,135 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'chomper': {
+                        // Prince of Persia Chomper / Steel Guillotine Clamp Trap
+                        // Detect corridor orientation:
+                        // East-West corridor has walls at North (r-1) and South (r+1) -> Blades emerge from North & South walls (Z-movement)
+                        // North-South corridor has walls at West (c-1) and East (c+1) -> Blades emerge from West & East walls (X-movement)
+                        const isWallLeft = (c > 0 && mapData.layout[r][c - 1] === '1');
+                        const isWallRight = (c < cols - 1 && mapData.layout[r][c + 1] === '1');
+                        const isWallTop = (r > 0 && mapData.layout[r - 1][c] === '1');
+                        const isWallBottom = (r < rows - 1 && mapData.layout[r + 1][c] === '1');
+
+                        // In a hallway running East-West (between top & bottom walls), passage is horizontal -> blades come from North/South walls
+                        const isEastWestPassage = (isWallTop || isWallBottom) && !(isWallLeft && isWallRight);
+
+                        const chomperGroup = new THREE.Group();
+                        const bladeMat = new THREE.MeshLambertMaterial({
+                            map: this.textures.chomperBlade,
+                            transparent: true,
+                            alphaTest: 0.1,
+                            side: THREE.DoubleSide
+                        });
+
+                        const bladeW = tileSize * 0.52;
+                        const bladeH = 2.4;
+                        const bladeGeo = new THREE.PlaneGeometry(bladeW, bladeH);
+
+                        const leftBlade = new THREE.Mesh(bladeGeo, bladeMat);
+                        const rightBlade = new THREE.Mesh(bladeGeo, bladeMat);
+
+                        const chomperCycle = objDef.cycleDuration || 2.2;
+                        const chomperOffset = (objDef.timeOffset !== undefined) ? objDef.timeOffset : ((r * 7 + c * 3) % chomperCycle);
+
+                        const chomperObj = {
+                            group: chomperGroup,
+                            leftBlade: leftBlade,
+                            rightBlade: rightBlade,
+                            isEastWestPassage: isEastWestPassage,
+                            x: wx,
+                            z: wz,
+                            timer: chomperOffset, // Staggered or custom offset
+                            cycleDuration: chomperCycle, // Period between chomp snaps
+                            damage: objDef.damage || 45,
+                            isCurrentlyDangerous: false,
+                            bladeWidth: bladeW
+                        };
+
+                        if (isEastWestPassage) {
+                            // Player walks along X (East-West corridor).
+                            // The two guillotine blades lie in the X=0 plane across the hallway (width along Z).
+                            // Left blade slides from North wall (z = -half) towards center (z = 0) with cutting edge pointing South (+Z).
+                            // Right blade slides from South wall (z = +half) towards center (z = 0) with cutting edge pointing North (-Z).
+                            // A PlaneGeometry in local space is in XY plane. Rotating around Y by 90deg (PI/2) puts its face along X, spanning Z!
+                            leftBlade.rotation.y = Math.PI / 2;
+                            // Right blade flipped around Y so its cutting edge faces the opposite way (-Z)
+                            rightBlade.rotation.y = -Math.PI / 2;
+                        } else {
+                            // Player walks along Z (North-South corridor).
+                            // The two guillotine blades lie in the Z=0 plane across the hallway (width along X).
+                            // Left blade slides from West wall (x = -half) towards center (x = 0) with cutting edge pointing East (+X).
+                            // Right blade slides from East wall (x = +half) towards center (x = 0) with cutting edge pointing West (-X).
+                            leftBlade.rotation.y = 0; // Flat along X
+                            rightBlade.rotation.y = Math.PI; // Flipped along X
+                        }
+
+                        chomperGroup.add(leftBlade);
+                        chomperGroup.add(rightBlade);
+                        chomperGroup.position.set(wx, 0, wz);
+                        this.scene.add(chomperGroup);
+
+                        this.chompers.push(chomperObj);
+                        break;
+                    }
+
+                    case 'pop_spikes': {
+                        // Prince of Persia hidden spikes that thrust out violently when stepped on (especially when running)
+                        const plateMat = new THREE.MeshLambertMaterial({ map: this.textures.popSpikePlate });
+                        const plateMesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), plateMat);
+                        plateMesh.rotation.x = -Math.PI / 2;
+                        plateMesh.position.set(wx, 0.015, wz);
+                        this.scene.add(plateMesh);
+
+                        // Group holding 8 sharp 3D metal spikes (conical spikes that thrust up out of floor holes)
+                        const spikesGroup = new THREE.Group();
+                        const spikeH = 1.8;
+                        const spikeGeo = new THREE.ConeGeometry(0.09, spikeH, 6);
+                        const spikeMat = new THREE.MeshLambertMaterial({ color: 0xd4d4d8 });
+
+                        const holeOffsets = [
+                            [-1.1, -1.1], [0, -1.1], [1.1, -1.1],
+                            [-0.55, 0], [0.55, 0],
+                            [-1.1, 1.1], [0, 1.1], [1.1, 1.1]
+                        ];
+
+                        holeOffsets.forEach(([ox, oz]) => {
+                            const spike = new THREE.Mesh(spikeGeo, spikeMat);
+                            // Set spike cone center so base is at y = 0 inside the group
+                            spike.position.set(ox, spikeH / 2, oz);
+                            spikesGroup.add(spike);
+                        });
+
+                        // Initially hidden retracted below floor
+                        const retractedY = -spikeH;
+                        spikesGroup.position.set(wx, retractedY, wz);
+                        this.scene.add(spikesGroup);
+
+                        const spikeCycle = objDef.cycleDuration || 2.4;
+                        const spikeOffset = (objDef.timeOffset !== undefined) ? objDef.timeOffset : ((r * 5 + c * 3) % spikeCycle);
+
+                        const popSpikeObj = {
+                            mesh: spikesGroup,
+                            x: wx,
+                            z: wz,
+                            isThrust: false,
+                            retractedY: retractedY,
+                            thrustY: 0.0, // Base at 0.0 -> spike tips reach y = +1.8 above floor!
+                            targetY: retractedY,
+                            currentY: retractedY,
+                            damage: objDef.damage || 35,
+                            timer: spikeOffset, // Periodic cycle with staggered or custom offset
+                            cycleDuration: spikeCycle, // Period between spike thrust cycles
+                            thrustSoundPlayed: false,
+                            bounds: {
+                                minX: wx - tileSize / 2, maxX: wx + tileSize / 2,
+                                minZ: wz - tileSize / 2, maxZ: wz + tileSize / 2
+                            }
+                        };
+                        this.popSpikes.push(popSpikeObj);
+                        break;
+                    }
+
                     case 'floor_tile': {
                         // Ground-level custom floor tile
                         const tileMat = new THREE.MeshLambertMaterial({
@@ -1142,6 +1277,144 @@ export class GameEngine {
 
                 // Smooth slide animation (raising up into the ceiling)
                 d.mesh.position.y += (d.targetY - d.mesh.position.y) * 8 * dt;
+            }
+        }
+
+        // Update Prince of Persia Chompers (Steel Guillotine Clamp Traps)
+        if (this.chompers && this.chompers.length > 0) {
+            for (const c of this.chompers) {
+                c.timer += dt;
+                const cycleTime = c.timer % c.cycleDuration;
+
+                // Cycle logic:
+                // 0.0 ~ 1.5s: Open (Stay pulled back inside walls)
+                // 1.5 ~ 1.65s: Snap shut violently! (Fast clamp)
+                // 1.65 ~ 1.95s: Stay tightly closed (Chomp!)
+                // 1.95 ~ 2.2s: Slowly retract back into walls
+                let progress = 0; // 0 = fully open, 1 = fully closed (meeting at center)
+                let snappingThisFrame = false;
+
+                if (cycleTime < 1.5) {
+                    progress = 0;
+                    c.isCurrentlyDangerous = false;
+                } else if (cycleTime < 1.65) {
+                    // Lightning fast snap shut
+                    const snapProgress = (cycleTime - 1.5) / 0.15;
+                    progress = Math.min(1.0, snapProgress);
+                    c.isCurrentlyDangerous = true;
+                    if (!c.snappedSoundPlayed) {
+                        c.snappedSoundPlayed = true;
+                        // Play sound if near player with realistic distance attenuation
+                        const distToPlayer = Math.hypot(this.player.x - c.x, this.player.z - c.z);
+                        const maxAudibleDist = 7.0; // Localized sound: inaudible from distant rooms
+                        if (distToPlayer < maxAudibleDist) {
+                            const falloff = 1.0 - (distToPlayer / maxAudibleDist);
+                            const vol = falloff * falloff; // Quadratic attenuation for natural proximity feeling
+                            this.sound.playChomperSnap(vol);
+                        }
+                    }
+                } else if (cycleTime < 1.95) {
+                    progress = 1.0;
+                    c.isCurrentlyDangerous = true;
+                } else {
+                    // Retract slowly
+                    const retractProgress = (cycleTime - 1.95) / 0.25;
+                    progress = Math.max(0, 1.0 - retractProgress);
+                    c.isCurrentlyDangerous = false;
+                    c.snappedSoundPlayed = false;
+                }
+
+                // Position the left and right blades
+                const maxSpread = 1.85; // Fully retracted
+                const closedSpread = 0.0; // Met at center
+                const currentOffset = maxSpread * (1.0 - progress) + closedSpread * progress;
+
+                if (c.isEastWestPassage) {
+                    c.leftBlade.position.z = -currentOffset;
+                    c.rightBlade.position.z = currentOffset;
+                } else {
+                    c.leftBlade.position.x = -currentOffset;
+                    c.rightBlade.position.x = currentOffset;
+                }
+
+                // Check collision with player if dangerous
+                if (c.isCurrentlyDangerous) {
+                    const distToPlayer = Math.hypot(this.player.x - c.x, this.player.z - c.z);
+                    if (distToPlayer < 1.35 && !this.player.isInvincible) {
+                        // CHOP! Sliced by chomper!
+                        this.sound.playChomperSlice();
+                        this.flashDamageScreen();
+                        this.particles.spawnBurst(this.player.x, 1.2, this.player.z, 0xdc2626, 24, 6.0); // Gruesome blood burst
+                        this.addPopup(`ギロチン切断! -${c.damage}`, '#ef4444');
+                        this.playerTakeDamage(c.damage, new THREE.Vector3(0, 0, 0));
+                    }
+                }
+            }
+        }
+
+        // Update Prince of Persia Floor Spikes (Periodic rhythm: thrusts up and retracts like guillotines)
+        if (this.popSpikes && this.popSpikes.length > 0) {
+            for (const sp of this.popSpikes) {
+                sp.timer = (sp.timer + dt) % sp.cycleDuration;
+                const cycleTime = sp.timer;
+
+                // Spike cycle timeline:
+                // 0.0s ~ 1.3s: Hidden beneath floor (safe traversal window)
+                // 1.3s ~ 1.45s: Rapid, violent upward thrust
+                // 1.45s ~ 1.95s: Fully extended sharp iron needles (dangerous)
+                // 1.95s ~ 2.4s: Retracting steadily back into floor
+                let progress = 0; // 0 = retracted, 1 = fully thrust
+                if (cycleTime < 1.3) {
+                    progress = 0;
+                    sp.isCurrentlyDangerous = false;
+                    sp.thrustSoundPlayed = false;
+                    sp.targetY = sp.retractedY;
+                } else if (cycleTime < 1.45) {
+                    const snapProgress = (cycleTime - 1.3) / 0.15;
+                    progress = Math.min(1.0, snapProgress);
+                    sp.targetY = sp.retractedY + (sp.thrustY - sp.retractedY) * progress;
+                    sp.isCurrentlyDangerous = true;
+
+                    if (!sp.thrustSoundPlayed) {
+                        sp.thrustSoundPlayed = true;
+                        // Proximity-based sound
+                        const distToPlayer = Math.hypot(this.player.x - sp.x, this.player.z - sp.z);
+                        const maxAudibleDist = 7.0;
+                        if (distToPlayer < maxAudibleDist) {
+                            const falloff = 1.0 - (distToPlayer / maxAudibleDist);
+                            this.sound.playSpikeThrust(falloff * falloff);
+                        }
+                    }
+                } else if (cycleTime < 1.95) {
+                    progress = 1.0;
+                    sp.targetY = sp.thrustY;
+                    sp.isCurrentlyDangerous = true;
+                } else {
+                    const retractProgress = (cycleTime - 1.95) / 0.45;
+                    progress = Math.max(0, 1.0 - retractProgress);
+                    sp.targetY = sp.retractedY + (sp.thrustY - sp.retractedY) * progress;
+                    sp.isCurrentlyDangerous = false;
+                }
+
+                // Check collision if player is standing on spikes while dangerous
+                if (sp.isCurrentlyDangerous) {
+                    const b = sp.bounds;
+                    const r = this.player.radius || 0.6;
+                    const inTrapZone = (this.player.x >= b.minX - r * 0.3 && this.player.x <= b.maxX + r * 0.3 &&
+                                       this.player.z >= b.minZ - r * 0.3 && this.player.z <= b.maxZ + r * 0.3);
+
+                    if (inTrapZone && !this.player.isInvincible) {
+                        this.sound.playHurt();
+                        this.flashDamageScreen();
+                        this.particles.spawnBurst(this.player.x, 0.4, this.player.z, 0xdc2626, 16, 4.0);
+                        this.addPopup(`針床串刺し! -${sp.damage}`, '#ef4444');
+                        this.playerTakeDamage(sp.damage, new THREE.Vector3(0, 0, 0));
+                    }
+                }
+
+                // Smooth spike vertical movement
+                sp.currentY += (sp.targetY - sp.currentY) * 20 * dt;
+                sp.mesh.position.y = sp.currentY;
             }
         }
 

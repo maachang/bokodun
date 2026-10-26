@@ -240,6 +240,100 @@ export class SoundFX {
     }
 
     /**
+     * プリンス・オブ・ペルシャ風 チョッパー（ギロチン挟み刃）の開閉・切断音
+     * @param {number} volume 音量倍率 (0.0 ~ 1.0)
+     */
+    playChomperSnap(volume = 1.0) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const v = Math.max(0, Math.min(1.0, volume));
+        if (v <= 0.001) return;
+
+        // Heavy metallic razor snap impact (sharp high metal clash + deep mechanical clank)
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(480, now);
+        osc.frequency.exponentialRampToValueAtTime(60, now + 0.12);
+
+        gain.gain.setValueAtTime(0.4 * v, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.12);
+
+        // Metal blade screech noise
+        const bufferSize = this.ctx.sampleRate * 0.14;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(2200, now);
+
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.35 * v, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(this.ctx.destination);
+        noise.start(now);
+    }
+
+    /**
+     * チョッパーで真っ二つに切断された時の血飛沫＆骨断ち音
+     */
+    playChomperSlice() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+
+        // Low heavy gut crunch + high blade slice
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(260, now);
+        osc.frequency.exponentialRampToValueAtTime(40, now + 0.22);
+        gain.gain.setValueAtTime(0.55, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.22);
+
+        this.playChomperSnap();
+    }
+
+    /**
+     * 飛び出す鉄串スパイクのズシャッ！音
+     * @param {number} volume 音量倍率 (0.0 ~ 1.0)
+     */
+    playSpikeThrust(volume = 1.0) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const v = Math.max(0, Math.min(1.0, volume));
+        if (v <= 0.001) return;
+
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(650, now);
+        osc.frequency.exponentialRampToValueAtTime(120, now + 0.15);
+        gain.gain.setValueAtTime(0.35 * v, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.15);
+    }
+
+    /**
      * 噴水に触れた時・水しぶきのシャバシャバ音 (清涼感のある水音)
      */
     playWaterSplash() {
