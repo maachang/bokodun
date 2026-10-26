@@ -3,3 +3,4 @@ log/
 *.local.json
 .DS_Store
 .claudeWork/
+__pycache__/
