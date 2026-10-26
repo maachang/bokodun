@@ -26,7 +26,7 @@ from PIL import Image, ImageFilter
 from collections import deque
 
 class MagentaChromaKeyer:
-    def __init__(self, tolerance=48.0, defringe_width=2, strict_tolerance=32.0, min_island_area=12, shadow_dist=60.0, grad_tolerance=8.0, grow_tolerance_scale=1.5, pool_min_area=600):
+    def __init__(self, tolerance=48.0, defringe_width=2, strict_tolerance=32.0, min_island_area=12, shadow_dist=60.0, grad_tolerance=8.0, grow_tolerance_scale=1.5, pool_min_area=600, edge_tolerance=30.0, row_tolerance=56.0):
         self.tolerance = tolerance
         self.defringe_width = defringe_width
         self.strict_tolerance = strict_tolerance
@@ -35,6 +35,8 @@ class MagentaChromaKeyer:
         self.grad_tolerance = grad_tolerance
         self.grow_tolerance_scale = grow_tolerance_scale
         self.pool_min_area = pool_min_area
+        self.edge_tolerance = edge_tolerance
+        self.row_tolerance = row_tolerance
 
     def process(self, src_path, dest_path=None, crop_bottom=True):
         if not os.path.exists(src_path):
@@ -100,8 +102,35 @@ class MagentaChromaKeyer:
         # Stage 3: 外周背景 + 内部孤立ループ（触角・羽・脚の間）のマゼンタ透過
         #   判定は「背景色との色距離」と「連結性」のみで行う（紫・ピンク等の体色を巻き込まない）
         # =========================================================================
-        # 背景色らしさ: ペリメーター背景色に近く、かつマゼンタ成分がある
-        bg_like = (~is_char_core) & (M > 18.0) & (min_dist_to_bg <= self.tolerance)
+        # 同じ行の左右端の色から期待される背景色（縦方向グラデーション・床の濃淡に追従）との距離
+        #   画像下部の暗い影の色が、体の暗い影を背景と誤認するのを防ぐ（全周最近傍だけでは区別できない）
+        edge_w = 3
+        left_c = arr[:, :edge_w].mean(axis=1)
+        right_c = arr[:, w - edge_w:].mean(axis=1)
+
+        def _row_ref(col):
+            col_M = np.minimum(col[:, 0] - col[:, 1], col[:, 2] - col[:, 1])
+            valid = col_M > 25.0
+            if not valid.any():
+                return None
+            rows = np.arange(h)
+            ref = np.stack([np.interp(rows, rows[valid], col[valid, c]) for c in range(3)], axis=1)
+            # 行方向の移動平均でキャラ接触・ノイズの影響を緩和
+            k = 9
+            pad = np.pad(ref, ((k // 2, k // 2), (0, 0)), mode='edge')
+            return np.stack([np.convolve(pad[:, c], np.ones(k) / k, mode='valid') for c in range(3)], axis=1)
+
+        l_ref = _row_ref(left_c)
+        r_ref = _row_ref(right_c)
+        if l_ref is not None and r_ref is not None:
+            t = np.linspace(0.0, 1.0, w)[None, :, None]
+            row_ref = l_ref[:, None, :] * (1.0 - t) + r_ref[:, None, :] * t
+            dist_row = np.sqrt(np.sum((arr - row_ref) ** 2, axis=2))
+        else:
+            dist_row = np.zeros((h, w), dtype=np.float32)
+
+        # 背景色らしさ: ペリメーター背景色に近く、同じ行の背景色にも近く、かつマゼンタ成分がある
+        bg_like = (~is_char_core) & (M > 18.0) & (min_dist_to_bg <= self.tolerance) & (dist_row <= self.row_tolerance)
         # 内部孤立ループ用の厳密判定（背景色にほぼ一致するもののみ）
         bg_strict = (~is_char_core) & (M > 28.0) & (min_dist_to_bg <= self.strict_tolerance)
 
@@ -129,13 +158,19 @@ class MagentaChromaKeyer:
             for dy, dx in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
                 ny, nx = cy + dy, cx + dx
                 if 0 <= ny < h and 0 <= nx < w and not is_bg[ny, nx]:
-                    if bg_like[ny, nx]:
+                    if bg_like[ny, nx] and np.linalg.norm(arr[ny, nx] - arr[cy, cx]) <= self.edge_tolerance:
+                        # 背景色に近くても、隣接ピクセルとの色差が大きい（=輪郭）場合は越えない（体の暗い影を巻き込まない）
                         is_bg[ny, nx] = True
                         q.append((ny, nx))
                     elif grow_ok[ny, nx] and np.linalg.norm(arr[ny, nx] - arr[cy, cx]) <= self.grad_tolerance:
                         # 地面の模様・影など背景色から外れた部分は、隣接ピクセルとの色連続性（なだらかさ）で背景側へ拡張
                         is_bg[ny, nx] = True
                         q.append((ny, nx))
+
+        # 輪郭で止まった縁（アンチエイリアス部）の背景色にじみを、既存の背景から2px以内かつ背景色に近いものに限り回収
+        for _ in range(2):
+            near_bg = np.array(Image.fromarray(is_bg.astype(np.uint8) * 255).filter(ImageFilter.MaxFilter(3))) > 0
+            is_bg = is_bg | (near_bg & bg_like)
 
         # 内部孤立ループ（外周から塞がれた脚や触角の間）の背景検出
         # 背景色にほぼ一致する連結成分のうち、一定面積以上のものだけを透過（点状の誤検出を避ける）
@@ -201,6 +236,36 @@ class MagentaChromaKeyer:
                             pool_seen[ny, nx] = True
                             comp.append((ny, nx))
             if touch_bg and len(comp) >= self.pool_min_area:
+                for cy, cx in comp:
+                    is_bg[cy, cx] = True
+
+        # 暗色保護（is_char_core）に入り込む、極めて暗い赤紫の接地影の帯（足元領域・背景に接する横長の塊のみ）
+        #   体の暗部は無彩色寄りでこの色味にならず、かつ縦に厚いため、横長の帯条件で区別する
+        strip_cand = (np.arange(h)[:, None] > h * 0.6) & (~is_bg) & (g < 12.0) & (r - g > 20.0) & (b - g > 15.0) & (lum < 60.0)
+        strip_seen = np.zeros((h, w), dtype=bool)
+        for sy, sx in zip(*np.where(strip_cand)):
+            if strip_seen[sy, sx]:
+                continue
+            comp = [(sy, sx)]
+            strip_seen[sy, sx] = True
+            touch_bg = False
+            qi = 0
+            while qi < len(comp):
+                cy, cx = comp[qi]
+                qi += 1
+                for dy, dx in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+                    ny, nx = cy + dy, cx + dx
+                    if 0 <= ny < h and 0 <= nx < w:
+                        if is_bg[ny, nx]:
+                            touch_bg = True
+                        elif strip_cand[ny, nx] and not strip_seen[ny, nx]:
+                            strip_seen[ny, nx] = True
+                            comp.append((ny, nx))
+            ys_c = [c[0] for c in comp]
+            xs_c = [c[1] for c in comp]
+            bw = max(xs_c) - min(xs_c) + 1
+            bh = max(ys_c) - min(ys_c) + 1
+            if touch_bg and len(comp) >= 200 and bw >= 2.5 * bh:
                 for cy, cx in comp:
                     is_bg[cy, cx] = True
 
