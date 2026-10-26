@@ -59,14 +59,42 @@ export class SDAssetManager {
             const isMagentaBg = (refR > 120 && refB > 100 && refG < refR * 0.85);
 
             if (isMagentaBg) {
-                // For magenta chroma key, remove ALL magenta pixels including internal islands (bone gaps, armpits, between legs)
-                for (let i = 0; i < data.length; i += 4) {
-                    const r = data[i];
-                    const g = data[i + 1];
-                    const b = data[i + 2];
-                    if ((r > 70 && b > 60 && g < r * 0.72 && g < b * 0.75) || (r > 130 && b > 100 && g < 100)) {
-                        data[i + 3] = 0;
-                    }
+                // マゼンタ背景: 背景色(コーナー平均)との色距離で判定し、紫・ピンク等の体色は巻き込まない
+                // 1) 外周からのフラッドフィル（背景色に近い連結領域）
+                // 2) 背景色にほぼ一致する内部孤立ピクセル（骨の隙間・脇・脚の間）も透過
+                const nearBg = (pIdx, tol) => {
+                    const dr = data[pIdx] - refR;
+                    const dg = data[pIdx + 1] - refG;
+                    const db = data[pIdx + 2] - refB;
+                    return (dr * dr + dg * dg + db * db) <= tol * tol;
+                };
+                const visited = new Uint8Array(w * h);
+                const queue = [];
+                for (let x = 0; x < w; x++) {
+                    queue.push(x, 0);
+                    queue.push(x, h - 1);
+                }
+                for (let y = 0; y < h; y++) {
+                    queue.push(0, y);
+                    queue.push(w - 1, y);
+                }
+                let head = 0;
+                while (head < queue.length) {
+                    const qx = queue[head++];
+                    const qy = queue[head++];
+                    const idx = qy * w + qx;
+                    if (visited[idx]) continue;
+                    visited[idx] = 1;
+                    const pIdx = idx * 4;
+                    if (!nearBg(pIdx, 60)) continue;
+                    data[pIdx + 3] = 0;
+                    if (qx > 0 && !visited[idx - 1]) queue.push(qx - 1, qy);
+                    if (qx < w - 1 && !visited[idx + 1]) queue.push(qx + 1, qy);
+                    if (qy > 0 && !visited[idx - w]) queue.push(qx, qy - 1);
+                    if (qy < h - 1 && !visited[idx + w]) queue.push(qx, qy + 1);
+                }
+                for (let i = 0; i < w * h; i++) {
+                    if (data[i * 4 + 3] !== 0 && nearBg(i * 4, 32)) data[i * 4 + 3] = 0;
                 }
                 ctx.putImageData(imgData, 0, 0);
             } else {
