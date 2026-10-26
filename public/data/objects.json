@@ -42,6 +42,25 @@
     "solid": true,
     "description": "木（樹木）"
   },
+  "mossy_boulder": {
+    "type": "boulder",
+    "texture": "boulder",
+    "solid": true,
+    "blocksProjectiles": true,
+    "scale": [2.6, 2.0, 1.0],
+    "radius": 0.85,
+    "description": "苔むした平原の自然岩（弓矢や魔法を防ぐ遮蔽物）"
+  },
+  "wooden_signpost": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [1.9, 2.0, 1.0],
+    "radius": 0.5,
+    "message": "← 地下迷宮 / エメラルド平原 / 岩山 →",
+    "description": "街道の木製道標・案内看板"
+  },
   "water": {
     "type": "liquid_tile",
     "texture": "water",
@@ -146,5 +165,86 @@
     "type": "portal",
     "solid": false,
     "description": "次マップへのポータル"
+  },
+  "wooden_fence": {
+    "type": "wooden_fence",
+    "texture": "woodenFence",
+    "solid": true,
+    "blocksProjectiles": false,
+    "height": 2.2,
+    "description": "村を取り囲む木製の柵（矢や魔法は通すがモンスターやプレイヤーは通過不可）"
+  },
+  "wooden_house": {
+    "type": "block",
+    "texture": "woodWall",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "木造の民家（三角屋根付き）"
+  },
+  "dirt_road": {
+    "type": "floor_tile",
+    "texture": "dirtRoad",
+    "solid": false,
+    "speedBonus": 1.15,
+    "description": "村の土の街道・わだち道（移動速度15%アップ）"
+  },
+  "city_wall": {
+    "type": "block",
+    "texture": "cityWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "街を囲むヨーロッパ風の堅固な石造りの城壁・市壁"
+  },
+  "brick_house": {
+    "type": "block",
+    "texture": "brick",
+    "roofTexture": "cityRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "レンガ造りの住宅（スレート屋根付き）"
+  },
+  "shop_building": {
+    "type": "block",
+    "texture": "shopWall",
+    "roofTexture": "cityRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "レンガ造りの商店・道具屋（日よけ・ショーウィンドウ付き）"
+  },
+  "inn_building": {
+    "type": "block",
+    "texture": "innWall",
+    "roofTexture": "cityRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "レンガ造りの宿屋・酒場（看板・あたたかいランプ窓付き）"
+  },
+  "paved_road": {
+    "type": "floor_tile",
+    "texture": "pavedRoad",
+    "solid": false,
+    "speedBonus": 1.3,
+    "description": "ヨーロッパ風の舗装された石畳の広場・大通り（移動速度30%アップ）"
+  },
+  "plaza_fountain": {
+    "type": "fountain",
+    "texture": "fountainWater",
+    "solid": true,
+    "blocksProjectiles": false,
+    "description": "中央広場の石造りの噴水（清らかな水が湧き出る）"
+  },
+  "city_signpost": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [1.9, 2.0, 1.0],
+    "radius": 0.5,
+    "message": "← 商業区 (道具屋・宿屋) / 中央噴水広場 / 城門 →",
+    "description": "街の案内標識"
   }
 }

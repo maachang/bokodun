@@ -1,0 +1,57 @@
+{
+  "id": "village",
+  "name": "始まりの村 (Village)",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "grassland",
+  "spawn": {
+    "x": 2,
+    "z": 13,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "grass",
+    "hasCeiling": false,
+    "ambientLight": 9408660,
+    "directionalLight": 16774610,
+    "fogColor": 12373460,
+    "fogNear": 22,
+    "fogFar": 80,
+    "skyColor": 9683955
+  },
+  "legend": {
+    "#": "wooden_fence",
+    "H": "wooden_house",
+    "D": "dirt_road",
+    "C": "cobblestone_path",
+    "T": "tree",
+    "O": "mossy_boulder",
+    "N": "wooden_signpost",
+    "~": "water_shallow",
+    "P": "water",
+    "=": "wood_bridge",
+    "M": "magic_circle",
+    "2": "portal",
+    "B": "barrier"
+  },
+  "enemies": {},
+  "layout": [
+    "################",
+    "#000000DD000000#",
+    "#0HH000DD00HH00#",
+    "#0HH0T0DD00HH00#",
+    "#000000DD000000#",
+    "#00T000DD0000T0#",
+    "#DDDDDDDDDDDDDD#",
+    "#DDDDDDDDDDDDDD#",
+    "#000000DD000000#",
+    "#0HH000DD00~P~0#",
+    "#0HH0N0DD00P=P0#",
+    "#000000DD00~P~0#",
+    "#0T0000DD000000#",
+    "#000000DD000020#",
+    "#000000DD000000#",
+    "################"
+  ]
+}

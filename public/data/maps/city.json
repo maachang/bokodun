@@ -1,0 +1,54 @@
+{
+  "id": "city",
+  "name": "城塞都市 (City)",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "village",
+  "spawn": {
+    "x": 2,
+    "z": 13,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": false,
+    "ambientLight": 9408660,
+    "directionalLight": 16774610,
+    "fogColor": 11713215,
+    "fogNear": 22,
+    "fogFar": 75,
+    "skyColor": 9018045
+  },
+  "legend": {
+    "W": "city_wall",
+    "H": "brick_house",
+    "S": "shop_building",
+    "I": "inn_building",
+    "=": "paved_road",
+    "F": "plaza_fountain",
+    "N": "city_signpost",
+    "T": "tree",
+    "2": "portal",
+    "D": "dungeon_door"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWWWWWWW",
+    "W==============W",
+    "W=SS==SS==II===W",
+    "W=SS==SS==II===W",
+    "W==============W",
+    "W===T======T===W",
+    "W======FF======W",
+    "W======FF======W",
+    "W===T======T===W",
+    "W==============W",
+    "W=HH==HH==HH===W",
+    "W=HH==HH==HH===W",
+    "W==============W",
+    "W==N========2==W",
+    "W==============W",
+    "WWWWWWWWWWWWWWWW"
+  ]
+}

@@ -8,6 +8,8 @@ export class Monster {
         this.z = z;
         this.radius = enemyDef?.radius ?? 0.8;
         this.active = true;
+        this.id = 'm_' + Math.random().toString(36).substring(2, 9);
+        this.iconUrl = '/images/enemies/slime_char.png';
 
         if (enemyDef) {
             this.name = enemyDef.name || 'モンスター';
@@ -27,6 +29,16 @@ export class Monster {
             this.spriteMat = new THREE.SpriteMaterial({ map: textures[texKey] || textures.slime, transparent: true });
             this.scale = enemyDef.scale ? [...enemyDef.scale] : [2.2, 2.0, 1];
             this.y = enemyDef.y ?? 1.0;
+
+            if (texKey === 'goblinArcher') {
+                this.iconUrl = '/images/enemies/goblin_archer.png';
+            } else if (texKey === 'goblin') {
+                this.iconUrl = '/images/enemies/goblin_mage.png';
+            } else if (texKey === 'skeleton') {
+                this.iconUrl = '/images/enemies/skeleton_char.png';
+            } else {
+                this.iconUrl = '/images/enemies/slime_char.png';
+            }
         } else {
             // Fallback for compatibility
             if (enemyType === 'S' || enemyType === 'slime') {
@@ -41,6 +53,7 @@ export class Monster {
                 this.spriteMat = new THREE.SpriteMaterial({ map: textures.slime, transparent: true });
                 this.scale = [2.2, 2.0, 1];
                 this.y = 1.0;
+                this.iconUrl = '/images/enemies/slime_char.png';
             } else if (enemyType === 'K' || enemyType === 'skeleton') {
                 this.name = 'スケルトン剣士';
                 this.maxHp = 60;
@@ -53,6 +66,7 @@ export class Monster {
                 this.spriteMat = new THREE.SpriteMaterial({ map: textures.skeleton, transparent: true });
                 this.scale = [2.4, 2.5, 1];
                 this.y = 1.25;
+                this.iconUrl = '/images/enemies/skeleton_char.png';
             } else {
                 this.name = 'ゴブリンアーチャー';
                 this.maxHp = 45;
@@ -69,6 +83,7 @@ export class Monster {
                 this.spriteMat = new THREE.SpriteMaterial({ map: textures.goblin, transparent: true });
                 this.scale = [2.3, 2.6, 1];
                 this.y = 1.3;
+                this.iconUrl = '/images/enemies/goblin_archer.png';
             }
         }
 
@@ -135,7 +150,8 @@ export class Monster {
 
                 const proj = new Projectile(this.x, this.z, dirX, dirZ, false, projSpeed, projDmg, {
                     type: this.shootType || 'magic',
-                    maxDistance: maxDist
+                    maxDistance: maxDist,
+                    sourceMonster: this
                 });
                 projectiles.push(proj);
                 if (scene) scene.add(proj.mesh);
@@ -189,6 +205,7 @@ export class Projectile {
         this.damage = damage;
         this.type = options.type || (isPlayer ? 'player_fireball' : 'magic');
         this.maxDistance = options.maxDistance || 0; // 0 means unlimited by distance (timed life)
+        this.sourceMonster = options.sourceMonster || null;
         this.radius = (this.type === 'arrow') ? 0.25 : 0.45;
         this.active = true;
         this.lifeTime = (this.type === 'arrow') ? 2.0 : 3.5;

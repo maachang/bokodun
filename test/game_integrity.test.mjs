@@ -13,6 +13,8 @@ test('1. JSON Schema & Integrity Validation', async (t) => {
             'public/data/enemies.json',
             'public/data/maps/dungeon.json',
             'public/data/maps/grassland.json',
+            'public/data/maps/village.json',
+            'public/data/maps/city.json',
             'public/data/maps/rockymountain.json',
             'public/data/maps/cave.json'
         ];
@@ -29,7 +31,7 @@ test('1. JSON Schema & Integrity Validation', async (t) => {
         const objects = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/objects.json'), 'utf-8'));
         const enemies = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/enemies.json'), 'utf-8'));
         
-        const mapFiles = ['dungeon.json', 'grassland.json', 'rockymountain.json', 'cave.json'];
+        const mapFiles = ['dungeon.json', 'grassland.json', 'village.json', 'city.json', 'rockymountain.json', 'cave.json'];
         for (const mapFile of mapFiles) {
             const map = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/maps', mapFile), 'utf-8'));
             
@@ -67,6 +69,8 @@ test('1. JSON Schema & Integrity Validation', async (t) => {
             'public/images/objects/dense_forest.jpg',
             'public/images/objects/forest_canopy_treeline.png',
             'public/images/objects/tree_pixel.png',
+            'public/images/objects/mossy_boulder.png',
+            'public/images/objects/signpost.png',
             'public/images/objects/barrier_dq.png',
             'public/images/objects/mossy_cave_rock.jpg',
             'public/images/enemies/slime_char.png',

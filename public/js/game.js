@@ -65,8 +65,12 @@ export class GameEngine {
         this.projectiles = [];
         this.portal = null;
         this.waterMeshes = [];
+        this.heatHazePlanes = [];
+        this.fountains = [];
         this.terrainGrid = [];
         this.doors = [];
+        this.signposts = [];
+        this.activeEnemyCards = [];
         this.popups = [];
 
         this.clock = new THREE.Clock();
@@ -147,6 +151,7 @@ export class GameEngine {
             shallowWater: RetroTextureGenerator.createShallowWaterTexture(),
             water: RetroTextureGenerator.createWaterTexture(),
             lava: RetroTextureGenerator.createLavaTexture(),
+            heatHaze: RetroTextureGenerator.createHeatHazeTexture(),
             poisonSwamp: RetroTextureGenerator.createPoisonSwampTexture(),
             ice: RetroTextureGenerator.createIceTexture(),
             woodBridge: RetroTextureGenerator.createWoodBridgeTexture(),
@@ -163,8 +168,20 @@ export class GameEngine {
             goblin: RetroTextureGenerator.createGoblinTexture(),
             goblinArcher: RetroTextureGenerator.createGoblinArcherTexture(),
             tree: RetroTextureGenerator.createTreeTexture(),
+            boulder: RetroTextureGenerator.createBoulderTexture(),
+            signpost: RetroTextureGenerator.createSignpostTexture(),
             forestCanopy: forestCanopyTex,
-            denseForest: denseForestTex
+            denseForest: denseForestTex,
+            woodWall: RetroTextureGenerator.createWoodWallTexture(),
+            woodenFence: RetroTextureGenerator.createWoodenFenceTexture(),
+            villageRoof: RetroTextureGenerator.createVillageRoofTexture(),
+            dirtRoad: RetroTextureGenerator.createDirtRoadTexture(),
+            cityWall: RetroTextureGenerator.createCityWallTexture(),
+            shopWall: RetroTextureGenerator.createShopWallTexture(),
+            innWall: RetroTextureGenerator.createInnWallTexture(),
+            cityRoof: RetroTextureGenerator.createCityRoofTexture(),
+            pavedRoad: RetroTextureGenerator.createPavedRoadTexture(),
+            fountainWater: RetroTextureGenerator.createFountainWaterTexture()
         };
     }
 
@@ -292,8 +309,14 @@ export class GameEngine {
         this.projectiles = [];
         this.portal = null;
         this.waterMeshes = [];
+        this.heatHazePlanes = [];
+        this.fountains = [];
         this.terrainGrid = [];
         this.doors = [];
+        this.signposts = [];
+        this.activeEnemyCards = [];
+        const enemyListEl = document.getElementById('enemyHudList');
+        if (enemyListEl) enemyListEl.innerHTML = '';
 
         const env = mapData.environment || {};
         // Environment lighting and fog
@@ -405,6 +428,25 @@ export class GameEngine {
                             const rock = new THREE.Mesh(rockGeo, mat);
                             rock.position.set(wx, rockH / 2, wz);
                             this.scene.add(rock);
+                        } else if (objDef.hasRoof) {
+                            // Buildings with European pitched roofs (Village wood or City brick/stone houses)
+                            const houseH = wallH * 0.92;
+                            const houseGeo = new THREE.BoxGeometry(tileSize, houseH, tileSize);
+                            const house = new THREE.Mesh(houseGeo, mat);
+                            house.position.set(wx, houseH / 2, wz);
+                            this.scene.add(house);
+
+                            // Triangular pitched roof capping the building (Slate blue for city or terracotta for village)
+                            const roofH = tileSize * 0.48;
+                            const roofGeo = new THREE.ConeGeometry(tileSize * 0.78, roofH, 4);
+                            const roofTex = (objDef.roofTexture && this.textures[objDef.roofTexture])
+                                ? this.textures[objDef.roofTexture]
+                                : (this.textures.villageRoof || this.textures.brick);
+                            const roofMat = new THREE.MeshLambertMaterial({ map: roofTex });
+                            const roofMesh = new THREE.Mesh(roofGeo, roofMat);
+                            roofMesh.rotation.y = Math.PI / 4;
+                            roofMesh.position.set(wx, houseH + roofH / 2, wz);
+                            this.scene.add(roofMesh);
                         } else {
                             const wall = new THREE.Mesh(standardWallGeo, mat);
                             wall.position.set(wx, wallH / 2, wz);
@@ -512,6 +554,61 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'wooden_fence': {
+                        // Wooden Picket Fence surrounding village & paths
+                        // Check adjacent neighbors to see which sides need fence panels
+                        const isNorthFence = (r > 0 && mapData.layout[r - 1][c] === char);
+                        const isSouthFence = (r < rows - 1 && mapData.layout[r + 1][c] === char);
+                        const isWestFence = (c > 0 && mapData.layout[r][c - 1] === char);
+                        const isEastFence = (c < cols - 1 && mapData.layout[r][c + 1] === char);
+
+                        const fenceMat = new THREE.MeshLambertMaterial({
+                            map: this.textures.woodenFence,
+                            transparent: true,
+                            alphaTest: 0.15,
+                            side: THREE.DoubleSide
+                        });
+
+                        const fenceH = objDef.height || 2.4;
+                        const fenceW = tileSize * 1.05;
+
+                        // Center square fence post
+                        const postGeo = new THREE.BoxGeometry(0.35, fenceH * 1.08, 0.35);
+                        const postMat = new THREE.MeshLambertMaterial({ map: this.textures.woodWall });
+                        const postMesh = new THREE.Mesh(postGeo, postMat);
+                        postMesh.position.set(wx, fenceH * 1.08 / 2, wz);
+                        this.scene.add(postMesh);
+
+                        // If it has connections, draw matching fence panels
+                        if (isWestFence || isEastFence || (!isNorthFence && !isSouthFence)) {
+                            // Horizontal X plane
+                            const fGeo = new THREE.PlaneGeometry(fenceW, fenceH);
+                            const fMesh = new THREE.Mesh(fGeo, fenceMat);
+                            fMesh.position.set(wx, fenceH / 2, wz);
+                            this.scene.add(fMesh);
+                        }
+                        if (isNorthFence || isSouthFence) {
+                            // Vertical Z plane
+                            const fGeo = new THREE.PlaneGeometry(fenceW, fenceH);
+                            const fMesh = new THREE.Mesh(fGeo, fenceMat);
+                            fMesh.rotation.y = Math.PI / 2;
+                            fMesh.position.set(wx, fenceH / 2, wz);
+                            this.scene.add(fMesh);
+                        }
+
+                        if (objDef.solid) {
+                            // Full tile collision box to completely prevent slipping through between fence posts
+                            this.colliders.push({
+                                minX: wx - tileSize / 2,
+                                maxX: wx + tileSize / 2,
+                                minZ: wz - tileSize / 2,
+                                maxZ: wz + tileSize / 2,
+                                blocksProjectiles: objDef.blocksProjectiles === true
+                            });
+                        }
+                        break;
+                    }
+
                     case 'tree': {
                         const treeMat = new THREE.SpriteMaterial({ map: this.textures.tree });
                         const tree = new THREE.Sprite(treeMat);
@@ -553,10 +650,128 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'boulder': {
+                        // Mossy natural boulder sprite with ground shadow & projectile blocking
+                        const boulderMat = new THREE.SpriteMaterial({ map: this.textures.boulder });
+                        const boulder = new THREE.Sprite(boulderMat);
+                        boulder.center.set(0.5, 0.0);
+                        const bScale = objDef.scale || [2.6, 2.0, 1.0];
+                        boulder.scale.set(bScale[0], bScale[1], bScale[2]);
+                        boulder.position.set(wx, -0.05, wz);
+                        this.scene.add(boulder);
+
+                        // Ground contact shadow
+                        const shadowCanvas = document.createElement('canvas');
+                        shadowCanvas.width = 32; shadowCanvas.height = 32;
+                        const sCtx = shadowCanvas.getContext('2d');
+                        const grad = sCtx.createRadialGradient(16, 16, 3, 16, 16, 16);
+                        grad.addColorStop(0, 'rgba(15, 25, 15, 0.65)');
+                        grad.addColorStop(0.6, 'rgba(10, 20, 10, 0.3)');
+                        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                        sCtx.fillStyle = grad;
+                        sCtx.fillRect(0, 0, 32, 32);
+
+                        const shadowTex = new THREE.CanvasTexture(shadowCanvas);
+                        const shadowMat = new THREE.MeshBasicMaterial({ map: shadowTex, transparent: true, depthWrite: false });
+                        const shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.6, 2.2), shadowMat);
+                        shadowMesh.rotation.x = -Math.PI / 2;
+                        shadowMesh.position.set(wx, 0.012, wz);
+                        this.scene.add(shadowMesh);
+
+                        if (objDef.solid) {
+                            const rad = objDef.radius || 0.85;
+                            this.colliders.push({
+                                minX: wx - rad, maxX: wx + rad,
+                                minZ: wz - rad, maxZ: wz + rad,
+                                blocksProjectiles: objDef.blocksProjectiles !== false
+                            });
+                        }
+                        break;
+                    }
+
+                    case 'signpost': {
+                        // Rustic wooden signpost sprite
+                        const signMat = new THREE.SpriteMaterial({ map: this.textures.signpost });
+                        const sign = new THREE.Sprite(signMat);
+                        sign.center.set(0.5, 0.0);
+                        const sScale = objDef.scale || [1.9, 2.0, 1.0];
+                        sign.scale.set(sScale[0], sScale[1], sScale[2]);
+                        sign.position.set(wx, 0.0, wz);
+                        this.scene.add(sign);
+
+                        if (objDef.solid) {
+                            const rad = objDef.radius || 0.5;
+                            this.colliders.push({
+                                minX: wx - rad, maxX: wx + rad,
+                                minZ: wz - rad, maxZ: wz + rad,
+                                blocksProjectiles: false
+                            });
+                        }
+
+                        // Store signpost interaction
+                        if (objDef.message) {
+                            this.signposts = this.signposts || [];
+                            this.signposts.push({
+                                x: wx, z: wz, message: objDef.message, radius: 2.2, triggered: false
+                            });
+                        }
+                        break;
+                    }
+
                     case 'monster': {
                         const m = new Monster(objDef.monsterId || 'S', wx, wz, this.textures);
                         this.monsters.push(m);
                         this.scene.add(m.sprite);
+                        break;
+                    }
+
+                    case 'fountain': {
+                        // European Plaza Fountain: stone basin with sparkling water & center water spire
+                        const basinMat = new THREE.MeshLambertMaterial({ map: this.textures.cityWall });
+                        const waterMat = new THREE.MeshLambertMaterial({
+                            map: this.textures.fountainWater,
+                            transparent: true,
+                            opacity: 0.88
+                        });
+
+                        // Hexagonal/Cylindrical stone pool rim
+                        const rimGeo = new THREE.CylinderGeometry(tileSize * 0.44, tileSize * 0.46, 0.5, 12, 1, true);
+                        const rimMesh = new THREE.Mesh(rimGeo, basinMat);
+                        rimMesh.position.set(wx, 0.25, wz);
+                        this.scene.add(rimMesh);
+
+                        // Water surface inside fountain
+                        const poolWaterGeo = new THREE.CircleGeometry(tileSize * 0.43, 12);
+                        const poolWater = new THREE.Mesh(poolWaterGeo, waterMat);
+                        poolWater.rotation.x = -Math.PI / 2;
+                        poolWater.position.set(wx, 0.38, wz);
+                        this.scene.add(poolWater);
+                        this.waterMeshes.push(poolWater);
+
+                        // Center ornamental stone spout pillar
+                        const centerGeo = new THREE.CylinderGeometry(0.25, 0.35, 1.3, 8);
+                        const centerMesh = new THREE.Mesh(centerGeo, basinMat);
+                        centerMesh.position.set(wx, 0.65, wz);
+                        this.scene.add(centerMesh);
+
+                        // Track active fountain for water spurting particles & player splash interaction
+                        this.fountains.push({
+                            x: wx,
+                            z: wz,
+                            topY: 1.3,
+                            surfaceY: 0.38,
+                            radius: tileSize * 0.45,
+                            splashCooldown: 0
+                        });
+
+                        if (objDef.solid) {
+                            const rad = tileSize * 0.45;
+                            this.colliders.push({
+                                minX: wx - rad, maxX: wx + rad,
+                                minZ: wz - rad, maxZ: wz + rad,
+                                blocksProjectiles: false
+                            });
+                        }
                         break;
                     }
 
@@ -768,11 +983,45 @@ export class GameEngine {
                         this.scene.add(waterMesh);
                         this.waterMeshes.push(waterMesh);
 
-                        // If lava, add a warm point light so it realistically illuminates dark caves & floors
+                        // If lava, add a warm point light and rising 3D heat wisps/smoke
                         if (isLava) {
                             const lavaLight = new THREE.PointLight(0xff4500, 1.4, tileSize * 2.8);
                             lavaLight.position.set(wx, 0.5, wz);
                             this.scene.add(lavaLight);
+
+                            // Spawn 3 layered billboard sprites per lava tile that rise vertically and face player
+                            const hazeMat = new THREE.SpriteMaterial({
+                                map: this.textures.heatHaze,
+                                transparent: true,
+                                opacity: 0.65,
+                                blending: THREE.AdditiveBlending,
+                                depthWrite: false
+                            });
+
+                            // Positions scattered slightly across the tile with balanced heat shimmer volume
+                            const hazeOffsets = [
+                                { ox: 0, oz: 0, baseScale: 2.2, phase: 0 },
+                                { ox: -tileSize * 0.22, oz: tileSize * 0.2, baseScale: 1.8, phase: 1.8 },
+                                { ox: tileSize * 0.25, oz: -tileSize * 0.18, baseScale: 1.9, phase: 3.5 }
+                            ];
+
+                            hazeOffsets.forEach(ho => {
+                                const sprite = new THREE.Sprite(hazeMat.clone());
+                                sprite.center.set(0.5, 0.0); // Exact bottom contact with lava surface
+                                sprite.scale.set(ho.baseScale, ho.baseScale * 0.55, 1);
+                                sprite.position.set(wx + ho.ox, waterSurfaceY, wz + ho.oz);
+                                this.scene.add(sprite);
+                                this.heatHazePlanes.push({
+                                    sprite: sprite,
+                                    baseX: wx + ho.ox,
+                                    baseZ: wz + ho.oz,
+                                    baseY: waterSurfaceY,
+                                    baseScale: ho.baseScale,
+                                    phase: ho.phase,
+                                    tileX: wx,
+                                    tileZ: wz
+                                });
+                            });
                         }
 
                         if (objDef.solid) {
@@ -896,6 +1145,20 @@ export class GameEngine {
             }
         }
 
+        // Proximity check for Signposts (Display guidance banner while near, hide immediately when leaving)
+        let activeSignMessage = null;
+        if (this.signposts && this.signposts.length > 0) {
+            for (const s of this.signposts) {
+                const distToSign = Math.hypot(this.player.x - s.x, this.player.z - s.z);
+                const triggerDist = s.radius || 2.4;
+                if (distToSign < triggerDist) {
+                    activeSignMessage = s.message;
+                    break;
+                }
+            }
+        }
+        this.updateSignpostBanner(activeSignMessage);
+
         // Animate liquid surfaces (water, shallow water, lava, swamp)
         if (this.waterMeshes && this.waterMeshes.length > 0) {
             const time = this.clock.getElapsedTime();
@@ -907,6 +1170,62 @@ export class GameEngine {
             this.textures.lava.offset.y = (time * 0.02) % 1;
             this.textures.poisonSwamp.offset.x = (time * 0.02) % 1;
             this.textures.poisonSwamp.offset.y = (time * 0.03) % 1;
+            if (this.textures.fountainWater) {
+                this.textures.fountainWater.offset.x = (time * 0.09) % 1;
+                this.textures.fountainWater.offset.y = (time * 0.07) % 1;
+            }
+
+            // Animate shimmering rising heat haze & smoke wisps above lava
+            if (this.heatHazePlanes && this.heatHazePlanes.length > 0) {
+                for (let i = 0; i < this.heatHazePlanes.length; i++) {
+                    const h = this.heatHazePlanes[i];
+                    // Cycle position within a natural heat shimmer layer (rising up to 0.40 units above surface)
+                    const cycle = ((time * 0.7 + h.phase) % 2.0) / 2.0; // 0.0 -> 1.0
+                    
+                    // Rising Y movement: noticeable heat shimmering layer above surface
+                    h.sprite.position.y = h.baseY + cycle * 0.40;
+
+                    // Lateral swaying shimmer (wavy hot air distortion)
+                    const sway = Math.sin(time * 3.5 + h.phase) * 0.15;
+                    h.sprite.position.x = h.baseX + sway;
+
+                    // Expand horizontally as heat wafts across the lava surface
+                    const scaleFactor = 1.0 + cycle * 0.3;
+                    h.sprite.scale.set(h.baseScale * scaleFactor, h.baseScale * 0.55 * scaleFactor, 1);
+
+                    // Soft fade in on magma surface, gently fades out around 0.4 units height
+                    let alpha = Math.sin(cycle * Math.PI) * 0.70;
+                    h.sprite.material.opacity = Math.max(0, alpha);
+
+                    // Periodically spawn floating ember particle
+                    if (Math.random() < 0.015) {
+                        this.particles.spawnHeatEmber(h.tileX, h.baseY, h.tileZ);
+                    }
+                }
+            }
+
+            // Animate fountain spurts and player water splash interaction (シャバシャバ演出)
+            if (this.fountains && this.fountains.length > 0) {
+                for (const f of this.fountains) {
+                    // Continuous fountain water spurting from central spout (rich, visible spray)
+                    this.particles.spawnWaterSpurt(f.x, f.topY, f.z, 2);
+
+                    // Check player touching or walking near the fountain rim
+                    const distToPlayer = Math.hypot(this.player.x - f.x, this.player.z - f.z);
+                    if (f.splashCooldown > 0) f.splashCooldown -= dt;
+
+                    // If player is right next to the fountain basin (<= radius + 0.6) and moving, trigger splash & sound
+                    const isMoving = (this.keys.forward || this.keys.backward || this.keys.left || this.keys.right);
+                    if (distToPlayer <= f.radius + 0.65 && isMoving && f.splashCooldown <= 0) {
+                        f.splashCooldown = 0.18; // Throttle splash triggers
+                        this.sound.playWaterSplash();
+                        this.particles.spawnWaterSplash(this.player.x, f.surfaceY + 0.1, this.player.z, 16);
+                        if (Math.random() < 0.3) {
+                            this.addPopup('シャバシャバ！', '#38bdf8', this.player.x, this.player.z);
+                        }
+                    }
+                }
+            }
         }
 
         // Turning via Q/E or arrows
@@ -1053,6 +1372,7 @@ export class GameEngine {
                         this.particles.spawnBurst(p.x, p.y, p.z, 0xff5500, 16, 5.0);
                         const isDead = m.takeDamage(p.damage, { x: p.dirX, z: p.dirZ });
                         this.addPopup(`ファイア! -${p.damage}`, '#f97316', m.x, m.z);
+                        this.notifyEnemyEngaged(m);
                         if (isDead) this.gainExp(m.exp);
                         break;
                     }
@@ -1062,6 +1382,9 @@ export class GameEngine {
                 const distP = Math.hypot(this.player.x - p.x, this.player.z - p.z);
                 if (distP < this.player.radius + p.radius) {
                     this.playerTakeDamage(p.damage, new THREE.Vector3(p.dirX, 0, p.dirZ));
+                    if (p.sourceMonster) {
+                        this.notifyEnemyEngaged(p.sourceMonster);
+                    }
                     if (p.type === 'arrow') {
                         this.sound.playArrowHit();
                         this.particles.spawnBurst(p.x, p.y, p.z, 0xd4d4d8, 8, 2.5);
@@ -1089,7 +1412,7 @@ export class GameEngine {
         this.updatePopups(dt);
 
         // Update UI
-        this.updateUI();
+        this.updateUI(dt);
 
         // Render Minimap
         this.renderMinimap();
@@ -1177,6 +1500,7 @@ export class GameEngine {
             const isDead = monster.takeDamage(damage, { x: nx, z: nz });
             this.particles.spawnBurst(monster.x, 1.2, monster.z, 0xfbbf24, 12, 4.0);
             this.addPopup(`半ずらし会心! -${damage}`, '#fbbf24', monster.x, monster.z);
+            this.notifyEnemyEngaged(monster);
 
             if (isDead) this.gainExp(monster.exp);
         } else if (isCharging) {
@@ -1188,12 +1512,14 @@ export class GameEngine {
             const isDead = monster.takeDamage(pDmg, { x: nx, z: nz });
             this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz));
             this.addPopup(`ボコッ! -${pDmg}`, '#ffffff', monster.x, monster.z);
+            this.notifyEnemyEngaged(monster);
 
             if (isDead) this.gainExp(monster.exp);
         } else {
             // Enemy hits player (player was backing away or standing still)
             const mDmg = monster.attackPower;
             this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz));
+            this.notifyEnemyEngaged(monster);
         }
     }
 
@@ -1266,7 +1592,45 @@ export class GameEngine {
         // Simple DOM based popups auto-remove
     }
 
-    updateUI() {
+    updateSignpostBanner(message) {
+        const banner = document.getElementById('signpostBanner');
+        if (!banner) return;
+        if (message) {
+            if (banner.innerText !== message) {
+                banner.innerText = `📜 ${message}`;
+            }
+            banner.style.display = 'block';
+        } else {
+            banner.style.display = 'none';
+        }
+    }
+
+    notifyEnemyEngaged(monster) {
+        if (!monster) return;
+        this.activeEnemyCards = this.activeEnemyCards || [];
+
+        // Check if monster already has an active card in the stack
+        const existing = this.activeEnemyCards.find(c => c.monster === monster);
+        if (existing) {
+            existing.timer = 4.0; // Refresh display duration on hit/get hit
+            existing.hp = Math.max(0, monster.hp);
+        } else {
+            // Add new engaged enemy to the top of the stack (limited to 3 cards max)
+            this.activeEnemyCards.push({
+                monster: monster,
+                name: monster.name || 'モンスター',
+                maxHp: monster.maxHp || 30,
+                hp: Math.max(0, monster.hp),
+                iconUrl: monster.iconUrl || '/images/enemies/slime_char.png',
+                timer: 4.0
+            });
+            if (this.activeEnemyCards.length > 3) {
+                this.activeEnemyCards.shift(); // Remove oldest bottom card if overflowing
+            }
+        }
+    }
+
+    updateUI(dt = 0) {
         document.getElementById('hpBar').style.width = `${(this.player.hp / this.player.maxHp) * 100}%`;
         document.getElementById('hpText').innerText = `${Math.ceil(this.player.hp)}/${this.player.maxHp}`;
         document.getElementById('mpBar').style.width = `${(this.player.mp / this.player.maxMp) * 100}%`;
@@ -1274,6 +1638,44 @@ export class GameEngine {
         document.getElementById('levelText').innerText = `Lv.${this.player.level}`;
         document.getElementById('expText').innerText = `EXP: ${this.player.exp}`;
         document.getElementById('monsterCount').innerText = `敵残数: ${this.monsters.length}`;
+
+        // Update active enemy status cards stacked above player HP/MP (Ys-style Target Info)
+        const enemyListEl = document.getElementById('enemyHudList');
+        if (enemyListEl && this.activeEnemyCards) {
+            // Tick down timers and remove expired or dead enemies
+            for (let i = this.activeEnemyCards.length - 1; i >= 0; i--) {
+                const card = this.activeEnemyCards[i];
+                card.timer -= dt;
+                card.hp = Math.max(0, card.monster ? card.monster.hp : 0);
+
+                if (card.timer <= 0 || (card.monster && !card.monster.active && card.hp <= 0)) {
+                    this.activeEnemyCards.splice(i, 1);
+                }
+            }
+
+            // Render current active enemy cards
+            if (this.activeEnemyCards.length === 0) {
+                enemyListEl.innerHTML = '';
+            } else {
+                enemyListEl.innerHTML = this.activeEnemyCards.map(c => {
+                    const hpPercent = Math.max(0, Math.min(100, (c.hp / c.maxHp) * 100));
+                    return `
+                        <div class="enemy-hud-card">
+                            <img class="enemy-hud-icon" src="${c.iconUrl}" alt="${c.name}" onerror="this.src='/images/enemies/slime_char.png'">
+                            <div class="enemy-hud-details">
+                                <div class="enemy-hud-header">
+                                    <span>${c.name}</span>
+                                    <span>${c.hp}/${c.maxHp}</span>
+                                </div>
+                                <div class="enemy-hud-hp-bg">
+                                    <div class="enemy-hud-hp-fill" style="width: ${hpPercent}%;"></div>
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+        }
     }
 
     renderMinimap() {

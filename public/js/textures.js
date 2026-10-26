@@ -260,6 +260,51 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 1b. Heat Haze / Magma Heat Shimmer (subtle scorching air distortion, horizontally flat and hot)
+    static createHeatHazeTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        ctx.clearRect(0, 0, 64, 64);
+
+        // Horizontally stretched scorching heat air pockets originating directly from the bottom edge
+        const puffs = [
+            { x: 32, y: 56, rx: 28, ry: 12, color: 'rgba(255, 110, 30, ' },
+            { x: 18, y: 52, rx: 20, ry: 10, color: 'rgba(255, 150, 45, ' },
+            { x: 46, y: 50, rx: 22, ry: 11, color: 'rgba(255, 180, 60, ' },
+            { x: 32, y: 36, rx: 24, ry: 9, color: 'rgba(255, 210, 100, ' }
+        ];
+
+        for (const p of puffs) {
+            ctx.save();
+            ctx.translate(p.x, p.y);
+            ctx.scale(p.rx / p.ry, 1);
+            const grad = ctx.createRadialGradient(0, 0, 1, 0, 0, p.ry);
+            grad.addColorStop(0, p.color + '0.50)');
+            grad.addColorStop(0.5, p.color + '0.30)');
+            grad.addColorStop(0.85, p.color + '0.10)');
+            grad.addColorStop(1, p.color + '0.0)');
+            ctx.fillStyle = grad;
+            ctx.beginPath();
+            ctx.arc(0, 0, p.ry, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Tiny glowing embers in the blistering heat
+        ctx.fillStyle = 'rgba(255, 245, 180, 0.75)';
+        ctx.fillRect(24, 52, 2, 1);
+        ctx.fillRect(38, 50, 2, 1);
+        ctx.fillRect(30, 40, 2, 1);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.LinearFilter;
+        texture.minFilter = THREE.LinearFilter;
+        return texture;
+    }
+
     // 2. Poison Swamp
     static createPoisonSwampTexture() {
         const canvas = document.createElement('canvas');
@@ -743,6 +788,488 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 11. Village Wooden Wall Texture (for rustic timber houses)
+    static createWoodWallTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Dark mortar / timber shadow base
+        ctx.fillStyle = '#27170c';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Horizontal rustic wood logs / timber planks
+        const logH = 14;
+        const colors = ['#8d5b32', '#a0683b', '#7a4e2b', '#946135'];
+        for (let y = 1; y < 64; y += 16) {
+            ctx.fillStyle = colors[Math.floor(Math.random() * colors.length)];
+            ctx.fillRect(0, y, 64, logH);
+
+            // Wood grain streaks
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+            ctx.fillRect(0, y + 4, 64, 2);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
+            ctx.fillRect(0, y + 1, 64, 2);
+
+            // Timber end joints / nails
+            ctx.fillStyle = '#1e1108';
+            ctx.fillRect(6, y + 6, 2, 2);
+            ctx.fillRect(56, y + 6, 2, 2);
+        }
+
+        // Vertical support studs at intervals
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+        ctx.fillRect(0, 0, 4, 64);
+        ctx.fillRect(60, 0, 4, 64);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 12. Wooden Fence Texture (for village boundaries & pastures)
+    static createWoodenFenceTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Transparent background between fence rails
+        ctx.clearRect(0, 0, 64, 64);
+
+        // Vertical fence posts (wooden stakes with pointed tips)
+        const postPositions = [6, 26, 46];
+        const postW = 10;
+        const postColor = '#8c5930';
+        const shadowColor = '#5e381b';
+        const highlightColor = '#b57843';
+
+        postPositions.forEach(px => {
+            // Shadow side
+            ctx.fillStyle = shadowColor;
+            ctx.fillRect(px, 12, postW, 52);
+
+            // Main post body
+            ctx.fillStyle = postColor;
+            ctx.fillRect(px + 2, 12, postW - 3, 52);
+
+            // Highlight side
+            ctx.fillStyle = highlightColor;
+            ctx.fillRect(px + 1, 12, 2, 52);
+
+            // Pointed picket top
+            ctx.fillStyle = postColor;
+            ctx.beginPath();
+            ctx.moveTo(px + postW / 2, 4);
+            ctx.lineTo(px, 12);
+            ctx.lineTo(px + postW, 12);
+            ctx.closePath();
+            ctx.fill();
+
+            // Tip highlight & shadow
+            ctx.fillStyle = highlightColor;
+            ctx.beginPath();
+            ctx.moveTo(px + postW / 2, 4);
+            ctx.lineTo(px, 12);
+            ctx.lineTo(px + postW / 2, 12);
+            ctx.closePath();
+            ctx.fill();
+        });
+
+        // Horizontal wooden cross rails
+        const railYs = [22, 44];
+        const railH = 7;
+        railYs.forEach(ry => {
+            // Shadow
+            ctx.fillStyle = shadowColor;
+            ctx.fillRect(0, ry + railH - 2, 64, 2);
+
+            // Rail body
+            ctx.fillStyle = '#9e6738';
+            ctx.fillRect(0, ry, 64, railH - 2);
+
+            // Rail highlight
+            ctx.fillStyle = '#c58a52';
+            ctx.fillRect(0, ry, 64, 2);
+
+            // Fastener nails on each post intersection
+            postPositions.forEach(px => {
+                ctx.fillStyle = '#22140a';
+                ctx.fillRect(px + postW / 2 - 1, ry + railH / 2 - 1, 2, 2);
+            });
+        });
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 13. Village Roof Texture (thatched / red-brown tile roof)
+    static createVillageRoofTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Terracotta / Cedar shingle tiles
+        ctx.fillStyle = '#5c2c16';
+        ctx.fillRect(0, 0, 64, 64);
+
+        const rowH = 10;
+        const tileColors = ['#9c4927', '#b55831', '#853e20', '#a84e2a'];
+        for (let y = 0; y < 64; y += rowH) {
+            const shift = ((y / rowH) % 2 === 0) ? 0 : 8;
+            for (let x = -8; x < 64; x += 16) {
+                ctx.fillStyle = tileColors[Math.floor(Math.random() * tileColors.length)];
+                ctx.fillRect(x + shift + 1, y + 1, 14, rowH - 2);
+
+                // Shingle highlights & shadow
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.fillRect(x + shift + 1, y + 1, 14, 2);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+                ctx.fillRect(x + shift + 1, y + rowH - 2, 14, 1);
+            }
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 14. Village Dirt Road Texture
+    static createDirtRoadTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Warm earthy brown base
+        ctx.fillStyle = '#6e543c';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Earth noise & small stones
+        const dirtTones = ['#5a432e', '#7c6147', '#4d3926', '#876c52'];
+        for (let i = 0; i < 90; i++) {
+            ctx.fillStyle = dirtTones[Math.floor(Math.random() * dirtTones.length)];
+            const rx = Math.floor(Math.random() * 63);
+            const ry = Math.floor(Math.random() * 63);
+            ctx.fillRect(rx, ry, 2, 2);
+        }
+
+        // Pebble stones scattered on dirt road
+        for (let i = 0; i < 18; i++) {
+            ctx.fillStyle = '#9e9182';
+            const px = Math.floor(Math.random() * 62);
+            const py = Math.floor(Math.random() * 62);
+            ctx.fillRect(px, py, 2, 2);
+            ctx.fillStyle = '#3a2d22';
+            ctx.fillRect(px, py + 2, 2, 1);
+        }
+
+        // Wagon wheel rut impressions
+        ctx.fillStyle = 'rgba(40, 28, 18, 0.45)';
+        ctx.fillRect(14, 0, 6, 64);
+        ctx.fillRect(44, 0, 6, 64);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 15. City Stone Wall (European fortified city wall / rampart with stone blocks)
+    static createCityWallTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Dark grey mortar
+        ctx.fillStyle = '#262930';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Ashlar dressed stone blocks (clean European castle/city wall stones)
+        const stoneColors = ['#6e7682', '#7b8391', '#5a616d', '#8a93a3', '#646c78'];
+        const rowH = 16;
+        for (let r = 0; r < 4; r++) {
+            const shift = (r % 2 === 0) ? 0 : 16;
+            for (let c = -1; c < 3; c++) {
+                const sx = c * 32 + shift;
+                const sy = r * 16;
+                ctx.fillStyle = stoneColors[Math.floor(Math.random() * stoneColors.length)];
+                ctx.fillRect(sx + 2, sy + 2, 28, 12);
+
+                // Top & left bevel highlight
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.2)';
+                ctx.fillRect(sx + 2, sy + 2, 28, 2);
+                ctx.fillRect(sx + 2, sy + 2, 2, 12);
+
+                // Bottom & right shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.35)';
+                ctx.fillRect(sx + 2, sy + 12, 28, 2);
+                ctx.fillRect(sx + 28, sy + 2, 2, 12);
+
+                // Micro texture noise
+                for (let i = 0; i < 8; i++) {
+                    ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.08)' : 'rgba(0,0,0,0.1)';
+                    ctx.fillRect(sx + 4 + Math.random() * 22, sy + 4 + Math.random() * 7, 2, 2);
+                }
+            }
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 16. Shop Brick House Wall (with decorative timber beam & storefront window)
+    static createShopWallTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Warm European red/ochre brick base
+        ctx.fillStyle = '#221915';
+        ctx.fillRect(0, 0, 64, 64);
+        const brickColors = ['#a24a38', '#b4533e', '#883e2f', '#964434'];
+        for (let r = 0; r < 8; r++) {
+            const shift = (r % 2 === 0) ? 0 : 8;
+            for (let c = -1; c < 5; c++) {
+                ctx.fillStyle = brickColors[Math.floor(Math.random() * brickColors.length)];
+                ctx.fillRect(c * 16 + shift + 1, r * 8 + 1, 14, 6);
+            }
+        }
+
+        // Shop display window (bay window with glass panes & awning)
+        // Dark window frame
+        ctx.fillStyle = '#2d1b0d';
+        ctx.fillRect(12, 22, 40, 32);
+
+        // Glass pane (warm golden interior light reflection)
+        ctx.fillStyle = '#ffd166';
+        ctx.fillRect(15, 25, 34, 26);
+
+        // Shop items on display silhouette
+        ctx.fillStyle = '#7a3b12';
+        ctx.fillRect(18, 38, 8, 10); // potion bottle / vase
+        ctx.fillRect(30, 40, 14, 8); // bread / goods box
+        ctx.fillStyle = '#38bdf8'; // blue magic flask
+        ctx.fillRect(20, 34, 4, 6);
+
+        // Window muntin grid bars
+        ctx.fillStyle = '#2d1b0d';
+        ctx.fillRect(31, 25, 2, 26);
+        ctx.fillRect(15, 37, 34, 2);
+
+        // Striped shop awning on top (red and white European canvas)
+        for (let x = 8; x < 56; x += 8) {
+            ctx.fillStyle = ((x / 8) % 2 === 0) ? '#e11d48' : '#f8fafc';
+            ctx.fillRect(x, 14, 8, 8);
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 17. Inn Brick House Wall (comfortable tavern/inn with lantern sign)
+    static createInnWallTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Sturdy brown-red brick wall base
+        ctx.fillStyle = '#1c1613';
+        ctx.fillRect(0, 0, 64, 64);
+        const brickColors = ['#8d4633', '#9c4d38', '#773b2c', '#aa543e'];
+        for (let r = 0; r < 8; r++) {
+            const shift = (r % 2 === 0) ? 0 : 8;
+            for (let c = -1; c < 5; c++) {
+                ctx.fillStyle = brickColors[Math.floor(Math.random() * brickColors.length)];
+                ctx.fillRect(c * 16 + shift + 1, r * 8 + 1, 14, 6);
+            }
+        }
+
+        // Half-timbered cross beams (European fachwerk)
+        ctx.fillStyle = '#3f2512';
+        ctx.fillRect(0, 0, 64, 4);
+        ctx.fillRect(0, 60, 64, 4);
+        ctx.fillRect(0, 0, 4, 64);
+        ctx.fillRect(60, 0, 4, 64);
+
+        // Inn double windows with cosy warm yellow tavern light
+        ctx.fillStyle = '#28170b';
+        ctx.fillRect(10, 20, 20, 24);
+        ctx.fillRect(34, 20, 20, 24);
+
+        ctx.fillStyle = '#fbbf24'; // Warm tavern lantern light
+        ctx.fillRect(12, 22, 16, 20);
+        ctx.fillRect(36, 22, 16, 20);
+
+        // Window curtains & frame
+        ctx.fillStyle = '#b91c1c';
+        ctx.fillRect(12, 22, 4, 20);
+        ctx.fillRect(24, 22, 4, 20);
+        ctx.fillRect(36, 22, 4, 20);
+        ctx.fillRect(48, 22, 4, 20);
+
+        // Window grid
+        ctx.fillStyle = '#28170b';
+        ctx.fillRect(19, 22, 2, 20);
+        ctx.fillRect(12, 31, 16, 2);
+        ctx.fillRect(43, 22, 2, 20);
+        ctx.fillRect(36, 31, 16, 2);
+
+        // Hanging wooden tavern sign banner (bed symbol)
+        ctx.fillStyle = '#5c3317';
+        ctx.fillRect(24, 6, 16, 10);
+        ctx.strokeStyle = '#222';
+        ctx.strokeRect(24, 6, 16, 10);
+        // Moon / star emblem on inn sign
+        ctx.fillStyle = '#fef08a';
+        ctx.fillRect(30, 8, 4, 4);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 18. City Slate Blue Roof Texture (French/German Parisian blue slate roofs)
+    static createCityRoofTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Dark navy slate base
+        ctx.fillStyle = '#1e2430';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Blue-grey slate shingles
+        const rowH = 8;
+        const slateColors = ['#334155', '#3f4f66', '#2b384a', '#475569'];
+        for (let y = 0; y < 64; y += rowH) {
+            const shift = ((y / rowH) % 2 === 0) ? 0 : 8;
+            for (let x = -8; x < 64; x += 16) {
+                ctx.fillStyle = slateColors[Math.floor(Math.random() * slateColors.length)];
+                ctx.fillRect(x + shift + 1, y + 1, 14, rowH - 2);
+
+                // Top highlight
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.22)';
+                ctx.fillRect(x + shift + 1, y + 1, 14, 1);
+                // Bottom shadow
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)';
+                ctx.fillRect(x + shift + 1, y + rowH - 2, 14, 1);
+            }
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 19. European Paver Road (Paved stone plaza / street)
+    static createPavedRoadTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Dark stone mortar
+        ctx.fillStyle = '#2d3339';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Elegant European interlocking paver stones (fan / herringbone style blocks)
+        const paverColors = ['#88929e', '#9ba5b2', '#76808c', '#a6b0bd', '#6d7782'];
+        const blockW = 16;
+        const blockH = 8;
+
+        for (let r = 0; r < 8; r++) {
+            const shift = (r % 2 === 0) ? 0 : 8;
+            for (let c = -1; c < 5; c++) {
+                const sx = c * blockW + shift;
+                const sy = r * blockH;
+                ctx.fillStyle = paverColors[Math.floor(Math.random() * paverColors.length)];
+                ctx.fillRect(sx + 1, sy + 1, blockW - 2, blockH - 2);
+
+                // Sunlit bevel edge
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.25)';
+                ctx.fillRect(sx + 1, sy + 1, blockW - 2, 1);
+                ctx.fillRect(sx + 1, sy + 1, 1, blockH - 2);
+
+                // Shadow bevel edge
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.3)';
+                ctx.fillRect(sx + 1, sy + blockH - 2, blockW - 2, 1);
+                ctx.fillRect(sx + blockW - 2, sy + 1, 1, blockH - 2);
+            }
+        }
+
+        // Center drainage curb line (European street gutter)
+        ctx.fillStyle = 'rgba(20, 24, 30, 0.35)';
+        ctx.fillRect(30, 0, 4, 64);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 20. Town Fountain Texture (for central plaza water basin)
+    static createFountainWaterTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Sparkling azure blue fountain water
+        ctx.fillStyle = '#0284c7';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Rippling water highlights
+        const waveColors = ['#38bdf8', '#7dd3fc', '#bae6fd', '#0369a1'];
+        for (let i = 0; i < 40; i++) {
+            ctx.fillStyle = waveColors[Math.floor(Math.random() * waveColors.length)];
+            const rx = Math.floor(Math.random() * 60);
+            const ry = Math.floor(Math.random() * 60);
+            ctx.fillRect(rx, ry, 3 + Math.floor(Math.random() * 4), 2);
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
     // Slime sprite: loads real character artwork from sdServer
     static createSlimeTexture() {
         const loader = new THREE.TextureLoader();
@@ -783,6 +1310,24 @@ export class RetroTextureGenerator {
     static createTreeTexture() {
         const loader = new THREE.TextureLoader();
         const texture = loader.load('/images/objects/tree_pixel.png?t=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // Mossy Boulder sprite
+    static createBoulderTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/objects/mossy_boulder.png?v=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // Wooden Signpost sprite
+    static createSignpostTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/objects/signpost.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
