@@ -126,27 +126,23 @@
             display: flex;
             flex-direction: column-reverse; /* Stacks new ones from bottom up */
             gap: 6px;
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             pointer-events: none;
+            width: 250px;
+            z-index: 20;
         }
 
         .enemy-hud-card {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(15, 23, 42, 0.92);
-            border: 1px solid #ef4444;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.8);
+            background: #0f172a; /* 完全な不透明の濃紺ソリッド背景 */
+            border: 2px solid #ef4444;
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.95);
             border-radius: 6px;
-            padding: 5px 10px;
-            min-width: 230px;
-            animation: enemyCardIn 0.2s ease-out;
-            transition: transform 0.25s ease, opacity 0.25s ease;
-        }
-
-        @keyframes enemyCardIn {
-            0% { transform: translateY(10px) scale(0.95); opacity: 0; }
-            100% { transform: translateY(0) scale(1.0); opacity: 1; }
+            padding: 6px 10px;
+            width: 100%;
+            box-sizing: border-box;
         }
 
         .enemy-hud-icon {
@@ -445,27 +441,27 @@
                     <div id="enemyHudList"></div>
 
                     <div class="status-container">
-                    <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                        <span id="levelText">Lv.1</span>
-                        <span id="hpText" style="color: #4ade80;">100/100</span>
-                    </div>
-                    <div class="hp-bar-bg">
-                        <div id="hpBar"></div>
-                    </div>
-                    <!-- MP Bar -->
-                    <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
-                        <span style="color: #60a5fa;">MP</span>
-                        <span id="mpText" style="color: #60a5fa;">60/60</span>
-                    </div>
-                    <div class="hp-bar-bg" style="height: 8px;">
-                        <div id="mpBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.15s;"></div>
-                    </div>
-                    <div style="margin-top: 4px; display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
-                        <span id="expText">EXP: 0</span>
-                        <span id="monsterCount">敵残数: 0</span>
+                        <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                            <span id="levelText">Lv.1</span>
+                            <span id="hpText" style="color: #4ade80;">100/100</span>
+                        </div>
+                        <div class="hp-bar-bg">
+                            <div id="hpBar"></div>
+                        </div>
+                        <!-- MP Bar -->
+                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
+                            <span style="color: #60a5fa;">MP</span>
+                            <span id="mpText" style="color: #60a5fa;">60/60</span>
+                        </div>
+                        <div class="hp-bar-bg" style="height: 8px;">
+                            <div id="mpBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.15s;"></div>
+                        </div>
+                        <div style="margin-top: 4px; display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
+                            <span id="expText">EXP: 0</span>
+                            <span id="monsterCount">敵残数: 0</span>
+                        </div>
                     </div>
                 </div>
-            </div>
 
                 <div class="badge" style="color: #facc15; font-size: 12px; display: flex; flex-direction: column; gap: 2px;">
                     <div>💡 秘技: 体を半分ずらして突撃 (半ずらし会心!)</div>

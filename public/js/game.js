@@ -1609,24 +1609,31 @@ export class GameEngine {
         if (!monster) return;
         this.activeEnemyCards = this.activeEnemyCards || [];
 
-        // Check if monster already has an active card in the stack
-        const existing = this.activeEnemyCards.find(c => c.monster === monster);
-        if (existing) {
-            existing.timer = 4.0; // Refresh display duration on hit/get hit
-            existing.hp = Math.max(0, monster.hp);
+        // If monster already exists, remove it first so we can move it to the bottom (most recent)
+        const idx = this.activeEnemyCards.findIndex(c => c.monster === monster);
+        let cardData;
+
+        if (idx !== -1) {
+            cardData = this.activeEnemyCards.splice(idx, 1)[0];
+            cardData.timer = 2.5; // Exactly 2.5 seconds display
+            cardData.hp = Math.max(0, monster.hp);
         } else {
-            // Add new engaged enemy to the top of the stack (limited to 3 cards max)
-            this.activeEnemyCards.push({
+            cardData = {
                 monster: monster,
                 name: monster.name || 'モンスター',
                 maxHp: monster.maxHp || 30,
                 hp: Math.max(0, monster.hp),
                 iconUrl: monster.iconUrl || '/images/enemies/slime_char.png',
-                timer: 4.0
-            });
-            if (this.activeEnemyCards.length > 3) {
-                this.activeEnemyCards.shift(); // Remove oldest bottom card if overflowing
-            }
+                timer: 2.5 // Exactly 2.5 seconds display
+            };
+        }
+
+        // Add to the front of the array (bottom of the flex-direction: column-reverse stack)
+        this.activeEnemyCards.unshift(cardData);
+
+        // Limit stack to maximum 3 cards
+        if (this.activeEnemyCards.length > 3) {
+            this.activeEnemyCards.pop();
         }
     }
 
@@ -1648,16 +1655,20 @@ export class GameEngine {
                 card.timer -= dt;
                 card.hp = Math.max(0, card.monster ? card.monster.hp : 0);
 
-                if (card.timer <= 0 || (card.monster && !card.monster.active && card.hp <= 0)) {
+                // Expire when timer runs out (2.5s)
+                if (card.timer <= 0) {
                     this.activeEnemyCards.splice(i, 1);
                 }
             }
 
-            // Render current active enemy cards
+            // Render current active enemy cards with DOM reuse to prevent re-creation flicker
             if (this.activeEnemyCards.length === 0) {
-                enemyListEl.innerHTML = '';
+                if (enemyListEl.innerHTML !== '') {
+                    enemyListEl.innerHTML = '';
+                }
             } else {
-                enemyListEl.innerHTML = this.activeEnemyCards.map(c => {
+                // Generate a key representing the state to only re-render when contents change
+                const newHtml = this.activeEnemyCards.map(c => {
                     const hpPercent = Math.max(0, Math.min(100, (c.hp / c.maxHp) * 100));
                     return `
                         <div class="enemy-hud-card">
@@ -1674,6 +1685,10 @@ export class GameEngine {
                         </div>
                     `;
                 }).join('');
+
+                if (enemyListEl.innerHTML !== newHtml) {
+                    enemyListEl.innerHTML = newHtml;
+                }
             }
         }
     }
