@@ -16,7 +16,8 @@ test('1. JSON Schema & Integrity Validation', async (t) => {
             'public/data/maps/village.json',
             'public/data/maps/city.json',
             'public/data/maps/rockymountain.json',
-            'public/data/maps/cave.json'
+            'public/data/maps/cave.json',
+            'public/data/maps/swamp.json'
         ];
 
         for (const file of jsonFiles) {
@@ -31,7 +32,7 @@ test('1. JSON Schema & Integrity Validation', async (t) => {
         const objects = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/objects.json'), 'utf-8'));
         const enemies = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/enemies.json'), 'utf-8'));
         
-        const mapFiles = ['dungeon.json', 'grassland.json', 'village.json', 'city.json', 'rockymountain.json', 'cave.json'];
+        const mapFiles = ['dungeon.json', 'grassland.json', 'village.json', 'city.json', 'rockymountain.json', 'cave.json', 'swamp.json'];
         for (const mapFile of mapFiles) {
             const map = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/maps', mapFile), 'utf-8'));
             
@@ -76,7 +77,13 @@ test('1. JSON Schema & Integrity Validation', async (t) => {
             'public/images/enemies/slime_char.png',
             'public/images/enemies/skeleton_char.png',
             'public/images/enemies/goblin_mage.png',
-            'public/images/enemies/goblin_archer.png'
+            'public/images/enemies/goblin_archer.png',
+            'public/images/enemies/tarantula_swamp.png',
+            'public/images/enemies/parasite_wasp.png',
+            'public/images/enemies/maria_mosquito.png',
+            'public/images/enemies/acid_worm.png',
+            'public/images/enemies/poison_moth.png',
+            'public/images/enemies/poison_toad.png'
         ];
 
         for (const img of imageFiles) {
@@ -166,8 +173,13 @@ test('4. Variable Scope & Syntax Static Analysis', async (t) => {
         const filePath = path.join(projectRoot, file);
 
         // 1. Rigorous Node.js compiler syntax check on every JS file
+        // (Bun の --check は import を解決しようとして '/js/three.module.js' で失敗するため、Bun 実行時は構文のみ検査する)
         assert.doesNotThrow(() => {
-            execFileSync(process.execPath, ['--check', filePath], { encoding: 'utf-8' });
+            if (typeof Bun !== 'undefined') {
+                new Bun.Transpiler({ loader: 'js' }).transformSync(fs.readFileSync(filePath, 'utf-8'));
+            } else {
+                execFileSync(process.execPath, ['--check', filePath], { encoding: 'utf-8' });
+            }
         }, `JavaScript syntax check failed for: ${file}`);
 
         const code = fs.readFileSync(filePath, 'utf-8');
