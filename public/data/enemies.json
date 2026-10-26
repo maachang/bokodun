@@ -9,7 +9,11 @@
     "attackPower": 8,
     "exp": 15,
     "canShoot": false,
-    "scale": [2.2, 1.95, 1.0],
+    "scale": [
+      2.2,
+      1.95,
+      1.0
+    ],
     "y": 1.0,
     "radius": 0.8
   },
@@ -23,7 +27,11 @@
     "attackPower": 14,
     "exp": 40,
     "canShoot": false,
-    "scale": [1.4, 2.8, 1.0],
+    "scale": [
+      1.4,
+      2.8,
+      1.0
+    ],
     "y": 1.4,
     "radius": 0.8
   },
@@ -40,7 +48,11 @@
     "shootType": "magic",
     "shootCooldown": 2.6,
     "shootRange": 16,
-    "scale": [1.6, 2.6, 1.0],
+    "scale": [
+      1.6,
+      2.6,
+      1.0
+    ],
     "y": 1.3,
     "radius": 0.8
   },
@@ -58,7 +70,11 @@
     "shootCooldown": 2.2,
     "shootRange": 14,
     "maxArrowDistance": 13,
-    "scale": [1.4, 2.8, 1.0],
+    "scale": [
+      1.4,
+      2.8,
+      1.0
+    ],
     "y": 1.4,
     "radius": 0.8
   },
@@ -72,8 +88,126 @@
     "attackPower": 18,
     "exp": 80,
     "canShoot": false,
-    "scale": [2.3, 2.4, 1.0],
+    "scale": [
+      2.3,
+      2.4,
+      1.0
+    ],
     "y": 1.2,
+    "radius": 0.95
+  },
+  "tarantula_swamp": {
+    "id": "tarantula_swamp",
+    "name": "タランチュラ・スワンプ",
+    "texture": "tarantulaSwamp",
+    "aiType": "stalker_spider",
+    "maxHp": 90,
+    "speed": 2.2,
+    "attackPower": 16,
+    "exp": 60,
+    "canShoot": false,
+    "scale": [
+      2.63,
+      2.0,
+      1.0
+    ],
+    "y": 1.1,
+    "radius": 0.95
+  },
+  "parasite_wasp": {
+    "id": "parasite_wasp",
+    "name": "パラサイト・ワスプ",
+    "texture": "parasiteWasp",
+    "aiType": "flying_chase",
+    "maxHp": 45,
+    "speed": 2.6,
+    "attackPower": 14,
+    "exp": 45,
+    "canShoot": false,
+    "scale": [
+      2.12,
+      1.7,
+      1.0
+    ],
+    "y": 1.4,
+    "radius": 0.8
+  },
+  "maria_mosquito": {
+    "id": "maria_mosquito",
+    "name": "マリア・モスキート",
+    "texture": "mariaMosquito",
+    "aiType": "flying_chase",
+    "maxHp": 35,
+    "speed": 2.8,
+    "attackPower": 12,
+    "exp": 35,
+    "canShoot": false,
+    "scale": [
+      1.9,
+      1.7,
+      1.0
+    ],
+    "y": 1.5,
+    "radius": 0.75
+  },
+  "acid_worm": {
+    "id": "acid_worm",
+    "name": "アシッド・ワーム",
+    "texture": "acidWorm",
+    "aiType": "worm_burrow",
+    "maxHp": 70,
+    "speed": 0,
+    "attackPower": 15,
+    "exp": 50,
+    "canShoot": true,
+    "shootType": "poison_breath",
+    "shootCooldown": 1.4,
+    "shootRange": 5.5,
+    "scale": [
+      2.24,
+      2.3,
+      1.0
+    ],
+    "y": 1.2,
+    "radius": 0.9
+  },
+  "poison_moth": {
+    "id": "poison_moth",
+    "name": "巨大毒蛾",
+    "texture": "poisonMoth",
+    "aiType": "flying_ranged",
+    "maxHp": 55,
+    "speed": 1.4,
+    "attackPower": 13,
+    "exp": 55,
+    "canShoot": true,
+    "shootType": "poison_dust",
+    "shootCooldown": 1.8,
+    "shootRange": 16,
+    "scale": [
+      2.63,
+      1.5,
+      1.0
+    ],
+    "y": 1.6,
+    "radius": 0.85
+  },
+  "poison_toad": {
+    "id": "poison_toad",
+    "name": "ポイズントード",
+    "texture": "poisonToad",
+    "aiType": "hop_pounce",
+    "maxHp": 65,
+    "speed": 2.4,
+    "attackPower": 15,
+    "exp": 55,
+    "canShoot": false,
+    "scale": [
+      2.32,
+      1.8,
+      1.0
+    ],
+    "y": 0.9,
     "radius": 0.95
   }
 }

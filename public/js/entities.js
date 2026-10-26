@@ -28,21 +28,37 @@ export class Monster {
             this.aiType = enemyDef.aiType || (this.canShoot ? 'ranged_maintain' : 'walk_chase');
             
             const texKey = enemyDef.texture || 'slime';
-            this.spriteMat = new THREE.SpriteMaterial({ map: textures[texKey] || textures.slime, transparent: true });
+            // Explicitly resolve texture with dynamic fallback creation if not pre-initialized
+            let textureObj = textures[texKey];
+            if (!textureObj) {
+                const loader = new THREE.TextureLoader();
+                const enemyImgFile = enemyDef.imageFile || `${enemyType}.png`;
+                textureObj = loader.load(`/images/enemies/${enemyImgFile}?v=${Date.now()}`);
+                textureObj.magFilter = THREE.NearestFilter;
+                textureObj.minFilter = THREE.NearestFilter;
+                textures[texKey] = textureObj;
+            }
+
+            this.spriteMat = new THREE.SpriteMaterial({ map: textureObj, transparent: true });
             this.scale = enemyDef.scale ? [...enemyDef.scale] : [2.2, 2.0, 1];
             this.y = enemyDef.y ?? 1.0;
 
-            if (texKey === 'goblinArcher') {
-                this.iconUrl = '/images/enemies/goblin_archer.png';
-            } else if (texKey === 'goblin') {
-                this.iconUrl = '/images/enemies/goblin_mage.png';
-            } else if (texKey === 'skeleton') {
-                this.iconUrl = '/images/enemies/skeleton_char.png';
-            } else if (texKey === 'mimic') {
-                this.iconUrl = '/images/enemies/mimic_char.png';
-            } else {
-                this.iconUrl = '/images/enemies/slime_char.png';
-            }
+            // Resolve HUD icon URL dynamically or by map
+            const iconMap = {
+                goblinArcher: '/images/enemies/goblin_archer.png',
+                goblin: '/images/enemies/goblin_mage.png',
+                skeleton: '/images/enemies/skeleton_char.png',
+                mimic: '/images/enemies/mimic_char.png',
+                tarantulaSwamp: '/images/enemies/tarantula_swamp.png',
+                parasiteWasp: '/images/enemies/parasite_wasp.png',
+                mariaMosquito: '/images/enemies/maria_mosquito.png',
+                acidWorm: '/images/enemies/acid_worm.png',
+                poisonMoth: '/images/enemies/poison_moth.png',
+                poisonToad: '/images/enemies/poison_toad.png',
+                slime: '/images/enemies/slime_char.png'
+            };
+
+            this.iconUrl = iconMap[texKey] || (enemyDef.imageFile ? `/images/enemies/${enemyDef.imageFile}` : `/images/enemies/${enemyType}.png`);
         } else {
             // Fallback for compatibility
             if (enemyType === 'S' || enemyType === 'slime') {
@@ -281,6 +297,142 @@ export class Monster {
                 break;
             }
 
+            case 'stalker_spider': {
+                // Pattern 5: Jumping Spider / Tarantula (Quiet stalk -> sudden high-speed sprint -> freeze pause)
+                // 3 phases: 0.0~1.4s Stalking (slow, low footsteps), 1.4~2.2s Sudden Sprint (rapid charge), 2.2~3.2s Freeze Standstill
+                if (dist < 20 && this.knockback.lengthSq() < 0.1) {
+                    const cyclePeriod = 3.2;
+                    const phaseTime = this.aiTimer % cyclePeriod;
+
+                    let moveSpeed = 0;
+                    if (phaseTime < 1.4) {
+                        // Phase 1: Slow deliberate crawl / stalking (quietly closes in)
+                        moveSpeed = this.speed * 0.45;
+                        // Twitching creep
+                        const creepScaleX = 1.0 + Math.sin(this.aiTimer * 10) * 0.05;
+                        this.sprite.scale.set(this.baseScaleX * creepScaleX, this.baseScaleY, 1);
+                        this.baseY = Math.abs(Math.sin(this.aiTimer * 6.0)) * 0.06;
+                    } else if (phaseTime < 2.2) {
+                        // Phase 2: Sudden explosive sprint (like jumping spider darting forward!)
+                        moveSpeed = this.speed * 2.3;
+                        // Flatten down for aerodynamic speed sprint
+                        this.sprite.scale.set(this.baseScaleX * 1.15, this.baseScaleY * 0.85, 1);
+                        this.baseY = 0.02;
+                    } else {
+                        // Phase 3: Total Freeze / Stillness (rearing up, analyzing prey)
+                        moveSpeed = 0;
+                        // Rigid high posture
+                        this.sprite.scale.set(this.baseScaleX * 0.92, this.baseScaleY * 1.08, 1);
+                        this.baseY = 0.0;
+                    }
+
+                    if (moveSpeed > 0 && dist > 0.8) {
+                        const nextX = this.x + dirX * moveSpeed * dt;
+                        const nextZ = this.z + dirZ * moveSpeed * dt;
+                        if (!this.checkWallCollision(nextX, this.z, colliders)) this.x = nextX;
+                        if (!this.checkWallCollision(this.x, nextZ, colliders)) this.z = nextZ;
+                    }
+                }
+                break;
+            }
+
+            case 'flying_chase': {
+                // Pattern 6: Flying insect chase (Parasite Wasp / Maria Mosquito)
+                // Hovers in mid-air (Y: 1.2m ~ 1.9m) with high-speed wing-buzzing flutter, darting toward player
+                if (dist < 20 && this.knockback.lengthSq() < 0.1) {
+                    // Wing vibration flutter scale
+                    const wingBuzz = 1.0 + Math.sin(this.aiTimer * 38.0) * 0.12;
+                    this.sprite.scale.set(this.baseScaleX * wingBuzz, this.baseScaleY, 1);
+
+                    // Hover height floating sinusoidally
+                    const hoverBaseY = (this.scale[1] > 2.0) ? 1.5 : 1.3;
+                    this.baseY = hoverBaseY + Math.sin(this.aiTimer * 5.0) * 0.35;
+
+                    if (dist > 0.8) {
+                        // Darting erratic flight: main chase vector + high-frequency lateral swoops
+                        const lateralDirX = -dirZ;
+                        const lateralDirZ = dirX;
+                        const wobble = Math.sin(this.aiTimer * 8.0) * 0.6;
+
+                        const vx = (dirX + lateralDirX * wobble) * this.speed;
+                        const vz = (dirZ + lateralDirZ * wobble) * this.speed;
+
+                        const nextX = this.x + vx * dt;
+                        const nextZ = this.z + vz * dt;
+                        if (!this.checkWallCollision(nextX, this.z, colliders)) this.x = nextX;
+                        if (!this.checkWallCollision(this.x, nextZ, colliders)) this.z = nextZ;
+                    }
+                }
+                break;
+            }
+
+            case 'flying_ranged': {
+                // Pattern 7: Flying Ranged Moth (Poison Moth)
+                // Glides gracefully high in the air (Y: 1.5m ~ 2.2m), maintains medium distance, casts poison spores
+                if (dist < 20 && this.knockback.lengthSq() < 0.1) {
+                    // Slow majestic wing flap
+                    const flap = 1.0 + Math.sin(this.aiTimer * 7.0) * 0.18;
+                    this.sprite.scale.set(this.baseScaleX * flap, this.baseScaleY * (2.0 - flap), 1);
+
+                    // High altitude floating
+                    this.baseY = 1.6 + Math.sin(this.aiTimer * 3.5) * 0.4;
+
+                    // Maintain comfortable distance around 6.0 ~ 11.0m
+                    let moveSpeed = 0;
+                    let targetX = 0;
+                    let targetZ = 0;
+
+                    if (dist < 5.0) {
+                        // Retreat backwards while in air
+                        targetX = -dirX;
+                        targetZ = -dirZ;
+                        moveSpeed = this.speed * 0.9;
+                    } else if (dist > 11.0) {
+                        // Close in
+                        targetX = dirX;
+                        targetZ = dirZ;
+                        moveSpeed = this.speed;
+                    } else {
+                        // Circling / strafing orbit
+                        const circleDir = (Math.sin(this.aiTimer * 0.8) > 0) ? 1 : -1;
+                        targetX = -dirZ * circleDir;
+                        targetZ = dirX * circleDir;
+                        moveSpeed = this.speed * 0.55;
+                    }
+
+                    if (moveSpeed > 0) {
+                        const nextX = this.x + targetX * moveSpeed * dt;
+                        const nextZ = this.z + targetZ * moveSpeed * dt;
+                        if (!this.checkWallCollision(nextX, this.z, colliders)) this.x = nextX;
+                        if (!this.checkWallCollision(this.x, nextZ, colliders)) this.z = nextZ;
+                    }
+                }
+                break;
+            }
+
+            case 'worm_burrow': {
+                // Pattern 8: Acid Worm (Writhing segmented serpentine undulating movement, close-range toxic mist)
+                if (dist < 18 && this.knockback.lengthSq() < 0.1) {
+                    // Serpentine undulating squirm / S-curve body distortion
+                    const wriggleX = 1.0 + Math.sin(this.aiTimer * 9.0) * 0.22;
+                    const wriggleY = 1.0 - Math.sin(this.aiTimer * 9.0) * 0.15;
+                    this.sprite.scale.set(this.baseScaleX * wriggleX, this.baseScaleY * wriggleY, 1);
+
+                    // Slithers along ground with vertical head bobbing
+                    this.baseY = Math.abs(Math.sin(this.aiTimer * 4.5)) * 0.18;
+
+                    // Creeps slowly toward player to get into toxic breath range (< 5.0m)
+                    if (dist > 2.2) {
+                        const crawlSpeed = 1.4;
+                        const nextX = this.x + dirX * crawlSpeed * dt;
+                        const nextZ = this.z + dirZ * crawlSpeed * dt;
+                        if (!this.checkWallCollision(nextX, this.z, colliders)) this.x = nextX;
+                        if (!this.checkWallCollision(this.x, nextZ, colliders)) this.z = nextZ;
+                    }
+                }
+                break;
+            }
+
             case 'walk_chase':
             default: {
                 // Constant walking pursuit (Skeleton / Melee warrior)
@@ -416,6 +568,30 @@ export class Projectile {
             // Rotate entire arrow to face heading direction
             const yaw = Math.atan2(-dirX, -dirZ);
             this.mesh.rotation.y = yaw;
+        } else if (this.type === 'poison_breath') {
+            // Acid Worm Toxic Breath / Poison Mist cloud
+            this.color = 0x84cc16;
+            this.trailColor = 0xa3e635;
+            this.lifeTime = 0.9; // Short-lived close-range lingering mist
+            const mistGeo = new THREE.DodecahedronGeometry(0.42, 1);
+            const mistMat = new THREE.MeshBasicMaterial({ color: 0x4ade80, wireframe: true });
+            this.aura = new THREE.Mesh(mistGeo, mistMat);
+            this.mesh.add(this.aura);
+        } else if (this.type === 'poison_dust') {
+            // Poison Moth Spores / Toxic Dust Cluster
+            this.color = 0xd946ef;
+            this.trailColor = 0xa855f7;
+            this.lifeTime = 2.5;
+            const sporeGeo = new THREE.SphereGeometry(0.22, 6, 6);
+            const sporeMat = new THREE.MeshBasicMaterial({ color: 0xf472b6 });
+            const spore = new THREE.Mesh(sporeGeo, sporeMat);
+
+            const dustRingGeo = new THREE.TorusGeometry(0.32, 0.05, 4, 8);
+            const dustRingMat = new THREE.MeshBasicMaterial({ color: 0xa855f7 });
+            this.aura = new THREE.Mesh(dustRingGeo, dustRingMat);
+
+            this.mesh.add(spore);
+            this.mesh.add(this.aura);
         } else if (this.isPlayer) {
             // Player Fireball: Bright Orange Core + Yellow Flame Aura
             this.color = 0xff6600;

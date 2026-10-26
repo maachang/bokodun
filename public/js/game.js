@@ -78,6 +78,8 @@ export class GameEngine {
         this.crumblingFloors = [];
         this.dartTraps = [];
         this.chests = [];
+        this.fireJets = [];
+        this.buzzsaws = [];
         this.terrainGrid = [];
         this.doors = [];
         this.signposts = [];
@@ -154,6 +156,10 @@ export class GameEngine {
         forestCanopyTex.magFilter = THREE.NearestFilter;
         forestCanopyTex.minFilter = THREE.NearestFilter;
 
+        const firePillarTex = loader.load('/images/objects/fire_pillar.png?v=' + Date.now());
+        firePillarTex.magFilter = THREE.NearestFilter;
+        firePillarTex.minFilter = THREE.NearestFilter;
+
         this.textures = {
             brick: RetroTextureGenerator.createBrickTexture(),
             floorStone: RetroTextureGenerator.createStoneFloorTexture(),
@@ -199,7 +205,18 @@ export class GameEngine {
             pressurePlate: RetroTextureGenerator.createPressurePlateTexture(),
             dartDispenser: RetroTextureGenerator.createDartDispenserTexture(),
             chest: RetroTextureGenerator.createChestTexture(),
-            mimic: RetroTextureGenerator.createMimicTexture()
+            mimic: RetroTextureGenerator.createMimicTexture(),
+            fireVent: RetroTextureGenerator.createFireVentTexture(),
+            buzzsawBlade: RetroTextureGenerator.createBuzzsawBladeTexture(),
+            buzzsawRail: RetroTextureGenerator.createBuzzsawRailTexture(),
+            swampGround: RetroTextureGenerator.createSwampGroundTexture(),
+            firePillar: firePillarTex,
+            tarantulaSwamp: RetroTextureGenerator.createTarantulaSwampTexture(),
+            parasiteWasp: RetroTextureGenerator.createParasiteWaspTexture(),
+            mariaMosquito: RetroTextureGenerator.createMariaMosquitoTexture(),
+            acidWorm: RetroTextureGenerator.createAcidWormTexture(),
+            poisonMoth: RetroTextureGenerator.createPoisonMothTexture(),
+            poisonToad: RetroTextureGenerator.createPoisonToadTexture()
         };
     }
 
@@ -340,6 +357,8 @@ export class GameEngine {
         this.crumblingFloors = [];
         this.dartTraps = [];
         this.chests = [];
+        this.fireJets = [];
+        this.buzzsaws = [];
         this.terrainGrid = [];
         this.doors = [];
         this.signposts = [];
@@ -381,6 +400,7 @@ export class GameEngine {
         if (env.floorType === 'grass') baseFloorTex = this.textures.grass;
         else if (env.floorType === 'sand') baseFloorTex = this.textures.sand;
         else if (env.floorType === 'water') baseFloorTex = this.textures.water;
+        else if (env.floorType === 'swamp') baseFloorTex = this.textures.swampGround;
 
         const baseFloorMat = new THREE.MeshLambertMaterial({ map: baseFloorTex });
         const cellGeo = new THREE.PlaneGeometry(tileSize, tileSize);
@@ -1208,6 +1228,139 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'fire_jet': {
+                        // Periodic Flamethrower / Fire Jet Floor Grate Trap
+                        const ventMat = new THREE.MeshLambertMaterial({ map: this.textures.fireVent });
+                        const ventMesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), ventMat);
+                        ventMesh.rotation.x = -Math.PI / 2;
+                        ventMesh.position.set(wx, 0.015, wz);
+                        this.scene.add(ventMesh);
+
+                        // Flame Pillar Group: Cross-plane volumetric sprite + billboard flame effect
+                        const flameGroup = new THREE.Group();
+                        const flameW = tileSize * 0.95;
+                        const flameH = 4.8; // Tall towering vortex of fire
+
+                        const firePillarMat = new THREE.MeshBasicMaterial({
+                            map: this.textures.firePillar,
+                            transparent: true,
+                            blending: THREE.AdditiveBlending,
+                            side: THREE.DoubleSide,
+                            depthWrite: false
+                        });
+
+                        const firePlaneGeo = new THREE.PlaneGeometry(flameW, flameH);
+
+                        // 4 Cross-planes (0°, 45°, 90°, 135°) for thick 3D cylindrical flame column
+                        const planes = [];
+                        for (let i = 0; i < 4; i++) {
+                            const p = new THREE.Mesh(firePlaneGeo, firePillarMat);
+                            p.rotation.y = (i * Math.PI) / 4;
+                            p.position.y = flameH / 2;
+                            flameGroup.add(p);
+                            planes.push(p);
+                        }
+
+                        // Dynamic point light for roaring flame
+                        const flameLight = new THREE.PointLight(0xff4500, 0, tileSize * 2.8);
+                        flameLight.position.set(0, 1.8, 0);
+                        flameGroup.add(flameLight);
+
+                        flameGroup.position.set(wx, 0, wz);
+                        flameGroup.visible = false;
+                        this.scene.add(flameGroup);
+
+                        const jetCycle = objDef.cycleDuration || 3.0;
+                        const jetOffset = (objDef.timeOffset !== undefined) ? objDef.timeOffset : ((r * 7 + c * 5) % jetCycle);
+
+                        const fireJetObj = {
+                            group: flameGroup,
+                            flamePlanes: planes,
+                            flameLight: flameLight,
+                            x: wx,
+                            z: wz,
+                            timer: jetOffset,
+                            cycleDuration: jetCycle,
+                            flameActiveDuration: objDef.activeDuration || 1.2, // 1.2s of roaring fire
+                            isErupting: false,
+                            soundPlayed: false,
+                            damage: objDef.damage || 40,
+                            bounds: {
+                                minX: wx - tileSize * 0.45, maxX: wx + tileSize * 0.45,
+                                minZ: wz - tileSize * 0.45, maxZ: wz + tileSize * 0.45
+                            }
+                        };
+                        this.fireJets.push(fireJetObj);
+                        break;
+                    }
+
+                    case 'buzzsaw': {
+                        // Rail-mounted Rotating Buzzsaw / Sawblade Trap
+                        // Detect corridor orientation to sweep ACROSS the hallway (left wall <-> right wall)
+                        // If walls are Top and Bottom (East-West passage), saw travels North-South (Z axis)
+                        // If walls are Left and Right (North-South passage), saw travels East-West (X axis)
+                        const isWallLeft = (c > 0 && mapData.layout[r][c - 1] === '1');
+                        const isWallRight = (c < cols - 1 && mapData.layout[r][c + 1] === '1');
+                        const isWallTop = (r > 0 && mapData.layout[r - 1][c] === '1');
+                        const isWallBottom = (r < rows - 1 && mapData.layout[r + 1][c] === '1');
+
+                        const isEastWestPassage = (isWallTop || isWallBottom) && !(isWallLeft && isWallRight);
+
+                        // Floor rail track (crosswise across corridor)
+                        const railMat = new THREE.MeshLambertMaterial({ map: this.textures.buzzsawRail });
+                        const railMesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), railMat);
+                        railMesh.rotation.x = -Math.PI / 2;
+                        if (!isEastWestPassage) {
+                            // If corridor runs North-South, rail groove runs East-West across corridor
+                            railMesh.rotation.z = Math.PI / 2;
+                        }
+                        railMesh.position.set(wx, 0.015, wz);
+                        this.scene.add(railMesh);
+
+                        // 3D Saw Blade Group (stands upright and sweeps from left wall to right wall)
+                        const sawGroup = new THREE.Group();
+                        const sawRadius = 1.35;
+                        const sawMat = new THREE.MeshLambertMaterial({
+                            map: this.textures.buzzsawBlade,
+                            transparent: true,
+                            alphaTest: 0.1,
+                            side: THREE.DoubleSide
+                        });
+                        const sawGeo = new THREE.PlaneGeometry(sawRadius * 2, sawRadius * 2);
+                        const sawMesh = new THREE.Mesh(sawGeo, sawMat);
+
+                        // Upright orientation aligned across the track
+                        if (isEastWestPassage) {
+                            // Corridor runs East-West: blade moves along Z (North-South).
+                            // Face blade towards X so player walking down the corridor sees the saw disk head-on!
+                            sawMesh.rotation.y = Math.PI / 2;
+                        } else {
+                            // Corridor runs North-South: blade moves along X (East-West).
+                            // Face blade towards Z so player walking along corridor sees the saw disk head-on!
+                            sawMesh.rotation.y = 0;
+                        }
+                        sawMesh.position.y = sawRadius * 0.85;
+                        sawGroup.add(sawMesh);
+
+                        sawGroup.position.set(wx, 0, wz);
+                        this.scene.add(sawGroup);
+
+                        const sawObj = {
+                            group: sawGroup,
+                            sawMesh: sawMesh,
+                            baseX: wx,
+                            baseZ: wz,
+                            isEastWest: isEastWestPassage, // East-West corridor means sweep along Z (crosswise)!
+                            travelDist: objDef.travelDistance || (tileSize * 0.35), // Sweeps between left and right walls (safe timing window)
+                            speed: objDef.speed || 3.0,
+                            timer: (r * 3 + c * 7) % 3.0,
+                            damage: objDef.damage || 35,
+                            radius: 1.05
+                        };
+                        this.buzzsaws.push(sawObj);
+                        break;
+                    }
+
                     case 'trap_tile': {
                         // Hazard traps (spike traps)
                         const trapMat = new THREE.MeshLambertMaterial({ map: this.textures[objDef.texture] });
@@ -1841,6 +1994,112 @@ export class GameEngine {
             }
         }
 
+        // Update Periodic Flamethrower / Fire Jets
+        if (this.fireJets && this.fireJets.length > 0) {
+            for (const fj of this.fireJets) {
+                fj.timer = (fj.timer + dt) % fj.cycleDuration;
+
+                // Cycle: [0.0 ~ activeDuration] = Erupting with roaring fire, rest = Inactive / glowing ember
+                if (fj.timer < fj.flameActiveDuration) {
+                    fj.isErupting = true;
+                    fj.group.visible = true;
+
+                    // Flickering flame scale and light intensity
+                    const flameIntensity = 0.9 + Math.random() * 0.25;
+                    const flickerX = 1.0 + (Math.random() - 0.5) * 0.12;
+                    const flickerY = 1.0 + (Math.random() - 0.5) * 0.15;
+                    fj.flamePlanes.forEach(p => {
+                        p.scale.set(flickerX, flickerY, 1);
+                    });
+                    fj.flameLight.intensity = 2.4 * flameIntensity;
+
+                    // Spark embers
+                    if (Math.random() < 0.45) {
+                        this.particles.spawnBurst(fj.x + (Math.random() - 0.5) * 0.8, 1.8, fj.z + (Math.random() - 0.5) * 0.8, 0xffaa00, 3, 2.0);
+                    }
+
+                    // Sound playback (with distance attenuation)
+                    if (!fj.soundPlayed) {
+                        fj.soundPlayed = true;
+                        const distToPlayer = Math.hypot(this.player.x - fj.x, this.player.z - fj.z);
+                        const maxAudibleDist = 8.0;
+                        if (distToPlayer < maxAudibleDist) {
+                            const falloff = 1.0 - (distToPlayer / maxAudibleDist);
+                            this.sound.playFlameJet(falloff * falloff);
+                        }
+                    }
+
+                    // Burn collision with player
+                    const b = fj.bounds;
+                    const inFlameZone = (this.player.x >= b.minX && this.player.x <= b.maxX &&
+                                        this.player.z >= b.minZ && this.player.z <= b.maxZ);
+
+                    if (inFlameZone && !this.player.isInvincible) {
+                        this.sound.playHurt();
+                        this.flashDamageScreen();
+                        this.particles.spawnBurst(this.player.x, 1.2, this.player.z, 0xff3300, 16, 4.0);
+                        this.addPopup(`火炎放射! -${fj.damage}`, '#f97316');
+                        this.playerTakeDamage(fj.damage, new THREE.Vector3(0, 0, 0));
+                    }
+                } else {
+                    fj.isErupting = false;
+                    fj.group.visible = false;
+                    fj.flameLight.intensity = 0;
+                    fj.soundPlayed = false;
+                }
+            }
+        }
+
+        // Update Rail Buzzsaws (Sweeping / oscillating saw blade across corridor)
+        if (this.buzzsaws && this.buzzsaws.length > 0) {
+            for (const bs of this.buzzsaws) {
+                bs.timer += dt * bs.speed;
+
+                // Ping-pong oscillating sweep (-1.0 to 1.0) across corridor (left wall <-> right wall)
+                const sweepOffset = Math.sin(bs.timer) * bs.travelDist;
+
+                let curX = bs.baseX;
+                let curZ = bs.baseZ;
+
+                if (bs.isEastWest) {
+                    // East-West corridor: sweep across North-South (Z axis)
+                    curZ += sweepOffset;
+                } else {
+                    // North-South corridor: sweep across East-West (X axis)
+                    curX += sweepOffset;
+                }
+
+                bs.group.position.x = curX;
+                bs.group.position.z = curZ;
+
+                // Ultra-rapid saw rotation spin around normal
+                bs.sawMesh.rotation.z += 25 * dt;
+
+                // Spark sparks flying from rail contact
+                if (Math.random() < 0.25) {
+                    this.particles.spawnBurst(curX, 0.1, curZ, 0xfacc15, 2, 2.0);
+                }
+
+                // Periodic whirring sound if near player
+                const distToPlayer = Math.hypot(this.player.x - curX, this.player.z - curZ);
+                const maxAudibleDist = 7.0;
+                if (distToPlayer < maxAudibleDist && Math.random() < 0.08) {
+                    const falloff = 1.0 - (distToPlayer / maxAudibleDist);
+                    this.sound.playBuzzsawWhirr(falloff * falloff);
+                }
+
+                // Check collision with player
+                if (distToPlayer < bs.radius && !this.player.isInvincible) {
+                    this.sound.playChomperSlice();
+                    this.sound.playHurt();
+                    this.flashDamageScreen();
+                    this.particles.spawnBurst(this.player.x, 1.0, this.player.z, 0xdc2626, 20, 5.0);
+                    this.addPopup(`回転ノコギリ切断! -${bs.damage}`, '#ef4444');
+                    this.playerTakeDamage(bs.damage, new THREE.Vector3(0, 0, 0));
+                }
+            }
+        }
+
         // Proximity check for Signposts and Chests (Display guidance banner while near, hide immediately when leaving)
         let activeSignMessage = null;
         if (nearChestInteractable) {
@@ -2121,6 +2380,14 @@ export class GameEngine {
                     if (p.type === 'arrow') {
                         this.sound.playArrowHit();
                         this.particles.spawnBurst(p.x, p.y, p.z, 0xd4d4d8, 8, 2.5);
+                    } else if (p.type === 'poison_breath') {
+                        this.sound.playExplosion();
+                        this.particles.spawnBurst(p.x, p.y, p.z, 0x84cc16, 20, 3.5);
+                        this.addPopup(`猛毒ブレス被弾! -${p.damage}`, '#a3e635');
+                    } else if (p.type === 'poison_dust') {
+                        this.sound.playExplosion();
+                        this.particles.spawnBurst(p.x, p.y, p.z, 0xd946ef, 16, 3.0);
+                        this.addPopup(`毒鱗粉被弾! -${p.damage}`, '#e879f9');
                     } else {
                         this.sound.playExplosion();
                         this.particles.spawnBurst(p.x, p.y, p.z, 0xd946ef, 14, 4.0);

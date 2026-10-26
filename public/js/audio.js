@@ -576,4 +576,68 @@ export class SoundFX {
         // Snap teeth together
         this.playChomperSnap(0.8);
     }
+
+    /**
+     * 火炎放射バーナーがゴオオオッと激しく噴出する音
+     * @param {number} volume 距離減衰ボリューム (0.0 ~ 1.0)
+     */
+    playFlameJet(volume = 1.0) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const v = Math.max(0, Math.min(1.0, volume));
+        if (v <= 0.001) return;
+
+        // Band-pass noise for roaring flame combustion
+        const bufferSize = this.ctx.sampleRate * 0.45;
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'bandpass';
+        filter.frequency.setValueAtTime(320, now);
+        filter.frequency.linearRampToValueAtTime(750, now + 0.15);
+        filter.frequency.exponentialRampToValueAtTime(240, now + 0.45);
+        filter.Q.setValueAtTime(1.5, now);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(0.42 * v, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.45);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+    }
+
+    /**
+     * 回転ノコギリ刃が高速回転・レール移動する金属切削ノイズ
+     * @param {number} volume 距離減衰ボリューム (0.0 ~ 1.0)
+     */
+    playBuzzsawWhirr(volume = 1.0) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const v = Math.max(0, Math.min(1.0, volume));
+        if (v <= 0.001) return;
+
+        // High buzzing saw tone + metal scrape
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(440, now);
+        osc.frequency.linearRampToValueAtTime(520, now + 0.1);
+        osc.frequency.linearRampToValueAtTime(420, now + 0.2);
+
+        gain.gain.setValueAtTime(0.18 * v, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.22);
+    }
 }

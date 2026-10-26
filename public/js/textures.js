@@ -340,6 +340,60 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 2b. Swamp Ground (Damp Peat, Decaying Roots & Mossy Earth - Safe solid ground)
+    static createSwampGroundTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Dark earthy peat and damp swamp mud palette
+        const groundColors = ['#1a1510', '#241b12', '#2c2217', '#362a1c', '#202619', '#2a331f'];
+        for (let x = 0; x < 64; x += 4) {
+            for (let y = 0; y < 64; y += 4) {
+                ctx.fillStyle = groundColors[Math.floor(Math.random() * groundColors.length)];
+                ctx.fillRect(x, y, 4, 4);
+            }
+        }
+
+        // Dark moss patches (olive green / swamp damp moss)
+        const mossColors = ['#334125', '#3d4d29', '#28361e'];
+        for (let i = 0; i < 18; i++) {
+            const mx = Math.floor(Math.random() * 56);
+            const my = Math.floor(Math.random() * 56);
+            const mw = 4 + Math.floor(Math.random() * 6);
+            const mh = 4 + Math.floor(Math.random() * 6);
+            ctx.fillStyle = mossColors[Math.floor(Math.random() * mossColors.length)];
+            ctx.fillRect(mx, my, mw, mh);
+        }
+
+        // Organic decaying roots and tangled twigs across the damp mud
+        ctx.strokeStyle = '#150f0a';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        // Root strand 1
+        ctx.moveTo(4, 20); ctx.lineTo(18, 26); ctx.lineTo(34, 22); ctx.lineTo(48, 28);
+        // Root strand 2
+        ctx.moveTo(16, 52); ctx.lineTo(32, 44); ctx.lineTo(54, 50);
+        ctx.stroke();
+
+        // Tiny damp soil flecks & dead leaf remnants
+        ctx.fillStyle = '#473620';
+        ctx.fillRect(10, 14, 2, 2);
+        ctx.fillRect(42, 38, 2, 2);
+        ctx.fillRect(52, 10, 2, 2);
+        ctx.fillStyle = '#1c2414';
+        ctx.fillRect(24, 50, 2, 2);
+        ctx.fillRect(36, 12, 2, 2);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
     // 3. Ice / Frozen Surface
     static createIceTexture() {
         const canvas = document.createElement('canvas');
@@ -1637,6 +1691,231 @@ export class RetroTextureGenerator {
     static createSignpostTexture() {
         const loader = new THREE.TextureLoader();
         const texture = loader.load('/images/objects/signpost.png?v=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // 28. Fire Vent Floor Grate Texture (Dark cast iron furnace grill)
+    static createFireVentTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Dark charred cast-iron rim
+        ctx.fillStyle = '#1e1c1b';
+        ctx.fillRect(0, 0, 64, 64);
+        ctx.strokeStyle = '#38322e';
+        ctx.lineWidth = 3;
+        ctx.strokeRect(2, 2, 60, 60);
+
+        // Vent slot grill (deep orange-red glowing furnace below)
+        for (let y = 8; y <= 52; y += 8) {
+            // Glowing fiery interior pit beneath grate
+            ctx.fillStyle = '#ea580c';
+            ctx.fillRect(6, y + 1, 52, 4);
+            ctx.fillStyle = '#fef08a';
+            ctx.fillRect(12, y + 2, 40, 2);
+
+            // Heavy dark iron grate bars
+            ctx.fillStyle = '#292524';
+            ctx.fillRect(6, y, 52, 3);
+            ctx.fillStyle = '#44403c';
+            ctx.fillRect(6, y, 52, 1);
+        }
+
+        // Cross bracing iron struts
+        ctx.fillStyle = '#292524';
+        ctx.fillRect(20, 4, 5, 56);
+        ctx.fillRect(39, 4, 5, 56);
+
+        // Bolt rivets
+        ctx.fillStyle = '#78716c';
+        const bolts = [[4, 4], [58, 4], [4, 58], [58, 58], [22, 4], [41, 4], [22, 58], [41, 58]];
+        bolts.forEach(([bx, by]) => ctx.fillRect(bx, by, 2, 2));
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 29. Buzzsaw Blade Texture (Round saw disc with sharp serrated teeth)
+    static createBuzzsawBladeTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 128;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+
+        const cx = 64;
+        const cy = 64;
+        const numTeeth = 20;
+        const outerR = 60;
+        const innerR = 48;
+
+        // Serrated saw teeth circle
+        ctx.beginPath();
+        for (let i = 0; i < numTeeth; i++) {
+            const angle1 = (i * 2 * Math.PI) / numTeeth;
+            const angle2 = ((i + 0.65) * 2 * Math.PI) / numTeeth;
+            const angle3 = ((i + 1.0) * 2 * Math.PI) / numTeeth;
+
+            const x1 = cx + Math.cos(angle1) * outerR;
+            const y1 = cy + Math.sin(angle1) * outerR;
+            const x2 = cx + Math.cos(angle2) * innerR;
+            const y2 = cy + Math.sin(angle2) * innerR;
+
+            if (i === 0) ctx.moveTo(x1, y1);
+            else ctx.lineTo(x1, y1);
+            ctx.lineTo(x2, y2);
+        }
+        ctx.closePath();
+
+        // Metallic steel gradient / radial fill
+        const grad = ctx.createRadialGradient(cx, cy, 10, cx, cy, 60);
+        grad.addColorStop(0, '#f1f5f9');
+        grad.addColorStop(0.4, '#94a3b8');
+        grad.addColorStop(0.85, '#cbd5e1');
+        grad.addColorStop(1, '#475569');
+        ctx.fillStyle = grad;
+        ctx.fill();
+
+        ctx.strokeStyle = '#334155';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+
+        // Inner circular blade cutout vents
+        const ventRadius = 26;
+        for (let i = 0; i < 4; i++) {
+            const va = (i * Math.PI) / 2;
+            const vx = cx + Math.cos(va) * ventRadius;
+            const vy = cy + Math.sin(va) * ventRadius;
+            ctx.fillStyle = '#0f172a';
+            ctx.beginPath();
+            ctx.arc(vx, vy, 6, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // Center hub spindle / axle
+        ctx.fillStyle = '#1e293b';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 13, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#e2e8f0';
+        ctx.beginPath();
+        ctx.arc(cx, cy, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        // Blood splatters along the cutting edge
+        ctx.fillStyle = 'rgba(185, 28, 28, 0.75)';
+        for (let i = 0; i < 7; i++) {
+            const ba = i * 0.95;
+            const bx = cx + Math.cos(ba) * 52;
+            const by = cy + Math.sin(ba) * 52;
+            ctx.beginPath();
+            ctx.arc(bx, by, 3 + (i % 3), 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.LinearFilter;
+        texture.minFilter = THREE.LinearFilter;
+        return texture;
+    }
+
+    // 30. Buzzsaw Floor Track / Rail Texture
+    static createBuzzsawRailTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Dark weathered floor stone base
+        ctx.fillStyle = '#2f2b28';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Center deep guide groove / slot where saw blade arm travels
+        ctx.fillStyle = '#0a0908';
+        ctx.fillRect(0, 26, 64, 12);
+
+        // Steel rail runners on both sides of the trench
+        ctx.fillStyle = '#64748b';
+        ctx.fillRect(0, 24, 64, 2);
+        ctx.fillRect(0, 38, 64, 2);
+
+        // Rail highlights
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillRect(0, 24, 64, 1);
+        ctx.fillRect(0, 39, 64, 1);
+
+        // Greased metallic floor track plates & ties
+        for (let x = 4; x < 64; x += 16) {
+            ctx.fillStyle = '#1e2229';
+            ctx.fillRect(x, 18, 8, 28);
+            // Tie bolts
+            ctx.fillStyle = '#94a3b8';
+            ctx.fillRect(x + 2, 20, 2, 2);
+            ctx.fillRect(x + 2, 42, 2, 2);
+        }
+
+        // Metal grind sparks / scratches
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(14, 29); ctx.lineTo(24, 30);
+        ctx.moveTo(42, 33); ctx.lineTo(54, 34);
+        ctx.stroke();
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // Swamp Enemy sprite textures (real artwork from sdServer)
+    static createTarantulaSwampTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/enemies/tarantula_swamp.png?v=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+    static createParasiteWaspTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/enemies/parasite_wasp.png?v=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+    static createMariaMosquitoTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/enemies/maria_mosquito.png?v=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+    static createAcidWormTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/enemies/acid_worm.png?v=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+    static createPoisonMothTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/enemies/poison_moth.png?v=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+    static createPoisonToadTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/enemies/poison_toad.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;

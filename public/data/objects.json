@@ -47,7 +47,11 @@
     "texture": "boulder",
     "solid": true,
     "blocksProjectiles": true,
-    "scale": [2.6, 2.0, 1.0],
+    "scale": [
+      2.6,
+      2.0,
+      1.0
+    ],
     "radius": 0.85,
     "description": "苔むした平原の自然岩（弓矢や魔法を防ぐ遮蔽物）"
   },
@@ -56,7 +60,11 @@
     "texture": "signpost",
     "solid": true,
     "blocksProjectiles": false,
-    "scale": [1.9, 2.0, 1.0],
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
     "radius": 0.5,
     "message": "← 地下迷宮 / エメラルド平原 / 岩山 →",
     "description": "街道の木製道標・案内看板"
@@ -242,7 +250,11 @@
     "texture": "signpost",
     "solid": true,
     "blocksProjectiles": false,
-    "scale": [1.9, 2.0, 1.0],
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
     "radius": 0.5,
     "message": "← 商業区 (道具屋・宿屋) / 中央噴水広場 / 城門 →",
     "description": "街の案内標識"
@@ -288,9 +300,22 @@
     "isMimic": false,
     "respawnTime": 120,
     "lootTable": [
-      { "type": "gold", "min": 25, "max": 60, "name": "ゴールド" },
-      { "type": "heal_potion", "heal": 40, "name": "HPポーション" },
-      { "type": "mp_potion", "heal": 30, "name": "MPポーション" }
+      {
+        "type": "gold",
+        "min": 25,
+        "max": 60,
+        "name": "ゴールド"
+      },
+      {
+        "type": "heal_potion",
+        "heal": 40,
+        "name": "HPポーション"
+      },
+      {
+        "type": "mp_potion",
+        "heal": 30,
+        "name": "MPポーション"
+      }
     ],
     "description": "アンティーク宝箱（開けるとアイテム・ゴールド入手。設定時間後にリポップ）"
   },
@@ -302,5 +327,30 @@
     "isMimic": true,
     "respawnTime": 180,
     "description": "ミミック宝箱（外見は宝箱だが開けようとすると牙を剥いて襲いかかる凶悪モンスター）"
+  },
+  "fire_jet_trap": {
+    "type": "fire_jet",
+    "texture": "fireVent",
+    "solid": false,
+    "damage": 40,
+    "cycleDuration": 3.0,
+    "activeDuration": 1.2,
+    "description": "火炎放射グリッド（周期的にボワァァッと火柱を噴出！炎が引いた隙に駆け抜けろ）"
+  },
+  "rail_buzzsaw": {
+    "type": "buzzsaw",
+    "texture": "buzzsawRail",
+    "solid": false,
+    "damage": 35,
+    "speed": 3.2,
+    "description": "回転ノコギリレール（通路のレール上を高速往復する巨大丸ノコ！待避ポケットを使いながら進め）"
+  },
+  "swamp_signpost": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "radius": 0.6,
+    "message": "⚠️ 警告: この先 瘴気の湿地帯。毒沼に入ると足を取られ体力を奪われます。猛毒の巨大蜘蛛や羽虫に警戒せよ！",
+    "description": "湿地帯の入口に立つ古びた警告看板"
   }
 }

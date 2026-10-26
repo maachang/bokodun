@@ -35,7 +35,9 @@
     "C": "pop_crumbling_floor",
     "A": "wall_dart_trap",
     "T": "treasure_chest",
-    "U": "mimic_chest"
+    "U": "mimic_chest",
+    "F": "fire_jet_trap",
+    "B": "rail_buzzsaw"
   },
   "enemies": {
     "S": "slime",
@@ -58,7 +60,7 @@
     "1010000110000101",
     "1010G001100G0101",
     "1011111111111101",
-    "10A00X0VV00CC201",
+    "10A0FX0VV00BC201",
     "1111111111111111"
   ]
 }

@@ -424,6 +424,7 @@
                     <button class="btn-scene" onclick="window.game.loadMap('city'); this.blur();">街</button>
                     <button class="btn-scene" onclick="window.game.loadMap('village'); this.blur();">村</button>
                     <button class="btn-scene" onclick="window.game.loadMap('grassland'); this.blur();">草原</button>
+                    <button class="btn-scene" onclick="window.game.loadMap('swamp'); this.blur();">湿地帯</button>
                     <button class="btn-scene" onclick="window.game.loadMap('rockymountain'); this.blur();">岩山</button>
                     <button class="btn-scene" onclick="window.game.loadMap('cave'); this.blur();">洞窟</button>
                     <button class="btn-scene" onclick="window.game.loadMap('dungeon'); this.blur();">地下迷宮</button>
@@ -559,7 +560,7 @@
     </div>
 
     <script type="module">
-        import { GameEngine } from '/js/game.js';
+        import { GameEngine } from '/js/game.js?v=swamp_update_1';
 
         let gameInstance = null;
         window.addEventListener('DOMContentLoaded', async () => {

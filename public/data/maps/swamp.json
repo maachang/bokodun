@@ -1,0 +1,61 @@
+{
+  "id": "swamp",
+  "name": "瘴気の湿地帯 (Toxic Swamp)",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "grassland",
+  "spawn": {
+    "x": 7,
+    "z": 1.5,
+    "angle": 180
+  },
+  "environment": {
+    "floorType": "swamp",
+    "hasCeiling": false,
+    "ambientLight": 3556420,
+    "directionalLight": 6127450,
+    "fogColor": 2307370,
+    "fogNear": 12,
+    "fogFar": 45,
+    "skyColor": 1845290
+  },
+  "legend": {
+    "F": "dense_forest",
+    "P": "poison_swamp",
+    "=": "wood_bridge",
+    "C": "cobblestone_path",
+    "T": "tree",
+    "O": "mossy_boulder",
+    "N": "swamp_signpost",
+    "M": "magic_circle",
+    "2": "portal",
+    "1": "rock_wall"
+  },
+  "enemies": {
+    "S": "tarantula_swamp",
+    "W": "parasite_wasp",
+    "Q": "maria_mosquito",
+    "A": "acid_worm",
+    "H": "poison_moth",
+    "K": "poison_toad"
+  },
+  "layout": [
+    "FFFFFFFFFFFFFFFF",
+    "F000000C0000000F",
+    "F00N000C0000T00F",
+    "F000000C0000000F",
+    "F00PPPPP=PPPPP0F",
+    "F0PPAWPP=PPWAP0F",
+    "F0PPK==PPP==KPPF",
+    "F0PPP=PPQPP=PPPF",
+    "F0PPH=PPOPP=HP0F",
+    "F0PPP=PPQPP=PPPF",
+    "F0PPK===S===KPPF",
+    "F0PPAWPP=PPWAP0F",
+    "F00PPPPP=PPPPP0F",
+    "F000000C0000000F",
+    "F00000020000000F",
+    "FFFFFFFFFFFFFFFF"
+  ]
+}
