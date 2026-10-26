@@ -33,16 +33,19 @@
     "X": "pop_chomper",
     "V": "pop_hidden_spikes",
     "C": "pop_crumbling_floor",
-    "A": "wall_dart_trap"
+    "A": "wall_dart_trap",
+    "T": "treasure_chest",
+    "U": "mimic_chest"
   },
   "enemies": {
     "S": "slime",
     "G": "goblin",
-    "K": "skeleton"
+    "K": "skeleton",
+    "mimic": "mimic"
   },
   "layout": [
     "1111111111111111",
-    "1000000100000001",
+    "1T000001000000U1",
     "1011110101111101",
     "1010010001000101",
     "1010011111000101",

@@ -16,6 +16,7 @@ export class Monster {
             this.maxHp = enemyDef.maxHp || 30;
             this.hp = this.maxHp;
             this.speed = enemyDef.speed || 1.5;
+            this.baseSpeed = this.speed;
             this.attackPower = enemyDef.attackPower || 10;
             this.exp = enemyDef.exp || 20;
             this.canShoot = !!enemyDef.canShoot;
@@ -24,6 +25,7 @@ export class Monster {
             this.shootTimer = this.canShoot ? Math.random() * 2 : 0;
             this.shootRange = enemyDef.shootRange || 15;
             this.maxArrowDistance = enemyDef.maxArrowDistance || 13;
+            this.aiType = enemyDef.aiType || (this.canShoot ? 'ranged_maintain' : 'walk_chase');
             
             const texKey = enemyDef.texture || 'slime';
             this.spriteMat = new THREE.SpriteMaterial({ map: textures[texKey] || textures.slime, transparent: true });
@@ -36,6 +38,8 @@ export class Monster {
                 this.iconUrl = '/images/enemies/goblin_mage.png';
             } else if (texKey === 'skeleton') {
                 this.iconUrl = '/images/enemies/skeleton_char.png';
+            } else if (texKey === 'mimic') {
+                this.iconUrl = '/images/enemies/mimic_char.png';
             } else {
                 this.iconUrl = '/images/enemies/slime_char.png';
             }
@@ -94,6 +98,15 @@ export class Monster {
 
         this.knockback = new THREE.Vector3();
         this.hitTimer = 0;
+
+        // Pattern & animation states
+        this.aiTimer = Math.random() * 2.0;
+        this.baseScaleX = this.scale[0];
+        this.baseScaleY = this.scale[1];
+        this.baseY = 0.0;
+        this.isLeaping = false;
+        this.leapVelocityY = 0;
+        this.leapTargetDir = { x: 0, z: 0 };
     }
 
     update(dt, player, colliders, projectiles, soundFx, scene) {
@@ -106,33 +119,187 @@ export class Monster {
             this.knockback.multiplyScalar(Math.max(0, 1 - dt * 10));
         }
 
-        // Hit flash
+        // Hit flash: blink red and visible
         if (this.hitTimer > 0) {
             this.hitTimer -= dt;
             this.spriteMat.color.setHex(0xff3333);
+            this.sprite.visible = true;
         } else {
             this.spriteMat.color.setHex(0xffffff);
+            this.sprite.visible = true;
         }
 
         const dx = player.x - this.x;
         const dz = player.z - this.z;
         const dist = Math.hypot(dx, dz);
+        const dirX = (dist > 0.001) ? dx / dist : 0;
+        const dirZ = (dist > 0.001) ? dz / dist : 0;
 
-        // Simple chase behavior if in range
-        if (dist < 18 && dist > 1.0 && this.knockback.lengthSq() < 0.1) {
-            const dirX = dx / dist;
-            const dirZ = dz / dist;
-            const nextX = this.x + dirX * this.speed * dt;
-            const nextZ = this.z + dirZ * this.speed * dt;
+        this.aiTimer += dt;
 
-            // Check collision with walls
-            if (!this.checkWallCollision(nextX, this.z, colliders)) {
-                this.x = nextX;
+        // =========================================================================
+        // Distinct Movement AI Patterns
+        // =========================================================================
+        switch (this.aiType) {
+            case 'stationary': {
+                // Pattern 1: Turret / Stationary (does not move, only attacks if in range)
+                break;
             }
-            if (!this.checkWallCollision(this.x, nextZ, colliders)) {
-                this.z = nextZ;
+
+            case 'ranged_maintain': {
+                // Pattern 2: Archer / Mage (Maintains ideal shooting distance)
+                // If player is too close (< 4.5), backs away slowly; if too far (> 11), approaches
+                if (dist < 18 && this.knockback.lengthSq() < 0.1) {
+                    let moveSpeed = 0;
+                    let targetDirX = 0;
+                    let targetDirZ = 0;
+
+                    if (dist < 4.5) {
+                        // Back away
+                        targetDirX = -dirX;
+                        targetDirZ = -dirZ;
+                        moveSpeed = this.speed * 0.85;
+                    } else if (dist > 10.5) {
+                        // Approach shooting range
+                        targetDirX = dirX;
+                        targetDirZ = dirZ;
+                        moveSpeed = this.speed;
+                    } else {
+                        // Strafe sideways slightly for evasive rhythm
+                        const strafeDir = Math.sin(this.aiTimer * 1.5) > 0 ? 1 : -1;
+                        targetDirX = -dirZ * strafeDir;
+                        targetDirZ = dirX * strafeDir;
+                        moveSpeed = this.speed * 0.45;
+                    }
+
+                    if (moveSpeed > 0) {
+                        const nextX = this.x + targetDirX * moveSpeed * dt;
+                        const nextZ = this.z + targetDirZ * moveSpeed * dt;
+                        if (!this.checkWallCollision(nextX, this.z, colliders)) this.x = nextX;
+                        if (!this.checkWallCollision(this.x, nextZ, colliders)) this.z = nextZ;
+                    }
+                }
+                break;
+            }
+
+            case 'bounce_leap': {
+                // Pattern 3: Slime (Poyo-poyo gelatin squish animation, hops towards player, leaps to attack when close)
+                if (dist < 18 && this.knockback.lengthSq() < 0.1) {
+                    const isCloseToPlayer = (dist < 5.0 && dist > 0.8);
+
+                    if (this.isLeaping) {
+                        // Currently in air
+                        this.leapVelocityY -= 14 * dt; // Gravity
+                        this.baseY += this.leapVelocityY * dt;
+
+                        // Fly forward towards target
+                        const leapSpeed = isCloseToPlayer ? (this.speed * 2.2) : (this.speed * 1.4);
+                        const nextX = this.x + this.leapTargetDir.x * leapSpeed * dt;
+                        const nextZ = this.z + this.leapTargetDir.z * leapSpeed * dt;
+                        if (!this.checkWallCollision(nextX, this.z, colliders)) this.x = nextX;
+                        if (!this.checkWallCollision(this.x, nextZ, colliders)) this.z = nextZ;
+
+                        // Air stretch animation
+                        this.sprite.scale.set(this.baseScaleX * 0.85, this.baseScaleY * 1.25, 1);
+
+                        // Land on ground
+                        if (this.baseY <= 0) {
+                            this.baseY = 0;
+                            this.isLeaping = false;
+                            this.leapVelocityY = 0;
+                            // Splat squash on landing
+                            this.sprite.scale.set(this.baseScaleX * 1.35, this.baseScaleY * 0.65, 1);
+                        }
+                    } else {
+                        // On ground: squish & prepare next hop
+                        const hopInterval = isCloseToPlayer ? 0.65 : 1.1; // Hops faster when close
+                        const squishCycle = (this.aiTimer % hopInterval) / hopInterval;
+
+                        // Poyo-poyo gelatin breathing rhythm
+                        const squishX = 1.0 + Math.sin(this.aiTimer * 6.0) * 0.12;
+                        const squishY = 1.0 - Math.sin(this.aiTimer * 6.0) * 0.12;
+                        this.sprite.scale.set(this.baseScaleX * squishX, this.baseScaleY * squishY, 1);
+
+                        if (squishCycle > 0.88) {
+                            // Initiate jump / leap attack!
+                            this.isLeaping = true;
+                            this.leapVelocityY = isCloseToPlayer ? 4.2 : 3.0; // Higher tackle leap when close
+                            this.leapTargetDir = { x: dirX, z: dirZ };
+                        }
+                    }
+                } else {
+                    // Idle breathing when far away
+                    const idleSquish = 1.0 + Math.sin(this.aiTimer * 3.0) * 0.06;
+                    this.sprite.scale.set(this.baseScaleX * idleSquish, this.baseScaleY * (2.0 - idleSquish), 1);
+                }
+                break;
+            }
+
+            case 'hop_pounce': {
+                // Pattern 4: Frog / Mimic (Crouches down, then springs forward with violent pounce attacks)
+                if (dist < 18 && this.knockback.lengthSq() < 0.1) {
+                    const isAttackDistance = (dist < 6.5 && dist > 0.8);
+
+                    if (this.isLeaping) {
+                        // High springing pounce arc
+                        this.leapVelocityY -= 16 * dt; // Strong gravity
+                        this.baseY += this.leapVelocityY * dt;
+
+                        const pounceSpeed = isAttackDistance ? (this.speed * 2.5) : (this.speed * 1.6);
+                        const nextX = this.x + this.leapTargetDir.x * pounceSpeed * dt;
+                        const nextZ = this.z + this.leapTargetDir.z * pounceSpeed * dt;
+                        if (!this.checkWallCollision(nextX, this.z, colliders)) this.x = nextX;
+                        if (!this.checkWallCollision(this.x, nextZ, colliders)) this.z = nextZ;
+
+                        // Spring stretch
+                        this.sprite.scale.set(this.baseScaleX * 0.9, this.baseScaleY * 1.2, 1);
+
+                        if (this.baseY <= 0) {
+                            this.baseY = 0;
+                            this.isLeaping = false;
+                            this.leapVelocityY = 0;
+                            // Heavy impact land
+                            this.sprite.scale.set(this.baseScaleX * 1.25, this.baseScaleY * 0.8, 1);
+                        }
+                    } else {
+                        // Crouch and wind-up on ground
+                        const hopInterval = isAttackDistance ? 0.75 : 1.25;
+                        const chargeCycle = (this.aiTimer % hopInterval) / hopInterval;
+
+                        // Squats down in anticipation
+                        const squatAmount = 1.0 - Math.min(0.3, chargeCycle * 0.35);
+                        this.sprite.scale.set(this.baseScaleX * (2.0 - squatAmount), this.baseScaleY * squatAmount, 1);
+
+                        if (chargeCycle > 0.9) {
+                            // POUNCE!
+                            this.isLeaping = true;
+                            this.leapVelocityY = isAttackDistance ? 5.2 : 3.8;
+                            this.leapTargetDir = { x: dirX, z: dirZ };
+                        }
+                    }
+                }
+                break;
+            }
+
+            case 'walk_chase':
+            default: {
+                // Constant walking pursuit (Skeleton / Melee warrior)
+                if (dist < 18 && dist > 1.0 && this.knockback.lengthSq() < 0.1) {
+                    const nextX = this.x + dirX * this.speed * dt;
+                    const nextZ = this.z + dirZ * this.speed * dt;
+
+                    if (!this.checkWallCollision(nextX, this.z, colliders)) this.x = nextX;
+                    if (!this.checkWallCollision(this.x, nextZ, colliders)) this.z = nextZ;
+
+                    // Footstep bobbing
+                    this.baseY = Math.abs(Math.sin(this.aiTimer * 8.0)) * 0.12;
+                }
+                break;
             }
         }
+
+        // Apply vertical position (hopping / leaping height)
+        this.sprite.position.y = this.baseY;
 
         // Projectile shooting logic for Archer / Mage
         const effectiveShootRange = this.shootRange || 15;
@@ -172,6 +339,7 @@ export class Monster {
 
     checkWallCollision(x, z, colliders) {
         for (const c of colliders) {
+            if (c.disabled) continue;
             if (x >= c.minX - this.radius && x <= c.maxX + this.radius &&
                 z >= c.minZ - this.radius && z <= c.maxZ + this.radius) {
                 return true;
@@ -183,7 +351,9 @@ export class Monster {
     takeDamage(amount, knockDir) {
         this.hp -= amount;
         this.hitTimer = 0.2;
-        this.knockback.set(knockDir.x * 12, 0, knockDir.z * 12);
+        if (knockDir) {
+            this.knockback.set(knockDir.x * 12, 0, knockDir.z * 12);
+        }
         if (this.hp <= 0) {
             this.active = false;
         }

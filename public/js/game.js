@@ -33,6 +33,7 @@ export class GameEngine {
             hp: 100,
             maxMp: 60,
             mp: 60,
+            gold: 0,
             exp: 0,
             level: 1,
             attackPower: 15,
@@ -76,6 +77,7 @@ export class GameEngine {
         this.popSpikes = [];
         this.crumblingFloors = [];
         this.dartTraps = [];
+        this.chests = [];
         this.terrainGrid = [];
         this.doors = [];
         this.signposts = [];
@@ -195,7 +197,9 @@ export class GameEngine {
             popSpikePlate: RetroTextureGenerator.createPoPSpikePlateTexture(),
             crumblingFloor: RetroTextureGenerator.createCrumblingFloorTexture(),
             pressurePlate: RetroTextureGenerator.createPressurePlateTexture(),
-            dartDispenser: RetroTextureGenerator.createDartDispenserTexture()
+            dartDispenser: RetroTextureGenerator.createDartDispenserTexture(),
+            chest: RetroTextureGenerator.createChestTexture(),
+            mimic: RetroTextureGenerator.createMimicTexture()
         };
     }
 
@@ -223,8 +227,14 @@ export class GameEngine {
                     e.preventDefault();
                     break;
                 case 'ArrowRight':
-                case 'KeyE':
                     this.keys.turnRight = true;
+                    e.preventDefault();
+                    break;
+                case 'KeyE':
+                    // E Key: Interact with nearest Chest or Door, or Turn Right if no object near
+                    if (!this.interactNearestObject()) {
+                        this.keys.turnRight = true;
+                    }
                     e.preventDefault();
                     break;
                 case 'Space':
@@ -329,6 +339,7 @@ export class GameEngine {
         this.popSpikes = [];
         this.crumblingFloors = [];
         this.dartTraps = [];
+        this.chests = [];
         this.terrainGrid = [];
         this.doors = [];
         this.signposts = [];
@@ -1097,6 +1108,80 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'chest': {
+                        // Antique Treasure Chest (or Mimic Monster in disguise)
+                        const chestGroup = new THREE.Group();
+                        const chestMat = new THREE.MeshLambertMaterial({ map: this.textures.chest });
+
+                        const chestW = 1.3;
+                        const chestH = 0.85;
+                        const chestD = 0.95;
+
+                        // Chest Lower Base Box
+                        const baseGeo = new THREE.BoxGeometry(chestW, chestH * 0.6, chestD);
+                        const baseMesh = new THREE.Mesh(baseGeo, chestMat);
+                        baseMesh.position.set(0, (chestH * 0.6) / 2, 0);
+                        chestGroup.add(baseMesh);
+
+                        // Chest Lid with Hinge Pivot at Back (-Z)
+                        const lidPivot = new THREE.Group();
+                        lidPivot.position.set(0, chestH * 0.6, -chestD / 2); // Hinge line
+
+                        const lidGeo = new THREE.BoxGeometry(chestW * 1.02, chestH * 0.42, chestD * 1.02);
+                        const lidMesh = new THREE.Mesh(lidGeo, chestMat);
+                        lidMesh.position.set(0, (chestH * 0.42) / 2, chestD / 2); // Center lid on pivot
+                        lidPivot.add(lidMesh);
+                        chestGroup.add(lidPivot);
+
+                        // Subtle gold lock cube on front
+                        const lockGeo = new THREE.BoxGeometry(0.22, 0.22, 0.08);
+                        const lockMat = new THREE.MeshLambertMaterial({ color: 0xfacc15 });
+                        const lockMesh = new THREE.Mesh(lockGeo, lockMat);
+                        lockMesh.position.set(0, (chestH * 0.6) / 2, chestD / 2 + 0.04);
+                        chestGroup.add(lockMesh);
+
+                        // Chest subtle ground shadow
+                        const cShadowMat = new THREE.MeshBasicMaterial({ color: 0x0a0a0a, transparent: true, opacity: 0.55 });
+                        const cShadow = new THREE.Mesh(new THREE.PlaneGeometry(chestW * 1.3, chestD * 1.3), cShadowMat);
+                        cShadow.rotation.x = -Math.PI / 2;
+                        cShadow.position.set(0, 0.015, 0);
+                        chestGroup.add(cShadow);
+
+                        chestGroup.position.set(wx, 0, wz);
+                        this.scene.add(chestGroup);
+
+                        const chestObj = {
+                            group: chestGroup,
+                            lidPivot: lidPivot,
+                            baseMesh: baseMesh,
+                            x: wx,
+                            z: wz,
+                            isMimic: !!objDef.isMimic,
+                            isOpen: false,
+                            targetLidAngle: 0, // 0 = closed, -Math.PI * 0.55 = open
+                            currentLidAngle: 0,
+                            respawnTimer: 0,
+                            respawnDuration: objDef.respawnTime || 120, // default 120s
+                            lootTable: objDef.lootTable || [
+                                { type: 'gold', min: 30, max: 80, name: 'ゴールド' }
+                            ],
+                            radius: objDef.radius || 1.4
+                        };
+                        this.chests.push(chestObj);
+
+                        if (objDef.solid) {
+                            const rad = 0.7;
+                            const collider = {
+                                minX: wx - rad, maxX: wx + rad,
+                                minZ: wz - rad, maxZ: wz + rad,
+                                blocksProjectiles: true
+                            };
+                            chestObj.collider = collider;
+                            this.colliders.push(collider);
+                        }
+                        break;
+                    }
+
                     case 'floor_tile': {
                         // Ground-level custom floor tile
                         const tileMat = new THREE.MeshLambertMaterial({
@@ -1723,9 +1808,44 @@ export class GameEngine {
             }
         }
 
-        // Proximity check for Signposts (Display guidance banner while near, hide immediately when leaving)
+        // Update Treasure Chests & Mimic Respawns
+        let nearChestInteractable = false;
+        if (this.chests && this.chests.length > 0) {
+            for (const ch of this.chests) {
+                // Smooth opening/closing lid rotation
+                ch.currentLidAngle += (ch.targetLidAngle - ch.currentLidAngle) * 8 * dt;
+                ch.lidPivot.rotation.x = ch.currentLidAngle;
+
+                // Handle Respawn timer if open
+                if (ch.isOpen && !ch.isDestroyed) {
+                    ch.respawnTimer += dt;
+                    if (ch.respawnTimer >= ch.respawnDuration) {
+                        // Reclose lid and refill treasure!
+                        ch.isOpen = false;
+                        ch.targetLidAngle = 0;
+                        ch.respawnTimer = 0;
+                        if (!ch.group.visible) {
+                            ch.group.visible = true; // Make visible again if mimic was defeated
+                        }
+                        if (ch.collider) {
+                            ch.collider.disabled = false;
+                        }
+                    }
+                }
+
+                // Check distance to prompt player interaction
+                const distToChest = Math.hypot(this.player.x - ch.x, this.player.z - ch.z);
+                if (distToChest < ch.radius + 0.8 && !ch.isOpen && ch.group.visible) {
+                    nearChestInteractable = true;
+                }
+            }
+        }
+
+        // Proximity check for Signposts and Chests (Display guidance banner while near, hide immediately when leaving)
         let activeSignMessage = null;
-        if (this.signposts && this.signposts.length > 0) {
+        if (nearChestInteractable) {
+            activeSignMessage = '【Eキー】宝箱を開ける';
+        } else if (this.signposts && this.signposts.length > 0) {
             for (const s of this.signposts) {
                 const distToSign = Math.hypot(this.player.x - s.x, this.player.z - s.z);
                 const triggerDist = s.radius || 2.4;
@@ -2232,6 +2352,90 @@ export class GameEngine {
         }, 350);
     }
 
+    // Player interaction with nearest Chest or Door (triggered by pressing E)
+    interactNearestObject() {
+        // 1. Check Treasure Chests
+        if (this.chests && this.chests.length > 0) {
+            for (const ch of this.chests) {
+                if (ch.isOpen || !ch.group.visible) continue;
+                const dist = Math.hypot(this.player.x - ch.x, this.player.z - ch.z);
+                if (dist <= ch.radius + 1.2) {
+                    this.openChest(ch);
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    // Open chest or trigger Mimic encounter
+    openChest(chest) {
+        if (chest.isOpen) return;
+        chest.isOpen = true;
+        chest.targetLidAngle = -Math.PI * 0.55; // Flip lid wide open!
+        chest.respawnTimer = 0;
+
+        if (chest.isMimic) {
+            // MIMIC TRAP!
+            this.sound.playMimicGrowl();
+            this.sound.playHurt();
+            this.flashDamageScreen();
+
+            // Bite damage!
+            const biteDamage = 28;
+            this.playerTakeDamage(biteDamage, new THREE.Vector3(0, 0, 0));
+            this.particles.spawnBurst(chest.x, 1.2, chest.z, 0xdc2626, 20, 5.0);
+            this.addPopup(`ガブッ！ミミックの奇襲！ -${biteDamage}`, '#ef4444');
+
+            // Hide stationary chest object & disable solid collider so mimic and player can move freely
+            chest.group.visible = false;
+            if (chest.collider) {
+                chest.collider.disabled = true;
+            }
+
+            const mimicDef = (this.enemyDefinitions && this.enemyDefinitions.mimic) ? this.enemyDefinitions.mimic : {
+                name: '人喰い箱ミミック',
+                maxHp: 75,
+                speed: 2.2,
+                attackPower: 18,
+                exp: 80,
+                radius: 0.95
+            };
+            const m = new Monster('mimic', chest.x, chest.z, this.textures, mimicDef);
+            // On mimic defeat: gives high rewards
+            m.exp = mimicDef.exp || 80;
+            this.monsters.push(m);
+            this.scene.add(m.sprite);
+            this.notifyEnemyEngaged(m);
+
+        } else {
+            // NORMAL TREASURE CHEST!
+            this.sound.playChestOpen();
+            this.sound.playItemGet();
+
+            // Gold / sparkles burst out of chest
+            this.particles.spawnBurst(chest.x, 0.8, chest.z, 0xfbbf24, 22, 4.0);
+
+            // Roll loot from lootTable
+            const lootItem = chest.lootTable[Math.floor(Math.random() * chest.lootTable.length)];
+            if (lootItem.type === 'gold') {
+                const amount = Math.floor(Math.random() * (lootItem.max - lootItem.min + 1)) + lootItem.min;
+                this.player.gold = (this.player.gold || 0) + amount;
+                this.addPopup(`宝箱発見！ ${amount}G 入手！`, '#facc15');
+            } else if (lootItem.type === 'heal_potion') {
+                const healAmt = lootItem.heal || 40;
+                this.player.hp = Math.min(this.player.maxHp, this.player.hp + healAmt);
+                this.particles.spawnBurst(this.player.x, 1.0, this.player.z, 0x22c55e, 14, 3.0);
+                this.addPopup(`宝箱発見！ HP薬で+${healAmt}回復！`, '#22c55e');
+            } else if (lootItem.type === 'mp_potion') {
+                const healAmt = lootItem.heal || 30;
+                this.player.mp = Math.min(this.player.maxMp, this.player.mp + healAmt);
+                this.particles.spawnBurst(this.player.x, 1.0, this.player.z, 0x38bdf8, 14, 3.0);
+                this.addPopup(`宝箱発見！ MP薬で+${healAmt}回復！`, '#38bdf8');
+            }
+        }
+    }
+
     gainExp(amount) {
         this.player.exp += amount;
         const nextLvExp = this.player.level * 40;
@@ -2333,6 +2537,8 @@ export class GameEngine {
         document.getElementById('mpText').innerText = `${Math.floor(this.player.mp)}/${this.player.maxMp}`;
         document.getElementById('levelText').innerText = `Lv.${this.player.level}`;
         document.getElementById('expText').innerText = `EXP: ${this.player.exp}`;
+        const goldEl = document.getElementById('goldText');
+        if (goldEl) goldEl.innerText = `${this.player.gold || 0} G`;
         document.getElementById('monsterCount').innerText = `敵残数: ${this.monsters.length}`;
 
         // Update active enemy status cards stacked above player HP/MP (Ys-style Target Info)
@@ -2411,6 +2617,15 @@ export class GameEngine {
             ctx.beginPath();
             ctx.arc(this.portal.x * scaleX, this.portal.z * scaleZ, 3, 0, Math.PI * 2);
             ctx.fill();
+        }
+
+        // Draw Chests (Gold square on minimap)
+        if (this.chests) {
+            for (const ch of this.chests) {
+                if (!ch.group.visible) continue;
+                ctx.fillStyle = ch.isOpen ? '#94a3b8' : '#facc15';
+                ctx.fillRect(ch.x * scaleX - 2, ch.z * scaleZ - 2, 4, 4);
+            }
         }
 
         // Draw Monsters

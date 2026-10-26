@@ -1506,6 +1506,79 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 26. Antique Wooden Chest (with iron bands, lock & golden rivets)
+    static createChestTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Dark aged oak wood planks
+        ctx.fillStyle = '#6b4226';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Wood grain stripes
+        ctx.fillStyle = '#54331d';
+        for (let y = 0; y < 64; y += 16) {
+            ctx.fillRect(0, y, 64, 2);
+            for (let x = 0; x < 64; x += 4) {
+                if (Math.random() < 0.3) {
+                    ctx.fillStyle = '#452917';
+                    ctx.fillRect(x, y + 2 + Math.floor(Math.random() * 12), 3, 1);
+                }
+            }
+        }
+
+        // Heavy dark iron reinforced bands (top, bottom, left, right)
+        ctx.fillStyle = '#1e293b';
+        ctx.fillRect(0, 0, 8, 64);
+        ctx.fillRect(56, 0, 8, 64);
+        ctx.fillRect(0, 0, 64, 6);
+        ctx.fillRect(0, 58, 64, 6);
+
+        // Center vertical band
+        ctx.fillRect(28, 0, 8, 64);
+
+        // Golden lock plate at center
+        ctx.fillStyle = '#eab308';
+        ctx.fillRect(26, 24, 12, 16);
+        ctx.fillStyle = '#ca8a04';
+        ctx.fillRect(27, 25, 10, 14);
+
+        // Black keyhole
+        ctx.fillStyle = '#0f172a';
+        ctx.beginPath();
+        ctx.arc(32, 29, 2.5, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillRect(31, 29, 2, 6);
+
+        // Golden studs / rivets on iron bands
+        ctx.fillStyle = '#facc15';
+        const rivets = [
+            [4, 3], [32, 3], [60, 3],
+            [4, 20], [60, 20],
+            [4, 44], [60, 44],
+            [4, 61], [32, 61], [60, 61]
+        ];
+        rivets.forEach(([rx, ry]) => {
+            ctx.fillRect(rx - 1, ry - 1, 2, 2);
+        });
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // 27. Mimic Face / Open Jaws with Sharp Teeth (sdServer id=121 transparent texture)
+    static createMimicTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/enemies/mimic_char.png?v=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
     // Slime sprite: loads real character artwork from sdServer
     static createSlimeTexture() {
         const loader = new THREE.TextureLoader();
