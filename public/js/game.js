@@ -2221,10 +2221,14 @@ export class GameEngine {
         // Cross product 2D: determine how much the player is offset from center
         const cross = Math.abs(pFwdX * nz - pFwdZ * nx);
 
+        // Player is actively pressing move key to attack/charge forward
+        const isPlayerMovingForward = (this.keys.forward && !this.player.isFalling);
+
         // Ys 1 "Half-offset" rule:
-        // If player is charging forward (dotFront > 0.4) and offset from dead-center (cross >= 0.25)
-        const isHalfOffset = (dotFront > 0.4 && cross >= 0.25);
-        const isCharging = (dotFront > 0.6);
+        // Attack only occurs if player is actively moving forward!
+        // If player is standing still, player does NOT attack, and enemy gets a free hit.
+        const isHalfOffset = (isPlayerMovingForward && dotFront > 0.4 && cross >= 0.25);
+        const isCharging = (isPlayerMovingForward && dotFront > 0.6);
 
         if (isHalfOffset) {
             // CRITICAL HALF-OFFSET HIT: Player takes 0 damage, monster takes full + bonus damage!
@@ -2249,7 +2253,7 @@ export class GameEngine {
 
             if (isDead) this.gainExp(monster.exp);
         } else {
-            // Enemy hits player (player was backing away or standing still)
+            // Enemy hits player (player is standing still, stopped, or backing away)
             const mDmg = monster.attackPower;
             this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz));
             this.notifyEnemyEngaged(monster);
