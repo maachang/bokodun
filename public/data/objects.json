@@ -262,5 +262,22 @@
     "damage": 35,
     "cycleDuration": 2.4,
     "description": "プリンス・オブ・ペルシャ風 飛び出す鉄串罠（周期を見極めて引っ込んだ瞬間に駆け抜ける）"
+  },
+  "pop_crumbling_floor": {
+    "type": "crumbling_floor",
+    "texture": "crumblingFloor",
+    "solid": false,
+    "damage": 30,
+    "shakeDuration": 0.85,
+    "respawnTime": 4.5,
+    "description": "プリンス・オブ・ペルシャ風 崩れる床（乗るとカタカタ震えて奈落へ崩落！立ち止まらず走り抜けろ）"
+  },
+  "wall_dart_trap": {
+    "type": "dart_trap",
+    "texture": "pressurePlate",
+    "solid": false,
+    "damage": 25,
+    "speed": 18,
+    "description": "壁矢罠（床の感圧スイッチを踏むと壁の射出口から高速の毒矢が水平に飛来）"
   }
 }

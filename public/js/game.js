@@ -40,7 +40,12 @@ export class GameEngine {
             invincibleTimer: 0,
             attackCooldown: 0,
             magicCooldown: 0,
-            knockback: new THREE.Vector3()
+            knockback: new THREE.Vector3(),
+            isFalling: false,
+            fallDepth: 0,
+            fallVelocityY: 0,
+            fallRespawnPos: null,
+            lastSafePos: { x: 0, z: 0 }
         };
 
         // Inputs
@@ -69,6 +74,8 @@ export class GameEngine {
         this.fountains = [];
         this.chompers = [];
         this.popSpikes = [];
+        this.crumblingFloors = [];
+        this.dartTraps = [];
         this.terrainGrid = [];
         this.doors = [];
         this.signposts = [];
@@ -185,7 +192,10 @@ export class GameEngine {
             pavedRoad: RetroTextureGenerator.createPavedRoadTexture(),
             fountainWater: RetroTextureGenerator.createFountainWaterTexture(),
             chomperBlade: RetroTextureGenerator.createChomperBladeTexture(),
-            popSpikePlate: RetroTextureGenerator.createPoPSpikePlateTexture()
+            popSpikePlate: RetroTextureGenerator.createPoPSpikePlateTexture(),
+            crumblingFloor: RetroTextureGenerator.createCrumblingFloorTexture(),
+            pressurePlate: RetroTextureGenerator.createPressurePlateTexture(),
+            dartDispenser: RetroTextureGenerator.createDartDispenserTexture()
         };
     }
 
@@ -317,6 +327,8 @@ export class GameEngine {
         this.fountains = [];
         this.chompers = [];
         this.popSpikes = [];
+        this.crumblingFloors = [];
+        this.dartTraps = [];
         this.terrainGrid = [];
         this.doors = [];
         this.signposts = [];
@@ -338,6 +350,7 @@ export class GameEngine {
 
         // Pre-build terrain lookup grid
         const waterMap = Array.from({ length: rows }, () => Array(cols).fill(false));
+        const holeFloorMap = Array.from({ length: rows }, () => Array(cols).fill(false));
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 const char = mapData.layout[r][c];
@@ -346,10 +359,13 @@ export class GameEngine {
                 if (objDef && objDef.type === 'liquid_tile') {
                     waterMap[r][c] = true;
                 }
+                if (objDef && objDef.type === 'crumbling_floor') {
+                    holeFloorMap[r][c] = true; // Crumbling floor has a deep bottomless pit cavity instead of normal floor!
+                }
             }
         }
 
-        // 1. Grid-based Floor Generation (carving holes for sunken water tiles)
+        // 1. Grid-based Floor Generation (carving holes for sunken water tiles and crumbling pitfall cavities)
         let baseFloorTex = this.textures.floorStone;
         if (env.floorType === 'grass') baseFloorTex = this.textures.grass;
         else if (env.floorType === 'sand') baseFloorTex = this.textures.sand;
@@ -360,7 +376,7 @@ export class GameEngine {
 
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
-                if (waterMap[r][c]) continue; // Water cell has a hole at Y=0!
+                if (waterMap[r][c] || holeFloorMap[r][c]) continue; // Water and crumbling pits do not have base floor at Y=0!
 
                 const wx = c * tileSize + tileSize / 2;
                 const wz = r * tileSize + tileSize / 2;
@@ -910,6 +926,177 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'crumbling_floor': {
+                        // Prince of Persia Loose / Crumbling Floor Tile
+                        // Deep 3D pit shaft (dark dungeon rock cavity with bottomless void)
+                        const pitDepth = 8.0;
+                        const pitGroup = new THREE.Group();
+
+                        // 4 side walls of the deep pit cavity
+                        const pitWallMat = new THREE.MeshLambertMaterial({ map: this.textures.rock });
+                        const pitWallGeo = new THREE.PlaneGeometry(tileSize, pitDepth);
+
+                        // North pit wall
+                        const pWallN = new THREE.Mesh(pitWallGeo, pitWallMat);
+                        pWallN.position.set(0, -pitDepth / 2, -tileSize / 2);
+                        pitGroup.add(pWallN);
+
+                        // South pit wall
+                        const pWallS = new THREE.Mesh(pitWallGeo, pitWallMat);
+                        pWallS.rotation.y = Math.PI;
+                        pWallS.position.set(0, -pitDepth / 2, tileSize / 2);
+                        pitGroup.add(pWallS);
+
+                        // West pit wall
+                        const pWallW = new THREE.Mesh(pitWallGeo, pitWallMat);
+                        pWallW.rotation.y = Math.PI / 2;
+                        pWallW.position.set(-tileSize / 2, -pitDepth / 2, 0);
+                        pitGroup.add(pWallW);
+
+                        // East pit wall
+                        const pWallE = new THREE.Mesh(pitWallGeo, pitWallMat);
+                        pWallE.rotation.y = -Math.PI / 2;
+                        pWallE.position.set(tileSize / 2, -pitDepth / 2, 0);
+                        pitGroup.add(pWallE);
+
+                        // Pitch-black bottom abyss
+                        const abyssGeo = new THREE.PlaneGeometry(tileSize, tileSize);
+                        const abyssMat = new THREE.MeshBasicMaterial({ color: 0x020202 });
+                        const abyssMesh = new THREE.Mesh(abyssGeo, abyssMat);
+                        abyssMesh.rotation.x = -Math.PI / 2;
+                        abyssMesh.position.set(0, -pitDepth, 0);
+                        pitGroup.add(abyssMesh);
+
+                        // Sharp iron spikes at the bottom of the pit cavity!
+                        const pitSpikeGeo = new THREE.ConeGeometry(0.12, 1.4, 5);
+                        const pitSpikeMat = new THREE.MeshLambertMaterial({ color: 0x94a3b8 });
+                        const bottomSpikes = [
+                            [-1.0, -1.0], [0, -1.0], [1.0, -1.0],
+                            [-0.5, 0], [0.5, 0],
+                            [-1.0, 1.0], [0, 1.0], [1.0, 1.0]
+                        ];
+                        bottomSpikes.forEach(([ox, oz]) => {
+                            const pSpike = new THREE.Mesh(pitSpikeGeo, pitSpikeMat);
+                            pSpike.position.set(ox, -pitDepth + 0.7, oz);
+                            pitGroup.add(pSpike);
+                        });
+
+                        pitGroup.position.set(wx, 0, wz);
+                        this.scene.add(pitGroup);
+
+                        // The fragile crumbling stone slab covering the pit
+                        const slabMat = new THREE.MeshLambertMaterial({
+                            map: this.textures.crumblingFloor
+                        });
+                        const slabGeo = new THREE.BoxGeometry(tileSize * 0.98, 0.16, tileSize * 0.98);
+                        const slabMesh = new THREE.Mesh(slabGeo, slabMat);
+                        slabMesh.position.set(wx, 0.08, wz);
+                        this.scene.add(slabMesh);
+
+                        const crumbleObj = {
+                            mesh: slabMesh,
+                            pitGroup: pitGroup,
+                            x: wx,
+                            z: wz,
+                            baseX: wx,
+                            baseZ: wz,
+                            state: 'intact', // 'intact' -> 'shaking' -> 'falling' -> 'fallen' -> (respawns)
+                            timer: 0,
+                            shakeDuration: objDef.shakeDuration || 0.85, // 0.85s warning rattle
+                            respawnTime: objDef.respawnTime || 4.5, // Respawns after 4.5s
+                            velocityY: 0,
+                            damage: objDef.damage || 35,
+                            bounds: {
+                                minX: wx - tileSize / 2, maxX: wx + tileSize / 2,
+                                minZ: wz - tileSize / 2, maxZ: wz + tileSize / 2
+                            }
+                        };
+                        this.crumblingFloors.push(crumbleObj);
+                        break;
+                    }
+
+                    case 'dart_trap': {
+                        // Wall Dart Trap linked with floor Pressure Plate
+                        // 1. Floor pressure plate switch at (wx, wz)
+                        const plateMat = new THREE.MeshLambertMaterial({ map: this.textures.pressurePlate });
+                        const plateGeo = new THREE.BoxGeometry(tileSize * 0.7, 0.05, tileSize * 0.7);
+                        const plateMesh = new THREE.Mesh(plateGeo, plateMat);
+                        plateMesh.position.set(wx, 0.025, wz);
+                        this.scene.add(plateMesh);
+
+                        // 2. Find closest adjacent wall in North/South/West/East to mount the dart dispenser block
+                        const checkDirs = [
+                            { dir: 'north', dr: -1, dc: 0, fwdX: 0, fwdZ: 1 },  // Wall is north -> shoots South (+Z)
+                            { dir: 'south', dr: 1, dc: 0, fwdX: 0, fwdZ: -1 }, // Wall is south -> shoots North (-Z)
+                            { dir: 'west', dr: 0, dc: -1, fwdX: 1, fwdZ: 0 },  // Wall is west -> shoots East (+X)
+                            { dir: 'east', dr: 0, dc: 1, fwdX: -1, fwdZ: 0 }   // Wall is east -> shoots West (-X)
+                        ];
+
+                        let chosenWall = null;
+                        for (const cd of checkDirs) {
+                            const nr = r + cd.dr;
+                            const nc = c + cd.dc;
+                            if (nr >= 0 && nr < rows && nc >= 0 && nc < cols) {
+                                if (mapData.layout[nr][nc] === '1') {
+                                    chosenWall = {
+                                        wx: nc * tileSize + tileSize / 2,
+                                        wz: nr * tileSize + tileSize / 2,
+                                        shootDirX: cd.fwdX,
+                                        shootDirZ: cd.fwdZ
+                                    };
+                                    break;
+                                }
+                            }
+                        }
+
+                        // If no direct adjacent wall, shoot from North by default
+                        if (!chosenWall) {
+                            chosenWall = {
+                                wx: wx,
+                                wz: wz - tileSize,
+                                shootDirX: 0,
+                                shootDirZ: 1
+                            };
+                        }
+
+                        // Mount dart dispenser decoration on wall surface
+                        const dispenserMat = new THREE.MeshLambertMaterial({ map: this.textures.dartDispenser });
+                        const dispenserGeo = new THREE.PlaneGeometry(1.4, 1.4);
+                        const dispenserMesh = new THREE.Mesh(dispenserGeo, dispenserMat);
+                        // Offset slightly out of wall face towards plate
+                        dispenserMesh.position.set(
+                            chosenWall.wx + chosenWall.shootDirX * (tileSize / 2 + 0.02),
+                            1.3, // Eye-level dart height
+                            chosenWall.wz + chosenWall.shootDirZ * (tileSize / 2 + 0.02)
+                        );
+                        // Face outwards along shooting direction
+                        const dispenserYaw = Math.atan2(chosenWall.shootDirX, chosenWall.shootDirZ);
+                        dispenserMesh.rotation.y = dispenserYaw;
+                        this.scene.add(dispenserMesh);
+
+                        const dartTrapObj = {
+                            plateMesh: plateMesh,
+                            plateBaseY: 0.025,
+                            platePressedY: 0.008,
+                            x: wx,
+                            z: wz,
+                            isStepped: false,
+                            cooldown: 0,
+                            damage: objDef.damage || 25,
+                            speed: objDef.speed || 18, // Swift whistling dart speed
+                            shootOriginX: chosenWall.wx + chosenWall.shootDirX * (tileSize / 2 + 0.1),
+                            shootOriginZ: chosenWall.wz + chosenWall.shootDirZ * (tileSize / 2 + 0.1),
+                            dirX: chosenWall.shootDirX,
+                            dirZ: chosenWall.shootDirZ,
+                            bounds: {
+                                minX: wx - tileSize * 0.35, maxX: wx + tileSize * 0.35,
+                                minZ: wz - tileSize * 0.35, maxZ: wz + tileSize * 0.35
+                            }
+                        };
+                        this.dartTraps.push(dartTrapObj);
+                        break;
+                    }
+
                     case 'floor_tile': {
                         // Ground-level custom floor tile
                         const tileMat = new THREE.MeshLambertMaterial({
@@ -1197,9 +1384,13 @@ export class GameEngine {
         // Spawn player
         this.player.x = mapData.spawn.x * tileSize + tileSize / 2;
         this.player.z = mapData.spawn.z * tileSize + tileSize / 2;
+        this.player.lastSafePos = { x: this.player.x, z: this.player.z };
         this.player.angle = mapData.spawn.angle || 0;
         this.player.pitch = 0;
         this.player.knockback.set(0, 0, 0);
+        this.player.isFalling = false;
+        this.player.fallDepth = 0;
+        this.player.fallVelocityY = 0;
 
         // Reset inputs on scene transition to prevent stuck keys
         Object.keys(this.keys).forEach(k => this.keys[k] = false);
@@ -1418,6 +1609,120 @@ export class GameEngine {
             }
         }
 
+        // Update Crumbling Floor Tiles (Falling Floor / Pitfall)
+        if (this.crumblingFloors && this.crumblingFloors.length > 0) {
+            for (const cf of this.crumblingFloors) {
+                const b = cf.bounds;
+                const r = this.player.radius || 0.6;
+                const onTile = (this.player.x >= b.minX + 0.25 && this.player.x <= b.maxX - 0.25 &&
+                                this.player.z >= b.minZ + 0.25 && this.player.z <= b.maxZ - 0.25);
+
+                if (cf.state === 'intact') {
+                    if (onTile && !this.player.isFalling) {
+                        cf.state = 'shaking';
+                        cf.timer = 0;
+                        this.sound.playCrumbleRumble();
+                        this.addPopup('床が崩れる！', '#f97316');
+                    }
+                } else if (cf.state === 'shaking') {
+                    cf.timer += dt;
+                    // Jitter / shake violently before collapse
+                    const shakeAmount = 0.08 * (cf.timer / cf.shakeDuration);
+                    cf.mesh.position.x = cf.baseX + (Math.random() - 0.5) * shakeAmount;
+                    cf.mesh.position.z = cf.baseZ + (Math.random() - 0.5) * shakeAmount;
+                    cf.mesh.position.y = 0.08 - (cf.timer / cf.shakeDuration) * 0.06;
+
+                    // Loose pebble particles falling
+                    if (Math.random() < 0.3) {
+                        this.particles.spawnBurst(cf.baseX + (Math.random() - 0.5) * 1.5, 0.1, cf.baseZ + (Math.random() - 0.5) * 1.5, 0x78716c, 2, 0.8);
+                    }
+
+                    if (cf.timer >= cf.shakeDuration) {
+                        // Collapse! Drops into dark bottom
+                        cf.state = 'falling';
+                        cf.timer = 0;
+                        cf.velocityY = 1.0;
+                        this.sound.playFloorCollapse();
+                        this.particles.spawnBurst(cf.baseX, 0.1, cf.baseZ, 0x44403c, 16, 2.5);
+
+                        // If player is still standing on it when it drops: Fall plunge sequence!
+                        if (onTile && !this.player.isFalling) {
+                            this.triggerPlayerFall(cf);
+                        }
+                    }
+                } else if (cf.state === 'falling') {
+                    cf.velocityY += 25 * dt; // Gravity
+                    cf.mesh.position.y -= cf.velocityY * dt;
+
+                    if (cf.mesh.position.y <= -8.0) {
+                        cf.state = 'fallen';
+                        cf.mesh.visible = false;
+                        cf.timer = 0;
+                    }
+                } else if (cf.state === 'fallen') {
+                    // Pit is an open empty hole!
+                    // If player steps into the open empty hole, they plummet into the pit!
+                    if (onTile && !this.player.isFalling) {
+                        this.triggerPlayerFall(cf);
+                    }
+
+                    cf.timer += dt;
+                    if (cf.timer >= cf.respawnTime) {
+                        // Reset intact floor slab
+                        cf.state = 'intact';
+                        cf.mesh.visible = true;
+                        cf.mesh.position.set(cf.baseX, 0.08, cf.baseZ);
+                        cf.timer = 0;
+                        cf.velocityY = 0;
+                    }
+                }
+            }
+        }
+
+        // Update Wall Dart Traps & Pressure Plates
+        if (this.dartTraps && this.dartTraps.length > 0) {
+            for (const trap of this.dartTraps) {
+                if (trap.cooldown > 0) trap.cooldown -= dt;
+
+                const b = trap.bounds;
+                const onPlate = (this.player.x >= b.minX && this.player.x <= b.maxX &&
+                                 this.player.z >= b.minZ && this.player.z <= b.maxZ);
+
+                if (onPlate) {
+                    trap.plateMesh.position.y = trap.platePressedY; // Pressed down
+                    if (!trap.isStepped && trap.cooldown <= 0) {
+                        trap.isStepped = true;
+                        trap.cooldown = 1.2; // Cooldown between dart bursts
+                        this.sound.playPlateClick();
+                        this.sound.playDartShoot();
+
+                        // Spawn high speed poison dart arrow flying from wall dispenser
+                        const dart = new Projectile(
+                            trap.shootOriginX,
+                            trap.shootOriginZ,
+                            trap.dirX,
+                            trap.dirZ,
+                            false,
+                            trap.speed,
+                            trap.damage,
+                            { type: 'arrow', maxDistance: 25 }
+                        );
+                        // Subtle green poison tip aura
+                        dart.y = 1.3;
+                        dart.mesh.position.y = 1.3;
+                        this.projectiles.push(dart);
+                        this.scene.add(dart.mesh);
+
+                        this.particles.spawnBurst(trap.shootOriginX, 1.3, trap.shootOriginZ, 0x22c55e, 8, 2.5);
+                        this.addPopup('カチッ！矢が飛んできた！', '#22c55e');
+                    }
+                } else {
+                    trap.isStepped = false;
+                    trap.plateMesh.position.y = trap.plateBaseY;
+                }
+            }
+        }
+
         // Proximity check for Signposts (Display guidance banner while near, hide immediately when leaving)
         let activeSignMessage = null;
         if (this.signposts && this.signposts.length > 0) {
@@ -1507,10 +1812,12 @@ export class GameEngine {
 
         // Player Move Direction
         const moveDir = new THREE.Vector3();
-        if (this.keys.forward) moveDir.z -= 1;
-        if (this.keys.backward) moveDir.z += 1;
-        if (this.keys.left) moveDir.x -= 1;
-        if (this.keys.right) moveDir.x += 1;
+        if (!this.player.isFalling) {
+            if (this.keys.forward) moveDir.z -= 1;
+            if (this.keys.backward) moveDir.z += 1;
+            if (this.keys.left) moveDir.x -= 1;
+            if (this.keys.right) moveDir.x += 1;
+        }
 
         let worldMoveX = 0;
         let worldMoveZ = 0;
@@ -1540,6 +1847,39 @@ export class GameEngine {
             worldMoveZ = (-moveDir.x * sin + moveDir.z * cos) * moveSpeed * dt;
 
             this.movePlayer(worldMoveX, worldMoveZ);
+        }
+
+        // Record last safe position while walking safely on solid ground (not over pitfall hole or liquid hazard)
+        if (!this.player.isFalling) {
+            let overPit = false;
+            if (this.crumblingFloors) {
+                for (const cf of this.crumblingFloors) {
+                    const b = cf.bounds;
+                    if (this.player.x >= b.minX - 0.2 && this.player.x <= b.maxX + 0.2 &&
+                        this.player.z >= b.minZ - 0.2 && this.player.z <= b.maxZ + 0.2) {
+                        overPit = true;
+                        break;
+                    }
+                }
+            }
+            if (!overPit) {
+                this.player.lastSafePos.x = this.player.x;
+                this.player.lastSafePos.z = this.player.z;
+            }
+        }
+
+        // Handle Falling Pitfall Animation & Plunge Sequence
+        if (this.player.isFalling) {
+            this.player.fallVelocityY += 28 * dt; // Rapid acceleration into pit
+            this.player.fallDepth += this.player.fallVelocityY * dt;
+
+            // Pitch and tilt camera down into the pit
+            this.player.pitch = Math.max(-0.6, this.player.pitch - 1.8 * dt);
+
+            // Reached pit bottom (impaled on pit spikes / crash impact)
+            if (this.player.fallDepth >= 5.5) {
+                this.finishPlayerFall();
+            }
         }
 
         // Calculate terrain special effects (Hazards, MP Regen, Spikes)
@@ -1610,8 +1950,8 @@ export class GameEngine {
             this.player.knockback.multiplyScalar(Math.max(0, 1 - dt * 10));
         }
 
-        // Camera height with elevation difference (wading in water lowers player's eye height naturally)
-        const eyeHeight = 1.8 - playerFloorDepth;
+        // Camera height with elevation difference (wading in water lowers player's eye height naturally, and falling plummets eye height into pit)
+        const eyeHeight = 1.8 - playerFloorDepth - (this.player.isFalling ? this.player.fallDepth : 0);
         this.camera.position.set(this.player.x, eyeHeight, this.player.z);
         this.camera.rotation.set(0, 0, 0);
         this.camera.rotateY(this.player.angle);
@@ -1814,6 +2154,82 @@ export class GameEngine {
                 this.loadMap(this.currentMapId);
             }, 1000);
         }
+    }
+
+    // Trigger falling down the pitfall shaft
+    triggerPlayerFall(crumbleObj) {
+        if (this.player.isFalling) return;
+        this.player.isFalling = true;
+        this.player.fallDepth = 0;
+        this.player.fallVelocityY = 1.0;
+        this.player.fallTrapRef = crumbleObj;
+
+        // Use the last confirmed safe position on solid ground before entering the pit trap
+        this.player.fallRespawnPos = {
+            x: this.player.lastSafePos.x,
+            z: this.player.lastSafePos.z
+        };
+
+        this.sound.playFallingScream();
+        this.addPopup('うわあああっ！奈落へ転落！', '#ef4444');
+    }
+
+    // Impact bottom of the pit, take damage and crawl back out
+    finishPlayerFall() {
+        if (!this.player.isFalling) return;
+        this.player.isFalling = false;
+
+        const dmg = this.player.fallTrapRef?.damage || 35;
+        this.player.hp = Math.max(0, this.player.hp - dmg);
+        this.sound.playHurt();
+        this.sound.playFloorCollapse();
+        this.flashDamageScreen();
+        this.particles.spawnBurst(this.player.x, 0.2, this.player.z, 0xdc2626, 24, 6.0);
+        this.addPopup(`針穴へ墜落！ -${dmg}`, '#ef4444');
+
+        if (this.player.hp <= 0) {
+            this.addPopup('GAME OVER! 奈落の底で力尽きた…', '#ef4444');
+            setTimeout(() => {
+                this.player.hp = this.player.maxHp;
+                this.player.fallDepth = 0;
+                this.player.fallVelocityY = 0;
+                this.player.pitch = 0;
+                this.loadMap(this.currentMapId);
+            }, 1000);
+            return;
+        }
+
+        // Fade black screen momentarily while crawling back to safety edge
+        this.flashScreen('rgba(0, 0, 0, 0.95)');
+        setTimeout(() => {
+            if (this.player.fallRespawnPos) {
+                this.player.x = this.player.fallRespawnPos.x;
+                this.player.z = this.player.fallRespawnPos.z;
+            }
+            // Ensure safe distance from colliders
+            const r = this.player.radius || 0.6;
+            for (const c of this.colliders) {
+                if (c.disabled) continue;
+                if (this.player.x >= c.minX - r && this.player.x <= c.maxX + r &&
+                    this.player.z >= c.minZ - r && this.player.z <= c.maxZ + r) {
+                    // Push out to open side
+                    const overlapLeft = (this.player.x + r) - c.minX;
+                    const overlapRight = c.maxX - (this.player.x - r);
+                    const overlapTop = (this.player.z + r) - c.minZ;
+                    const overlapBottom = c.maxZ - (this.player.z - r);
+                    const minOverlap = Math.min(overlapLeft, overlapRight, overlapTop, overlapBottom);
+                    if (minOverlap === overlapLeft) this.player.x = c.minX - r - 0.1;
+                    else if (minOverlap === overlapRight) this.player.x = c.maxX + r + 0.1;
+                    else if (minOverlap === overlapTop) this.player.z = c.minZ - r - 0.1;
+                    else this.player.z = c.maxZ + r + 0.1;
+                }
+            }
+
+            this.player.fallDepth = 0;
+            this.player.fallVelocityY = 0;
+            this.player.pitch = 0;
+            this.addPopup('なんとか穴の縁へ這い上がった！', '#fef08a');
+        }, 350);
     }
 
     gainExp(amount) {

@@ -1365,6 +1365,147 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 23. PoP Crumbling / Falling Floor Stone Texture (Severely fractured flagstone)
+    static createCrumblingFloorTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Dark aged slate tile
+        ctx.fillStyle = '#47433f';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Grid border grooves
+        ctx.strokeStyle = '#272320';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(1, 1, 62, 62);
+
+        // Deep jagged cracks spreading across the stone
+        ctx.strokeStyle = '#141210';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        // Main fracture from top-left to bottom-right
+        ctx.moveTo(8, 6);
+        ctx.lineTo(20, 18);
+        ctx.lineTo(16, 28);
+        ctx.lineTo(34, 38);
+        ctx.lineTo(46, 34);
+        ctx.lineTo(58, 54);
+        // Secondary fracture
+        ctx.moveTo(34, 38);
+        ctx.lineTo(28, 56);
+        // Third fracture
+        ctx.moveTo(20, 18);
+        ctx.lineTo(42, 14);
+        ctx.lineTo(56, 22);
+        ctx.stroke();
+
+        // White/Grey chipped edges along cracks
+        ctx.strokeStyle = '#78716c';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(9, 7);
+        ctx.lineTo(21, 19);
+        ctx.moveTo(35, 39);
+        ctx.lineTo(47, 35);
+        ctx.stroke();
+
+        // Crumbly loose pebble specs
+        ctx.fillStyle = '#1c1917';
+        for (let i = 0; i < 24; i++) {
+            const rx = 4 + Math.floor(Math.random() * 56);
+            const ry = 4 + Math.floor(Math.random() * 56);
+            ctx.fillRect(rx, ry, 2, 2);
+        }
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // 24. Pressure Plate Trap Floor Texture (Slightly raised metal/stone trigger switch)
+    static createPressurePlateTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Outer floor stone
+        ctx.fillStyle = '#3a3532';
+        ctx.fillRect(0, 0, 64, 64);
+
+        // Recessed shadow border around plate
+        ctx.fillStyle = '#141210';
+        ctx.fillRect(10, 10, 44, 44);
+
+        // Center raised pressure plate
+        ctx.fillStyle = '#64748b'; // Slate metal plate
+        ctx.fillRect(13, 13, 38, 38);
+
+        // Plate highlight and bevel
+        ctx.fillStyle = '#94a3b8';
+        ctx.fillRect(13, 13, 38, 3);
+        ctx.fillRect(13, 13, 3, 38);
+
+        ctx.fillStyle = '#334155';
+        ctx.fillRect(13, 48, 38, 3);
+        ctx.fillRect(48, 13, 3, 38);
+
+        // Rivets at four corners of the trigger plate
+        ctx.fillStyle = '#cbd5e1';
+        ctx.fillRect(16, 16, 3, 3);
+        ctx.fillRect(45, 16, 3, 3);
+        ctx.fillRect(16, 45, 3, 3);
+        ctx.fillRect(45, 45, 3, 3);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // 25. Wall Dart Trap Dispenser Texture (Brick with ominous arrow hole)
+    static createDartDispenserTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+
+        // Base dungeon brick background
+        ctx.fillStyle = '#222026';
+        ctx.fillRect(0, 0, 64, 64);
+        ctx.fillStyle = '#73332b';
+        ctx.fillRect(2, 2, 60, 60);
+
+        // Stone carved demon / gargoyle slit face
+        ctx.fillStyle = '#1e1b18';
+        ctx.fillRect(16, 16, 32, 32);
+        ctx.strokeStyle = '#47433f';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(16, 16, 32, 32);
+
+        // Ominous circular barrel hole where poison dart shoots from
+        ctx.fillStyle = '#050505';
+        ctx.beginPath();
+        ctx.arc(32, 32, 9, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.strokeStyle = '#292524';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        // Poison green residue around the barrel nozzle
+        ctx.fillStyle = 'rgba(34, 197, 94, 0.45)';
+        ctx.fillRect(29, 39, 6, 4);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
     // Slime sprite: loads real character artwork from sdServer
     static createSlimeTexture() {
         const loader = new THREE.TextureLoader();

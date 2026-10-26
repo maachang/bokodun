@@ -31,7 +31,9 @@
     "M": "magic_circle",
     "P": "poison_swamp",
     "X": "pop_chomper",
-    "V": "pop_hidden_spikes"
+    "V": "pop_hidden_spikes",
+    "C": "pop_crumbling_floor",
+    "A": "wall_dart_trap"
   },
   "enemies": {
     "S": "slime",
@@ -53,7 +55,7 @@
     "1010000110000101",
     "1010G001100G0101",
     "1011111111111101",
-    "10000X0VV0000201",
+    "10A00X0VV00CC201",
     "1111111111111111"
   ]
 }
