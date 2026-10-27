@@ -145,6 +145,107 @@ export class SoundFX {
         noise.start(now);
     }
 
+    // ---- 呪文ごとの効果音（items.json の呪文の sound: fire / ice / bolt）----
+    playSpellShoot(kind = 'fire') {
+        if (kind === 'ice') this.playIceShoot();
+        else if (kind === 'bolt') this.playBoltShoot();
+        else this.playShoot(true);
+    }
+
+    playSpellHit(kind = 'fire') {
+        if (kind === 'ice') this.playIceHit();
+        else if (kind === 'bolt') this.playBoltHit();
+        else this.playExplosion();
+    }
+
+    // 氷の発射「キラッ」: 高い音が澄んで上ずる
+    playIceShoot() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1600, now);
+        osc.frequency.exponentialRampToValueAtTime(2800, now + 0.12);
+        gain.gain.setValueAtTime(0.18, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.14);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.14);
+    }
+
+    // 氷の命中「キン」: 硬く澄んだ 2 音の響き
+    playIceHit() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        for (const freq of [2400, 3600]) {
+            const osc = this.ctx.createOscillator();
+            const gain = this.ctx.createGain();
+            osc.type = 'sine';
+            osc.frequency.setValueAtTime(freq, now);
+            gain.gain.setValueAtTime(0.16, now);
+            gain.gain.exponentialRampToValueAtTime(0.001, now + 0.25);
+            osc.connect(gain);
+            gain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + 0.25);
+        }
+    }
+
+    // 雷（光弾）の発射「ピッ」: 高く短い
+    playBoltShoot() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const gain = this.ctx.createGain();
+        osc.type = 'square';
+        osc.frequency.setValueAtTime(2800, now);
+        osc.frequency.exponentialRampToValueAtTime(1800, now + 0.07);
+        gain.gain.setValueAtTime(0.14, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + 0.07);
+        osc.connect(gain);
+        gain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.07);
+    }
+
+    // 雷（光弾）の命中「バチッ」: 鋭い電撃と短いノイズ
+    playBoltHit() {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const osc = this.ctx.createOscillator();
+        const oscGain = this.ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(1800, now);
+        osc.frequency.exponentialRampToValueAtTime(200, now + 0.1);
+        oscGain.gain.setValueAtTime(0.18, now);
+        oscGain.gain.exponentialRampToValueAtTime(0.001, now + 0.1);
+        osc.connect(oscGain);
+        oscGain.connect(this.ctx.destination);
+        osc.start(now);
+        osc.stop(now + 0.1);
+
+        const bufferSize = Math.floor(this.ctx.sampleRate * 0.08);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'highpass';
+        filter.frequency.setValueAtTime(2500, now);
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(0.2, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.08);
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(this.ctx.destination);
+        noise.start(now);
+    }
+
     // 落下の笛「ぴゅーーーん」: 高い音から低い音へ滑り落ちる（爆発火球の予告の長さ duration に合わせて鳴らす）
     playStrikeWhistle(duration = 0.3) {
         if (!this.ctx) return;

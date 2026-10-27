@@ -1870,7 +1870,7 @@ export class GameEngine {
 
     // 飛び道具（ファイア・拡散弾・マジックボルト）: count 発を spreadDeg 間隔の扇状に発射
     shootProjectiles(w, powerScale = 1.0) {
-        this.sound.playShoot(true);
+        this.sound.playSpellShoot(w.sound);
 
         const count = w.count || 1;
         const spreadRad = (w.spreadDeg || 0) * Math.PI / 180;
@@ -1886,13 +1886,50 @@ export class GameEngine {
             spawnX = this.player.x + dirX * 0.8;
             spawnZ = this.player.z + dirZ * 0.8;
 
-            const fireball = new Projectile(spawnX, spawnZ, dirX, dirZ, true, w.speed, Math.floor(w.damage * powerScale));
+            const fireball = new Projectile(spawnX, spawnZ, dirX, dirZ, true, w.speed, Math.floor(w.damage * powerScale), {
+                visual: w.visual,
+                status: w.status,
+                pierce: w.pierce,
+                label: w.name,
+                soundKind: w.sound
+            });
             this.projectiles.push(fireball);
             this.scene.add(fireball.mesh);
         }
 
         // Muzzle flare effect
-        this.particles.spawnBurst(spawnX, 1.3, spawnZ, 0xffaa00, 8, 3.0);
+        this.particles.spawnBurst(spawnX, 1.3, spawnZ, new THREE.Color(w.visual?.muzzle ?? '#ffaa00').getHex(), 8, 3.0);
+    }
+
+    // プレイヤーの弾（魔法・矢）が敵に当たったときの処理: ダメージ・状態異常・効果音・貫通。弾が消費されたら true
+    hitMonsterWithProjectile(p, m) {
+        const isArrow = (p.type === 'arrow');
+        if (isArrow) this.sound.playArrowHit(); else this.sound.playSpellHit(p.soundKind ?? 'fire');
+        const hitColor = isArrow ? 0xd4d4d8 : new THREE.Color(p.visual?.hit ?? '#ff5500').getHex();
+        this.particles.spawnBurst(p.x, p.y, p.z, hitColor, isArrow ? 8 : 16, isArrow ? 2.5 : 5.0);
+
+        const isDead = m.takeDamage(p.damage, { x: p.dirX, z: p.dirZ });
+        this.addPopup(`${p.label || 'ファイア'}! -${p.damage}`, '#f97316', m.x, m.z);
+        if (!isDead && p.status && m.applyStatus(p.status)) {
+            this.addPopup(p.status.type === 'burn' ? '燃焼!' : '鈍足!', p.status.type === 'burn' ? '#fb923c' : '#7dd3fc', m.x, m.z);
+        }
+        this.notifyEnemyEngaged(m);
+        if (isDead) this.gainExp(m.exp);
+
+        // 貫通: 残り体数があれば弾は消えずに先へ進む（同じ敵に二重ヒットしない）
+        p.hitMonsters.add(m);
+        p.hitsLeft--;
+        if (p.hitsLeft <= 0) p.active = false;
+        return !p.active;
+    }
+
+    // 燃焼の継続ダメージを受け取って与える（倒したら経験値）
+    processBurn(m) {
+        const burn = m.consumeBurnDamage();
+        if (burn <= 0 || !m.active) return;
+        const isDead = m.takeDamage(burn, null);
+        this.addPopup(`燃焼 -${burn}`, '#fb923c', m.x, m.z);
+        if (isDead) this.gainExp(m.exp);
     }
 
     // 落下系の魔法（爆発火球）: 前方 targetDistance の地面を狙い（手前に壁があればその直前）、予告の輪 → 着弾の範囲ダメージ → 火柱
@@ -2629,18 +2666,10 @@ export class GameEngine {
             if (p.isPlayer) {
                 // Check player fireball hit monster
                 for (const m of this.monsters) {
-                    if (!m.active) continue;
+                    if (!m.active || p.hitMonsters.has(m)) continue;
                     const distM = Math.hypot(m.x - p.x, m.z - p.z);
                     if (distM < m.radius + p.radius) {
-                        p.active = false;
-                        const isArrow = (p.type === 'arrow');
-                        if (isArrow) this.sound.playArrowHit(); else this.sound.playExplosion();
-                        this.particles.spawnBurst(p.x, p.y, p.z, isArrow ? 0xd4d4d8 : 0xff5500, isArrow ? 8 : 16, isArrow ? 2.5 : 5.0);
-                        const isDead = m.takeDamage(p.damage, { x: p.dirX, z: p.dirZ });
-                        this.addPopup(`${p.label || 'ファイア'}! -${p.damage}`, '#f97316', m.x, m.z);
-                        this.notifyEnemyEngaged(m);
-                        if (isDead) this.gainExp(m.exp);
-                        break;
+                        if (this.hitMonsterWithProjectile(p, m)) break;
                     }
                 }
             } else {
@@ -2751,6 +2780,7 @@ export class GameEngine {
         for (let i = this.monsters.length - 1; i >= 0; i--) {
             const m = this.monsters[i];
             m.update(dt, this.player, this.colliders, this.projectiles, this.sound, this.scene, this.visibility ?? 1.0);
+            this.processBurn(m);
 
             // Check collision with player for Ys-style bump attack
             const dx = m.x - this.player.x;

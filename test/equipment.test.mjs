@@ -74,6 +74,23 @@ const bump = (g, m) => {
     g.resolveYsBump(m, dx, dz, Math.hypot(dx, dz));
 };
 
+// 音の生成を記録する、最小限の AudioContext の代用品
+function fakeAudio(M) {
+    const log = { oscillators: [], noises: 0, started: 0 };
+    const param = () => ({ ramps: [], setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime(v, tm) { this.ramps.push([v, tm]); } });
+    const ctx = {
+        currentTime: 0, sampleRate: 8000, destination: {},
+        createOscillator() { const o = { type: '', frequency: param(), connect() {}, start() { log.started++; }, stop() {} }; log.oscillators.push(o); return o; },
+        createGain() { return { gain: param(), connect() {} }; },
+        createBiquadFilter() { return { type: '', frequency: param(), connect() {} }; },
+        createBuffer(ch, size) { return { getChannelData: () => new Float32Array(size) }; },
+        createBufferSource() { log.noises++; return { connect() {}, start() { log.started++; } }; },
+    };
+    const fx = new M.SoundFX();
+    fx.ctx = ctx;
+    return { fx, log };
+}
+
 test('定義ファイル（items.json / weaponClasses.json / player.json）', async (t) => {
     await t.test('武器クラス 8 種が定義され、attack ごとの必須項目がある', () => {
         assert.deepEqual(Object.keys(weaponClasses), ['bare_hands', 'dagger', 'sword', 'greatsword', 'mace', 'staff', 'magic_rod', 'bow']);
@@ -102,6 +119,19 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
             } else {
                 assert.ok(['fireball', 'strike', 'spread'].includes(it.type), `${id}: type`);
                 assert.ok(it.mp >= 0 && it.cooldown > 0 && it.damage > 0, `${id}: 呪文の項目`);
+                if (it.type !== 'strike') {
+                    const v = it.visual;
+                    assert.ok(['orb', 'crystal', 'bolt'].includes(v?.shape) && v.size > 0, `${id}: visual`);
+                    for (const k of ['core', 'aura', 'trail', 'muzzle', 'hit']) assert.match(v[k] ?? '', /^#[0-9a-f]{6}$/i, `${id}: visual.${k}`);
+                    assert.ok(['fire', 'ice', 'bolt'].includes(it.sound), `${id}: sound`);
+                }
+                if (it.status) {
+                    assert.ok(it.status.duration > 0, `${id}: status.duration`);
+                    if (it.status.type === 'burn') assert.ok(it.status.dps > 0);
+                    else if (it.status.type === 'slow') assert.ok(it.status.speedScale > 0 && it.status.speedScale < 1);
+                    else assert.fail(`${id}: 未知の状態異常 ${it.status.type}`);
+                }
+                if (it.pierce !== undefined) assert.ok(Number.isInteger(it.pierce) && it.pierce >= 1, `${id}: pierce`);
                 if (it.type === 'strike') assert.ok(it.blastRadius > 0 && it.targetDistance > 0 && it.warnTime >= 0 && it.pillarTime > 0, `${id}: 落下系の項目`);
                 else assert.ok(it.speed > 0, `${id}: speed`);
                 if (it.type === 'spread') assert.ok(it.count >= 2 && it.spreadDeg > 0);
@@ -451,25 +481,8 @@ test('生きている敵は障害物（プレイヤーは突き抜けられな�
 test('爆発火球の効果音（SoundFX）', async (t) => {
     const M = await loadModules();
 
-    // 音の生成を記録する、最小限の AudioContext の代用品
-    function fakeAudio() {
-        const log = { oscillators: [], noises: 0, started: 0 };
-        const param = () => ({ ramps: [], setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime(v, tm) { this.ramps.push([v, tm]); } });
-        const ctx = {
-            currentTime: 0, sampleRate: 8000, destination: {},
-            createOscillator() { const o = { type: '', frequency: param(), connect() {}, start() { log.started++; }, stop() {} }; log.oscillators.push(o); return o; },
-            createGain() { return { gain: param(), connect() {} }; },
-            createBiquadFilter() { return { type: '', frequency: param(), connect() {} }; },
-            createBuffer(ch, size) { return { getChannelData: () => new Float32Array(size) }; },
-            createBufferSource() { log.noises++; return { connect() {}, start() { log.started++; } }; },
-        };
-        const fx = new M.SoundFX();
-        fx.ctx = ctx;
-        return { fx, log };
-    }
-
     await t.test('落下の笛: 予告の長さに合わせて、高い音から低い音へ滑り落ちる', () => {
-        const { fx, log } = fakeAudio();
+        const { fx, log } = fakeAudio(M);
         fx.playStrikeWhistle(0.3);
         const whistle = log.oscillators.find(o => o.type === 'sine' && o.frequency.ramps.length > 0);
         assert.ok(whistle, '周波数が下降する音がある');
@@ -478,7 +491,7 @@ test('爆発火球の効果音（SoundFX）', async (t) => {
     });
 
     await t.test('重い爆発音: 衝撃・低い地鳴り・長い爆風ノイズが鳴る。AudioContext が無い（未初期化）場合は何もしない', () => {
-        const { fx, log } = fakeAudio();
+        const { fx, log } = fakeAudio(M);
         fx.playBigExplosion();
         assert.equal(log.oscillators.length, 2, '衝撃と地鳴り');
         assert.equal(log.noises, 1, '爆風のノイズ');
@@ -488,6 +501,148 @@ test('爆発火球の効果音（SoundFX）', async (t) => {
 
         const silent = new M.SoundFX(); // ctx = null
         assert.doesNotThrow(() => { silent.playBigExplosion(); silent.playStrikeWhistle(0.3); });
+    });
+});
+
+test('呪文の個性（見た目・状態異常・貫通・効果音）', async (t) => {
+    const M = await loadModules();
+    // 魔法スロット 1〜4 に入っている呪文を、スロット番号で撃って、できた弾を返す
+    const cast = (slot) => {
+        const { g, calls } = makeGame(M);
+        g.selectMagic(slot);
+        g.useMagic();
+        return { g, calls, p: g.projectiles[0] };
+    };
+    const geoTypes = (p) => p.mesh.children.map(c => c.geometry.type);
+
+    await t.test('弾の見た目が呪文ごとに違う（火=球、氷=結晶、雷=細長い光弾）', () => {
+        const fire = cast(0).p, ice = cast(2).p, bolt = cast(3).p;
+        assert.deepEqual(geoTypes(fire), ['SphereGeometry', 'DodecahedronGeometry']);
+        assert.deepEqual(geoTypes(ice), ['OctahedronGeometry', 'OctahedronGeometry']);
+        assert.deepEqual(geoTypes(bolt), ['BoxGeometry', 'BoxGeometry']);
+        assert.ok(ice.mesh.scale.x < fire.mesh.scale.x, '氷の礫は小さい');
+        assert.equal(bolt.noSpin, true, '光弾は回転しない');
+        assert.equal(fire.noSpin, undefined);
+        assert.notEqual(fire.trailColor, ice.trailColor);
+        assert.notEqual(ice.trailColor, bolt.trailColor);
+        assert.notEqual(fire.color, bolt.color);
+    });
+
+    await t.test('発射の効果音が呪文ごとに違う（ファイア / 氷 / 雷）', () => {
+        assert.deepEqual(cast(0).calls.sounds.find(([n]) => n === 'playSpellShoot'), ['playSpellShoot', 'fire']);
+        assert.deepEqual(cast(2).calls.sounds.find(([n]) => n === 'playSpellShoot'), ['playSpellShoot', 'ice']);
+        assert.deepEqual(cast(3).calls.sounds.find(([n]) => n === 'playSpellShoot'), ['playSpellShoot', 'bolt']);
+    });
+
+    await t.test('ファイア: 命中した敵が燃え、毎秒3の継続ダメージを3秒受ける（再命中は延長のみ）', () => {
+        const { g, calls, p } = cast(0);
+        const m = spawn(M, 'skeleton', 0, -3);
+        g.monsters.push(m);
+        assert.equal(g.hitMonsterWithProjectile(p, m), true, '弾は消える');
+        assert.equal(m.maxHp - m.hp, 25);
+        assert.ok(calls.popups.includes('燃焼!'));
+        assert.ok(m.spriteMat.color !== undefined);
+
+        const popupsBefore = calls.popups.filter(s => s === '燃焼!').length;
+        const p2 = cast(0).p;
+        g.hitMonsterWithProjectile(p2, m);
+        assert.equal(calls.popups.filter(s => s === '燃焼!').length, popupsBefore, '二重には「燃焼!」を出さない');
+
+        // 3 秒間で 3 回（毎秒 3）= 9 ダメージ
+        const hp0 = m.hp;
+        for (let i = 0; i < 70; i++) { m.update(0.05, { x: 0, z: 0, radius: 0.4 }, [], [], null, null, 1.0); g.processBurn(m); }
+        assert.equal(hp0 - m.hp, 9);
+        assert.equal(m.burnTimer <= 0, true, '燃焼は終わる');
+        assert.ok(calls.popups.some(s => s.startsWith('燃焼 -3')));
+    });
+
+    await t.test('燃焼で倒れたら経験値が入る', () => {
+        const { g, calls, p } = cast(0);
+        const m = spawn(M, 'slime', 0, -3);
+        g.monsters.push(m);
+        m.hp = 30;
+        g.hitMonsterWithProjectile(p, m); // 25 ダメージ → HP 5、燃焼
+        for (let i = 0; i < 70 && m.active; i++) { m.update(0.05, { x: 0, z: 0, radius: 0.4 }, [], [], null, null, 1.0); g.processBurn(m); }
+        assert.equal(m.active, false);
+        assert.ok(calls.exp > 0);
+    });
+
+    await t.test('敵の色: 燃焼中は赤み、鈍足中は青み（状態異常がなければ白）', () => {
+        const m = spawn(M, 'skeleton', 0, -3);
+        const color = () => { m.update(0.05, { x: 0, z: 0, radius: 0.4 }, [], [], null, null, 1.0); return m.spriteMat.color; };
+        assert.deepEqual([color().r, color().g, color().b], [1, 1, 1]);
+        m.applyStatus({ type: 'burn', duration: 3, dps: 3 });
+        const burning = color();
+        assert.ok(burning.r > burning.g && burning.r > burning.b);
+        const m2 = spawn(M, 'skeleton', 0, -3);
+        m2.applyStatus({ type: 'slow', duration: 2.5, speedScale: 0.6 });
+        m2.update(0.05, { x: 0, z: 0, radius: 0.4 }, [], [], null, null, 1.0);
+        assert.ok(m2.spriteMat.color.b > m2.spriteMat.color.r);
+    });
+
+    await t.test('拡散弾（氷）: 命中した敵が鈍足になり、移動が 60% に落ちて、時間が経つと戻る', () => {
+        const { g, calls, p } = cast(2);
+        assert.equal(g.projectiles.length, 3);
+        const slowed = spawn(M, 'skeleton', 0, -10);
+        const normal = spawn(M, 'skeleton', 0, -10);
+        g.monsters.push(slowed);
+        g.hitMonsterWithProjectile(p, slowed);
+        assert.ok(calls.popups.includes('鈍足!'));
+        assert.equal(slowed.slowScale, 0.6);
+
+        const player = { x: 0, z: 0, radius: 0.4 };
+        const moved = (m, sec) => { const z0 = m.z; for (let i = 0; i < sec / 0.05; i++) m.update(0.05, player, [], [], null, null, 1.0); return m.z - z0; };
+        slowed.knockback.set(0, 0, 0); // ノックバックの影響を消す
+        const slowMove = moved(slowed, 1.0);
+        const normalMove = moved(normal, 1.0);
+        assert.ok(Math.abs(slowMove / normalMove - 0.6) < 0.1, `移動量は約 60% (${slowMove / normalMove})`);
+
+        moved(slowed, 2.0); // 2.5 秒を超えて鈍足が解ける
+        assert.equal(slowed.slowTimer <= 0, true);
+        assert.equal(slowed.slowScale, 1);
+    });
+
+    await t.test('マジックボルト: 2 体まで貫通し、同じ敵には二重ヒットしない（ファイアは貫通しない）', () => {
+        const { g, p } = cast(3);
+        assert.equal(p.hitsLeft, 2);
+        const a = spawn(M, 'skeleton', 0, -3);
+        const b = spawn(M, 'skeleton', 0, -4);
+        const c = spawn(M, 'skeleton', 0, -5);
+        assert.equal(g.hitMonsterWithProjectile(p, a), false, '1 体目: 弾は残る');
+        assert.equal(p.active, true);
+        assert.equal(g.hitMonsterWithProjectile(p, b), true, '2 体目: 弾が消える');
+        assert.equal(p.active, false);
+        assert.equal(a.maxHp - a.hp, 8);
+        assert.equal(b.maxHp - b.hp, 8);
+        assert.equal(c.hp, c.maxHp);
+        assert.ok(p.hitMonsters.has(a) && p.hitMonsters.has(b) && !p.hitMonsters.has(c));
+
+        assert.equal(g.hitMonsterWithProjectile(cast(0).p, spawn(M, 'skeleton', 0, -3)), true, 'ファイアは 1 体で消える');
+    });
+
+    await t.test('命中の効果音が呪文ごとに違う', () => {
+        for (const [slot, kind] of [[0, 'fire'], [2, 'ice'], [3, 'bolt']]) {
+            const { g, calls, p } = cast(slot);
+            g.hitMonsterWithProjectile(p, spawn(M, 'skeleton', 0, -3));
+            assert.deepEqual(calls.sounds.find(([n]) => n === 'playSpellHit'), ['playSpellHit', kind]);
+        }
+    });
+
+    await t.test('SoundFX: 氷・雷の発射音と命中音が鳴る（火は既存の音）。AudioContext が無ければ何もしない', () => {
+        for (const kind of ['fire', 'ice', 'bolt']) {
+            const { fx, log } = fakeAudio(M);
+            fx.playSpellShoot(kind);
+            assert.ok(log.oscillators.length >= 1 && log.started >= 1, `${kind}: 発射音`);
+            const hit = fakeAudio(M);
+            hit.fx.playSpellHit(kind);
+            assert.ok(hit.log.started >= 1, `${kind}: 命中音`);
+        }
+        const ice = fakeAudio(M); ice.fx.playIceHit();
+        assert.equal(ice.log.oscillators.length, 2, '氷の命中は 2 音の響き');
+        const bolt = fakeAudio(M); bolt.fx.playBoltHit();
+        assert.equal(bolt.log.noises, 1, '雷の命中は電撃＋ノイズ');
+        const silent = new M.SoundFX();
+        assert.doesNotThrow(() => { silent.playSpellShoot('ice'); silent.playSpellHit('bolt'); });
     });
 });
 

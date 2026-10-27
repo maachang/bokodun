@@ -159,6 +159,13 @@ export class Monster {
         this.appearAlpha = this.alwaysAware ? 1 : 0; // 現在の透明度（現れるとき 0→1 へフェードイン。ミミックは最初から見える）
         this.spriteMat.opacity = this.appearAlpha;
         this.sprite.visible = this.appearAlpha > 0;
+        // 状態異常: 燃焼（毎秒の継続ダメージ）・鈍足（AI の進行速度が落ちる）
+        this.burnTimer = 0;
+        this.burnDps = 0;
+        this.burnTick = 0;
+        this.pendingBurn = 0;       // まだ game.js が受け取っていない燃焼ダメージ（倒したときの経験値処理のため game.js 側で takeDamage する）
+        this.slowTimer = 0;
+        this.slowScale = 1;
         this.stunTimer = 0;         // スタン中（メイスなど）は AI（移動・攻撃・射撃）が止まる
 
         // Pattern & animation states
@@ -174,6 +181,8 @@ export class Monster {
     update(dt, player, colliders, projectiles, soundFx, scene, visibility = 1.0) {
         if (!this.active) return;
 
+        this.updateStatus(dt);
+
         // Knockback decay
         if (this.knockback.lengthSq() > 0.001) {
             this.x += this.knockback.x * dt;
@@ -187,7 +196,9 @@ export class Monster {
             this.spriteMat.color.setHex(0xff3333);
             this.sprite.visible = true;
         } else {
-            this.spriteMat.color.setHex(0xffffff);
+            // 状態異常の色: 燃焼=赤み / 鈍足=青み
+            const burning = this.burnTimer > 0, slowed = this.slowTimer > 0;
+            this.spriteMat.color.setRGB(slowed ? 0.6 : 1, burning ? 0.6 : (slowed ? 0.85 : 1), burning ? 0.5 : (slowed ? 1.2 : 1));
             this.sprite.visible = true;
         }
 
@@ -222,6 +233,9 @@ export class Monster {
             this.sprite.position.set(this.x, this.baseY, this.z);
             return;
         }
+
+        // 鈍足: AI の時間の進みを遅くして、移動・攻撃・射撃・アニメーションをまとめてゆっくりにする
+        if (this.slowTimer > 0) dt *= this.slowScale;
 
         // =========================================================================
         // Distinct Movement AI Patterns
@@ -626,6 +640,47 @@ export class Monster {
         return false;
     }
 
+    // 状態異常をかける。新しくかかったとき true（すでにかかっている場合は持続時間を延長するだけ）
+    applyStatus(status) {
+        if (status.type === 'burn') {
+            const fresh = this.burnTimer <= 0;
+            this.burnTimer = Math.max(this.burnTimer, status.duration);
+            this.burnDps = Math.max(this.burnDps, status.dps);
+            if (fresh) this.burnTick = 1.0;
+            return fresh;
+        }
+        if (status.type === 'slow') {
+            const fresh = this.slowTimer <= 0;
+            this.slowTimer = Math.max(this.slowTimer, status.duration);
+            this.slowScale = status.speedScale;
+            return fresh;
+        }
+        return false;
+    }
+
+    updateStatus(dt) {
+        if (this.burnTimer > 0) {
+            this.burnTimer -= dt;
+            this.burnTick -= dt;
+            while (this.burnTick <= 1e-6) {
+                this.pendingBurn += this.burnDps;
+                this.burnTick += 1.0;
+            }
+            if (this.burnTimer <= 0) this.burnDps = 0;
+        }
+        if (this.slowTimer > 0) {
+            this.slowTimer -= dt;
+            if (this.slowTimer <= 0) this.slowScale = 1;
+        }
+    }
+
+    // 燃焼で溜まったダメージを受け取る（game.js が takeDamage して、倒したら経験値を与える）
+    consumeBurnDamage() {
+        const d = this.pendingBurn;
+        this.pendingBurn = 0;
+        return d;
+    }
+
     // 一定時間、AI（移動・攻撃・射撃）を止める。長い方を優先する
     stun(seconds) {
         this.stunTimer = Math.max(this.stunTimer, seconds);
@@ -693,6 +748,12 @@ export class Projectile {
         this.type = options.type || (isPlayer ? 'player_fireball' : 'magic');
         this.maxDistance = options.maxDistance || 0; // 0 means unlimited by distance (timed life)
         this.sourceMonster = options.sourceMonster || null;
+        this.visual = options.visual || null;        // 見た目（呪文の visual 定義: 形・色・大きさ）
+        this.status = options.status || null;        // 命中した敵に与える状態異常（燃焼・鈍足）
+        this.label = options.label || null;          // 命中時のポップアップに出す名前
+        this.soundKind = options.soundKind || null;  // 命中時の効果音の種類（fire / ice / bolt）
+        this.hitsLeft = options.pierce || 1;         // 貫通できる残り体数（1=貫通しない）
+        this.hitMonsters = new Set();                // 貫通中に、すでに当たった敵（二重ヒットしない）
         this.radius = (this.type === 'arrow') ? 0.25 : 0.45;
         this.active = true;
         this.lifeTime = (this.type === 'arrow') ? 2.0 : 3.5;
@@ -758,19 +819,31 @@ export class Projectile {
             this.mesh.add(spore);
             this.mesh.add(this.aura);
         } else if (this.isPlayer) {
-            // Player Fireball: Bright Orange Core + Yellow Flame Aura
-            this.color = 0xff6600;
-            this.trailColor = 0xffaa00;
-            const coreGeo = new THREE.SphereGeometry(0.25, 8, 8);
-            const coreMat = new THREE.MeshBasicMaterial({ color: 0xffffff });
+            // プレイヤーの魔法弾: 見た目は呪文の visual で決まる（orb=火球 / crystal=氷の礫 / bolt=細長い光弾）。未指定は従来の火球
+            const v = this.visual || {};
+            const hex = (c, def) => new THREE.Color(c ?? def).getHex();
+            this.color = hex(v.aura, '#ff6600');
+            this.trailColor = hex(v.trail, '#ffaa00');
+            const coreMat = new THREE.MeshBasicMaterial({ color: hex(v.core, '#ffffff') });
+            const auraMat = new THREE.MeshBasicMaterial({ color: hex(v.aura, '#ff4400'), wireframe: true });
+            let coreGeo, auraGeo;
+            if (v.shape === 'crystal') {
+                coreGeo = new THREE.OctahedronGeometry(0.22);
+                auraGeo = new THREE.OctahedronGeometry(0.34);
+            } else if (v.shape === 'bolt') {
+                coreGeo = new THREE.BoxGeometry(0.08, 0.08, 0.7);
+                auraGeo = new THREE.BoxGeometry(0.16, 0.16, 0.9);
+                this.mesh.rotation.y = Math.atan2(-dirX, -dirZ); // 長い軸を進行方向へ向ける
+                this.noSpin = true;                               // 細長い光弾は回転させない
+            } else {
+                coreGeo = new THREE.SphereGeometry(0.25, 8, 8);
+                auraGeo = new THREE.DodecahedronGeometry(0.38, 1);
+            }
             const core = new THREE.Mesh(coreGeo, coreMat);
-
-            const auraGeo = new THREE.DodecahedronGeometry(0.38, 1);
-            const auraMat = new THREE.MeshBasicMaterial({ color: 0xff4400, wireframe: true });
             this.aura = new THREE.Mesh(auraGeo, auraMat);
-
             this.mesh.add(core);
             this.mesh.add(this.aura);
+            if (v.size) this.mesh.scale.setScalar(v.size);
         } else {
             // Enemy Dark Magic: Violet / Magenta Energy Sphere
             this.color = 0xa855f7;
@@ -831,7 +904,7 @@ export class Projectile {
         this.mesh.position.z = this.z;
 
         // Aura spin for magic/fireball
-        if (this.aura) {
+        if (this.aura && !this.noSpin) {
             this.aura.rotation.x += dt * 8;
             this.aura.rotation.y += dt * 10;
         }

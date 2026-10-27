@@ -69,7 +69,22 @@
     "mp": 10,
     "cooldown": 0.35,
     "damage": 25,
-    "speed": 14
+    "speed": 14,
+    "sound": "fire",
+    "visual": {
+      "shape": "orb",
+      "size": 1.0,
+      "core": "#ffffff",
+      "aura": "#ff4400",
+      "trail": "#ffaa00",
+      "muzzle": "#ffaa00",
+      "hit": "#ff5500"
+    },
+    "status": {
+      "type": "burn",
+      "duration": 3,
+      "dps": 3
+    }
   },
   "explosion": {
     "id": "explosion",
@@ -95,7 +110,22 @@
     "damage": 15,
     "speed": 14,
     "count": 3,
-    "spreadDeg": 12
+    "spreadDeg": 12,
+    "sound": "ice",
+    "visual": {
+      "shape": "crystal",
+      "size": 0.7,
+      "core": "#e0f7ff",
+      "aura": "#38bdf8",
+      "trail": "#bae6fd",
+      "muzzle": "#7dd3fc",
+      "hit": "#7dd3fc"
+    },
+    "status": {
+      "type": "slow",
+      "duration": 2.5,
+      "speedScale": 0.6
+    }
   },
   "magic_bolt": {
     "id": "magic_bolt",
@@ -105,6 +135,17 @@
     "mp": 4,
     "cooldown": 0.2,
     "damage": 8,
-    "speed": 16
+    "speed": 16,
+    "sound": "bolt",
+    "visual": {
+      "shape": "bolt",
+      "size": 1.0,
+      "core": "#ffffff",
+      "aura": "#60a5fa",
+      "trail": "#93c5fd",
+      "muzzle": "#bfdbfe",
+      "hit": "#93c5fd"
+    },
+    "pierce": 2
   }
 }
