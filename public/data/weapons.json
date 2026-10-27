@@ -1,0 +1,43 @@
+[
+  {
+    "id": "dagger",
+    "name": "ダガー",
+    "type": "melee",
+    "mp": 0,
+    "cooldown": 0.4,
+    "powerScale": 1.0,
+    "randomBonus": 3,
+    "range": 2.2,
+    "arcDeg": 50
+  },
+  {
+    "id": "fire",
+    "name": "ファイア",
+    "type": "fireball",
+    "mp": 10,
+    "cooldown": 0.35,
+    "damage": 25,
+    "speed": 14
+  },
+  {
+    "id": "explosion",
+    "name": "爆発火球",
+    "type": "explosive",
+    "mp": 20,
+    "cooldown": 0.9,
+    "damage": 35,
+    "speed": 14,
+    "blastRadius": 3.0
+  },
+  {
+    "id": "spread",
+    "name": "拡散弾",
+    "type": "spread",
+    "mp": 20,
+    "cooldown": 0.9,
+    "damage": 15,
+    "speed": 14,
+    "count": 3,
+    "spreadDeg": 12
+  }
+]

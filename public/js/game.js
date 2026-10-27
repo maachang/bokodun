@@ -41,6 +41,7 @@ export class GameEngine {
             invincibleTimer: 0,
             attackCooldown: 0,
             magicCooldown: 0,
+            weaponIndex: 1, // 選択中の武器（weapons.json の添字）。既定はファイア（従来の火球）
             knockback: new THREE.Vector3(),
             isFalling: false,
             fallDepth: 0,
@@ -66,6 +67,7 @@ export class GameEngine {
         this.mapCache = {};
         this.objectDefinitions = null;
         this.enemyDefinitions = null;
+        this.weapons = [];
         this.colliders = [];
         this.monsters = [];
         this.projectiles = [];
@@ -100,17 +102,21 @@ export class GameEngine {
 
     async loadDefinitions() {
         try {
-            const [objRes, enemyRes] = await Promise.all([
+            const [objRes, enemyRes, weaponRes] = await Promise.all([
                 fetch('/data/objects.json'),
-                fetch('/data/enemies.json')
+                fetch('/data/enemies.json'),
+                fetch('/data/weapons.json')
             ]);
             this.objectDefinitions = await objRes.json();
             this.enemyDefinitions = await enemyRes.json();
+            this.weapons = await weaponRes.json();
         } catch (e) {
             console.error('Failed to load definitions:', e);
             this.objectDefinitions = this.objectDefinitions || {};
             this.enemyDefinitions = this.enemyDefinitions || {};
+            this.weapons = this.weapons || [];
         }
+        this.updateWeaponHud();
     }
 
     initThree() {
@@ -256,7 +262,15 @@ export class GameEngine {
                     break;
                 case 'Space':
                 case 'KeyF':
-                    this.castFireball();
+                    this.useWeapon();
+                    e.preventDefault();
+                    break;
+                case 'Digit1': case 'Numpad1': this.setWeapon(0); break;
+                case 'Digit2': case 'Numpad2': this.setWeapon(1); break;
+                case 'Digit3': case 'Numpad3': this.setWeapon(2); break;
+                case 'Digit4': case 'Numpad4': this.setWeapon(3); break;
+                case 'Tab':
+                    this.cycleWeapon();
                     e.preventDefault();
                     break;
                 case 'ShiftLeft':
@@ -300,8 +314,8 @@ export class GameEngine {
             if (!this.isPointerLocked) {
                 this.canvas.requestPointerLock?.();
             } else {
-                // If pointer already locked, click casts magic
-                this.castFireball();
+                // If pointer already locked, click attacks with the selected weapon
+                this.useWeapon();
             }
         });
 
@@ -1647,31 +1661,130 @@ export class GameEngine {
         document.getElementById('currentAreaName').innerText = mapData.name || '';
     }
 
-    castFireball() {
+    // ---- 武器・呪文の切り替え（定義は public/data/weapons.json）----
+    setWeapon(index) {
+        if (!this.weapons[index] || index === this.player.weaponIndex) return;
+        this.player.weaponIndex = index;
+        this.updateWeaponHud();
+    }
+
+    cycleWeapon() {
+        if (this.weapons.length === 0) return;
+        this.setWeapon((this.player.weaponIndex + 1) % this.weapons.length);
+    }
+
+    // 武器スロット HUD（選択中をハイライト）
+    updateWeaponHud() {
+        const el = jhtml.$('weaponHud');
+        if (!el) return;
+        el.innerHTML = this.weapons.map((w, i) => jhtml.html`<span class="weapon-slot ${i === this.player.weaponIndex ? 'active' : ''}">${i + 1} ${w.name}</span>`).join('');
+    }
+
+    // 選択中の武器で攻撃（Space / F / クリック）
+    useWeapon() {
+        const w = this.weapons[this.player.weaponIndex];
+        if (!w) return;
         if (this.player.magicCooldown > 0) return;
-        if (this.player.mp < 10) {
+        if (w.mp > 0 && this.player.mp < w.mp) {
             this.addPopup('MP不足!', '#38bdf8');
             return;
         }
 
-        this.player.mp -= 10;
-        this.player.magicCooldown = 0.35; // 0.35s casting cooldown
+        this.player.mp -= w.mp;
+        this.player.magicCooldown = w.cooldown;
+
+        if (w.type === 'melee') {
+            this.swingMelee(w);
+        } else {
+            this.shootProjectiles(w);
+        }
+    }
+
+    // 近接攻撃: 前方の扇形（range・arcDeg 内）にいる敵をすべて斬る
+    swingMelee(w) {
+        const fwdX = -Math.sin(this.player.angle);
+        const fwdZ = -Math.cos(this.player.angle);
+        const cosArc = Math.cos(w.arcDeg * Math.PI / 180);
+
+        this.sound.playAttack(false);
+        this.particles.spawnBurst(this.player.x + fwdX * 1.2, 1.0, this.player.z + fwdZ * 1.2, 0xe5e7eb, 6, 3.0);
+
+        for (const m of this.monsters) {
+            if (!m.active) continue;
+            const dx = m.x - this.player.x;
+            const dz = m.z - this.player.z;
+            const dist = Math.hypot(dx, dz);
+            if (dist > w.range + m.radius) continue;
+            if (dist > 0.001 && (dx * fwdX + dz * fwdZ) / dist < cosArc) continue;
+
+            const damage = Math.floor(this.player.attackPower * w.powerScale + Math.random() * w.randomBonus);
+            const nx = dist > 0.001 ? dx / dist : fwdX;
+            const nz = dist > 0.001 ? dz / dist : fwdZ;
+            const isDead = m.takeDamage(damage, { x: nx, z: nz });
+            this.particles.spawnBurst(m.x, 1.2, m.z, 0xe5e7eb, 8, 3.5);
+            this.addPopup(`斬! -${damage}`, '#e5e7eb', m.x, m.z);
+            this.notifyEnemyEngaged(m);
+            if (isDead) this.gainExp(m.exp);
+        }
+    }
+
+    // 飛び道具（ファイア・爆発火球・拡散弾）: count 発を spreadDeg 間隔の扇状に発射
+    shootProjectiles(w) {
         this.sound.playShoot(true);
 
-        // Direction player is facing
-        const dirX = -Math.sin(this.player.angle);
-        const dirZ = -Math.cos(this.player.angle);
+        const count = w.count || 1;
+        const spreadRad = (w.spreadDeg || 0) * Math.PI / 180;
+        let spawnX = this.player.x;
+        let spawnZ = this.player.z;
 
-        // Spawn fireball slightly ahead of player
-        const spawnX = this.player.x + dirX * 0.8;
-        const spawnZ = this.player.z + dirZ * 0.8;
+        for (let i = 0; i < count; i++) {
+            const angle = this.player.angle + (i - (count - 1) / 2) * spreadRad;
+            const dirX = -Math.sin(angle);
+            const dirZ = -Math.cos(angle);
 
-        const fireball = new Projectile(spawnX, spawnZ, dirX, dirZ, true, 14, 25);
-        this.projectiles.push(fireball);
-        this.scene.add(fireball.mesh);
+            // Spawn fireball slightly ahead of player
+            spawnX = this.player.x + dirX * 0.8;
+            spawnZ = this.player.z + dirZ * 0.8;
+
+            const fireball = new Projectile(spawnX, spawnZ, dirX, dirZ, true, w.speed, w.damage, {
+                explosive: w.type === 'explosive',
+                blastRadius: w.blastRadius
+            });
+            this.projectiles.push(fireball);
+            this.scene.add(fireball.mesh);
+        }
 
         // Muzzle flare effect
         this.particles.spawnBurst(spawnX, 1.3, spawnZ, 0xffaa00, 8, 3.0);
+    }
+
+    // 爆発火球の着弾: 半径 blastRadius 内の敵すべてに p.damage の範囲ダメージ
+    explodeAt(p) {
+        if (p.exploded) return;
+        p.exploded = true;
+        p.active = false;
+
+        // 壁の中心で爆発して壁越しの敵を巻き込まないよう、進行方向の逆へ少し戻す
+        const ex = p.x - p.dirX * 0.6;
+        const ez = p.z - p.dirZ * 0.6;
+
+        this.sound.playExplosion();
+        this.particles.spawnBurst(ex, p.y, ez, 0xff5500, 40, 7.0);
+        this.particles.spawnBurst(ex, p.y, ez, 0xffdd33, 24, 4.5);
+
+        for (const m of this.monsters) {
+            if (!m.active) continue;
+            const dx = m.x - ex;
+            const dz = m.z - ez;
+            const dist = Math.hypot(dx, dz);
+            if (dist > p.blastRadius + m.radius) continue;
+            const nx = dist > 0.001 ? dx / dist : p.dirX;
+            const nz = dist > 0.001 ? dz / dist : p.dirZ;
+            const isDead = m.takeDamage(p.damage, { x: nx, z: nz });
+            this.addPopup(`爆発! -${p.damage}`, '#f97316', m.x, m.z);
+            this.notifyEnemyEngaged(m);
+            if (isDead) this.gainExp(m.exp);
+        }
     }
 
     update(dt) {
@@ -2356,11 +2469,18 @@ export class GameEngine {
             p.update(dt, this.colliders, this.particles);
 
             if (p.isPlayer) {
+                // 爆発火球が壁に当たったら爆発
+                if (p.explosive && p.hitWall) this.explodeAt(p);
+
                 // Check player fireball hit monster
                 for (const m of this.monsters) {
-                    if (!m.active) continue;
+                    if (!m.active || p.exploded) continue;
                     const distM = Math.hypot(m.x - p.x, m.z - p.z);
                     if (distM < m.radius + p.radius) {
+                        if (p.explosive) {
+                            this.explodeAt(p);
+                            break;
+                        }
                         p.active = false;
                         this.sound.playExplosion();
                         this.particles.spawnBurst(p.x, p.y, p.z, 0xff5500, 16, 5.0);

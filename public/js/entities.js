@@ -668,7 +668,12 @@ export class Projectile {
         this.type = options.type || (isPlayer ? 'player_fireball' : 'magic');
         this.maxDistance = options.maxDistance || 0; // 0 means unlimited by distance (timed life)
         this.sourceMonster = options.sourceMonster || null;
-        this.radius = (this.type === 'arrow') ? 0.25 : 0.45;
+        // 爆発弾（プレイヤーの爆発火球）: 敵・壁に当たると範囲ダメージを与える
+        this.explosive = !!options.explosive;
+        this.blastRadius = options.blastRadius || 0;
+        this.exploded = false;
+        this.hitWall = false;
+        this.radius = (this.type === 'arrow') ? 0.25 : (this.explosive ? 0.6 : 0.45);
         this.active = true;
         this.lifeTime = (this.type === 'arrow') ? 2.0 : 3.5;
         this.trailTimer = 0;
@@ -762,6 +767,7 @@ export class Projectile {
             this.mesh.add(this.aura);
         }
 
+        if (this.explosive) this.mesh.scale.setScalar(1.5); // 爆発火球は一回り大きい
         this.mesh.position.set(this.x, this.y, this.z);
     }
 
@@ -826,6 +832,7 @@ export class Projectile {
             if (this.x >= c.minX && this.x <= c.maxX &&
                 this.z >= c.minZ && this.z <= c.maxZ) {
                 this.active = false;
+                this.hitWall = true;
                 if (particles) {
                     const burstCount = (this.type === 'arrow') ? 5 : 12;
                     const burstSpeed = (this.type === 'arrow') ? 1.5 : 3.5;

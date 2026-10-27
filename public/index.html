@@ -122,6 +122,26 @@
         }
 
         /* Enemy Info HUD Panel (Ys-style Target Info) */
+        #weaponHud {
+            display: flex;
+            gap: 4px;
+            margin-top: 6px;
+            font-size: 11px;
+        }
+        .weapon-slot {
+            padding: 2px 6px;
+            border: 1px solid #475569;
+            border-radius: 3px;
+            color: #94a3b8;
+            background: rgba(15, 23, 42, 0.6);
+            white-space: nowrap;
+        }
+        .weapon-slot.active {
+            color: #fef08a;
+            border-color: #facc15;
+            background: rgba(120, 53, 15, 0.7);
+            font-weight: bold;
+        }
         #enemyHudList {
             display: flex;
             flex-direction: column-reverse; /* Stacks new ones from bottom up */
@@ -457,6 +477,8 @@
                         <div class="hp-bar-bg" style="height: 8px;">
                             <div id="mpBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.15s;"></div>
                         </div>
+                        <!-- 武器・呪文スロット（選択中をハイライト） -->
+                        <div id="weaponHud"></div>
                         <div style="margin-top: 4px; display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
                             <span id="expText">EXP: 0</span>
                             <span id="goldText" style="color: #facc15; font-weight: bold;">0 G</span>
@@ -469,7 +491,7 @@
 
                 <div class="badge" style="color: #facc15; font-size: 12px; display: flex; flex-direction: column; gap: 2px;">
                     <div>💡 秘技: 体を半分ずらして突撃 (半ずらし会心!)</div>
-                    <div style="color: #60a5fa;">🔥 魔法: [Space] または [F] または マウスクリックで火球発射 (消費MP: 10)</div>
+                    <div style="color: #60a5fa;">🔥 攻撃: [Space] / [F] / マウスクリック　武器切替: [1]〜[4] / [Tab]</div>
                 </div>
             </div>
         </div>
@@ -559,8 +581,9 @@
         </div>
     </div>
 
+    <script src="/jhtml.browser.js"></script>
     <script type="module">
-        import { GameEngine } from '/js/game.js?v=swamp_update_1';
+        import { GameEngine } from '/js/game.js?v=weapon_switch_1';
 
         let gameInstance = null;
         window.addEventListener('DOMContentLoaded', async () => {
