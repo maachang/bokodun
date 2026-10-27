@@ -482,6 +482,7 @@ export class GameEngine {
         }
 
         // Ceiling mesh if specified
+        this.strikeEffects.setCeilingHeight(env.hasCeiling ? wallH : null);
         if (env.hasCeiling) {
             const ceilGeo = new THREE.PlaneGeometry(cols * tileSize, rows * tileSize);
             let ceilTex = this.textures.brick;

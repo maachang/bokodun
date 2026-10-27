@@ -84,6 +84,7 @@ void main() {
     #include <colorspace_fragment>
 }`;
 
+const CEILING_MARGIN = 0.2;      // 天井のあるマップで、火柱・煙の上端を天井からこれだけ下に収める
 const SMOKE_COUNT = 32;          // 煙の塊の数
 const SMOKE_START_Q = 0.5;       // 火柱の持続の、この割合を過ぎたら煙が出始める（火柱と煙の間が途切れない）
 
@@ -96,6 +97,12 @@ export class StrikeEffectSystem {
         this.texture = texture;
         this.camera = camera;
         this.strikes = [];
+        this.ceilingHeight = null;   // 天井の高さ（天井のないマップは null）。火柱の高さと煙の上限が、これを越えないようにする
+    }
+
+    // マップ読み込み時に呼ぶ。天井のないマップは null
+    setCeilingHeight(h) {
+        this.ceilingHeight = h ?? null;
     }
 
     // x, z: 着弾点 / radius: 範囲の半径 / warnTime: 予告の長さ / pillarTime: 火柱の持続 / smokeTime: 火柱が消えてからの煙の長さ（0 なら煙なし）
@@ -128,7 +135,7 @@ export class StrikeEffectSystem {
         s.impacted = true;
         if (s.onImpact) s.onImpact();
 
-        const height = 5;
+        const height = this.ceilingHeight != null ? Math.min(5, this.ceilingHeight - CEILING_MARGIN) : 5;
         const width = s.radius * 1.1;
         const pillar = new THREE.Group();
         pillar.position.set(s.x, 0, s.z);
@@ -248,8 +255,12 @@ export class StrikeEffectSystem {
             const t = Math.min(1, (f.age - f.delay) / f.life);
             const e = 1 - Math.pow(1 - t, 3);   // 最初は勢いよく、だんだん遅く
             f.mesh.visible = true;
-            f.mesh.position.set(f.x0 + f.driftX * t, f.y0 + f.rise * e, f.z0 + f.driftZ * t);
-            f.mesh.scale.setScalar(f.size0 * (1 + (f.grow - 1) * e));
+            const size = f.size0 * (1 + (f.grow - 1) * e);
+            let y = f.y0 + f.rise * e;
+            // 天井のあるマップでは、板の上端が天井に届かないように止める（天井で板が欠けて直線の切れ目になるのを防ぐ）
+            if (this.ceilingHeight != null) y = Math.min(y, Math.max(f.y0, this.ceilingHeight - CEILING_MARGIN - size / 2));
+            f.mesh.position.set(f.x0 + f.driftX * t, y, f.z0 + f.driftZ * t);
+            f.mesh.scale.setScalar(size);
             if (this.camera) f.mesh.quaternion.copy(this.camera.quaternion);   // 常にカメラを向く板
             const u = f.mat.uniforms;
             u.uAge.value = t;

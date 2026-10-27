@@ -863,6 +863,31 @@ test('落下エフェクト（StrikeEffectSystem）', async (t) => {
         assert.notEqual(f.mat.depthTest, false, '壁には隠される（深度テストあり）');
     });
 
+    await t.test('天井のあるマップ: 火柱の高さも煙の位置も、天井（高さ 4）に届かない。天井なしは従来どおり', () => {
+        const scene = { add() {}, remove() {} };
+        const run = (ceiling) => {
+            const fx = new M.StrikeEffectSystem(scene, null);
+            fx.setCeilingHeight(ceiling);
+            fx.schedule(0, 0, { radius: 3, warnTime: 0, pillarTime: 0.4, smokeTime: 2.0 });
+            fx.update(0.01);
+            const height = fx.strikes[0].pillar.height;
+            let maxTop = 0;
+            for (let k = 0; k < 60; k++) {
+                fx.update(0.05);
+                for (const f of fx.strikes[0]?.puffs ?? []) {
+                    if (f.mesh.visible) maxTop = Math.max(maxTop, f.mesh.position.y + f.mesh.scale.x / 2);
+                }
+            }
+            return { height, maxTop };
+        };
+        const low = run(4);
+        assert.ok(low.height <= 4 - 0.2 + 1e-9, `火柱の高さ ${low.height}`);
+        assert.ok(low.maxTop <= 4 - 0.2 + 1e-9, `煙の上端 ${low.maxTop}`);
+        const open = run(null);
+        assert.equal(open.height, 5);
+        assert.ok(open.maxTop > 4, `天井なしは天井より高く昇る (${open.maxTop})`);
+    });
+
     await t.test('火柱: 画像の暗い背景と縁を消すシェーダーで描く（板の縁に長方形の輪郭が出ない）', () => {
         const scene = { add() {}, remove() {} };
         const texture = { isTexture: true };
