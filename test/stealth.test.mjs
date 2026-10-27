@@ -75,51 +75,81 @@ test('隠密: 敵の索敵（距離・視野角・視線・地形係数・状態
 
     await t.test('未発見の敵は 感知距離×2.5×視界係数 を超えると描画しない', () => {
         const m = make(Monster, 'slime'); // 感知距離 8 → 草原 20m
-        run(m, P(0, 19), 1.0, 0.1);
+        run(m, P(0, 19), 1.0, 1.0);
         assert.equal(m.sprite.visible, true);
-        run(m, P(0, 21), 1.0, 0.1);
+        run(m, P(0, 21), 1.0, 1.0);
         assert.equal(m.sprite.visible, false);
-        run(m, P(0, 11), 0.6, 0.1);   // 湿地(0.6) → 12m
+        run(m, P(0, 11), 0.6, 1.0);   // 湿地(0.6) → 12m
         assert.equal(m.sprite.visible, true);
-        run(m, P(0, 13), 0.6, 0.1);
+        run(m, P(0, 13), 0.6, 1.0);
         assert.equal(m.sprite.visible, false);
     });
 
     await t.test('隠密性: high は描画距離が半分になり、発見済みでも遠くでは見えない', () => {
         const spider = make(Monster, 'tarantula_swamp'); // 感知12・high → 草原 15m
-        run(spider, P(0, 14), 1.0, 0.1);
+        run(spider, P(0, 14), 1.0, 1.0);
         assert.equal(spider.sprite.visible, true);
-        run(spider, P(0, 16), 1.0, 0.1);
+        run(spider, P(0, 16), 1.0, 1.0);
         assert.equal(spider.sprite.visible, false);
 
         // 発見済み(chase)でも high は遠くで見えない（normal は常に見える）
         spider.takeDamage(1, null);
         assert.equal(spider.state, 'chase');
-        run(spider, P(0, 16), 1.0, 0.1);
+        run(spider, P(0, 16), 1.0, 1.0);
         assert.equal(spider.sprite.visible, false);
         const slime = make(Monster, 'slime');
         slime.takeDamage(1, null);
-        run(slime, P(0, 40), 1.0, 0.1);
+        run(slime, P(0, 40), 1.0, 1.0);
         assert.equal(slime.sprite.visible, true);
     });
 
     await t.test('隠密性: high は描画距離の手前で透明から徐々に見えてくる', () => {
         const spider = make(Monster, 'tarantula_swamp'); // 描画距離 15m、フェード範囲は 9〜15m
-        run(spider, P(0, 8), 1.0, 0.1);
+        run(spider, P(0, 8), 1.0, 1.0);
         assert.equal(spider.spriteMat.opacity, 1);
-        run(spider, P(0, 12), 1.0, 0.1);
+        run(spider, P(0, 12), 1.0, 1.0);
         assert.ok(spider.spriteMat.opacity > 0 && spider.spriteMat.opacity < 1);
         const mid = spider.spriteMat.opacity;
-        run(spider, P(0, 10), 1.0, 0.1);
+        run(spider, P(0, 10), 1.0, 1.0);
         assert.ok(spider.spriteMat.opacity > mid, '近いほど濃い');
     });
 
     await t.test('隠密性: low は描画距離が広い（スケルトン 感知10 → 草原 35m）', () => {
         const sk = make(Monster, 'skeleton');
-        run(sk, P(0, 34), 1.0, 0.1);
+        run(sk, P(0, 34), 1.0, 1.0);
         assert.equal(sk.sprite.visible, true);
-        run(sk, P(0, 36), 1.0, 0.1);
+        run(sk, P(0, 36), 1.0, 1.0);
         assert.equal(sk.sprite.visible, false);
+    });
+
+    await t.test('出現: 見える範囲に入った敵は、突然ではなく時間をかけて透明から現れる（フェードイン）', () => {
+        const m = make(Monster, 'slime');
+        assert.equal(m.spriteMat.opacity, 0, '最初は透明');
+        run(m, P(0, 5), 1.0, 0.3);
+        assert.ok(m.spriteMat.opacity > 0.3 && m.spriteMat.opacity < 0.7, `半分ほど現れている (${m.spriteMat.opacity})`);
+        assert.equal(m.sprite.visible, true);
+        run(m, P(0, 5), 1.0, 0.4);
+        assert.equal(m.spriteMat.opacity, 1, '約 0.6 秒で完全に現れる');
+    });
+
+    await t.test('出現: 見えない範囲へ出る場合も、すぐには消えず徐々に消える（フェードアウト）', () => {
+        const m = make(Monster, 'slime');
+        m.facing = Math.PI; // プレイヤーに背を向けて、気づかない（未発見のまま）
+        run(m, P(0, 5), 1.0, 1.0);
+        assert.equal(m.state, 'unaware');
+        assert.equal(m.spriteMat.opacity, 1);
+        run(m, P(0, 40), 1.0, 0.2);
+        assert.ok(m.spriteMat.opacity > 0 && m.spriteMat.opacity < 1, `消えかけ (${m.spriteMat.opacity})`);
+        run(m, P(0, 40), 1.0, 1.0);
+        assert.equal(m.sprite.visible, false);
+    });
+
+    await t.test('出現: ミミックは最初から見える。倒した敵は透明度を引きずらずに死亡演出へ入る', () => {
+        assert.equal(make(Monster, 'mimic').appearAlpha, 1);
+        const m = make(Monster, 'slime');
+        run(m, P(0, 5), 1.0, 0.2); // フェードイン途中
+        m.takeDamage(9999, { x: 1, z: 0 });
+        assert.equal(m.spriteMat.opacity, 1);
     });
 
     await t.test('ミミックは常に発見済み状態', () => {

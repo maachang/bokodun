@@ -9,6 +9,7 @@ const SENSE_DRAW_SCALE = 2.5;     // 未発見の敵を描画する距離（＝�
 // 隠密性（stealth）: プレイヤーから見つけやすいかどうか。未発見の敵の描画距離に掛かる倍率
 //   low=見つかりやすい / normal=標準 / high=見つかりにくい（発見済みでも遠くでは見えず、描画距離の手前で透明から徐々に見えてくる）
 const STEALTH_DRAW_MULT = { low: 1.4, normal: 1.0, high: 0.5 };
+const APPEAR_FADE_TIME = 0.6;     // 敵が現れる／消えるときに、透明度が 0↔1 へ変化するのにかける時間（秒）。突然出てこず「フワッ」と現れる
 const STEALTH_FADE_BAND = 0.4;    // high の敵が透明から見えてくる範囲（描画距離の外側 40% 分）
 const LOST_TIME = 4.0;            // 追跡中に見失ってから未発見に戻るまでの時間（秒）
 
@@ -155,6 +156,9 @@ export class Monster {
         this.deathFxTimer = 0;
         this.deathTiltDir = 1;      // 横倒しの向き（1 / -1）
 
+        this.appearAlpha = this.alwaysAware ? 1 : 0; // 現在の透明度（現れるとき 0→1 へフェードイン。ミミックは最初から見える）
+        this.spriteMat.opacity = this.appearAlpha;
+        this.sprite.visible = this.appearAlpha > 0;
         this.stunTimer = 0;         // スタン中（メイスなど）は AI（移動・攻撃・射撃）が止まる
 
         // Pattern & animation states
@@ -199,12 +203,18 @@ export class Monster {
         this.updateAwareness(dt, dx, dz, dist, player, colliders, visibility);
         const drawRange = this.senseRange * SENSE_DRAW_SCALE * visibility * STEALTH_DRAW_MULT[this.stealth];
         // 発見済みの敵は常に描画する。ただし隠密性が高い敵は、発見済みでも描画距離を超えると見えない
-        this.sprite.visible = (this.state === 'chase' && this.stealth !== 'high') || (dist <= drawRange);
+        const shown = (this.state === 'chase' && this.stealth !== 'high') || (dist <= drawRange);
         // 隠密性が高い敵は、描画距離の手前で透明から徐々に見えてくる
         const fadeStart = drawRange * (1 - STEALTH_FADE_BAND);
-        this.spriteMat.opacity = (this.stealth === 'high' && dist > fadeStart)
-            ? Math.min(1, Math.max(0, (drawRange - dist) / (drawRange - fadeStart)))
-            : 1;
+        const targetAlpha = !shown ? 0
+            : (this.stealth === 'high' && dist > fadeStart)
+                ? Math.min(1, Math.max(0, (drawRange - dist) / (drawRange - fadeStart)))
+                : 1;
+        // 現れる・消えるときは、目標の透明度へ APPEAR_FADE_TIME かけて滑らかに近づける（突然出てこない）
+        const step = dt / APPEAR_FADE_TIME;
+        this.appearAlpha += Math.max(-step, Math.min(step, targetAlpha - this.appearAlpha));
+        this.spriteMat.opacity = this.appearAlpha;
+        this.sprite.visible = this.appearAlpha > 0.01;
 
         // スタン中は AI（移動・攻撃・射撃）を止める
         if (this.stunTimer > 0) {
