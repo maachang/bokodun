@@ -1689,6 +1689,94 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 家の中の板張りの床（明るい木目の縦板）
+    static createWoodFloorTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#2a1a0e';
+        ctx.fillRect(0, 0, 64, 64);
+        const tones = ['#a8764a', '#b9855a', '#98683f', '#c0905f'];
+        for (let x = 0; x < 64; x += 16) {
+            ctx.fillStyle = tones[(x / 16 + 1) % tones.length];
+            ctx.fillRect(x + 1, 0, 14, 64);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.14)';
+            ctx.fillRect(x + 5, 0, 1, 64);
+            ctx.fillRect(x + 10, 0, 1, 64);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.10)';
+            ctx.fillRect(x + 2, 0, 1, 64);
+            // 板の継ぎ目
+            ctx.fillStyle = '#2a1a0e';
+            ctx.fillRect(x + 1, ((x / 16) * 23) % 56 + 6, 14, 1);
+        }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // 家の中の敷物（赤地に金の縁取りと菱形の模様）
+    static createRugTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#7a1f24';
+        ctx.fillRect(0, 0, 64, 64);
+        ctx.fillStyle = '#d4a84a';
+        ctx.fillRect(2, 2, 60, 2);
+        ctx.fillRect(2, 60, 60, 2);
+        ctx.fillRect(2, 2, 2, 60);
+        ctx.fillRect(60, 2, 2, 60);
+        ctx.fillStyle = '#4a1216';
+        ctx.fillRect(8, 8, 48, 48);
+        ctx.fillStyle = '#b8863a';
+        for (let i = 0; i < 4; i++) {
+            const cx = 32, cy = 32, d = 22 - i * 6;
+            ctx.beginPath();
+            ctx.moveTo(cx, cy - d);
+            ctx.lineTo(cx + d, cy);
+            ctx.lineTo(cx, cy + d);
+            ctx.lineTo(cx - d, cy);
+            ctx.closePath();
+            if (i % 2 === 0) ctx.fill();
+            else { ctx.fillStyle = '#4a1216'; ctx.fill(); ctx.fillStyle = '#b8863a'; }
+        }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // 家の木の扉（縦板に鉄の帯と取っ手）
+    static createWoodDoorTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 128;
+        const ctx = canvas.getContext('2d');
+        const tones = ['#8a5a30', '#7a4e28', '#96653a', '#6e4624'];
+        for (let x = 0; x < 64; x += 16) {
+            ctx.fillStyle = tones[(x / 16) % tones.length];
+            ctx.fillRect(x, 0, 16, 128);
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.25)';
+            ctx.fillRect(x, 0, 1, 128);
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.08)';
+            ctx.fillRect(x + 3, 0, 1, 128);
+        }
+        ctx.fillStyle = '#2b2b30';
+        ctx.fillRect(0, 22, 64, 8);
+        ctx.fillRect(0, 98, 64, 8);
+        ctx.fillStyle = '#555560';
+        for (let x = 6; x < 64; x += 20) { ctx.fillRect(x, 24, 3, 3); ctx.fillRect(x, 100, 3, 3); }
+        ctx.fillStyle = '#d4a84a';
+        ctx.fillRect(50, 62, 6, 6);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
     // Mossy Boulder sprite
     static createBoulderTexture() {
         const loader = new THREE.TextureLoader();

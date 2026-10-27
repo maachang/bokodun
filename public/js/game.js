@@ -238,6 +238,9 @@ export class GameEngine {
             forestCanopy: forestCanopyTex,
             denseForest: denseForestTex,
             woodWall: RetroTextureGenerator.createWoodWallTexture(),
+            woodFloor: RetroTextureGenerator.createWoodFloorTexture(),
+            rug: RetroTextureGenerator.createRugTexture(),
+            woodDoor: RetroTextureGenerator.createWoodDoorTexture(),
             woodenFence: RetroTextureGenerator.createWoodenFenceTexture(),
             villageRoof: RetroTextureGenerator.createVillageRoofTexture(),
             dirtRoad: RetroTextureGenerator.createDirtRoadTexture(),
@@ -1278,6 +1281,7 @@ export class GameEngine {
                         const elev = (objDef.texture === 'woodBridge') ? 0.04 : 0.01;
                         tileMesh.position.set(wx, elev, wz);
                         this.scene.add(tileMesh);
+                        if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);   // 屋内の床は天井もつける
 
                         this.terrainGrid.push({
                             minX: wx - tileSize / 2, maxX: wx + tileSize / 2,
@@ -1470,15 +1474,22 @@ export class GameEngine {
                     case 'door': {
                         // Wall-mounted interactive door
                         // Detect wall orientation: check if walls are on Left/Right (horizontal door) or Top/Bottom (vertical door)
-                        const isWallLeft = (c > 0 && mapData.layout[r][c - 1] === '1');
-                        const isWallRight = (c < cols - 1 && mapData.layout[r][c + 1] === '1');
-                        const isWallTop = (r > 0 && mapData.layout[r - 1][c] === '1');
-                        const isWallBottom = (r < rows - 1 && mapData.layout[r + 1][c] === '1');
+                        // 壁は '1'、または凡例が壁ブロック（type: block）の文字
+                        const isWallChar = (ch) => ch === '1' || this.objectDefinitions[mapData.legend?.[ch]]?.type === 'block';
+                        const isWallLeft = (c > 0 && isWallChar(mapData.layout[r][c - 1]));
+                        const isWallRight = (c < cols - 1 && isWallChar(mapData.layout[r][c + 1]));
+                        const isWallTop = (r > 0 && isWallChar(mapData.layout[r - 1][c]));
+                        const isWallBottom = (r < rows - 1 && isWallChar(mapData.layout[r + 1][c]));
 
                         const isVertical = (isWallTop || isWallBottom) && !(isWallLeft && isWallRight);
 
-                        const doorMat = new THREE.MeshLambertMaterial({ map: this.textures.door });
-                        const frameMat = brickMat;
+                        const doorMat = new THREE.MeshLambertMaterial({ map: this.textures[objDef.texture] || this.textures.door });
+                        const frameMat = objDef.frameTexture && this.textures[objDef.frameTexture]
+                            ? new THREE.MeshLambertMaterial({ map: this.textures[objDef.frameTexture] })
+                            : brickMat;
+                        // 屋内の戸口は、床と天井もつける
+                        if (objDef.floorTexture) this.addFloorTile(wx, wz, tileSize, objDef.floorTexture);
+                        if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
                         const doorThickness = 0.45;
                         const doorW = tileSize * 0.75;
                         const doorGeo = new THREE.BoxGeometry(doorW, wallH, doorThickness);
@@ -1544,6 +1555,35 @@ export class GameEngine {
                             x: wx,
                             z: wz
                         });
+                        break;
+                    }
+
+                    case 'furniture': {
+                        // 家具: 箱形のパーツを組み合わせた置物（objects.json の parts。座標はマス中心からの相対）。
+                        // 当たり判定は collider（幅, 奥行き）と colliderOffset（x, z）。壁に寄せた家具は offset でずらす
+                        const group = new THREE.Group();
+                        for (const p of objDef.parts || []) {
+                            const geo = new THREE.BoxGeometry(p.size[0], p.size[1], p.size[2]);
+                            const mat = p.basic
+                                ? new THREE.MeshBasicMaterial({ color: p.color })
+                                : new THREE.MeshLambertMaterial({ color: p.color });
+                            const mesh = new THREE.Mesh(geo, mat);
+                            mesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
+                            group.add(mesh);
+                        }
+                        group.position.set(wx, 0, wz);
+                        this.scene.add(group);
+                        if (objDef.floorTexture) this.addFloorTile(wx, wz, tileSize, objDef.floorTexture);
+                        if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
+                        if (objDef.collider) {
+                            const [cw, cd] = objDef.collider;
+                            const [ox, oz] = objDef.colliderOffset || [0, 0];
+                            this.colliders.push({
+                                minX: wx + ox - cw / 2, maxX: wx + ox + cw / 2,
+                                minZ: wz + oz - cd / 2, maxZ: wz + oz + cd / 2,
+                                blocksProjectiles: objDef.blocksProjectiles === true
+                            });
+                        }
                         break;
                     }
 
@@ -2835,6 +2875,24 @@ export class GameEngine {
             if (best.x !== undefined) this.player.x = best.x;
             else this.player.z = best.z;
         }
+    }
+
+    // 屋内の床（板張りなど）を 1 マス分敷く
+    addFloorTile(wx, wz, tileSize, textureKey) {
+        const mat = new THREE.MeshLambertMaterial({ map: this.textures[textureKey] || this.textures.sand });
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), mat);
+        mesh.rotation.x = -Math.PI / 2;
+        mesh.position.set(wx, 0.01, wz);
+        this.scene.add(mesh);
+    }
+
+    // 屋内の天井を 1 マス分張る（壁の高さ。下から見える向き）
+    addCeilingTile(wx, wz, tileSize, wallH, textureKey) {
+        const mat = new THREE.MeshLambertMaterial({ map: this.textures[textureKey] || this.textures.brick });
+        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), mat);
+        mesh.rotation.x = Math.PI / 2;
+        mesh.position.set(wx, wallH, wz);
+        this.scene.add(mesh);
     }
 
     movePlayer(dx, dz) {
