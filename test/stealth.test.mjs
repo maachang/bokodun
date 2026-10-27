@@ -20,17 +20,23 @@ const defs = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/enem
 const tex = new Proxy({}, { get: () => ({}) });
 const P = (x, z) => ({ x, z, radius: 0.4 });
 // facing = 0 は +z 方向（プレイヤーを +z 側に置くと正面）
-const make = (Monster, type) => { const m = new Monster(type, 0, 0, tex, defs[type]); m.facing = 0; return m; };
+// 位置を固定して判定を検証するため、既定では速度 0（AI が動かない）にする。still=false で通常速度
+const make = (Monster, type, still = true) => {
+    const m = new Monster(type, 0, 0, tex, defs[type]);
+    m.facing = 0;
+    if (still) m.speed = 0;
+    return m;
+};
 const run = (m, player, visibility, sec, colliders = []) => {
     for (let t = 0; t < sec; t += 0.05) m.update(0.05, player, colliders, [], null, null, visibility);
     return m.state;
 };
 
-test('隠密: 敵の索敵（距離・視野角・視線・地形係数・状態遷移）', async (t) => {
+test('隠密: 敵の索敵（距離・視野角・視線・地形係数・状態遷移・描画）', async (t) => {
     const Monster = await loadMonster();
     const wall = [{ minX: -3, maxX: 3, minZ: 3, maxZ: 4 }];
 
-    await t.test('正面の感知距離内なら、気づいた瞬間に追跡（攻撃）へ移る', () => {
+    await t.test('正面の感知距離内なら、気づいた瞬間に発見済み(chase)になる', () => {
         const m = make(Monster, 'slime');
         assert.equal(run(m, P(0, 7), 1.0, 0.05), 'chase');
     });
@@ -61,7 +67,6 @@ test('隠密: 敵の索敵（距離・視野角・視線・地形係数・状態
 
     await t.test('追跡中に見失って 4 秒で未発見に戻る', () => {
         const m = make(Monster, 'slime');
-        m.speed = 0; // 位置を固定する（追跡中に壁を越えて視線が通ってしまうのを防ぐ）
         run(m, P(0, 5), 1.0, 2);
         assert.equal(m.state, 'chase');
         assert.equal(run(m, P(0, 5), 1.0, 3, wall), 'chase');
@@ -78,11 +83,16 @@ test('隠密: 敵の索敵（距離・視野角・視線・地形係数・状態
         assert.equal(m.sprite.visible, false);
     });
 
-    await t.test('ミミックは常に追跡状態、飛行の敵は待機中もホバー高さを保つ', () => {
+    await t.test('ミミックは常に発見済み状態', () => {
         assert.equal(make(Monster, 'mimic').state, 'chase');
-        const wasp = make(Monster, 'parasite_wasp');
-        run(wasp, P(0, 40), 1.0, 0.2);
-        assert.ok(wasp.sprite.position.y > 1);
+    });
+
+    await t.test('未発見でも AI（移動）は従来どおり距離 18 以内で動く（隠密は描画のみに影響）', () => {
+        const m = make(Monster, 'skeleton', false); // 感知距離 10。15m 先は未発見
+        m.facing = Math.PI;                  // プレイヤーに背を向ける
+        run(m, P(0, 15), 1.0, 1.0);
+        assert.equal(m.state, 'unaware');
+        assert.ok(m.z > 0.5, `未発見でもプレイヤーへ近づく (z=${m.z})`);
     });
 });
 

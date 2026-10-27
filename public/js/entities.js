@@ -1,11 +1,11 @@
 import * as THREE from '/js/three.module.js';
 
 // 隠密（索敵）仕様の定数
+// ※ 索敵状態は「見える／見えない（描画）」の制御にのみ使う。移動・攻撃・射撃の AI は索敵状態に関係なく従来どおり距離で動く
 const SENSE_DEFAULT_RANGE = 10;   // 感知距離の既定値（enemies.json の senseRange 未指定時）
 const SENSE_DEFAULT_ANGLE = 70;   // 視野角（正面からの半角・度）の既定値（senseAngle 未指定時）
 const SENSE_NEAR_DIST = 2.0;      // この距離以内（かつ壁越しでない）なら視野角外でも即気づく
 const SENSE_DRAW_SCALE = 1.5;     // 未発見の敵を描画する距離 = 感知距離 × この倍率 × 地形の視界係数
-const ALERT_TIME = 0;             // 警戒（気づき始め）の時間（秒）。0 なら気づいた瞬間に追跡・攻撃へ移る
 const LOST_TIME = 4.0;            // 追跡中に見失ってから未発見に戻るまでの時間（秒）
 
 export class Monster {
@@ -131,10 +131,9 @@ export class Monster {
         this.knockback = new THREE.Vector3();
         this.hitTimer = 0;
 
-        // 索敵状態: 'unaware'(未発見) → 'alert'(警戒) → 'chase'(追跡)
+        // 索敵状態: 'unaware'(未発見: 感知距離を超えると描画されない) / 'chase'(発見済み: 常に描画)
         this.state = this.alwaysAware ? 'chase' : 'unaware';
         this.facing = Math.random() * Math.PI * 2; // 正面方向（atan2(dx, dz) 基準）
-        this.alertTimer = 0;
         this.lostTimer = 0;
 
         // Pattern & animation states
@@ -175,14 +174,9 @@ export class Monster {
 
         this.aiTimer += dt;
 
-        // 索敵: 未発見・警戒の間は AI（移動・攻撃・射撃）を動かさず、静止姿勢で待機する
+        // 索敵: 見える／見えない（描画）の制御のみ。AI（移動・攻撃・射撃）は従来どおり下の距離判定で動く
         this.updateAwareness(dt, dx, dz, dist, player, colliders, visibility);
-        if (this.state !== 'chase') {
-            this.applyIdlePose();
-            this.sprite.position.set(this.x, this.baseY, this.z);
-            this.sprite.visible = (dist <= this.senseRange * SENSE_DRAW_SCALE * visibility);
-            return;
-        }
+        this.sprite.visible = (this.state === 'chase') || (dist <= this.senseRange * SENSE_DRAW_SCALE * visibility);
 
         // =========================================================================
         // Distinct Movement AI Patterns
@@ -535,7 +529,7 @@ export class Monster {
         return true;
     }
 
-    // 索敵状態の更新（感知距離 = 種類別 senseRange × 地形の視界係数 visibility）
+    // 索敵状態の更新（感知距離 = 種類別 senseRange × 地形の視界係数 visibility）。描画の制御にのみ使う
     updateAwareness(dt, dx, dz, dist, player, colliders, visibility) {
         if (this.alwaysAware) {
             this.state = 'chase';
@@ -561,27 +555,11 @@ export class Monster {
 
         if (this.state === 'unaware') {
             if (sees) {
-                if (ALERT_TIME > 0) {
-                    this.state = 'alert';
-                    this.alertTimer = ALERT_TIME;
-                } else {
-                    this.state = 'chase';
-                    this.lostTimer = 0;
-                }
-            }
-        } else if (this.state === 'alert') {
-            this.facing = toPlayer;
-            if (!sees) {
-                this.state = 'unaware';
-            } else {
-                this.alertTimer -= dt;
-                if (this.alertTimer <= 0) {
-                    this.state = 'chase';
-                    this.lostTimer = 0;
-                }
+                this.state = 'chase';
+                this.lostTimer = 0;
             }
         } else {
-            // chase: 視線が通り感知圏内にいる間は追跡を継続。見失って一定時間で未発見に戻る
+            // chase: 視線が通り感知圏内にいる間は発見済みを維持。見失って一定時間で未発見に戻る
             this.facing = toPlayer;
             if (keepSight) {
                 this.lostTimer = 0;
@@ -589,21 +567,6 @@ export class Monster {
                 this.lostTimer += dt;
                 if (this.lostTimer >= LOST_TIME) this.state = 'unaware';
             }
-        }
-    }
-
-    // 未発見・警戒中の待機姿勢（目立つ動きを抑える）
-    applyIdlePose() {
-        this.isLeaping = false;
-        this.leapVelocityY = 0;
-        const breath = 1.0 + Math.sin(this.aiTimer * 1.2) * 0.015;
-        this.sprite.scale.set(this.baseScaleX * breath, this.baseScaleY, 1);
-        if (this.aiType === 'flying_chase') {
-            this.baseY = (this.scale[1] > 2.0) ? 1.5 : 1.3;
-        } else if (this.aiType === 'flying_ranged') {
-            this.baseY = 1.6;
-        } else {
-            this.baseY = 0;
         }
     }
 
