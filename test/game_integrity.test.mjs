@@ -164,6 +164,7 @@ test('4. Variable Scope & Syntax Static Analysis', async (t) => {
         'public/js/game.js',
         'public/js/textures.js',
         'public/js/entities.js',
+        'public/js/npc.js',
         'public/js/audio.js',
         'public/js/particles.js',
         'public/js/sdAssetManager.js'

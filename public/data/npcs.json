@@ -1,0 +1,120 @@
+{
+  "village_chief": {
+    "name": "村長",
+    "texture": "/images/npcs/village_chief.png",
+    "height": 2.4,
+    "aspect": 0.4,
+    "radius": 0.45,
+    "speed": 0.7,
+    "wanderRadius": 1.0,
+    "lines": [
+      "よく来た、旅の人。ここは静かで、良い村じゃよ。",
+      "南の橋を渡れば、東の草原へ出られる。魔物には気をつけなさい。",
+      "わしの家は自由に見ていくがよい。"
+    ]
+  },
+  "villager_man": {
+    "name": "村人の男",
+    "texture": "/images/npcs/villager_man.png",
+    "height": 2.3,
+    "aspect": 0.356,
+    "radius": 0.45,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "今年は畑の出来がいい。",
+      "最近、草原で魔物を見たって話だ。"
+    ]
+  },
+  "villager_woman": {
+    "name": "村人の女",
+    "texture": "/images/npcs/villager_woman.png",
+    "height": 2.2,
+    "aspect": 0.366,
+    "radius": 0.45,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "花壇の花がきれいに咲いたのよ。",
+      "川の水は冷たいから、落ちないようにね。"
+    ]
+  },
+  "child_boy": {
+    "name": "村の男の子",
+    "texture": "/images/npcs/child_boy.png",
+    "height": 1.6,
+    "aspect": 0.351,
+    "radius": 0.35,
+    "speed": 1.3,
+    "wanderRadius": 3.0,
+    "lines": [
+      "橋のむこうに行ってみたいなあ。",
+      "おにいちゃん、冒険者？ すごい！"
+    ]
+  },
+  "child_girl": {
+    "name": "村の女の子",
+    "texture": "/images/npcs/child_girl.png",
+    "height": 1.55,
+    "aspect": 0.318,
+    "radius": 0.35,
+    "speed": 1.3,
+    "wanderRadius": 3.0,
+    "lines": [
+      "お花をつんでもいい？ ……だめ？",
+      "村長さんは、いつもやさしいんだよ。"
+    ]
+  },
+  "elder_man": {
+    "name": "村の老人",
+    "texture": "/images/npcs/elder_man.png",
+    "height": 2.1,
+    "aspect": 0.39,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "わしが若い頃は、この辺りも魔物だらけじゃった。",
+      "ほっほっ、元気そうでなによりじゃ。"
+    ]
+  },
+  "elder_woman": {
+    "name": "村の老婆",
+    "texture": "/images/npcs/elder_woman.png",
+    "height": 2.0,
+    "aspect": 0.407,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "おや、旅の人かい。ゆっくりしていきなさい。",
+      "腰が痛くてねぇ……天気が崩れるかもしれないよ。"
+    ]
+  },
+  "merchant_man": {
+    "name": "商人",
+    "texture": "/images/npcs/merchant_man.png",
+    "height": 2.4,
+    "aspect": 0.537,
+    "radius": 0.6,
+    "speed": 0.7,
+    "wanderRadius": 2.0,
+    "lines": [
+      "いい品が入っているよ。……今日は仕入れの途中でね。",
+      "おっと、旦那、運がいい。また今度寄っておくれ。"
+    ]
+  },
+  "merchant_woman": {
+    "name": "商人の婦人",
+    "texture": "/images/npcs/merchant_woman.png",
+    "height": 2.5,
+    "aspect": 0.727,
+    "radius": 0.6,
+    "speed": 0.7,
+    "wanderRadius": 2.0,
+    "lines": [
+      "あたしの目利きは確かだよ。損はさせないさ。",
+      "村の外は物騒だからね。準備はしっかりしていきな。"
+    ]
+  }
+}

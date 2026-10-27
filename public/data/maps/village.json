@@ -76,5 +76,52 @@
     "#XXx0y00x00DD000y0x002x#",
     "#0X00000000DD0000000XX0#",
     "########################"
+  ],
+  "npcs": [
+    {
+      "id": "village_chief",
+      "x": 16,
+      "z": 4
+    },
+    {
+      "id": "merchant_man",
+      "x": 16,
+      "z": 11
+    },
+    {
+      "id": "merchant_woman",
+      "x": 10,
+      "z": 14
+    },
+    {
+      "id": "villager_man",
+      "x": 20,
+      "z": 14
+    },
+    {
+      "id": "villager_woman",
+      "x": 4,
+      "z": 10
+    },
+    {
+      "id": "child_boy",
+      "x": 5,
+      "z": 16
+    },
+    {
+      "id": "child_girl",
+      "x": 14,
+      "z": 10
+    },
+    {
+      "id": "elder_man",
+      "x": 3,
+      "z": 5
+    },
+    {
+      "id": "elder_woman",
+      "x": 21,
+      "z": 6
+    }
   ]
 }

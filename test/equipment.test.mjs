@@ -14,7 +14,7 @@ const enemyDefs = readJson('enemies.json');
 // ブラウザ向けの絶対パス import ('/js/xxx.js') を相対パスに読み替えた一時コピーを作ってロードする
 async function loadModules() {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'equipment-'));
-    for (const f of ['game', 'textures', 'entities', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'sdAssetManager', 'three.module']) {
+    for (const f of ['game', 'textures', 'entities', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'npc', 'sdAssetManager', 'three.module']) {
         const src = fs.readFileSync(path.join(projectRoot, `public/js/${f}.js`), 'utf-8').replaceAll("'/js/", "'./");
         fs.writeFileSync(path.join(dir, `${f}.js`), src);
     }

@@ -1,6 +1,7 @@
 import * as THREE from '/js/three.module.js';
 import { RetroTextureGenerator } from '/js/textures.js';
 import { Monster, Projectile } from '/js/entities.js';
+import { Npc } from '/js/npc.js';
 import { SoundFX } from '/js/audio.js';
 import { SDAssetManager } from '/js/sdAssetManager.js';
 import { ParticleSystem } from '/js/particles.js';
@@ -109,6 +110,8 @@ export class GameEngine {
         this.terrainGrid = [];
         this.doors = [];
         this.signposts = [];
+        this.npcs = [];
+        this.npcTextures = {};
         this.activeEnemyCards = [];
         this.popups = [];
 
@@ -129,17 +132,19 @@ export class GameEngine {
 
     async loadDefinitions() {
         try {
-            const [objRes, enemyRes, itemRes, classRes, playerRes] = await Promise.all([
+            const [objRes, enemyRes, itemRes, classRes, playerRes, npcRes] = await Promise.all([
                 fetch('/data/objects.json'),
                 fetch('/data/enemies.json'),
                 fetch('/data/items.json'),
                 fetch('/data/weaponClasses.json'),
-                fetch('/data/player.json')
+                fetch('/data/player.json'),
+                fetch('/data/npcs.json')
             ]);
             this.objectDefinitions = await objRes.json();
             this.enemyDefinitions = await enemyRes.json();
             this.items = await itemRes.json();
             this.weaponClasses = await classRes.json();
+            this.npcDefinitions = await npcRes.json();
             // 初期装備（装備スロットの中身と選択中のスロット）
             const playerDef = await playerRes.json();
             this.player.equipSlots = [...playerDef.equipSlots];
@@ -429,6 +434,8 @@ export class GameEngine {
         this.terrainGrid = [];
         this.doors = [];
         this.signposts = [];
+        this.npcs = [];
+        this.npcTextures = this.npcTextures || {};
         this.activeEnemyCards = [];
         const enemyListEl = document.getElementById('enemyHudList');
         if (enemyListEl) enemyListEl.innerHTML = '';
@@ -1750,6 +1757,20 @@ export class GameEngine {
             }
         }
 
+        // 村人（NPC）: マップの npcs（{ id: npcs.json の ID, x, z: マスの位置 }）。マスの上の床や家具とは独立に置く
+        for (const n of mapData.npcs || []) {
+            const npcDef = this.npcDefinitions?.[n.id];
+            if (!npcDef) continue;
+            if (!this.npcTextures[n.id]) {
+                const tex = new THREE.TextureLoader().load(npcDef.texture);
+                tex.colorSpace = THREE.SRGBColorSpace;   // 写実的な絵なので、色をそのまま出す
+                this.npcTextures[n.id] = tex;
+            }
+            const npc = new Npc(n.id, n.x * tileSize + tileSize / 2, n.z * tileSize + tileSize / 2, this.npcTextures[n.id], npcDef);
+            this.npcs.push(npc);
+            this.scene.add(npc.sprite);
+        }
+
         // Spawn player
         this.player.x = mapData.spawn.x * tileSize + tileSize / 2;
         this.player.z = mapData.spawn.z * tileSize + tileSize / 2;
@@ -2541,8 +2562,11 @@ export class GameEngine {
 
         // Proximity check for Signposts and Chests (Display guidance banner while near, hide immediately when leaving)
         let activeSignMessage = null;
+        let activeSignIcon = '📜';
         if (nearChestInteractable) {
             activeSignMessage = '【Eキー】宝箱を開ける';
+        } else if ((activeSignMessage = this.nearbyNpcSpeech()) !== null) {
+            activeSignIcon = '💬';
         } else if (this.signposts && this.signposts.length > 0) {
             for (const s of this.signposts) {
                 const distToSign = Math.hypot(this.player.x - s.x, this.player.z - s.z);
@@ -2553,7 +2577,7 @@ export class GameEngine {
                 }
             }
         }
-        this.updateSignpostBanner(activeSignMessage);
+        this.updateSignpostBanner(activeSignMessage, activeSignIcon);
 
         // Animate liquid surfaces (water, shallow water, lava, swamp)
         if (this.waterMeshes && this.waterMeshes.length > 0) {
@@ -2862,6 +2886,9 @@ export class GameEngine {
         // Update Monsters and Ys-style "Bump Combat"
         this.updateCombat(dt);
 
+        // 村人（歩き回る）
+        this.updateNpcs(dt);
+
         // Update Popups
         this.updatePopups(dt);
 
@@ -2902,6 +2929,36 @@ export class GameEngine {
             if (best.x !== undefined) this.player.x = best.x;
             else this.player.z = best.z;
         }
+    }
+
+    // 村人が、その位置に立てないか（壁・家具などの当たり判定、水、プレイヤー、ほかの村人）
+    isNpcBlocked(self, x, z, radius) {
+        for (const c of this.colliders) {
+            if (c.disabled) continue;
+            if (x >= c.minX - radius && x <= c.maxX + radius && z >= c.minZ - radius && z <= c.maxZ + radius) return true;
+        }
+        for (const t of this.terrainGrid) {
+            if (t.depth > 0 && x >= t.minX && x <= t.maxX && z >= t.minZ && z <= t.maxZ) return true;
+        }
+        if (Math.hypot(x - this.player.x, z - this.player.z) < radius + this.player.radius + 0.3) return true;
+        for (const n of this.npcs) {
+            if (n !== self && Math.hypot(x - n.x, z - n.z) < radius + n.radius + 0.2) return true;
+        }
+        return false;
+    }
+
+    updateNpcs(dt) {
+        for (const n of this.npcs ?? []) n.update(dt, (x, z, r) => this.isNpcBlocked(n, x, z, r));
+    }
+
+    // 近くの村人のセリフ（いなければ null）
+    nearbyNpcSpeech() {
+        let found = null;
+        for (const n of this.npcs ?? []) {
+            const s = n.speechFor(this.player);   // 離れた村人のセリフも、ここでリセットされる
+            if (s !== null && found === null) found = s;
+        }
+        return found;
     }
 
     // 屋内の床（板張りなど）を 1 マス分敷く
@@ -2957,7 +3014,7 @@ export class GameEngine {
         // 生きている敵は障害物（突き抜けられない）。敵に近づく方向の移動だけ、敵の円の縁まで押し戻して横へ滑らせる。
         // 突進の攻撃判定（距離 player.radius + m.radius 未満）が成立するよう、縁は攻撃判定の距離より内側（80%）にする。
         // すでに重なっている敵から離れる方向の移動は妨げない。倒れている最中（active=false）の敵は障害物にしない
-        for (const m of this.monsters) {
+        for (const m of [...this.monsters, ...(this.npcs ?? [])]) {
             if (!m.active) continue;
             const minDist = (r + m.radius) * 0.8;
             const cx = this.player.x - m.x;
@@ -3338,12 +3395,12 @@ export class GameEngine {
         // Simple DOM based popups auto-remove
     }
 
-    updateSignpostBanner(message) {
+    updateSignpostBanner(message, icon = '📜') {
         const banner = document.getElementById('signpostBanner');
         if (!banner) return;
         if (message) {
-            if (banner.innerText !== message) {
-                banner.innerText = `📜 ${message}`;
+            if (banner.innerText !== `${icon} ${message}`) {
+                banner.innerText = `${icon} ${message}`;
             }
             banner.style.display = 'block';
         } else {
@@ -3487,6 +3544,14 @@ export class GameEngine {
             ctx.fillStyle = (m.type === 'S') ? '#10b981' : '#f97316';
             ctx.beginPath();
             ctx.arc(m.x * scaleX, m.z * scaleZ, 2.5, 0, Math.PI * 2);
+            ctx.fill();
+        }
+
+        // 村人（黄色い点）
+        ctx.fillStyle = '#facc15';
+        for (const n of this.npcs ?? []) {
+            ctx.beginPath();
+            ctx.arc(n.x * scaleX, n.z * scaleZ, 2.5, 0, Math.PI * 2);
             ctx.fill();
         }
 
