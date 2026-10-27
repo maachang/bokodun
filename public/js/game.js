@@ -2604,7 +2604,9 @@ export class GameEngine {
                 this.footstepDistance = (this.footstepDistance || 0) + Math.hypot(this.player.x - stepFromX, this.player.z - stepFromZ);
                 if (this.footstepDistance >= FOOTSTEP_STRIDE) {
                     this.footstepDistance %= FOOTSTEP_STRIDE;
-                    this.sound.playFootstep(this.mapData?.environment?.floorType);
+                    // 足音はマップ（空間）ごとに決める。environment.footstep が無いマップ（屋外など）は鳴らさない
+                    const footstep = this.mapData?.environment?.footstep;
+                    if (footstep) this.sound.playFootstep(footstep);
                 }
             }
         }

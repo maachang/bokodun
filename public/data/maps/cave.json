@@ -13,6 +13,7 @@
   "environment": {
     "floorType": "stone",
     "hasCeiling": true,
+    "footstep": "cave",
     "ceilingTexture": "mossyStone",
     "ambientLight": 7837830,
     "directionalLight": 12308670,

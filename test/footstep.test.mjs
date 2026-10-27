@@ -29,7 +29,7 @@ function fakeCtx() {
 
 test('足音: 床の種類ごとに鳴らせる（未知の種類・未指定は石）', async () => {
     const SoundFX = await loadSoundFX();
-    for (const floor of ['stone', 'grass', 'sand', 'swamp', 'water', 'unknown', undefined]) {
+    for (const floor of ['stone', 'cave', 'grass', 'sand', 'swamp', 'water', 'unknown', undefined]) {
         const s = new SoundFX();
         s.ctx = fakeCtx();
         s.playFootstep(floor);
@@ -42,10 +42,12 @@ test('足音: AudioContext 未初期化なら何もしない', async () => {
     assert.doesNotThrow(() => new SoundFX().playFootstep('stone'));
 });
 
-test('足音: 全マップの floorType は足音が定義済みの種類', () => {
+test('足音: 全マップの footstep は定義済みの種類、または無し（屋外は無音）', () => {
     const dir = path.join(projectRoot, 'public/data/maps');
+    const expected = { dungeon: 'stone', cave: 'cave' };
     for (const f of fs.readdirSync(dir)) {
-        const floor = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8')).environment?.floorType;
-        assert.ok(['stone', 'grass', 'sand', 'swamp', 'water'].includes(floor), `${f}: ${floor}`);
+        const id = f.replace('.json', '');
+        const footstep = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8')).environment?.footstep;
+        assert.equal(footstep, expected[id], `${f}: ${footstep}`);
     }
 });

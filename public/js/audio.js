@@ -33,8 +33,8 @@ export class SoundFX {
     }
 
     /**
-     * 足音。床の種類（マップの floorType）で音色を変える
-     * stone=コツ / grass=サクッ / sand=ザッ / swamp=ピチャ / water=パシャ
+     * 足音。マップ（空間）ごとの種類（environment.footstep）で音色を変える
+     * stone=コツ / cave=コォン（低く響く） / grass=サクッ / sand=ザッ / swamp=ピチャ / water=パシャ
      */
     playFootstep(floorType = 'stone') {
         if (!this.ctx) return;
@@ -43,6 +43,7 @@ export class SoundFX {
         const jitter = 0.9 + Math.random() * 0.2;
         const FOOTSTEPS = {
             stone: { noise: 'bandpass', freq: 1800, q: 1.5, dur: 0.06, vol: 0.10, tone: 'triangle', toneFreq: 260, toneVol: 0.06 },
+            cave:  { noise: 'bandpass', freq: 900,  q: 2.0, dur: 0.12, vol: 0.10, tone: 'sine', toneFreq: 140, toneVol: 0.08 },
             grass: { noise: 'bandpass', freq: 3200, q: 0.7, dur: 0.09, vol: 0.09, tone: null },
             sand:  { noise: 'lowpass',  freq: 1500, q: 0.5, dur: 0.12, vol: 0.10, tone: null },
             swamp: { noise: 'bandpass', freq: 700,  q: 2.5, dur: 0.14, vol: 0.12, tone: 'sine', toneFreq: 190, toneVol: 0.07, toneSlide: 2.2 },
