@@ -14,14 +14,15 @@ const enemyDefs = readJson('enemies.json');
 // ブラウザ向けの絶対パス import ('/js/xxx.js') を相対パスに読み替えた一時コピーを作ってロードする
 async function loadModules() {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'equipment-'));
-    for (const f of ['game', 'textures', 'entities', 'audio', 'particles', 'slashEffect', 'sdAssetManager', 'three.module']) {
+    for (const f of ['game', 'textures', 'entities', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'sdAssetManager', 'three.module']) {
         const src = fs.readFileSync(path.join(projectRoot, `public/js/${f}.js`), 'utf-8').replaceAll("'/js/", "'./");
         fs.writeFileSync(path.join(dir, `${f}.js`), src);
     }
     const { GameEngine } = await import(path.join(dir, 'game.js'));
     const { Monster, Projectile } = await import(path.join(dir, 'entities.js'));
     const { SlashEffectSystem } = await import(path.join(dir, 'slashEffect.js'));
-    return { GameEngine, Monster, Projectile, SlashEffectSystem };
+    const { StrikeEffectSystem } = await import(path.join(dir, 'strikeEffect.js'));
+    return { GameEngine, Monster, Projectile, SlashEffectSystem, StrikeEffectSystem };
 }
 
 const tex = new Proxy({}, { get: () => ({}) });
@@ -31,7 +32,7 @@ const bySlot = (id) => playerDef.equipSlots.indexOf(id);
 // DOM・描画に依存しない、戦闘ロジックだけを検証するための模擬ゲーム
 function makeGame({ GameEngine }, { mp = 60 } = {}) {
     const g = Object.create(GameEngine.prototype);
-    const calls = { popups: [], exp: 0, sounds: [], slashes: [], playerDamage: [] };
+    const calls = { popups: [], exp: 0, sounds: [], slashes: [], strikes: [], playerDamage: [] };
     Object.assign(g, {
         player: {
             x: 0, z: 0, angle: 0, radius: 0.6, attackPower: 15, mp, magicCooldown: 0, attackCooldown: 0,
@@ -45,6 +46,7 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
         sound: new Proxy({}, { get: (_, name) => (...args) => calls.sounds.push([name, ...args]) }),
         particles: { spawnBurst() {} },
         slashEffects: { spawn: (...args) => calls.slashes.push(args) },
+        strikeEffects: { schedule: (...args) => calls.strikes.push(args) },
         scene: { add() {} },
         addPopup: (msg) => calls.popups.push(msg),
         playerTakeDamage: (amount) => calls.playerDamage.push(amount),
@@ -97,9 +99,10 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
             if (it.kind === 'weapon') {
                 assert.ok(weaponClasses[it.weaponClass], `${id}: 未定義の weaponClass ${it.weaponClass}`);
             } else {
-                assert.ok(['fireball', 'explosive', 'spread'].includes(it.type), `${id}: type`);
-                assert.ok(it.mp >= 0 && it.cooldown > 0 && it.damage > 0 && it.speed > 0, `${id}: 呪文の項目`);
-                if (it.type === 'explosive') assert.ok(it.blastRadius > 0);
+                assert.ok(['fireball', 'strike', 'spread'].includes(it.type), `${id}: type`);
+                assert.ok(it.mp >= 0 && it.cooldown > 0 && it.damage > 0, `${id}: 呪文の項目`);
+                if (it.type === 'strike') assert.ok(it.blastRadius > 0 && it.targetDistance > 0 && it.warnTime >= 0 && it.pillarTime > 0, `${id}: 落下系の項目`);
+                else assert.ok(it.speed > 0, `${id}: speed`);
                 if (it.type === 'spread') assert.ok(it.count >= 2 && it.spreadDeg > 0);
             }
         }
@@ -339,33 +342,49 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         assert.equal(g.player.mp, 0);
     });
 
-    await t.test('爆発火球: 爆発弾を発射し、着弾で半径内の敵すべてにダメージ（範囲外は無傷）', () => {
+    await t.test('爆発火球: 弾を飛ばさず、前方 6m の地面に予告→着弾する（MP20・間隔0.9秒）', () => {
         const { g, calls } = makeGame(M);
         g.selectMagic(1);
         g.useMagic();
-        assert.equal(g.projectiles.length, 1);
-        const p = g.projectiles[0];
-        assert.ok(p.explosive && p.blastRadius === 3.0 && p.damage === 35);
+        assert.equal(g.projectiles.length, 0, '弾は飛ばない');
         assert.equal(g.player.mp, 40);
+        assert.equal(g.player.magicCooldown, 0.9);
+        assert.equal(calls.strikes.length, 1);
+        const [x, z, opts] = calls.strikes[0];
+        assert.ok(Math.abs(x) < 1e-9 && Math.abs(z + 6) < 1e-9, `プレイヤー前方 6m (${x}, ${z})`);
+        assert.deepEqual([opts.radius, opts.warnTime, opts.pillarTime], [3.0, 0.3, 0.8]);
+    });
 
-        // 爆発位置 = 弾の位置から進行方向の逆へ 0.6 戻した点
-        p.x = 0; p.z = -10; p.dirX = 0; p.dirZ = -1;
+    await t.test('爆発火球: 手前に壁があれば、その直前に着弾する。杖の補正で威力が上がる', () => {
+        const { g, calls } = makeGame(M);
+        g.colliders = [{ minX: -2, maxX: 2, minZ: -4.5, maxZ: -3.5 }]; // z=-3.5 に壁
+        equip(g, 'apprentice_staff');
+        g.selectMagic(1);
+        g.useMagic();
+        const [, z, opts] = calls.strikes[0];
+        assert.ok(z > -3.5 && z < -2.5, `壁の手前 (z=${z})`);
+
+        const near = spawn(M, 'slime', 0, z - 0.5);
+        g.monsters.push(near);
+        opts.onImpact(); // 着弾
+        assert.equal(near.maxHp - near.hp, 42, '35 × 1.2');
+    });
+
+    await t.test('着弾の範囲ダメージ: 半径内の敵すべてに当たり（外向きにノックバック）、範囲外は無傷。倒すと経験値', () => {
+        const { g, calls } = makeGame(M);
         const near = spawn(M, 'slime', 0, -9.4);
         const edge = spawn(M, 'slime', 2.5, -9.4);
         const outside = spawn(M, 'slime', 8, -9.4);
         near.hp = 1; // 倒せる
         g.monsters.push(near, edge, outside);
 
-        g.explodeAt(p);
-        assert.equal(p.active, false);
+        g.blastAt(0, -10, 3.0, 35);
         assert.equal(near.active, false, '範囲内で倒れる');
         assert.ok(calls.exp > 0, '経験値が入る');
         assert.equal(edge.hp, edge.maxHp - 35);
         assert.equal(outside.hp, outside.maxHp);
-
-        const hpAfter = edge.hp;
-        g.explodeAt(p); // 二重爆発しない
-        assert.equal(edge.hp, hpAfter);
+        assert.ok(edge.knockback.x > 0, '中心から外向きに飛ぶ');
+        assert.ok(calls.sounds.some(([n]) => n === 'playExplosion'));
     });
 
     await t.test('弓: 魔法スロットに入れると Space で矢を放つ（MP不要・重力で落ちる矢・射程はクラスの range）', () => {
@@ -382,13 +401,6 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         assert.ok(calls.sounds.some(([n]) => n === 'playBowShoot'));
     });
 
-    await t.test('爆発弾は壁に当たると hitWall になる（爆発のきっかけ）', () => {
-        const wall = [{ minX: -1, maxX: 1, minZ: -6, maxZ: -5 }];
-        const p = new M.Projectile(0, -4, 0, -1, true, 14, 35, { explosive: true, blastRadius: 3 });
-        for (let i = 0; i < 20 && !p.hitWall; i++) p.update(0.05, wall, null);
-        assert.equal(p.hitWall, true);
-        assert.equal(p.active, false);
-    });
 });
 
 test('生きている敵は障害物（プレイヤーは突き抜けられない）', async (t) => {
@@ -431,6 +443,48 @@ test('生きている敵は障害物（プレイヤーは突き抜けられな�
         g.monsters.push(m);
         g.movePlayer(0, 0.3);
         assert.ok(Math.abs(g.player.z - 0.3) < 1e-9, '後ろへ離れられる');
+    });
+});
+
+test('落下エフェクト（StrikeEffectSystem）', async (t) => {
+    const M = await loadModules();
+
+    await t.test('予告の輪 → 着弾（onImpact を 1 回だけ呼ぶ）→ 火柱 → 消える。シーンから取り除かれる', () => {
+        const scene = { added: [], removed: [], add(o) { this.added.push(o); }, remove(o) { this.removed.push(o); } };
+        const fx = new M.StrikeEffectSystem(scene, null);
+        let impacts = 0;
+        fx.schedule(0, -6, { radius: 3, warnTime: 0.3, pillarTime: 0.8, onImpact: () => impacts++ });
+        assert.equal(scene.added.length, 1, '予告の輪');
+
+        fx.update(0.2);
+        assert.equal(impacts, 0, '予告中は着弾しない');
+        assert.equal(scene.removed.length, 0);
+
+        fx.update(0.11); // t = 0.31 → 着弾
+        assert.equal(impacts, 1);
+        assert.equal(scene.removed.length, 1, '予告の輪が消える');
+        assert.equal(scene.added.length, 2, '火柱が出る');
+        const pillar = fx.strikes[0].pillar;
+        assert.equal(pillar.group.children.length, 4, '交差する板 3 枚 + 衝撃波リング');
+
+        fx.update(0.3); // 火柱の持続の途中
+        assert.equal(impacts, 1, '着弾は 1 回だけ');
+        assert.equal(fx.strikes.length, 1);
+        assert.ok(pillar.group.scale.y === 1 && pillar.mat.opacity > 0, '立ち上がっている');
+
+        fx.update(0.6); // 持続 0.8 を超える
+        assert.equal(fx.strikes.length, 0);
+        assert.equal(scene.removed.length, 2);
+    });
+
+    await t.test('火柱は終盤で透明になって消える', () => {
+        const scene = { add() {}, remove() {} };
+        const fx = new M.StrikeEffectSystem(scene, null);
+        fx.schedule(0, 0, { warnTime: 0, pillarTime: 1.0 });
+        fx.update(0.01);
+        const pl = fx.strikes[0].pillar;
+        fx.update(0.9);
+        assert.ok(pl.mat.opacity < 0.5, `終盤は薄い (${pl.mat.opacity})`);
     });
 });
 

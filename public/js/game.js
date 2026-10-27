@@ -5,6 +5,7 @@ import { SoundFX } from '/js/audio.js';
 import { SDAssetManager } from '/js/sdAssetManager.js';
 import { ParticleSystem } from '/js/particles.js';
 import { SlashEffectSystem } from '/js/slashEffect.js';
+import { StrikeEffectSystem } from '/js/strikeEffect.js';
 
 export class GameEngine {
     constructor() {
@@ -98,6 +99,7 @@ export class GameEngine {
 
         this.initThree();
         this.initTextures();
+        this.strikeEffects = new StrikeEffectSystem(this.scene, this.textures.firePillar);
         this.initControls();
         this.initEquipHudEvents();
     }
@@ -1841,7 +1843,8 @@ export class GameEngine {
             }
             this.player.mp -= mp;
             this.player.magicCooldown = item.cooldown * (fcls?.cooldownScale ?? 1);
-            this.shootProjectiles(item, powerScale);
+            if (item.type === 'strike') this.castStrike(item, powerScale);
+            else this.shootProjectiles(item, powerScale);
         } else {
             const cls = this.weaponClasses[item.weaponClass];
             if (cls?.attack !== 'shoot') return;
@@ -1865,7 +1868,7 @@ export class GameEngine {
         this.sound.playBowShoot();
     }
 
-    // 飛び道具（ファイア・爆発火球・拡散弾）: count 発を spreadDeg 間隔の扇状に発射
+    // 飛び道具（ファイア・拡散弾・マジックボルト）: count 発を spreadDeg 間隔の扇状に発射
     shootProjectiles(w, powerScale = 1.0) {
         this.sound.playShoot(true);
 
@@ -1883,10 +1886,7 @@ export class GameEngine {
             spawnX = this.player.x + dirX * 0.8;
             spawnZ = this.player.z + dirZ * 0.8;
 
-            const fireball = new Projectile(spawnX, spawnZ, dirX, dirZ, true, w.speed, Math.floor(w.damage * powerScale), {
-                explosive: w.type === 'explosive',
-                blastRadius: w.blastRadius
-            });
+            const fireball = new Projectile(spawnX, spawnZ, dirX, dirZ, true, w.speed, Math.floor(w.damage * powerScale));
             this.projectiles.push(fireball);
             this.scene.add(fireball.mesh);
         }
@@ -1895,30 +1895,50 @@ export class GameEngine {
         this.particles.spawnBurst(spawnX, 1.3, spawnZ, 0xffaa00, 8, 3.0);
     }
 
-    // 爆発火球の着弾: 半径 blastRadius 内の敵すべてに p.damage の範囲ダメージ
-    explodeAt(p) {
-        if (p.exploded) return;
-        p.exploded = true;
-        p.active = false;
+    // 落下系の魔法（爆発火球）: 前方 targetDistance の地面を狙い（手前に壁があればその直前）、予告の輪 → 着弾の範囲ダメージ → 火柱
+    castStrike(spell, powerScale = 1.0) {
+        const dirX = -Math.sin(this.player.angle);
+        const dirZ = -Math.cos(this.player.angle);
 
-        // 壁の中心で爆発して壁越しの敵を巻き込まないよう、進行方向の逆へ少し戻す
-        const ex = p.x - p.dirX * 0.6;
-        const ez = p.z - p.dirZ * 0.6;
+        // 壁・柱など弾を止めるものがあれば、その直前を着弾点にする
+        let dist = spell.targetDistance;
+        for (let d = 1.0; d <= spell.targetDistance; d += 0.25) {
+            const x = this.player.x + dirX * d;
+            const z = this.player.z + dirZ * d;
+            if (this.colliders.some(c => !c.disabled && c.blocksProjectiles !== false && x >= c.minX && x <= c.maxX && z >= c.minZ && z <= c.maxZ)) {
+                dist = Math.max(0.8, d - 0.3);
+                break;
+            }
+        }
+        const tx = this.player.x + dirX * dist;
+        const tz = this.player.z + dirZ * dist;
+        const damage = Math.floor(spell.damage * powerScale);
 
+        this.sound.playShoot(true);
+        this.strikeEffects.schedule(tx, tz, {
+            radius: spell.blastRadius,
+            warnTime: spell.warnTime,
+            pillarTime: spell.pillarTime,
+            onImpact: () => this.blastAt(tx, tz, spell.blastRadius, damage)
+        });
+    }
+
+    // 着弾の範囲ダメージ: 中心から半径 radius 内の敵すべてに damage（ノックバックは中心から外向き）
+    blastAt(x, z, radius, damage) {
         this.sound.playExplosion();
-        this.particles.spawnBurst(ex, p.y, ez, 0xff5500, 40, 7.0);
-        this.particles.spawnBurst(ex, p.y, ez, 0xffdd33, 24, 4.5);
+        this.particles.spawnBurst(x, 0.8, z, 0xff5500, 40, 7.0);
+        this.particles.spawnBurst(x, 1.5, z, 0xffdd33, 24, 4.5);
 
         for (const m of this.monsters) {
             if (!m.active) continue;
-            const dx = m.x - ex;
-            const dz = m.z - ez;
+            const dx = m.x - x;
+            const dz = m.z - z;
             const dist = Math.hypot(dx, dz);
-            if (dist > p.blastRadius + m.radius) continue;
-            const nx = dist > 0.001 ? dx / dist : p.dirX;
-            const nz = dist > 0.001 ? dz / dist : p.dirZ;
-            const isDead = m.takeDamage(p.damage, { x: nx, z: nz });
-            this.addPopup(`爆発! -${p.damage}`, '#f97316', m.x, m.z);
+            if (dist > radius + m.radius) continue;
+            const nx = dist > 0.001 ? dx / dist : 0;
+            const nz = dist > 0.001 ? dz / dist : 1;
+            const isDead = m.takeDamage(damage, { x: nx, z: nz });
+            this.addPopup(`爆発! -${damage}`, '#f97316', m.x, m.z);
             this.notifyEnemyEngaged(m);
             if (isDead) this.gainExp(m.exp);
         }
@@ -2606,18 +2626,11 @@ export class GameEngine {
             p.update(dt, this.colliders, this.particles);
 
             if (p.isPlayer) {
-                // 爆発火球が壁に当たったら爆発
-                if (p.explosive && p.hitWall) this.explodeAt(p);
-
                 // Check player fireball hit monster
                 for (const m of this.monsters) {
-                    if (!m.active || p.exploded) continue;
+                    if (!m.active) continue;
                     const distM = Math.hypot(m.x - p.x, m.z - p.z);
                     if (distM < m.radius + p.radius) {
-                        if (p.explosive) {
-                            this.explodeAt(p);
-                            break;
-                        }
                         p.active = false;
                         const isArrow = (p.type === 'arrow');
                         if (isArrow) this.sound.playArrowHit(); else this.sound.playExplosion();
@@ -2665,6 +2678,7 @@ export class GameEngine {
         // Update Particle System
         this.particles.update(dt);
         this.slashEffects.update(dt);
+        this.strikeEffects.update(dt);
 
         // Update Monsters and Ys-style "Bump Combat"
         this.updateCombat(dt);

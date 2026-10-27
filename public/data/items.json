@@ -75,12 +75,14 @@
     "id": "explosion",
     "name": "爆発火球",
     "kind": "spell",
-    "type": "explosive",
+    "type": "strike",
     "mp": 20,
     "cooldown": 0.9,
     "damage": 35,
-    "speed": 14,
-    "blastRadius": 3.0
+    "blastRadius": 3.0,
+    "targetDistance": 6,
+    "warnTime": 0.3,
+    "pillarTime": 0.8
   },
   "spread": {
     "id": "spread",
