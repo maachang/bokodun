@@ -44,7 +44,7 @@ export class Monster {
             this.name = enemyDef.name || 'モンスター';
             this.maxHp = enemyDef.maxHp || 30;
             this.hp = this.maxHp;
-            this.speed = enemyDef.speed || 1.5;
+            this.speed = enemyDef.speed ?? 1.5; // 0 を指定した場合は 0（動かない）として扱う
             this.baseSpeed = this.speed;
             this.attackPower = enemyDef.attackPower || 10;
             this.exp = enemyDef.exp || 20;
@@ -474,7 +474,7 @@ export class Monster {
 
                     // Creeps slowly toward player to get into toxic breath range (< 5.0m)
                     if (dist > 2.2) {
-                        const crawlSpeed = 1.4;
+                        const crawlSpeed = this.speed;
                         const nextX = this.x + dirX * crawlSpeed * dt;
                         const nextZ = this.z + dirZ * crawlSpeed * dt;
                         if (!this.checkWallCollision(nextX, this.z, colliders)) this.x = nextX;

@@ -175,6 +175,35 @@ test('死亡演出: 白フラッシュ → 横倒し → 半透明で消える',
     });
 });
 
+test('敵の速度: enemies.json の speed が反映される', async (t) => {
+    const Monster = await loadMonster();
+
+    await t.test('speed は敵ごとに指定でき、0 は 0 として扱われる', () => {
+        const m = new Monster('slime', 0, 0, tex, { ...defs.slime, speed: 0 });
+        assert.equal(m.speed, 0);
+        const w = new Monster('slime', 0, 0, tex, { ...defs.slime, speed: 4.2 });
+        assert.equal(w.speed, 4.2);
+        const d = new Monster('slime', 0, 0, tex, { ...defs.slime, speed: undefined });
+        assert.equal(d.speed, 1.5);
+    });
+
+    await t.test('ワームの這う速さは speed に従う（固定値ではない）', () => {
+        const move = (speed) => {
+            const m = new Monster('acid_worm', 0, 0, tex, { ...defs.acid_worm, speed });
+            for (let i = 0; i < 20; i++) m.update(0.05, P(0, 10), [], [], null, null, 1.0);
+            return m.z;
+        };
+        const slow = move(1.0);
+        const fast = move(3.0);
+        assert.ok(fast > slow * 2, `速いほど遠くへ進む (slow=${slow}, fast=${fast})`);
+    });
+
+    await t.test('飛行の敵（ワスプ・蚊）はスライムより速い', () => {
+        assert.ok(defs.parasite_wasp.speed > defs.slime.speed * 2);
+        assert.ok(defs.maria_mosquito.speed > defs.parasite_wasp.speed);
+    });
+});
+
 test('隠密: データ定義（視界係数・感知距離）', async (t) => {
     await t.test('全マップの environment に 0〜1 の visibility がある', () => {
         const dir = path.join(projectRoot, 'public/data/maps');
