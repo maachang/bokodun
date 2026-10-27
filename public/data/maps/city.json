@@ -18,6 +18,7 @@
     "fogColor": 11713215,
     "fogNear": 22,
     "fogFar": 75,
+    "visibility": 0.9,
     "skyColor": 9018045
   },
   "legend": {

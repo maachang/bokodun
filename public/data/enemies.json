@@ -15,7 +15,8 @@
       1.0
     ],
     "y": 1.0,
-    "radius": 0.8
+    "radius": 0.8,
+    "senseRange": 8
   },
   "skeleton": {
     "id": "skeleton",
@@ -94,7 +95,8 @@
       1.0
     ],
     "y": 1.2,
-    "radius": 0.95
+    "radius": 0.95,
+    "alwaysAware": true
   },
   "tarantula_swamp": {
     "id": "tarantula_swamp",
@@ -112,7 +114,8 @@
       1.0
     ],
     "y": 1.1,
-    "radius": 0.95
+    "radius": 0.95,
+    "senseRange": 12
   },
   "parasite_wasp": {
     "id": "parasite_wasp",
@@ -130,7 +133,8 @@
       1.0
     ],
     "y": 1.4,
-    "radius": 0.8
+    "radius": 0.8,
+    "senseRange": 14
   },
   "maria_mosquito": {
     "id": "maria_mosquito",
@@ -148,7 +152,8 @@
       1.0
     ],
     "y": 1.5,
-    "radius": 0.75
+    "radius": 0.75,
+    "senseRange": 14
   },
   "acid_worm": {
     "id": "acid_worm",
@@ -169,7 +174,8 @@
       1.0
     ],
     "y": 1.2,
-    "radius": 0.9
+    "radius": 0.9,
+    "senseRange": 7
   },
   "poison_moth": {
     "id": "poison_moth",
@@ -190,7 +196,8 @@
       1.0
     ],
     "y": 1.6,
-    "radius": 0.85
+    "radius": 0.85,
+    "senseRange": 14
   },
   "poison_toad": {
     "id": "poison_toad",
@@ -208,6 +215,7 @@
       1.0
     ],
     "y": 0.9,
-    "radius": 0.95
+    "radius": 0.95,
+    "senseRange": 8
   }
 }

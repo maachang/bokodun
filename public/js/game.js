@@ -371,6 +371,8 @@ export class GameEngine {
         this.ambientLight.color.setHex(env.ambientLight || 0x555555);
         this.dirLight.color.setHex(env.directionalLight || 0xffffff);
         this.scene.fog = new THREE.Fog(env.fogColor || 0x000000, env.fogNear || 10, env.fogFar || 50);
+        // 地形ごとの視界係数（敵の感知距離・未発見の敵の描画距離に掛かる。未指定は 1.0）
+        this.visibility = env.visibility ?? 1.0;
         this.scene.background = new THREE.Color(env.skyColor || 0x000000);
 
         const rows = mapData.layout.length;
@@ -2451,7 +2453,7 @@ export class GameEngine {
     updateCombat(dt) {
         for (let i = this.monsters.length - 1; i >= 0; i--) {
             const m = this.monsters[i];
-            m.update(dt, this.player, this.colliders, this.projectiles, this.sound, this.scene);
+            m.update(dt, this.player, this.colliders, this.projectiles, this.sound, this.scene, this.visibility ?? 1.0);
 
             // Check collision with player for Ys-style bump attack
             const dx = m.x - this.player.x;
