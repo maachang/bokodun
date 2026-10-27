@@ -535,6 +535,63 @@ test('生きている敵は障害物（プレイヤーは突き抜けられな�
         assert.ok(g.player.z < -4, `通過した (z=${g.player.z})`);
     });
 
+    await t.test('壁際で敵に近づく移動をしても、壁にめり込まない（押し戻しが壁に重なる場合は動く前の位置に留まる）', () => {
+        const { g } = makeGame(M);
+        g.colliders = [{ minX: 1.0, maxX: 2.0, minZ: -5, maxZ: 5 }]; // プレイヤーの中心が入れない範囲は x 0.4〜2.6
+        g.player.x = 0.3;
+        const m = spawn(M, 'skeleton', -0.3, -1.0);
+        g.monsters.push(m);
+        g.movePlayer(0, -0.3);
+        assert.equal(g.isInsideWall(g.player.x, g.player.z), false, `壁の外にいる (${g.player.x}, ${g.player.z})`);
+        // めり込まないので、その後も壁から離れる方向へ自由に動ける
+        const x0 = g.player.x;
+        g.movePlayer(-0.2, 0);
+        assert.ok(g.player.x < x0);
+    });
+
+    await t.test('壁・敵・移動をランダムに組み合わせても、壁の外から始めれば、壁の中に入り込まない', () => {
+        let seed = 12345;
+        const rnd = () => { seed = (seed * 1664525 + 1013904223) % 4294967296; return seed / 4294967296; };
+        for (let trial = 0; trial < 300; trial++) {
+            const { g } = makeGame(M);
+            g.colliders = Array.from({ length: 1 + Math.floor(rnd() * 3) }, () => {
+                const x = (rnd() - 0.5) * 8, z = (rnd() - 0.5) * 8, w = 0.5 + rnd() * 2, h = 0.5 + rnd() * 2;
+                return { minX: x, maxX: x + w, minZ: z, maxZ: z + h };
+            });
+            g.monsters = Array.from({ length: Math.floor(rnd() * 3) + 1 }, () => spawn(M, 'skeleton', (rnd() - 0.5) * 8, (rnd() - 0.5) * 8));
+            // 壁の外に開始位置を決める
+            let tries = 0;
+            do { g.player.x = (rnd() - 0.5) * 8; g.player.z = (rnd() - 0.5) * 8; } while (g.isInsideWall(g.player.x, g.player.z) && ++tries < 100);
+            if (g.isInsideWall(g.player.x, g.player.z)) continue;
+            for (let step = 0; step < 60; step++) {
+                g.movePlayer((rnd() - 0.5) * 0.5, (rnd() - 0.5) * 0.5);
+                assert.equal(g.isInsideWall(g.player.x, g.player.z), false, `trial ${trial} step ${step}: 壁の中 (${g.player.x}, ${g.player.z})`);
+            }
+        }
+    });
+
+    await t.test('すでに壁にめり込んでいても、次の移動で最も近い壁の外へ出されて、動けるようになる', () => {
+        const { g } = makeGame(M);
+        g.colliders = [{ minX: 1.0, maxX: 2.0, minZ: -5, maxZ: 5 }]; // 判定範囲 x 0.4〜2.6
+        g.player.x = 0.9; // 範囲の左端寄りの奥（左の縁まで 0.5、右の縁まで 1.7）
+        g.player.z = 0;
+        assert.equal(g.isInsideWall(g.player.x, g.player.z), true);
+        g.movePlayer(0, 0);
+        assert.equal(g.isInsideWall(g.player.x, g.player.z), false);
+        assert.ok(g.player.x < 0.4, `近い側（左）の縁の外へ出る (${g.player.x})`);
+        const x0 = g.player.x;
+        g.movePlayer(-0.2, 0);
+        assert.ok(g.player.x < x0, '動ける');
+    });
+
+    await t.test('無効（disabled）な壁にはめり込み扱いにならない', () => {
+        const { g } = makeGame(M);
+        g.colliders = [{ minX: 1.0, maxX: 2.0, minZ: -5, maxZ: 5, disabled: true }];
+        g.player.x = 1.5;
+        g.movePlayer(0, 0);
+        assert.equal(g.player.x, 1.5);
+    });
+
     await t.test('すでに重なっている敵から離れる方向の移動は妨げられない', () => {
         const { g } = makeGame(M);
         const m = spawn(M, 'skeleton', 0, -0.3); // 敵のほうから重なってきた

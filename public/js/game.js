@@ -2748,7 +2748,40 @@ export class GameEngine {
         this.renderMinimap();
     }
 
+    // 壁（colliders）の判定範囲（プレイヤーの半径ぶん外側へ広げた矩形）の中に (x, z) があるか
+    isInsideWall(x, z) {
+        const r = this.player.radius;
+        for (const c of this.colliders) {
+            if (c.disabled) continue;
+            if (x >= c.minX - r && x <= c.maxX + r && z >= c.minZ - r && z <= c.maxZ + r) return true;
+        }
+        return false;
+    }
+
+    // すでに壁の中にいる（めり込んだ）場合に、最も近い壁の外側の縁へ出す。通常の移動は壁に入る位置を事前に止めるので、
+    // めり込みは押し戻しなど想定外の原因で起きる。放っておくと、どの方向へも動けなくなる
+    depenetrateFromWalls() {
+        const r = this.player.radius;
+        const EPS = 0.001; // 判定は境界を含む（<=）ので、縁のわずかに外へ出す
+        for (let i = 0; i <= this.colliders.length; i++) {
+            const c = this.colliders.find(c => !c.disabled &&
+                this.player.x >= c.minX - r && this.player.x <= c.maxX + r &&
+                this.player.z >= c.minZ - r && this.player.z <= c.maxZ + r);
+            if (!c) return;
+            const exits = [
+                { d: this.player.x - (c.minX - r), x: c.minX - r - EPS },
+                { d: (c.maxX + r) - this.player.x, x: c.maxX + r + EPS },
+                { d: this.player.z - (c.minZ - r), z: c.minZ - r - EPS },
+                { d: (c.maxZ + r) - this.player.z, z: c.maxZ + r + EPS }
+            ];
+            const best = exits.reduce((a, b) => (b.d < a.d ? b : a));
+            if (best.x !== undefined) this.player.x = best.x;
+            else this.player.z = best.z;
+        }
+    }
+
     movePlayer(dx, dz) {
+        this.depenetrateFromWalls();
         const prevX = this.player.x;
         const prevZ = this.player.z;
         const nextX = this.player.x + dx;
@@ -2791,12 +2824,15 @@ export class GameEngine {
             if (d >= minDist) continue;
             const prevD = Math.hypot(prevX - m.x, prevZ - m.z);
             if (d >= prevD) continue;
-            if (d > 0.0001) {
-                this.player.x = m.x + cx / d * minDist;
-                this.player.z = m.z + cz / d * minDist;
-            } else {
+            // 押し戻した位置が壁に重なる場合は、押し戻さず動く前の位置に留まる（壁にめり込んで動けなくなるのを防ぐ）
+            const pushedX = d > 0.0001 ? m.x + cx / d * minDist : prevX;
+            const pushedZ = d > 0.0001 ? m.z + cz / d * minDist : prevZ;
+            if (this.isInsideWall(pushedX, pushedZ)) {
                 this.player.x = prevX;
                 this.player.z = prevZ;
+            } else {
+                this.player.x = pushedX;
+                this.player.z = pushedZ;
             }
         }
     }
