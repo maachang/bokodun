@@ -353,7 +353,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         assert.equal(calls.strikes.length, 1);
         const [x, z, opts] = calls.strikes[0];
         assert.ok(Math.abs(x) < 1e-9 && Math.abs(z + 6) < 1e-9, `プレイヤー前方 6m (${x}, ${z})`);
-        assert.deepEqual([opts.radius, opts.warnTime, opts.pillarTime], [3.0, 0.3, 0.8]);
+        assert.deepEqual([opts.radius, opts.warnTime, opts.pillarTime, opts.smokeTime], [3.0, 0.3, 0.8, 2.0]);
         assert.deepEqual(calls.sounds.find(([n]) => n === 'playStrikeWhistle'), ['playStrikeWhistle', 0.3], '予告の長さに合わせて「ぴゅーーーん」');
     });
 
@@ -520,6 +520,42 @@ test('落下エフェクト（StrikeEffectSystem）', async (t) => {
         fx.update(0.6); // 持続 0.8 を超える
         assert.equal(fx.strikes.length, 0);
         assert.equal(scene.removed.length, 2);
+    });
+
+    await t.test('煙: 火柱が消えた直後から灰色の塊が立ちのぼり、smokeTime 以内にすべて消えて終了する', () => {
+        const scene = { added: [], removed: [], add(o) { this.added.push(o); }, remove(o) { this.removed.push(o); } };
+        const fx = new M.StrikeEffectSystem(scene, null);
+        fx.schedule(0, -6, { radius: 3, warnTime: 0, pillarTime: 0.8, smokeTime: 2.0 });
+        fx.update(0.01);                       // 着弾 → 火柱
+        const addedBeforeSmoke = scene.added.length;
+        fx.update(0.7);                        // 火柱の途中
+        assert.equal(fx.strikes[0].puffs, null, '火柱の間は煙なし');
+
+        fx.update(0.2);                        // 火柱が消える（t ≈ 0.91 > 0.81）
+        const s = fx.strikes[0];
+        assert.ok(s.puffs && s.puffs.length === 10, '煙の塊が 10 個');
+        assert.equal(scene.added.length - addedBeforeSmoke, 10, '煙がシーンに追加される');
+        assert.equal(fx.strikes.length, 1, '煙が残っている間は終了しない');
+
+        fx.update(1.0);                        // 煙の途中
+        const risen = s.puffs.filter(f => f.mesh.visible);
+        assert.ok(risen.length > 0, '煙が現れている');
+        assert.ok(risen.every(f => f.mesh.position.y > 0.3 && f.mat.opacity >= 0 && f.mat.opacity <= 0.55), '立ちのぼり、薄い');
+        assert.ok(risen.some(f => f.mesh.scale.x > 0.6), '膨らむ');
+
+        fx.update(1.5);                        // smokeTime(2.0) を超える
+        assert.equal(fx.strikes.length, 0, 'すべて消えたら終了');
+        const smokeRemoved = scene.removed.length;
+        assert.ok(smokeRemoved >= 10 + 2, '煙の塊 10 個を含めて取り除かれる');
+    });
+
+    await t.test('煙なし（smokeTime 未指定）: 火柱が消えたら従来どおりすぐ終了する', () => {
+        const scene = { add() {}, remove() {} };
+        const fx = new M.StrikeEffectSystem(scene, null);
+        fx.schedule(0, 0, { warnTime: 0, pillarTime: 0.5 });
+        fx.update(0.01);
+        fx.update(0.6);
+        assert.equal(fx.strikes.length, 0);
     });
 
     await t.test('火柱は終盤で透明になって消える', () => {

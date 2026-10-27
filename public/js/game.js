@@ -1919,6 +1919,7 @@ export class GameEngine {
             radius: spell.blastRadius,
             warnTime: spell.warnTime,
             pillarTime: spell.pillarTime,
+            smokeTime: spell.smokeTime ?? 0,
             onImpact: () => this.blastAt(tx, tz, spell.blastRadius, damage)
         });
     }

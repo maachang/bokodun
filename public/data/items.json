@@ -82,7 +82,8 @@
     "blastRadius": 3.0,
     "targetDistance": 6,
     "warnTime": 0.3,
-    "pillarTime": 0.8
+    "pillarTime": 0.8,
+    "smokeTime": 2.0
   },
   "spread": {
     "id": "spread",
