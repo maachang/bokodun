@@ -1678,6 +1678,17 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 湿地の木: 枝が長く垂れ下がる柳
+    static createSwampTreeTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/objects/swamp_tree.png');
+        // sRGB として扱う（指定がないとリニア扱いで二重に変換され、暗い色が持ち上がって白っぽく見える）
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
     // Mossy Boulder sprite
     static createBoulderTexture() {
         const loader = new THREE.TextureLoader();

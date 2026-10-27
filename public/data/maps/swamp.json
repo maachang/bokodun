@@ -26,7 +26,7 @@
     "P": "poison_swamp",
     "=": "wood_bridge",
     "C": "cobblestone_path",
-    "T": "tree",
+    "T": "swamp_tree",
     "O": "mossy_boulder",
     "N": "swamp_signpost",
     "M": "magic_circle",

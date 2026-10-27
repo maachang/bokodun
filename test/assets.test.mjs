@@ -30,3 +30,19 @@ test('参照している画像ファイルの存在', async (t) => {
         assert.ok(game.includes('/images/effects/fire_pillar.png'));
     });
 });
+
+test('湿地の木: 湿地マップの T は専用の木（swamp_tree）で、画像が存在し、透過している', () => {
+    const swamp = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/maps/swamp.json'), 'utf-8'));
+    assert.equal(swamp.legend.T, 'swamp_tree');
+    const objects = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/objects.json'), 'utf-8'));
+    assert.equal(objects.swamp_tree.type, 'tree');
+    assert.equal(objects.swamp_tree.texture, 'swampTree');
+    assert.ok(objects.swamp_tree.aspect > 0);
+    const png = fs.readFileSync(path.join(projectRoot, 'public/images/objects/swamp_tree.png'));
+    assert.equal(png.readUInt8(25), 6, 'RGBA（アルファ付き）の PNG');
+    const tex = fs.readFileSync(path.join(projectRoot, 'public/js/textures.js'), 'utf-8');
+    assert.match(tex.slice(tex.indexOf('createSwampTreeTexture')), /colorSpace = THREE\.SRGBColorSpace/, '色空間の指定（二重変換で白っぽくならない）');
+    // 草原など他のマップの木は従来のまま
+    const grass = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/maps/grassland.json'), 'utf-8'));
+    assert.equal(grass.legend.T, 'tree');
+});

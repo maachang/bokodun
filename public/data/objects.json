@@ -42,6 +42,13 @@
     "solid": true,
     "description": "木（樹木）"
   },
+  "swamp_tree": {
+    "type": "tree",
+    "texture": "swampTree",
+    "aspect": 0.8,
+    "solid": true,
+    "description": "湿地の木（枝が長く垂れ下がる柳）"
+  },
   "mossy_boulder": {
     "type": "boulder",
     "texture": "boulder",

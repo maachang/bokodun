@@ -232,6 +232,7 @@ export class GameEngine {
             goblin: RetroTextureGenerator.createGoblinTexture(),
             goblinArcher: RetroTextureGenerator.createGoblinArcherTexture(),
             tree: RetroTextureGenerator.createTreeTexture(),
+            swampTree: RetroTextureGenerator.createSwampTreeTexture(),
             boulder: RetroTextureGenerator.createBoulderTexture(),
             signpost: RetroTextureGenerator.createSignpostTexture(),
             forestCanopy: forestCanopyTex,
@@ -726,11 +727,11 @@ export class GameEngine {
                     }
 
                     case 'tree': {
-                        const treeMat = new THREE.SpriteMaterial({ map: this.textures.tree });
+                        const treeMat = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.tree });
                         const tree = new THREE.Sprite(treeMat);
                         tree.center.set(0.5, 0.0);
                         const scaleVar = 4.8 + ((r * 5 + c * 3) % 4) * 0.5;
-                        tree.scale.set(scaleVar * (899 / 893), scaleVar, 1);
+                        tree.scale.set(scaleVar * (objDef.aspect ?? (899 / 893)), scaleVar, 1);   // aspect: 画像の幅/高さ（省略時は標準の木）
                         // Sink tree base slightly into grass (-0.08) so trunk roots naturally penetrate the terrain
                         tree.position.set(wx, -0.08, wz);
                         this.scene.add(tree);
