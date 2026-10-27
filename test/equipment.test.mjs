@@ -42,6 +42,8 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
             isFalling: false
         },
         keys: { forward: true },
+        hitStop: 0,
+        cameraShake: { time: 0, duration: 0.15, amp: 0 },
         colliders: [],
         monsters: [], projectiles: [], items, weaponClasses,
         sound: new Proxy({}, { get: (_, name) => (...args) => calls.sounds.push([name, ...args]) }),
@@ -291,6 +293,70 @@ test('近接武器は突進攻撃に効く', async (t) => {
         assert.equal(m.hp, m.maxHp);
         assert.equal(calls.slashes.length, 0);
         assert.equal(calls.playerDamage.length, 1);
+    });
+
+    await t.test('被弾リアクション: 突進が当たると打撃音とヒットストップが入り、会心・撃破・重い武器では画面が揺れる', () => {
+        // 通常の突進（ダガー）: 短いヒットストップ、揺れなし
+        const normal = charge('dagger');
+        assert.equal(normal.g.hitStop, 0.05);
+        assert.equal(normal.g.cameraShake.time, 0, '通常の突進では揺れない');
+        assert.deepEqual(normal.calls.sounds.find(([n]) => n === 'playEnemyHit'), ['playEnemyHit', false]);
+
+        // 半ずらし会心: 長めのヒットストップ・揺れ・重い打撃音
+        const crit = charge('dagger', { x: 0.5, z: -1.2 });
+        assert.equal(crit.g.hitStop, 0.08);
+        assert.ok(crit.g.cameraShake.time > 0 && crit.g.cameraShake.amp > 0);
+        assert.deepEqual(crit.calls.sounds.find(([n]) => n === 'playEnemyHit'), ['playEnemyHit', true]);
+
+        // 重い武器（大剣）: ヒットストップが 0.03 長く、揺れる
+        const heavy = charge('iron_greatsword');
+        assert.ok(Math.abs(heavy.g.hitStop - 0.08) < 1e-9, `0.05 + 0.03 (${heavy.g.hitStop})`);
+        assert.ok(heavy.g.cameraShake.time > 0);
+
+        // 撃破: 最も長いヒットストップ・揺れ
+        const { g } = makeGame(M);
+        const weak = spawn(M, 'slime', 0, -1.2);
+        weak.hp = 1;
+        g.monsters.push(weak);
+        bump(g, weak);
+        assert.equal(weak.active, false);
+        assert.equal(g.hitStop, 0.1);
+        assert.ok(g.cameraShake.time > 0);
+    });
+
+    await t.test('立ち止まっている間（被弾するだけ）は、ヒットストップも打撃音も入らない', () => {
+        const { g, calls } = makeGame(M);
+        g.keys.forward = false;
+        const m = spawn(M, 'skeleton', 0, -1.2);
+        g.monsters.push(m);
+        bump(g, m);
+        assert.equal(g.hitStop, 0);
+        assert.equal(calls.sounds.some(([n]) => n === 'playEnemyHit'), false);
+    });
+
+    await t.test('ヒットストップ中はゲームの時間が止まり（update が何も進めない）、時間が経つと解ける', () => {
+        const { g } = makeGame(M);
+        g.requestHitStop(0.1);
+        g.requestHitStop(0.05); // 長い方が残る
+        assert.equal(g.hitStop, 0.1);
+        g.update(0.04); // 止まっている間は、他の状態に触れずに残り時間だけ減る
+        assert.ok(Math.abs(g.hitStop - 0.06) < 1e-9);
+        assert.equal(g.player.magicCooldown, 0, 'クールダウンなども進まない');
+    });
+
+    await t.test('敵の被弾の色: 最初は白く光り、その後は赤みがかり、元に戻る', () => {
+        const m = spawn(M, 'skeleton', 0, -10);
+        const player = { x: 0, z: 0, radius: 0.4 };
+        const color = () => { m.update(0.02, player, [], [], null, null, 1.0); return m.spriteMat.color; };
+        m.takeDamage(1, null);
+        const white = color();
+        assert.ok(white.r > 1 && white.g > 1 && white.b > 1, '白く光る（1 を超える）');
+        for (let i = 0; i < 5; i++) color(); // 約 0.1 秒経過
+        const red = color();
+        assert.ok(red.r > red.g && red.r > red.b, '赤みがかる');
+        for (let i = 0; i < 15; i++) color(); // 0.2 秒を超える
+        const normal = color();
+        assert.deepEqual([normal.r, normal.g, normal.b], [1, 1, 1]);
     });
 
     await t.test('スタン中の敵は AI が止まり、解けたら動く', () => {
@@ -626,6 +692,18 @@ test('呪文の個性（見た目・状態異常・貫通・効果音）', async
             g.hitMonsterWithProjectile(p, spawn(M, 'skeleton', 0, -3));
             assert.deepEqual(calls.sounds.find(([n]) => n === 'playSpellHit'), ['playSpellHit', kind]);
         }
+    });
+
+    await t.test('SoundFX: 敵への打撃音は、重い（heavy）ほど低く長い。AudioContext が無ければ何もしない', () => {
+        const light = fakeAudio(M); light.fx.playEnemyHit(false);
+        const heavy = fakeAudio(M); heavy.fx.playEnemyHit(true);
+        assert.equal(light.log.oscillators.length, 1);
+        assert.equal(light.log.noises, 1);
+        const lightEnd = light.log.oscillators[0].frequency.ramps[0];
+        const heavyEnd = heavy.log.oscillators[0].frequency.ramps[0];
+        assert.ok(heavyEnd[0] < lightEnd[0], '重いほど低い音まで下がる');
+        assert.ok(heavyEnd[1] > lightEnd[1], '重いほど長い');
+        assert.doesNotThrow(() => new M.SoundFX().playEnemyHit(true));
     });
 
     await t.test('SoundFX: 氷・雷の発射音と命中音が鳴る（火は既存の音）。AudioContext が無ければ何もしない', () => {

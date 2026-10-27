@@ -145,6 +145,44 @@ export class SoundFX {
         noise.start(now);
     }
 
+    // 敵への打撃音「ドスッ」: 低い打撃音 + 短いノイズ。heavy（大剣・メイス・会心）はより重く長い
+    playEnemyHit(heavy = false) {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        const len = heavy ? 0.18 : 0.1;
+
+        const thump = this.ctx.createOscillator();
+        const thumpGain = this.ctx.createGain();
+        thump.type = 'sine';
+        thump.frequency.setValueAtTime(heavy ? 120 : 170, now);
+        thump.frequency.exponentialRampToValueAtTime(heavy ? 40 : 60, now + len);
+        thumpGain.gain.setValueAtTime(heavy ? 0.45 : 0.32, now);
+        thumpGain.gain.exponentialRampToValueAtTime(0.001, now + len);
+        thump.connect(thumpGain);
+        thumpGain.connect(this.ctx.destination);
+        thump.start(now);
+        thump.stop(now + len);
+
+        const bufferSize = Math.floor(this.ctx.sampleRate * 0.06);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) {
+            data[i] = Math.random() * 2 - 1;
+        }
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = 'lowpass';
+        filter.frequency.setValueAtTime(heavy ? 1500 : 2200, now);
+        const noiseGain = this.ctx.createGain();
+        noiseGain.gain.setValueAtTime(heavy ? 0.3 : 0.2, now);
+        noiseGain.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        noise.connect(filter);
+        filter.connect(noiseGain);
+        noiseGain.connect(this.ctx.destination);
+        noise.start(now);
+    }
+
     // ---- 呪文ごとの効果音（items.json の呪文の sound: fire / ice / bolt）----
     playSpellShoot(kind = 'fire') {
         if (kind === 'ice') this.playIceShoot();

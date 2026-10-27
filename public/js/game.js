@@ -7,6 +7,14 @@ import { ParticleSystem } from '/js/particles.js';
 import { SlashEffectSystem } from '/js/slashEffect.js';
 import { StrikeEffectSystem } from '/js/strikeEffect.js';
 
+// 被弾リアクション（突進の命中時）の調整値
+//   ヒットストップ: 命中した瞬間にゲームの時間を一瞬止める（秒）。重い武器・会心・撃破で長くなる
+//   カメラの揺れ: 会心・撃破・重い武器の命中で、画面を短く揺らす（amp=揺れの大きさ、duration=秒）
+const HIT_FEEDBACK = {
+    hitStop: { charge: 0.05, crit: 0.08, kill: 0.10, heavyBonus: 0.03, blast: 0.04 },
+    shake: { amp: 0.08, duration: 0.15 }
+};
+
 export class GameEngine {
     constructor() {
         this.container = document.getElementById('viewport');
@@ -74,6 +82,8 @@ export class GameEngine {
         this.objectDefinitions = null;
         this.enemyDefinitions = null;
         this.items = {};   // アイテム定義（items.json: id → 定義）
+        this.hitStop = 0;        // ヒットストップの残り時間（秒）。0 より大きい間はゲームの時間が止まる
+        this.cameraShake = { time: 0, duration: 0.15, amp: 0 };
         this.weaponClasses = {}; // 武器クラス定義（weaponClasses.json: クラス名 → 攻撃の形・範囲・エフェクト）
         this.colliders = [];
         this.monsters = [];
@@ -1976,6 +1986,7 @@ export class GameEngine {
             const nx = dist > 0.001 ? dx / dist : 0;
             const nz = dist > 0.001 ? dz / dist : 1;
             const isDead = m.takeDamage(damage, { x: nx, z: nz });
+            this.requestHitStop(HIT_FEEDBACK.hitStop.blast);
             this.addPopup(`爆発! -${damage}`, '#f97316', m.x, m.z);
             this.notifyEnemyEngaged(m);
             if (isDead) this.gainExp(m.exp);
@@ -1983,6 +1994,12 @@ export class GameEngine {
     }
 
     update(dt) {
+        // ヒットストップ中はゲームの時間を止める（描画は続く）
+        if (this.hitStop > 0) {
+            this.hitStop -= dt;
+            return;
+        }
+
         // Player cooldown & invincibility
         if (this.player.attackCooldown > 0) this.player.attackCooldown -= dt;
         if (this.player.magicCooldown > 0) this.player.magicCooldown -= dt;
@@ -2646,6 +2663,14 @@ export class GameEngine {
         this.camera.rotateY(this.player.angle);
         this.camera.rotateX(this.player.pitch);
 
+        // カメラの揺れ（強い一撃の手応え）。時間とともに小さくなる
+        if (this.cameraShake.time > 0) {
+            this.cameraShake.time -= dt;
+            const a = this.cameraShake.amp * Math.max(0, this.cameraShake.time / this.cameraShake.duration);
+            this.camera.position.x += (Math.random() - 0.5) * 2 * a;
+            this.camera.position.y += (Math.random() - 0.5) * 2 * a;
+        }
+
         // Update Portal Animation & Check
         if (this.portal) {
             this.portal.mesh.rotation.y += dt * 2;
@@ -2814,6 +2839,24 @@ export class GameEngine {
     }
 
     // Classic Ys 1 "Half-Offset" Combat resolution
+    requestHitStop(seconds) {
+        this.hitStop = Math.max(this.hitStop, seconds);
+    }
+
+    shakeCamera(amp = HIT_FEEDBACK.shake.amp, duration = HIT_FEEDBACK.shake.duration) {
+        this.cameraShake = { time: duration, duration, amp: Math.max(amp, this.cameraShake.time > 0 ? this.cameraShake.amp : 0) };
+    }
+
+    // 突進が敵に当たったときの手応え: 打撃音・ヒットストップ・（強い一撃なら）カメラの揺れ
+    //   crit=半ずらし会心 / killed=撃破 / heavy=重い武器（大剣・メイス）
+    playerHitFeedback({ crit, killed, heavy }) {
+        const f = HIT_FEEDBACK;
+        this.sound.playEnemyHit(crit || heavy);
+        const base = killed ? f.hitStop.kill : (crit ? f.hitStop.crit : f.hitStop.charge);
+        this.requestHitStop(base + (heavy ? f.hitStop.heavyBonus : 0));
+        if (crit || killed || heavy) this.shakeCamera();
+    }
+
     resolveYsBump(monster, dx, dz, dist) {
         // 装備中の近接武器（未装備なら素手）のクラスが、突進攻撃のダメージ・間隔・ノックバック・スタン・エフェクトを決める
         const weapon = this.getMeleeItem();
@@ -2860,6 +2903,7 @@ export class GameEngine {
             this.sound.playAttack(true);
             const isDead = monster.takeDamage(damage, { x: nx, z: nz }, knockScale);
             applyWeaponEffects(isDead);
+            this.playerHitFeedback({ crit: true, killed: isDead, heavy: heavySound });
             this.particles.spawnBurst(monster.x, 1.2, monster.z, 0xfbbf24, 12, 4.0);
             this.addPopup(`半ずらし会心! -${damage}`, '#fbbf24', monster.x, monster.z);
             this.notifyEnemyEngaged(monster);
@@ -2873,6 +2917,7 @@ export class GameEngine {
             this.sound.playAttack(heavySound);
             const isDead = monster.takeDamage(pDmg, { x: nx, z: nz }, knockScale);
             applyWeaponEffects(isDead);
+            this.playerHitFeedback({ crit: false, killed: isDead, heavy: heavySound });
             this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz));
             this.addPopup(`ボコッ! -${pDmg}`, '#ffffff', monster.x, monster.z);
             this.notifyEnemyEngaged(monster);

@@ -9,6 +9,8 @@ const SENSE_DRAW_SCALE = 2.5;     // 未発見の敵を描画する距離（＝�
 // 隠密性（stealth）: プレイヤーから見つけやすいかどうか。未発見の敵の描画距離に掛かる倍率
 //   low=見つかりやすい / normal=標準 / high=見つかりにくい（発見済みでも遠くでは見えず、描画距離の手前で透明から徐々に見えてくる）
 const STEALTH_DRAW_MULT = { low: 1.4, normal: 1.0, high: 0.5 };
+const HIT_FLASH_TIME = 0.2;       // 被弾の色変化の長さ（秒）。最初の HIT_WHITE_TIME は白く光り、残りは赤みがかる
+const HIT_WHITE_TIME = 0.08;
 const APPEAR_FADE_TIME = 0.6;     // 敵が現れる／消えるときに、透明度が 0↔1 へ変化するのにかける時間（秒）。突然出てこず「フワッ」と現れる
 const STEALTH_FADE_BAND = 0.4;    // high の敵が透明から見えてくる範囲（描画距離の外側 40% 分）
 const LOST_TIME = 4.0;            // 追跡中に見失ってから未発見に戻るまでの時間（秒）
@@ -192,8 +194,9 @@ export class Monster {
 
         // Hit flash: blink red and visible
         if (this.hitTimer > 0) {
+            // 被弾の瞬間は白く光り（ヒットの手応え）、その後は赤みがかって元に戻る
+            this.spriteMat.color.setRGB(...(this.hitTimer > HIT_FLASH_TIME - HIT_WHITE_TIME ? [2.5, 2.5, 2.5] : [1, 0.2, 0.2]));
             this.hitTimer -= dt;
-            this.spriteMat.color.setHex(0xff3333);
             this.sprite.visible = true;
         } else {
             // 状態異常の色: 燃焼=赤み / 鈍足=青み
@@ -689,7 +692,7 @@ export class Monster {
     // knockScale: ノックバックの強さの倍率（既定 1.0。大剣・メイスなどが大きくする）
     takeDamage(amount, knockDir, knockScale = 1.0) {
         this.hp -= amount;
-        this.hitTimer = 0.2;
+        this.hitTimer = HIT_FLASH_TIME;
         // 被弾したら状態にかかわらず即追跡
         this.state = 'chase';
         this.lostTimer = 0;
