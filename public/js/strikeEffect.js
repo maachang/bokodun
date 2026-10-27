@@ -7,6 +7,36 @@ import * as THREE from '/js/three.module.js';
  *   塊の輪郭はノイズで崩れ、内側に濃淡がつく / 発生直後は炎の色（下側が赤橙）で、冷めるにつれて暗い灰色になる /
  *   ゆっくり立ちのぼりながら膨らみ、薄くなって消える
  */
+// ---- 火柱のシェーダー（ソースは ASCII のみ）----
+// fire_pillar.png は外周が透明ではなく、暗い赤褐色の背景が付いている。そのまま加算合成すると、板の縁に縦長の長方形の輪郭が見える。
+// そこで、(1) 暗い色は足さない（背景を消す）(2) 左右・上端をなめらかに透明にする (3) 根元は地面に溶け込ませる。
+// uHasMap が 0（画像が無い）のときは、単色の炎のグラデーションを使う
+const PILLAR_VERTEX = `
+varying vec2 vUv;
+void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+
+const PILLAR_FRAGMENT = `
+uniform sampler2D uMap;
+uniform float uHasMap;
+uniform float uOpacity;
+varying vec2 vUv;
+void main() {
+    vec4 tex = texture2D(uMap, vUv);
+    vec3 fallback = vec3(1.0, 0.4, 0.05) * (1.0 - 0.5 * vUv.y);
+    vec3 c = mix(fallback, tex.rgb, uHasMap);
+    float texAlpha = mix(1.0, tex.a, uHasMap);
+    float lum = max(c.r, max(c.g, c.b));
+    c *= mix(1.0, smoothstep(0.12, 0.45, lum), uHasMap);
+    float side = smoothstep(0.0, 0.22, vUv.x) * smoothstep(0.0, 0.22, 1.0 - vUv.x);
+    float top = smoothstep(0.0, 0.25, 1.0 - vUv.y);
+    float root = smoothstep(0.0, 0.06, vUv.y);
+    gl_FragColor = vec4(c, texAlpha * side * top * root * uOpacity);
+    #include <colorspace_fragment>
+}`;
+
 // ---- 煙のシェーダー（ソースは ASCII のみ。日本語の説明はこの JS 側に書く）----
 // ノイズ（fbm）で輪郭を崩したふわっとした塊。uHeat が大きいほど炎の色（下側が赤橙）、小さいほど暗い灰色。
 // uAge: 塊の経過（0〜1。ノイズをゆっくり動かす）、uAlpha: 全体の濃さ、uSeed: 塊ごとの模様の違い
@@ -103,11 +133,15 @@ export class StrikeEffectSystem {
         const pillar = new THREE.Group();
         pillar.position.set(s.x, 0, s.z);
 
-        const mat = new THREE.MeshBasicMaterial({
-            map: this.texture || null,
-            color: this.texture ? 0xffffff : 0xff6600,
+        const mat = new THREE.ShaderMaterial({
+            uniforms: {
+                uMap: { value: this.texture || null },
+                uHasMap: { value: this.texture ? 1 : 0 },
+                uOpacity: { value: 1 }
+            },
+            vertexShader: PILLAR_VERTEX,
+            fragmentShader: PILLAR_FRAGMENT,
             transparent: true,
-            opacity: 1,
             side: THREE.DoubleSide,
             depthWrite: false,
             blending: THREE.AdditiveBlending
@@ -149,7 +183,7 @@ export class StrikeEffectSystem {
             const pl = s.pillar;
             if (pl) {
                 pl.group.scale.y = Math.min(1, q / 0.25) || 0.01;
-                pl.mat.opacity = q > 0.7 ? Math.max(0, 1 - (q - 0.7) / 0.3) : 0.85 + 0.15 * Math.sin(s.t * 50);
+                pl.mat.uniforms.uOpacity.value = q > 0.7 ? Math.max(0, 1 - (q - 0.7) / 0.3) : 0.85 + 0.15 * Math.sin(s.t * 50);
                 pl.ring.scale.setScalar(1 + q * (s.radius / 0.9) * 1.5);
                 pl.ringMat.opacity = 0.9 * (1 - q);
 

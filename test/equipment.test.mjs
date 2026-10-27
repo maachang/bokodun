@@ -805,7 +805,7 @@ test('落下エフェクト（StrikeEffectSystem）', async (t) => {
         fx.update(0.3); // 火柱の持続の途中
         assert.equal(impacts, 1, '着弾は 1 回だけ');
         assert.equal(fx.strikes.length, 1);
-        assert.ok(pillar.group.scale.y === 1 && pillar.mat.opacity > 0, '立ち上がっている');
+        assert.ok(pillar.group.scale.y === 1 && pillar.mat.uniforms.uOpacity.value > 0, '立ち上がっている');
 
         fx.update(0.6); // 持続 0.8 を超える
         assert.equal(fx.strikes.length, 0);
@@ -863,6 +863,39 @@ test('落下エフェクト（StrikeEffectSystem）', async (t) => {
         assert.notEqual(f.mat.depthTest, false, '壁には隠される（深度テストあり）');
     });
 
+    await t.test('火柱: 画像の暗い背景と縁を消すシェーダーで描く（板の縁に長方形の輪郭が出ない）', () => {
+        const scene = { add() {}, remove() {} };
+        const texture = { isTexture: true };
+        const fx = new M.StrikeEffectSystem(scene, texture);
+        fx.schedule(0, 0, { warnTime: 0, pillarTime: 0.8 });
+        fx.update(0.01);
+        const pl = fx.strikes[0].pillar;
+        assert.equal(pl.mat.isShaderMaterial, true, '画像をそのまま貼る材質ではなく、専用のシェーダー');
+        assert.equal(pl.mat.uniforms.uHasMap.value, 1);
+        assert.equal(pl.mat.uniforms.uMap.value, texture);
+        assert.equal(pl.mat.blending, 2, '加算合成');
+        assert.equal(pl.mat.depthWrite, false);
+        assert.equal(pl.group.children.filter(c => c.geometry.type === 'PlaneGeometry').length, 3, '交差する板 3 枚');
+
+        // 画像が無い場合は単色のグラデーションに切り替わる
+        const none = new M.StrikeEffectSystem(scene, null);
+        none.schedule(0, 0, { warnTime: 0, pillarTime: 0.8 });
+        none.update(0.01);
+        assert.equal(none.strikes[0].pillar.mat.uniforms.uHasMap.value, 0);
+    });
+
+    await t.test('火柱のシェーダー: ASCII のみ・色管理を通す・暗い背景を消し、左右・上端・根元をなめらかに消す式を含む', () => {
+        const src = fs.readFileSync(path.join(projectRoot, 'public/js/strikeEffect.js'), 'utf-8');
+        const shaders = [...src.slice(src.indexOf('const PILLAR_VERTEX'), src.indexOf('// ---- 煙のシェーダー')).matchAll(/`([^`]*)`/g)].map(m => m[1]);
+        assert.equal(shaders.length, 2);
+        for (const body of shaders) assert.equal(/[^\x00-\x7F]/.test(body), false, '非 ASCII 文字なし');
+        const frag = shaders[1];
+        assert.ok(frag.includes('#include <colorspace_fragment>'));
+        assert.ok(frag.includes('smoothstep(0.12, 0.45, lum)'), '暗い背景を消す');
+        assert.ok(frag.includes('float side =') && frag.includes('float top =') && frag.includes('float root ='), '左右・上端・根元をなめらかに消す');
+        for (const u of ['uMap', 'uHasMap', 'uOpacity']) assert.ok(frag.includes(u), u);
+    });
+
     await t.test('煙のシェーダーのソースは ASCII のみで、three.js の色管理（colorspace_fragment）を通す', () => {
         const src = fs.readFileSync(path.join(projectRoot, 'public/js/strikeEffect.js'), 'utf-8');
         const shaders = [...src.slice(src.indexOf('const SMOKE_VERTEX'), src.indexOf('const SMOKE_COUNT')).matchAll(/`([^`]*)`/g)].map(m => m[1]);
@@ -888,7 +921,7 @@ test('落下エフェクト（StrikeEffectSystem）', async (t) => {
         fx.update(0.01);
         const pl = fx.strikes[0].pillar;
         fx.update(0.9);
-        assert.ok(pl.mat.opacity < 0.5, `終盤は薄い (${pl.mat.opacity})`);
+        assert.ok(pl.mat.uniforms.uOpacity.value < 0.5, `終盤は薄い (${pl.mat.uniforms.uOpacity.value})`);
     });
 });
 
@@ -1001,7 +1034,9 @@ test('斬撃エフェクト（SlashEffectSystem）: カメラに固定した、�
         const widthAtEnds = (arcDeg) => {
             const camera = makeCamera();
             const fx = new M.SlashEffectSystem(camera);
-            fx.spawn(2.6, arcDeg, def('slash'));
+            const random = Math.random;
+            Math.random = () => 0.5; // 大きさのランダムなばらつきを固定して、弧の広がりだけを比べる
+            try { fx.spawn(2.6, arcDeg, def('slash')); } finally { Math.random = random; }
             const geo = fx.effects[0].meshes[0].geometry;
             const pos = geo.getAttribute('position');
             const w = (i) => Math.hypot(pos.getX(2 * i + 1) - pos.getX(2 * i), pos.getY(2 * i + 1) - pos.getY(2 * i));
