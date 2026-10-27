@@ -5,7 +5,7 @@ const SENSE_DEFAULT_RANGE = 10;   // 感知距離の既定値（enemies.json の
 const SENSE_DEFAULT_ANGLE = 70;   // 視野角（正面からの半角・度）の既定値（senseAngle 未指定時）
 const SENSE_NEAR_DIST = 2.0;      // この距離以内（かつ壁越しでない）なら視野角外でも即気づく
 const SENSE_DRAW_SCALE = 1.5;     // 未発見の敵を描画する距離 = 感知距離 × この倍率 × 地形の視界係数
-const ALERT_TIME = 0.8;           // 警戒（気づき始め）の時間（秒）
+const ALERT_TIME = 0;             // 警戒（気づき始め）の時間（秒）。0 なら気づいた瞬間に追跡・攻撃へ移る
 const LOST_TIME = 4.0;            // 追跡中に見失ってから未発見に戻るまでの時間（秒）
 
 export class Monster {
@@ -561,8 +561,13 @@ export class Monster {
 
         if (this.state === 'unaware') {
             if (sees) {
-                this.state = 'alert';
-                this.alertTimer = ALERT_TIME;
+                if (ALERT_TIME > 0) {
+                    this.state = 'alert';
+                    this.alertTimer = ALERT_TIME;
+                } else {
+                    this.state = 'chase';
+                    this.lostTimer = 0;
+                }
             }
         } else if (this.state === 'alert') {
             this.facing = toPlayer;

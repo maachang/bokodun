@@ -30,10 +30,9 @@ test('隠密: 敵の索敵（距離・視野角・視線・地形係数・状態
     const Monster = await loadMonster();
     const wall = [{ minX: -3, maxX: 3, minZ: 3, maxZ: 4 }];
 
-    await t.test('正面の感知距離内なら 警戒 → 追跡 に遷移する', () => {
+    await t.test('正面の感知距離内なら、気づいた瞬間に追跡（攻撃）へ移る', () => {
         const m = make(Monster, 'slime');
-        assert.equal(run(m, P(0, 7), 1.0, 0.3), 'alert');
-        assert.equal(run(m, P(0, 7), 1.0, 0.9), 'chase');
+        assert.equal(run(m, P(0, 7), 1.0, 0.05), 'chase');
     });
 
     await t.test('感知距離の外では未発見のまま', () => {
@@ -62,6 +61,7 @@ test('隠密: 敵の索敵（距離・視野角・視線・地形係数・状態
 
     await t.test('追跡中に見失って 4 秒で未発見に戻る', () => {
         const m = make(Monster, 'slime');
+        m.speed = 0; // 位置を固定する（追跡中に壁を越えて視線が通ってしまうのを防ぐ）
         run(m, P(0, 5), 1.0, 2);
         assert.equal(m.state, 'chase');
         assert.equal(run(m, P(0, 5), 1.0, 3, wall), 'chase');
