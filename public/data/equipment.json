@@ -1,5 +1,5 @@
 {
-  "_comment": "武器・防具の一覧（草案）。西洋の一般的な装備。weight は購入時に指定できる重さの範囲[最小,最大]（1〜50）、dice は基本値（n個のm面ダイス＋固定値k）。weaponClass は既存の public/data/weaponClasses.json の最も近い攻撃モーションで、斧・槍・クロスボウなどの専用クラスは今後追加する。twoHanded の武器は盾と同時に装備できない想定（仮）。価格・入手方法・魔法の+値は別途。",
+  "_comment": "武器・防具の一覧（草案）。西洋の一般的な装備。weight は購入時に指定できる重さの範囲[最小,最大]（1〜50）、dice は基本値（n個のm面ダイス＋固定値k）。weaponClass は既存の public/data/weaponClasses.json の最も近い攻撃モーションで、斧・槍・クロスボウなどの専用クラスは今後追加する。twoHanded の武器は盾と同時に装備できない想定（仮）。heavy は金属製の重装備（盾は全種）で、シーフ系のクリティカル率ペナルティと回避無効の対象。価格・入手方法・魔法の+値は別途。",
   "weapons": [
     { "id": "dagger", "name": "ダガー", "category": "短剣", "weaponClass": "dagger", "blunt": false, "twoHanded": false, "weight": [1, 8], "dice": { "n": 1, "m": 6, "k": 2 } },
     { "id": "rapier", "name": "レイピア", "category": "細剣", "weaponClass": "sword", "blunt": false, "twoHanded": false, "weight": [4, 12], "dice": { "n": 1, "m": 6, "k": 3 } },
@@ -29,25 +29,25 @@
     { "id": "cloth_armor", "name": "布の服", "category": "布", "weight": [1, 8], "dice": { "n": 1, "m": 6, "k": 0 } },
     { "id": "leather_armor", "name": "レザーアーマー", "category": "革", "weight": [5, 18], "dice": { "n": 1, "m": 6, "k": 2 } },
     { "id": "studded_leather", "name": "スタデッドレザー", "category": "革", "weight": [8, 22], "dice": { "n": 2, "m": 6, "k": 0 } },
-    { "id": "chain_mail", "name": "チェインメイル", "category": "鎖", "weight": [15, 35], "dice": { "n": 2, "m": 6, "k": 2 } },
-    { "id": "scale_mail", "name": "スケイルメイル", "category": "鱗", "weight": [18, 38], "dice": { "n": 2, "m": 6, "k": 3 } },
-    { "id": "breastplate", "name": "ブレストプレート", "category": "板金", "weight": [20, 40], "dice": { "n": 2, "m": 6, "k": 4 } },
-    { "id": "half_plate", "name": "ハーフプレート", "category": "板金", "weight": [28, 45], "dice": { "n": 3, "m": 6, "k": 2 } },
-    { "id": "full_plate", "name": "フルプレート", "category": "板金", "weight": [35, 50], "dice": { "n": 3, "m": 6, "k": 4 } }
+    { "id": "chain_mail", "name": "チェインメイル", "category": "鎖", "heavy": true, "weight": [15, 35], "dice": { "n": 2, "m": 6, "k": 2 } },
+    { "id": "scale_mail", "name": "スケイルメイル", "category": "鱗", "heavy": true, "weight": [18, 38], "dice": { "n": 2, "m": 6, "k": 3 } },
+    { "id": "breastplate", "name": "ブレストプレート", "category": "板金", "heavy": true, "weight": [20, 40], "dice": { "n": 2, "m": 6, "k": 4 } },
+    { "id": "half_plate", "name": "ハーフプレート", "category": "板金", "heavy": true, "weight": [28, 45], "dice": { "n": 3, "m": 6, "k": 2 } },
+    { "id": "full_plate", "name": "フルプレート", "category": "板金", "heavy": true, "weight": [35, 50], "dice": { "n": 3, "m": 6, "k": 4 } }
   ],
   "helms": [
     { "id": "hood", "name": "フード", "category": "布", "weight": [1, 4], "dice": { "n": 1, "m": 6, "k": 0 } },
     { "id": "leather_cap", "name": "レザーキャップ", "category": "革", "weight": [2, 8], "dice": { "n": 1, "m": 6, "k": 1 } },
-    { "id": "coif", "name": "コイフ", "category": "鎖", "weight": [4, 12], "dice": { "n": 2, "m": 6, "k": 0 } },
-    { "id": "iron_helm", "name": "アイアンヘルム", "category": "鉄", "weight": [8, 20], "dice": { "n": 2, "m": 6, "k": 1 } },
-    { "id": "bascinet", "name": "バシネット", "category": "鉄", "weight": [10, 25], "dice": { "n": 2, "m": 6, "k": 2 } },
-    { "id": "great_helm", "name": "グレートヘルム", "category": "鉄", "weight": [18, 35], "dice": { "n": 2, "m": 6, "k": 3 } }
+    { "id": "coif", "name": "コイフ", "category": "鎖", "heavy": true, "weight": [4, 12], "dice": { "n": 2, "m": 6, "k": 0 } },
+    { "id": "iron_helm", "name": "アイアンヘルム", "category": "鉄", "heavy": true, "weight": [8, 20], "dice": { "n": 2, "m": 6, "k": 1 } },
+    { "id": "bascinet", "name": "バシネット", "category": "鉄", "heavy": true, "weight": [10, 25], "dice": { "n": 2, "m": 6, "k": 2 } },
+    { "id": "great_helm", "name": "グレートヘルム", "category": "鉄", "heavy": true, "weight": [18, 35], "dice": { "n": 2, "m": 6, "k": 3 } }
   ],
   "shields": [
-    { "id": "buckler", "name": "バックラー", "category": "小型", "weight": [2, 10], "dice": { "n": 1, "m": 6, "k": 1 } },
-    { "id": "round_shield", "name": "ラウンドシールド", "category": "中型", "weight": [6, 20], "dice": { "n": 2, "m": 6, "k": 0 } },
-    { "id": "heater_shield", "name": "ヒーターシールド", "category": "中型", "weight": [10, 28], "dice": { "n": 2, "m": 6, "k": 1 } },
-    { "id": "kite_shield", "name": "カイトシールド", "category": "大型", "weight": [12, 30], "dice": { "n": 2, "m": 6, "k": 2 } },
-    { "id": "tower_shield", "name": "タワーシールド", "category": "大型", "weight": [25, 50], "dice": { "n": 3, "m": 6, "k": 0 } }
+    { "id": "buckler", "name": "バックラー", "category": "小型", "heavy": true, "weight": [2, 10], "dice": { "n": 1, "m": 6, "k": 1 } },
+    { "id": "round_shield", "name": "ラウンドシールド", "category": "中型", "heavy": true, "weight": [6, 20], "dice": { "n": 2, "m": 6, "k": 0 } },
+    { "id": "heater_shield", "name": "ヒーターシールド", "category": "中型", "heavy": true, "weight": [10, 28], "dice": { "n": 2, "m": 6, "k": 1 } },
+    { "id": "kite_shield", "name": "カイトシールド", "category": "大型", "heavy": true, "weight": [12, 30], "dice": { "n": 2, "m": 6, "k": 2 } },
+    { "id": "tower_shield", "name": "タワーシールド", "category": "大型", "heavy": true, "weight": [25, 50], "dice": { "n": 3, "m": 6, "k": 0 } }
   ]
 }

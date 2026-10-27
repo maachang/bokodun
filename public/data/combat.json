@@ -18,6 +18,15 @@
     "_note": "防御 = Σ(係数 × ダメージ表[部位の重さ][部位のダイス値])。ダメージ = max(1, 攻撃 − 防御 − 生命力軽減)"
   },
   "vitReductionDivisor": 5,
+  "heavyGear": {
+    "thiefCritPenalty": { "armor": 5, "helm": 5, "shield": 5, "floor": 1, "_note": "シーフ系が heavy の装備を着けると、部位ごとにクリティカル率を下げる（草案）。下限は鈍器と同じ1%。" }
+  },
+  "dodge": {
+    "agiCoef": 0.5,
+    "levelCoef": 0.1,
+    "minDamage": 1,
+    "_note": "回避値 D = 敏捷度 × agiCoef + 第一職業Lv × levelCoef。軽減量 = 0〜D の乱数。被ダメージは最低 minDamage。heavy の装備（シーフ系のクリティカルペナルティ対象）を着けていると無効。職業は問わない。こちらの防御で1ゾロが出たときは、回避値は0（軽減なし）。通常の敵のクリティカルは回避の対象。"
+  },
   "hpMp": {
     "hpPerLevel": 1,
     "mpPerLevel": 0.5,
