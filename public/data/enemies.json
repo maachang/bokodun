@@ -16,7 +16,9 @@
     ],
     "y": 1.0,
     "radius": 0.8,
-    "senseRange": 8
+    "senseRange": 8,
+    "deathColor": "#34d399",
+    "stealth": "normal"
   },
   "skeleton": {
     "id": "skeleton",
@@ -34,7 +36,9 @@
       1.0
     ],
     "y": 1.4,
-    "radius": 0.8
+    "radius": 0.8,
+    "deathColor": "#e5e7eb",
+    "stealth": "low"
   },
   "goblin": {
     "id": "goblin",
@@ -55,7 +59,9 @@
       1.0
     ],
     "y": 1.3,
-    "radius": 0.8
+    "radius": 0.8,
+    "deathColor": "#4ade80",
+    "stealth": "normal"
   },
   "goblin_archer": {
     "id": "goblin_archer",
@@ -77,7 +83,9 @@
       1.0
     ],
     "y": 1.4,
-    "radius": 0.8
+    "radius": 0.8,
+    "deathColor": "#4ade80",
+    "stealth": "normal"
   },
   "mimic": {
     "id": "mimic",
@@ -96,7 +104,8 @@
     ],
     "y": 1.2,
     "radius": 0.95,
-    "alwaysAware": true
+    "alwaysAware": true,
+    "deathColor": "#ef4444"
   },
   "tarantula_swamp": {
     "id": "tarantula_swamp",
@@ -115,7 +124,9 @@
     ],
     "y": 1.1,
     "radius": 0.95,
-    "senseRange": 12
+    "senseRange": 12,
+    "deathColor": "#6b21a8",
+    "stealth": "high"
   },
   "parasite_wasp": {
     "id": "parasite_wasp",
@@ -134,7 +145,9 @@
     ],
     "y": 1.4,
     "radius": 0.8,
-    "senseRange": 14
+    "senseRange": 14,
+    "deathColor": "#a3e635",
+    "stealth": "normal"
   },
   "maria_mosquito": {
     "id": "maria_mosquito",
@@ -153,7 +166,9 @@
     ],
     "y": 1.5,
     "radius": 0.75,
-    "senseRange": 14
+    "senseRange": 14,
+    "deathColor": "#a3e635",
+    "stealth": "high"
   },
   "acid_worm": {
     "id": "acid_worm",
@@ -175,7 +190,9 @@
     ],
     "y": 1.2,
     "radius": 0.9,
-    "senseRange": 7
+    "senseRange": 7,
+    "deathColor": "#7c8a3a",
+    "stealth": "high"
   },
   "poison_moth": {
     "id": "poison_moth",
@@ -197,7 +214,9 @@
     ],
     "y": 1.6,
     "radius": 0.85,
-    "senseRange": 14
+    "senseRange": 14,
+    "deathColor": "#a3e635",
+    "stealth": "normal"
   },
   "poison_toad": {
     "id": "poison_toad",
@@ -216,6 +235,8 @@
     ],
     "y": 0.9,
     "radius": 0.95,
-    "senseRange": 8
+    "senseRange": 8,
+    "deathColor": "#7c8a3a",
+    "stealth": "high"
   }
 }

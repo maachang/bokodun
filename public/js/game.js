@@ -2461,13 +2461,27 @@ export class GameEngine {
             const dist = Math.hypot(dx, dz);
             const bumpThreshold = this.player.radius + m.radius;
 
-            if (dist < bumpThreshold && this.player.attackCooldown <= 0) {
+            // 倒れている最中の敵は攻撃も当たり判定もしない
+            if (m.active && dist < bumpThreshold && this.player.attackCooldown <= 0) {
                 this.resolveYsBump(m, dx, dz, dist);
             }
 
             if (!m.active) {
-                this.scene.remove(m.sprite);
-                this.monsters.splice(i, 1);
+                // 死亡演出: 効果音・粒子を出しつつ、倒れて消えるアニメーションが終わってから削除する
+                if (!m.deathStarted) {
+                    m.deathStarted = true;
+                    this.sound.playEnemyDeath();
+                    this.particles.spawnBurst(m.x, 1.0, m.z, m.deathColor, 14, 3.5);
+                }
+                m.deathFxTimer -= dt;
+                if (m.deathFxTimer <= 0 && m.deathTimer >= 0.1 && m.deathTimer < 1.2) {
+                    m.deathFxTimer = 0.12;
+                    this.particles.spawnBurst(m.x, 0.6, m.z, m.deathColor, 3, 2.0);
+                }
+                if (m.updateDeath(dt)) {
+                    this.scene.remove(m.sprite);
+                    this.monsters.splice(i, 1);
+                }
             }
         }
     }
@@ -2812,7 +2826,7 @@ export class GameEngine {
         document.getElementById('expText').innerText = `EXP: ${this.player.exp}`;
         const goldEl = document.getElementById('goldText');
         if (goldEl) goldEl.innerText = `${this.player.gold || 0} G`;
-        document.getElementById('monsterCount').innerText = `敵残数: ${this.monsters.length}`;
+        document.getElementById('monsterCount').innerText = `敵残数: ${this.monsters.filter(m => m.active).length}`;
 
         // Update active enemy status cards stacked above player HP/MP (Ys-style Target Info)
         const enemyListEl = document.getElementById('enemyHudList');
@@ -2903,6 +2917,7 @@ export class GameEngine {
 
         // Draw Monsters
         for (const m of this.monsters) {
+            if (!m.active) continue;
             ctx.fillStyle = (m.type === 'S') ? '#10b981' : '#f97316';
             ctx.beginPath();
             ctx.arc(m.x * scaleX, m.z * scaleZ, 2.5, 0, Math.PI * 2);

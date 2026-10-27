@@ -73,14 +73,53 @@ test('隠密: 敵の索敵（距離・視野角・視線・地形係数・状態
         assert.equal(run(m, P(0, 5), 1.0, 2, wall), 'unaware');
     });
 
-    await t.test('未発見の敵は 感知距離×1.5×視界係数 を超えると描画しない', () => {
-        const m = make(Monster, 'slime');
-        run(m, P(0, 11), 1.0, 0.1);
+    await t.test('未発見の敵は 感知距離×2.5×視界係数 を超えると描画しない', () => {
+        const m = make(Monster, 'slime'); // 感知距離 8 → 草原 20m
+        run(m, P(0, 19), 1.0, 0.1);
         assert.equal(m.sprite.visible, true);
-        run(m, P(0, 13), 1.0, 0.1);
+        run(m, P(0, 21), 1.0, 0.1);
         assert.equal(m.sprite.visible, false);
-        run(m, P(0, 11), 0.6, 0.1);
+        run(m, P(0, 11), 0.6, 0.1);   // 湿地(0.6) → 12m
+        assert.equal(m.sprite.visible, true);
+        run(m, P(0, 13), 0.6, 0.1);
         assert.equal(m.sprite.visible, false);
+    });
+
+    await t.test('隠密性: high は描画距離が半分になり、発見済みでも遠くでは見えない', () => {
+        const spider = make(Monster, 'tarantula_swamp'); // 感知12・high → 草原 15m
+        run(spider, P(0, 14), 1.0, 0.1);
+        assert.equal(spider.sprite.visible, true);
+        run(spider, P(0, 16), 1.0, 0.1);
+        assert.equal(spider.sprite.visible, false);
+
+        // 発見済み(chase)でも high は遠くで見えない（normal は常に見える）
+        spider.takeDamage(1, null);
+        assert.equal(spider.state, 'chase');
+        run(spider, P(0, 16), 1.0, 0.1);
+        assert.equal(spider.sprite.visible, false);
+        const slime = make(Monster, 'slime');
+        slime.takeDamage(1, null);
+        run(slime, P(0, 40), 1.0, 0.1);
+        assert.equal(slime.sprite.visible, true);
+    });
+
+    await t.test('隠密性: high は描画距離の手前で透明から徐々に見えてくる', () => {
+        const spider = make(Monster, 'tarantula_swamp'); // 描画距離 15m、フェード範囲は 9〜15m
+        run(spider, P(0, 8), 1.0, 0.1);
+        assert.equal(spider.spriteMat.opacity, 1);
+        run(spider, P(0, 12), 1.0, 0.1);
+        assert.ok(spider.spriteMat.opacity > 0 && spider.spriteMat.opacity < 1);
+        const mid = spider.spriteMat.opacity;
+        run(spider, P(0, 10), 1.0, 0.1);
+        assert.ok(spider.spriteMat.opacity > mid, '近いほど濃い');
+    });
+
+    await t.test('隠密性: low は描画距離が広い（スケルトン 感知10 → 草原 35m）', () => {
+        const sk = make(Monster, 'skeleton');
+        run(sk, P(0, 34), 1.0, 0.1);
+        assert.equal(sk.sprite.visible, true);
+        run(sk, P(0, 36), 1.0, 0.1);
+        assert.equal(sk.sprite.visible, false);
     });
 
     await t.test('ミミックは常に発見済み状態', () => {
@@ -96,6 +135,46 @@ test('隠密: 敵の索敵（距離・視野角・視線・地形係数・状態
     });
 });
 
+test('死亡演出: 白フラッシュ → 横倒し → 半透明で消える', async (t) => {
+    const Monster = await loadMonster();
+
+    await t.test('致命傷で active=false になり、約1.3秒かけて演出が終わる', () => {
+        const m = make(Monster, 'slime');
+        assert.equal(m.takeDamage(9999, { x: 1, z: 0 }), true);
+        assert.equal(m.active, false);
+        assert.equal(m.deathTiltDir, 1);
+
+        assert.equal(m.updateDeath(0.05), false);
+        assert.ok(m.spriteMat.color.r > 1, '最初の 0.1 秒は白く光る');
+
+        m.updateDeath(0.35); // t = 0.4
+        assert.equal(m.spriteMat.color.r, 1);
+        assert.ok(Math.abs(m.spriteMat.rotation) > 0 && Math.abs(m.spriteMat.rotation) < Math.PI / 2, '倒れている途中');
+
+        m.updateDeath(0.3);  // t = 0.7
+        assert.ok(Math.abs(Math.abs(m.spriteMat.rotation) - Math.PI / 2) < 1e-6, '0.7 秒で 90° 横倒し');
+
+        assert.equal(m.updateDeath(0.3), false); // t = 1.0
+        assert.ok(m.spriteMat.opacity > 0 && m.spriteMat.opacity < 1, '半透明で消えていく');
+        assert.equal(m.updateDeath(0.31), true); // t > 1.3
+    });
+
+    await t.test('撃たれた方向で横倒しの向きが変わる', () => {
+        const m = make(Monster, 'slime');
+        m.takeDamage(9999, { x: -1, z: 0 });
+        assert.equal(m.deathTiltDir, -1);
+    });
+
+    await t.test('飛行の敵は倒れながら地面へ落下する', () => {
+        const m = make(Monster, 'parasite_wasp');
+        run(m, P(0, 5), 1.0, 0.3); // 発見済みにしてホバー
+        assert.ok(m.baseY > 0.5); // ホバー高さ（1.3 ± 0.35 で上下動する）
+        m.takeDamage(9999, { x: 1, z: 0 });
+        for (let i = 0; i < 20; i++) m.updateDeath(0.03); // t = 0.6
+        assert.ok(m.sprite.position.y < m.baseY * 0.5);
+    });
+});
+
 test('隠密: データ定義（視界係数・感知距離）', async (t) => {
     await t.test('全マップの environment に 0〜1 の visibility がある', () => {
         const dir = path.join(projectRoot, 'public/data/maps');
@@ -103,6 +182,18 @@ test('隠密: データ定義（視界係数・感知距離）', async (t) => {
             const map = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8'));
             const v = map.environment?.visibility;
             assert.ok(typeof v === 'number' && v > 0 && v <= 1, `${f}: environment.visibility が不正 (${v})`);
+        }
+    });
+
+    await t.test('stealth は low / normal / high のいずれか（未指定は normal）', () => {
+        for (const [id, d] of Object.entries(defs)) {
+            if (d.stealth !== undefined) assert.ok(['low', 'normal', 'high'].includes(d.stealth), `${id}: stealth`);
+        }
+    });
+
+    await t.test('全ての敵に deathColor（#rrggbb）がある', () => {
+        for (const [id, d] of Object.entries(defs)) {
+            assert.match(d.deathColor ?? '', /^#[0-9a-fA-F]{6}$/, `${id}: deathColor`);
         }
     });
 

@@ -5,8 +5,17 @@ import * as THREE from '/js/three.module.js';
 const SENSE_DEFAULT_RANGE = 10;   // 感知距離の既定値（enemies.json の senseRange 未指定時）
 const SENSE_DEFAULT_ANGLE = 70;   // 視野角（正面からの半角・度）の既定値（senseAngle 未指定時）
 const SENSE_NEAR_DIST = 2.0;      // この距離以内（かつ壁越しでない）なら視野角外でも即気づく
-const SENSE_DRAW_SCALE = 1.5;     // 未発見の敵を描画する距離 = 感知距離 × この倍率 × 地形の視界係数
+const SENSE_DRAW_SCALE = 2.5;     // 未発見の敵を描画する距離（＝発見済みの維持範囲）= 感知距離 × この倍率 × 地形の視界係数
+// 隠密性（stealth）: プレイヤーから見つけやすいかどうか。未発見の敵の描画距離に掛かる倍率
+//   low=見つかりやすい / normal=標準 / high=見つかりにくい（発見済みでも遠くでは見えず、描画距離の手前で透明から徐々に見えてくる）
+const STEALTH_DRAW_MULT = { low: 1.4, normal: 1.0, high: 0.5 };
+const STEALTH_FADE_BAND = 0.4;    // high の敵が透明から見えてくる範囲（描画距離の外側 40% 分）
 const LOST_TIME = 4.0;            // 追跡中に見失ってから未発見に戻るまでの時間（秒）
+
+// 死亡演出の時間配分（秒）: 白フラッシュ → 横倒し → 半透明で消える
+const DEATH_FLASH_TIME = 0.1;
+const DEATH_FALL_END = 0.7;
+const DEATH_DURATION = 1.3;
 
 export class Monster {
     constructor(enemyType, x, z, textures, enemyDef = null) {
@@ -23,11 +32,15 @@ export class Monster {
         this.senseRange = SENSE_DEFAULT_RANGE;
         this.senseAngle = SENSE_DEFAULT_ANGLE;
         this.alwaysAware = false;
+        this.stealth = 'normal';
+        this.deathColor = 0xffffff; // 死亡時の粒子の色（enemies.json の deathColor で上書き）
 
         if (enemyDef) {
             this.senseRange = enemyDef.senseRange ?? SENSE_DEFAULT_RANGE;
             this.senseAngle = enemyDef.senseAngle ?? SENSE_DEFAULT_ANGLE;
             this.alwaysAware = !!enemyDef.alwaysAware;
+            if (enemyDef.stealth in STEALTH_DRAW_MULT) this.stealth = enemyDef.stealth;
+            if (enemyDef.deathColor) this.deathColor = new THREE.Color(enemyDef.deathColor).getHex();
             this.name = enemyDef.name || 'モンスター';
             this.maxHp = enemyDef.maxHp || 30;
             this.hp = this.maxHp;
@@ -136,6 +149,12 @@ export class Monster {
         this.facing = Math.random() * Math.PI * 2; // 正面方向（atan2(dx, dz) 基準）
         this.lostTimer = 0;
 
+        // 死亡演出の状態
+        this.deathStarted = false;  // game.js 側で効果音・初期の粒子を出したか
+        this.deathTimer = 0;
+        this.deathFxTimer = 0;
+        this.deathTiltDir = 1;      // 横倒しの向き（1 / -1）
+
         // Pattern & animation states
         this.aiTimer = Math.random() * 2.0;
         this.baseScaleX = this.scale[0];
@@ -176,7 +195,14 @@ export class Monster {
 
         // 索敵: 見える／見えない（描画）の制御のみ。AI（移動・攻撃・射撃）は従来どおり下の距離判定で動く
         this.updateAwareness(dt, dx, dz, dist, player, colliders, visibility);
-        this.sprite.visible = (this.state === 'chase') || (dist <= this.senseRange * SENSE_DRAW_SCALE * visibility);
+        const drawRange = this.senseRange * SENSE_DRAW_SCALE * visibility * STEALTH_DRAW_MULT[this.stealth];
+        // 発見済みの敵は常に描画する。ただし隠密性が高い敵は、発見済みでも描画距離を超えると見えない
+        this.sprite.visible = (this.state === 'chase' && this.stealth !== 'high') || (dist <= drawRange);
+        // 隠密性が高い敵は、描画距離の手前で透明から徐々に見えてくる
+        const fadeStart = drawRange * (1 - STEALTH_FADE_BAND);
+        this.spriteMat.opacity = (this.stealth === 'high' && dist > fadeStart)
+            ? Math.min(1, Math.max(0, (drawRange - dist) / (drawRange - fadeStart)))
+            : 1;
 
         // =========================================================================
         // Distinct Movement AI Patterns
@@ -592,8 +618,38 @@ export class Monster {
         }
         if (this.hp <= 0) {
             this.active = false;
+            this.spriteMat.opacity = 1; // 隠密の透明度を引きずらない（死亡演出のフェードは updateDeath が行う）
+            // 横倒しの向きは、撃たれた方向（ノックバック）の左右成分で決める。無ければランダム
+            this.deathTiltDir = knockDir ? (knockDir.x >= 0 ? 1 : -1) : (Math.random() < 0.5 ? 1 : -1);
         }
         return this.hp <= 0;
+    }
+
+    // 死亡演出の更新。終了（スプライトを消してよい）なら true を返す
+    //   0〜0.1秒: 白フラッシュ / 0.1〜0.7秒: 横倒し（飛行の敵は先に落下） / 0.7〜1.3秒: 半透明になって消える
+    updateDeath(dt) {
+        this.deathTimer += dt;
+        const t = this.deathTimer;
+        const mat = this.spriteMat;
+
+        if (t < DEATH_FLASH_TIME) {
+            mat.color.setRGB(2.5, 2.5, 2.5);
+            return false;
+        }
+        mat.color.setRGB(1, 1, 1);
+
+        // 倒れる（地面側の足元を支点に回転）。飛行の敵は同時に地面へ落下する
+        const p = Math.min(1, (t - DEATH_FLASH_TIME) / (DEATH_FALL_END - DEATH_FLASH_TIME));
+        const eased = p * p;
+        mat.rotation = this.deathTiltDir * (Math.PI / 2) * eased;
+        this.sprite.scale.set(this.baseScaleX, this.baseScaleY * (1.0 - 0.2 * eased), 1);
+        this.sprite.position.y = this.baseY * (1.0 - eased);
+
+        // 半透明になって消える
+        if (t > DEATH_FALL_END) {
+            mat.opacity = Math.max(0, 1.0 - (t - DEATH_FALL_END) / (DEATH_DURATION - DEATH_FALL_END));
+        }
+        return t >= DEATH_DURATION;
     }
 }
 
