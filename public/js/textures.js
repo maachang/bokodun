@@ -1777,6 +1777,72 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 草むら・生い茂る草・野の花の共通ヘルパー: 透明な canvas に、ドットの草の葉や花を描く
+    static _plantCanvas(w, h, draw) {
+        const canvas = document.createElement('canvas');
+        canvas.width = w;
+        canvas.height = h;
+        draw(canvas.getContext('2d'), w, h);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // 草が生えている（低い草むら）
+    static createGrassTuftTexture() {
+        return RetroTextureGenerator._plantCanvas(48, 40, (ctx, w, h) => {
+            const greens = ['#3f7a2a', '#4f9a34', '#2f5f20', '#63b043'];
+            const blades = [[6, 22], [12, 30], [18, 24], [24, 34], [30, 26], [36, 30], [42, 20], [15, 18], [33, 16]];
+            blades.forEach(([x, len], i) => {
+                ctx.fillStyle = greens[i % greens.length];
+                for (let y = 0; y < len; y++) {
+                    const lean = Math.floor(y / 9) * (i % 2 === 0 ? 1 : -1);
+                    ctx.fillRect(x + lean, h - 1 - y, 3, 1);
+                }
+                ctx.fillRect(x + (i % 2 === 0 ? 3 : -3), h - 1 - len, 2, 2);   // 葉先
+            });
+        });
+    }
+
+    // 草が生い茂っている（背の高い草）
+    static createTallGrassTexture() {
+        return RetroTextureGenerator._plantCanvas(64, 96, (ctx, w, h) => {
+            const greens = ['#2f6a22', '#3f8a2c', '#255318', '#55a63a', '#7bbf4a'];
+            for (let i = 0; i < 16; i++) {
+                const x = 3 + i * 4;
+                const len = 38 + ((i * 37) % 50);
+                ctx.fillStyle = greens[i % greens.length];
+                const dir = (i % 3) - 1;
+                for (let y = 0; y < len; y++) {
+                    const lean = Math.floor(y / 14) * dir;
+                    ctx.fillRect(x + lean, h - 1 - y, 3, 1);
+                }
+                ctx.fillRect(x + Math.floor(len / 14) * dir + dir, h - 1 - len, 3, 3);   // 穂先
+            }
+            // 根元を濃く
+            ctx.fillStyle = 'rgba(20, 50, 15, 0.55)';
+            ctx.fillRect(0, h - 8, w, 8);
+        });
+    }
+
+    // 野の花（草むらに白・黄・紅の小さな花）
+    static createWildFlowersTexture() {
+        return RetroTextureGenerator._plantCanvas(48, 40, (ctx, w, h) => {
+            const flowers = [[8, 24, '#f4f0e0'], [18, 32, '#f2d34a'], [28, 26, '#e8587a'], [38, 30, '#f4f0e0'], [23, 20, '#9a6ad8']];
+            flowers.forEach(([x, len, color]) => {
+                ctx.fillStyle = '#3f7a2a';
+                ctx.fillRect(x + 1, h - len, 2, len);
+                ctx.fillRect(x - 3, h - 8, 3, 2);
+                ctx.fillRect(x + 4, h - 12, 3, 2);
+                ctx.fillStyle = color;
+                ctx.fillRect(x - 2, h - len - 2, 6, 6);
+                ctx.fillStyle = '#e0a020';
+                ctx.fillRect(x, h - len, 2, 2);
+            });
+        });
+    }
+
     // Mossy Boulder sprite
     static createBoulderTexture() {
         const loader = new THREE.TextureLoader();

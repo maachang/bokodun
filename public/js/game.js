@@ -241,6 +241,9 @@ export class GameEngine {
             woodFloor: RetroTextureGenerator.createWoodFloorTexture(),
             rug: RetroTextureGenerator.createRugTexture(),
             woodDoor: RetroTextureGenerator.createWoodDoorTexture(),
+            grassTuft: RetroTextureGenerator.createGrassTuftTexture(),
+            tallGrass: RetroTextureGenerator.createTallGrassTexture(),
+            wildFlowers: RetroTextureGenerator.createWildFlowersTexture(),
             woodenFence: RetroTextureGenerator.createWoodenFenceTexture(),
             villageRoof: RetroTextureGenerator.createVillageRoofTexture(),
             dirtRoad: RetroTextureGenerator.createDirtRoadTexture(),
@@ -1573,7 +1576,8 @@ export class GameEngine {
                         }
                         group.position.set(wx, 0, wz);
                         this.scene.add(group);
-                        if (objDef.floorTexture) this.addFloorTile(wx, wz, tileSize, objDef.floorTexture);
+                        const furnitureFloor = objDef.floorTexture ?? mapData.decorFloor;   // 屋外の街では、飾りの下も石畳（map の decorFloor）
+                        if (furnitureFloor) this.addFloorTile(wx, wz, tileSize, furnitureFloor);
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
                         if (objDef.collider) {
                             const [cw, cd] = objDef.collider;
@@ -1583,6 +1587,29 @@ export class GameEngine {
                                 minZ: wz + oz - cd / 2, maxZ: wz + oz + cd / 2,
                                 blocksProjectiles: objDef.blocksProjectiles === true
                             });
+                        }
+                        break;
+                    }
+
+                    case 'plant': {
+                        // 草むら・生い茂る草・野の花: 当たり判定のない見た目だけの飾り。
+                        // 1 マスに count 枚のスプライトを、マスの位置から決まる配置（毎回同じ）で散らす
+                        if (mapData.decorFloor) this.addFloorTile(wx, wz, tileSize, mapData.decorFloor);
+                        const plantTex = this.textures[objDef.texture] || this.textures.grassTuft;
+                        const count = objDef.count || 4;
+                        const spread = objDef.spread || tileSize * 0.8;
+                        const [pw, ph] = objDef.scale || [1.2, 1.0];
+                        for (let i = 0; i < count; i++) {
+                            const h1 = Math.sin((r * 12.9898 + c * 78.233 + i * 37.719) * 43758.5453) * 43758.5453;
+                            const h2 = Math.sin((r * 39.346 + c * 11.135 + i * 83.155) * 24634.6345) * 24634.6345;
+                            const fx = h1 - Math.floor(h1);
+                            const fz = h2 - Math.floor(h2);
+                            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: plantTex }));
+                            sprite.center.set(0.5, 0.0);
+                            const k = 0.8 + fx * 0.5;   // 大きさのばらつき
+                            sprite.scale.set(pw * k, ph * k, 1);
+                            sprite.position.set(wx + (fx - 0.5) * spread, -0.02, wz + (fz - 0.5) * spread);
+                            this.scene.add(sprite);
                         }
                         break;
                     }

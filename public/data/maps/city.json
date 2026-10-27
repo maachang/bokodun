@@ -31,25 +31,33 @@
     "N": "city_signpost",
     "T": "tree",
     "2": "portal",
-    "D": "dungeon_door"
+    "D": "dungeon_door",
+    "P": "water",
+    "b": "wood_bridge",
+    "f": "flower_bed",
+    "v": "flower_bed_blue",
+    "x": "grass_tuft",
+    "X": "tall_grass",
+    "y": "wild_flowers"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWWWWWWWWW",
-    "W==============W",
+    "Wx=====y======xW",
     "W=SS==SS==II===W",
     "W=SS==SS==II===W",
-    "W==============W",
+    "W=x====fv====x=W",
     "W===T======T===W",
-    "W======FF======W",
-    "W======FF======W",
+    "W====f=FF=v====W",
+    "W====v=FF=f====W",
     "W===T======T===W",
-    "W==============W",
+    "W=x====vf====x=W",
     "W=HH==HH==HH===W",
     "W=HH==HH==HH===W",
-    "W==============W",
-    "W==N========2==W",
-    "W==============W",
+    "WPPPPbPPPbPPPPPW",
+    "Wx=N===y=y==2=xW",
+    "WXX===x==x===XXW",
     "WWWWWWWWWWWWWWWW"
-  ]
+  ],
+  "decorFloor": "pavedRoad"
 }

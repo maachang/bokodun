@@ -26,7 +26,7 @@ test('村: 村長の家の外壁・屋内の床・扉・家具の定義', () => 
     assert.ok(objects.wooden_door.floorTexture && objects.wooden_door.ceilingTexture);
     for (const [id, def] of Object.entries(objects)) {
         if (def.type !== 'furniture') continue;
-        assert.ok(def.floorTexture && def.ceilingTexture, `${id}: 家具の下にも床と天井`);
+        if (!id.startsWith('flower_bed')) assert.ok(def.floorTexture && def.ceilingTexture, `${id}: 屋内の家具の下にも床と天井`);   // 花壇は屋外
         assert.ok(def.parts.length > 0, id);
         for (const p of def.parts) {
             assert.equal(p.size.length, 3, id);
@@ -46,7 +46,7 @@ test('村: スポーンから、家の中のすべての床マス・敷物マス
         const ch = layout[r][c];
         if (ch === '0') return true;
         const d = defOf(r, c);
-        return !!d && (d.solid === false || d.type === 'door' || d.type === 'furniture');
+        return !!d && (!d.solid || d.type === 'door' || d.type === 'furniture');
     };
     const start = [village.spawn.z, village.spawn.x];
     assert.ok(passable(...start), 'スポーン位置が通れる');
@@ -99,4 +99,67 @@ test('村: 家の中に部屋が複数ある（扉で仕切られた床の領域
         }
     }
     assert.ok(rooms >= 5, `部屋の数: ${rooms}`);
+});
+
+// 村・街: 川（深い水は通れない）を橋で渡れる。花壇は通れない、草は見た目だけ
+for (const id of ['village', 'city']) {
+    test(`${id}: 川は橋でしか渡れない。草は当たり判定なし、花壇は通れない`, () => {
+        const map = readJson(`public/data/maps/${id}.json`);
+        const lay = map.layout;
+        const defOf = (r, c) => objects[map.legend[lay[r][c]]];
+        const passable = (r, c) => {
+            if (lay[r][c] === '0') return true;
+            const d = defOf(r, c);
+            return !!d && !d.solid && d.type !== 'furniture';   // 家具（花壇）・深い水・壁は通れない。草や床は通れる
+        };
+        // 草・野の花は当たり判定を持たない（solid にも collider にもならない）
+        for (const [ch, objId] of Object.entries(map.legend)) {
+            const d = objects[objId];
+            if (d.type === 'plant') {
+                assert.equal(d.solid, undefined, `${id}:${ch} 草は solid にしない`);
+                assert.ok(d.count > 0 && d.scale.length === 2);
+            }
+        }
+        // 川（深い水）があり、橋（wood_bridge）が、それをまたいでいる
+        const deep = [], bridges = [];
+        for (let r = 0; r < lay.length; r++) {
+            for (let c = 0; c < lay[0].length; c++) {
+                const d = defOf(r, c);
+                if (d?.type === 'liquid_tile' && d.solid) deep.push([r, c]);
+                if (d?.texture === 'woodBridge') bridges.push([r, c]);
+            }
+        }
+        assert.ok(deep.length >= 10, `${id}: 川の深い水域`);
+        assert.ok(bridges.length >= 1, `${id}: 橋`);
+        const bfs = (blocked) => {
+            const start = [map.spawn.z, map.spawn.x];
+            const seen = new Set([start.join(',')]);
+            const queue = [start];
+            while (queue.length) {
+                const [r, c] = queue.shift();
+                for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+                    const nr = r + dr, nc = c + dc;
+                    if (nr < 0 || nc < 0 || nr >= lay.length || nc >= lay[0].length) continue;
+                    const k = `${nr},${nc}`;
+                    if (seen.has(k) || !passable(nr, nc) || blocked.has(k)) continue;
+                    seen.add(k);
+                    queue.push([nr, nc]);
+                }
+            }
+            return seen;
+        };
+        // 一番北の橋の、北側の岸へ: 橋を渡れば行け、橋をすべて塞ぐと行けない（川が区画を分けている）
+        const top = bridges.reduce((a, b) => (b[0] < a[0] ? b : a));
+        const north = `${top[0] - 1},${top[1]}`;
+        assert.ok(passable(top[0] - 1, top[1]), `${id}: 橋の北側は通れる`);
+        assert.ok(bfs(new Set()).has(north), `${id}: 橋を渡れば北側へ行ける`);
+        assert.ok(!bfs(new Set(bridges.map(b => b.join(',')))).has(north), `${id}: 橋以外では川を渡れない`);
+        // スポーンの上に飾り（草や花壇）が置かれていない
+        assert.equal(lay[map.spawn.z][map.spawn.x] === '0' || defOf(map.spawn.z, map.spawn.x)?.type === 'floor_tile', true, `${id}: スポーンの位置`);
+    });
+}
+
+test('街: 飾り（花壇・草）の下は石畳（decorFloor）', () => {
+    const city = readJson('public/data/maps/city.json');
+    assert.equal(city.decorFloor, 'pavedRoad');
 });
