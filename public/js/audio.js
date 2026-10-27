@@ -32,6 +32,61 @@ export class SoundFX {
         osc.stop(now + 0.12);
     }
 
+    /**
+     * 足音。床の種類（マップの floorType）で音色を変える
+     * stone=コツ / grass=サクッ / sand=ザッ / swamp=ピチャ / water=パシャ
+     */
+    playFootstep(floorType = 'stone') {
+        if (!this.ctx) return;
+        const now = this.ctx.currentTime;
+        // 毎回同じ音に聞こえないよう、音程と音量を少しだけ揺らす
+        const jitter = 0.9 + Math.random() * 0.2;
+        const FOOTSTEPS = {
+            stone: { noise: 'bandpass', freq: 1800, q: 1.5, dur: 0.06, vol: 0.10, tone: 'triangle', toneFreq: 260, toneVol: 0.06 },
+            grass: { noise: 'bandpass', freq: 3200, q: 0.7, dur: 0.09, vol: 0.09, tone: null },
+            sand:  { noise: 'lowpass',  freq: 1500, q: 0.5, dur: 0.12, vol: 0.10, tone: null },
+            swamp: { noise: 'bandpass', freq: 700,  q: 2.5, dur: 0.14, vol: 0.12, tone: 'sine', toneFreq: 190, toneVol: 0.07, toneSlide: 2.2 },
+            water: { noise: 'bandpass', freq: 1400, q: 3.0, dur: 0.12, vol: 0.12, tone: 'sine', toneFreq: 520, toneVol: 0.05, toneSlide: 1.6 }
+        };
+        const f = FOOTSTEPS[floorType] || FOOTSTEPS.stone;
+
+        const bufferSize = Math.floor(this.ctx.sampleRate * f.dur);
+        const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+        const data = buffer.getChannelData(0);
+        for (let i = 0; i < bufferSize; i++) data[i] = Math.random() * 2 - 1;
+        const noise = this.ctx.createBufferSource();
+        noise.buffer = buffer;
+
+        const filter = this.ctx.createBiquadFilter();
+        filter.type = f.noise;
+        filter.frequency.setValueAtTime(f.freq * jitter, now);
+        filter.Q.setValueAtTime(f.q, now);
+
+        const gain = this.ctx.createGain();
+        gain.gain.setValueAtTime(f.vol * jitter, now);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + f.dur);
+
+        noise.connect(filter);
+        filter.connect(gain);
+        gain.connect(this.ctx.destination);
+        noise.start(now);
+
+        // 芯になる短い音（石の硬さ、泥や水のはねる音）
+        if (f.tone) {
+            const osc = this.ctx.createOscillator();
+            const oscGain = this.ctx.createGain();
+            osc.type = f.tone;
+            osc.frequency.setValueAtTime(f.toneFreq * jitter, now);
+            if (f.toneSlide) osc.frequency.exponentialRampToValueAtTime(f.toneFreq * jitter * f.toneSlide, now + f.dur);
+            oscGain.gain.setValueAtTime(f.toneVol, now);
+            oscGain.gain.exponentialRampToValueAtTime(0.001, now + f.dur);
+            osc.connect(oscGain);
+            oscGain.connect(this.ctx.destination);
+            osc.start(now);
+            osc.stop(now + f.dur);
+        }
+    }
+
     playDoorOpen() {
         if (!this.ctx) return;
         const now = this.ctx.currentTime;

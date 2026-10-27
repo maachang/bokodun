@@ -11,6 +11,9 @@ import { StrikeEffectSystem } from '/js/strikeEffect.js';
 //   ヒットストップ: 命中した瞬間にゲームの時間を一瞬止める（秒）。重い武器・会心・撃破で長くなる
 //   カメラの揺れ: 会心・撃破・重い武器の命中で、画面を短く揺らす（amp=揺れの大きさ、duration=秒）
 // 斬撃エフェクトの強さ（SlashEffectSystem.spawn の power）: 会心・撃破で大きく・多くの火花になる
+// 足音: 歩いた距離がこの値（ワールド単位）に達するたびに1回鳴らす
+const FOOTSTEP_STRIDE = 3.2;
+
 const EFFECT_POWER = { normal: 1.0, crit: 1.4, kill: 1.2 };
 const effectPower = (crit, killed) => (crit ? EFFECT_POWER.crit : EFFECT_POWER.normal) * (killed ? EFFECT_POWER.kill : 1);
 
@@ -2592,7 +2595,17 @@ export class GameEngine {
             worldMoveX = (moveDir.x * cos + moveDir.z * sin) * moveSpeed * dt;
             worldMoveZ = (-moveDir.x * sin + moveDir.z * cos) * moveSpeed * dt;
 
+            const stepFromX = this.player.x;
+            const stepFromZ = this.player.z;
             this.movePlayer(worldMoveX, worldMoveZ);
+            // 足音: 実際に進んだ距離が一定に達するたびに1回鳴らす（壁に押し付けて進めない間は鳴らさない）
+            if (!this.player.isFalling) {
+                this.footstepDistance = (this.footstepDistance || 0) + Math.hypot(this.player.x - stepFromX, this.player.z - stepFromZ);
+                if (this.footstepDistance >= FOOTSTEP_STRIDE) {
+                    this.footstepDistance %= FOOTSTEP_STRIDE;
+                    this.sound.playFootstep(this.mapData?.environment?.floorType);
+                }
+            }
         }
 
         // Record last safe position while walking safely on solid ground (not over pitfall hole or liquid hazard)
