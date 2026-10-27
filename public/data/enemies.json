@@ -1,6 +1,7 @@
 {
   "slime": {
     "id": "slime",
+    "chestRank": "wood",
     "name": "スライム",
     "texture": "slime",
     "aiType": "bounce_leap",
@@ -22,6 +23,7 @@
   },
   "skeleton": {
     "id": "skeleton",
+    "chestRank": "iron",
     "name": "スケルトン剣士",
     "texture": "skeleton",
     "aiType": "walk_chase",
@@ -42,6 +44,7 @@
   },
   "goblin": {
     "id": "goblin",
+    "chestRank": "copper",
     "name": "ゴブリンシャーマン",
     "texture": "goblin",
     "aiType": "ranged_maintain",
@@ -65,6 +68,7 @@
   },
   "goblin_archer": {
     "id": "goblin_archer",
+    "chestRank": "wood",
     "name": "ゴブリンアーチャー",
     "texture": "goblinArcher",
     "aiType": "ranged_maintain",
@@ -89,6 +93,7 @@
   },
   "mimic": {
     "id": "mimic",
+    "chestRank": "gold",
     "name": "人喰い箱ミミック",
     "texture": "mimic",
     "aiType": "hop_pounce",
@@ -109,6 +114,7 @@
   },
   "tarantula_swamp": {
     "id": "tarantula_swamp",
+    "chestRank": "silver",
     "name": "タランチュラ・スワンプ",
     "texture": "tarantulaSwamp",
     "aiType": "stalker_spider",
@@ -130,6 +136,7 @@
   },
   "parasite_wasp": {
     "id": "parasite_wasp",
+    "chestRank": "copper",
     "name": "パラサイト・ワスプ",
     "texture": "parasiteWasp",
     "aiType": "flying_chase",
@@ -151,6 +158,7 @@
   },
   "maria_mosquito": {
     "id": "maria_mosquito",
+    "chestRank": "wood",
     "name": "マリア・モスキート",
     "texture": "mariaMosquito",
     "aiType": "flying_chase",
@@ -172,6 +180,7 @@
   },
   "acid_worm": {
     "id": "acid_worm",
+    "chestRank": "iron",
     "name": "アシッド・ワーム",
     "texture": "acidWorm",
     "aiType": "worm_burrow",
@@ -196,6 +205,7 @@
   },
   "poison_moth": {
     "id": "poison_moth",
+    "chestRank": "copper",
     "name": "巨大毒蛾",
     "texture": "poisonMoth",
     "aiType": "flying_ranged",
@@ -220,6 +230,7 @@
   },
   "poison_toad": {
     "id": "poison_toad",
+    "chestRank": "copper",
     "name": "ポイズントード",
     "texture": "poisonToad",
     "aiType": "hop_pounce",
