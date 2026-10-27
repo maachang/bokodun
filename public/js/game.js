@@ -169,7 +169,8 @@ export class GameEngine {
         this.scene.add(this.dirLight);
 
         this.particles = new ParticleSystem(this.scene);
-        this.slashEffects = new SlashEffectSystem(this.scene);
+        this.scene.add(this.camera); // カメラに固定した画面上のエフェクト（斬撃）を描画するため、カメラをシーンに入れる
+        this.slashEffects = new SlashEffectSystem(this.camera);
     }
 
     initTextures() {
@@ -2928,7 +2929,7 @@ export class GameEngine {
         const applyWeaponEffects = (isDead) => {
             if (!cls) return;
             if (cls.stun > 0 && !isDead) monster.stun(cls.stun);
-            this.slashEffects.spawn(this.player.x, this.player.z, this.player.angle, cls.range, cls.arcDeg, cls.effect);
+            this.slashEffects.spawn(cls.range, cls.arcDeg, cls.effect);
         };
         const knockScale = cls ? cls.knockback : 1.0;
         const heavySound = cls ? cls.sound === 'heavy' : false;

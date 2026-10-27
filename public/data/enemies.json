@@ -192,7 +192,7 @@
     "radius": 0.9,
     "senseRange": 7,
     "deathColor": "#7c8a3a",
-    "stealth": "high"
+    "stealth": "normal"
   },
   "poison_moth": {
     "id": "poison_moth",
@@ -237,6 +237,6 @@
     "radius": 0.95,
     "senseRange": 8,
     "deathColor": "#7c8a3a",
-    "stealth": "high"
+    "stealth": "normal"
   }
 }

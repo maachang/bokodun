@@ -264,7 +264,7 @@ test('近接武器は突進攻撃に効く', async (t) => {
         for (const [id, shape] of [['dagger', 'thrust'], ['iron_sword', 'slash'], ['iron_mace', 'smash'], ['fists', 'punch']]) {
             const { calls } = charge(id);
             assert.equal(calls.slashes.length, 1, `${id}: エフェクトが 1 回出る`);
-            assert.equal(calls.slashes[0][5].shape, shape);
+            assert.equal(calls.slashes[0][2].shape, shape);
         }
     });
 
@@ -859,16 +859,18 @@ test('落下エフェクト（StrikeEffectSystem）', async (t) => {
     });
 });
 
-test('斬撃エフェクト（SlashEffectSystem）', async (t) => {
+test('斬撃エフェクト（SlashEffectSystem）: カメラに固定した画面上の表示', async (t) => {
     const M = await loadModules();
+    // カメラの代用品（子の追加・削除を記録する）
+    const makeCamera = () => ({ children: [], add(o) { this.children.push(o); }, remove(o) { this.children = this.children.filter(c => c !== o); } });
+    const effectDef = (shape) => ({ shape, color: '#ffffff', size: 1, duration: 0.2, tiltDeg: -35, sweepDeg: 70 });
 
     for (const shape of ['slash', 'thrust', 'smash', 'punch']) {
-        await t.test(`${shape}: 生成されてシーンに追加され、時間経過で消えて破棄される`, () => {
-            const added = [], removed = [];
-            const scene = { add: (o) => added.push(o), remove: (o) => removed.push(o) };
-            const fx = new M.SlashEffectSystem(scene);
-            fx.spawn(0, 0, 0, 2.6, 70, { shape, color: '#ffffff', size: 1, duration: 0.2, tiltDeg: -35, sweepDeg: 70 });
-            assert.equal(added.length, 1);
+        await t.test(`${shape}: カメラの子として表示され、時間経過で消えて取り除かれる`, () => {
+            const camera = makeCamera();
+            const fx = new M.SlashEffectSystem(camera);
+            fx.spawn(2.6, 70, effectDef(shape));
+            assert.equal(camera.children.length, 1, 'カメラに取り付けられる');
             assert.equal(fx.effects.length, 1);
 
             fx.update(0.1);
@@ -876,9 +878,48 @@ test('斬撃エフェクト（SlashEffectSystem）', async (t) => {
             assert.ok(e.material.opacity > 0 && e.material.opacity < 1, '半分経過で半透明');
             fx.update(0.11);
             assert.equal(fx.effects.length, 0);
-            assert.equal(removed.length, 1);
+            assert.equal(camera.children.length, 0, 'カメラから取り除かれる');
         });
     }
+
+    await t.test('敵や壁に隠されず、常に手前に描かれる（深度テストなし・描画順が最後）', () => {
+        const camera = makeCamera();
+        const fx = new M.SlashEffectSystem(camera);
+        for (const shape of ['slash', 'thrust', 'smash', 'punch']) {
+            fx.spawn(2.6, 70, effectDef(shape));
+        }
+        for (const e of fx.effects) {
+            assert.equal(e.material.depthTest, false);
+            assert.equal(e.material.depthWrite, false);
+            assert.equal(e.group.children[0].renderOrder, 999);
+        }
+    });
+
+    await t.test('位置は画面の正面のやや手前で、攻撃のたびに画面内のランダムな位置に出る（向き・傾きも変わる）', () => {
+        const camera = makeCamera();
+        const fx = new M.SlashEffectSystem(camera);
+        const xs = new Set(), ys = new Set(), rots = new Set();
+        for (let i = 0; i < 60; i++) {
+            fx.spawn(2.6, 70, effectDef('slash'));
+            const e = fx.effects[fx.effects.length - 1];
+            const p = e.group.position;
+            assert.equal(p.z, -1.5, 'カメラの正面 1.5 の位置');
+            assert.ok(Math.abs(p.x) <= 0.6 && p.y >= -0.35 && p.y <= 0.25, `画面内に収まる (${p.x}, ${p.y})`);
+            xs.add(p.x.toFixed(3)); ys.add(p.y.toFixed(3)); rots.add(e.group.children[0].rotation.z.toFixed(3));
+        }
+        assert.ok(xs.size > 30 && ys.size > 30 && rots.size > 30, '位置・傾きがランダムに変わる');
+    });
+
+    await t.test('形はクラスの shape ごとに違う（弧・衝撃波=リング、突き=細長い板、素手=円）', () => {
+        const camera = makeCamera();
+        const fx = new M.SlashEffectSystem(camera);
+        const types = {};
+        for (const shape of ['slash', 'thrust', 'smash', 'punch']) {
+            fx.spawn(2.6, 70, effectDef(shape));
+            types[shape] = fx.effects[fx.effects.length - 1].geometry.type;
+        }
+        assert.deepEqual(types, { slash: 'RingGeometry', thrust: 'PlaneGeometry', smash: 'RingGeometry', punch: 'CircleGeometry' });
+    });
 });
 
 test('HUD の描画（武器スロット・魔法スロット）', async (t) => {
