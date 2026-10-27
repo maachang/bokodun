@@ -9,7 +9,12 @@
     "knockback": 0.8,
     "stun": 0,
     "sound": "light",
-    "effect": { "shape": "punch", "color": "#ffffff", "size": 0.8, "duration": 0.15 }
+    "effect": {
+      "shape": "punch",
+      "color": "#ffffff",
+      "size": 0.8,
+      "duration": 0.15
+    }
   },
   "dagger": {
     "name": "ダガー",
@@ -21,7 +26,12 @@
     "knockback": 0.8,
     "stun": 0,
     "sound": "light",
-    "effect": { "shape": "thrust", "color": "#e5e7eb", "size": 1.0, "duration": 0.15 }
+    "effect": {
+      "shape": "thrust",
+      "color": "#e5e7eb",
+      "size": 1.0,
+      "duration": 0.15
+    }
   },
   "sword": {
     "name": "剣",
@@ -33,7 +43,14 @@
     "knockback": 1.0,
     "stun": 0,
     "sound": "light",
-    "effect": { "shape": "slash", "color": "#e0f2fe", "size": 1.0, "duration": 0.2, "tiltDeg": -35, "sweepDeg": 70 }
+    "effect": {
+      "shape": "slash",
+      "color": "#e0f2fe",
+      "size": 1.0,
+      "duration": 0.2,
+      "tiltDeg": -35,
+      "sweepDeg": 70
+    }
   },
   "greatsword": {
     "name": "大剣",
@@ -45,7 +62,14 @@
     "knockback": 2.0,
     "stun": 0,
     "sound": "heavy",
-    "effect": { "shape": "slash", "color": "#fde68a", "size": 1.4, "duration": 0.3, "tiltDeg": 0, "sweepDeg": 120 }
+    "effect": {
+      "shape": "slash",
+      "color": "#fde68a",
+      "size": 1.4,
+      "duration": 0.3,
+      "tiltDeg": 0,
+      "sweepDeg": 120
+    }
   },
   "mace": {
     "name": "メイス",
@@ -57,17 +81,26 @@
     "knockback": 1.8,
     "stun": 0.5,
     "sound": "heavy",
-    "effect": { "shape": "smash", "color": "#fb923c", "size": 1.0, "duration": 0.3 }
+    "effect": {
+      "shape": "smash",
+      "color": "#fb923c",
+      "size": 1.0,
+      "duration": 0.3
+    }
   },
   "staff": {
     "name": "杖",
     "attack": "cast",
-    "spellPowerScale": 1.0
+    "spellPowerScale": 1.2,
+    "mpScale": 1.0,
+    "cooldownScale": 1.0
   },
   "magic_rod": {
     "name": "マジックロッド",
     "attack": "cast",
-    "spellPowerScale": 1.0
+    "spellPowerScale": 1.0,
+    "mpScale": 0.5,
+    "cooldownScale": 0.5
   },
   "bow": {
     "name": "弓矢",

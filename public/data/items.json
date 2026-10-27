@@ -1,17 +1,107 @@
 {
-  "fists": { "id": "fists", "name": "素手", "kind": "weapon", "weaponClass": "bare_hands", "powerScale": 1.0, "randomBonus": 2 },
-  "dagger": { "id": "dagger", "name": "ダガー", "kind": "weapon", "weaponClass": "dagger", "powerScale": 1.0, "randomBonus": 3 },
-  "iron_sword": { "id": "iron_sword", "name": "鉄の剣", "kind": "weapon", "weaponClass": "sword", "powerScale": 1.0, "randomBonus": 3 },
-  "iron_greatsword": { "id": "iron_greatsword", "name": "鉄の大剣", "kind": "weapon", "weaponClass": "greatsword", "powerScale": 1.0, "randomBonus": 4 },
-  "iron_mace": { "id": "iron_mace", "name": "鉄のメイス", "kind": "weapon", "weaponClass": "mace", "powerScale": 1.0, "randomBonus": 3 },
-  "short_bow": { "id": "short_bow", "name": "短弓", "kind": "weapon", "weaponClass": "bow", "powerScale": 1.0, "randomBonus": 3 },
-  "apprentice_staff": { "id": "apprentice_staff", "name": "見習いの杖", "kind": "weapon", "weaponClass": "staff", "spell": "fire", "powerScale": 1.0 },
-  "blast_staff": { "id": "blast_staff", "name": "爆裂の杖", "kind": "weapon", "weaponClass": "staff", "spell": "explosion", "powerScale": 1.0 },
-  "scatter_staff": { "id": "scatter_staff", "name": "散弾の杖", "kind": "weapon", "weaponClass": "staff", "spell": "spread", "powerScale": 1.0 },
-  "magic_rod": { "id": "magic_rod", "name": "マジックロッド", "kind": "weapon", "weaponClass": "magic_rod", "spell": "magic_bolt", "powerScale": 1.0 },
-
-  "fire": { "id": "fire", "name": "ファイア", "kind": "spell", "type": "fireball", "mp": 10, "cooldown": 0.35, "damage": 25, "speed": 14 },
-  "explosion": { "id": "explosion", "name": "爆発火球", "kind": "spell", "type": "explosive", "mp": 20, "cooldown": 0.9, "damage": 35, "speed": 14, "blastRadius": 3.0 },
-  "spread": { "id": "spread", "name": "拡散弾", "kind": "spell", "type": "spread", "mp": 20, "cooldown": 0.9, "damage": 15, "speed": 14, "count": 3, "spreadDeg": 12 },
-  "magic_bolt": { "id": "magic_bolt", "name": "マジックボルト", "kind": "spell", "type": "fireball", "mp": 4, "cooldown": 0.2, "damage": 8, "speed": 16 }
+  "fists": {
+    "id": "fists",
+    "name": "素手",
+    "kind": "weapon",
+    "weaponClass": "bare_hands",
+    "powerScale": 1.0,
+    "randomBonus": 2
+  },
+  "dagger": {
+    "id": "dagger",
+    "name": "ダガー",
+    "kind": "weapon",
+    "weaponClass": "dagger",
+    "powerScale": 1.0,
+    "randomBonus": 3
+  },
+  "iron_sword": {
+    "id": "iron_sword",
+    "name": "鉄の剣",
+    "kind": "weapon",
+    "weaponClass": "sword",
+    "powerScale": 1.0,
+    "randomBonus": 3
+  },
+  "iron_greatsword": {
+    "id": "iron_greatsword",
+    "name": "鉄の大剣",
+    "kind": "weapon",
+    "weaponClass": "greatsword",
+    "powerScale": 1.0,
+    "randomBonus": 4
+  },
+  "iron_mace": {
+    "id": "iron_mace",
+    "name": "鉄のメイス",
+    "kind": "weapon",
+    "weaponClass": "mace",
+    "powerScale": 1.0,
+    "randomBonus": 3
+  },
+  "short_bow": {
+    "id": "short_bow",
+    "name": "短弓",
+    "kind": "weapon",
+    "weaponClass": "bow",
+    "powerScale": 1.0,
+    "randomBonus": 3
+  },
+  "apprentice_staff": {
+    "id": "apprentice_staff",
+    "name": "見習いの杖",
+    "kind": "weapon",
+    "weaponClass": "staff",
+    "powerScale": 1.0
+  },
+  "magic_rod": {
+    "id": "magic_rod",
+    "name": "マジックロッド",
+    "kind": "weapon",
+    "weaponClass": "magic_rod",
+    "powerScale": 1.0
+  },
+  "fire": {
+    "id": "fire",
+    "name": "ファイア",
+    "kind": "spell",
+    "type": "fireball",
+    "mp": 10,
+    "cooldown": 0.35,
+    "damage": 25,
+    "speed": 14
+  },
+  "explosion": {
+    "id": "explosion",
+    "name": "爆発火球",
+    "kind": "spell",
+    "type": "explosive",
+    "mp": 20,
+    "cooldown": 0.9,
+    "damage": 35,
+    "speed": 14,
+    "blastRadius": 3.0
+  },
+  "spread": {
+    "id": "spread",
+    "name": "拡散弾",
+    "kind": "spell",
+    "type": "spread",
+    "mp": 20,
+    "cooldown": 0.9,
+    "damage": 15,
+    "speed": 14,
+    "count": 3,
+    "spreadDeg": 12
+  },
+  "magic_bolt": {
+    "id": "magic_bolt",
+    "name": "マジックボルト",
+    "kind": "spell",
+    "type": "fireball",
+    "mp": 4,
+    "cooldown": 0.2,
+    "damage": 8,
+    "speed": 16
+  }
 }

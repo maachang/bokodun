@@ -122,12 +122,14 @@
         }
 
         /* Enemy Info HUD Panel (Ys-style Target Info) */
-        #weaponHud {
+        /* 武器スロット（クリックで選択）と魔法スロット（数字キー 1〜4・セレクトボックス）。HUD 全体は pointer-events:none なので個別に有効化する */
+        #weaponHud, #magicHud {
             display: flex;
             flex-wrap: wrap;
             gap: 4px;
             margin-top: 6px;
             font-size: 11px;
+            pointer-events: auto;
         }
         .weapon-slot {
             padding: 2px 6px;
@@ -136,10 +138,12 @@
             color: #94a3b8;
             background: rgba(15, 23, 42, 0.6);
             white-space: nowrap;
+            cursor: pointer;
         }
         .weapon-slot.empty {
             color: #475569;
             border-style: dashed;
+            cursor: default;
         }
         .weapon-slot.active-melee {
             color: #fef08a;
@@ -147,11 +151,34 @@
             background: rgba(120, 53, 15, 0.7);
             font-weight: bold;
         }
-        .weapon-slot.active-ranged {
+        .weapon-slot.active-focus {
+            color: #bbf7d0;
+            border-color: #4ade80;
+            background: rgba(20, 83, 45, 0.7);
+            font-weight: bold;
+        }
+        .magic-slot {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            padding: 1px 4px;
+            border: 1px solid #475569;
+            border-radius: 3px;
+            color: #94a3b8;
+            background: rgba(15, 23, 42, 0.6);
+        }
+        .magic-slot.active-magic {
             color: #bae6fd;
             border-color: #38bdf8;
             background: rgba(12, 74, 110, 0.7);
             font-weight: bold;
+        }
+        .magic-slot select {
+            font-size: 11px;
+            max-width: 96px;
+            color: inherit;
+            background: rgba(15, 23, 42, 0.9);
+            border: none;
         }
         #enemyHudList {
             display: flex;
@@ -488,7 +515,8 @@
                         <div class="hp-bar-bg" style="height: 8px;">
                             <div id="mpBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.15s;"></div>
                         </div>
-                        <!-- 装備スロット（選択中をハイライト。空きは破線） -->
+                        <!-- 魔法スロット（数字キー 1〜4 で切り替え。中身はセレクトボックスで選ぶ）と、武器スロット（クリックで選択。空きは破線） -->
+                        <div id="magicHud"></div>
                         <div id="weaponHud"></div>
                         <div style="margin-top: 4px; display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
                             <span id="expText">EXP: 0</span>
@@ -502,7 +530,7 @@
 
                 <div class="badge" style="color: #facc15; font-size: 12px; display: flex; flex-direction: column; gap: 2px;">
                     <div>💡 秘技: 体を半分ずらして突撃 (半ずらし会心!)</div>
-                    <div style="color: #60a5fa;">🔥 魔法・弓: [Space] / [F] / マウスクリック　装備切替: [1]〜[8] / [Tab]（金=突進の近接武器、青=杖・弓）</div>
+                    <div style="color: #60a5fa;">🔥 魔法: [Space] / [F] / クリックで発射　魔法切替: [1]〜[4] / [Tab]　武器: 画面左下をクリック（Esc でマウス解除）</div>
                 </div>
             </div>
         </div>
@@ -594,7 +622,7 @@
 
     <script src="/jhtml.browser.js"></script>
     <script type="module">
-        import { GameEngine } from '/js/game.js?v=bump_weapons_1';
+        import { GameEngine } from '/js/game.js?v=magic_slots_1';
 
         let gameInstance = null;
         window.addEventListener('DOMContentLoaded', async () => {

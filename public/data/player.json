@@ -1,5 +1,7 @@
 {
-  "equipSlots": ["dagger", "apprentice_staff", "blast_staff", "scatter_staff", null, null, null, null],
+  "equipSlots": ["dagger", "iron_sword", "iron_greatsword", "iron_mace", "apprentice_staff", "magic_rod", null, null],
   "meleeSlot": 0,
-  "rangedSlot": 1
+  "focusSlot": null,
+  "magicSlots": ["fire", "explosion", "spread", "magic_bolt"],
+  "selectedMagic": 0
 }
