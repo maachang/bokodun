@@ -1,0 +1,79 @@
+{
+  "_comment": "職業定義（草案）。仕様: docs/character-spec.md。必要経験値: Lv n → n+1 は round(expBase × n^1.5)。requires は取得条件（すべて満たす）。retryCrit はリトライクリティカルの回数。thiefFamily はクリティカル率20%の職業。",
+  "maxLevel": 99,
+  "highTierMinLevel": 20,
+  "jobs": {
+    "fighter":  { "name": "ファイター",   "type": "combat", "tier": "base", "expBase": 20, "requires": [], "retryCrit": 0, "thiefFamily": false },
+    "thief":    { "name": "シーフ",       "type": "combat", "tier": "base", "expBase": 22, "requires": [], "retryCrit": 1, "thiefFamily": true },
+    "sorcerer": { "name": "ソーサラー",   "type": "combat", "tier": "base", "expBase": 25, "requires": [], "retryCrit": 0, "thiefFamily": false },
+    "priest":   { "name": "プリースト",   "type": "combat", "tier": "base", "expBase": 25, "requires": [], "retryCrit": 0, "thiefFamily": false },
+
+    "knight":      { "name": "ナイト",       "type": "combat", "tier": "high", "expBase": 40, "requires": [{ "job": "fighter", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
+    "assassin":    { "name": "アサシン",     "type": "combat", "tier": "high", "expBase": 44, "requires": [{ "job": "thief", "level": 20 }], "retryCrit": 2, "thiefFamily": true },
+    "wizard":      { "name": "ウィザード",   "type": "combat", "tier": "high", "expBase": 50, "requires": [{ "job": "sorcerer", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
+    "bishop":      { "name": "ビショップ",   "type": "combat", "tier": "high", "expBase": 50, "requires": [{ "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
+    "spellsword":  { "name": "魔法戦士",     "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "sorcerer", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
+    "paladin":     { "name": "パラディン",   "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
+    "ninja":       { "name": "ニンジャ",     "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "thief", "level": 20 }], "retryCrit": 3, "thiefFamily": true },
+    "mystic":      { "name": "ミスティック", "type": "combat", "tier": "high", "expBase": 60, "requires": [{ "job": "sorcerer", "level": 20 }, { "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
+
+    "sage": {
+      "name": "セージ", "type": "support", "tier": "base", "expBase": 15, "requires": [],
+      "unlocks": [
+        { "level": 1,  "effect": "identifyLow",   "text": "低級アイテムの鑑定" },
+        { "level": 5,  "effect": "enemyName",     "text": "敵の名前表示" },
+        { "level": 10, "effect": "enemyStats",    "text": "敵のHP・攻撃力表示" },
+        { "level": 30, "effect": "identifyHigh",  "text": "高級アイテムの鑑定" },
+        { "level": 50, "effect": "enemyWeakness", "text": "敵の弱点・耐性表示" }
+      ]
+    },
+    "scout": {
+      "name": "スカウト", "type": "support", "tier": "base", "expBase": 15, "requires": [],
+      "unlocks": [
+        { "level": 1,  "effect": "trapSense",     "text": "罠が見える（近距離）" },
+        { "level": 5,  "effect": "lockpickEasy",  "text": "簡単な鍵開け" },
+        { "level": 10, "effect": "trapDisarm",    "text": "罠の解除" },
+        { "level": 30, "effect": "lockpickHard",  "text": "難しい鍵開け" },
+        { "level": 50, "effect": "trapSenseFar",  "text": "罠の遠距離探知" }
+      ]
+    },
+    "ranger": {
+      "name": "レンジャー", "type": "support", "tier": "base", "expBase": 15, "requires": [],
+      "unlocks": [
+        { "level": 1,  "effect": "miniMap",       "text": "簡易ミニマップ" },
+        { "level": 5,  "effect": "enemySense",    "text": "敵の探知" },
+        { "level": 10, "effect": "terrainEase",   "text": "草・湿地の速度低下を軽減" },
+        { "level": 30, "effect": "miniMapWide",   "text": "ミニマップの範囲拡大" },
+        { "level": 50, "effect": "stealthUp",     "text": "足音・ステルス強化" }
+      ]
+    },
+    "merchant": {
+      "name": "商人", "type": "support", "tier": "base", "expBase": 12, "requires": [],
+      "unlocks": [
+        { "level": 1,  "effect": "trade",         "text": "売買ができる" },
+        { "level": 5,  "effect": "sellUp5",       "text": "売値＋5%" },
+        { "level": 10, "effect": "buyDown5",      "text": "買値－5%、品揃え拡大" },
+        { "level": 30, "effect": "tradeUp15",     "text": "売値＋15%、買値－15%" },
+        { "level": 50, "effect": "specialTrade",  "text": "特別品の取引" }
+      ]
+    },
+    "smith": {
+      "name": "鍛冶", "type": "support", "tier": "base", "expBase": 18, "requires": [],
+      "unlocks": [
+        { "level": 1,  "effect": "repairWeapon",  "text": "武器の修理" },
+        { "level": 5,  "effect": "enhance1",      "text": "武器の強化＋1" },
+        { "level": 10, "effect": "enhance3",      "text": "強化＋3、防具の修理" },
+        { "level": 30, "effect": "enhance6",      "text": "強化＋6" },
+        { "level": 50, "effect": "craftSpecial",  "text": "特殊な武器の作成" }
+      ]
+    },
+
+    "archsage":    { "name": "大賢者",       "type": "support", "tier": "high", "expBase": 30, "requires": [{ "job": "sage", "level": 20 }], "unlocks": [] },
+    "scoutmaster": { "name": "盗賊の頭領",   "type": "support", "tier": "high", "expBase": 30, "requires": [{ "job": "scout", "level": 20 }], "unlocks": [] },
+    "explorer":    { "name": "探検家",       "type": "support", "tier": "high", "expBase": 36, "requires": [{ "job": "ranger", "level": 20 }, { "job": "sage", "level": 20 }], "unlocks": [] },
+    "tycoon":      { "name": "大商人",       "type": "support", "tier": "high", "expBase": 24, "requires": [{ "job": "merchant", "level": 20 }], "unlocks": [] },
+    "mastersmith": { "name": "名匠",         "type": "support", "tier": "high", "expBase": 36, "requires": [{ "job": "smith", "level": 20 }], "unlocks": [] },
+    "alchemist":   { "name": "錬金術師",     "type": "support", "tier": "high", "expBase": 40, "requires": [{ "job": "sage", "level": 20 }, { "job": "smith", "level": 20 }], "unlocks": [] },
+    "broker":      { "name": "ブローカー",   "type": "support", "tier": "high", "expBase": 36, "requires": [{ "job": "scout", "level": 20 }, { "job": "merchant", "level": 20 }], "unlocks": [] }
+  }
+}

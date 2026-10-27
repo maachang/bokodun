@@ -1,0 +1,31 @@
+{
+  "_comment": "戦闘ルール定数（草案）。仕様: docs/character-spec.md。バランス調整はここを変更する。",
+  "levelBonus": { "maxLevel": 99, "maxBonus": 15, "_note": "攻撃値に加算する値 = floor(第一職業レベル × maxBonus / maxLevel)" },
+  "critRate": {
+    "normal": 10,
+    "thiefFamily": 20,
+    "blunt": 1,
+    "heavyThiefPenaltyFactor": 0.5,
+    "_note": "シーフ系は軽い武器（重さ ≤ 筋力 × lightWeaponMaxRatio）のときだけ thiefFamily。重い武器は normal × heavyThiefPenaltyFactor。鈍器は全職業 blunt。"
+  },
+  "lightWeaponMaxRatio": 0.5,
+  "critDamageMultiplier": 1.5,
+  "magicPlusCritBonus": 5,
+  "equipWeightMultiplier": { "normal": 1.0, "blunt": 1.5, "_note": "装備できる重さの上限 = 筋力 × 倍率（最大50）" },
+  "defense": {
+    "coef": { "armor": 0.6, "helm": 0.2, "shield": 0.2 },
+    "minDamage": 1,
+    "_note": "防御 = Σ(係数 × ダメージ表[部位の重さ][部位のダイス値])。ダメージ = max(1, 攻撃 − 防御 − 生命力軽減)"
+  },
+  "vitReductionDivisor": 5,
+  "hpMp": {
+    "hpPerLevel": 1,
+    "mpPerLevel": 0.5,
+    "_note": "最大HP = round((筋力＋生命力) × 種族hpRate) ＋ 第一職業Lv × hpPerLevel。最大MP = round((知力＋精神力) × 種族mpRate) ＋ 第一職業Lv × mpPerLevel（草案）"
+  },
+  "fumble": {
+    "attackDamage": 1,
+    "defenseEnemyAutoCrit": true,
+    "_note": "攻撃の1ゾロは必ず最大1ダメージ。防御の1ゾロは相手が必ずクリティカル（相手がシーフ系なら、続けてリトライクリティカルで上乗せ）。"
+  }
+}

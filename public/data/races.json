@@ -1,0 +1,14 @@
+{
+  "_comment": "種族定義。coef は能力値の種族係数（最大値 = 25 × 係数）。仕様: docs/character-spec.md",
+  "abilities": ["dex", "agi", "str", "vit", "intel", "mnd"],
+  "races": {
+    "human":    { "id": "human",    "name": "人間",     "coef": { "dex": 1.0, "agi": 1.0, "str": 1.0, "vit": 1.0, "intel": 1.0, "mnd": 1.0 }, "hpRate": 1.0, "mpRate": 1.0 },
+    "elf":      { "id": "elf",      "name": "エルフ",   "coef": { "dex": 1.2, "agi": 1.2, "str": 0.6, "vit": 0.8, "intel": 1.2, "mnd": 1.0 }, "hpRate": 0.8, "mpRate": 1.3 },
+    "dwarf":    { "id": "dwarf",    "name": "ドワーフ", "coef": { "dex": 1.0, "agi": 0.6, "str": 1.4, "vit": 1.4, "intel": 0.8, "mnd": 0.8 }, "hpRate": 1.3, "mpRate": 0.8 },
+    "demon":    { "id": "demon",    "name": "魔族",     "coef": { "dex": 0.8, "agi": 1.0, "str": 1.2, "vit": 1.0, "intel": 1.2, "mnd": 0.8 }, "hpRate": 1.1, "mpRate": 1.2 },
+    "fairy":    { "id": "fairy",    "name": "妖精",     "coef": { "dex": 1.2, "agi": 1.4, "str": 0.4, "vit": 0.4, "intel": 1.4, "mnd": 1.2 }, "hpRate": 0.7, "mpRate": 1.4 },
+    "beast":    { "id": "beast",    "name": "獣人",     "coef": { "dex": 1.0, "agi": 1.4, "str": 1.2, "vit": 1.2, "intel": 0.4, "mnd": 0.8 }, "hpRate": 1.2, "mpRate": 0.8 },
+    "dragon":   { "id": "dragon",   "name": "竜人",     "coef": { "dex": 0.6, "agi": 0.8, "str": 1.4, "vit": 1.4, "intel": 0.8, "mnd": 1.0 }, "hpRate": 1.4, "mpRate": 0.9 },
+    "halfling": { "id": "halfling", "name": "小人",     "coef": { "dex": 1.4, "agi": 1.4, "str": 0.4, "vit": 0.6, "intel": 1.2, "mnd": 1.0 }, "hpRate": 0.8, "mpRate": 1.0 }
+  }
+}
