@@ -449,7 +449,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         assert.equal(calls.strikes.length, 1);
         const [x, z, opts] = calls.strikes[0];
         assert.ok(Math.abs(x) < 1e-9 && Math.abs(z + 6) < 1e-9, `プレイヤー前方 6m (${x}, ${z})`);
-        assert.deepEqual([opts.radius, opts.warnTime, opts.pillarTime, opts.smokeTime], [3.0, 0.3, 0.8, 2.0]);
+        assert.deepEqual([opts.radius, opts.warnTime, opts.pillarTime, opts.smokeTime], [3.0, 0.3, 0.8, 2.6]);
         assert.deepEqual(calls.sounds.find(([n]) => n === 'playStrikeWhistle'), ['playStrikeWhistle', 0.3], '予告の長さに合わせて「ぴゅーーーん」');
     });
 
@@ -812,31 +812,64 @@ test('落下エフェクト（StrikeEffectSystem）', async (t) => {
         assert.equal(scene.removed.length, 2);
     });
 
-    await t.test('煙: 火柱が消えた直後から灰色の塊が立ちのぼり、smokeTime 以内にすべて消えて終了する', () => {
+    await t.test('煙: 火柱の持続の半分を過ぎると、ふわっとした煙の塊が出始め、火柱と並行して立ちのぼり、smokeTime 後にすべて消えて終了する', () => {
         const scene = { added: [], removed: [], add(o) { this.added.push(o); }, remove(o) { this.removed.push(o); } };
         const fx = new M.StrikeEffectSystem(scene, null);
         fx.schedule(0, -6, { radius: 3, warnTime: 0, pillarTime: 0.8, smokeTime: 2.0 });
         fx.update(0.01);                       // 着弾 → 火柱
         const addedBeforeSmoke = scene.added.length;
-        fx.update(0.7);                        // 火柱の途中
-        assert.equal(fx.strikes[0].puffs, null, '火柱の間は煙なし');
+        fx.update(0.3);                        // 火柱の前半（q ≈ 0.39）
+        assert.equal(fx.strikes[0].puffs, null, '火柱の前半は煙なし');
 
-        fx.update(0.2);                        // 火柱が消える（t ≈ 0.91 > 0.81）
+        fx.update(0.15);                       // q ≈ 0.58: 煙が出始める。火柱はまだ立っている
         const s = fx.strikes[0];
-        assert.ok(s.puffs && s.puffs.length === 10, '煙の塊が 10 個');
-        assert.equal(scene.added.length - addedBeforeSmoke, 10, '煙がシーンに追加される');
-        assert.equal(fx.strikes.length, 1, '煙が残っている間は終了しない');
+        assert.ok(s.pillar, '火柱はまだある（煙と並行）');
+        assert.equal(s.puffs.length, 32, '煙の塊が 32 個');
+        assert.equal(scene.added.length - addedBeforeSmoke, 32, '煙がシーンに追加される');
 
-        fx.update(1.0);                        // 煙の途中
+        fx.update(0.5);                        // 火柱が消えて、煙だけが残る
+        assert.equal(fx.strikes[0].pillar, null);
+        assert.equal(fx.strikes.length, 1, '煙が残っている間は終了しない');
         const risen = s.puffs.filter(f => f.mesh.visible);
         assert.ok(risen.length > 0, '煙が現れている');
-        assert.ok(risen.every(f => f.mesh.position.y > 0.3 && f.mat.opacity >= 0 && f.mat.opacity <= 0.55), '立ちのぼり、薄い');
-        assert.ok(risen.some(f => f.mesh.scale.x > 0.6), '膨らむ');
+        assert.ok(risen.every(f => f.mesh.position.y > 0.3), '立ちのぼる');
+        assert.ok(risen.some(f => f.mesh.scale.x > f.size0), '膨らむ');
+        assert.ok(risen.every(f => f.mat.uniforms.uAlpha.value >= 0 && f.mat.uniforms.uAlpha.value <= 0.85), '濃さは 0〜0.85');
 
-        fx.update(1.5);                        // smokeTime(2.0) を超える
+        fx.update(2.2);                        // 出し始めから smokeTime(2.0) を超える
         assert.equal(fx.strikes.length, 0, 'すべて消えたら終了');
-        const smokeRemoved = scene.removed.length;
-        assert.ok(smokeRemoved >= 10 + 2, '煙の塊 10 個を含めて取り除かれる');
+        assert.ok(scene.removed.length >= 32 + 1, '煙の塊 32 個と火柱が取り除かれる');
+    });
+
+    await t.test('煙の塊は炎の色から冷めていき（uHeat が下がる）、カメラの方を向く。壁には隠され、塊どうしは隠し合わない', () => {
+        const scene = { add() {}, remove() {} };
+        const camera = { quaternion: { x: 0.1, y: 0.2, z: 0.3, w: 0.9 } };
+        const fx = new M.StrikeEffectSystem(scene, null, camera);
+        fx.schedule(0, 0, { warnTime: 0, pillarTime: 0.2, smokeTime: 2.0 });
+        fx.update(0.01);
+        fx.update(0.2);                        // 煙が出始める
+        const f = fx.strikes[0].puffs.reduce((a, b) => (a.delay <= b.delay ? a : b)); // 最初に出る塊
+        fx.update(0.05);
+        const heatEarly = f.mat.uniforms.uHeat.value;
+        fx.update(0.6);
+        const heatLater = f.mat.uniforms.uHeat.value;
+        assert.ok(heatEarly > 0.4, `最初は炎の色 (${heatEarly})`);
+        assert.ok(heatLater < heatEarly * 0.5, `冷める (${heatLater})`);
+        const q = f.mesh.quaternion;
+        assert.ok(Math.abs(q.x - 0.1) < 1e-9 && Math.abs(q.y - 0.2) < 1e-9 && Math.abs(q.z - 0.3) < 1e-9 && Math.abs(q.w - 0.9) < 1e-9, 'カメラと同じ向き');
+        assert.equal(f.mat.isShaderMaterial, true);
+        assert.equal(f.mat.transparent, true);
+        assert.equal(f.mat.depthWrite, false, '塊どうしが重なって濃くなる');
+        assert.notEqual(f.mat.depthTest, false, '壁には隠される（深度テストあり）');
+    });
+
+    await t.test('煙のシェーダーのソースは ASCII のみで、three.js の色管理（colorspace_fragment）を通す', () => {
+        const src = fs.readFileSync(path.join(projectRoot, 'public/js/strikeEffect.js'), 'utf-8');
+        const shaders = [...src.slice(src.indexOf('const SMOKE_VERTEX'), src.indexOf('const SMOKE_COUNT')).matchAll(/`([^`]*)`/g)].map(m => m[1]);
+        assert.equal(shaders.length, 2);
+        for (const body of shaders) assert.equal(/[^\x00-\x7F]/.test(body), false, '非 ASCII 文字なし');
+        assert.ok(shaders[1].includes('#include <colorspace_fragment>'));
+        for (const u of ['uSeed', 'uAge', 'uHeat', 'uAlpha']) assert.ok(shaders[1].includes(`uniform float ${u};`), u);
     });
 
     await t.test('煙なし（smokeTime 未指定）: 火柱が消えたら従来どおりすぐ終了する', () => {
@@ -859,66 +892,198 @@ test('落下エフェクト（StrikeEffectSystem）', async (t) => {
     });
 });
 
-test('斬撃エフェクト（SlashEffectSystem）: カメラに固定した画面上の表示', async (t) => {
+test('斬撃エフェクト（SlashEffectSystem）: カメラに固定した、シェーダーで描く画面上の表示', async (t) => {
     const M = await loadModules();
     // カメラの代用品（子の追加・削除を記録する）
     const makeCamera = () => ({ children: [], add(o) { this.children.push(o); }, remove(o) { this.children = this.children.filter(c => c !== o); } });
-    const effectDef = (shape) => ({ shape, color: '#ffffff', size: 1, duration: 0.2, tiltDeg: -35, sweepDeg: 70 });
+    const def = (shape, extra = {}) => ({ shape, color: '#e0f2fe', size: 1, duration: 0.2, tiltDeg: -35, ...extra });
+    const SHAPES = ['slash', 'thrust', 'smash', 'punch'];
+    const DURATION = 0.2 * 2.2; // effect.duration × 2.2
+    const spawn1 = (shape, power = 1.0, extra = {}) => {
+        const camera = makeCamera();
+        const fx = new M.SlashEffectSystem(camera);
+        fx.spawn(2.6, 70, def(shape, extra), power);
+        return { camera, fx, e: fx.effects[0] };
+    };
 
-    for (const shape of ['slash', 'thrust', 'smash', 'punch']) {
-        await t.test(`${shape}: カメラの子として表示され、時間経過で消えて取り除かれる`, () => {
-            const camera = makeCamera();
-            const fx = new M.SlashEffectSystem(camera);
-            fx.spawn(2.6, 70, effectDef(shape));
-            assert.equal(camera.children.length, 1, 'カメラに取り付けられる');
-            assert.equal(fx.effects.length, 1);
-
-            fx.update(0.1);
-            const e = fx.effects[0];
-            assert.ok(e.material.opacity > 0 && e.material.opacity < 1, '半分経過で半透明');
-            fx.update(0.11);
+    for (const shape of SHAPES) {
+        await t.test(`${shape}: カメラの子（本体とフラッシュ）として表示され、時間経過で消えてすべて取り除かれる`, () => {
+            const { camera, fx, e } = spawn1(shape);
+            assert.equal(camera.children.length, 2, '本体とフラッシュがカメラに取り付けられる');
+            assert.equal(e.shape, shape);
+            fx.update(DURATION * 0.5);
+            assert.equal(fx.effects.length, 1, '途中ではまだ表示されている');
+            fx.update(DURATION * 0.6);
             assert.equal(fx.effects.length, 0);
-            assert.equal(camera.children.length, 0, 'カメラから取り除かれる');
+            assert.equal(camera.children.length, 0, '本体もフラッシュも取り除かれる');
         });
     }
 
-    await t.test('敵や壁に隠されず、常に手前に描かれる（深度テストなし・描画順が最後）', () => {
-        const camera = makeCamera();
-        const fx = new M.SlashEffectSystem(camera);
-        for (const shape of ['slash', 'thrust', 'smash', 'punch']) {
-            fx.spawn(2.6, 70, effectDef(shape));
-        }
-        for (const e of fx.effects) {
-            assert.equal(e.material.depthTest, false);
-            assert.equal(e.material.depthWrite, false);
-            assert.equal(e.group.children[0].renderOrder, 999);
+    await t.test('敵や壁に隠されず、常に手前に光って見える（シェーダー材質・深度テストなし・加算合成・描画順が最後）', () => {
+        for (const shape of SHAPES) {
+            const { e } = spawn1(shape);
+            assert.ok(e.materials.length > 0);
+            for (const m of e.materials) {
+                assert.equal(m.isShaderMaterial, true);
+                assert.equal(m.transparent, true);
+                assert.equal(m.depthTest, false);
+                assert.equal(m.depthWrite, false);
+                assert.equal(m.blending, 2, '加算合成 (THREE.AdditiveBlending)');
+            }
+            for (const mesh of e.meshes) assert.equal(mesh.renderOrder, 999);
+            assert.equal(e.flash.renderOrder, 998, 'フラッシュは本体の後ろ');
+            assert.equal(e.flashMat.depthTest, false);
         }
     });
 
-    await t.test('位置は画面の正面のやや手前で、攻撃のたびに画面内のランダムな位置に出る（向き・傾きも変わる）', () => {
+    await t.test('形ごとに重ねて描く（弧=弧2本＋星＋火花、突き=筋3本＋星＋火花、衝撃波=リング2＋円盤＋光線14＋火花、素手=星2＋リング＋火花）', () => {
+        const sparks = 14, star = 5; // 星 = 円盤 1 + 筋 4
+        assert.equal(spawn1('slash').e.meshes.length, 2 + star + sparks);
+        assert.equal(spawn1('thrust').e.meshes.length, 3 + star + sparks);
+        assert.equal(spawn1('smash').e.meshes.length, 2 + 1 + 14 + sparks);
+        assert.equal(spawn1('punch').e.meshes.length, 2 * star + 1 + sparks);
+    });
+
+    await t.test('斬撃: 光の先端が弧に沿って走り（0→1）、その後は尾が流れ去る（1 を超える）。先端が尖る・尾を引く', () => {
+        const { fx, e } = spawn1('slash');
+        const main = e.meshes[0];
+        const head = () => main.material.uniforms.uHead.value;
+        assert.equal(head(), 0, '最初は端にある');
+        fx.update(DURATION * 0.2);
+        const mid = head();
+        assert.ok(mid > 0.4 && mid < 1, `走っている途中 (${mid})`);
+        fx.update(DURATION * 0.2); // p = 0.4
+        assert.ok(head() >= 1, '弧の端まで走った');
+        fx.update(DURATION * 0.4); // p = 0.8
+        assert.ok(head() > 1.2, `尾が流れ去っていく (${head()})`);
+        assert.ok(main.material.uniforms.uTail.value > 0.5, '尾が長い');
+    });
+
+    await t.test('最初の 62% は全開で光り、その後に薄くなって消える。画面全体のフラッシュは最初の 25% で消える', () => {
+        const { fx, e } = spawn1('slash');
+        const fade = () => e.meshes[0].material.uniforms.uFade.value;
+        assert.ok(e.flashMat.opacity > 0, '最初はフラッシュ');
+        fx.update(DURATION * 0.3);
+        assert.equal(fade(), 1, '全開');
+        assert.equal(e.flashMat.opacity, 0, 'フラッシュは消えている');
+        fx.update(DURATION * 0.3); // p = 0.6
+        assert.equal(fade(), 1);
+        fx.update(DURATION * 0.2); // p = 0.8
+        assert.ok(fade() > 0 && fade() < 1, `薄くなっていく (${fade()})`);
+    });
+
+    await t.test('火花: 当たった点から飛び散る線。会心・撃破（power が大きい）ほど数が増え、本体も大きい', () => {
+        const normal = spawn1('slash', 1.0).e;
+        const strong = spawn1('slash', 1.68).e;
+        assert.equal(normal.sparkCount, 14);
+        assert.equal(strong.sparkCount, 24);
+        assert.ok(strong.meshes.length > normal.meshes.length);
+        assert.ok(strong.flashBase > normal.flashBase, 'フラッシュも濃い');
+        for (const e of [normal, strong]) e.meshes[0].geometry.computeBoundingSphere();
+        assert.ok(strong.meshes[0].geometry.boundingSphere.radius > normal.meshes[0].geometry.boundingSphere.radius, '弧が大きい');
+    });
+
+    await t.test('火花は途中から現れ、時間とともに外へ飛び、薄くなって消える', () => {
+        const { fx, e } = spawn1('punch');
+        const spark = e.meshes[e.meshes.length - 1];
+        assert.equal(spark.visible, false, '最初は出ていない');
+        fx.update(DURATION * 0.3);
+        assert.equal(spark.visible, true);
+        const d1 = Math.hypot(spark.position.x, spark.position.y);
+        fx.update(DURATION * 0.3);
+        const d2 = Math.hypot(spark.position.x, spark.position.y);
+        assert.ok(d2 > d1, '外へ飛んでいく');
+        fx.update(DURATION * 0.35); // p = 0.95
+        assert.equal(spark.visible, false, '消えた');
+    });
+
+    await t.test('弧の厚みと開き: 両端が尖った帯（幅が両端で 0 に近い）で、クラスの弧の広がり（arcDeg）に応じて開く', () => {
+        const widthAtEnds = (arcDeg) => {
+            const camera = makeCamera();
+            const fx = new M.SlashEffectSystem(camera);
+            fx.spawn(2.6, arcDeg, def('slash'));
+            const geo = fx.effects[0].meshes[0].geometry;
+            const pos = geo.getAttribute('position');
+            const w = (i) => Math.hypot(pos.getX(2 * i + 1) - pos.getX(2 * i), pos.getY(2 * i + 1) - pos.getY(2 * i));
+            const n = pos.count / 2 - 1;
+            geo.computeBoundingBox();
+            return { start: w(0), mid: w(Math.floor(n / 2)), end: w(n), spanX: geo.boundingBox.max.x - geo.boundingBox.min.x };
+        };
+        const sword = widthAtEnds(70), great = widthAtEnds(120);
+        assert.ok(sword.start < sword.mid * 0.05 && sword.end < sword.mid * 0.05, '両端が尖る');
+        assert.ok(sword.mid > 0.3, '中央は太い');
+        assert.ok(great.spanX > sword.spanX, '大剣のほうが広い弧');
+    });
+
+    await t.test('シェーダーは three.js の色管理（colorspace_fragment）を通す。使う include は three.module.js に実在する', () => {
+        const src = fs.readFileSync(path.join(projectRoot, 'public/js/slashEffect.js'), 'utf-8');
+        const three = fs.readFileSync(path.join(projectRoot, 'public/js/three.module.js'), 'utf-8');
+        const includes = [...src.matchAll(/#include <([a-z_]+)>/g)].map(m => m[1]);
+        assert.ok(includes.includes('colorspace_fragment'));
+        for (const name of includes) assert.ok(three.includes(name), `three.module.js に ${name} がある`);
+        // シェーダーのソースは ASCII のみ（非 ASCII 文字を拒否するドライバーがあるため）
+        const shaders = src.slice(src.indexOf('const VERTEX'), src.indexOf('const ease'));
+        const shaderBodies = [...shaders.matchAll(/`([^`]*)`/g)].map(m => m[1]);
+        assert.equal(shaderBodies.length, 2, '頂点・フラグメントの 2 つ');
+        for (const body of shaderBodies) assert.equal(/[^\x00-\x7F]/.test(body), false, '非 ASCII 文字なし');
+        // 変数の宣言ミスなどの単純な誤りを防ぐ: 使う uniform は、すべてシェーダー内で宣言されている
+        const frag = src.slice(src.indexOf('const FRAGMENT'), src.indexOf('const ease'));
+        for (const u of ['uKind', 'uHead', 'uTail', 'uFade', 'uColor', 'uCore']) assert.ok(frag.includes(`uniform`) && frag.includes(`${u};`), `${u}`);
+    });
+
+    await t.test('位置は画面の正面のやや手前で、攻撃のたびに画面内のランダムな位置・傾き・向き（左右反転）で出る', () => {
         const camera = makeCamera();
         const fx = new M.SlashEffectSystem(camera);
-        const xs = new Set(), ys = new Set(), rots = new Set();
+        const xs = new Set(), ys = new Set(), rots = new Set(), flips = new Set();
         for (let i = 0; i < 60; i++) {
-            fx.spawn(2.6, 70, effectDef('slash'));
-            const e = fx.effects[fx.effects.length - 1];
-            const p = e.group.position;
-            assert.equal(p.z, -1.5, 'カメラの正面 1.5 の位置');
-            assert.ok(Math.abs(p.x) <= 0.6 && p.y >= -0.35 && p.y <= 0.25, `画面内に収まる (${p.x}, ${p.y})`);
-            xs.add(p.x.toFixed(3)); ys.add(p.y.toFixed(3)); rots.add(e.group.children[0].rotation.z.toFixed(3));
+            fx.spawn(2.6, 70, def('slash'));
+            const g = fx.effects[fx.effects.length - 1].group;
+            assert.equal(g.position.z, -1.5, 'カメラの正面 1.5 の位置');
+            assert.ok(Math.abs(g.position.x) <= 0.35 && g.position.y >= -0.2 && g.position.y <= 0.2, `画面内に収まる (${g.position.x}, ${g.position.y})`);
+            xs.add(g.position.x.toFixed(3)); ys.add(g.position.y.toFixed(3)); rots.add(g.rotation.z.toFixed(3)); flips.add(g.scale.x);
         }
         assert.ok(xs.size > 30 && ys.size > 30 && rots.size > 30, '位置・傾きがランダムに変わる');
+        assert.deepEqual([...flips].sort(), [-1, 1], '斬る向きが左右に反転する');
+    });
+});
+
+test('エフェクトテストボタン（武器エフェクトの確認用）', async (t) => {
+    const M = await loadModules();
+
+    await t.test('testWeaponEffect: 近接クラスのエフェクトを、強さ（通常 / 会心 / 会心＋撃破）に応じた power で表示する', () => {
+        const { g, calls } = makeGame(M);
+        assert.equal(g.testWeaponEffect('sword', 'normal'), true);
+        assert.equal(g.testWeaponEffect('sword', 'crit'), true);
+        assert.equal(g.testWeaponEffect('greatsword', 'kill'), true);
+        assert.deepEqual(calls.slashes.map(s => s[2].shape), ['slash', 'slash', 'slash']);
+        assert.deepEqual(calls.slashes.map(s => s[0]), [2.6, 2.6, 3.2], 'クラスの範囲の目安');
+        const powers = calls.slashes.map(s => s[3]);
+        assert.equal(powers[0], 1.0);
+        assert.equal(powers[1], 1.4);
+        assert.ok(Math.abs(powers[2] - 1.4 * 1.2) < 1e-9, '会心＋撃破が最も強い');
     });
 
-    await t.test('形はクラスの shape ごとに違う（弧・衝撃波=リング、突き=細長い板、素手=円）', () => {
-        const camera = makeCamera();
-        const fx = new M.SlashEffectSystem(camera);
-        const types = {};
-        for (const shape of ['slash', 'thrust', 'smash', 'punch']) {
-            fx.spawn(2.6, 70, effectDef(shape));
-            types[shape] = fx.effects[fx.effects.length - 1].geometry.type;
-        }
-        assert.deepEqual(types, { slash: 'RingGeometry', thrust: 'PlaneGeometry', smash: 'RingGeometry', punch: 'CircleGeometry' });
+    await t.test('近接でないクラス・未定義のクラスは何も出さない', () => {
+        const { g, calls } = makeGame(M);
+        assert.equal(g.testWeaponEffect('staff'), false);
+        assert.equal(g.testWeaponEffect('bow'), false);
+        assert.equal(g.testWeaponEffect('no_such_class'), false);
+        assert.equal(calls.slashes.length, 0);
+    });
+
+    await t.test('突進が当たったとき: 通常=1.0、会心=1.4、撃破=1.2 倍（会心で撃破なら 1.68）の強さで出る', () => {
+        const run = (x, hp) => {
+            const { g, calls } = makeGame(M);
+            const m = spawn(M, 'slime', x, -1.2);
+            if (hp) m.hp = hp;
+            g.monsters.push(m);
+            bump(g, m);
+            return calls.slashes[0][3];
+        };
+        assert.equal(run(0), 1.0);
+        assert.equal(run(0.5), 1.4, '半ずらし会心');
+        assert.ok(Math.abs(run(0, 1) - 1.2) < 1e-9, '通常の突進で撃破');
+        assert.ok(Math.abs(run(0.5, 1) - 1.68) < 1e-9, '会心で撃破');
     });
 });
 
@@ -932,7 +1097,7 @@ test('HUD の描画（武器スロット・魔法スロット）', async (t) => 
     const M = await loadModules();
     // jhtml.browser.js をそのまま読み込み、DOM 取得（$）だけ仮の要素に差し替える
     await import(jhtmlPath);
-    const els = { weaponHud: { innerHTML: '' }, magicHud: { innerHTML: '' } };
+    const els = { weaponHud: { innerHTML: '' }, magicHud: { innerHTML: '' }, effectTestHud: { innerHTML: '' } };
     const realDollar = globalThis.jhtml.$;
     globalThis.jhtml.$ = (id) => els[id] ?? null;
 
@@ -955,6 +1120,15 @@ test('HUD の描画（武器スロット・魔法スロット）', async (t) => 
         assert.match(magicHtml, /<option value="fire" selected>ファイア<\/option>/, '1 番の中身はファイア');
         assert.match(magicHtml, /<option value="short_bow"\s*>短弓<\/option>/, '選択肢に弓がある');
         assert.doesNotMatch(magicHtml, /iron_sword/, '近接武器は選択肢にない');
+
+        // エフェクトテストのパネル: 強さの選択と、近接クラスごとのボタン
+        g.updateEffectTestHud = M.GameEngine.prototype.updateEffectTestHud;
+        g.updateEffectTestHud();
+        const testHtml = els.effectTestHud.innerHTML;
+        assert.match(testHtml, /<select id="effectTestStrength">/);
+        assert.deepEqual([...testHtml.matchAll(/<option value="([^"]+)"/g)].map(m => m[1]), ['normal', 'crit', 'kill']);
+        const buttons = [...testHtml.matchAll(/<button class="test-btn" data-class="([^"]+)">([^<]+)<\/button>/g)].map(m => [m[1], m[2]]);
+        assert.deepEqual(buttons, [['bare_hands', '素手'], ['dagger', 'ダガー'], ['sword', '剣'], ['greatsword', '大剣'], ['mace', 'メイス']], '近接クラスだけ');
 
         g.selectMagic(2);
         g.setMagicSlot(2, 'magic_bolt');

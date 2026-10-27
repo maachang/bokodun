@@ -193,6 +193,23 @@
             background: rgba(20, 83, 45, 0.7);
             font-weight: bold;
         }
+        #effectTestHud {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            font-size: 11px;
+            pointer-events: auto;
+        }
+        .test-btn, #effectTestStrength {
+            font-size: 11px;
+            padding: 2px 8px;
+            color: #e2e8f0;
+            background: rgba(30, 41, 59, 0.9);
+            border: 1px solid #475569;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        .test-btn:hover { border-color: #facc15; color: #fef08a; }
         .magic-slot {
             display: flex;
             align-items: center;
@@ -569,6 +586,12 @@
             <div id="weaponHud"></div>
         </section>
 
+        <!-- 武器エフェクトのテスト（突進を当てなくても、各武器クラスの斬撃エフェクトを表示して確認できる） -->
+        <section class="panel" id="panel-effectTest">
+            <div class="panel-title">EFFECT TEST（武器エフェクト）</div>
+            <div id="effectTestHud"></div>
+        </section>
+
         <!-- Ys-style 戦闘中の敵のステータスカード -->
         <section class="panel-bare" id="panel-enemies">
             <div id="enemyHudList"></div>
@@ -689,7 +712,7 @@
 
     <script src="/jhtml.browser.js"></script>
     <script type="module">
-        import { GameEngine } from '/js/game.js?v=layout_1';
+        import { GameEngine } from '/js/game.js?v=effect_test_1';
         import { applyLayout } from '/js/layout.js';
 
         let gameInstance = null;

@@ -10,6 +10,10 @@ import { StrikeEffectSystem } from '/js/strikeEffect.js';
 // 被弾リアクション（突進の命中時）の調整値
 //   ヒットストップ: 命中した瞬間にゲームの時間を一瞬止める（秒）。重い武器・会心・撃破で長くなる
 //   カメラの揺れ: 会心・撃破・重い武器の命中で、画面を短く揺らす（amp=揺れの大きさ、duration=秒）
+// 斬撃エフェクトの強さ（SlashEffectSystem.spawn の power）: 会心・撃破で大きく・多くの火花になる
+const EFFECT_POWER = { normal: 1.0, crit: 1.4, kill: 1.2 };
+const effectPower = (crit, killed) => (crit ? EFFECT_POWER.crit : EFFECT_POWER.normal) * (killed ? EFFECT_POWER.kill : 1);
+
 const HIT_FEEDBACK = {
     hitStop: { charge: 0.05, crit: 0.08, kill: 0.10, heavyBonus: 0.03, blast: 0.04 },
     shake: { amp: 0.08, duration: 0.15 }
@@ -109,9 +113,10 @@ export class GameEngine {
 
         this.initThree();
         this.initTextures();
-        this.strikeEffects = new StrikeEffectSystem(this.scene, this.textures.firePillar);
+        this.strikeEffects = new StrikeEffectSystem(this.scene, this.textures.firePillar, this.camera);
         this.initControls();
         this.initEquipHudEvents();
+        this.initEffectTestEvents();
     }
 
     async init() {
@@ -147,6 +152,7 @@ export class GameEngine {
             this.weaponClasses = this.weaponClasses || {};
         }
         this.updateEquipHud();
+        this.updateEffectTestHud();
     }
 
     initThree() {
@@ -194,7 +200,7 @@ export class GameEngine {
         forestCanopyTex.magFilter = THREE.NearestFilter;
         forestCanopyTex.minFilter = THREE.NearestFilter;
 
-        const firePillarTex = loader.load('/images/objects/fire_pillar.png?v=' + Date.now());
+        const firePillarTex = loader.load('/images/effects/fire_pillar.png?v=' + Date.now());
         firePillarTex.magFilter = THREE.NearestFilter;
         firePillarTex.minFilter = THREE.NearestFilter;
 
@@ -363,6 +369,17 @@ export class GameEngine {
         });
     }
 
+    // シーンの子をすべて取り除き、照明とカメラだけを入れ直す。
+    // カメラは、カメラに取り付けた画面上のエフェクト（斬撃）を描画するために、シーンに入っている必要がある
+    resetScene() {
+        while (this.scene.children.length > 0) {
+            this.scene.remove(this.scene.children[0]);
+        }
+        this.scene.add(this.ambientLight);
+        this.scene.add(this.dirLight);
+        this.scene.add(this.camera);
+    }
+
     async loadMap(mapId) {
         this.currentMapId = mapId;
 
@@ -383,12 +400,7 @@ export class GameEngine {
         }
         this.mapData = mapData;
 
-        // Reset scene children (except lights/camera)
-        while (this.scene.children.length > 0) {
-            this.scene.remove(this.scene.children[0]);
-        }
-        this.scene.add(this.ambientLight);
-        this.scene.add(this.dirLight);
+        this.resetScene();
 
         this.colliders = [];
         this.monsters = [];
@@ -1837,6 +1849,33 @@ export class GameEngine {
         });
     }
 
+    // 武器エフェクトのテスト表示（HUD の「エフェクトテスト」パネル）。突進を当てなくても、各武器クラスの斬撃エフェクトを確認できる
+    //   strength: 'normal'=通常のヒット / 'crit'=半ずらし会心 / 'kill'=会心で撃破（最も強い）
+    testWeaponEffect(classId, strength = 'normal') {
+        const cls = this.weaponClasses[classId];
+        if (!cls || cls.attack !== 'melee') return false;
+        this.slashEffects.spawn(cls.range, cls.arcDeg, cls.effect, effectPower(strength !== 'normal', strength === 'kill'));
+        return true;
+    }
+
+    updateEffectTestHud() {
+        const el = jhtml.$('effectTestHud');
+        if (!el) return;
+        const classes = Object.entries(this.weaponClasses).filter(([, c]) => c.attack === 'melee');
+        el.innerHTML = jhtml.html`<select id="effectTestStrength"><option value="normal">通常</option><option value="crit">会心</option><option value="kill">会心＋撃破</option></select>`
+            + classes.map(([id, c]) => jhtml.html`<button class="test-btn" data-class="${id}">${c.name}</button>`).join('');
+    }
+
+    // エフェクトテストの操作（コンストラクタから一度だけ呼ぶ）
+    initEffectTestEvents() {
+        jhtml.on('effectTestHud', 'click', '.test-btn', (e, el) => {
+            const strength = jhtml.$('effectTestStrength')?.value || 'normal';
+            this.testWeaponEffect(el.dataset.class, strength);
+            el.blur(); // ゲームのキー操作をボタンが奪わないようにする
+        });
+        jhtml.on('effectTestHud', 'change', 'select', (e, el) => el.blur());
+    }
+
     // Space / F / クリック: 選択中の魔法スロットを使う。呪文は杖・ロッドの補正（威力・消費MP・間隔）を受け、弓は矢を放つ
     useMagic() {
         const item = this.getMagicItem();
@@ -2926,10 +2965,10 @@ export class GameEngine {
         const isCharging = (isPlayerMovingForward && dotFront > 0.6);
 
         // 武器クラスの効果（ノックバック・スタン・斬撃エフェクト）を、突進が当たった敵に適用する
-        const applyWeaponEffects = (isDead) => {
+        const applyWeaponEffects = (isDead, crit) => {
             if (!cls) return;
             if (cls.stun > 0 && !isDead) monster.stun(cls.stun);
-            this.slashEffects.spawn(cls.range, cls.arcDeg, cls.effect);
+            this.slashEffects.spawn(cls.range, cls.arcDeg, cls.effect, effectPower(crit, isDead));
         };
         const knockScale = cls ? cls.knockback : 1.0;
         const heavySound = cls ? cls.sound === 'heavy' : false;
@@ -2939,7 +2978,7 @@ export class GameEngine {
             const damage = Math.floor(this.player.attackPower * 1.5 * damageScale + Math.random() * 5);
             this.sound.playAttack(true);
             const isDead = monster.takeDamage(damage, { x: nx, z: nz }, knockScale);
-            applyWeaponEffects(isDead);
+            applyWeaponEffects(isDead, true);
             this.playerHitFeedback({ crit: true, killed: isDead, heavy: heavySound });
             this.particles.spawnBurst(monster.x, 1.2, monster.z, 0xfbbf24, 12, 4.0);
             this.addPopup(`半ずらし会心! -${damage}`, '#fbbf24', monster.x, monster.z);
@@ -2953,7 +2992,7 @@ export class GameEngine {
 
             this.sound.playAttack(heavySound);
             const isDead = monster.takeDamage(pDmg, { x: nx, z: nz }, knockScale);
-            applyWeaponEffects(isDead);
+            applyWeaponEffects(isDead, false);
             this.playerHitFeedback({ crit: false, killed: isDead, heavy: heavySound });
             this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz));
             this.addPopup(`ボコッ! -${pDmg}`, '#ffffff', monster.x, monster.z);

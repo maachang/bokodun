@@ -3,12 +3,68 @@ import * as THREE from '/js/three.module.js';
 /**
  * 落下系の魔法（爆発火球など）の演出: 地面の予告の輪 → 着弾（onImpact を 1 回呼ぶ）→ 火柱と衝撃波 → 煙
  * 火柱は fire_pillar の画像（texture）を縦長の板 3 枚で十字に交差させて描く。texture が無い場合は単色
- * 煙は火柱が消えた直後から、着弾点の周りに数個の灰色の塊が立ちのぼり、膨らみながら薄くなって消える
+ * 煙は火柱が消え始める頃（火柱の持続の半分）から出る。ふわっとした煙の塊を、シェーダーで描いたカメラを向く板で重ねる:
+ *   塊の輪郭はノイズで崩れ、内側に濃淡がつく / 発生直後は炎の色（下側が赤橙）で、冷めるにつれて暗い灰色になる /
+ *   ゆっくり立ちのぼりながら膨らみ、薄くなって消える
  */
+// ---- 煙のシェーダー（ソースは ASCII のみ。日本語の説明はこの JS 側に書く）----
+// ノイズ（fbm）で輪郭を崩したふわっとした塊。uHeat が大きいほど炎の色（下側が赤橙）、小さいほど暗い灰色。
+// uAge: 塊の経過（0〜1。ノイズをゆっくり動かす）、uAlpha: 全体の濃さ、uSeed: 塊ごとの模様の違い
+const SMOKE_VERTEX = `
+varying vec2 vUv;
+void main() {
+    vUv = uv;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+}`;
+
+const SMOKE_FRAGMENT = `
+uniform float uSeed;
+uniform float uAge;
+uniform float uHeat;
+uniform float uAlpha;
+varying vec2 vUv;
+float hash(vec2 p) { return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }
+float noise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    return mix(mix(hash(i), hash(i + vec2(1.0, 0.0)), f.x), mix(hash(i + vec2(0.0, 1.0)), hash(i + vec2(1.0, 1.0)), f.x), f.y);
+}
+float fbm(vec2 p) {
+    float v = 0.0;
+    float a = 0.5;
+    for (int i = 0; i < 4; i++) {
+        v += a * noise(p);
+        p *= 2.03;
+        a *= 0.5;
+    }
+    return v;
+}
+void main() {
+    vec2 p = vUv * 2.0 - 1.0;
+    float r = length(p);
+    float n = fbm(vec2(p.x * 2.2 + uSeed * 17.0 + uAge * 0.6, p.y * 2.2 + uSeed * 9.0));
+    float edge = 1.0 - smoothstep(0.25, 1.0, r + (n - 0.5) * 0.9);
+    float dens = edge * (0.55 + 0.9 * n);
+    float lit = p.y * 0.5 + 0.5;
+    vec3 gray = mix(vec3(0.10, 0.10, 0.11), vec3(0.42, 0.42, 0.44), clamp(n * 0.8 + lit * 0.4, 0.0, 1.0));
+    float m = clamp(uHeat * (1.0 - lit) * 0.9 * n + uHeat * 0.25, 0.0, 1.0);
+    vec3 col = mix(gray, vec3(1.0, 0.45, 0.1), m);
+    gl_FragColor = vec4(col, clamp(dens * uAlpha, 0.0, 1.0));
+    #include <colorspace_fragment>
+}`;
+
+const SMOKE_COUNT = 32;          // 煙の塊の数
+const SMOKE_START_Q = 0.5;       // 火柱の持続の、この割合を過ぎたら煙が出始める（火柱と煙の間が途切れない）
+
+const smoothstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+
 export class StrikeEffectSystem {
-    constructor(scene, texture = null) {
+    // camera: 煙の板を常にカメラへ向けるために使う（省略すると向きを更新しない）
+    constructor(scene, texture = null, camera = null) {
         this.scene = scene;
         this.texture = texture;
+        this.camera = camera;
         this.strikes = [];
     }
 
@@ -105,42 +161,47 @@ export class StrikeEffectSystem {
                     pl.ringGeo.dispose();
                     for (const g of s.geometries) g.dispose();
                     s.pillar = null;
-                    if (s.smokeTime > 0) this.startSmoke(s);
                 }
             }
 
-            // 煙: 火柱が消えた直後から立ちのぼる。すべての塊が消えたら終了
-            if (!s.pillar) {
-                if (s.puffs) this.updateSmoke(s, dt);
-                if (!s.puffs || s.puffs.length === 0) this.strikes.splice(i, 1);
-            }
+            // 煙: 火柱が消え始める頃から出る。火柱と並行して動き、すべての塊が消えたら終了
+            if (!s.puffs && s.smokeTime > 0 && q >= SMOKE_START_Q) this.startSmoke(s);
+            if (s.puffs) this.updateSmoke(s, dt);
+            if (!s.pillar && (!s.puffs || s.puffs.length === 0)) this.strikes.splice(i, 1);
         }
     }
 
-    // 煙の塊（灰色の球）を、着弾点の周りの範囲内に数個、時間差で出す。各塊は smokeTime 以内に消える
+    // 煙の塊を、着弾点の周りに時間差で出す。各塊は smokeTime 以内に消える（出し始めから smokeTime 後にすべて消える）
     startSmoke(s) {
-        const geo = new THREE.IcosahedronGeometry(0.5, 1);
+        const geo = new THREE.PlaneGeometry(1, 1);
         s.smokeGeo = geo;
         s.puffs = [];
-        const count = 10;
-        for (let i = 0; i < count; i++) {
+        for (let i = 0; i < SMOKE_COUNT; i++) {
+            const delay = (i / SMOKE_COUNT) * Math.min(0.7, s.smokeTime * 0.3) * (0.7 + Math.random() * 0.6);
             const angle = Math.random() * Math.PI * 2;
             const dist = Math.sqrt(Math.random()) * s.radius * 0.6;
-            const delay = Math.random() * Math.min(0.6, s.smokeTime * 0.3);
-            const mat = new THREE.MeshBasicMaterial({ color: 0x4a4a4a, transparent: true, opacity: 0, depthWrite: false });
+            const driftAngle = Math.random() * Math.PI * 2;
+            const mat = new THREE.ShaderMaterial({
+                uniforms: { uSeed: { value: Math.random() }, uAge: { value: 0 }, uHeat: { value: 1 }, uAlpha: { value: 0 } },
+                vertexShader: SMOKE_VERTEX,
+                fragmentShader: SMOKE_FRAGMENT,
+                transparent: true,
+                depthWrite: false,   // 塊どうしが互いを隠さず、重なって濃くなる（壁には隠される）
+                side: THREE.DoubleSide
+            });
             const mesh = new THREE.Mesh(geo, mat);
-            mesh.position.set(s.x + Math.cos(angle) * dist, 0.3, s.z + Math.sin(angle) * dist);
             mesh.visible = false;
             this.scene.add(mesh);
             s.puffs.push({
                 mesh, mat, age: 0, delay,
                 life: s.smokeTime - delay,
-                baseX: mesh.position.x, baseZ: mesh.position.z,
-                rise: 1.2 + Math.random() * 0.8,
-                startScale: 0.6 + Math.random() * 0.4,
-                endScale: 2.0 + Math.random() * 1.0,
-                driftX: (Math.random() - 0.5) * 0.8,
-                driftZ: (Math.random() - 0.5) * 0.8
+                x0: s.x + Math.cos(angle) * dist, z0: s.z + Math.sin(angle) * dist,
+                y0: 0.3 + Math.random() * 0.4,
+                rise: 1.6 + Math.random() * 3.4,                       // 立ちのぼる高さ
+                driftX: Math.cos(driftAngle) * (Math.random() * 1.2), // 横へ流れる量
+                driftZ: Math.sin(driftAngle) * (Math.random() * 1.2),
+                size0: s.radius * 0.34 * (0.7 + Math.random() * 0.6),  // 最初の大きさ
+                grow: 2.2 + Math.random()                              // 最後に何倍まで膨らむか
             });
         }
     }
@@ -151,12 +212,15 @@ export class StrikeEffectSystem {
             f.age += dt;
             if (f.age < f.delay) continue;
             const t = Math.min(1, (f.age - f.delay) / f.life);
+            const e = 1 - Math.pow(1 - t, 3);   // 最初は勢いよく、だんだん遅く
             f.mesh.visible = true;
-            f.mesh.position.set(f.baseX + f.driftX * t, 0.3 + f.rise * t, f.baseZ + f.driftZ * t);
-            f.mesh.scale.setScalar(f.startScale + (f.endScale - f.startScale) * t);
-            // 濃い灰色から明るい灰色へ。最初の 20% で現れ、残りでゆっくり薄くなる
-            f.mat.color.setRGB(0.29 + 0.3 * t, 0.29 + 0.3 * t, 0.29 + 0.3 * t);
-            f.mat.opacity = 0.55 * (t < 0.2 ? t / 0.2 : 1 - (t - 0.2) / 0.8);
+            f.mesh.position.set(f.x0 + f.driftX * t, f.y0 + f.rise * e, f.z0 + f.driftZ * t);
+            f.mesh.scale.setScalar(f.size0 * (1 + (f.grow - 1) * e));
+            if (this.camera) f.mesh.quaternion.copy(this.camera.quaternion);   // 常にカメラを向く板
+            const u = f.mat.uniforms;
+            u.uAge.value = t;
+            u.uHeat.value = Math.pow(Math.max(0, 1 - t / 0.45), 2);            // 最初の約 45% で炎の色が冷める
+            u.uAlpha.value = 0.85 * smoothstep(0, 0.12, t) * (1 - smoothstep(0.4, 1.0, t));
             if (t >= 1) {
                 this.scene.remove(f.mesh);
                 f.mat.dispose();

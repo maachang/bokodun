@@ -98,7 +98,7 @@
     "targetDistance": 6,
     "warnTime": 0.3,
     "pillarTime": 0.8,
-    "smokeTime": 2.0
+    "smokeTime": 2.6
   },
   "spread": {
     "id": "spread",

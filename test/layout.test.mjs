@@ -77,7 +77,7 @@ test('layout.json と index.html の整合', async (t) => {
     await t.test('既定のプリセット: 右の領域は「ミニマップ → 敵の情報」の順（敵の情報はミニマップの下）', () => {
         const r = resolveLayout(layoutConfig);
         const right = r.placements.filter(p => p.region === 'right').map(p => p.panel);
-        assert.deepEqual(right, ['minimap', 'enemies']);
+        assert.deepEqual(right.slice(0, 2), ['minimap', 'enemies']);
     });
 
     await t.test('index.html に、全パネル・全領域の要素と、パネルの中身の id がある', () => {

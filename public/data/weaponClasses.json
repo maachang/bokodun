@@ -65,7 +65,7 @@
     "effect": {
       "shape": "slash",
       "color": "#fde68a",
-      "size": 1.4,
+      "size": 1.0,
       "duration": 0.3,
       "tiltDeg": 0,
       "sweepDeg": 120

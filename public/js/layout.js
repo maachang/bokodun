@@ -10,7 +10,7 @@
  *   - ゲーム画面の幅は game.width（高さは 4:3 で自動）
  */
 
-export const PANELS = ['status', 'magic', 'weapon', 'enemies', 'minimap', 'areaNav', 'hints'];
+export const PANELS = ['status', 'magic', 'weapon', 'enemies', 'minimap', 'areaNav', 'hints', 'effectTest'];
 export const REGIONS = ['top', 'left', 'right', 'bottom', 'overlay-top', 'overlay-top-right', 'overlay-bottom-left', 'overlay-bottom-right', 'hidden'];
 
 // プリセットに書かれていない（または不正な指定の）パネルの既定の領域
@@ -21,7 +21,8 @@ const DEFAULT_PANELS = {
     enemies: 'right',
     minimap: 'right',
     areaNav: 'top',
-    hints: 'bottom'
+    hints: 'bottom',
+    effectTest: 'right'
 };
 const DEFAULT_WIDTH = 800;
 const MIN_WIDTH = 320;
