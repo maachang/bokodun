@@ -313,8 +313,8 @@ class MagentaChromaKeyer:
         print(f"  Cropped Size: {result_img.size} (aspect ratio: {result_img.size[0]/result_img.size[1]:.3f})")
         return result_img.size
 
-def process_image(src_path, dest_path=None, tolerance=48.0, defringe_width=2, crop_bottom=True):
-    keyer = MagentaChromaKeyer(tolerance=tolerance, defringe_width=defringe_width)
+def process_image(src_path, dest_path=None, tolerance=48.0, defringe_width=2, crop_bottom=True, min_island_area=12):
+    keyer = MagentaChromaKeyer(tolerance=tolerance, defringe_width=defringe_width, min_island_area=min_island_area)
     return keyer.process(src_path, dest_path=dest_path, crop_bottom=crop_bottom)
 
 def main():
@@ -323,6 +323,7 @@ def main():
     parser.add_argument("-o", "--output", help="Path to output PNG (default: overwrite input)")
     parser.add_argument("-t", "--tolerance", type=float, default=48.0, help="Color distance tolerance (default: 48.0)")
     parser.add_argument("--defringe-width", type=int, default=2, help="Defringe width in pixels (default: 2)")
+    parser.add_argument("--min-island-area", type=int, default=12, help="Min pixel area of enclosed background islands to make transparent (default: 12). Raise for glossy bodies whose pink highlights get punched out")
     parser.add_argument("--no-crop", action="store_true", help="Do not crop transparent bounding box")
 
     args = parser.parse_args()
@@ -331,7 +332,8 @@ def main():
         dest_path=args.output,
         tolerance=args.tolerance,
         defringe_width=args.defringe_width,
-        crop_bottom=not args.no_crop
+        crop_bottom=not args.no_crop,
+        min_island_area=args.min_island_area
     )
 
 if __name__ == "__main__":
