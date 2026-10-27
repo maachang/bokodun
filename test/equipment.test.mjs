@@ -22,7 +22,8 @@ async function loadModules() {
     const { Monster, Projectile } = await import(path.join(dir, 'entities.js'));
     const { SlashEffectSystem } = await import(path.join(dir, 'slashEffect.js'));
     const { StrikeEffectSystem } = await import(path.join(dir, 'strikeEffect.js'));
-    return { GameEngine, Monster, Projectile, SlashEffectSystem, StrikeEffectSystem };
+    const { SoundFX } = await import(path.join(dir, 'audio.js'));
+    return { GameEngine, Monster, Projectile, SlashEffectSystem, StrikeEffectSystem, SoundFX };
 }
 
 const tex = new Proxy({}, { get: () => ({}) });
@@ -353,6 +354,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         const [x, z, opts] = calls.strikes[0];
         assert.ok(Math.abs(x) < 1e-9 && Math.abs(z + 6) < 1e-9, `プレイヤー前方 6m (${x}, ${z})`);
         assert.deepEqual([opts.radius, opts.warnTime, opts.pillarTime], [3.0, 0.3, 0.8]);
+        assert.deepEqual(calls.sounds.find(([n]) => n === 'playStrikeWhistle'), ['playStrikeWhistle', 0.3], '予告の長さに合わせて「ぴゅーーーん」');
     });
 
     await t.test('爆発火球: 手前に壁があれば、その直前に着弾する。杖の補正で威力が上がる', () => {
@@ -384,7 +386,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         assert.equal(edge.hp, edge.maxHp - 35);
         assert.equal(outside.hp, outside.maxHp);
         assert.ok(edge.knockback.x > 0, '中心から外向きに飛ぶ');
-        assert.ok(calls.sounds.some(([n]) => n === 'playExplosion'));
+        assert.ok(calls.sounds.some(([n]) => n === 'playBigExplosion'), '着弾で「ばーーん」');
     });
 
     await t.test('弓: 魔法スロットに入れると Space で矢を放つ（MP不要・重力で落ちる矢・射程はクラスの range）', () => {
@@ -443,6 +445,49 @@ test('生きている敵は障害物（プレイヤーは突き抜けられな�
         g.monsters.push(m);
         g.movePlayer(0, 0.3);
         assert.ok(Math.abs(g.player.z - 0.3) < 1e-9, '後ろへ離れられる');
+    });
+});
+
+test('爆発火球の効果音（SoundFX）', async (t) => {
+    const M = await loadModules();
+
+    // 音の生成を記録する、最小限の AudioContext の代用品
+    function fakeAudio() {
+        const log = { oscillators: [], noises: 0, started: 0 };
+        const param = () => ({ ramps: [], setValueAtTime() {}, linearRampToValueAtTime() {}, exponentialRampToValueAtTime(v, tm) { this.ramps.push([v, tm]); } });
+        const ctx = {
+            currentTime: 0, sampleRate: 8000, destination: {},
+            createOscillator() { const o = { type: '', frequency: param(), connect() {}, start() { log.started++; }, stop() {} }; log.oscillators.push(o); return o; },
+            createGain() { return { gain: param(), connect() {} }; },
+            createBiquadFilter() { return { type: '', frequency: param(), connect() {} }; },
+            createBuffer(ch, size) { return { getChannelData: () => new Float32Array(size) }; },
+            createBufferSource() { log.noises++; return { connect() {}, start() { log.started++; } }; },
+        };
+        const fx = new M.SoundFX();
+        fx.ctx = ctx;
+        return { fx, log };
+    }
+
+    await t.test('落下の笛: 予告の長さに合わせて、高い音から低い音へ滑り落ちる', () => {
+        const { fx, log } = fakeAudio();
+        fx.playStrikeWhistle(0.3);
+        const whistle = log.oscillators.find(o => o.type === 'sine' && o.frequency.ramps.length > 0);
+        assert.ok(whistle, '周波数が下降する音がある');
+        const [freq, endTime] = whistle.frequency.ramps[0];
+        assert.ok(freq < 2400 && Math.abs(endTime - 0.3) < 1e-9, `600Hz まで 0.3 秒で下降 (${freq}, ${endTime})`);
+    });
+
+    await t.test('重い爆発音: 衝撃・低い地鳴り・長い爆風ノイズが鳴る。AudioContext が無い（未初期化）場合は何もしない', () => {
+        const { fx, log } = fakeAudio();
+        fx.playBigExplosion();
+        assert.equal(log.oscillators.length, 2, '衝撃と地鳴り');
+        assert.equal(log.noises, 1, '爆風のノイズ');
+        assert.ok(log.started >= 3);
+        const boom = log.oscillators.find(o => o.type === 'sine');
+        assert.ok(boom.frequency.ramps[0][0] <= 40, '低い音まで下がる');
+
+        const silent = new M.SoundFX(); // ctx = null
+        assert.doesNotThrow(() => { silent.playBigExplosion(); silent.playStrikeWhistle(0.3); });
     });
 });
 

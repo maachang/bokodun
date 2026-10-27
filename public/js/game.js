@@ -1914,7 +1914,7 @@ export class GameEngine {
         const tz = this.player.z + dirZ * dist;
         const damage = Math.floor(spell.damage * powerScale);
 
-        this.sound.playShoot(true);
+        this.sound.playStrikeWhistle(spell.warnTime); // 「ぴゅーーーん」（予告の間に鳴る）→ 着弾で「ばーーん」
         this.strikeEffects.schedule(tx, tz, {
             radius: spell.blastRadius,
             warnTime: spell.warnTime,
@@ -1925,7 +1925,7 @@ export class GameEngine {
 
     // 着弾の範囲ダメージ: 中心から半径 radius 内の敵すべてに damage（ノックバックは中心から外向き）
     blastAt(x, z, radius, damage) {
-        this.sound.playExplosion();
+        this.sound.playBigExplosion();
         this.particles.spawnBurst(x, 0.8, z, 0xff5500, 40, 7.0);
         this.particles.spawnBurst(x, 1.5, z, 0xffdd33, 24, 4.5);
 
