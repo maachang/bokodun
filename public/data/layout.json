@@ -1,0 +1,44 @@
+{
+  "active": "sidebars",
+  "presets": {
+    "sidebars": {
+      "label": "枠外パネル（左: ステータス・魔法・武器、右: ミニマップ・敵の情報、上: エリア、下: ヒント）",
+      "game": { "width": 800 },
+      "panels": {
+        "status": "left",
+        "magic": "left",
+        "weapon": "left",
+        "minimap": "right",
+        "enemies": "right",
+        "areaNav": "top",
+        "hints": "bottom"
+      }
+    },
+    "classic": {
+      "label": "従来（すべてゲーム画面に重ねる）",
+      "game": { "width": 800 },
+      "panels": {
+        "enemies": "overlay-bottom-left",
+        "status": "overlay-bottom-left",
+        "magic": "overlay-bottom-left",
+        "weapon": "overlay-bottom-left",
+        "minimap": "overlay-top-right",
+        "areaNav": "overlay-top",
+        "hints": "overlay-bottom-right"
+      }
+    },
+    "minimal": {
+      "label": "最小（ステータス類は下の枠外、ミニマップと敵カードだけ画面に重ねる）",
+      "game": { "width": 800 },
+      "panels": {
+        "status": "bottom",
+        "magic": "bottom",
+        "weapon": "bottom",
+        "enemies": "overlay-bottom-left",
+        "minimap": "overlay-top-right",
+        "areaNav": "top",
+        "hints": "hidden"
+      }
+    }
+  }
+}

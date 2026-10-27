@@ -16,18 +16,68 @@
             background: #090a0f;
             color: #f1f5f9;
             font-family: 'Courier New', Courier, monospace, sans-serif;
-            overflow: hidden;
+            overflow: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
-            justify-content: center;
-            height: 100vh;
+            min-height: 100vh;
+            padding: 12px;
         }
+
+        /* 画面レイアウト: ゲーム画面の周囲に、枠外パネルの領域（top / left / right / bottom）を置く。
+           どのパネルをどの領域に置くかは public/data/layout.json で決める（js/layout.js が起動時に組み立てる） */
+        #app {
+            display: grid;
+            grid-template-columns: auto auto auto;
+            grid-template-areas:
+                "top top top"
+                "left game right"
+                "bottom bottom bottom";
+            gap: 10px;
+            justify-content: center;
+            align-items: start;
+            margin: auto;
+        }
+        #region-top { grid-area: top; }
+        #region-left { grid-area: left; }
+        #region-right { grid-area: right; }
+        #region-bottom { grid-area: bottom; }
+        #gameWrapper { grid-area: game; }
+        .region { display: flex; gap: 8px; }
+        .region:empty { display: none; }
+        #region-left, #region-right { flex-direction: column; align-items: stretch; }
+        #region-top, #region-bottom { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
+        /* ウィンドウ幅が足りないときは、左右のパネルを下へ折り返す */
+        @media (max-width: 1300px) {
+            #app {
+                grid-template-columns: auto;
+                grid-template-areas: "top" "game" "left" "right" "bottom";
+            }
+            #region-left, #region-right { flex-direction: row; flex-wrap: wrap; justify-content: center; }
+        }
+
+        /* 画面内（ゲーム画面に重ねる）の領域 */
+        .overlay-region {
+            position: absolute;
+            display: flex;
+            gap: 8px;
+            pointer-events: none;
+            z-index: 5;
+        }
+        #overlay-top {
+            top: 10px; left: 12px; right: 12px;
+            flex-direction: row; justify-content: space-between; align-items: center;
+            text-shadow: 1px 1px 2px #000, 0 0 5px #000;
+        }
+        #overlay-top-right { top: 50px; right: 12px; flex-direction: column; align-items: flex-end; }
+        #overlay-bottom-left { bottom: 12px; left: 12px; flex-direction: column; align-items: flex-start; }
+        #overlay-bottom-right { bottom: 12px; right: 12px; flex-direction: column; align-items: flex-end; }
+        .overlay-region .panel-title { display: none; }
 
         #gameWrapper {
             position: relative;
-            width: 800px;
-            height: 600px;
+            width: var(--game-width, 800px);
+            height: calc(var(--game-width, 800px) * 3 / 4);
             background: #000;
             border: 4px solid #334155;
             box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.9);
@@ -62,18 +112,6 @@
             transition: opacity 0.1s ease-out;
         }
 
-        #hudTop {
-            position: absolute;
-            top: 10px;
-            left: 12px;
-            right: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            pointer-events: none;
-            text-shadow: 1px 1px 2px #000, 0 0 5px #000;
-        }
-
         .badge {
             background: rgba(15, 23, 42, 0.85);
             padding: 6px 14px;
@@ -84,9 +122,6 @@
         }
 
         #minimapBox {
-            position: absolute;
-            top: 50px;
-            right: 12px;
             width: 140px;
             height: 140px;
             background: rgba(15, 23, 42, 0.85);
@@ -102,23 +137,24 @@
             display: block;
         }
 
-        #hudBottom {
-            position: absolute;
-            bottom: 12px;
-            left: 12px;
-            right: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-end;
-            pointer-events: none;
-        }
-
-        .status-container {
+        /* パネル（ステータス・魔法スロット・武器スロットなど）。panel-bare は枠なし（中身がそれぞれ枠を持つもの） */
+        .panel {
             background: rgba(15, 23, 42, 0.88);
             border: 1px solid #475569;
             border-radius: 6px;
             padding: 8px 14px;
             min-width: 220px;
+        }
+        .panel-bare {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        }
+        .panel-title {
+            font-size: 10px;
+            color: #64748b;
+            letter-spacing: 1px;
+            margin-bottom: 2px;
         }
 
         /* Enemy Info HUD Panel (Ys-style Target Info) */
@@ -466,74 +502,105 @@
 </head>
 <body>
 
-    <div id="gameWrapper">
-        <canvas id="gameCanvas"></canvas>
-        <div class="scanlines"></div>
-        <div id="damageFlash"></div>
+    <!-- 画面レイアウト: パネルは最初「パネル置き場」にあり、起動時に layout.js が layout.json の指定どおり各領域へ移す -->
+    <div id="app">
+        <div id="region-top" class="region"></div>
+        <div id="region-left" class="region"></div>
 
-        <!-- HUD Layer -->
-        <div id="hudOverlay">
-            <!-- Active Signpost / Notice Guidance Banner -->
-            <div id="signpostBanner"></div>
+        <div id="gameWrapper">
+            <canvas id="gameCanvas"></canvas>
+            <div class="scanlines"></div>
+            <div id="damageFlash"></div>
 
-            <div id="hudTop">
-                <div class="badge" id="currentAreaName">エリア名</div>
-                <div style="pointer-events: auto; display: flex; gap: 6px; align-items: center;">
-                    <button class="btn-scene" onclick="window.game.loadMap('city'); this.blur();">街</button>
-                    <button class="btn-scene" onclick="window.game.loadMap('village'); this.blur();">村</button>
-                    <button class="btn-scene" onclick="window.game.loadMap('grassland'); this.blur();">草原</button>
-                    <button class="btn-scene" onclick="window.game.loadMap('swamp'); this.blur();">湿地帯</button>
-                    <button class="btn-scene" onclick="window.game.loadMap('rockymountain'); this.blur();">岩山</button>
-                    <button class="btn-scene" onclick="window.game.loadMap('cave'); this.blur();">洞窟</button>
-                    <button class="btn-scene" onclick="window.game.loadMap('dungeon'); this.blur();">地下迷宮</button>
-                    <button class="btn-workshop" onclick="openWorkshop(); this.blur();">🎨 AI工房 (sdServer)</button>
-                </div>
+            <!-- HUD Layer（画面内の領域） -->
+            <div id="hudOverlay">
+                <!-- Active Signpost / Notice Guidance Banner -->
+                <div id="signpostBanner"></div>
+
+                <div id="overlay-top" class="overlay-region"></div>
+                <div id="overlay-top-right" class="overlay-region"></div>
+                <div id="overlay-bottom-left" class="overlay-region"></div>
+                <div id="overlay-bottom-right" class="overlay-region"></div>
             </div>
+        </div>
 
+        <div id="region-right" class="region"></div>
+        <div id="region-bottom" class="region"></div>
+    </div>
+
+    <!-- パネル置き場（layout.json で "hidden" を指定したパネルはここに残り、表示されない） -->
+    <div id="panelStore" style="display: none;">
+        <!-- ステータス -->
+        <section class="panel" id="panel-status">
+            <div class="panel-title">STATUS</div>
+            <div style="display: flex; justify-content: space-between; font-size: 13px;">
+                <span id="levelText">Lv.1</span>
+                <span id="hpText" style="color: #4ade80;">100/100</span>
+            </div>
+            <div class="hp-bar-bg">
+                <div id="hpBar"></div>
+            </div>
+            <!-- MP Bar -->
+            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
+                <span style="color: #60a5fa;">MP</span>
+                <span id="mpText" style="color: #60a5fa;">60/60</span>
+            </div>
+            <div class="hp-bar-bg" style="height: 8px;">
+                <div id="mpBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.15s;"></div>
+            </div>
+            <div style="margin-top: 4px; display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
+                <span id="expText">EXP: 0</span>
+                <span id="goldText" style="color: #facc15; font-weight: bold;">0 G</span>
+            </div>
+            <div style="margin-top: 2px; font-size: 11px; color: #64748b; text-align: right;">
+                <span id="monsterCount">敵残数: 0</span>
+            </div>
+        </section>
+
+        <!-- 魔法スロット（数字キー 1〜4 で切り替え。中身はセレクトボックスで選ぶ） -->
+        <section class="panel" id="panel-magic">
+            <div class="panel-title">MAGIC [1]-[4] / [Tab]</div>
+            <div id="magicHud"></div>
+        </section>
+
+        <!-- 武器スロット（クリックで選択。空きは破線） -->
+        <section class="panel" id="panel-weapon">
+            <div class="panel-title">WEAPON（クリックで選択）</div>
+            <div id="weaponHud"></div>
+        </section>
+
+        <!-- Ys-style 戦闘中の敵のステータスカード -->
+        <section class="panel-bare" id="panel-enemies">
+            <div id="enemyHudList"></div>
+        </section>
+
+        <!-- ミニマップ -->
+        <section class="panel-bare" id="panel-minimap">
             <div id="minimapBox">
                 <canvas id="minimapCanvas" width="140" height="140"></canvas>
             </div>
+        </section>
 
-            <div id="hudBottom">
-                <div style="display: flex; flex-direction: column; align-items: flex-start;">
-                    <!-- Ys-style active enemies stacked above player HP/MP -->
-                    <div id="enemyHudList"></div>
-
-                    <div class="status-container">
-                        <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                            <span id="levelText">Lv.1</span>
-                            <span id="hpText" style="color: #4ade80;">100/100</span>
-                        </div>
-                        <div class="hp-bar-bg">
-                            <div id="hpBar"></div>
-                        </div>
-                        <!-- MP Bar -->
-                        <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
-                            <span style="color: #60a5fa;">MP</span>
-                            <span id="mpText" style="color: #60a5fa;">60/60</span>
-                        </div>
-                        <div class="hp-bar-bg" style="height: 8px;">
-                            <div id="mpBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.15s;"></div>
-                        </div>
-                        <!-- 魔法スロット（数字キー 1〜4 で切り替え。中身はセレクトボックスで選ぶ）と、武器スロット（クリックで選択。空きは破線） -->
-                        <div id="magicHud"></div>
-                        <div id="weaponHud"></div>
-                        <div style="margin-top: 4px; display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
-                            <span id="expText">EXP: 0</span>
-                            <span id="goldText" style="color: #facc15; font-weight: bold;">0 G</span>
-                        </div>
-                        <div style="margin-top: 2px; font-size: 11px; color: #64748b; text-align: right;">
-                            <span id="monsterCount">敵残数: 0</span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="badge" style="color: #facc15; font-size: 12px; display: flex; flex-direction: column; gap: 2px;">
-                    <div>💡 秘技: 体を半分ずらして突撃 (半ずらし会心!)</div>
-                    <div style="color: #60a5fa;">🔥 魔法: [Space] / [F] / クリックで発射　魔法切替: [1]〜[4] / [Tab]　武器: 画面左下をクリック（Esc でマウス解除）</div>
-                </div>
+        <!-- エリア名とマップ切り替え -->
+        <section id="panel-areaNav" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+            <div class="badge" id="currentAreaName">エリア名</div>
+            <div style="pointer-events: auto; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
+                <button class="btn-scene" onclick="window.game.loadMap('city'); this.blur();">街</button>
+                <button class="btn-scene" onclick="window.game.loadMap('village'); this.blur();">村</button>
+                <button class="btn-scene" onclick="window.game.loadMap('grassland'); this.blur();">草原</button>
+                <button class="btn-scene" onclick="window.game.loadMap('swamp'); this.blur();">湿地帯</button>
+                <button class="btn-scene" onclick="window.game.loadMap('rockymountain'); this.blur();">岩山</button>
+                <button class="btn-scene" onclick="window.game.loadMap('cave'); this.blur();">洞窟</button>
+                <button class="btn-scene" onclick="window.game.loadMap('dungeon'); this.blur();">地下迷宮</button>
+                <button class="btn-workshop" onclick="openWorkshop(); this.blur();">🎨 AI工房 (sdServer)</button>
             </div>
-        </div>
+        </section>
+
+        <!-- 操作ヒント -->
+        <section class="badge" id="panel-hints" style="color: #facc15; font-size: 12px; display: flex; flex-direction: column; gap: 2px;">
+            <div>💡 秘技: 体を半分ずらして突撃 (半ずらし会心!)</div>
+            <div style="color: #60a5fa;">🔥 魔法: [Space] / [F] / クリックで発射　魔法切替: [1]〜[4] / [Tab]　武器: 武器パネルをクリック（Esc でマウス解除）</div>
+        </section>
     </div>
 
     <div id="instructions">
@@ -622,10 +689,12 @@
 
     <script src="/jhtml.browser.js"></script>
     <script type="module">
-        import { GameEngine } from '/js/game.js?v=strike_1';
+        import { GameEngine } from '/js/game.js?v=layout_1';
+        import { applyLayout } from '/js/layout.js';
 
         let gameInstance = null;
         window.addEventListener('DOMContentLoaded', async () => {
+            await applyLayout(); // 画面レイアウト（public/data/layout.json）を組み立ててから、ゲームを始める
             gameInstance = new GameEngine();
             window.game = gameInstance;
             await gameInstance.init();
