@@ -1,0 +1,80 @@
+{
+  "bare_hands": {
+    "name": "素手",
+    "attack": "melee",
+    "range": 1.4,
+    "arcDeg": 40,
+    "cooldown": 0.3,
+    "damageScale": 0.6,
+    "knockback": 0.8,
+    "stun": 0,
+    "sound": "light",
+    "effect": { "shape": "punch", "color": "#ffffff", "size": 0.8, "duration": 0.15 }
+  },
+  "dagger": {
+    "name": "ダガー",
+    "attack": "melee",
+    "range": 2.2,
+    "arcDeg": 50,
+    "cooldown": 0.3,
+    "damageScale": 0.9,
+    "knockback": 0.8,
+    "stun": 0,
+    "sound": "light",
+    "effect": { "shape": "thrust", "color": "#e5e7eb", "size": 1.0, "duration": 0.15 }
+  },
+  "sword": {
+    "name": "剣",
+    "attack": "melee",
+    "range": 2.6,
+    "arcDeg": 70,
+    "cooldown": 0.5,
+    "damageScale": 1.3,
+    "knockback": 1.0,
+    "stun": 0,
+    "sound": "light",
+    "effect": { "shape": "slash", "color": "#e0f2fe", "size": 1.0, "duration": 0.2, "tiltDeg": -35, "sweepDeg": 70 }
+  },
+  "greatsword": {
+    "name": "大剣",
+    "attack": "melee",
+    "range": 3.2,
+    "arcDeg": 120,
+    "cooldown": 1.0,
+    "damageScale": 2.2,
+    "knockback": 2.0,
+    "stun": 0,
+    "sound": "heavy",
+    "effect": { "shape": "slash", "color": "#fde68a", "size": 1.4, "duration": 0.3, "tiltDeg": 0, "sweepDeg": 120 }
+  },
+  "mace": {
+    "name": "メイス",
+    "attack": "melee",
+    "range": 2.4,
+    "arcDeg": 60,
+    "cooldown": 0.7,
+    "damageScale": 1.6,
+    "knockback": 1.8,
+    "stun": 0.5,
+    "sound": "heavy",
+    "effect": { "shape": "smash", "color": "#fb923c", "size": 1.0, "duration": 0.3 }
+  },
+  "staff": {
+    "name": "杖",
+    "attack": "cast",
+    "spellPowerScale": 1.0
+  },
+  "magic_rod": {
+    "name": "マジックロッド",
+    "attack": "cast",
+    "spellPowerScale": 1.0
+  },
+  "bow": {
+    "name": "弓矢",
+    "attack": "shoot",
+    "range": 20,
+    "cooldown": 0.6,
+    "damageScale": 1.4,
+    "projectileSpeed": 18
+  }
+}

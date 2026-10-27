@@ -4,6 +4,7 @@ import { Monster, Projectile } from '/js/entities.js';
 import { SoundFX } from '/js/audio.js';
 import { SDAssetManager } from '/js/sdAssetManager.js';
 import { ParticleSystem } from '/js/particles.js';
+import { SlashEffectSystem } from '/js/slashEffect.js';
 
 export class GameEngine {
     constructor() {
@@ -41,7 +42,9 @@ export class GameEngine {
             invincibleTimer: 0,
             attackCooldown: 0,
             magicCooldown: 0,
-            weaponIndex: 1, // 選択中の武器（weapons.json の添字）。既定はファイア（従来の火球）
+            equipSlots: [],     // 装備スロット（アイテム ID または null＝空き）。初期値は player.json
+            meleeSlot: null,    // 突進攻撃に使う近接武器のスロット番号（null=素手）
+            rangedSlot: null,   // Space / F / クリックで使う杖・ロッド・弓のスロット番号（null=なし）
             knockback: new THREE.Vector3(),
             isFalling: false,
             fallDepth: 0,
@@ -67,7 +70,8 @@ export class GameEngine {
         this.mapCache = {};
         this.objectDefinitions = null;
         this.enemyDefinitions = null;
-        this.weapons = [];
+        this.items = {};   // アイテム定義（items.json: id → 定義）
+        this.weaponClasses = {}; // 武器クラス定義（weaponClasses.json: クラス名 → 攻撃の形・範囲・エフェクト）
         this.colliders = [];
         this.monsters = [];
         this.projectiles = [];
@@ -102,21 +106,30 @@ export class GameEngine {
 
     async loadDefinitions() {
         try {
-            const [objRes, enemyRes, weaponRes] = await Promise.all([
+            const [objRes, enemyRes, itemRes, classRes, playerRes] = await Promise.all([
                 fetch('/data/objects.json'),
                 fetch('/data/enemies.json'),
-                fetch('/data/weapons.json')
+                fetch('/data/items.json'),
+                fetch('/data/weaponClasses.json'),
+                fetch('/data/player.json')
             ]);
             this.objectDefinitions = await objRes.json();
             this.enemyDefinitions = await enemyRes.json();
-            this.weapons = await weaponRes.json();
+            this.items = await itemRes.json();
+            this.weaponClasses = await classRes.json();
+            // 初期装備（装備スロットの中身と選択中のスロット）
+            const playerDef = await playerRes.json();
+            this.player.equipSlots = [...playerDef.equipSlots];
+            this.player.meleeSlot = playerDef.meleeSlot ?? null;
+            this.player.rangedSlot = playerDef.rangedSlot ?? null;
         } catch (e) {
             console.error('Failed to load definitions:', e);
             this.objectDefinitions = this.objectDefinitions || {};
             this.enemyDefinitions = this.enemyDefinitions || {};
-            this.weapons = this.weapons || [];
+            this.items = this.items || {};
+            this.weaponClasses = this.weaponClasses || {};
         }
-        this.updateWeaponHud();
+        this.updateEquipHud();
     }
 
     initThree() {
@@ -139,6 +152,7 @@ export class GameEngine {
         this.scene.add(this.dirLight);
 
         this.particles = new ParticleSystem(this.scene);
+        this.slashEffects = new SlashEffectSystem(this.scene);
     }
 
     initTextures() {
@@ -262,15 +276,11 @@ export class GameEngine {
                     break;
                 case 'Space':
                 case 'KeyF':
-                    this.useWeapon();
+                    this.useRanged();
                     e.preventDefault();
                     break;
-                case 'Digit1': case 'Numpad1': this.setWeapon(0); break;
-                case 'Digit2': case 'Numpad2': this.setWeapon(1); break;
-                case 'Digit3': case 'Numpad3': this.setWeapon(2); break;
-                case 'Digit4': case 'Numpad4': this.setWeapon(3); break;
                 case 'Tab':
-                    this.cycleWeapon();
+                    this.cycleSlot();
                     e.preventDefault();
                     break;
                 case 'ShiftLeft':
@@ -278,6 +288,9 @@ export class GameEngine {
                     this.keys.sprint = true;
                     break;
             }
+            // 数字キー 1〜9: 装備スロットの直接選択
+            const slotKey = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
+            if (slotKey) this.selectSlot(Number(slotKey[1]) - 1);
         });
 
         window.addEventListener('keyup', (e) => {
@@ -315,7 +328,7 @@ export class GameEngine {
                 this.canvas.requestPointerLock?.();
             } else {
                 // If pointer already locked, click attacks with the selected weapon
-                this.useWeapon();
+                this.useRanged();
             }
         });
 
@@ -1661,75 +1674,128 @@ export class GameEngine {
         document.getElementById('currentAreaName').innerText = mapData.name || '';
     }
 
-    // ---- 武器・呪文の切り替え（定義は public/data/weapons.json）----
-    setWeapon(index) {
-        if (!this.weapons[index] || index === this.player.weaponIndex) return;
-        this.player.weaponIndex = index;
-        this.updateWeaponHud();
+    // ---- 装備スロット（アイテム定義は items.json、スロットの中身は player.equipSlots）----
+    //   近接武器（melee）は「突進攻撃」に、杖・ロッド・弓（cast / shoot）は「Space / F / クリック」に使われる。
+    //   スロットを選ぶと、そのアイテムのクラスに応じて突進用か Space 用のどちらかに装備され、両方が同時に有効になる
+    getSlotItem(slot) {
+        const id = slot === null ? null : this.player.equipSlots[slot];
+        return (id && this.items[id]) || null;
     }
 
-    cycleWeapon() {
-        if (this.weapons.length === 0) return;
-        this.setWeapon((this.player.weaponIndex + 1) % this.weapons.length);
+    // 突進攻撃に使う近接武器（未装備なら素手）
+    getMeleeItem() {
+        return this.getSlotItem(this.player.meleeSlot) || this.items.fists || null;
     }
 
-    // 武器スロット HUD（選択中をハイライト）
-    updateWeaponHud() {
+    // Space / F / クリックで使う杖・ロッド・弓（未装備なら null）
+    getRangedItem() {
+        return this.getSlotItem(this.player.rangedSlot);
+    }
+
+    // 空きスロットを選んでも何も変わらない
+    selectSlot(slot) {
+        const item = this.getSlotItem(slot);
+        const cls = item && this.weaponClasses[item.weaponClass];
+        if (!cls) return;
+        if (cls.attack === 'melee') this.player.meleeSlot = slot;
+        else this.player.rangedSlot = slot;
+        this.updateEquipHud();
+    }
+
+    // Tab: 次の「空きでない」スロットを選ぶ（直前に選んだスロットから順送り）
+    cycleSlot() {
+        const slots = this.player.equipSlots;
+        const current = this.lastSelectedSlot ?? this.player.meleeSlot ?? 0;
+        for (let step = 1; step <= slots.length; step++) {
+            const next = (current + step) % slots.length;
+            if (this.getSlotItem(next)) {
+                this.lastSelectedSlot = next;
+                this.selectSlot(next);
+                return;
+            }
+        }
+    }
+
+    // デバッグ用: スロットの中身を差し替える（コンソールから game.equipItem(4, 'iron_sword') / game.equipItem(4, null)）
+    equipItem(slot, itemId) {
+        if (slot < 0 || slot >= this.player.equipSlots.length) {
+            console.warn(`スロット番号が範囲外です (0〜${this.player.equipSlots.length - 1})`);
+            return false;
+        }
+        if (itemId !== null && !this.items[itemId]) {
+            console.warn(`未定義のアイテムです: ${itemId} （game.listItems() で一覧）`);
+            return false;
+        }
+        if (itemId !== null && this.items[itemId].kind === 'spell') {
+            console.warn(`呪文はスロットに入れられません（杖・ロッドが束ねて使います）: ${itemId}`);
+            return false;
+        }
+        this.player.equipSlots[slot] = itemId;
+        // 装備中だったスロットを差し替えた場合、新しい中身に合わせて装備を更新する
+        if (this.player.meleeSlot === slot) this.player.meleeSlot = null;
+        if (this.player.rangedSlot === slot) this.player.rangedSlot = null;
+        this.updateEquipHud();
+        return true;
+    }
+
+    // デバッグ用: アイテム定義の一覧と、現在のスロットの中身をコンソールに表示
+    listItems() {
+        console.table(Object.values(this.items).map(i => ({ id: i.id, name: i.name, kind: i.kind, class: i.weaponClass ?? i.type })));
+        console.log('equipSlots:', this.player.equipSlots.map((id, i) => `${i + 1}:${id ?? '(空き)'}`).join('  '));
+    }
+
+    // 装備スロット HUD（突進用の近接武器は金色、Space 用の杖・弓は青でハイライト。空きは破線）
+    updateEquipHud() {
         const el = jhtml.$('weaponHud');
         if (!el) return;
-        el.innerHTML = this.weapons.map((w, i) => jhtml.html`<span class="weapon-slot ${i === this.player.weaponIndex ? 'active' : ''}">${i + 1} ${w.name}</span>`).join('');
+        el.innerHTML = this.player.equipSlots.map((id, i) => {
+            const item = (id && this.items[id]) || null;
+            const cls = (i === this.player.meleeSlot ? 'active-melee ' : '') + (i === this.player.rangedSlot ? 'active-ranged ' : '') + (item ? '' : 'empty');
+            return jhtml.html`<span class="weapon-slot ${cls}">${i + 1} ${item ? item.name : '―'}</span>`;
+        }).join('');
     }
 
-    // 選択中の武器で攻撃（Space / F / クリック）
-    useWeapon() {
-        const w = this.weapons[this.player.weaponIndex];
-        if (!w) return;
+    // Space / F / クリック: 杖・ロッド（束ねた呪文を撃つ）または弓で遠距離攻撃。近接武器は突進で使う（resolveYsBump）
+    useRanged() {
+        const item = this.getRangedItem();
+        if (!item) return;
         if (this.player.magicCooldown > 0) return;
-        if (w.mp > 0 && this.player.mp < w.mp) {
-            this.addPopup('MP不足!', '#38bdf8');
-            return;
-        }
+        const cls = this.weaponClasses[item.weaponClass];
+        if (!cls) return;
 
-        this.player.mp -= w.mp;
-        this.player.magicCooldown = w.cooldown;
-
-        if (w.type === 'melee') {
-            this.swingMelee(w);
-        } else {
-            this.shootProjectiles(w);
+        if (cls.attack === 'shoot') {
+            this.player.magicCooldown = cls.cooldown;
+            this.shootArrow(item, cls);
+        } else if (cls.attack === 'cast') {
+            const spell = this.items[item.spell];
+            if (!spell) return;
+            if (spell.mp > 0 && this.player.mp < spell.mp) {
+                this.addPopup('MP不足!', '#38bdf8');
+                return;
+            }
+            this.player.mp -= spell.mp;
+            this.player.magicCooldown = spell.cooldown;
+            this.shootProjectiles(spell, cls.spellPowerScale * (item.powerScale ?? 1));
         }
     }
 
-    // 近接攻撃: 前方の扇形（range・arcDeg 内）にいる敵をすべて斬る
-    swingMelee(w) {
-        const fwdX = -Math.sin(this.player.angle);
-        const fwdZ = -Math.cos(this.player.angle);
-        const cosArc = Math.cos(w.arcDeg * Math.PI / 180);
-
-        this.sound.playAttack(false);
-        this.particles.spawnBurst(this.player.x + fwdX * 1.2, 1.0, this.player.z + fwdZ * 1.2, 0xe5e7eb, 6, 3.0);
-
-        for (const m of this.monsters) {
-            if (!m.active) continue;
-            const dx = m.x - this.player.x;
-            const dz = m.z - this.player.z;
-            const dist = Math.hypot(dx, dz);
-            if (dist > w.range + m.radius) continue;
-            if (dist > 0.001 && (dx * fwdX + dz * fwdZ) / dist < cosArc) continue;
-
-            const damage = Math.floor(this.player.attackPower * w.powerScale + Math.random() * w.randomBonus);
-            const nx = dist > 0.001 ? dx / dist : fwdX;
-            const nz = dist > 0.001 ? dz / dist : fwdZ;
-            const isDead = m.takeDamage(damage, { x: nx, z: nz });
-            this.particles.spawnBurst(m.x, 1.2, m.z, 0xe5e7eb, 8, 3.5);
-            this.addPopup(`斬! -${damage}`, '#e5e7eb', m.x, m.z);
-            this.notifyEnemyEngaged(m);
-            if (isDead) this.gainExp(m.exp);
-        }
+    // 弓: 重力で落ちる矢を放つ（MP 不要。射程はクラスの range）
+    shootArrow(item, cls) {
+        const dirX = -Math.sin(this.player.angle);
+        const dirZ = -Math.cos(this.player.angle);
+        const damage = Math.floor(this.player.attackPower * cls.damageScale * (item.powerScale ?? 1) + Math.random() * (item.randomBonus ?? 0));
+        const arrow = new Projectile(this.player.x + dirX * 0.8, this.player.z + dirZ * 0.8, dirX, dirZ, true, cls.projectileSpeed, damage, {
+            type: 'arrow',
+            maxDistance: cls.range
+        });
+        arrow.label = cls.name;
+        this.projectiles.push(arrow);
+        this.scene.add(arrow.mesh);
+        this.sound.playBowShoot();
     }
 
     // 飛び道具（ファイア・爆発火球・拡散弾）: count 発を spreadDeg 間隔の扇状に発射
-    shootProjectiles(w) {
+    shootProjectiles(w, powerScale = 1.0) {
         this.sound.playShoot(true);
 
         const count = w.count || 1;
@@ -1746,7 +1812,7 @@ export class GameEngine {
             spawnX = this.player.x + dirX * 0.8;
             spawnZ = this.player.z + dirZ * 0.8;
 
-            const fireball = new Projectile(spawnX, spawnZ, dirX, dirZ, true, w.speed, w.damage, {
+            const fireball = new Projectile(spawnX, spawnZ, dirX, dirZ, true, w.speed, Math.floor(w.damage * powerScale), {
                 explosive: w.type === 'explosive',
                 blastRadius: w.blastRadius
             });
@@ -2482,10 +2548,11 @@ export class GameEngine {
                             break;
                         }
                         p.active = false;
-                        this.sound.playExplosion();
-                        this.particles.spawnBurst(p.x, p.y, p.z, 0xff5500, 16, 5.0);
+                        const isArrow = (p.type === 'arrow');
+                        if (isArrow) this.sound.playArrowHit(); else this.sound.playExplosion();
+                        this.particles.spawnBurst(p.x, p.y, p.z, isArrow ? 0xd4d4d8 : 0xff5500, isArrow ? 8 : 16, isArrow ? 2.5 : 5.0);
                         const isDead = m.takeDamage(p.damage, { x: p.dirX, z: p.dirZ });
-                        this.addPopup(`ファイア! -${p.damage}`, '#f97316', m.x, m.z);
+                        this.addPopup(`${p.label || 'ファイア'}! -${p.damage}`, '#f97316', m.x, m.z);
                         this.notifyEnemyEngaged(m);
                         if (isDead) this.gainExp(m.exp);
                         break;
@@ -2526,6 +2593,7 @@ export class GameEngine {
 
         // Update Particle System
         this.particles.update(dt);
+        this.slashEffects.update(dt);
 
         // Update Monsters and Ys-style "Bump Combat"
         this.updateCombat(dt);
@@ -2541,6 +2609,8 @@ export class GameEngine {
     }
 
     movePlayer(dx, dz) {
+        const prevX = this.player.x;
+        const prevZ = this.player.z;
         const nextX = this.player.x + dx;
         const nextZ = this.player.z + dz;
         const r = this.player.radius;
@@ -2568,6 +2638,27 @@ export class GameEngine {
             }
         }
         if (canMoveZ) this.player.z = nextZ;
+
+        // 生きている敵は障害物（突き抜けられない）。敵に近づく方向の移動だけ、敵の円の縁まで押し戻して横へ滑らせる。
+        // 突進の攻撃判定（距離 player.radius + m.radius 未満）が成立するよう、縁は攻撃判定の距離より内側（80%）にする。
+        // すでに重なっている敵から離れる方向の移動は妨げない。倒れている最中（active=false）の敵は障害物にしない
+        for (const m of this.monsters) {
+            if (!m.active) continue;
+            const minDist = (r + m.radius) * 0.8;
+            const cx = this.player.x - m.x;
+            const cz = this.player.z - m.z;
+            const d = Math.hypot(cx, cz);
+            if (d >= minDist) continue;
+            const prevD = Math.hypot(prevX - m.x, prevZ - m.z);
+            if (d >= prevD) continue;
+            if (d > 0.0001) {
+                this.player.x = m.x + cx / d * minDist;
+                this.player.z = m.z + cz / d * minDist;
+            } else {
+                this.player.x = prevX;
+                this.player.z = prevZ;
+            }
+        }
     }
 
     updateCombat(dt) {
@@ -2608,7 +2699,12 @@ export class GameEngine {
 
     // Classic Ys 1 "Half-Offset" Combat resolution
     resolveYsBump(monster, dx, dz, dist) {
-        this.player.attackCooldown = 0.22; // Quick hit intervals for "bokosuka"
+        // 装備中の近接武器（未装備なら素手）のクラスが、突進攻撃のダメージ・間隔・ノックバック・スタン・エフェクトを決める
+        const weapon = this.getMeleeItem();
+        const cls = (weapon && this.weaponClasses[weapon.weaponClass]) || null;
+        const damageScale = (cls ? cls.damageScale : 1.0) * (weapon?.powerScale ?? 1);
+        const randomBonus = weapon?.randomBonus ?? 3;
+        this.player.attackCooldown = cls ? cls.cooldown : 0.22; // Quick hit intervals for "bokosuka"
 
         // Player forward vector
         const pFwdX = -Math.sin(this.player.angle);
@@ -2633,11 +2729,21 @@ export class GameEngine {
         const isHalfOffset = (isPlayerMovingForward && dotFront > 0.4 && cross >= 0.25);
         const isCharging = (isPlayerMovingForward && dotFront > 0.6);
 
+        // 武器クラスの効果（ノックバック・スタン・斬撃エフェクト）を、突進が当たった敵に適用する
+        const applyWeaponEffects = (isDead) => {
+            if (!cls) return;
+            if (cls.stun > 0 && !isDead) monster.stun(cls.stun);
+            this.slashEffects.spawn(this.player.x, this.player.z, this.player.angle, cls.range, cls.arcDeg, cls.effect);
+        };
+        const knockScale = cls ? cls.knockback : 1.0;
+        const heavySound = cls ? cls.sound === 'heavy' : false;
+
         if (isHalfOffset) {
             // CRITICAL HALF-OFFSET HIT: Player takes 0 damage, monster takes full + bonus damage!
-            const damage = Math.floor(this.player.attackPower * 1.5 + Math.random() * 5);
+            const damage = Math.floor(this.player.attackPower * 1.5 * damageScale + Math.random() * 5);
             this.sound.playAttack(true);
-            const isDead = monster.takeDamage(damage, { x: nx, z: nz });
+            const isDead = monster.takeDamage(damage, { x: nx, z: nz }, knockScale);
+            applyWeaponEffects(isDead);
             this.particles.spawnBurst(monster.x, 1.2, monster.z, 0xfbbf24, 12, 4.0);
             this.addPopup(`半ずらし会心! -${damage}`, '#fbbf24', monster.x, monster.z);
             this.notifyEnemyEngaged(monster);
@@ -2645,11 +2751,12 @@ export class GameEngine {
             if (isDead) this.gainExp(monster.exp);
         } else if (isCharging) {
             // Normal charge: Mutual damage (player takes half, enemy takes standard)
-            const pDmg = Math.floor(this.player.attackPower + Math.random() * 3);
+            const pDmg = Math.floor(this.player.attackPower * damageScale + Math.random() * randomBonus);
             const mDmg = Math.floor(monster.attackPower * 0.5);
 
-            this.sound.playAttack(false);
-            const isDead = monster.takeDamage(pDmg, { x: nx, z: nz });
+            this.sound.playAttack(heavySound);
+            const isDead = monster.takeDamage(pDmg, { x: nx, z: nz }, knockScale);
+            applyWeaponEffects(isDead);
             this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz));
             this.addPopup(`ボコッ! -${pDmg}`, '#ffffff', monster.x, monster.z);
             this.notifyEnemyEngaged(monster);

@@ -124,6 +124,7 @@
         /* Enemy Info HUD Panel (Ys-style Target Info) */
         #weaponHud {
             display: flex;
+            flex-wrap: wrap;
             gap: 4px;
             margin-top: 6px;
             font-size: 11px;
@@ -136,10 +137,20 @@
             background: rgba(15, 23, 42, 0.6);
             white-space: nowrap;
         }
-        .weapon-slot.active {
+        .weapon-slot.empty {
+            color: #475569;
+            border-style: dashed;
+        }
+        .weapon-slot.active-melee {
             color: #fef08a;
             border-color: #facc15;
             background: rgba(120, 53, 15, 0.7);
+            font-weight: bold;
+        }
+        .weapon-slot.active-ranged {
+            color: #bae6fd;
+            border-color: #38bdf8;
+            background: rgba(12, 74, 110, 0.7);
             font-weight: bold;
         }
         #enemyHudList {
@@ -477,7 +488,7 @@
                         <div class="hp-bar-bg" style="height: 8px;">
                             <div id="mpBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.15s;"></div>
                         </div>
-                        <!-- 武器・呪文スロット（選択中をハイライト） -->
+                        <!-- 装備スロット（選択中をハイライト。空きは破線） -->
                         <div id="weaponHud"></div>
                         <div style="margin-top: 4px; display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
                             <span id="expText">EXP: 0</span>
@@ -491,7 +502,7 @@
 
                 <div class="badge" style="color: #facc15; font-size: 12px; display: flex; flex-direction: column; gap: 2px;">
                     <div>💡 秘技: 体を半分ずらして突撃 (半ずらし会心!)</div>
-                    <div style="color: #60a5fa;">🔥 攻撃: [Space] / [F] / マウスクリック　武器切替: [1]〜[4] / [Tab]</div>
+                    <div style="color: #60a5fa;">🔥 魔法・弓: [Space] / [F] / マウスクリック　装備切替: [1]〜[8] / [Tab]（金=突進の近接武器、青=杖・弓）</div>
                 </div>
             </div>
         </div>
@@ -583,7 +594,7 @@
 
     <script src="/jhtml.browser.js"></script>
     <script type="module">
-        import { GameEngine } from '/js/game.js?v=weapon_switch_1';
+        import { GameEngine } from '/js/game.js?v=bump_weapons_1';
 
         let gameInstance = null;
         window.addEventListener('DOMContentLoaded', async () => {

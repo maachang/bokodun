@@ -1,0 +1,5 @@
+{
+  "equipSlots": ["dagger", "apprentice_staff", "blast_staff", "scatter_staff", null, null, null, null],
+  "meleeSlot": 0,
+  "rangedSlot": 1
+}

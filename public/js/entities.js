@@ -155,6 +155,8 @@ export class Monster {
         this.deathFxTimer = 0;
         this.deathTiltDir = 1;      // 横倒しの向き（1 / -1）
 
+        this.stunTimer = 0;         // スタン中（メイスなど）は AI（移動・攻撃・射撃）が止まる
+
         // Pattern & animation states
         this.aiTimer = Math.random() * 2.0;
         this.baseScaleX = this.scale[0];
@@ -203,6 +205,13 @@ export class Monster {
         this.spriteMat.opacity = (this.stealth === 'high' && dist > fadeStart)
             ? Math.min(1, Math.max(0, (drawRange - dist) / (drawRange - fadeStart)))
             : 1;
+
+        // スタン中は AI（移動・攻撃・射撃）を止める
+        if (this.stunTimer > 0) {
+            this.stunTimer -= dt;
+            this.sprite.position.set(this.x, this.baseY, this.z);
+            return;
+        }
 
         // =========================================================================
         // Distinct Movement AI Patterns
@@ -607,14 +616,20 @@ export class Monster {
         return false;
     }
 
-    takeDamage(amount, knockDir) {
+    // 一定時間、AI（移動・攻撃・射撃）を止める。長い方を優先する
+    stun(seconds) {
+        this.stunTimer = Math.max(this.stunTimer, seconds);
+    }
+
+    // knockScale: ノックバックの強さの倍率（既定 1.0。大剣・メイスなどが大きくする）
+    takeDamage(amount, knockDir, knockScale = 1.0) {
         this.hp -= amount;
         this.hitTimer = 0.2;
         // 被弾したら状態にかかわらず即追跡
         this.state = 'chase';
         this.lostTimer = 0;
         if (knockDir) {
-            this.knockback.set(knockDir.x * 12, 0, knockDir.z * 12);
+            this.knockback.set(knockDir.x * 12 * knockScale, 0, knockDir.z * 12 * knockScale);
         }
         if (this.hp <= 0) {
             this.active = false;
