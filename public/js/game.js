@@ -2251,7 +2251,9 @@ export class GameEngine {
             for (const d of this.doors) {
                 const distToPlayer = Math.hypot(this.player.x - d.x, this.player.z - d.z);
                 // Open door when approaching within 2.4 units, close when far away (>3.2 units)
-                if (distToPlayer < 2.4 && !d.isOpen) {
+                // 扉が自分の前側（向いている側）にあるときだけ開く。後ろ向きに近づいたり、後ろ移動（S / ↓）中は開かない
+                const inFront = (d.x - this.player.x) * -Math.sin(this.player.angle) + (d.z - this.player.z) * -Math.cos(this.player.angle) > 0;
+                if (distToPlayer < 2.4 && !d.isOpen && inFront && !this.keys.backward) {
                     d.isOpen = true;
                     d.targetY = d.openY;
                     this.sound.playDoorOpen();
@@ -2268,7 +2270,8 @@ export class GameEngine {
                 d.mesh.position.y += (d.targetY - d.mesh.position.y) * 8 * dt;
 
                 // 行き先つきの扉: 開いた扉のマスの中へ入ったら移動
-                if (d.link.nextMap && d.isOpen &&
+                if (d.link.nextMap && d.isOpen && !this.keys.backward &&   // 後ろ移動で扉の中へ入っても移動しない
+                    
                     Math.abs(this.player.x - d.x) < d.half && Math.abs(this.player.z - d.z) < d.half) {
                     this.sound.playLevelClear();
                     this.addPopup(d.link.message ?? '次のエリアへ', '#fef08a');
