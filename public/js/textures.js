@@ -1861,6 +1861,100 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 店のマーク（32×32 の枠の中に描く）: weapon = 剣、item = 薬びん。立て札の板と、扉の上のアイコンで共通に使う
+    static drawShopMark(ctx, kind, x, y, size) {
+        ctx.save();
+        ctx.translate(x, y);
+        ctx.scale(size / 32, size / 32);
+        ctx.lineCap = 'round';
+        ctx.lineJoin = 'round';
+        if (kind === 'weapon') {
+            // 剣（左下の柄から、右上の切っ先へ）
+            ctx.fillStyle = '#e5e7eb';
+            ctx.strokeStyle = '#374151';
+            ctx.lineWidth = 1.5;
+            ctx.beginPath();
+            ctx.moveTo(27, 3); ctx.lineTo(30, 6); ctx.lineTo(15, 21); ctx.lineTo(11, 17);
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            ctx.strokeStyle = '#b8862b';   // 鍔
+            ctx.lineWidth = 3.5;
+            ctx.beginPath(); ctx.moveTo(8, 15); ctx.lineTo(17, 24); ctx.stroke();
+            ctx.strokeStyle = '#5b3a1a';   // 柄
+            ctx.lineWidth = 3.5;
+            ctx.beginPath(); ctx.moveTo(11.5, 20.5); ctx.lineTo(6.5, 25.5); ctx.stroke();
+            ctx.fillStyle = '#facc15';     // 柄頭
+            ctx.beginPath(); ctx.arc(5, 27, 2.2, 0, Math.PI * 2); ctx.fill();
+        } else {
+            // 薬びん（丸い瓶、細い首、栓）
+            ctx.fillStyle = '#b45309';     // 栓
+            ctx.fillRect(12.5, 2.5, 7, 4);
+            ctx.fillStyle = '#dbeafe';     // 首
+            ctx.strokeStyle = '#374151';
+            ctx.lineWidth = 1.5;
+            ctx.fillRect(13, 6, 6, 8);
+            ctx.strokeRect(13, 6, 6, 8);
+            ctx.fillStyle = '#dc2626';     // 瓶と薬
+            ctx.beginPath(); ctx.arc(16, 21, 9, 0, Math.PI * 2);
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fca5a5';     // つや
+            ctx.fillRect(10, 18, 2.5, 6);
+        }
+        ctx.restore();
+    }
+
+    // 扉の上に出す、店のアイコン（丸い札の中に、店のマーク）
+    static createShopIconTexture(kind) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#1f2937';
+        ctx.beginPath(); ctx.arc(32, 32, 30, 0, Math.PI * 2); ctx.fill();
+        ctx.strokeStyle = '#facc15';
+        ctx.lineWidth = 3;
+        ctx.beginPath(); ctx.arc(32, 32, 28, 0, Math.PI * 2); ctx.stroke();
+        RetroTextureGenerator.drawShopMark(ctx, kind, 12, 12, 40);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        return texture;
+    }
+
+    // 店の立て札: 細い柱の上に、横長の板が乗った T 型のシンプルな看板（板に店のマークを描く）
+    static createShopSignTexture(kind) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 96;
+        const ctx = canvas.getContext('2d');
+
+        // 柱（板の下から、地面まで）
+        ctx.fillStyle = '#6b4423';
+        ctx.fillRect(28, 28, 8, 68);
+        ctx.fillStyle = '#8a5a2e';
+        ctx.fillRect(28, 28, 3, 68);
+        ctx.fillStyle = '#4a2f18';
+        ctx.fillRect(34, 28, 2, 68);
+
+        // 板（柱の上に横長に乗せる）
+        ctx.fillStyle = '#4a2f18';
+        ctx.fillRect(2, 2, 60, 30);
+        ctx.fillStyle = '#c8955a';
+        ctx.fillRect(4, 4, 56, 26);
+        ctx.fillStyle = '#dcae74';
+        ctx.fillRect(4, 4, 56, 4);
+        ctx.fillStyle = '#9a6a38';
+        ctx.fillRect(4, 26, 56, 4);
+
+        // 店のマーク
+        RetroTextureGenerator.drawShopMark(ctx, kind, 18, 3, 28);
+
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;   // 板の色を、そのまま出す
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
     // 28. Fire Vent Floor Grate Texture (Dark cast iron furnace grill)
     static createFireVentTexture() {
         const canvas = document.createElement('canvas');

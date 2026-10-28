@@ -48,7 +48,8 @@
     "v": "flower_bed_blue",
     "x": "grass_tuft",
     "X": "tall_grass",
-    "y": "wild_flowers"
+    "y": "wild_flowers",
+    "Q": "item_shop_sign"
   },
   "enemies": {},
   "layout": [
@@ -66,7 +67,7 @@
     "#0000T00x00DD00x00T00x0#",
     "#DDDDDDDDDDDDDDDDDDDDDD#",
     "#DDDDDDDDDDDDDDDDDDDDDD#",
-    "#0XX0x00yy0DDN00x000000#",
+    "#0XX0xQ0yy0DDN00x000000#",
     "#0HH00HdH0xDD0xXX0yyx00#",
     "#0HH00HHH00DD0XXX00XX00#",
     "#~~~~~~~~~~==~~~~~~~~~~#",
@@ -148,7 +149,8 @@
         "x": 7,
         "z": 14,
         "angle": 0
-      }
+      },
+      "icon": "itemShopIcon"
     }
   }
 }

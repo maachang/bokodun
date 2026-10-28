@@ -2278,5 +2278,33 @@
     "nextMap": "$back",
     "message": "外に出る",
     "description": "建物（店）の出口の扉。近づくと開き、中へ入ると、入ってきた場所へ戻る"
+  },
+  "weapon_shop_sign": {
+    "type": "signpost",
+    "texture": "weaponShopSign",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.3,
+      1.95,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "武器屋",
+    "description": "武器屋の立て札（扉の横）"
+  },
+  "item_shop_sign": {
+    "type": "signpost",
+    "texture": "itemShopSign",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.3,
+      1.95,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "道具屋",
+    "description": "道具屋の立て札（扉の横）"
   }
 }

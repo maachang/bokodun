@@ -40,7 +40,8 @@
     "X": "tall_grass",
     "y": "wild_flowers",
     "G": "castle_gate",
-    "d": "shop_door"
+    "d": "shop_door",
+    "Q": "weapon_shop_sign"
   },
   "enemies": {},
   "layout": [
@@ -53,7 +54,7 @@
     "Wx=====y======xW",
     "WSSS=SSS==III==W",
     "WSdS=SSS==III==W",
-    "W=x====fv====x=W",
+    "W=xQ===fv====x=W",
     "W===T======T===W",
     "W====f=FF=v====W",
     "W====v=FF=f====W",
@@ -97,7 +98,8 @@
         "x": 2,
         "z": 9,
         "angle": 3.14159
-      }
+      },
+      "icon": "weaponShopIcon"
     },
     "8,0": {
       "nextMap": "castle",

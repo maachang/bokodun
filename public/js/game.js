@@ -244,6 +244,10 @@ export class GameEngine {
             swampTree: RetroTextureGenerator.createSwampTreeTexture(),
             boulder: RetroTextureGenerator.createBoulderTexture(),
             signpost: RetroTextureGenerator.createSignpostTexture(),
+            weaponShopSign: RetroTextureGenerator.createShopSignTexture('weapon'),
+            itemShopSign: RetroTextureGenerator.createShopSignTexture('item'),
+            weaponShopIcon: RetroTextureGenerator.createShopIconTexture('weapon'),
+            itemShopIcon: RetroTextureGenerator.createShopIconTexture('item'),
             forestCanopy: forestCanopyTex,
             denseForest: denseForestTex,
             woodWall: RetroTextureGenerator.createWoodWallTexture(),
@@ -864,7 +868,7 @@ export class GameEngine {
 
                     case 'signpost': {
                         // Rustic wooden signpost sprite
-                        const signMat = new THREE.SpriteMaterial({ map: this.textures.signpost });
+                        const signMat = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.signpost });
                         const sign = new THREE.Sprite(signMat);
                         sign.center.set(0.5, 0.0);
                         const sScale = objDef.scale || [1.9, 2.0, 1.0];
@@ -1622,6 +1626,17 @@ export class GameEngine {
                             link: { ...objDef, ...mapData.links?.[`${c},${r}`] },   // 行き先（nextMap）があれば、開いた扉の中へ入ると、そのマップへ移動する。マスごとの指定は map の links
                             half: tileSize / 2
                         });
+                        // 店のアイコン: 扉の外側（戻る先の側）の壁の面に、扉の上のほうへ出す
+                        const doorLink = this.doors[this.doors.length - 1].link;
+                        if (doorLink.icon && doorLink.back && this.textures[doorLink.icon]) {
+                            const dx = doorLink.back.x * tileSize + tileSize / 2 - wx;
+                            const dz = doorLink.back.z * tileSize + tileSize / 2 - wz;
+                            const len = Math.hypot(dx, dz) || 1;
+                            const icon = new THREE.Sprite(new THREE.SpriteMaterial({ map: this.textures[doorLink.icon] }));
+                            icon.scale.set(1.5, 1.5, 1);
+                            icon.position.set(wx + dx / len * (tileSize / 2 + 0.15), wallH * 0.78, wz + dz / len * (tileSize / 2 + 0.15));
+                            this.scene.add(icon);
+                        }
                         break;
                     }
 
