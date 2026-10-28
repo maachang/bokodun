@@ -1886,19 +1886,33 @@ export class RetroTextureGenerator {
             ctx.fillStyle = '#facc15';     // 柄頭
             ctx.beginPath(); ctx.arc(5, 27, 2.2, 0, Math.PI * 2); ctx.fill();
         } else {
-            // 薬びん（丸い瓶、細い首、栓）
-            ctx.fillStyle = '#b45309';     // 栓
-            ctx.fillRect(12.5, 2.5, 7, 4);
-            ctx.fillStyle = '#dbeafe';     // 首
+            // 薬びん（三角フラスコ: 細い首と栓、裾の広い瓶に緑の薬と泡。丸い赤だとグローブに見えるので、形と色を変えた）
             ctx.strokeStyle = '#374151';
-            ctx.lineWidth = 1.5;
-            ctx.fillRect(13, 6, 6, 8);
-            ctx.strokeRect(13, 6, 6, 8);
-            ctx.fillStyle = '#dc2626';     // 瓶と薬
-            ctx.beginPath(); ctx.arc(16, 21, 9, 0, Math.PI * 2);
-            ctx.fill(); ctx.stroke();
-            ctx.fillStyle = '#fca5a5';     // つや
-            ctx.fillRect(10, 18, 2.5, 6);
+            ctx.lineWidth = 1.6;
+            ctx.fillStyle = '#e0f2fe';     // ガラス
+            ctx.beginPath();
+            ctx.moveTo(13, 6); ctx.lineTo(13, 13); ctx.lineTo(5, 26); ctx.lineTo(7, 29);
+            ctx.lineTo(25, 29); ctx.lineTo(27, 26); ctx.lineTo(19, 13); ctx.lineTo(19, 6);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = '#22c55e';     // 薬（下のほう）
+            ctx.beginPath();
+            ctx.moveTo(10.5, 19); ctx.lineTo(21.5, 19); ctx.lineTo(27, 26); ctx.lineTo(25, 29);
+            ctx.lineTo(7, 29); ctx.lineTo(5, 26);
+            ctx.closePath();
+            ctx.fill();
+            ctx.fillStyle = '#bbf7d0';     // 薬の水面と泡
+            ctx.fillRect(10.5, 19, 11, 2);
+            ctx.beginPath(); ctx.arc(13, 24, 1.6, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath(); ctx.arc(18.5, 26, 1.2, 0, Math.PI * 2); ctx.fill();
+            ctx.beginPath();               // 外形
+            ctx.moveTo(13, 6); ctx.lineTo(13, 13); ctx.lineTo(5, 26); ctx.lineTo(7, 29);
+            ctx.lineTo(25, 29); ctx.lineTo(27, 26); ctx.lineTo(19, 13); ctx.lineTo(19, 6);
+            ctx.closePath();
+            ctx.stroke();
+            ctx.fillStyle = '#b45309';     // 栓
+            ctx.fillRect(12, 2, 8, 5);
+            ctx.strokeRect(12, 2, 8, 5);
         }
         ctx.restore();
     }

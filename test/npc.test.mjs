@@ -96,7 +96,7 @@ test('村人のセリフ: 近づくと出る（離れるまで同じセリフ）
 // ゲーム側（GameEngine）: 村人が立てない場所の判定、プレイヤーとの衝突、セリフ
 async function loadGame() {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'npcgame-'));
-    for (const f of ['game', 'textures', 'entities', 'npc', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'sdAssetManager', 'three.module']) {
+    for (const f of ['game', 'textures', 'entities', 'npc', 'mapNavigator', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'sdAssetManager', 'three.module']) {
         const src = fs.readFileSync(path.join(projectRoot, `public/js/${f}.js`), 'utf-8').replaceAll("'/js/", "'./");
         fs.writeFileSync(path.join(dir, `${f}.js`), src);
     }

@@ -2,6 +2,7 @@ import * as THREE from '/js/three.module.js';
 import { RetroTextureGenerator } from '/js/textures.js';
 import { Monster, Projectile } from '/js/entities.js';
 import { Npc } from '/js/npc.js';
+import { MapNavigator } from '/js/mapNavigator.js';
 import { SoundFX } from '/js/audio.js';
 import { SDAssetManager } from '/js/sdAssetManager.js';
 import { ParticleSystem } from '/js/particles.js';
@@ -85,6 +86,7 @@ export class GameEngine {
         };
 
         this.isPointerLocked = false;
+        this.nav = new MapNavigator();   // マップ間の移動の記録と、移動中の二重実行の防止
         this.mouseMode = false;   // マウスモード（クリックでポインターをロックし、マウスで視点を動かす）。OFF。視点は Ctrl+矢印キー、Ctrl+0 でリセット
         this.currentMapId = 'dungeon';
         this.mapData = null;
@@ -428,18 +430,23 @@ export class GameEngine {
     // 建物などへの出入り: 行き先 nextMap へ移動する。扉・門のマスごとの指定は、マップの links（"列,行": { nextMap, message, params, back }）
     //   nextMap が '$back' なら、直前に入った場所の、link.back の位置へ戻る（建物の出口用）。params は行き先マップへ渡す値（店の種類など）
     enterMap(nextMap, link = {}) {
-        if (nextMap === '$back') {
-            const back = this.mapStack?.pop();
-            if (back) { this.loadMap(back.mapId, { keepStack: true, spawn: back.spawn }); return; }
-            nextMap = this.currentMapData?.nextMap;   // 戻る先がなければ、マップの次のマップへ
-        } else if (link.back) {
-            (this.mapStack ??= []).push({ mapId: this.currentMapId, spawn: link.back });
-        }
-        this.loadMap(nextMap, { keepStack: true, params: link.params });
+        // 移動中（マップの読み込み中）は何もしない。呼ばれるたびに戻る先を記録して、出口で別の場所へ飛ぶのを防ぐ
+        const plan = this.nav.plan(this.currentMapId, nextMap, link, this.currentMapData?.nextMap);
+        if (plan) this.loadMap(plan.mapId, plan.opts);
     }
 
     async loadMap(mapId, opts = {}) {
-        if (!opts.keepStack) this.mapStack = [];   // 画面の切り替えボタンなどで直接移動したら、戻る先の記録は捨てる
+        if (this.nav.busy) return;   // 読み込み中は、次の移動を受け付けない
+        this.nav.busy = true;
+        try {
+            await this.loadMapBody(mapId, opts);
+        } finally {
+            this.nav.busy = false;
+        }
+    }
+
+    async loadMapBody(mapId, opts = {}) {
+        if (!opts.keepStack) this.nav.clear();   // 画面の切り替えボタンなどで直接移動したら、戻る先の記録は捨てる
         this.mapParams = opts.params ?? {};
         const fromMapId = this.currentMapId;   // 移動前のマップ（出現位置の切り替えに使う）
         this.currentMapId = mapId;
