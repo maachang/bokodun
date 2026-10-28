@@ -8,6 +8,7 @@ const readJson = (f) => JSON.parse(fs.readFileSync(path.join(projectRoot, f), 'u
 const objects = readJson('public/data/objects.json');
 const npcs = readJson('public/data/npcs.json');
 const shops = readJson('public/data/shops.json');
+const items = readJson('public/data/items.json');
 const mapDir = path.join(projectRoot, 'public/data/maps');
 const maps = Object.fromEntries(fs.readdirSync(mapDir).map(f => [f.replace('.json', ''), readJson(`public/data/maps/${f}`)]));
 
@@ -47,6 +48,13 @@ test('店の種類: 店主の NPC が定義されている。汎用の店マッ�
     for (const [id, shop] of Object.entries(shops)) {
         if (id.startsWith('_')) continue;
         assert.ok(shop.name && npcs[shop.keeper], `${id}: 店名・店主`);
+        // itemId を持つ品は、items.json の定義と名前・価格が同じ
+        for (const g of shop.goods ?? []) {
+            if (!g.itemId) continue;
+            assert.ok(items[g.itemId], `${id}: 未定義の itemId ${g.itemId}`);
+            assert.equal(g.name, items[g.itemId].name, `${id}/${g.itemId}: 名前`);
+            assert.equal(g.price, items[g.itemId].price, `${id}/${g.itemId}: 価格`);
+        }
     }
     assert.ok(maps.shop.npcs.some(n => n.id === '$shopkeeper'));
 });

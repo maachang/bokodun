@@ -1,5 +1,5 @@
 {
-  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。goods は販売一覧のダミー（買う処理は未実装）。",
+  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。goods は販売一覧のダミー（買う処理は未実装）。道具屋は itemId で items.json と対応（名前・価格は items.json と同じ）。",
   "weapon_shop": {
     "name": "武器屋",
     "keeper": "weapon_keeper",
@@ -47,16 +47,34 @@
     "keeper": "item_keeper",
     "goods": [
       {
+        "itemId": "herb",
         "name": "薬草",
         "price": 20
       },
       {
+        "itemId": "potion",
+        "name": "ポーション",
+        "price": 60
+      },
+      {
+        "itemId": "mana_drop",
+        "name": "魔力の雫",
+        "price": 25
+      },
+      {
+        "itemId": "mana_water",
+        "name": "魔力の水",
+        "price": 75
+      },
+      {
+        "itemId": "antidote",
         "name": "毒消し",
         "price": 30
       },
       {
-        "name": "ポーション",
-        "price": 60
+        "itemId": "return_stone",
+        "name": "帰還の石",
+        "price": 150
       }
     ]
   }
