@@ -24,6 +24,8 @@ const HIT_FEEDBACK = {
     shake: { amp: 0.08, duration: 0.15 }
 };
 
+const SHOP_PAGE_SIZE = 6;   // 販売一覧の 1 画面あたりの件数
+
 export class GameEngine {
     constructor() {
         this.container = document.getElementById('viewport');
@@ -292,6 +294,11 @@ export class GameEngine {
     initControls() {
         window.addEventListener('keydown', (e) => {
             this.sound.init();
+            // 店のメニューを開いている間は、メニューの操作だけを受け付ける
+            if (this.shopMenu) {
+                this.shopMenuKey(e);
+                return;
+            }
             // カメラ操作: Ctrl+↑↓ で視点の上下、Ctrl+←→ で微調整の旋回（移動・旋回の矢印キーとは別）、Ctrl+0 で視点を水平に戻す
             if (e.ctrlKey) {
                 const camKey = { ArrowUp: 'camUp', ArrowDown: 'camDown', ArrowLeft: 'camLeft', ArrowRight: 'camRight' }[e.code];
@@ -1855,6 +1862,7 @@ export class GameEngine {
                 this.npcTextures[npcId] = tex;
             }
             const npc = new Npc(npcId, n.x * tileSize + tileSize / 2, n.z * tileSize + tileSize / 2, this.npcTextures[npcId], npcDef);
+            if (n.id === '$shopkeeper' && shop) npc.shopId = this.mapParams.shopId;   // 話しかけて（Eキー）売買のメニューを開ける店主
             this.npcs.push(npc);
             this.scene.add(npc.sprite);
         }
@@ -2218,6 +2226,7 @@ export class GameEngine {
     }
 
     update(dt) {
+        if (this.shopMenu) return;   // 店のメニュー中はゲームの時間を止める
         // ヒットストップ中はゲームの時間を止める（描画は続く）
         if (this.hitStop > 0) {
             this.hitStop -= dt;
@@ -3073,12 +3082,89 @@ export class GameEngine {
         }
     }
 
+    // 店のメニュー（「買う」「売る」→「販売一覧」）。品揃え・価格は shops.json のダミー。買う・売るの処理はまだ無い
+    openShopMenu(shopId) {
+        this.shopMenu = { shopId, screen: 'top', index: 0, note: '' };
+        for (const k of Object.keys(this.keys)) this.keys[k] = false;   // 押しっぱなしの移動キーを止める
+        if (!this.shopMenuEl) {
+            const el = document.createElement('div');
+            el.style.cssText = 'position:fixed;left:50%;bottom:8%;transform:translateX(-50%);min-width:340px;max-width:90vw;' +
+                'background:rgba(15,23,42,0.95);border:2px solid #38bdf8;border-radius:10px;color:#f8fafc;padding:14px 18px;z-index:200;font-size:16px;';
+            document.body.appendChild(el);
+            this.shopMenuEl = el;
+        }
+        this.shopMenuEl.style.display = 'block';
+        this.renderShopMenu();
+    }
+
+    closeShopMenu() {
+        this.shopMenu = null;
+        if (this.shopMenuEl) this.shopMenuEl.style.display = 'none';
+    }
+
+    // 画面ごとの選択肢（label, 選んだときの動き）
+    shopMenuChoices() {
+        const m = this.shopMenu, shop = this.shops?.[m.shopId] ?? {};
+        if (m.screen === 'buy') {
+            // 販売一覧は 1 画面に SHOP_PAGE_SIZE 件ずつ。多いときはページ送り（←→ か「次のページ」）
+            const all = shop.goods ?? [], pages = Math.max(1, Math.ceil(all.length / SHOP_PAGE_SIZE));
+            m.page = Math.min(m.page ?? 0, pages - 1);
+            const goods = all.slice(m.page * SHOP_PAGE_SIZE, (m.page + 1) * SHOP_PAGE_SIZE)
+                .map(g => ({ label: `${g.name}　${g.price}G`, act: () => { m.note = `（ダミー）${g.name}の購入は準備中です`; } }));
+            const turn = (d) => () => { m.page += d; m.index = 0; m.note = ''; };
+            if (m.page > 0) goods.push({ label: '◀ 前のページ', act: turn(-1) });
+            if (m.page < pages - 1) goods.push({ label: '次のページ ▶', act: turn(1) });
+            return [...goods, { label: 'もどる', act: () => { m.screen = 'top'; m.index = 0; m.note = ''; } }];
+        }
+        if (m.screen === 'sell') {
+            return [{ label: 'もどる', act: () => { m.screen = 'top'; m.index = 1; m.note = ''; } }];
+        }
+        return [
+            { label: '買う', act: () => { m.screen = 'buy'; m.page = 0; m.index = 0; m.note = ''; } },
+            { label: '売る', act: () => { m.screen = 'sell'; m.index = 0; m.note = ''; } },
+            { label: 'やめる', act: () => this.closeShopMenu() }
+        ];
+    }
+
+    renderShopMenu() {
+        const m = this.shopMenu;
+        if (!m) return;
+        const shop = this.shops?.[m.shopId] ?? {};
+        const esc = (t) => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+        const title = { top: `${shop.name ?? '店'}　いらっしゃい！`, buy: `販売一覧（${(m.page ?? 0) + 1}/${Math.max(1, Math.ceil((shop.goods ?? []).length / SHOP_PAGE_SIZE))}）`, sell: '売却（持ち物）' }[m.screen];
+        const choices = this.shopMenuChoices();
+        const body = m.screen === 'sell' ? '<div style="margin:6px 0;color:#94a3b8">（ダミー）売れる持ち物の一覧は準備中です</div>' : '';
+        this.shopMenuEl.innerHTML = `<div style="font-weight:bold;margin-bottom:8px;color:#7dd3fc">${esc(title)}</div>${body}` +
+            choices.map((c, i) => `<div data-i="${i}" style="padding:3px 10px;cursor:pointer;${i === m.index ? 'background:#1e3a5f;border-radius:4px' : ''}">${i === m.index ? '▶ ' : '　'}${esc(c.label)}</div>`).join('') +
+            `<div style="margin-top:8px;color:#fbbf24;min-height:1.2em">${esc(m.note)}</div>` +
+            '<div style="margin-top:4px;color:#64748b;font-size:12px">↑↓ 選ぶ　Enter/E 決定　Esc 閉じる</div>';
+        this.shopMenuEl.querySelectorAll('[data-i]').forEach(d => {
+            d.onclick = () => { m.index = Number(d.dataset.i); this.shopMenuChoices()[m.index].act(); this.renderShopMenu(); };
+        });
+    }
+
+    shopMenuKey(e) {
+        const m = this.shopMenu, n = this.shopMenuChoices().length;
+        if (e.code === 'ArrowUp' || e.code === 'KeyW') m.index = (m.index + n - 1) % n;
+        else if (e.code === 'ArrowDown' || e.code === 'KeyS') m.index = (m.index + 1) % n;
+        else if ((e.code === 'ArrowLeft' || e.code === 'ArrowRight') && m.screen === 'buy') {
+            const all = this.shops?.[m.shopId]?.goods ?? [], pages = Math.ceil(all.length / SHOP_PAGE_SIZE);
+            m.page = Math.max(0, Math.min(pages - 1, (m.page ?? 0) + (e.code === 'ArrowLeft' ? -1 : 1)));
+            m.index = 0; m.note = '';
+        }
+        else if (e.code === 'Enter' || e.code === 'KeyE' || e.code === 'Space') this.shopMenuChoices()[m.index].act();
+        else if (e.code === 'Escape') { if (m.screen === 'top') this.closeShopMenu(); else { m.screen = 'top'; m.index = 0; m.note = ''; } }
+        else return;
+        e.preventDefault();
+        this.renderShopMenu();
+    }
+
     // 近くの村人のセリフ（いなければ null）
     nearbyNpcSpeech() {
         let found = null;
         for (const n of this.npcs ?? []) {
             const s = n.speechFor(this.player);   // 離れた村人のセリフも、ここでリセットされる
-            if (s !== null && found === null) found = s;
+            if (s !== null && found === null) found = n.shopId ? `${s}\n【Eキー】取引メニューを表示` : s;   // 店主には、最下行に操作の案内を添える
         }
         return found;
     }
@@ -3386,6 +3472,13 @@ export class GameEngine {
 
     // Player interaction with nearest Chest or Door (triggered by pressing E)
     interactNearestObject() {
+        // 0. 店主に話しかける（売買のメニューを開く）
+        for (const n of this.npcs ?? []) {
+            if (n.shopId && Math.hypot(this.player.x - n.x, this.player.z - n.z) <= (n.speechRadius ?? 3)) {
+                this.openShopMenu(n.shopId);
+                return true;
+            }
+        }
         // 1. Check Treasure Chests
         if (this.chests && this.chests.length > 0) {
             for (const ch of this.chests) {

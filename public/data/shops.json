@@ -1,11 +1,63 @@
 {
-  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。品揃え・売買は未実装（後回し）。",
+  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。goods は販売一覧のダミー（買う処理は未実装）。",
   "weapon_shop": {
     "name": "武器屋",
-    "keeper": "weapon_keeper"
+    "keeper": "weapon_keeper",
+    "goods": [
+      {
+        "name": "ショートソード",
+        "price": 120
+      },
+      {
+        "name": "ハンドアックス",
+        "price": 150
+      },
+      {
+        "name": "バックラー",
+        "price": 80
+      },
+      {
+        "name": "ロングソード",
+        "price": 300
+      },
+      {
+        "name": "レイピア",
+        "price": 280
+      },
+      {
+        "name": "バトルアックス",
+        "price": 350
+      },
+      {
+        "name": "メイス",
+        "price": 200
+      },
+      {
+        "name": "ショートスピア",
+        "price": 160
+      },
+      {
+        "name": "ラウンドシールド",
+        "price": 220
+      }
+    ]
   },
   "item_shop": {
     "name": "道具屋",
-    "keeper": "item_keeper"
+    "keeper": "item_keeper",
+    "goods": [
+      {
+        "name": "薬草",
+        "price": 20
+      },
+      {
+        "name": "毒消し",
+        "price": 30
+      },
+      {
+        "name": "ポーション",
+        "price": 60
+      }
+    ]
   }
 }
