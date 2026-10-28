@@ -80,10 +80,12 @@ export class GameEngine {
             right: false,
             turnLeft: false,
             turnRight: false,
-            sprint: false
+            sprint: false,
+            camUp: false, camDown: false, camLeft: false, camRight: false   // Ctrl+矢印キー: 視点の上下・微調整の旋回
         };
 
         this.isPointerLocked = false;
+        this.mouseMode = false;   // マウスモード（クリックでポインターをロックし、マウスで視点を動かす）。OFF。視点は Ctrl+矢印キー、Ctrl+0 でリセット
         this.currentMapId = 'dungeon';
         this.mapData = null;
         this.mapCache = {};
@@ -284,6 +286,20 @@ export class GameEngine {
     initControls() {
         window.addEventListener('keydown', (e) => {
             this.sound.init();
+            // カメラ操作: Ctrl+↑↓ で視点の上下、Ctrl+←→ で微調整の旋回（移動・旋回の矢印キーとは別）、Ctrl+0 で視点を水平に戻す
+            if (e.ctrlKey) {
+                const camKey = { ArrowUp: 'camUp', ArrowDown: 'camDown', ArrowLeft: 'camLeft', ArrowRight: 'camRight' }[e.code];
+                if (camKey) {
+                    this.keys[camKey] = true;
+                    e.preventDefault();
+                    return;
+                }
+                if (e.code === 'Digit0' || e.code === 'Numpad0') {
+                    this.player.pitch = 0;
+                    e.preventDefault();
+                    return;
+                }
+            }
             switch (e.code) {
                 case 'KeyW': case 'ArrowUp':
                     this.keys.forward = true;
@@ -335,6 +351,12 @@ export class GameEngine {
         });
 
         window.addEventListener('keyup', (e) => {
+            // Ctrl を離したときや、矢印キーを離したときは、カメラ操作も止める
+            if (e.code === 'ControlLeft' || e.code === 'ControlRight') {
+                this.keys.camUp = this.keys.camDown = this.keys.camLeft = this.keys.camRight = false;
+            }
+            const camRelease = { ArrowUp: 'camUp', ArrowDown: 'camDown', ArrowLeft: 'camLeft', ArrowRight: 'camRight' }[e.code];
+            if (camRelease) this.keys[camRelease] = false;
             switch (e.code) {
                 case 'KeyW': case 'ArrowUp':
                     this.keys.forward = false;
@@ -365,10 +387,10 @@ export class GameEngine {
 
         this.canvas.addEventListener('click', (e) => {
             this.sound.init();
-            if (!this.isPointerLocked) {
+            if (this.mouseMode && !this.isPointerLocked) {
                 this.canvas.requestPointerLock?.();
             } else {
-                // If pointer already locked, click attacks with the selected weapon
+                // クリックで、選択中の魔法を撃つ（マウスモードの間はロック済みのときだけ）
                 this.useMagic();
             }
         });
@@ -2705,6 +2727,11 @@ export class GameEngine {
         // Turning via Q/E or arrows
         if (this.keys.turnLeft) this.player.angle += this.player.rotSpeed * dt;
         if (this.keys.turnRight) this.player.angle -= this.player.rotSpeed * dt;
+        // Ctrl+矢印キー: 視点の上下（pitch）と、ゆっくりした旋回（狙いの微調整）
+        if (this.keys.camUp) this.player.pitch = Math.min(0.6, this.player.pitch + 1.2 * dt);
+        if (this.keys.camDown) this.player.pitch = Math.max(-0.6, this.player.pitch - 1.2 * dt);
+        if (this.keys.camLeft) this.player.angle += this.player.rotSpeed * 0.35 * dt;
+        if (this.keys.camRight) this.player.angle -= this.player.rotSpeed * 0.35 * dt;
 
         // Player Move Direction
         const moveDir = new THREE.Vector3();
