@@ -96,7 +96,7 @@ export class GameEngine {
         this.colliders = [];
         this.monsters = [];
         this.projectiles = [];
-        this.portal = null;
+        this.portals = [];   // ポータル（次のマップへの入口）。マップに複数置ける
         this.waterMeshes = [];
         this.heatHazePlanes = [];
         this.fountains = [];
@@ -397,6 +397,7 @@ export class GameEngine {
     }
 
     async loadMap(mapId) {
+        const fromMapId = this.currentMapId;   // 移動前のマップ（出現位置の切り替えに使う）
         this.currentMapId = mapId;
 
         if (!this.objectDefinitions) {
@@ -421,7 +422,7 @@ export class GameEngine {
         this.colliders = [];
         this.monsters = [];
         this.projectiles = [];
-        this.portal = null;
+        this.portals = [];   // ポータル（次のマップへの入口）。マップに複数置ける
         this.waterMeshes = [];
         this.heatHazePlanes = [];
         this.fountains = [];
@@ -1760,11 +1761,11 @@ export class GameEngine {
 
                     case 'portal': {
                         const portalGeo = new THREE.CylinderGeometry(0.8, 0.8, 2.5, 16);
-                        const portalMat = new THREE.MeshBasicMaterial({ color: 0x38bdf8, wireframe: true });
+                        const portalMat = new THREE.MeshBasicMaterial({ color: objDef.color ? parseInt(objDef.color.slice(1), 16) : 0x38bdf8, wireframe: true });
                         const portalMesh = new THREE.Mesh(portalGeo, portalMat);
                         portalMesh.position.set(wx, 1.25, wz);
                         this.scene.add(portalMesh);
-                        this.portal = { x: wx, z: wz, radius: 1.2, mesh: portalMesh, nextMap: mapData.nextMap };
+                        this.portals.push({ x: wx, z: wz, radius: 1.2, mesh: portalMesh, nextMap: objDef.nextMap ?? mapData.nextMap, message: objDef.message, color: objDef.color });
                         break;
                     }
                 }
@@ -1786,10 +1787,12 @@ export class GameEngine {
         }
 
         // Spawn player
-        this.player.x = mapData.spawn.x * tileSize + tileSize / 2;
-        this.player.z = mapData.spawn.z * tileSize + tileSize / 2;
+        // 別のマップから来たときの出現位置は、マップの spawnFrom（{ 元のマップID: {x, z, angle} }）があればそれを使う
+        const spawn = (fromMapId !== mapId && mapData.spawnFrom?.[fromMapId]) || mapData.spawn;
+        this.player.x = spawn.x * tileSize + tileSize / 2;
+        this.player.z = spawn.z * tileSize + tileSize / 2;
         this.player.lastSafePos = { x: this.player.x, z: this.player.z };
-        this.player.angle = mapData.spawn.angle || 0;
+        this.player.angle = spawn.angle || 0;
         this.player.pitch = 0;
         this.player.knockback.set(0, 0, 0);
         this.player.isFalling = false;
@@ -2837,13 +2840,13 @@ export class GameEngine {
         }
 
         // Update Portal Animation & Check
-        if (this.portal) {
-            this.portal.mesh.rotation.y += dt * 2;
-            const distPortal = Math.hypot(this.player.x - this.portal.x, this.player.z - this.portal.z);
-            if (distPortal < this.portal.radius) {
+        for (const portal of this.portals) {
+            portal.mesh.rotation.y += dt * 2;
+            const distPortal = Math.hypot(this.player.x - portal.x, this.player.z - portal.z);
+            if (distPortal < portal.radius) {
                 this.sound.playLevelClear();
-                this.addPopup('ステージクリア！次のエリアへ', '#38bdf8');
-                this.loadMap(this.portal.nextMap);
+                this.addPopup(portal.message ?? 'ステージクリア！次のエリアへ', portal.color ?? '#38bdf8');
+                this.loadMap(portal.nextMap);
                 return;
             }
         }
@@ -3551,10 +3554,10 @@ export class GameEngine {
         }
 
         // Draw Portal
-        if (this.portal) {
-            ctx.fillStyle = '#38bdf8';
+        for (const portal of this.portals) {
+            ctx.fillStyle = portal.color ?? '#38bdf8';
             ctx.beginPath();
-            ctx.arc(this.portal.x * scaleX, this.portal.z * scaleZ, 3, 0, Math.PI * 2);
+            ctx.arc(portal.x * scaleX, portal.z * scaleZ, 3, 0, Math.PI * 2);
             ctx.fill();
         }
 

@@ -38,12 +38,13 @@
     "v": "flower_bed_blue",
     "x": "grass_tuft",
     "X": "tall_grass",
-    "y": "wild_flowers"
+    "y": "wild_flowers",
+    "G": "castle_gate"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWWWWWWWWW",
-    "Wx=====y======xW",
+    "Wx=====yG=====xW",
     "W=SS==SS==II===W",
     "W=SS==SS==II===W",
     "W=x====fv====x=W",
@@ -59,5 +60,12 @@
     "WXX===x==x===XXW",
     "WWWWWWWWWWWWWWWW"
   ],
-  "decorFloor": "pavedRoad"
+  "decorFloor": "pavedRoad",
+  "spawnFrom": {
+    "castle": {
+      "x": 8,
+      "z": 2,
+      "angle": 3.14159
+    }
+  }
 }

@@ -2234,5 +2234,21 @@
     "elevation": 0.9,
     "solid": false,
     "description": "高台の絨毯の段（高さ 0.9）"
+  },
+  "castle_gate": {
+    "type": "portal",
+    "solid": false,
+    "nextMap": "castle",
+    "color": "#facc15",
+    "message": "王城に入る",
+    "description": "街の城門（王城へのポータル）"
+  },
+  "castle_exit": {
+    "type": "portal",
+    "solid": false,
+    "nextMap": "city",
+    "color": "#facc15",
+    "message": "街に戻る",
+    "description": "王城の出口（街へのポータル）"
   }
 }
