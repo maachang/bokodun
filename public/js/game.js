@@ -146,6 +146,7 @@ export class GameEngine {
             this.items = await itemRes.json();
             this.weaponClasses = await classRes.json();
             this.npcDefinitions = await npcRes.json();
+            this.shops = await (await fetch('/data/shops.json')).json();   // 店の種類（店名・店主）。汎用の店マップが、入った店に応じて切り替える
             // 初期装備（装備スロットの中身と選択中のスロット）
             const playerDef = await playerRes.json();
             this.player.equipSlots = [...playerDef.equipSlots];
@@ -396,7 +397,22 @@ export class GameEngine {
         this.scene.add(this.camera);
     }
 
-    async loadMap(mapId) {
+    // 建物などへの出入り: 行き先 nextMap へ移動する。扉・門のマスごとの指定は、マップの links（"列,行": { nextMap, message, params, back }）
+    //   nextMap が '$back' なら、直前に入った場所の、link.back の位置へ戻る（建物の出口用）。params は行き先マップへ渡す値（店の種類など）
+    enterMap(nextMap, link = {}) {
+        if (nextMap === '$back') {
+            const back = this.mapStack?.pop();
+            if (back) { this.loadMap(back.mapId, { keepStack: true, spawn: back.spawn }); return; }
+            nextMap = this.currentMapData?.nextMap;   // 戻る先がなければ、マップの次のマップへ
+        } else if (link.back) {
+            (this.mapStack ??= []).push({ mapId: this.currentMapId, spawn: link.back });
+        }
+        this.loadMap(nextMap, { keepStack: true, params: link.params });
+    }
+
+    async loadMap(mapId, opts = {}) {
+        if (!opts.keepStack) this.mapStack = [];   // 画面の切り替えボタンなどで直接移動したら、戻る先の記録は捨てる
+        this.mapParams = opts.params ?? {};
         const fromMapId = this.currentMapId;   // 移動前のマップ（出現位置の切り替えに使う）
         this.currentMapId = mapId;
 
@@ -1500,7 +1516,7 @@ export class GameEngine {
                         // Wall-mounted interactive door
                         // Detect wall orientation: check if walls are on Left/Right (horizontal door) or Top/Bottom (vertical door)
                         // 壁は '1'、または凡例が壁ブロック（type: block）の文字
-                        const isWallChar = (ch) => ch === '1' || this.objectDefinitions[mapData.legend?.[ch]]?.type === 'block';
+                        const isWallChar = (ch) => ch === '1' || ['block', 'door'].includes(this.objectDefinitions[mapData.legend?.[ch]]?.type);   // 並んだ扉は、隣の扉も壁として数える
                         const isWallLeft = (c > 0 && isWallChar(mapData.layout[r][c - 1]));
                         const isWallRight = (c < cols - 1 && isWallChar(mapData.layout[r][c + 1]));
                         const isWallTop = (r > 0 && isWallChar(mapData.layout[r - 1][c]));
@@ -1579,8 +1595,7 @@ export class GameEngine {
                             openY: wallH * 1.45,
                             x: wx,
                             z: wz,
-                            nextMap: objDef.nextMap,   // 行き先があれば、開いた扉の中へ入ると、そのマップへ移動する
-                            message: objDef.message,
+                            link: { ...objDef, ...mapData.links?.[`${c},${r}`] },   // 行き先（nextMap）があれば、開いた扉の中へ入ると、そのマップへ移動する。マスごとの指定は map の links
                             half: tileSize / 2
                         });
                         break;
@@ -1765,7 +1780,7 @@ export class GameEngine {
                     case 'gateway': {
                         // 壁の切れ目・開いた門: 見えない移動マス。このマスへ入ると nextMap へ移動する
                         if (objDef.floorTexture) this.addFloorTile(wx, wz, tileSize, objDef.floorTexture);
-                        this.portals.push({ x: wx, z: wz, halfSize: tileSize / 2, mesh: null, nextMap: objDef.nextMap ?? mapData.nextMap, message: objDef.message, color: objDef.color });
+                        this.portals.push({ x: wx, z: wz, halfSize: tileSize / 2, mesh: null, link: { ...objDef, nextMap: objDef.nextMap ?? mapData.nextMap, ...mapData.links?.[`${c},${r}`] } });
                         break;
                     }
 
@@ -1775,7 +1790,7 @@ export class GameEngine {
                         const portalMesh = new THREE.Mesh(portalGeo, portalMat);
                         portalMesh.position.set(wx, 1.25, wz);
                         this.scene.add(portalMesh);
-                        this.portals.push({ x: wx, z: wz, radius: 1.2, mesh: portalMesh, nextMap: objDef.nextMap ?? mapData.nextMap, message: objDef.message, color: objDef.color });
+                        this.portals.push({ x: wx, z: wz, radius: 1.2, mesh: portalMesh, link: { ...objDef, nextMap: objDef.nextMap ?? mapData.nextMap, ...mapData.links?.[`${c},${r}`] } });
                         break;
                     }
                 }
@@ -1783,22 +1798,24 @@ export class GameEngine {
         }
 
         // 村人（NPC）: マップの npcs（{ id: npcs.json の ID, x, z: マスの位置 }）。マスの上の床や家具とは独立に置く
+        const shop = this.shops?.[this.mapParams.shopId];   // 汎用の店マップ: 入った店の種類（店名・店主）
         for (const n of mapData.npcs || []) {
-            const npcDef = this.npcDefinitions?.[n.id];
+            const npcId = n.id === '$shopkeeper' ? (shop?.keeper ?? 'merchant_man') : n.id;   // '$shopkeeper' は店ごとの店主に置き換える
+            const npcDef = this.npcDefinitions?.[npcId];
             if (!npcDef) continue;
-            if (!this.npcTextures[n.id]) {
+            if (!this.npcTextures[npcId]) {
                 const tex = new THREE.TextureLoader().load(npcDef.texture);
                 tex.colorSpace = THREE.SRGBColorSpace;   // 写実的な絵なので、色をそのまま出す
-                this.npcTextures[n.id] = tex;
+                this.npcTextures[npcId] = tex;
             }
-            const npc = new Npc(n.id, n.x * tileSize + tileSize / 2, n.z * tileSize + tileSize / 2, this.npcTextures[n.id], npcDef);
+            const npc = new Npc(npcId, n.x * tileSize + tileSize / 2, n.z * tileSize + tileSize / 2, this.npcTextures[npcId], npcDef);
             this.npcs.push(npc);
             this.scene.add(npc.sprite);
         }
 
         // Spawn player
         // 別のマップから来たときの出現位置は、マップの spawnFrom（{ 元のマップID: {x, z, angle} }）があればそれを使う
-        const spawn = (fromMapId !== mapId && mapData.spawnFrom?.[fromMapId]) || mapData.spawn;
+        const spawn = opts.spawn || (fromMapId !== mapId && mapData.spawnFrom?.[fromMapId]) || mapData.spawn;
         this.player.x = spawn.x * tileSize + tileSize / 2;
         this.player.z = spawn.z * tileSize + tileSize / 2;
         this.player.lastSafePos = { x: this.player.x, z: this.player.z };
@@ -1821,7 +1838,8 @@ export class GameEngine {
             }
         }
 
-        document.getElementById('currentAreaName').innerText = mapData.name || '';
+        this.currentMapData = mapData;
+        document.getElementById('currentAreaName').innerText = (shop ? `${mapData.name}：${shop.name}` : mapData.name) || '';
     }
 
     // ---- 武器スロットと魔法スロット（アイテム定義は items.json、初期値は player.json）----
@@ -2195,11 +2213,11 @@ export class GameEngine {
                 d.mesh.position.y += (d.targetY - d.mesh.position.y) * 8 * dt;
 
                 // 行き先つきの扉: 開いた扉のマスの中へ入ったら移動
-                if (d.nextMap && d.isOpen &&
+                if (d.link.nextMap && d.isOpen &&
                     Math.abs(this.player.x - d.x) < d.half && Math.abs(this.player.z - d.z) < d.half) {
                     this.sound.playLevelClear();
-                    this.addPopup(d.message ?? '次のエリアへ', '#fef08a');
-                    this.loadMap(d.nextMap);
+                    this.addPopup(d.link.message ?? '次のエリアへ', '#fef08a');
+                    this.enterMap(d.link.nextMap, d.link);
                     return;
                 }
             }
@@ -2866,8 +2884,8 @@ export class GameEngine {
                 : Math.hypot(this.player.x - portal.x, this.player.z - portal.z) < portal.radius;                                  // 筒のポータル（円）
             if (reached) {
                 this.sound.playLevelClear();
-                this.addPopup(portal.message ?? 'ステージクリア！次のエリアへ', portal.color ?? '#38bdf8');
-                this.loadMap(portal.nextMap);
+                this.addPopup(portal.link.message ?? 'ステージクリア！次のエリアへ', portal.link.color ?? '#38bdf8');
+                this.enterMap(portal.link.nextMap, portal.link);
                 return;
             }
         }
@@ -3576,7 +3594,7 @@ export class GameEngine {
 
         // Draw Portal
         for (const portal of this.portals) {
-            ctx.fillStyle = portal.color ?? '#38bdf8';
+            ctx.fillStyle = portal.link.color ?? '#38bdf8';
             ctx.beginPath();
             ctx.arc(portal.x * scaleX, portal.z * scaleZ, 3, 0, Math.PI * 2);
             ctx.fill();

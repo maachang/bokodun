@@ -197,5 +197,31 @@
       "王様は……まあ、見ればわかる。",
       "通ってよし。くれぐれも、失礼のないように。"
     ]
+  },
+  "weapon_keeper": {
+    "name": "武器屋の主人",
+    "texture": "/images/npcs/merchant_man.png",
+    "height": 2.4,
+    "aspect": 0.537,
+    "radius": 0.6,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "いらっしゃい。剣も斧も、重さを指定して仕入れられるぜ。",
+      "品揃えは、まだ準備中でね。また来てくれ。"
+    ]
+  },
+  "item_keeper": {
+    "name": "道具屋の女将",
+    "texture": "/images/npcs/merchant_woman.png",
+    "height": 2.5,
+    "aspect": 0.727,
+    "radius": 0.6,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "いらっしゃい。薬もロープも、いろいろあるよ。",
+      "品物は、まだ準備中なんだ。ごめんね。"
+    ]
   }
 }

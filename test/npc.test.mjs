@@ -32,19 +32,23 @@ test('村人の定義: 画像が存在し、縦横比が画像と合い、セリ
 });
 
 test('村: 村人の配置（定義済みの村人、マップ内、通れない場所に置かない、重ならない）', () => {
-    const village = readJson('public/data/maps/village.json');
-    const seen = [];
-    for (const n of village.npcs) {
-        assert.ok(npcs[n.id], `未定義の村人: ${n.id}`);
-        assert.ok(n.x > 0 && n.z > 0 && n.x < village.layout[0].length - 1 && n.z < village.layout.length - 1, `${n.id}: マップ内`);
-        const d = objects[village.legend[village.layout[n.z][n.x]]];
-        assert.ok(village.layout[n.z][n.x] === '0' || (d && !d.solid && d.type !== 'furniture'), `${n.id}: 通れないマス (${village.layout[n.z][n.x]})`);
-        assert.ok(!seen.some(s => s.x === n.x && s.z === n.z), `${n.id}: 重なり`);
-        seen.push(n);
+    // 村長は、村長の家（別の屋内マップ）の中にいる
+    for (const id of ['village', 'village_chief_house']) {
+        const map = readJson(`public/data/maps/${id}.json`);
+        const seen = [];
+        for (const n of map.npcs) {
+            assert.ok(npcs[n.id], `未定義の村人: ${n.id}`);
+            assert.ok(n.x > 0 && n.z > 0 && n.x < map.layout[0].length - 1 && n.z < map.layout.length - 1, `${id}/${n.id}: マップ内`);
+            const d = objects[map.legend[map.layout[n.z][n.x]]];
+            assert.ok(map.layout[n.z][n.x] === '0' || (d && !d.solid && d.type !== 'furniture'), `${id}/${n.id}: 通れないマス (${map.layout[n.z][n.x]})`);
+            assert.ok(!seen.some(s => s.x === n.x && s.z === n.z), `${id}/${n.id}: 重なり`);
+            seen.push(n);
+        }
     }
-    // 村長は村長の家の中
-    const chief = village.npcs.find(n => n.id === 'village_chief');
-    assert.ok(chief.x >= 6 && chief.x <= 17 && chief.z >= 1 && chief.z <= 8, '村長は家の中');
+    const village = readJson('public/data/maps/village.json');
+    const house = readJson('public/data/maps/village_chief_house.json');
+    assert.ok(!village.npcs.some(n => n.id === 'village_chief'), '村長は村の外には出ていない');
+    assert.ok(house.npcs.some(n => n.id === 'village_chief'), '村長は村長の家の中');
 });
 
 test('村人の動き: 立ち止まり → 生まれた位置の近く（wanderRadius 以内）を歩く → また止まる', async () => {

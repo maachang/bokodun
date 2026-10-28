@@ -54,12 +54,12 @@
   "layout": [
     "########################",
     "#x0000WWWWWWWWWWWW00XXx#",
-    "#xHH00WkFtWuuWFsFW0HHX0#",
-    "#0HH00WFFFduudFtFW0HH00#",
-    "#0fv00WWWWWuuWFhFW0vf00#",
-    "#xy0T0WeFFduuWWWWW000y0#",
-    "#0HH00WFFuWuudFtFW0HH00#",
-    "#0HH00WeFFWuuWgFoW0HH00#",
+    "#xHH00WWWWWWWWWWWW0HHX0#",
+    "#0HH00WWWWWWWWWWWW0HH00#",
+    "#0fv00WWWWWWWWWWWW0vf00#",
+    "#xy0T0WWWWWWWWWWWW000y0#",
+    "#0HH00WWWWWWWWWWWW0HH00#",
+    "#0HH00WWWWWWWWWWWW0HH00#",
     "#0vf00WWWWWddWWWWW0fv00#",
     "#T000000fv0CC0vf0000000#",
     "#XXx0yx000NDD00O00y0Tx0#",
@@ -67,8 +67,8 @@
     "#DDDDDDDDDDDDDDDDDDDDDD#",
     "#DDDDDDDDDDDDDDDDDDDDDD#",
     "#0XX0x00yy0DDN00x000000#",
-    "#0HH000HH0xDD0xXX0yyx00#",
-    "#0HH000HH00DD0XXX00XX00#",
+    "#0HH00HdH0xDD0xXX0yyx00#",
+    "#0HH00HHH00DD0XXX00XX00#",
     "#~~~~~~~~~~==~~~~~~~~~~#",
     "#PPPPPPPPPP==PPPPPPPPPP#",
     "#PPPPPPPPPP==PPPPPPPPPP#",
@@ -78,11 +78,6 @@
     "########################"
   ],
   "npcs": [
-    {
-      "id": "village_chief",
-      "x": 16,
-      "z": 4
-    },
     {
       "id": "merchant_man",
       "x": 16,
@@ -123,5 +118,37 @@
       "x": 21,
       "z": 6
     }
-  ]
+  ],
+  "links": {
+    "11,8": {
+      "nextMap": "village_chief_house",
+      "message": "村長の家に入る",
+      "back": {
+        "x": 11,
+        "z": 9,
+        "angle": 3.14159
+      }
+    },
+    "12,8": {
+      "nextMap": "village_chief_house",
+      "message": "村長の家に入る",
+      "back": {
+        "x": 12,
+        "z": 9,
+        "angle": 3.14159
+      }
+    },
+    "7,15": {
+      "nextMap": "shop",
+      "params": {
+        "shopId": "item_shop"
+      },
+      "message": "道具屋に入る",
+      "back": {
+        "x": 7,
+        "z": 14,
+        "angle": 0
+      }
+    }
+  }
 }

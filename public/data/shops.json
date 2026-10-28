@@ -1,0 +1,11 @@
+{
+  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。品揃え・売買は未実装（後回し）。",
+  "weapon_shop": {
+    "name": "武器屋",
+    "keeper": "weapon_keeper"
+  },
+  "item_shop": {
+    "name": "道具屋",
+    "keeper": "item_keeper"
+  }
+}

@@ -2252,5 +2252,26 @@
     "color": "#facc15",
     "message": "街に戻る",
     "description": "王城の出口（壁の切れ目。入ると街へ移動）"
+  },
+  "shop_floor": {
+    "type": "floor_tile",
+    "texture": "woodFloor",
+    "solid": false,
+    "description": "店の中の板張りの床（天井は店の天井を使う）"
+  },
+  "shop_door": {
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "shopWall",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "description": "街の店の扉（近づくと開き、中へ入ると店へ移動。行き先は map の links）"
+  },
+  "building_exit": {
+    "type": "gateway",
+    "floorTexture": "woodFloor",
+    "nextMap": "$back",
+    "message": "外に出る",
+    "description": "建物の出口（壁の切れ目。入ると、入ってきた場所へ戻る）"
   }
 }

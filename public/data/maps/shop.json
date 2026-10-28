@@ -1,0 +1,53 @@
+{
+  "id": "shop",
+  "name": "店",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "village",
+  "spawn": {
+    "x": 6,
+    "z": 6,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "woodWall",
+    "ambientLight": 10096512,
+    "directionalLight": 13615264,
+    "fogColor": 2761760,
+    "fogNear": 14,
+    "fogFar": 48,
+    "visibility": 0.9,
+    "skyColor": 2761760
+  },
+  "legend": {
+    "W": "wooden_wall",
+    "F": "shop_floor",
+    "k": "bookshelf",
+    "t": "table",
+    "g": "cupboard",
+    "E": "building_exit"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWWWW",
+    "WkkFkkFkkFkkW",
+    "WgFFFFFFFFFgW",
+    "WFFFtttttFFFW",
+    "WFFFFFFFFFFFW",
+    "WFFFFFFFFFFFW",
+    "WgFFFFFFFFFgW",
+    "WFFFFFFFFFFFW",
+    "WWWWWEEEWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "$shopkeeper",
+      "x": 6,
+      "z": 2
+    }
+  ]
+}

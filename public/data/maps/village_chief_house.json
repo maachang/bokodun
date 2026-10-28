@@ -1,0 +1,57 @@
+{
+  "id": "village_chief_house",
+  "name": "村長の家",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "village",
+  "spawn": {
+    "x": 5,
+    "z": 6,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "grass",
+    "hasCeiling": false,
+    "ambientLight": 9408660,
+    "directionalLight": 16774610,
+    "fogColor": 12373460,
+    "fogNear": 22,
+    "fogFar": 80,
+    "visibility": 0.9,
+    "skyColor": 9683955
+  },
+  "legend": {
+    "O": "mossy_boulder",
+    "W": "wooden_wall",
+    "F": "wood_floor",
+    "u": "rug",
+    "d": "wooden_door",
+    "t": "table",
+    "h": "chair",
+    "e": "bed",
+    "k": "bookshelf",
+    "g": "cupboard",
+    "s": "hearth",
+    "o": "stove",
+    "E": "building_exit"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWWW",
+    "WkFtWuuWFsFW",
+    "WFFFduudFtFW",
+    "WWWWWuuWFhFW",
+    "WeFFduuWWWWW",
+    "WFFuWuudFtFW",
+    "WeFFWuuWgFoW",
+    "WWWWWEEWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "village_chief",
+      "x": 10,
+      "z": 3
+    }
+  ]
+}

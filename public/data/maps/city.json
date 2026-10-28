@@ -39,7 +39,8 @@
     "x": "grass_tuft",
     "X": "tall_grass",
     "y": "wild_flowers",
-    "G": "castle_gate"
+    "G": "castle_gate",
+    "d": "shop_door"
   },
   "enemies": {},
   "layout": [
@@ -50,8 +51,8 @@
     "W=x==f=====v=x=W",
     "Wx============xW",
     "Wx=====y======xW",
-    "W=SS==SS==II===W",
-    "W=SS==SS==II===W",
+    "WSSS=SSS==III==W",
+    "WSdS=SSS==III==W",
     "W=x====fv====x=W",
     "W===T======T===W",
     "W====f=FF=v====W",
@@ -84,5 +85,19 @@
       "x": 10,
       "z": 1
     }
-  ]
+  ],
+  "links": {
+    "2,8": {
+      "nextMap": "shop",
+      "params": {
+        "shopId": "weapon_shop"
+      },
+      "message": "武器屋に入る",
+      "back": {
+        "x": 2,
+        "z": 9,
+        "angle": 3.14159
+      }
+    }
+  }
 }
