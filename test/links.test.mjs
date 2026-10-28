@@ -58,3 +58,14 @@ test('店の種類: 店主の NPC が定義されている。汎用の店マッ�
     }
     assert.ok(maps.shop.npcs.some(n => n.id === '$shopkeeper'));
 });
+
+// マップの大きさの上限（docs/map-spec.md）。負荷が大きいときは、この値を下げて、マップを分ける
+const MAP_MAX_SIZE = 100;
+
+test('マップの大きさ: 全ての行が同じ長さで、縦横とも MAP_MAX_SIZE 以下', () => {
+    for (const [id, map] of Object.entries(maps)) {
+        const rows = map.layout.length, cols = map.layout[0].length;
+        assert.ok(rows <= MAP_MAX_SIZE && cols <= MAP_MAX_SIZE, `${id}: ${cols}x${rows} が上限 ${MAP_MAX_SIZE}x${MAP_MAX_SIZE} を超えている`);
+        map.layout.forEach((row, r) => assert.equal(row.length, cols, `${id}: ${r} 行目の長さが ${cols} と違う`));
+    }
+});
