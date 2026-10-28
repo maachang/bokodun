@@ -387,10 +387,12 @@ export class GameEngine {
 
         this.canvas.addEventListener('click', (e) => {
             this.sound.init();
-            if (this.mouseMode && !this.isPointerLocked) {
+            // マウスモードOFFのときは、クリックでは何もしない（魔法は Space / F）
+            if (!this.mouseMode) return;
+            if (!this.isPointerLocked) {
                 this.canvas.requestPointerLock?.();
             } else {
-                // クリックで、選択中の魔法を撃つ（マウスモードの間はロック済みのときだけ）
+                // ロック済みのクリックで、選択中の魔法を撃つ
                 this.useMagic();
             }
         });
