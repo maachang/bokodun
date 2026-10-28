@@ -2246,12 +2246,13 @@
     "description": "街の城門の大扉（近づくと開き、中へ入ると王城へ移動）"
   },
   "castle_exit": {
-    "type": "gateway",
-    "floorTexture": "pavedRoad",
-    "nextMap": "city",
-    "color": "#facc15",
+    "type": "door",
+    "texture": "woodDoor",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "nextMap": "$back",
     "message": "街に戻る",
-    "description": "王城の出口（壁の切れ目。入ると街へ移動）"
+    "description": "王城の出口の扉。近づくと開き、中へ入ると、入ってきた場所（街の城門の前）へ戻る"
   },
   "shop_floor": {
     "type": "floor_tile",
@@ -2268,10 +2269,14 @@
     "description": "街の店の扉（近づくと開き、中へ入ると店へ移動。行き先は map の links）"
   },
   "building_exit": {
-    "type": "gateway",
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "woodWall",
     "floorTexture": "woodFloor",
+    "solid": true,
+    "interactionDistance": 2.2,
     "nextMap": "$back",
     "message": "外に出る",
-    "description": "建物の出口（壁の切れ目。入ると、入ってきた場所へ戻る）"
+    "description": "建物（店）の出口の扉。近づくと開き、中へ入ると、入ってきた場所へ戻る"
   }
 }

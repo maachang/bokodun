@@ -33,8 +33,7 @@
     "k": "bookshelf",
     "g": "cupboard",
     "s": "hearth",
-    "o": "stove",
-    "E": "building_exit"
+    "o": "stove"
   },
   "enemies": {},
   "layout": [
@@ -45,7 +44,7 @@
     "WeFFduuWWWWW",
     "WFFuWuudFtFW",
     "WeFFWuuWgFoW",
-    "WWWWWEEWWWWW"
+    "WWWWWddWWWWW"
   ],
   "npcs": [
     {
@@ -53,5 +52,15 @@
       "x": 10,
       "z": 3
     }
-  ]
+  ],
+  "links": {
+    "5,7": {
+      "nextMap": "$back",
+      "message": "外に出る"
+    },
+    "6,7": {
+      "nextMap": "$back",
+      "message": "外に出る"
+    }
+  }
 }

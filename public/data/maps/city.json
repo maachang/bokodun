@@ -98,6 +98,24 @@
         "z": 9,
         "angle": 3.14159
       }
+    },
+    "8,0": {
+      "nextMap": "castle",
+      "message": "王城に入る",
+      "back": {
+        "x": 8,
+        "z": 1,
+        "angle": 3.14159
+      }
+    },
+    "9,0": {
+      "nextMap": "castle",
+      "message": "王城に入る",
+      "back": {
+        "x": 9,
+        "z": 1,
+        "angle": 3.14159
+      }
     }
   }
 }
