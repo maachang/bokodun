@@ -2306,5 +2306,103 @@
     "radius": 0.5,
     "message": "道具屋",
     "description": "道具屋の立て札（扉の横）"
+  },
+  "adventurer_guild_sign": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "冒険者ギルド",
+    "description": "冒険者ギルドの案内標識（街のマップ用。建物の前に立てる）"
+  },
+  "mage_guild_sign": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "魔法ギルド",
+    "description": "魔法ギルドの案内標識（街のマップ用。建物の前に立てる）"
+  },
+  "merchant_guild_sign": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "商人ギルド",
+    "description": "商人ギルドの案内標識（街のマップ用。建物の前に立てる）"
+  },
+  "training_sign": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "職業訓練所",
+    "description": "職業訓練所の案内標識（街のマップ用。建物の前に立てる）"
+  },
+  "church_sign": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "教会",
+    "description": "教会の案内標識（街のマップ用。建物の前に立てる）"
+  },
+  "smith_sign": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "鍛冶屋",
+    "description": "鍛冶屋の案内標識（街のマップ用。建物の前に立てる）"
+  },
+  "noble_district_sign": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "貴族街",
+    "description": "貴族街の案内標識（街のマップ用。建物の前に立てる）"
   }
 }

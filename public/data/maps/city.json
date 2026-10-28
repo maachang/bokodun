@@ -6,8 +6,8 @@
   "wallHeight": 4,
   "nextMap": "village",
   "spawn": {
-    "x": 2,
-    "z": 18,
+    "x": 28,
+    "z": 60,
     "angle": 0
   },
   "environment": {
@@ -21,6 +21,278 @@
     "visibility": 0.9,
     "skyColor": 9018045
   },
+  "enemies": {},
+  "decorFloor": "pavedRoad",
+  "spawnFrom": {
+    "castle": {
+      "x": 31,
+      "z": 1,
+      "angle": 3.14159
+    }
+  },
+  "npcs": [
+    {
+      "id": "gate_guard",
+      "x": 30,
+      "z": 1
+    },
+    {
+      "id": "gate_guard",
+      "x": 33,
+      "z": 1
+    },
+    {
+      "id": "adv_guild_master",
+      "x": 37,
+      "z": 40
+    },
+    {
+      "id": "adv_clerk_man",
+      "x": 41,
+      "z": 40
+    },
+    {
+      "id": "mage_guild_master",
+      "x": 43,
+      "z": 40
+    },
+    {
+      "id": "mage_clerk_woman",
+      "x": 47,
+      "z": 40
+    },
+    {
+      "id": "mage_clerk_man",
+      "x": 49,
+      "z": 40
+    },
+    {
+      "id": "merchant_master_man",
+      "x": 48,
+      "z": 39
+    },
+    {
+      "id": "merchant_master_woman",
+      "x": 53,
+      "z": 40
+    },
+    {
+      "id": "trainer",
+      "x": 55,
+      "z": 40
+    },
+    {
+      "id": "dwarf_smith",
+      "x": 15,
+      "z": 40
+    },
+    {
+      "id": "priest_senior",
+      "x": 21,
+      "z": 40
+    },
+    {
+      "id": "priest_man",
+      "x": 25,
+      "z": 40
+    },
+    {
+      "id": "priest_woman",
+      "x": 27,
+      "z": 40
+    },
+    {
+      "id": "cardinal",
+      "x": 28,
+      "z": 41
+    },
+    {
+      "id": "duke_man",
+      "x": 28,
+      "z": 6
+    },
+    {
+      "id": "duke_woman",
+      "x": 26,
+      "z": 12
+    },
+    {
+      "id": "margrave_man",
+      "x": 18,
+      "z": 16
+    },
+    {
+      "id": "margrave_woman",
+      "x": 10,
+      "z": 21
+    },
+    {
+      "id": "marquis_man",
+      "x": 20,
+      "z": 24
+    },
+    {
+      "id": "marquis_woman",
+      "x": 30,
+      "z": 8
+    },
+    {
+      "id": "viscount_man",
+      "x": 33,
+      "z": 14
+    },
+    {
+      "id": "baron_man",
+      "x": 25,
+      "z": 3
+    },
+    {
+      "id": "baron_woman",
+      "x": 13,
+      "z": 9
+    },
+    {
+      "id": "town_man",
+      "x": 31,
+      "z": 20
+    },
+    {
+      "id": "town_woman",
+      "x": 33,
+      "z": 24
+    },
+    {
+      "id": "town_boy",
+      "x": 30,
+      "z": 38
+    },
+    {
+      "id": "town_girl",
+      "x": 32,
+      "z": 44
+    },
+    {
+      "id": "town_middle_man",
+      "x": 20,
+      "z": 31
+    },
+    {
+      "id": "town_middle_woman",
+      "x": 10,
+      "z": 32
+    },
+    {
+      "id": "town_old_man",
+      "x": 45,
+      "z": 31
+    },
+    {
+      "id": "town_old_woman",
+      "x": 55,
+      "z": 32
+    },
+    {
+      "id": "junior_merchant_man",
+      "x": 31,
+      "z": 48
+    },
+    {
+      "id": "junior_merchant_woman",
+      "x": 35,
+      "z": 52
+    },
+    {
+      "id": "senior_merchant_woman",
+      "x": 31,
+      "z": 36
+    },
+    {
+      "id": "child_boy",
+      "x": 31,
+      "z": 29
+    },
+    {
+      "id": "child_girl",
+      "x": 33,
+      "z": 29
+    },
+    {
+      "id": "elder_man",
+      "x": 6,
+      "z": 31
+    },
+    {
+      "id": "elder_woman",
+      "x": 50,
+      "z": 32
+    },
+    {
+      "id": "guard_spear",
+      "x": 30,
+      "z": 12
+    },
+    {
+      "id": "guard_spear",
+      "x": 33,
+      "z": 40
+    },
+    {
+      "id": "guard_light",
+      "x": 30,
+      "z": 50
+    },
+    {
+      "id": "guard_light",
+      "x": 33,
+      "z": 6
+    }
+  ],
+  "links": {
+    "31,0": {
+      "nextMap": "castle",
+      "message": "王城に入る",
+      "back": {
+        "x": 31,
+        "z": 1,
+        "angle": 3.14159
+      }
+    },
+    "32,0": {
+      "nextMap": "castle",
+      "message": "王城に入る",
+      "back": {
+        "x": 32,
+        "z": 1,
+        "angle": 3.14159
+      }
+    },
+    "38,5": {
+      "nextMap": "shop",
+      "params": {
+        "shopId": "weapon_shop"
+      },
+      "message": "武器屋に入る",
+      "back": {
+        "x": 38,
+        "z": 6,
+        "angle": 3.14159
+      },
+      "icon": "weaponShopIcon"
+    },
+    "44,5": {
+      "nextMap": "shop",
+      "params": {
+        "shopId": "item_shop"
+      },
+      "message": "道具屋に入る",
+      "back": {
+        "x": 44,
+        "z": 6,
+        "angle": 3.14159
+      },
+      "icon": "itemShopIcon"
+    }
+  },
   "legend": {
     "W": "city_wall",
     "H": "brick_house",
@@ -31,7 +303,6 @@
     "N": "city_signpost",
     "T": "tree",
     "2": "portal",
-    "D": "dungeon_door",
     "P": "water",
     "b": "wood_bridge",
     "f": "flower_bed",
@@ -41,83 +312,80 @@
     "y": "wild_flowers",
     "G": "castle_gate",
     "d": "shop_door",
-    "Q": "weapon_shop_sign"
+    "Q": "weapon_shop_sign",
+    "q": "item_shop_sign",
+    "a": "adventurer_guild_sign",
+    "m": "mage_guild_sign",
+    "g": "merchant_guild_sign",
+    "r": "training_sign",
+    "c": "church_sign",
+    "k": "smith_sign",
+    "n": "noble_district_sign"
   },
-  "enemies": {},
   "layout": [
-    "WWWWWWWWGGWWWWWW",
-    "Wx============xW",
-    "W=x==f=====v=x=W",
-    "W====T======T==W",
-    "W=x==f=====v=x=W",
-    "Wx============xW",
-    "Wx=====y======xW",
-    "WSSS=SSS==III==W",
-    "WSdS=SSS==III==W",
-    "W=xQ===fv====x=W",
-    "W===T======T===W",
-    "W====f=FF=v====W",
-    "W====v=FF=f====W",
-    "W===T======T===W",
-    "W=x====vf====x=W",
-    "W=HH==HH==HH===W",
-    "W=HH==HH==HH===W",
-    "WPPPPbPPPbPPPPPW",
-    "Wx=N===y=y==2=xW",
-    "WXX===x==x===XXW",
-    "WWWWWWWWWWWWWWWW"
-  ],
-  "decorFloor": "pavedRoad",
-  "spawnFrom": {
-    "castle": {
-      "x": 8,
-      "z": 1,
-      "angle": 3.14159
-    }
-  },
-  "npcs": [
-    {
-      "id": "gate_guard",
-      "x": 7,
-      "z": 1
-    },
-    {
-      "id": "gate_guard",
-      "x": 10,
-      "z": 1
-    }
-  ],
-  "links": {
-    "2,8": {
-      "nextMap": "shop",
-      "params": {
-        "shopId": "weapon_shop"
-      },
-      "message": "武器屋に入る",
-      "back": {
-        "x": 2,
-        "z": 9,
-        "angle": 3.14159
-      },
-      "icon": "weaponShopIcon"
-    },
-    "8,0": {
-      "nextMap": "castle",
-      "message": "王城に入る",
-      "back": {
-        "x": 8,
-        "z": 1,
-        "angle": 3.14159
-      }
-    },
-    "9,0": {
-      "nextMap": "castle",
-      "message": "王城に入る",
-      "back": {
-        "x": 9,
-        "z": 1,
-        "angle": 3.14159
-      }
-    }
-  }
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "W==============================================================W",
+    "W==============================================================W",
+    "W==HHHH==HHHH=fHHHH==HHHH============SSSS==SSSS==IIII==SSSS====W",
+    "W==HHHH==HHHH==HHHH==HHHH====v====T==SSSS==SSSS==IIII==SSSSf===W",
+    "W==HHHH==HHHH==HHHH==HHHH============SdSS==SdSS==IIII==SSSSv===W",
+    "W======================n===============Q=====q=====N===========W",
+    "W==y====================================y===v====y====v========W",
+    "W==HHHH==HHHH==HHHH==HHHH============SSSS==SSSS==IIII==SSSS====W",
+    "W==HHHH==HHHH=xHHHH==HHHHf===========SSSS==SSSS==IIII==SSSS====W",
+    "W==HHHH==HHHH==HHHH==HHHH====T====v==SSSS==SSSS==IIII==SSSS====W",
+    "W==============================================================W",
+    "W=========v=========v===============y===============f==========W",
+    "W==HHHH==HHHH==HHHH==HHHH===========fSSSSv=IIII==SSSS==SSSS====W",
+    "W==HHHH==HHHHx=HHHH==HHHH============SSSS==IIII==SSSS==SSSS====W",
+    "W==HHHHT=HHHH==HHHH==HHHH============SSSS==IIII==SSSST=SSSS====W",
+    "W============================v====v============================W",
+    "W==xy===========v=y====================f=====f=vf====xv========W",
+    "W==HHHH==HHHH=xHHHH==HHHHv===========SSSS==SSSS==SSSS==SSSS====W",
+    "W==HHHHx=HHHH=vHHHH==HHHH============SSSSv=SSSS==SSSS=TSSSS====W",
+    "W==HHHH==HHHH==HHHH==HHHH===========xSSSS==SSSS==SSSS=fSSSS====W",
+    "W==============================================================W",
+    "W===y==========x=========x===v====f===========v====f===========W",
+    "W==HHHH==HHHH==HHHH==HHHH============SSSS==SSSSx=SSSS==SSSS====W",
+    "W==HHHH==HHHH==HHHH==HHHHf===========SSSS==SSSS==SSSS==SSSS====W",
+    "W==HHHH==HHHH==HHHH==HHHHx===========SSSS==SSSS==SSSS=fSSSST===W",
+    "W==============================================================W",
+    "W=======================y=================f============f=======W",
+    "W=========================fvf======vvf=========================W",
+    "W===========================T======T===========================W",
+    "W=========================T==========T=========================W",
+    "W==============================FF==============================W",
+    "W==============================FF==============================W",
+    "W=========================T==========T=========================W",
+    "W===========================T======T===========================W",
+    "W=========================vvf======vfv=========================W",
+    "W==HHHH==HHHH=xSSSS==HHHH============SSSS==SSSS==SSSS==HHHH====W",
+    "W==HHHH=xHHHH=fSSSS==HHHH===========TSSSS==SSSS==SSSS==HHHH====W",
+    "W==HHHH==HHHH==SSSS==HHHH============SSSS==SSSS==SSSS==HHHH====W",
+    "W================k=====c===============a=====m=====g=====r=====W",
+    "W=============fx====f========f====f===========f=====f======x===W",
+    "W==HHHH=vHHHH==HHHH==HHHH============SSSS==SSSS==SSSSv=SSSS====W",
+    "W==HHHH=xHHHH==HHHH==HHHHx===========SSSS==SSSS==SSSS==SSSS====W",
+    "W==HHHH==HHHH==HHHH=xHHHH===========vSSSS==SSSS=fSSSSf=SSSS====W",
+    "W==============================================================W",
+    "W=x========y========v===============f====v=======vf=y==========W",
+    "W==HHHH==HHHH==HHHH=vHHHHT===f====T==SSSS==SSSS==SSSS==SSSS====W",
+    "W==HHHH==HHHH==HHHH==HHHH============SSSS==SSSS==SSSS==SSSS====W",
+    "W==HHHH==HHHH==HHHH==HHHH============SSSS==SSSS==SSSS==SSSS====W",
+    "W==============================================================W",
+    "W=======vf=xf============v===========y==============x====vvf===W",
+    "W==HHHH==HHHHxxHHHH==HHHH============SSSS==SSSS==SSSS==SSSS====W",
+    "W=vHHHH==HHHH==HHHH=vHHHH====f====v==SSSS==SSSS==SSSS==SSSS====W",
+    "W==HHHH==HHHH==HHHH==HHHH============SSSS==SSSS==SSSSx=SSSS====W",
+    "W==============================================================W",
+    "W==========y============vy=====================x========v======W",
+    "W==============================================================W",
+    "WPPPPPPPbbPPPPPPPPPPPPPPPPPPPbbbbbbPPPPPPPPPPPPPPPPPPPbbPPPPPPPW",
+    "WyXx=xXxx==X=X=x=xxX=xyxxxy=x======Xxxyy==xx=x=XxXxxyXyXyXXX=XyW",
+    "W=yy==x=XXxxXX=x=x=x=y=xxxXXXyXx==Xyxx==XxyXxxxxxyXxy=Xy=xxXx=yW",
+    "WXx====x==xxyy==xyX=X===xxxX=yx=yx===Xxy=x==yy==x=xx==yxX=x=yXxW",
+    "Wy=y=xXy==xyyyx==y===XXxxyX=xyy2==xx==x=X=xxx==xyX===xx==y=xy==W",
+    "W====x==xXx=xxy=y=yx=X=xX=x==y====x==XxXyXyy=yy=x==y=xxy=yy==xXW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+  ]
 }

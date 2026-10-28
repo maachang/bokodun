@@ -225,5 +225,434 @@
       "……ごめんね、品物はまだ準備中なんだ。"
     ],
     "speechRadius": 9.5
+  },
+  "adv_clerk_man": {
+    "name": "冒険者ギルドの受付",
+    "texture": "/images/npcs/adv_clerk_man.png",
+    "height": 2.3,
+    "aspect": 0.354,
+    "radius": 0.41,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "冒険者の登録ですか？ ……準備中なので、少しお待ちください。",
+      "依頼の受付も、そのうち始めます。"
+    ]
+  },
+  "adv_guild_master": {
+    "name": "冒険者ギルドマスター",
+    "texture": "/images/npcs/adv_guild_master.png",
+    "height": 2.7,
+    "aspect": 0.465,
+    "radius": 0.5,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "冒険者ギルドへようこそ。腕に覚えがあるなら、歓迎するぞ。",
+      "無茶はするな。生きて帰るのが一流だ。"
+    ]
+  },
+  "baron_man": {
+    "name": "男爵",
+    "texture": "/images/npcs/baron_man.png",
+    "height": 2.3,
+    "aspect": 0.322,
+    "radius": 0.4,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "男爵と言っても名ばかりでな。それでも、身なりだけは整えているのさ。",
+      "古い屋敷でも、家は家だ。"
+    ]
+  },
+  "baron_woman": {
+    "name": "男爵夫人",
+    "texture": "/images/npcs/baron_woman.png",
+    "height": 2.3,
+    "aspect": 0.603,
+    "radius": 0.53,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "このドレスも、もう十年になりますの。直して着ていますのよ。",
+      "質素でも、品は保ちたいものですわ。"
+    ]
+  },
+  "cardinal": {
+    "name": "枢機卿",
+    "texture": "/images/npcs/cardinal.png",
+    "height": 2.4,
+    "aspect": 0.895,
+    "radius": 0.68,
+    "speed": 0.4,
+    "wanderRadius": 1.5,
+    "lines": [
+      "神のご加護があらんことを。……ところで、今夜の予定はあるかね？",
+      "年を取ると、信仰より楽しみが増えるものでね。"
+    ]
+  },
+  "duke_man": {
+    "name": "公爵",
+    "texture": "/images/npcs/duke_man.png",
+    "height": 2.3,
+    "aspect": 0.651,
+    "radius": 0.55,
+    "speed": 0.4,
+    "wanderRadius": 1.5,
+    "lines": [
+      "余に道を譲りたまえ。……ああ、君は誰だったか。",
+      "王の兄である余が、なぜ待たされねばならんのだ。"
+    ]
+  },
+  "duke_woman": {
+    "name": "公爵夫人",
+    "texture": "/images/npcs/duke_woman.png",
+    "height": 2.4,
+    "aspect": 0.781,
+    "radius": 0.62,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "この国の民は、みな勤勉ですのね。……少し、うらやましいわ。",
+      "政のことは、わたくしには分かりません。"
+    ]
+  },
+  "dwarf_smith": {
+    "name": "ドワーフの鍛冶屋",
+    "texture": "/images/npcs/dwarf_smith.png",
+    "height": 2.1,
+    "aspect": 0.648,
+    "radius": 0.52,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "いい鉄は、いい火で鍛えるもんだ。素材を持ってきたら、見てやろう。",
+      "半端な武器は、わしの前に出すな。"
+    ]
+  },
+  "junior_merchant_man": {
+    "name": "下っ端商人",
+    "texture": "/images/npcs/junior_merchant_man.png",
+    "height": 2.3,
+    "aspect": 0.358,
+    "radius": 0.41,
+    "speed": 0.8,
+    "wanderRadius": 2.5,
+    "lines": [
+      "まだ下っ端ですが、いつかは大商人になってみせますよ！",
+      "仕入れが大変でしてね。"
+    ]
+  },
+  "junior_merchant_woman": {
+    "name": "下っ端商人の女",
+    "texture": "/images/npcs/junior_merchant_woman.png",
+    "height": 2.3,
+    "aspect": 0.368,
+    "radius": 0.42,
+    "speed": 0.8,
+    "wanderRadius": 2.5,
+    "lines": [
+      "いらっしゃいませ！ ……あ、私はまだ見習いなんです。",
+      "ギルド長に認められる日を夢見てます。"
+    ]
+  },
+  "mage_clerk_man": {
+    "name": "魔法ギルドの受付",
+    "texture": "/images/npcs/mage_clerk_man.png",
+    "height": 2.4,
+    "aspect": 0.37,
+    "radius": 0.43,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "魔法のお仕事の依頼は、こちらで受け付けます……そのうち。",
+      "フードは、癖でして。"
+    ]
+  },
+  "mage_clerk_woman": {
+    "name": "魔法ギルドの受付",
+    "texture": "/images/npcs/mage_clerk_woman.png",
+    "height": 2.3,
+    "aspect": 0.393,
+    "radius": 0.43,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "スクロールのご用ですか？ 魔法ギルドは、まだ準備中なんです。",
+      "魔法の知識は、積み重ねが大切ですよ。"
+    ]
+  },
+  "mage_guild_master": {
+    "name": "魔法ギルドマスター",
+    "texture": "/images/npcs/mage_guild_master.png",
+    "height": 2.5,
+    "aspect": 0.701,
+    "radius": 0.6,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "魔法の探求に終わりはないわ。知識を求めるなら、いつでもいらっしゃい。",
+      "力を持つなら、責任も持ちなさい。"
+    ]
+  },
+  "margrave_man": {
+    "name": "辺境伯",
+    "texture": "/images/npcs/margrave_man.png",
+    "height": 2.5,
+    "aspect": 0.55,
+    "radius": 0.53,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "国境を守る身だ。戦のことなら、いつでも相談に乗ろう。",
+      "辺境では、剣が礼儀より先に立つのでな。"
+    ]
+  },
+  "margrave_woman": {
+    "name": "辺境伯夫人",
+    "texture": "/images/npcs/margrave_woman.png",
+    "height": 2.5,
+    "aspect": 0.672,
+    "radius": 0.59,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "ふふ、私の腕が気になる？ 組み手なら、いつでも受けて立つわよ。",
+      "ドレスは窮屈ね。剣のほうが性に合うわ。"
+    ]
+  },
+  "marquis_man": {
+    "name": "侯爵",
+    "texture": "/images/npcs/marquis_man.png",
+    "height": 2.3,
+    "aspect": 0.363,
+    "radius": 0.42,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "宮廷は退屈でね。たまの散歩が、何よりの楽しみだよ。",
+      "王子にも、困ったものだ。"
+    ]
+  },
+  "marquis_woman": {
+    "name": "侯爵夫人",
+    "texture": "/images/npcs/marquis_woman.png",
+    "height": 2.4,
+    "aspect": 0.714,
+    "radius": 0.59,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "ごきげんよう。今日は良い風が吹いていますわね。",
+      "街の噴水は、何度見ても飽きませんわ。"
+    ]
+  },
+  "merchant_master_man": {
+    "name": "商人ギルドマスター",
+    "texture": "/images/npcs/merchant_master_man.png",
+    "height": 2.3,
+    "aspect": 0.541,
+    "radius": 0.5,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ほう、いい目をしておられる。商売の話なら、いくらでも。",
+      "ギルドは、信用で成り立っているのですよ。"
+    ]
+  },
+  "merchant_master_woman": {
+    "name": "商人ギルドマスターの婦人",
+    "texture": "/images/npcs/merchant_master_woman.png",
+    "height": 2.5,
+    "aspect": 0.684,
+    "radius": 0.59,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "取引は信用が第一。うちのギルドは、そこだけは譲りませんよ。",
+      "油断は禁物。それが商いの鉄則です。"
+    ]
+  },
+  "priest_man": {
+    "name": "助祭",
+    "texture": "/images/npcs/priest_man.png",
+    "height": 2.3,
+    "aspect": 0.375,
+    "radius": 0.42,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "迷える人々のために、今日も祈りを捧げています。",
+      "ボランティアが、私の生きがいでして。"
+    ]
+  },
+  "priest_senior": {
+    "name": "司祭",
+    "texture": "/images/npcs/priest_senior.png",
+    "height": 2.4,
+    "aspect": 0.662,
+    "radius": 0.57,
+    "speed": 0.4,
+    "wanderRadius": 1.5,
+    "lines": [
+      "祈りは大切だが、食事も大切だ。そう思わんかね。",
+      "このカツラは……いや、何でもない。"
+    ]
+  },
+  "priest_woman": {
+    "name": "修道女",
+    "texture": "/images/npcs/priest_woman.png",
+    "height": 2.3,
+    "aspect": 0.5,
+    "radius": 0.48,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "困ったことがあれば、教会へ。お話を聞くくらいはできますよ。",
+      "皆さまに、神のご加護がありますように。"
+    ]
+  },
+  "senior_merchant_woman": {
+    "name": "上級商人の婦人",
+    "texture": "/images/npcs/senior_merchant_woman.png",
+    "height": 2.3,
+    "aspect": 0.357,
+    "radius": 0.41,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "上等な品ほど、値段の理由があるのですよ。",
+      "目利きは、一朝一夕では身につきません。"
+    ]
+  },
+  "town_boy": {
+    "name": "街の少年",
+    "texture": "/images/npcs/town_boy.png",
+    "height": 1.6,
+    "aspect": 0.318,
+    "radius": 0.35,
+    "speed": 1.3,
+    "wanderRadius": 3.0,
+    "lines": [
+      "ぼくも大きくなったら、冒険者になるんだ！",
+      "お城の兵隊さん、かっこいいよね。"
+    ]
+  },
+  "town_girl": {
+    "name": "街の少女",
+    "texture": "/images/npcs/town_girl.png",
+    "height": 1.55,
+    "aspect": 0.321,
+    "radius": 0.35,
+    "speed": 1.3,
+    "wanderRadius": 3.0,
+    "lines": [
+      "噴水の水が、きらきらしてきれいなの。",
+      "お母さんに、お使いを頼まれたの。"
+    ]
+  },
+  "town_man": {
+    "name": "街の男",
+    "texture": "/images/npcs/town_man.png",
+    "height": 2.3,
+    "aspect": 0.345,
+    "radius": 0.41,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "今日も市場は賑わっているな。",
+      "最近、冒険者が増えた気がするよ。"
+    ]
+  },
+  "town_middle_man": {
+    "name": "街の中年男",
+    "texture": "/images/npcs/town_middle_man.png",
+    "height": 2.3,
+    "aspect": 0.369,
+    "radius": 0.42,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "仕事帰りの一杯が、何よりの楽しみでね。",
+      "この街も、昔は静かだったんだがなあ。"
+    ]
+  },
+  "town_middle_woman": {
+    "name": "街の中年女",
+    "texture": "/images/npcs/town_middle_woman.png",
+    "height": 2.2,
+    "aspect": 0.561,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "うちの子ったら、また遊びに出かけてしまって。",
+      "市場で、いい野菜が手に入ったのよ。"
+    ]
+  },
+  "town_old_man": {
+    "name": "街の老人",
+    "texture": "/images/npcs/town_old_man.png",
+    "height": 2.1,
+    "aspect": 0.362,
+    "radius": 0.4,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "この街も、ずいぶん大きくなったものだ。",
+      "ワシが若い頃は、まだ城壁もなかった。"
+    ]
+  },
+  "town_old_woman": {
+    "name": "街の老婆",
+    "texture": "/images/npcs/town_old_woman.png",
+    "height": 2.0,
+    "aspect": 0.371,
+    "radius": 0.4,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "噴水のそばは、風が気持ちいいねえ。",
+      "長生きするものだよ。いろんなことが見られる。"
+    ]
+  },
+  "town_woman": {
+    "name": "街の女",
+    "texture": "/images/npcs/town_woman.png",
+    "height": 2.2,
+    "aspect": 0.609,
+    "radius": 0.52,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "お買い物？ 道具屋さんは、広場の北東にあるわよ。",
+      "この街は、いつも活気があるわね。"
+    ]
+  },
+  "trainer": {
+    "name": "職業訓練所の教官",
+    "texture": "/images/npcs/trainer.png",
+    "height": 2.7,
+    "aspect": 0.517,
+    "radius": 0.53,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "鍛えたいなら、まず体だ！ 経験が溜まったら、訓練所へ来い！",
+      "筋肉は裏切らん！"
+    ]
+  },
+  "viscount_man": {
+    "name": "子爵",
+    "texture": "/images/npcs/viscount_man.png",
+    "height": 2.3,
+    "aspect": 0.349,
+    "radius": 0.41,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "子爵ともなれば、付き合いが多くてね……見栄も楽ではないのだよ。",
+      "中身より、肩書きが物を言う世の中さ。"
+    ]
   }
 }
