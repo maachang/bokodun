@@ -61,9 +61,12 @@
       "name": "鍛冶", "type": "support", "tier": "base", "expBase": 18, "requires": [],
       "unlocks": [
         { "level": 1,  "effect": "repairWeapon",  "text": "武器の修理" },
-        { "level": 5,  "effect": "enhance1",      "text": "武器の強化＋1" },
-        { "level": 10, "effect": "enhance3",      "text": "強化＋3、防具の修理" },
-        { "level": 30, "effect": "enhance6",      "text": "強化＋6" },
+        { "level": 5,  "effect": "enhance1",      "text": "武器の強化＋1（強化できる回数の上限 1）" },
+        { "level": 5,  "effect": "craftBasic",    "text": "素材で武器・防具の作成（木・銅ランクの素材）" },
+        { "level": 10, "effect": "enhance3",      "text": "強化＋3（回数の上限 3）、防具の修理" },
+        { "level": 20, "effect": "craftMid",      "text": "素材で武器・防具の作成（鉄・銀ランクの素材）" },
+        { "level": 30, "effect": "enhance6",      "text": "強化＋6（回数の上限 6）" },
+        { "level": 40, "effect": "craftHigh",     "text": "素材で武器・防具の作成（金・漆黒ランクの素材）" },
         { "level": 50, "effect": "craftSpecial",  "text": "特殊な武器の作成" }
       ]
     },
@@ -73,7 +76,13 @@
     "explorer":    { "name": "探検家",       "type": "support", "tier": "high", "expBase": 36, "requires": [{ "job": "ranger", "level": 20 }, { "job": "sage", "level": 20 }], "unlocks": [] },
     "tycoon":      { "name": "大商人",       "type": "support", "tier": "high", "expBase": 24, "requires": [{ "job": "merchant", "level": 20 }], "unlocks": [] },
     "mastersmith": { "name": "名匠",         "type": "support", "tier": "high", "expBase": 36, "requires": [{ "job": "smith", "level": 20 }], "unlocks": [] },
-    "alchemist":   { "name": "錬金術師",     "type": "support", "tier": "high", "expBase": 40, "requires": [{ "job": "sage", "level": 20 }, { "job": "smith", "level": 20 }], "unlocks": [] },
+    "alchemist":   { "name": "錬金術師",     "type": "support", "tier": "high", "expBase": 40, "requires": [{ "job": "sage", "level": 20 }, { "job": "smith", "level": 20 }],
+      "unlocks": [
+        { "level": 1,  "effect": "combine1",      "text": "素材の合成（＋1 まで）" },
+        { "level": 10, "effect": "combine3",      "text": "合成（＋3 まで）" },
+        { "level": 20, "effect": "combineRiskDown", "text": "合成の失敗のリスクを軽減" },
+        { "level": 30, "effect": "combine5",      "text": "合成（＋5 まで）" }
+      ] },
     "broker":      { "name": "ブローカー",   "type": "support", "tier": "high", "expBase": 36, "requires": [{ "job": "scout", "level": 20 }, { "job": "merchant", "level": 20 }], "unlocks": [] }
   }
 }
