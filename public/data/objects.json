@@ -2236,19 +2236,21 @@
     "description": "高台の絨毯の段（高さ 0.9）"
   },
   "castle_gate": {
-    "type": "portal",
-    "solid": false,
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "cityWall",
+    "solid": true,
+    "interactionDistance": 2.2,
     "nextMap": "castle",
-    "color": "#facc15",
     "message": "王城に入る",
-    "description": "街の城門（王城へのポータル）"
+    "description": "街の城門の大扉（近づくと開き、中へ入ると王城へ移動）"
   },
   "castle_exit": {
-    "type": "portal",
-    "solid": false,
+    "type": "gateway",
+    "floorTexture": "pavedRoad",
     "nextMap": "city",
     "color": "#facc15",
     "message": "街に戻る",
-    "description": "王城の出口（街へのポータル）"
+    "description": "王城の出口（壁の切れ目。入ると街へ移動）"
   }
 }

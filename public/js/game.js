@@ -1578,7 +1578,10 @@ export class GameEngine {
                             baseY: wallH / 2,
                             openY: wallH * 1.45,
                             x: wx,
-                            z: wz
+                            z: wz,
+                            nextMap: objDef.nextMap,   // 行き先があれば、開いた扉の中へ入ると、そのマップへ移動する
+                            message: objDef.message,
+                            half: tileSize / 2
                         });
                         break;
                     }
@@ -1756,6 +1759,13 @@ export class GameEngine {
                             hazardType: objDef.hazardType,
                             isWater: true
                         });
+                        break;
+                    }
+
+                    case 'gateway': {
+                        // 壁の切れ目・開いた門: 見えない移動マス。このマスへ入ると nextMap へ移動する
+                        if (objDef.floorTexture) this.addFloorTile(wx, wz, tileSize, objDef.floorTexture);
+                        this.portals.push({ x: wx, z: wz, halfSize: tileSize / 2, mesh: null, nextMap: objDef.nextMap ?? mapData.nextMap, message: objDef.message, color: objDef.color });
                         break;
                     }
 
@@ -2183,6 +2193,15 @@ export class GameEngine {
 
                 // Smooth slide animation (raising up into the ceiling)
                 d.mesh.position.y += (d.targetY - d.mesh.position.y) * 8 * dt;
+
+                // 行き先つきの扉: 開いた扉のマスの中へ入ったら移動
+                if (d.nextMap && d.isOpen &&
+                    Math.abs(this.player.x - d.x) < d.half && Math.abs(this.player.z - d.z) < d.half) {
+                    this.sound.playLevelClear();
+                    this.addPopup(d.message ?? '次のエリアへ', '#fef08a');
+                    this.loadMap(d.nextMap);
+                    return;
+                }
             }
         }
 
@@ -2841,9 +2860,11 @@ export class GameEngine {
 
         // Update Portal Animation & Check
         for (const portal of this.portals) {
-            portal.mesh.rotation.y += dt * 2;
-            const distPortal = Math.hypot(this.player.x - portal.x, this.player.z - portal.z);
-            if (distPortal < portal.radius) {
+            if (portal.mesh) portal.mesh.rotation.y += dt * 2;
+            const reached = portal.halfSize
+                ? Math.abs(this.player.x - portal.x) < portal.halfSize && Math.abs(this.player.z - portal.z) < portal.halfSize   // 門のマス（四角）
+                : Math.hypot(this.player.x - portal.x, this.player.z - portal.z) < portal.radius;                                  // 筒のポータル（円）
+            if (reached) {
                 this.sound.playLevelClear();
                 this.addPopup(portal.message ?? 'ステージクリア！次のエリアへ', portal.color ?? '#38bdf8');
                 this.loadMap(portal.nextMap);

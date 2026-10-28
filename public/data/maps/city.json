@@ -7,7 +7,7 @@
   "nextMap": "village",
   "spawn": {
     "x": 2,
-    "z": 13,
+    "z": 18,
     "angle": 0
   },
   "environment": {
@@ -43,8 +43,13 @@
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWWWWWWW",
-    "Wx=====yG=====xW",
+    "WWWWWWWWGGWWWWWW",
+    "Wx============xW",
+    "W=x==f=====v=x=W",
+    "W====T======T==W",
+    "W=x==f=====v=x=W",
+    "Wx============xW",
+    "Wx=====y======xW",
     "W=SS==SS==II===W",
     "W=SS==SS==II===W",
     "W=x====fv====x=W",
@@ -64,8 +69,20 @@
   "spawnFrom": {
     "castle": {
       "x": 8,
-      "z": 2,
+      "z": 1,
       "angle": 3.14159
     }
-  }
+  },
+  "npcs": [
+    {
+      "id": "gate_guard",
+      "x": 7,
+      "z": 1
+    },
+    {
+      "id": "gate_guard",
+      "x": 10,
+      "z": 1
+    }
+  ]
 }
