@@ -147,5 +147,120 @@
       "hit": "#93c5fd"
     },
     "pierce": 2
+  },
+  "herb": {
+    "id": "herb",
+    "name": "薬草",
+    "kind": "consumable",
+    "effect": {
+      "type": "heal_hp",
+      "tier": "small"
+    },
+    "price": 20,
+    "autoUsable": true
+  },
+  "potion": {
+    "id": "potion",
+    "name": "ポーション",
+    "kind": "consumable",
+    "effect": {
+      "type": "heal_hp",
+      "tier": "medium"
+    },
+    "price": 60,
+    "autoUsable": true
+  },
+  "high_potion": {
+    "id": "high_potion",
+    "name": "ハイポーション",
+    "kind": "consumable",
+    "effect": {
+      "type": "heal_hp",
+      "tier": "large"
+    },
+    "price": 200,
+    "autoUsable": true
+  },
+  "mana_drop": {
+    "id": "mana_drop",
+    "name": "魔力の雫",
+    "kind": "consumable",
+    "effect": {
+      "type": "heal_mp",
+      "tier": "small"
+    },
+    "price": 25,
+    "autoUsable": true
+  },
+  "mana_water": {
+    "id": "mana_water",
+    "name": "魔力の水",
+    "kind": "consumable",
+    "effect": {
+      "type": "heal_mp",
+      "tier": "medium"
+    },
+    "price": 75,
+    "autoUsable": true
+  },
+  "mana_spring": {
+    "id": "mana_spring",
+    "name": "魔力の霊水",
+    "kind": "consumable",
+    "effect": {
+      "type": "heal_mp",
+      "tier": "large"
+    },
+    "price": 250,
+    "autoUsable": true
+  },
+  "antidote": {
+    "id": "antidote",
+    "name": "毒消し",
+    "kind": "consumable",
+    "effect": {
+      "type": "cure_poison"
+    },
+    "price": 30,
+    "autoUsable": true
+  },
+  "paralysis_cure": {
+    "id": "paralysis_cure",
+    "name": "麻痺治し",
+    "kind": "consumable",
+    "effect": {
+      "type": "cure_paralysis"
+    },
+    "price": 100,
+    "autoUsable": true
+  },
+  "revive_potion": {
+    "id": "revive_potion",
+    "name": "蘇生の薬",
+    "kind": "consumable",
+    "effect": {
+      "type": "revive"
+    },
+    "price": 500,
+    "autoUsable": true
+  },
+  "return_stone": {
+    "id": "return_stone",
+    "name": "帰還の石",
+    "kind": "consumable",
+    "effect": {
+      "type": "return_town"
+    },
+    "price": 150,
+    "autoUsable": false
+  },
+  "key": {
+    "id": "key",
+    "name": "鍵",
+    "kind": "key",
+    "effect": {
+      "type": "unlock_chest_lock"
+    },
+    "price": null
   }
 }

@@ -115,8 +115,13 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
     await t.test('アイテム: 武器は定義済みの weaponClass を持つ。呪文は発射の項目を持つ', () => {
         for (const [id, it] of Object.entries(items)) {
             assert.equal(it.id, id, `${id}: id がキーと一致`);
-            assert.ok(it.name && ['weapon', 'spell'].includes(it.kind), `${id}: kind`);
-            if (it.kind === 'weapon') {
+            assert.ok(it.name && ['weapon', 'spell', 'consumable', 'key'].includes(it.kind), `${id}: kind`);
+            if (it.kind === 'consumable' || it.kind === 'key') {
+                // 消耗品・鍵（docs/item-spec.md の最小セット）: 効果の種類と価格（鍵は売らないので null）
+                assert.ok(['heal_hp', 'heal_mp', 'cure_poison', 'cure_paralysis', 'revive', 'return_town', 'unlock_chest_lock'].includes(it.effect?.type), `${id}: effect.type`);
+                if (it.effect.tier !== undefined) assert.ok(['small', 'medium', 'large'].includes(it.effect.tier), `${id}: effect.tier`);
+                assert.ok(it.price === null ? it.kind === 'key' : Number.isInteger(it.price) && it.price > 0, `${id}: price`);
+            } else if (it.kind === 'weapon') {
                 assert.ok(weaponClasses[it.weaponClass], `${id}: 未定義の weaponClass ${it.weaponClass}`);
             } else {
                 assert.ok(['fireball', 'strike', 'spread'].includes(it.type), `${id}: type`);
