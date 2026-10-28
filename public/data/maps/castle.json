@@ -26,24 +26,30 @@
   "legend": {
     "W": "brick_wall",
     "d": "wooden_door",
-    "u": "rug",
+    "u": "castle_rug",
     "k": "bookshelf",
     "t": "table",
     "h": "chair",
     "g": "cupboard",
     "s": "hearth",
-    "2": "portal"
+    "2": "portal",
+    "a": "dais_stone_3",
+    "b": "dais_stone_2",
+    "c": "dais_stone_1",
+    "A": "dais_rug_3",
+    "B": "dais_rug_2",
+    "C": "dais_rug_1"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWWWWWWWWWWWWW",
-    "Wkkk0W0s0uu0s0Wtt0gW",
-    "Wkkk0W000uu000W0h0gW",
-    "W0000W000uu000W0000W",
-    "W0000W000uu000W0000W",
+    "Wkkk0WaaaAAaaaWtt0gW",
+    "Wkkk0WaaaAAaaaW0h0gW",
+    "W0000WbbbBBbbbW0000W",
+    "W0000WcccCCcccW0000W",
     "W0000d000uu000d0000W",
     "Wkkh0W000uu000W0000W",
-    "Wt000W000uu000W0000W",
+    "Wt000Ws00uu00sW0000W",
     "WWWWWWWWWuuWWWWWWWWW",
     "W0s000000uu000000s0W",
     "W00h0h000uu000h0h00W",
@@ -58,23 +64,23 @@
   "npcs": [
     {
       "id": "king",
-      "x": 10,
-      "z": 2
+      "x": 9,
+      "z": 1
     },
     {
       "id": "prince",
-      "x": 12,
-      "z": 3
+      "x": 10,
+      "z": 1
     },
     {
       "id": "guard_heavy",
-      "x": 8,
-      "z": 4
+      "x": 7,
+      "z": 2
     },
     {
       "id": "guard_heavy",
       "x": 12,
-      "z": 5
+      "z": 2
     },
     {
       "id": "guard_spear",

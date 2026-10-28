@@ -2186,5 +2186,53 @@
     ],
     "spread": 3.0,
     "description": "野の花（草むらに咲く小さな花。見た目だけで、当たり判定なし）"
+  },
+  "castle_rug": {
+    "type": "floor_tile",
+    "texture": "rug",
+    "solid": false,
+    "description": "城の中の絨毯（天井は城の天井を使う）"
+  },
+  "dais_stone_1": {
+    "type": "floor_tile",
+    "texture": "pavedRoad",
+    "elevation": 0.3,
+    "solid": false,
+    "description": "高台の石の段（高さ 0.3）"
+  },
+  "dais_rug_1": {
+    "type": "floor_tile",
+    "texture": "rug",
+    "elevation": 0.3,
+    "solid": false,
+    "description": "高台の絨毯の段（高さ 0.3）"
+  },
+  "dais_stone_2": {
+    "type": "floor_tile",
+    "texture": "pavedRoad",
+    "elevation": 0.6,
+    "solid": false,
+    "description": "高台の石の段（高さ 0.6）"
+  },
+  "dais_rug_2": {
+    "type": "floor_tile",
+    "texture": "rug",
+    "elevation": 0.6,
+    "solid": false,
+    "description": "高台の絨毯の段（高さ 0.6）"
+  },
+  "dais_stone_3": {
+    "type": "floor_tile",
+    "texture": "pavedRoad",
+    "elevation": 0.9,
+    "solid": false,
+    "description": "高台の石の段（高さ 0.9）"
+  },
+  "dais_rug_3": {
+    "type": "floor_tile",
+    "texture": "rug",
+    "elevation": 0.9,
+    "solid": false,
+    "description": "高台の絨毯の段（高さ 0.9）"
   }
 }

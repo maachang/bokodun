@@ -108,6 +108,7 @@ export class GameEngine {
         this.fireJets = [];
         this.buzzsaws = [];
         this.terrainGrid = [];
+        this.raisedFloors = [];   // 高さのある床（王城の高台の段など）。目線とNPCの足元の高さに使う
         this.doors = [];
         this.signposts = [];
         this.npcs = [];
@@ -432,6 +433,7 @@ export class GameEngine {
         this.fireJets = [];
         this.buzzsaws = [];
         this.terrainGrid = [];
+        this.raisedFloors = [];   // 高さのある床（王城の高台の段など）。目線とNPCの足元の高さに使う
         this.doors = [];
         this.signposts = [];
         this.npcs = [];
@@ -1284,6 +1286,17 @@ export class GameEngine {
                         const tileMat = new THREE.MeshLambertMaterial({
                             map: this.textures[objDef.texture] || this.textures.sand
                         });
+                        if (objDef.elevation > 0) {
+                            // 高さのある床（階段状の高台）: 上面の高さが elevation の箱。歩いて上れる（壁ではない）
+                            const stepMesh = new THREE.Mesh(new THREE.BoxGeometry(tileSize, objDef.elevation, tileSize), tileMat);
+                            stepMesh.position.set(wx, objDef.elevation / 2, wz);
+                            this.scene.add(stepMesh);
+                            this.raisedFloors.push({
+                                minX: wx - tileSize / 2, maxX: wx + tileSize / 2,
+                                minZ: wz - tileSize / 2, maxZ: wz + tileSize / 2,
+                                height: objDef.elevation
+                            });
+                        } else {
                         const tileGeo = new THREE.PlaneGeometry(tileSize, tileSize);
                         const tileMesh = new THREE.Mesh(tileGeo, tileMat);
                         tileMesh.rotation.x = -Math.PI / 2;
@@ -1291,6 +1304,7 @@ export class GameEngine {
                         const elev = (objDef.texture === 'woodBridge') ? 0.04 : 0.01;
                         tileMesh.position.set(wx, elev, wz);
                         this.scene.add(tileMesh);
+                        }
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);   // 屋内の床は天井もつける
 
                         this.terrainGrid.push({
@@ -2805,7 +2819,10 @@ export class GameEngine {
         }
 
         // Camera height with elevation difference (wading in water lowers player's eye height naturally, and falling plummets eye height into pit)
-        const eyeHeight = 1.8 - playerFloorDepth - (this.player.isFalling ? this.player.fallDepth : 0);
+        // 高さのある床（高台の段）の上では目線も上がる。段ごとに急に跳ねないよう、なめらかに追従させる
+        const targetFloorY = this.getFloorHeight(this.player.x, this.player.z);
+        this.player.floorY = (this.player.floorY ?? targetFloorY) + (targetFloorY - (this.player.floorY ?? targetFloorY)) * Math.min(1, dt * 10);
+        const eyeHeight = 1.8 + this.player.floorY - playerFloorDepth - (this.player.isFalling ? this.player.fallDepth : 0);
         this.camera.position.set(this.player.x, eyeHeight, this.player.z);
         this.camera.rotation.set(0, 0, 0);
         this.camera.rotateY(this.player.angle);
@@ -2932,6 +2949,15 @@ export class GameEngine {
     }
 
     // 村人が、その位置に立てないか（壁・家具などの当たり判定、水、プレイヤー、ほかの村人）
+    // その位置にある、高さのある床の高さ（なければ 0）
+    getFloorHeight(x, z) {
+        let h = 0;
+        for (const t of this.raisedFloors ?? []) {
+            if (x >= t.minX && x <= t.maxX && z >= t.minZ && z <= t.maxZ) h = Math.max(h, t.height);
+        }
+        return h;
+    }
+
     isNpcBlocked(self, x, z, radius) {
         for (const c of this.colliders) {
             if (c.disabled) continue;
@@ -2948,7 +2974,10 @@ export class GameEngine {
     }
 
     updateNpcs(dt) {
-        for (const n of this.npcs ?? []) n.update(dt, (x, z, r) => this.isNpcBlocked(n, x, z, r));
+        for (const n of this.npcs ?? []) {
+            n.update(dt, (x, z, r) => this.isNpcBlocked(n, x, z, r));
+            n.sprite.position.y += this.getFloorHeight(n.x, n.z);   // 高台の上では足元も上げる
+        }
     }
 
     // 近くの村人のセリフ（いなければ null）
