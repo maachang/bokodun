@@ -24,6 +24,7 @@ import argparse
 import numpy as np
 from PIL import Image, ImageFilter
 from collections import deque
+from bleed_transparent_rgb import bleed
 
 class MagentaChromaKeyer:
     def __init__(self, tolerance=48.0, defringe_width=2, strict_tolerance=32.0, min_island_area=12, shadow_dist=60.0, grad_tolerance=8.0, grow_tolerance_scale=1.5, pool_min_area=600, edge_tolerance=30.0, row_tolerance=56.0):
@@ -308,6 +309,8 @@ class MagentaChromaKeyer:
             result_img = Image.fromarray(out_arr)
 
         os.makedirs(os.path.dirname(os.path.abspath(dest_path)), exist_ok=True)
+        # 完全透明部の RGB を近傍の不透明色で埋める（遠景縮小時にマゼンタが輪郭へ混ざるのを防ぐ）
+        result_img = Image.fromarray(bleed(np.array(result_img.convert("RGBA"))))
         result_img.save(dest_path, format="PNG")
         print(f"Processed: {src_path} -> {dest_path}")
         print(f"  Cropped Size: {result_img.size} (aspect ratio: {result_img.size[0]/result_img.size[1]:.3f})")
