@@ -6,8 +6,8 @@
   "wallHeight": 4,
   "nextMap": "village",
   "spawn": {
-    "x": 6,
-    "z": 6,
+    "x": 3,
+    "z": 4,
     "angle": 0
   },
   "environment": {
@@ -33,20 +33,17 @@
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWWWW",
-    "WkkFkkFkkFkkW",
-    "WgFFFFFFFFFgW",
-    "WFFFtttttFFFW",
-    "WFFFFFFFFFFFW",
-    "WFFFFFFFFFFFW",
-    "WgFFFFFFFFFgW",
-    "WFFFFFFFFFFFW",
-    "WWWWWEEEWWWWW"
+    "WWWWWWW",
+    "WkkFkkW",
+    "WgFFFgW",
+    "WtttttW",
+    "WFFFFFW",
+    "WWWEWWW"
   ],
   "npcs": [
     {
       "id": "$shopkeeper",
-      "x": 6,
+      "x": 3,
       "z": 2
     }
   ]
