@@ -44,7 +44,7 @@ test('足音: AudioContext 未初期化なら何もしない', async () => {
 
 test('足音: 全マップの footstep は定義済みの種類、または無し（屋外は無音）', () => {
     const dir = path.join(projectRoot, 'public/data/maps');
-    const expected = { dungeon: 'stone', cave: 'cave' };
+    const expected = { dungeon: 'stone', cave: 'cave', castle: 'stone' };
     for (const f of fs.readdirSync(dir)) {
         const id = f.replace('.json', '');
         const footstep = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8')).environment?.footstep;

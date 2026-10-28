@@ -1,0 +1,100 @@
+{
+  "id": "castle",
+  "name": "王城 (Castle)",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "city",
+  "spawn": {
+    "x": 9,
+    "z": 15,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "brick",
+    "ambientLight": 10096512,
+    "directionalLight": 13615264,
+    "fogColor": 2761760,
+    "fogNear": 14,
+    "fogFar": 48,
+    "visibility": 0.9,
+    "skyColor": 2761760
+  },
+  "legend": {
+    "W": "brick_wall",
+    "d": "wooden_door",
+    "u": "rug",
+    "k": "bookshelf",
+    "t": "table",
+    "h": "chair",
+    "g": "cupboard",
+    "s": "hearth",
+    "2": "portal"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWWWWWWWWWWW",
+    "Wkkk0W0s0uu0s0Wtt0gW",
+    "Wkkk0W000uu000W0h0gW",
+    "W0000W000uu000W0000W",
+    "W0000W000uu000W0000W",
+    "W0000d000uu000d0000W",
+    "Wkkh0W000uu000W0000W",
+    "Wt000W000uu000W0000W",
+    "WWWWWWWWWuuWWWWWWWWW",
+    "W0s000000uu000000s0W",
+    "W00h0h000uu000h0h00W",
+    "W00ttt000uu000ttt00W",
+    "W00h0h000uu000h0h00W",
+    "W00000000uu00000000W",
+    "W00000000uu00000000W",
+    "W00000000uu00000000W",
+    "W000000002u00000000W",
+    "WWWWWWWWWWWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "king",
+      "x": 10,
+      "z": 2
+    },
+    {
+      "id": "prince",
+      "x": 12,
+      "z": 3
+    },
+    {
+      "id": "guard_heavy",
+      "x": 8,
+      "z": 4
+    },
+    {
+      "id": "guard_heavy",
+      "x": 12,
+      "z": 5
+    },
+    {
+      "id": "guard_spear",
+      "x": 8,
+      "z": 14
+    },
+    {
+      "id": "guard_spear",
+      "x": 11,
+      "z": 14
+    },
+    {
+      "id": "guard_light",
+      "x": 17,
+      "z": 4
+    },
+    {
+      "id": "guard_light",
+      "x": 2,
+      "z": 4
+    }
+  ]
+}

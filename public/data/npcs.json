@@ -116,5 +116,72 @@
       "あたしの目利きは確かだよ。損はさせないさ。",
       "村の外は物騒だからね。準備はしっかりしていきな。"
     ]
+  },
+  "king": {
+    "name": "王様",
+    "texture": "/images/npcs/king.png",
+    "height": 2.2,
+    "aspect": 1.062,
+    "radius": 1.0,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ふむ……よくぞ参った、冒険者よ。",
+      "わしは腹が減った。……いや、国の行く末が心配なだけじゃ。",
+      "税を上げれば宝石が増える。簡単な話じゃろう？"
+    ]
+  },
+  "prince": {
+    "name": "王子",
+    "texture": "/images/npcs/prince.png",
+    "height": 2.3,
+    "aspect": 0.565,
+    "radius": 0.7,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ぼくは顔がいいから、何をしても許されるんだ。",
+      "勉強？ それって、おいしいの？",
+      "冒険者かあ。ぼくも魔王を倒してみたいなあ……明日あたり。"
+    ]
+  },
+  "guard_heavy": {
+    "name": "重装の衛兵",
+    "texture": "/images/npcs/guard_heavy.png",
+    "height": 2.8,
+    "aspect": 0.815,
+    "radius": 0.8,
+    "speed": 0.5,
+    "wanderRadius": 1.0,
+    "lines": [
+      "陛下の御前だ。静かにしろ。",
+      "……この国は、大丈夫なのだろうか。"
+    ]
+  },
+  "guard_spear": {
+    "name": "城の衛兵",
+    "texture": "/images/npcs/guard_spear.png",
+    "height": 2.6,
+    "aspect": 0.414,
+    "radius": 0.5,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "ここは王城だ。無礼は許さんぞ。",
+      "怪しい動きをすれば、容赦はしない。"
+    ]
+  },
+  "guard_light": {
+    "name": "軽装の衛兵",
+    "texture": "/images/npcs/guard_light.png",
+    "height": 2.4,
+    "aspect": 0.275,
+    "radius": 0.45,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "見回り中だ。何か用か？",
+      "城の中では、剣を抜くなよ。"
+    ]
   }
 }
