@@ -250,8 +250,10 @@ test('隠密: データ定義（視界係数・感知距離）', async (t) => {
         }
     });
 
-    await t.test('全ての敵に deathColor（#rrggbb）がある', () => {
+    await t.test('定義済み（maxHp あり）の敵に deathColor（#rrggbb）がある', () => {
+        // 画像・名前だけ登録した敵（数値未決）は対象外
         for (const [id, d] of Object.entries(defs)) {
+            if (d.maxHp === undefined) continue;
             assert.match(d.deathColor ?? '', /^#[0-9a-fA-F]{6}$/, `${id}: deathColor`);
         }
     });
