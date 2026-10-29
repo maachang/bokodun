@@ -3644,7 +3644,7 @@ export class GameEngine {
                 name: monster.name || 'モンスター',
                 maxHp: monster.maxHp || 30,
                 hp: Math.max(0, monster.hp),
-                iconUrl: monster.iconUrl || '/images/enemies/slime_char.png',
+                iconUrl: monster.iconUrl || '/images/enemies/slime/slime.png',
                 timer: 2.5 // Exactly 2.5 seconds display
             };
         }
@@ -3695,7 +3695,7 @@ export class GameEngine {
                     const hpPercent = Math.max(0, Math.min(100, (c.hp / c.maxHp) * 100));
                     return `
                         <div class="enemy-hud-card">
-                            <img class="enemy-hud-icon" src="${c.iconUrl}" alt="${c.name}" onerror="this.src='/images/enemies/slime_char.png'">
+                            <img class="enemy-hud-icon" src="${c.iconUrl}" alt="${c.name}" onerror="this.src='/images/enemies/slime/slime.png'">
                             <div class="enemy-hud-details">
                                 <div class="enemy-hud-header">
                                     <span>${c.name}</span>

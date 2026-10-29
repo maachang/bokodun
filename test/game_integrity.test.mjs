@@ -74,16 +74,16 @@ test('1. JSON Schema & Integrity Validation', async (t) => {
             'public/images/objects/signpost.png',
             'public/images/objects/barrier_dq.png',
             'public/images/objects/mossy_cave_rock.jpg',
-            'public/images/enemies/slime_char.png',
-            'public/images/enemies/skeleton_char.png',
-            'public/images/enemies/goblin_mage.png',
-            'public/images/enemies/goblin_archer.png',
-            'public/images/enemies/tarantula_swamp.png',
-            'public/images/enemies/parasite_wasp.png',
-            'public/images/enemies/maria_mosquito.png',
-            'public/images/enemies/acid_worm.png',
-            'public/images/enemies/poison_moth.png',
-            'public/images/enemies/poison_toad.png'
+            'public/images/enemies/slime/slime.png',
+            'public/images/enemies/undead/skeleton.png',
+            'public/images/enemies/demihuman/goblin_mage.png',
+            'public/images/enemies/demihuman/goblin_archer.png',
+            'public/images/enemies/insect/tarantula_swamp.png',
+            'public/images/enemies/insect/parasite_wasp.png',
+            'public/images/enemies/insect/maria_mosquito.png',
+            'public/images/enemies/insect/acid_worm.png',
+            'public/images/enemies/insect/poison_moth.png',
+            'public/images/enemies/reptile/poison_toad.png'
         ];
 
         for (const img of imageFiles) {

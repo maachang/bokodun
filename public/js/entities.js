@@ -29,7 +29,7 @@ export class Monster {
         this.radius = enemyDef?.radius ?? 0.8;
         this.active = true;
         this.id = 'm_' + Math.random().toString(36).substring(2, 9);
-        this.iconUrl = '/images/enemies/slime_char.png';
+        this.iconUrl = '/images/enemies/slime/slime.png';
 
         // 索敵パラメータ（敵の種類ごとに enemies.json で上書き）
         this.senseRange = SENSE_DEFAULT_RANGE;
@@ -77,17 +77,17 @@ export class Monster {
 
             // Resolve HUD icon URL dynamically or by map
             const iconMap = {
-                goblinArcher: '/images/enemies/goblin_archer.png',
-                goblin: '/images/enemies/goblin_mage.png',
-                skeleton: '/images/enemies/skeleton_char.png',
-                mimic: '/images/enemies/mimic_char.png',
-                tarantulaSwamp: '/images/enemies/tarantula_swamp.png',
-                parasiteWasp: '/images/enemies/parasite_wasp.png',
-                mariaMosquito: '/images/enemies/maria_mosquito.png',
-                acidWorm: '/images/enemies/acid_worm.png',
-                poisonMoth: '/images/enemies/poison_moth.png',
-                poisonToad: '/images/enemies/poison_toad.png',
-                slime: '/images/enemies/slime_char.png'
+                goblinArcher: '/images/enemies/demihuman/goblin_archer.png',
+                goblin: '/images/enemies/demihuman/goblin_mage.png',
+                skeleton: '/images/enemies/undead/skeleton.png',
+                mimic: '/images/enemies/golem/mimic.png',
+                tarantulaSwamp: '/images/enemies/insect/tarantula_swamp.png',
+                parasiteWasp: '/images/enemies/insect/parasite_wasp.png',
+                mariaMosquito: '/images/enemies/insect/maria_mosquito.png',
+                acidWorm: '/images/enemies/insect/acid_worm.png',
+                poisonMoth: '/images/enemies/insect/poison_moth.png',
+                poisonToad: '/images/enemies/reptile/poison_toad.png',
+                slime: '/images/enemies/slime/slime.png'
             };
 
             this.iconUrl = iconMap[texKey] || (enemyDef.imageFile ? `/images/enemies/${enemyDef.imageFile}` : `/images/enemies/${enemyType}.png`);
@@ -105,7 +105,7 @@ export class Monster {
                 this.spriteMat = new THREE.SpriteMaterial({ map: textures.slime, transparent: true });
                 this.scale = [2.2, 2.0, 1];
                 this.y = 1.0;
-                this.iconUrl = '/images/enemies/slime_char.png';
+                this.iconUrl = '/images/enemies/slime/slime.png';
             } else if (enemyType === 'K' || enemyType === 'skeleton') {
                 this.name = 'スケルトン剣士';
                 this.maxHp = 60;
@@ -118,7 +118,7 @@ export class Monster {
                 this.spriteMat = new THREE.SpriteMaterial({ map: textures.skeleton, transparent: true });
                 this.scale = [2.4, 2.5, 1];
                 this.y = 1.25;
-                this.iconUrl = '/images/enemies/skeleton_char.png';
+                this.iconUrl = '/images/enemies/undead/skeleton.png';
             } else {
                 this.name = 'ゴブリンアーチャー';
                 this.maxHp = 45;
@@ -135,7 +135,7 @@ export class Monster {
                 this.spriteMat = new THREE.SpriteMaterial({ map: textures.goblin, transparent: true });
                 this.scale = [2.3, 2.6, 1];
                 this.y = 1.3;
-                this.iconUrl = '/images/enemies/goblin_archer.png';
+                this.iconUrl = '/images/enemies/demihuman/goblin_archer.png';
             }
         }
 

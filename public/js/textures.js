@@ -1627,7 +1627,7 @@ export class RetroTextureGenerator {
     // 27. Mimic Face / Open Jaws with Sharp Teeth (sdServer id=121 transparent texture)
     static createMimicTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/mimic_char.png?v=' + Date.now());
+        const texture = loader.load('/images/enemies/golem/mimic.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
@@ -1636,7 +1636,7 @@ export class RetroTextureGenerator {
     // Slime sprite: loads real character artwork from sdServer
     static createSlimeTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/slime_char.png?v2=' + Date.now());
+        const texture = loader.load('/images/enemies/slime/slime.png?v2=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
@@ -1645,7 +1645,7 @@ export class RetroTextureGenerator {
     // Skeleton warrior sprite
     static createSkeletonTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/skeleton_char.png?v2=' + Date.now());
+        const texture = loader.load('/images/enemies/undead/skeleton.png?v2=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
@@ -1654,7 +1654,7 @@ export class RetroTextureGenerator {
     // Goblin Shaman / Mage sprite
     static createGoblinTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/goblin_mage.png?v2=' + Date.now());
+        const texture = loader.load('/images/enemies/demihuman/goblin_mage.png?v2=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
@@ -1663,7 +1663,7 @@ export class RetroTextureGenerator {
     // Goblin Archer sprite
     static createGoblinArcherTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/goblin_archer.png?v=' + Date.now());
+        const texture = loader.load('/images/enemies/demihuman/goblin_archer.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
@@ -2153,42 +2153,42 @@ export class RetroTextureGenerator {
     // Swamp Enemy sprite textures (real artwork from sdServer)
     static createTarantulaSwampTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/tarantula_swamp.png?v=' + Date.now());
+        const texture = loader.load('/images/enemies/insect/tarantula_swamp.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
     }
     static createParasiteWaspTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/parasite_wasp.png?v=' + Date.now());
+        const texture = loader.load('/images/enemies/insect/parasite_wasp.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
     }
     static createMariaMosquitoTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/maria_mosquito.png?v=' + Date.now());
+        const texture = loader.load('/images/enemies/insect/maria_mosquito.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
     }
     static createAcidWormTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/acid_worm.png?v=' + Date.now());
+        const texture = loader.load('/images/enemies/insect/acid_worm.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
     }
     static createPoisonMothTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/poison_moth.png?v=' + Date.now());
+        const texture = loader.load('/images/enemies/insect/poison_moth.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;
     }
     static createPoisonToadTexture() {
         const loader = new THREE.TextureLoader();
-        const texture = loader.load('/images/enemies/poison_toad.png?v=' + Date.now());
+        const texture = loader.load('/images/enemies/reptile/poison_toad.png?v=' + Date.now());
         texture.magFilter = THREE.NearestFilter;
         texture.minFilter = THREE.NearestFilter;
         return texture;

@@ -11,7 +11,7 @@
     "exp": 15,
     "canShoot": false,
     "scale": [
-      2.2,
+      2.54,
       1.95,
       1.0
     ],
@@ -33,7 +33,7 @@
     "exp": 40,
     "canShoot": false,
     "scale": [
-      1.4,
+      1.49,
       2.8,
       1.0
     ],
@@ -57,7 +57,7 @@
     "shootCooldown": 2.6,
     "shootRange": 16,
     "scale": [
-      1.6,
+      1.39,
       2.6,
       1.0
     ],
@@ -82,7 +82,7 @@
     "shootRange": 14,
     "maxArrowDistance": 13,
     "scale": [
-      1.4,
+      1.15,
       2.8,
       1.0
     ],
@@ -103,7 +103,7 @@
     "exp": 80,
     "canShoot": false,
     "scale": [
-      2.3,
+      2.04,
       2.4,
       1.0
     ],
@@ -124,7 +124,7 @@
     "exp": 60,
     "canShoot": false,
     "scale": [
-      2.63,
+      3.13,
       2.0,
       1.0
     ],
@@ -146,7 +146,7 @@
     "exp": 45,
     "canShoot": false,
     "scale": [
-      2.12,
+      2.33,
       1.7,
       1.0
     ],
@@ -168,7 +168,7 @@
     "exp": 35,
     "canShoot": false,
     "scale": [
-      1.9,
+      1.66,
       1.7,
       1.0
     ],
@@ -193,7 +193,7 @@
     "shootCooldown": 1.4,
     "shootRange": 5.5,
     "scale": [
-      2.24,
+      1.6,
       2.3,
       1.0
     ],
@@ -218,7 +218,7 @@
     "shootCooldown": 1.8,
     "shootRange": 16,
     "scale": [
-      2.63,
+      2.47,
       1.5,
       1.0
     ],
@@ -240,7 +240,7 @@
     "exp": 55,
     "canShoot": false,
     "scale": [
-      2.32,
+      2.29,
       1.8,
       1.0
     ],

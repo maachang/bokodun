@@ -646,8 +646,8 @@
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; padding: 10px; background: #1e293b; border-radius: 6px;">
                     <span style="font-size: 13px; font-weight: bold;">適用対象:</span>
                     <select id="applyTarget" class="form-select" style="width: 220px;">
-                        <option value="slime">👾 スライム（敵スプライト・黒背景透過）</option>
-                        <option value="goblin">🧙 ゴブリン魔導士（敵スプライト・黒背景透過）</option>
+                        <option value="slime">👾 スライム（敵スプライト）</option>
+                        <option value="goblin">🧙 ゴブリン魔導士（敵スプライト）</option>
                         <option value="wall">🧱 ダンジョン・岩山の壁テクスチャ</option>
                         <option value="floor">🌿 床・地面テクスチャ</option>
                     </select>
@@ -783,11 +783,10 @@
 
         async function applyGalleryImage(imagePath) {
             const target = document.getElementById('applyTarget').value;
-            const removeBg = (target === 'slime' || target === 'goblin') ? 'auto' : 'none';
 
             document.getElementById('galleryStatus').innerText = 'テクスチャを変換中...';
             try {
-                const texture = await gameInstance.sdManager.loadTexture(imagePath, removeBg);
+                const texture = await gameInstance.sdManager.loadTexture(imagePath);
                 gameInstance.applyTexture(target, texture);
                 gameInstance.addPopup(`🎨 ${target}のグラフィックを適用しました！`, '#38bdf8');
                 closeWorkshop();
@@ -837,8 +836,7 @@
                         } else if (statusRes.status === 'completed') {
                             clearInterval(pollInterval);
                             statusText.innerText = '✨ 生成完了！ゲームに適用中...';
-                            const removeBg = (target === 'slime' || target === 'goblin') ? 'black' : 'none';
-                            const texture = await gameInstance.sdManager.loadTexture(statusRes.image_path, removeBg);
+                            const texture = await gameInstance.sdManager.loadTexture(statusRes.image_path);
                             gameInstance.applyTexture(target, texture);
                             btn.disabled = false;
                             gameInstance.addPopup(`🎨 新規生成AI画像を適用しました！`, '#a855f7');
