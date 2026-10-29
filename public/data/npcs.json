@@ -1,6 +1,7 @@
 {
   "village_chief": {
     "name": "村長",
+    "sdId": 133,
     "texture": "/images/npcs/village_chief.png",
     "height": 2.4,
     "aspect": 0.476,
@@ -15,6 +16,7 @@
   },
   "villager_man": {
     "name": "村人の男",
+    "sdId": 127,
     "texture": "/images/npcs/villager_man.png",
     "height": 2.3,
     "aspect": 0.37,
@@ -28,6 +30,7 @@
   },
   "villager_woman": {
     "name": "村人の女",
+    "sdId": 128,
     "texture": "/images/npcs/villager_woman.png",
     "height": 2.2,
     "aspect": 0.381,
@@ -41,6 +44,7 @@
   },
   "child_boy": {
     "name": "村の男の子",
+    "sdId": 129,
     "texture": "/images/npcs/child_boy.png",
     "height": 1.6,
     "aspect": 0.365,
@@ -54,6 +58,7 @@
   },
   "child_girl": {
     "name": "村の女の子",
+    "sdId": 130,
     "texture": "/images/npcs/child_girl.png",
     "height": 1.55,
     "aspect": 0.342,
@@ -67,6 +72,7 @@
   },
   "elder_man": {
     "name": "村の老人",
+    "sdId": 131,
     "texture": "/images/npcs/elder_man.png",
     "height": 2.1,
     "aspect": 0.396,
@@ -80,6 +86,7 @@
   },
   "elder_woman": {
     "name": "村の老婆",
+    "sdId": 132,
     "texture": "/images/npcs/elder_woman.png",
     "height": 2.0,
     "aspect": 0.36,
@@ -93,6 +100,7 @@
   },
   "merchant_man": {
     "name": "商人",
+    "sdId": 134,
     "texture": "/images/npcs/merchant_man.png",
     "height": 2.4,
     "aspect": 0.485,
@@ -106,6 +114,7 @@
   },
   "merchant_woman": {
     "name": "商人の婦人",
+    "sdId": 135,
     "texture": "/images/npcs/merchant_woman.png",
     "height": 2.5,
     "aspect": 0.408,
@@ -119,6 +128,7 @@
   },
   "king": {
     "name": "王様",
+    "sdId": 17,
     "texture": "/images/npcs/king.png",
     "height": 2.2,
     "aspect": 1.059,
@@ -133,6 +143,7 @@
   },
   "prince": {
     "name": "王子",
+    "sdId": 7,
     "texture": "/images/npcs/prince.png",
     "height": 2.3,
     "aspect": 0.624,
@@ -147,6 +158,7 @@
   },
   "guard_heavy": {
     "name": "重装の衛兵",
+    "sdId": 16,
     "texture": "/images/npcs/guard_heavy.png",
     "height": 2.8,
     "aspect": 0.52,
@@ -160,6 +172,7 @@
   },
   "guard_spear": {
     "name": "城の衛兵",
+    "sdId": 9,
     "texture": "/images/npcs/guard_spear.png",
     "height": 2.6,
     "aspect": 0.373,
@@ -173,6 +186,7 @@
   },
   "guard_light": {
     "name": "軽装の衛兵",
+    "sdId": 2,
     "texture": "/images/npcs/guard_light.png",
     "height": 2.4,
     "aspect": 0.321,
@@ -186,6 +200,7 @@
   },
   "gate_guard": {
     "name": "城門の衛兵",
+    "sdId": 9,
     "texture": "/images/npcs/guard_spear.png",
     "height": 2.6,
     "aspect": 0.373,
@@ -200,6 +215,7 @@
   },
   "weapon_keeper": {
     "name": "武器屋の主人",
+    "sdId": 134,
     "texture": "/images/npcs/merchant_man.png",
     "height": 2.4,
     "aspect": 0.485,
@@ -214,6 +230,7 @@
   },
   "item_keeper": {
     "name": "道具屋の女将",
+    "sdId": 135,
     "texture": "/images/npcs/merchant_woman.png",
     "height": 2.5,
     "aspect": 0.408,
@@ -228,6 +245,7 @@
   },
   "adv_clerk_man": {
     "name": "冒険者ギルドの受付",
+    "sdId": 150,
     "texture": "/images/npcs/adv_clerk_man.png",
     "height": 2.3,
     "aspect": 0.368,
@@ -241,6 +259,7 @@
   },
   "adv_guild_master": {
     "name": "冒険者ギルドマスター",
+    "sdId": 154,
     "texture": "/images/npcs/adv_guild_master.png",
     "height": 2.7,
     "aspect": 0.405,
@@ -254,6 +273,7 @@
   },
   "baron_man": {
     "name": "男爵",
+    "sdId": 169,
     "texture": "/images/npcs/baron_man.png",
     "height": 2.3,
     "aspect": 0.344,
@@ -267,6 +287,7 @@
   },
   "baron_woman": {
     "name": "男爵夫人",
+    "sdId": 170,
     "texture": "/images/npcs/baron_woman.png",
     "height": 2.3,
     "aspect": 0.389,
@@ -280,6 +301,7 @@
   },
   "cardinal": {
     "name": "枢機卿",
+    "sdId": 160,
     "texture": "/images/npcs/cardinal.png",
     "height": 2.4,
     "aspect": 0.665,
@@ -293,6 +315,7 @@
   },
   "duke_man": {
     "name": "公爵",
+    "sdId": 176,
     "texture": "/images/npcs/duke_man.png",
     "height": 2.3,
     "aspect": 0.688,
@@ -306,6 +329,7 @@
   },
   "duke_woman": {
     "name": "公爵夫人",
+    "sdId": 177,
     "texture": "/images/npcs/duke_woman.png",
     "height": 2.4,
     "aspect": 0.681,
@@ -319,6 +343,7 @@
   },
   "dwarf_smith": {
     "name": "ドワーフの鍛冶屋",
+    "sdId": 166,
     "texture": "/images/npcs/dwarf_smith.png",
     "height": 2.1,
     "aspect": 0.52,
@@ -332,6 +357,7 @@
   },
   "junior_merchant_man": {
     "name": "下っ端商人",
+    "sdId": 145,
     "texture": "/images/npcs/junior_merchant_man.png",
     "height": 2.3,
     "aspect": 0.339,
@@ -345,6 +371,7 @@
   },
   "junior_merchant_woman": {
     "name": "下っ端商人の女",
+    "sdId": 144,
     "texture": "/images/npcs/junior_merchant_woman.png",
     "height": 2.3,
     "aspect": 0.35,
@@ -358,6 +385,7 @@
   },
   "mage_clerk_man": {
     "name": "魔法ギルドの受付",
+    "sdId": 153,
     "texture": "/images/npcs/mage_clerk_man.png",
     "height": 2.4,
     "aspect": 0.398,
@@ -371,6 +399,7 @@
   },
   "mage_clerk_woman": {
     "name": "魔法ギルドの受付",
+    "sdId": 152,
     "texture": "/images/npcs/mage_clerk_woman.png",
     "height": 2.3,
     "aspect": 0.362,
@@ -384,6 +413,7 @@
   },
   "mage_guild_master": {
     "name": "魔法ギルドマスター",
+    "sdId": 156,
     "texture": "/images/npcs/mage_guild_master.png",
     "height": 2.5,
     "aspect": 0.557,
@@ -397,6 +427,7 @@
   },
   "margrave_man": {
     "name": "辺境伯",
+    "sdId": 174,
     "texture": "/images/npcs/margrave_man.png",
     "height": 2.5,
     "aspect": 0.486,
@@ -410,6 +441,7 @@
   },
   "margrave_woman": {
     "name": "辺境伯夫人",
+    "sdId": 175,
     "texture": "/images/npcs/margrave_woman.png",
     "height": 2.5,
     "aspect": 0.657,
@@ -423,6 +455,7 @@
   },
   "marquis_man": {
     "name": "侯爵",
+    "sdId": 173,
     "texture": "/images/npcs/marquis_man.png",
     "height": 2.3,
     "aspect": 0.359,
@@ -436,6 +469,7 @@
   },
   "marquis_woman": {
     "name": "侯爵夫人",
+    "sdId": 171,
     "texture": "/images/npcs/marquis_woman.png",
     "height": 2.4,
     "aspect": 0.412,
@@ -449,6 +483,7 @@
   },
   "merchant_master_man": {
     "name": "商人ギルドマスター",
+    "sdId": 149,
     "texture": "/images/npcs/merchant_master_man.png",
     "height": 2.3,
     "aspect": 0.347,
@@ -462,6 +497,7 @@
   },
   "merchant_master_woman": {
     "name": "商人ギルドマスターの婦人",
+    "sdId": 148,
     "texture": "/images/npcs/merchant_master_woman.png",
     "height": 2.5,
     "aspect": 0.425,
@@ -475,6 +511,7 @@
   },
   "priest_man": {
     "name": "助祭",
+    "sdId": 157,
     "texture": "/images/npcs/priest_man.png",
     "height": 2.3,
     "aspect": 0.369,
@@ -488,6 +525,7 @@
   },
   "priest_senior": {
     "name": "司祭",
+    "sdId": 159,
     "texture": "/images/npcs/priest_senior.png",
     "height": 2.4,
     "aspect": 0.543,
@@ -501,6 +539,7 @@
   },
   "priest_woman": {
     "name": "修道女",
+    "sdId": 158,
     "texture": "/images/npcs/priest_woman.png",
     "height": 2.3,
     "aspect": 0.342,
@@ -514,6 +553,7 @@
   },
   "senior_merchant_woman": {
     "name": "上級商人の婦人",
+    "sdId": 147,
     "texture": "/images/npcs/senior_merchant_woman.png",
     "height": 2.3,
     "aspect": 0.361,
@@ -527,6 +567,7 @@
   },
   "town_boy": {
     "name": "街の少年",
+    "sdId": 138,
     "texture": "/images/npcs/town_boy.png",
     "height": 1.6,
     "aspect": 0.341,
@@ -540,6 +581,7 @@
   },
   "town_girl": {
     "name": "街の少女",
+    "sdId": 139,
     "texture": "/images/npcs/town_girl.png",
     "height": 1.55,
     "aspect": 0.344,
@@ -553,6 +595,7 @@
   },
   "town_man": {
     "name": "街の男",
+    "sdId": 136,
     "texture": "/images/npcs/town_man.png",
     "height": 2.3,
     "aspect": 0.457,
@@ -566,6 +609,7 @@
   },
   "town_middle_man": {
     "name": "街の中年男",
+    "sdId": 140,
     "texture": "/images/npcs/town_middle_man.png",
     "height": 2.3,
     "aspect": 0.37,
@@ -579,6 +623,7 @@
   },
   "town_middle_woman": {
     "name": "街の中年女",
+    "sdId": 141,
     "texture": "/images/npcs/town_middle_woman.png",
     "height": 2.2,
     "aspect": 0.381,
@@ -592,6 +637,7 @@
   },
   "town_old_man": {
     "name": "街の老人",
+    "sdId": 143,
     "texture": "/images/npcs/town_old_man.png",
     "height": 2.1,
     "aspect": 0.371,
@@ -605,6 +651,7 @@
   },
   "town_old_woman": {
     "name": "街の老婆",
+    "sdId": 142,
     "texture": "/images/npcs/town_old_woman.png",
     "height": 2.0,
     "aspect": 0.361,
@@ -618,6 +665,7 @@
   },
   "town_woman": {
     "name": "街の女",
+    "sdId": 137,
     "texture": "/images/npcs/town_woman.png",
     "height": 2.2,
     "aspect": 0.334,
@@ -631,6 +679,7 @@
   },
   "trainer": {
     "name": "職業訓練所の教官",
+    "sdId": 155,
     "texture": "/images/npcs/trainer.png",
     "height": 2.7,
     "aspect": 0.465,
@@ -644,6 +693,7 @@
   },
   "viscount_man": {
     "name": "子爵",
+    "sdId": 172,
     "texture": "/images/npcs/viscount_man.png",
     "height": 2.3,
     "aspect": 0.319,
