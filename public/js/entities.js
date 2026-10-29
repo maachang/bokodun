@@ -59,7 +59,8 @@ export class Monster {
             this.maxArrowDistance = enemyDef.maxArrowDistance || 13;
             this.aiType = enemyDef.aiType || (this.canShoot ? 'ranged_maintain' : 'walk_chase');
             
-            const texKey = enemyDef.texture || 'slime';
+            // texture 未指定で imageFile がある敵は、敵の type（id）をテクスチャキーにして、imageFile から読み込む
+            const texKey = enemyDef.texture || (enemyDef.imageFile ? enemyType : 'slime');
             // Explicitly resolve texture with dynamic fallback creation if not pre-initialized
             let textureObj = textures[texKey];
             if (!textureObj) {

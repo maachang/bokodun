@@ -358,7 +358,23 @@
   "griffon": {
     "id": "griffon",
     "name": "グリフォン",
-    "imageFile": "beast/griffon.png"
+    "imageFile": "beast/griffon.png",
+    "chestRank": "iron",
+    "aiType": "walk_chase",
+    "maxHp": 200,
+    "speed": 2.0,
+    "attackPower": 30,
+    "exp": 0,
+    "canShoot": false,
+    "scale": [
+      7.32,
+      5.6,
+      1.0
+    ],
+    "y": 2.8,
+    "radius": 1.6,
+    "deathColor": "#c9a24a",
+    "stealth": "normal"
   },
   "cockatrice": {
     "id": "cockatrice",
