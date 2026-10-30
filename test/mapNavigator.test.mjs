@@ -64,22 +64,25 @@ test('GameEngine: 初めて開くマップの読み込み中に enterMap が繰�
     g.currentMapId = 'city';
     g.currentMapData = { nextMap: 'village' };
     const loads = [];
+    let finishLoad = null;   // 読み込みの完了は、テスト側で明示的に行う（時間待ちにすると、負荷で結果が変わって不安定になる）
     g.loadMapBody = async (mapId, opts) => {   // 読み込みに時間がかかるマップ（loadMap は、読み込みの前に currentMapId を移動先へ変える）
         loads.push({ mapId, opts });
         g.currentMapId = mapId;
-        await new Promise(r => setTimeout(r, 30));
+        await new Promise(r => { finishLoad = r; });
         g.currentMapData = { nextMap: 'city' };
     };
     for (let frame = 0; frame < 20; frame++) {
         g.enterMap('castle', { back });
         await new Promise(r => setTimeout(r, 1));
     }
-    await new Promise(r => setTimeout(r, 60));
+    finishLoad();
+    await new Promise(r => setTimeout(r, 10));
     assert.equal(loads.length, 1, '移動は 1 回だけ');
     assert.equal(g.nav.stack.length, 1, '戻る先の記録は 1 件だけ');
 
     g.enterMap('$back', {});
-    await new Promise(r => setTimeout(r, 60));
+    finishLoad();
+    await new Promise(r => setTimeout(r, 10));
     assert.equal(loads.length, 2);
     assert.equal(loads[1].mapId, 'city', '出口は、入った街へ戻る（城の玉座の間ではない）');
     assert.deepEqual(loads[1].opts.spawn, back);
