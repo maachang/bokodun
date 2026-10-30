@@ -281,7 +281,8 @@
       1.47,
       1.2,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "quicksilver_slime": {
     "id": "quicksilver_slime",
@@ -292,7 +293,8 @@
       1.71,
       1.2,
       1.0
-    ]
+    ],
+    "radius": 0.51
   },
   "slime_emperor": {
     "id": "slime_emperor",
@@ -303,7 +305,8 @@
       2.34,
       2.2,
       1.0
-    ]
+    ],
+    "radius": 0.7
   },
   "ant_pawn": {
     "id": "ant_pawn",
@@ -314,7 +317,8 @@
       1.63,
       1.0,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "ant_knight": {
     "id": "ant_knight",
@@ -325,7 +329,8 @@
       1.88,
       1.5,
       1.0
-    ]
+    ],
+    "radius": 0.56
   },
   "ant_general": {
     "id": "ant_general",
@@ -336,7 +341,8 @@
       1.22,
       2.0,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "ant_queen": {
     "id": "ant_queen",
@@ -347,7 +353,8 @@
       1.13,
       2.6,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "assassin_centipede": {
     "id": "assassin_centipede",
@@ -358,7 +365,8 @@
       1.53,
       1.3,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "beetle_king": {
     "id": "beetle_king",
@@ -369,7 +377,8 @@
       2.65,
       2.4,
       1.0
-    ]
+    ],
+    "radius": 0.79
   },
   "killer_mantis": {
     "id": "killer_mantis",
@@ -380,7 +389,8 @@
       3.58,
       3.0,
       1.0
-    ]
+    ],
+    "radius": 1.07
   },
   "scorpion": {
     "id": "scorpion",
@@ -391,7 +401,8 @@
       1.25,
       1.2,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "cobra": {
     "id": "cobra",
@@ -402,7 +413,8 @@
       2.07,
       1.5,
       1.0
-    ]
+    ],
+    "radius": 0.62
   },
   "snapping_turtle": {
     "id": "snapping_turtle",
@@ -413,7 +425,8 @@
       2.13,
       1.6,
       1.0
-    ]
+    ],
+    "radius": 0.64
   },
   "venom_snake": {
     "id": "venom_snake",
@@ -424,7 +437,8 @@
       2.58,
       1.4,
       1.0
-    ]
+    ],
+    "radius": 0.77
   },
   "giant_rat": {
     "id": "giant_rat",
@@ -435,7 +449,8 @@
       0.84,
       1.0,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "sand_rat": {
     "id": "sand_rat",
@@ -446,7 +461,8 @@
       0.68,
       0.8,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "giant_bat": {
     "id": "giant_bat",
@@ -457,7 +473,8 @@
       2.18,
       1.6,
       1.0
-    ]
+    ],
+    "radius": 0.65
   },
   "mandrill": {
     "id": "mandrill",
@@ -468,7 +485,8 @@
       1.45,
       2.2,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "great_wolf": {
     "id": "great_wolf",
@@ -479,7 +497,8 @@
       1.03,
       2.0,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "fenrir": {
     "id": "fenrir",
@@ -490,7 +509,8 @@
       1.77,
       4.0,
       1.0
-    ]
+    ],
+    "radius": 0.53
   },
   "snow_leopard": {
     "id": "snow_leopard",
@@ -501,7 +521,8 @@
       0.71,
       1.6,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "griffon": {
     "id": "griffon",
@@ -521,7 +542,7 @@
       1.0
     ],
     "y": 2.8,
-    "radius": 1.6,
+    "radius": 1.25,
     "deathColor": "#c9a24a",
     "stealth": "normal"
   },
@@ -534,7 +555,8 @@
       2.02,
       2.0,
       1.0
-    ]
+    ],
+    "radius": 0.61
   },
   "chimera": {
     "id": "chimera",
@@ -545,7 +567,8 @@
       2.36,
       3.2,
       1.0
-    ]
+    ],
+    "radius": 0.71
   },
   "manticore": {
     "id": "manticore",
@@ -556,7 +579,8 @@
       2.46,
       3.0,
       1.0
-    ]
+    ],
+    "radius": 0.74
   },
   "goblin_scout": {
     "id": "goblin_scout",
@@ -567,7 +591,8 @@
       0.75,
       1.6,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "goblin_soldier": {
     "id": "goblin_soldier",
@@ -578,7 +603,8 @@
       0.97,
       2.0,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "goblin_king": {
     "id": "goblin_king",
@@ -589,7 +615,8 @@
       1.67,
       2.6,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "goblin_emperor": {
     "id": "goblin_emperor",
@@ -600,7 +627,8 @@
       2.26,
       3.0,
       1.0
-    ]
+    ],
+    "radius": 0.68
   },
   "hobgoblin_male": {
     "id": "hobgoblin_male",
@@ -611,7 +639,8 @@
       1.96,
       2.6,
       1.0
-    ]
+    ],
+    "radius": 0.59
   },
   "hobgoblin_female": {
     "id": "hobgoblin_female",
@@ -622,7 +651,8 @@
       0.89,
       2.4,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "orc_warrior": {
     "id": "orc_warrior",
@@ -633,7 +663,8 @@
       1.46,
       2.8,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "orc_general": {
     "id": "orc_general",
@@ -644,7 +675,8 @@
       2.15,
       3.1,
       1.0
-    ]
+    ],
+    "radius": 0.64
   },
   "orc_king": {
     "id": "orc_king",
@@ -655,7 +687,8 @@
       2.52,
       3.4,
       1.0
-    ]
+    ],
+    "radius": 0.76
   },
   "ogre": {
     "id": "ogre",
@@ -666,7 +699,8 @@
       2.16,
       3.6,
       1.0
-    ]
+    ],
+    "radius": 0.65
   },
   "cyclops": {
     "id": "cyclops",
@@ -677,7 +711,8 @@
       3.3,
       5.0,
       1.0
-    ]
+    ],
+    "radius": 0.99
   },
   "lizardman": {
     "id": "lizardman",
@@ -688,7 +723,8 @@
       1.53,
       2.7,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "naga_male": {
     "id": "naga_male",
@@ -699,7 +735,8 @@
       2.46,
       2.8,
       1.0
-    ]
+    ],
+    "radius": 0.74
   },
   "naga_female": {
     "id": "naga_female",
@@ -710,7 +747,8 @@
       1.37,
       2.7,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "dark_elf": {
     "id": "dark_elf",
@@ -721,7 +759,8 @@
       0.78,
       2.4,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "dog_warrior_male": {
     "id": "dog_warrior_male",
@@ -732,7 +771,8 @@
       0.93,
       2.0,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "dog_warrior_female": {
     "id": "dog_warrior_female",
@@ -743,7 +783,8 @@
       0.76,
       1.9,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "swordsman": {
     "id": "swordsman",
@@ -754,7 +795,8 @@
       0.91,
       2.3,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "thief": {
     "id": "thief",
@@ -765,7 +807,8 @@
       1.04,
       2.2,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "assassin": {
     "id": "assassin",
@@ -776,7 +819,8 @@
       1.08,
       2.3,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "mage": {
     "id": "mage",
@@ -787,7 +831,8 @@
       0.89,
       2.3,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "magician": {
     "id": "magician",
@@ -798,7 +843,8 @@
       0.78,
       2.3,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "wizard": {
     "id": "wizard",
@@ -809,7 +855,8 @@
       0.99,
       2.2,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "archmage": {
     "id": "archmage",
@@ -820,7 +867,8 @@
       1.05,
       2.5,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "mohawk_thug": {
     "id": "mohawk_thug",
@@ -831,7 +879,8 @@
       1.03,
       2.4,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "bandit_grunt": {
     "id": "bandit_grunt",
@@ -842,7 +891,8 @@
       0.86,
       2.2,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "bandit_leader": {
     "id": "bandit_leader",
@@ -853,7 +903,8 @@
       1.12,
       2.4,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "bandit_boss": {
     "id": "bandit_boss",
@@ -864,7 +915,8 @@
       1.43,
       2.9,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "fallen_priest": {
     "id": "fallen_priest",
@@ -875,7 +927,8 @@
       1.03,
       2.3,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "fallen_priestess": {
     "id": "fallen_priestess",
@@ -886,7 +939,8 @@
       1.12,
       2.2,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "guard_light_spear": {
     "id": "guard_light_spear",
@@ -897,7 +951,8 @@
       0.77,
       2.4,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "guard_heavy_spear": {
     "id": "guard_heavy_spear",
@@ -908,7 +963,8 @@
       0.97,
       2.6,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "guard_elite": {
     "id": "guard_elite",
@@ -919,7 +975,8 @@
       1.45,
       2.8,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "zombie": {
     "id": "zombie",
@@ -930,7 +987,8 @@
       0.84,
       2.3,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "ghost": {
     "id": "ghost",
@@ -941,7 +999,8 @@
       1.51,
       2.4,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "ghoul": {
     "id": "ghoul",
@@ -952,7 +1011,8 @@
       1.19,
       2.3,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "banshee": {
     "id": "banshee",
@@ -963,7 +1023,8 @@
       1.1,
       2.3,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "lich": {
     "id": "lich",
@@ -974,7 +1035,8 @@
       1.74,
       2.6,
       1.0
-    ]
+    ],
+    "radius": 0.52
   },
   "vampire": {
     "id": "vampire",
@@ -985,7 +1047,8 @@
       1.67,
       2.4,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "vampire_lord": {
     "id": "vampire_lord",
@@ -996,7 +1059,8 @@
       1.36,
       2.6,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "no_life_king": {
     "id": "no_life_king",
@@ -1007,7 +1071,8 @@
       1.47,
       3.0,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "wyvern": {
     "id": "wyvern",
@@ -1018,7 +1083,8 @@
       8.41,
       5.0,
       1.0
-    ]
+    ],
+    "radius": 2.52
   },
   "red_dragon": {
     "id": "red_dragon",
@@ -1029,7 +1095,8 @@
       6.29,
       6.5,
       1.0
-    ]
+    ],
+    "radius": 1.89
   },
   "green_dragon": {
     "id": "green_dragon",
@@ -1040,7 +1107,8 @@
       8.52,
       6.5,
       1.0
-    ]
+    ],
+    "radius": 2.56
   },
   "white_dragon": {
     "id": "white_dragon",
@@ -1051,7 +1119,8 @@
       8.64,
       6.5,
       1.0
-    ]
+    ],
+    "radius": 2.59
   },
   "golden_dragon": {
     "id": "golden_dragon",
@@ -1062,7 +1131,8 @@
       8.81,
       7.0,
       1.0
-    ]
+    ],
+    "radius": 2.64
   },
   "dark_dragon": {
     "id": "dark_dragon",
@@ -1073,7 +1143,8 @@
       8.14,
       7.0,
       1.0
-    ]
+    ],
+    "radius": 2.44
   },
   "earth_dragon": {
     "id": "earth_dragon",
@@ -1084,7 +1155,8 @@
       3.92,
       5.5,
       1.0
-    ]
+    ],
+    "radius": 1.18
   },
   "dragon_emperor": {
     "id": "dragon_emperor",
@@ -1095,7 +1167,8 @@
       9.4,
       8.5,
       1.0
-    ]
+    ],
+    "radius": 2.82
   },
   "wood_golem": {
     "id": "wood_golem",
@@ -1106,7 +1179,8 @@
       2.41,
       4.0,
       1.0
-    ]
+    ],
+    "radius": 0.72
   },
   "stone_golem": {
     "id": "stone_golem",
@@ -1117,7 +1191,8 @@
       3.32,
       4.5,
       1.0
-    ]
+    ],
+    "radius": 1.0
   },
   "iron_golem": {
     "id": "iron_golem",
@@ -1128,7 +1203,8 @@
       3.35,
       4.8,
       1.0
-    ]
+    ],
+    "radius": 1.0
   },
   "mithril_golem": {
     "id": "mithril_golem",
@@ -1139,7 +1215,8 @@
       2.84,
       4.8,
       1.0
-    ]
+    ],
+    "radius": 0.85
   },
   "diamond_golem": {
     "id": "diamond_golem",
@@ -1150,7 +1227,8 @@
       3.5,
       5.0,
       1.0
-    ]
+    ],
+    "radius": 1.05
   },
   "gargoyle": {
     "id": "gargoyle",
@@ -1161,7 +1239,8 @@
       1.24,
       2.6,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "will_o_wisp": {
     "id": "will_o_wisp",
@@ -1172,7 +1251,8 @@
       0.58,
       1.4,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "sylph": {
     "id": "sylph",
@@ -1183,7 +1263,8 @@
       1.23,
       2.0,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "undine": {
     "id": "undine",
@@ -1194,7 +1275,8 @@
       0.72,
       2.4,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "salamander": {
     "id": "salamander",
@@ -1205,7 +1287,8 @@
       1.88,
       1.5,
       1.0
-    ]
+    ],
+    "radius": 0.56
   },
   "gnome": {
     "id": "gnome",
@@ -1216,7 +1299,8 @@
       0.89,
       1.5,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "jack_o_lantern": {
     "id": "jack_o_lantern",
@@ -1227,7 +1311,8 @@
       1.59,
       2.6,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "dullahan": {
     "id": "dullahan",
@@ -1238,7 +1323,8 @@
       1.47,
       3.2,
       1.0
-    ]
+    ],
+    "radius": 0.5
   },
   "lesser_demon": {
     "id": "lesser_demon",
@@ -1249,7 +1335,8 @@
       2.74,
       2.6,
       1.0
-    ]
+    ],
+    "radius": 0.82
   },
   "arch_demon": {
     "id": "arch_demon",
@@ -1260,7 +1347,8 @@
       1.83,
       3.4,
       1.0
-    ]
+    ],
+    "radius": 0.55
   },
   "arch_devil": {
     "id": "arch_devil",
@@ -1271,7 +1359,8 @@
       2.28,
       3.8,
       1.0
-    ]
+    ],
+    "radius": 0.68
   },
   "demon_lord": {
     "id": "demon_lord",
@@ -1282,6 +1371,7 @@
       1.65,
       4.2,
       1.0
-    ]
+    ],
+    "radius": 0.5
   }
 }
