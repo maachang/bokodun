@@ -276,127 +276,232 @@
     "id": "acid_slime",
     "name": "アシッドスライム",
     "sdId": 95,
-    "imageFile": "slime/acid_slime.png"
+    "imageFile": "slime/acid_slime.png",
+    "scale": [
+      1.47,
+      1.2,
+      1.0
+    ]
   },
   "quicksilver_slime": {
     "id": "quicksilver_slime",
     "name": "水銀スライム",
     "sdId": 99,
-    "imageFile": "slime/quicksilver_slime.png"
+    "imageFile": "slime/quicksilver_slime.png",
+    "scale": [
+      1.71,
+      1.2,
+      1.0
+    ]
   },
   "slime_emperor": {
     "id": "slime_emperor",
     "name": "スライムエンペラー",
     "sdId": 100,
-    "imageFile": "slime/slime_emperor.png"
+    "imageFile": "slime/slime_emperor.png",
+    "scale": [
+      2.34,
+      2.2,
+      1.0
+    ]
   },
   "ant_pawn": {
     "id": "ant_pawn",
     "name": "アントポーン",
     "sdId": 85,
-    "imageFile": "insect/ant_pawn.png"
+    "imageFile": "insect/ant_pawn.png",
+    "scale": [
+      1.63,
+      1.0,
+      1.0
+    ]
   },
   "ant_knight": {
     "id": "ant_knight",
     "name": "アントナイト",
     "sdId": 86,
-    "imageFile": "insect/ant_knight.png"
+    "imageFile": "insect/ant_knight.png",
+    "scale": [
+      1.88,
+      1.5,
+      1.0
+    ]
   },
   "ant_general": {
     "id": "ant_general",
     "name": "アントジェネラル",
     "sdId": 87,
-    "imageFile": "insect/ant_general.png"
+    "imageFile": "insect/ant_general.png",
+    "scale": [
+      1.22,
+      2.0,
+      1.0
+    ]
   },
   "ant_queen": {
     "id": "ant_queen",
     "name": "アント女王",
     "sdId": 88,
-    "imageFile": "insect/ant_queen.png"
+    "imageFile": "insect/ant_queen.png",
+    "scale": [
+      1.13,
+      2.6,
+      1.0
+    ]
   },
   "assassin_centipede": {
     "id": "assassin_centipede",
     "name": "アサシン・ムカデ",
     "sdId": 82,
-    "imageFile": "insect/assassin_centipede.png"
+    "imageFile": "insect/assassin_centipede.png",
+    "scale": [
+      1.53,
+      1.3,
+      1.0
+    ]
   },
   "beetle_king": {
     "id": "beetle_king",
     "name": "ビートルキング",
     "sdId": 104,
-    "imageFile": "insect/beetle_king.png"
+    "imageFile": "insect/beetle_king.png",
+    "scale": [
+      2.65,
+      2.4,
+      1.0
+    ]
   },
   "killer_mantis": {
     "id": "killer_mantis",
     "name": "キラーマンティス",
     "sdId": 89,
-    "imageFile": "insect/killer_mantis.png"
+    "imageFile": "insect/killer_mantis.png",
+    "scale": [
+      3.58,
+      3.0,
+      1.0
+    ]
   },
   "scorpion": {
     "id": "scorpion",
     "name": "スコーピオン",
     "sdId": 68,
-    "imageFile": "insect/scorpion.png"
+    "imageFile": "insect/scorpion.png",
+    "scale": [
+      1.25,
+      1.2,
+      1.0
+    ]
   },
   "cobra": {
     "id": "cobra",
     "name": "コブラ",
     "sdId": 63,
-    "imageFile": "reptile/cobra.png"
+    "imageFile": "reptile/cobra.png",
+    "scale": [
+      2.07,
+      1.5,
+      1.0
+    ]
   },
   "snapping_turtle": {
     "id": "snapping_turtle",
     "name": "巨大カミツキガメ",
     "sdId": 167,
-    "imageFile": "reptile/snapping_turtle.png"
+    "imageFile": "reptile/snapping_turtle.png",
+    "scale": [
+      2.13,
+      1.6,
+      1.0
+    ]
   },
   "venom_snake": {
     "id": "venom_snake",
     "name": "巨大毒蛇",
     "sdId": 168,
-    "imageFile": "reptile/venom_snake.png"
+    "imageFile": "reptile/venom_snake.png",
+    "scale": [
+      2.58,
+      1.4,
+      1.0
+    ]
   },
   "giant_rat": {
     "id": "giant_rat",
     "name": "大ねずみ",
     "sdId": 59,
-    "imageFile": "beast/giant_rat.png"
+    "imageFile": "beast/giant_rat.png",
+    "scale": [
+      0.84,
+      1.0,
+      1.0
+    ]
   },
   "sand_rat": {
     "id": "sand_rat",
     "name": "スナネズミ",
     "sdId": 69,
-    "imageFile": "beast/sand_rat.png"
+    "imageFile": "beast/sand_rat.png",
+    "scale": [
+      0.68,
+      0.8,
+      1.0
+    ]
   },
   "giant_bat": {
     "id": "giant_bat",
     "name": "大コウモリ",
     "sdId": 35,
-    "imageFile": "beast/giant_bat.png"
+    "imageFile": "beast/giant_bat.png",
+    "scale": [
+      2.18,
+      1.6,
+      1.0
+    ]
   },
   "mandrill": {
     "id": "mandrill",
     "name": "マントヒヒ",
     "sdId": 115,
-    "imageFile": "beast/mandrill.png"
+    "imageFile": "beast/mandrill.png",
+    "scale": [
+      1.45,
+      2.2,
+      1.0
+    ]
   },
   "great_wolf": {
     "id": "great_wolf",
     "name": "大狼",
     "sdId": 102,
-    "imageFile": "beast/great_wolf.png"
+    "imageFile": "beast/great_wolf.png",
+    "scale": [
+      1.03,
+      2.0,
+      1.0
+    ]
   },
   "fenrir": {
     "id": "fenrir",
     "name": "フェンリル",
     "sdId": 101,
-    "imageFile": "beast/fenrir.png"
+    "imageFile": "beast/fenrir.png",
+    "scale": [
+      1.77,
+      4.0,
+      1.0
+    ]
   },
   "snow_leopard": {
     "id": "snow_leopard",
     "name": "ユキヒョウ",
     "sdId": 103,
-    "imageFile": "beast/snow_leopard.png"
+    "imageFile": "beast/snow_leopard.png",
+    "scale": [
+      0.71,
+      1.6,
+      1.0
+    ]
   },
   "griffon": {
     "id": "griffon",
@@ -411,8 +516,8 @@
     "exp": 0,
     "canShoot": false,
     "scale": [
-      6.49,
-      5.6,
+      4.17,
+      3.6,
       1.0
     ],
     "y": 2.8,
@@ -424,414 +529,759 @@
     "id": "cockatrice",
     "name": "コカトリス",
     "sdId": 78,
-    "imageFile": "beast/cockatrice.png"
+    "imageFile": "beast/cockatrice.png",
+    "scale": [
+      2.02,
+      2.0,
+      1.0
+    ]
   },
   "chimera": {
     "id": "chimera",
     "name": "キマイラ",
     "sdId": 36,
-    "imageFile": "beast/chimera.png"
+    "imageFile": "beast/chimera.png",
+    "scale": [
+      2.36,
+      3.2,
+      1.0
+    ]
   },
   "manticore": {
     "id": "manticore",
     "name": "マンティコア",
     "sdId": 105,
-    "imageFile": "beast/manticore.png"
+    "imageFile": "beast/manticore.png",
+    "scale": [
+      2.46,
+      3.0,
+      1.0
+    ]
   },
   "goblin_scout": {
     "id": "goblin_scout",
     "name": "ゴブリン（小）",
     "sdId": 32,
-    "imageFile": "demihuman/goblin_scout.png"
+    "imageFile": "demihuman/goblin_scout.png",
+    "scale": [
+      0.75,
+      1.6,
+      1.0
+    ]
   },
   "goblin_soldier": {
     "id": "goblin_soldier",
     "name": "ゴブリンソルジャー",
     "sdId": 26,
-    "imageFile": "demihuman/goblin_soldier.png"
+    "imageFile": "demihuman/goblin_soldier.png",
+    "scale": [
+      0.97,
+      2.0,
+      1.0
+    ]
   },
   "goblin_king": {
     "id": "goblin_king",
     "name": "ゴブリンキング",
     "sdId": 38,
-    "imageFile": "demihuman/goblin_king.png"
+    "imageFile": "demihuman/goblin_king.png",
+    "scale": [
+      1.67,
+      2.6,
+      1.0
+    ]
   },
   "goblin_emperor": {
     "id": "goblin_emperor",
     "name": "ゴブリンエンペラー",
     "sdId": 73,
-    "imageFile": "demihuman/goblin_emperor.png"
+    "imageFile": "demihuman/goblin_emperor.png",
+    "scale": [
+      2.26,
+      3.0,
+      1.0
+    ]
   },
   "hobgoblin_male": {
     "id": "hobgoblin_male",
     "name": "ホブゴブリン（雄）",
     "sdId": 15,
-    "imageFile": "demihuman/hobgoblin_male.png"
+    "imageFile": "demihuman/hobgoblin_male.png",
+    "scale": [
+      1.96,
+      2.6,
+      1.0
+    ]
   },
   "hobgoblin_female": {
     "id": "hobgoblin_female",
     "name": "ホブゴブリン（雌）",
     "sdId": 3,
-    "imageFile": "demihuman/hobgoblin_female.png"
+    "imageFile": "demihuman/hobgoblin_female.png",
+    "scale": [
+      0.89,
+      2.4,
+      1.0
+    ]
   },
   "orc_warrior": {
     "id": "orc_warrior",
     "name": "オークの戦士",
     "sdId": 6,
-    "imageFile": "demihuman/orc_warrior.png"
+    "imageFile": "demihuman/orc_warrior.png",
+    "scale": [
+      1.46,
+      2.8,
+      1.0
+    ]
   },
   "orc_general": {
     "id": "orc_general",
     "name": "オークジェネラル",
     "sdId": 31,
-    "imageFile": "demihuman/orc_general.png"
+    "imageFile": "demihuman/orc_general.png",
+    "scale": [
+      2.15,
+      3.1,
+      1.0
+    ]
   },
   "orc_king": {
     "id": "orc_king",
     "name": "オークキング",
     "sdId": 8,
-    "imageFile": "demihuman/orc_king.png"
+    "imageFile": "demihuman/orc_king.png",
+    "scale": [
+      2.52,
+      3.4,
+      1.0
+    ]
   },
   "ogre": {
     "id": "ogre",
     "name": "オーガ",
     "sdId": 58,
-    "imageFile": "demihuman/ogre.png"
+    "imageFile": "demihuman/ogre.png",
+    "scale": [
+      2.16,
+      3.6,
+      1.0
+    ]
   },
   "cyclops": {
     "id": "cyclops",
     "name": "サイクロプス",
     "sdId": 65,
-    "imageFile": "demihuman/cyclops.png"
+    "imageFile": "demihuman/cyclops.png",
+    "scale": [
+      3.3,
+      5.0,
+      1.0
+    ]
   },
   "lizardman": {
     "id": "lizardman",
     "name": "リザードマン",
     "sdId": 70,
-    "imageFile": "demihuman/lizardman.png"
+    "imageFile": "demihuman/lizardman.png",
+    "scale": [
+      1.53,
+      2.7,
+      1.0
+    ]
   },
   "naga_male": {
     "id": "naga_male",
     "name": "ナーガ（雄）",
     "sdId": 93,
-    "imageFile": "demihuman/naga_male.png"
+    "imageFile": "demihuman/naga_male.png",
+    "scale": [
+      2.46,
+      2.8,
+      1.0
+    ]
   },
   "naga_female": {
     "id": "naga_female",
     "name": "ナーガ（雌）",
     "sdId": 92,
-    "imageFile": "demihuman/naga_female.png"
+    "imageFile": "demihuman/naga_female.png",
+    "scale": [
+      1.37,
+      2.7,
+      1.0
+    ]
   },
   "dark_elf": {
     "id": "dark_elf",
     "name": "ダークエルフ",
     "sdId": 20,
-    "imageFile": "demihuman/dark_elf.png"
+    "imageFile": "demihuman/dark_elf.png",
+    "scale": [
+      0.78,
+      2.4,
+      1.0
+    ]
   },
   "dog_warrior_male": {
     "id": "dog_warrior_male",
     "name": "犬獣人の戦士（雄）",
     "sdId": 11,
-    "imageFile": "demihuman/dog_warrior_male.png"
+    "imageFile": "demihuman/dog_warrior_male.png",
+    "scale": [
+      0.93,
+      2.0,
+      1.0
+    ]
   },
   "dog_warrior_female": {
     "id": "dog_warrior_female",
     "name": "犬獣人の戦士（雌）",
     "sdId": 5,
-    "imageFile": "demihuman/dog_warrior_female.png"
+    "imageFile": "demihuman/dog_warrior_female.png",
+    "scale": [
+      0.76,
+      1.9,
+      1.0
+    ]
   },
   "swordsman": {
     "id": "swordsman",
     "name": "ソードマン",
     "sdId": 66,
-    "imageFile": "human/swordsman.png"
+    "imageFile": "human/swordsman.png",
+    "scale": [
+      0.91,
+      2.3,
+      1.0
+    ]
   },
   "thief": {
     "id": "thief",
     "name": "シーフ",
     "sdId": 75,
-    "imageFile": "human/thief.png"
+    "imageFile": "human/thief.png",
+    "scale": [
+      1.04,
+      2.2,
+      1.0
+    ]
   },
   "assassin": {
     "id": "assassin",
     "name": "アサシン",
     "sdId": 76,
-    "imageFile": "human/assassin.png"
+    "imageFile": "human/assassin.png",
+    "scale": [
+      1.08,
+      2.3,
+      1.0
+    ]
   },
   "mage": {
     "id": "mage",
     "name": "メイジ",
     "sdId": 118,
-    "imageFile": "human/mage.png"
+    "imageFile": "human/mage.png",
+    "scale": [
+      0.89,
+      2.3,
+      1.0
+    ]
   },
   "magician": {
     "id": "magician",
     "name": "マジシャン",
     "sdId": 119,
-    "imageFile": "human/magician.png"
+    "imageFile": "human/magician.png",
+    "scale": [
+      0.78,
+      2.3,
+      1.0
+    ]
   },
   "wizard": {
     "id": "wizard",
     "name": "ウィザード",
     "sdId": 120,
-    "imageFile": "human/wizard.png"
+    "imageFile": "human/wizard.png",
+    "scale": [
+      0.99,
+      2.2,
+      1.0
+    ]
   },
   "archmage": {
     "id": "archmage",
     "name": "アークメイジ",
     "sdId": 48,
-    "imageFile": "human/archmage.png"
+    "imageFile": "human/archmage.png",
+    "scale": [
+      1.05,
+      2.5,
+      1.0
+    ]
   },
   "mohawk_thug": {
     "id": "mohawk_thug",
     "name": "モヒカンのならず者",
     "sdId": 12,
-    "imageFile": "human/mohawk_thug.png"
+    "imageFile": "human/mohawk_thug.png",
+    "scale": [
+      1.03,
+      2.4,
+      1.0
+    ]
   },
   "bandit_grunt": {
     "id": "bandit_grunt",
     "name": "山賊の下っ端",
     "sdId": 163,
-    "imageFile": "human/bandit_grunt.png"
+    "imageFile": "human/bandit_grunt.png",
+    "scale": [
+      0.86,
+      2.2,
+      1.0
+    ]
   },
   "bandit_leader": {
     "id": "bandit_leader",
     "name": "山賊のリーダー",
     "sdId": 164,
-    "imageFile": "human/bandit_leader.png"
+    "imageFile": "human/bandit_leader.png",
+    "scale": [
+      1.12,
+      2.4,
+      1.0
+    ]
   },
   "bandit_boss": {
     "id": "bandit_boss",
     "name": "山賊のボス",
     "sdId": 165,
-    "imageFile": "human/bandit_boss.png"
+    "imageFile": "human/bandit_boss.png",
+    "scale": [
+      1.43,
+      2.9,
+      1.0
+    ]
   },
   "fallen_priest": {
     "id": "fallen_priest",
     "name": "堕落した男のプリースト",
     "sdId": 161,
-    "imageFile": "human/fallen_priest.png"
+    "imageFile": "human/fallen_priest.png",
+    "scale": [
+      1.03,
+      2.3,
+      1.0
+    ]
   },
   "fallen_priestess": {
     "id": "fallen_priestess",
     "name": "堕落した女のプリースト",
     "sdId": 162,
-    "imageFile": "human/fallen_priestess.png"
+    "imageFile": "human/fallen_priestess.png",
+    "scale": [
+      1.12,
+      2.2,
+      1.0
+    ]
   },
   "guard_light_spear": {
     "id": "guard_light_spear",
     "name": "軽装衛兵（槍）",
     "sdId": 2,
-    "imageFile": "human/guard_light_spear.png"
+    "imageFile": "human/guard_light_spear.png",
+    "scale": [
+      0.77,
+      2.4,
+      1.0
+    ]
   },
   "guard_heavy_spear": {
     "id": "guard_heavy_spear",
     "name": "重装衛兵（槍・兜なし）",
     "sdId": 9,
-    "imageFile": "human/guard_heavy_spear.png"
+    "imageFile": "human/guard_heavy_spear.png",
+    "scale": [
+      0.97,
+      2.6,
+      1.0
+    ]
   },
   "guard_elite": {
     "id": "guard_elite",
     "name": "重装衛兵（フルフェイス）",
     "sdId": 16,
-    "imageFile": "human/guard_elite.png"
+    "imageFile": "human/guard_elite.png",
+    "scale": [
+      1.45,
+      2.8,
+      1.0
+    ]
   },
   "zombie": {
     "id": "zombie",
     "name": "ゾンビ",
     "sdId": 64,
-    "imageFile": "undead/zombie.png"
+    "imageFile": "undead/zombie.png",
+    "scale": [
+      0.84,
+      2.3,
+      1.0
+    ]
   },
   "ghost": {
     "id": "ghost",
     "name": "ゴースト",
     "sdId": 71,
-    "imageFile": "undead/ghost.png"
+    "imageFile": "undead/ghost.png",
+    "scale": [
+      1.51,
+      2.4,
+      1.0
+    ]
   },
   "ghoul": {
     "id": "ghoul",
     "name": "グール",
     "sdId": 49,
-    "imageFile": "undead/ghoul.png"
+    "imageFile": "undead/ghoul.png",
+    "scale": [
+      1.19,
+      2.3,
+      1.0
+    ]
   },
   "banshee": {
     "id": "banshee",
     "name": "バンシー",
     "sdId": 74,
-    "imageFile": "undead/banshee.png"
+    "imageFile": "undead/banshee.png",
+    "scale": [
+      1.1,
+      2.3,
+      1.0
+    ]
   },
   "lich": {
     "id": "lich",
     "name": "リッチ",
     "sdId": 72,
-    "imageFile": "undead/lich.png"
+    "imageFile": "undead/lich.png",
+    "scale": [
+      1.74,
+      2.6,
+      1.0
+    ]
   },
   "vampire": {
     "id": "vampire",
     "name": "ヴァンパイア",
     "sdId": 56,
-    "imageFile": "undead/vampire.png"
+    "imageFile": "undead/vampire.png",
+    "scale": [
+      1.67,
+      2.4,
+      1.0
+    ]
   },
   "vampire_lord": {
     "id": "vampire_lord",
     "name": "ヴァンパイアロード",
     "sdId": 57,
-    "imageFile": "undead/vampire_lord.png"
+    "imageFile": "undead/vampire_lord.png",
+    "scale": [
+      1.36,
+      2.6,
+      1.0
+    ]
   },
   "no_life_king": {
     "id": "no_life_king",
     "name": "ノーライフキング",
     "sdId": 40,
-    "imageFile": "undead/no_life_king.png"
+    "imageFile": "undead/no_life_king.png",
+    "scale": [
+      1.47,
+      3.0,
+      1.0
+    ]
   },
   "wyvern": {
     "id": "wyvern",
     "name": "ワイバーン",
     "sdId": 67,
-    "imageFile": "dragon/wyvern.png"
+    "imageFile": "dragon/wyvern.png",
+    "scale": [
+      8.41,
+      5.0,
+      1.0
+    ]
   },
   "red_dragon": {
     "id": "red_dragon",
     "name": "レッドドラゴン",
     "sdId": 13,
-    "imageFile": "dragon/red_dragon.png"
+    "imageFile": "dragon/red_dragon.png",
+    "scale": [
+      6.29,
+      6.5,
+      1.0
+    ]
   },
   "green_dragon": {
     "id": "green_dragon",
     "name": "グリーンドラゴン",
     "sdId": 110,
-    "imageFile": "dragon/green_dragon.png"
+    "imageFile": "dragon/green_dragon.png",
+    "scale": [
+      8.52,
+      6.5,
+      1.0
+    ]
   },
   "white_dragon": {
     "id": "white_dragon",
     "name": "ホワイトドラゴン",
     "sdId": 107,
-    "imageFile": "dragon/white_dragon.png"
+    "imageFile": "dragon/white_dragon.png",
+    "scale": [
+      8.64,
+      6.5,
+      1.0
+    ]
   },
   "golden_dragon": {
     "id": "golden_dragon",
     "name": "ゴールデンドラゴン",
     "sdId": 108,
-    "imageFile": "dragon/golden_dragon.png"
+    "imageFile": "dragon/golden_dragon.png",
+    "scale": [
+      8.81,
+      7.0,
+      1.0
+    ]
   },
   "dark_dragon": {
     "id": "dark_dragon",
     "name": "ダークドラゴン",
     "sdId": 106,
-    "imageFile": "dragon/dark_dragon.png"
+    "imageFile": "dragon/dark_dragon.png",
+    "scale": [
+      8.14,
+      7.0,
+      1.0
+    ]
   },
   "earth_dragon": {
     "id": "earth_dragon",
     "name": "アースドラゴン",
     "sdId": 111,
-    "imageFile": "dragon/earth_dragon.png"
+    "imageFile": "dragon/earth_dragon.png",
+    "scale": [
+      3.92,
+      5.5,
+      1.0
+    ]
   },
   "dragon_emperor": {
     "id": "dragon_emperor",
     "name": "ドラゴンエンペラー",
     "sdId": 109,
-    "imageFile": "dragon/dragon_emperor.png"
+    "imageFile": "dragon/dragon_emperor.png",
+    "scale": [
+      9.4,
+      8.5,
+      1.0
+    ]
   },
   "wood_golem": {
     "id": "wood_golem",
     "name": "ウッドゴーレム",
     "sdId": 51,
-    "imageFile": "golem/wood_golem.png"
+    "imageFile": "golem/wood_golem.png",
+    "scale": [
+      2.41,
+      4.0,
+      1.0
+    ]
   },
   "stone_golem": {
     "id": "stone_golem",
     "name": "ストーンゴーレム",
     "sdId": 53,
-    "imageFile": "golem/stone_golem.png"
+    "imageFile": "golem/stone_golem.png",
+    "scale": [
+      3.32,
+      4.5,
+      1.0
+    ]
   },
   "iron_golem": {
     "id": "iron_golem",
     "name": "アイアンゴーレム",
     "sdId": 52,
-    "imageFile": "golem/iron_golem.png"
+    "imageFile": "golem/iron_golem.png",
+    "scale": [
+      3.35,
+      4.8,
+      1.0
+    ]
   },
   "mithril_golem": {
     "id": "mithril_golem",
     "name": "ミスリルゴーレム",
     "sdId": 55,
-    "imageFile": "golem/mithril_golem.png"
+    "imageFile": "golem/mithril_golem.png",
+    "scale": [
+      2.84,
+      4.8,
+      1.0
+    ]
   },
   "diamond_golem": {
     "id": "diamond_golem",
     "name": "ダイヤモンドゴーレム",
     "sdId": 98,
-    "imageFile": "golem/diamond_golem.png"
+    "imageFile": "golem/diamond_golem.png",
+    "scale": [
+      3.5,
+      5.0,
+      1.0
+    ]
   },
   "gargoyle": {
     "id": "gargoyle",
     "name": "ガーゴイル",
     "sdId": 45,
-    "imageFile": "golem/gargoyle.png"
+    "imageFile": "golem/gargoyle.png",
+    "scale": [
+      1.24,
+      2.6,
+      1.0
+    ]
   },
   "will_o_wisp": {
     "id": "will_o_wisp",
     "name": "ウィルオーウィスプ",
     "sdId": 61,
-    "imageFile": "fairy/will_o_wisp.png"
+    "imageFile": "fairy/will_o_wisp.png",
+    "scale": [
+      0.58,
+      1.4,
+      1.0
+    ]
   },
   "sylph": {
     "id": "sylph",
     "name": "シルフ",
     "sdId": 94,
-    "imageFile": "fairy/sylph.png"
+    "imageFile": "fairy/sylph.png",
+    "scale": [
+      1.23,
+      2.0,
+      1.0
+    ]
   },
   "undine": {
     "id": "undine",
     "name": "ウンディーネ",
     "sdId": 123,
-    "imageFile": "fairy/undine.png"
+    "imageFile": "fairy/undine.png",
+    "scale": [
+      0.72,
+      2.4,
+      1.0
+    ]
   },
   "salamander": {
     "id": "salamander",
     "name": "サラマンダー",
     "sdId": 122,
-    "imageFile": "fairy/salamander.png"
+    "imageFile": "fairy/salamander.png",
+    "scale": [
+      1.88,
+      1.5,
+      1.0
+    ]
   },
   "gnome": {
     "id": "gnome",
     "name": "ノーム",
     "sdId": 124,
-    "imageFile": "fairy/gnome.png"
+    "imageFile": "fairy/gnome.png",
+    "scale": [
+      0.89,
+      1.5,
+      1.0
+    ]
   },
   "jack_o_lantern": {
     "id": "jack_o_lantern",
     "name": "ジャック・オ・ランターン",
     "sdId": 125,
-    "imageFile": "fairy/jack_o_lantern.png"
+    "imageFile": "fairy/jack_o_lantern.png",
+    "scale": [
+      1.59,
+      2.6,
+      1.0
+    ]
   },
   "dullahan": {
     "id": "dullahan",
     "name": "デュラハン",
     "sdId": 126,
-    "imageFile": "fairy/dullahan.png"
+    "imageFile": "fairy/dullahan.png",
+    "scale": [
+      1.47,
+      3.2,
+      1.0
+    ]
   },
   "lesser_demon": {
     "id": "lesser_demon",
     "name": "レッサーデーモン",
     "sdId": 34,
-    "imageFile": "demon/lesser_demon.png"
+    "imageFile": "demon/lesser_demon.png",
+    "scale": [
+      2.74,
+      2.6,
+      1.0
+    ]
   },
   "arch_demon": {
     "id": "arch_demon",
     "name": "アークデーモン",
     "sdId": 39,
-    "imageFile": "demon/arch_demon.png"
+    "imageFile": "demon/arch_demon.png",
+    "scale": [
+      1.83,
+      3.4,
+      1.0
+    ]
   },
   "arch_devil": {
     "id": "arch_devil",
     "name": "アーチデビル",
     "sdId": 46,
-    "imageFile": "demon/arch_devil.png"
+    "imageFile": "demon/arch_devil.png",
+    "scale": [
+      2.28,
+      3.8,
+      1.0
+    ]
   },
   "demon_lord": {
     "id": "demon_lord",
     "name": "デーモンロード",
     "sdId": 47,
-    "imageFile": "demon/demon_lord.png"
+    "imageFile": "demon/demon_lord.png",
+    "scale": [
+      1.65,
+      4.2,
+      1.0
+    ]
   }
 }
