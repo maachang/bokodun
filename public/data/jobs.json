@@ -1,5 +1,5 @@
 {
-  "_comment": "職業定義（草案）。仕様: docs/character-spec.md。必要経験値: Lv n → n+1 は round(expBase × n^1.5)。requires は取得条件（すべて満たす）。retryCrit はリトライクリティカルの回数。thiefFamily はクリティカル率20%の職業。",
+  "_comment": "職業定義（草案）。上位職は hpPerLevel / mpPerLevel / levelBonusMax（基本職は combat.json の値）を持ち、第一職業を上位職にすると Lv1 から始まる。固有特性: heavyDodge=重装備でも回避が有効、dodgeAgiCoef=回避の敏捷度の係数、defenseRate=防御の倍率（数値は仮置き。動かして調整する）。仕様: docs/character-spec.md。必要経験値: Lv n → n+1 は round(expBase × n^1.5)。requires は取得条件（すべて満たす）。retryCrit はリトライクリティカルの回数。thiefFamily はクリティカル率20%の職業。",
   "maxLevel": 99,
   "highTierMinLevel": 20,
   "jobs": {
@@ -8,14 +8,14 @@
     "sorcerer": { "name": "ソーサラー",   "type": "combat", "tier": "base", "expBase": 25, "requires": [], "retryCrit": 0, "thiefFamily": false },
     "priest":   { "name": "プリースト",   "type": "combat", "tier": "base", "expBase": 25, "requires": [], "retryCrit": 0, "thiefFamily": false },
 
-    "knight":      { "name": "ナイト",       "type": "combat", "tier": "high", "expBase": 40, "requires": [{ "job": "fighter", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
-    "assassin":    { "name": "アサシン",     "type": "combat", "tier": "high", "expBase": 44, "requires": [{ "job": "thief", "level": 20 }], "retryCrit": 2, "thiefFamily": true },
-    "wizard":      { "name": "ウィザード",   "type": "combat", "tier": "high", "expBase": 50, "requires": [{ "job": "sorcerer", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
-    "bishop":      { "name": "ビショップ",   "type": "combat", "tier": "high", "expBase": 50, "requires": [{ "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
-    "spellsword":  { "name": "魔法戦士",     "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "sorcerer", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
-    "paladin":     { "name": "パラディン",   "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
-    "ninja":       { "name": "ニンジャ",     "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "thief", "level": 20 }], "retryCrit": 3, "thiefFamily": true },
-    "mystic":      { "name": "ミスティック", "type": "combat", "tier": "high", "expBase": 60, "requires": [{ "job": "sorcerer", "level": 20 }, { "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false },
+    "knight":      { "name": "ナイト",       "type": "combat", "tier": "high", "expBase": 40, "requires": [{ "job": "fighter", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1, "levelBonusMax": 25, "heavyDodge": true },
+    "assassin":    { "name": "アサシン",     "type": "combat", "tier": "high", "expBase": 44, "requires": [{ "job": "thief", "level": 20 }], "retryCrit": 2, "thiefFamily": true, "hpPerLevel": 2, "mpPerLevel": 1, "levelBonusMax": 25 },
+    "wizard":      { "name": "ウィザード",   "type": "combat", "tier": "high", "expBase": 50, "requires": [{ "job": "sorcerer", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.5, "levelBonusMax": 25 },
+    "bishop":      { "name": "ビショップ",   "type": "combat", "tier": "high", "expBase": 50, "requires": [{ "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.5, "levelBonusMax": 25 },
+    "spellsword":  { "name": "魔法戦士",     "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "sorcerer", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.25, "levelBonusMax": 25 },
+    "paladin":     { "name": "パラディン",   "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1, "levelBonusMax": 25, "defenseRate": 1.1 },
+    "ninja":       { "name": "ニンジャ",     "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "thief", "level": 20 }], "retryCrit": 3, "thiefFamily": true, "hpPerLevel": 2, "mpPerLevel": 1, "levelBonusMax": 25, "dodgeAgiCoef": 0.7 },
+    "mystic":      { "name": "ミスティック", "type": "combat", "tier": "high", "expBase": 60, "requires": [{ "job": "sorcerer", "level": 20 }, { "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.5, "levelBonusMax": 25 },
 
     "sage": {
       "name": "セージ", "type": "support", "tier": "base", "expBase": 15, "requires": [],

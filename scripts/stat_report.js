@@ -28,7 +28,7 @@ const dice = (n, m, k) => {
     const t = [...d.values()].reduce((a, b) => a + b, 0);
     return [...d].map(([v, c]) => [v, c / t]);
 };
-const lvBonus = lv => Math.floor(lv * C.levelBonus.maxBonus / C.levelBonus.maxLevel);
+const lvBonus = (lv, job) => Math.floor(lv * ((job && job.levelBonusMax) || C.levelBonus.maxBonus) / C.levelBonus.maxLevel);
 const ABIL = ['dex', 'agi', 'str', 'vit', 'intel', 'mnd'];
 const abilities = (race, A, B, Cc, Dd) => {
     const base = { dex: A + B, agi: A + Cc, str: B + Dd, vit: B + Cc, intel: Cc + Dd, mnd: A + Dd }, co = races[race].coef;
@@ -54,13 +54,13 @@ function bestWeapon(a, lv, job, onlyLight) {
         const light = wt <= a.str * C.lightWeaponMaxRatio;
         if (onlyLight && !light) continue;
         let p = w.blunt ? C.critRate.blunt : (job.thiefFamily ? (light ? C.critRate.thiefFamily : C.critRate.normal * C.critRate.heavyThiefPenaltyFactor) : C.critRate.normal);
-        const dn = dice(w.dice.n, w.dice.m, w.dice.k).reduce((s, [v, q]) => s + q * tb(wt, v + lvBonus(lv)), 0);
+        const dn = dice(w.dice.n, w.dice.m, w.dice.k).reduce((s, [v, q]) => s + q * tb(wt, v + lvBonus(lv, job)), 0);
         const e = expected(dn, p / 100, job.retryCrit || 0);
         if (!best || e > best.e) best = { id: w.id, name: w.name, wt: Math.floor(wt), dn, p, e };
     }
     return best;
 }
-function gear(a, kind) {
+function gear(a, kind, job) {
     // kind: 'light' = 回避ありの軽装（heavy でない防具のみ）、'heavy' = 持てる最大の防具（回避なし）
     const parts = [['armors', C.defense.coef.armor], ['helms', C.defense.coef.helm], ['shields', C.defense.coef.shield]];
     let def = 0;
@@ -75,16 +75,16 @@ function gear(a, kind) {
         }
         def += coef * b;
     }
-    return def;
+    return def * ((job && job.defenseRate) || 1);
 }
 function build(raceId, roll, lv, jobId) {
     const r = races[raceId], job = jobsAll[jobId], a = abilities(raceId, roll, roll, roll, roll);
-    const hp = Math.round((a.str + a.vit) * r.hpRate) + lv * C.hpMp.hpPerLevel;
-    const mp = Math.round((a.intel + a.mnd) * r.mpRate) + lv * C.hpMp.mpPerLevel;
-    const w = bestWeapon(a, lv, job), w2 = bestWeapon(a, lv, job, true), dodgeD = a.agi * C.dodge.agiCoef + lv * C.dodge.levelCoef;
-    const dl = gear(a, 'light'), dh = gear(a, 'heavy'), vr = a.vit / C.vitReductionDivisor;
+    const hp = Math.round((a.str + a.vit) * r.hpRate) + lv * (job.hpPerLevel ?? C.hpMp.hpPerLevel);
+    const mp = Math.round((a.intel + a.mnd) * r.mpRate) + lv * (job.mpPerLevel ?? C.hpMp.mpPerLevel);
+    const w = bestWeapon(a, lv, job), w2 = bestWeapon(a, lv, job, true), dodgeD = a.agi * (job.dodgeAgiCoef ?? C.dodge.agiCoef) + lv * C.dodge.levelCoef;
+    const dl = gear(a, 'light', job), dh = gear(a, 'heavy', job), vr = a.vit / C.vitReductionDivisor;
     const taken = (atk, def, dodge) => Math.max(1, atk - def - vr - dodge);
-    return { a, hp, mp, w, w2, dodgeD, dl, dh, vr, light: atk => taken(atk, dl, dodgeD / 2), heavy: atk => taken(atk, dh, 0) };
+    return { a, hp, mp, w, w2, dodgeD, dl, dh, vr, light: atk => taken(atk, dl, dodgeD / 2), heavy: atk => taken(atk, dh, job.heavyDodge ? dodgeD / 2 : 0) };
 }
 const f1 = x => (Math.round(x * 10) / 10).toFixed(1);
 const out = [];
@@ -123,6 +123,17 @@ for (const lv of [1, 20, 50, 99]) {
         P(`| ${lv} | ${lab} | ${f1(df)} | ${s.hp} | ` + ATK.map(x => `${f1(fn(x))}（${Math.floor(s.hp / fn(x))}回）`).join(' | ') + ' |');
 }
 
+P('\n## 3b. 上位職の追い付き（人間・平均）: 上位職は Lv1 から始まる。基本職 Lv99 を超えるレベル\n');
+const bs = build('human', 6.75, 99, 'fighter');
+P(`基準: ファイター Lv99 = HP ${bs.hp}、剣の期待dmg ${f1(bs.w.e)}\n`);
+P('| 上位職 | Lv1 HP | Lv20 HP | Lv50 HP | Lv99 HP | Lv99 MP | Lv99 期待dmg | HPが基準を超えるLv | dmgが基準を超えるLv |');
+P('|---|---|---|---|---|---|---|---|---|');
+for (const [jid, j] of combat.filter(([, j]) => j.tier === 'high')) {
+    const at = (fn) => { for (let l = 1; l <= 99; l++) if (fn(build('human', 6.75, l, jid), l)) return l; return '-'; };
+    const s99 = build('human', 6.75, 99, jid);
+    P(`| ${j.name} | ${build('human', 6.75, 1, jid).hp} | ${build('human', 6.75, 20, jid).hp} | ${build('human', 6.75, 50, jid).hp} | ${s99.hp} | ${f1(s99.mp)} | ${f1(s99.w.e)} | ${at(s => s.hp >= bs.hp)} | ${at(s => s.w.e >= bs.w.e)} |`);
+}
+
 P('\n## 4. 上位職の差（仕様書で定義されている範囲）\n');
 P('| 職業 | 取得条件 | expBase | クリ率（軽い武器） | リトライ | Lv99の累計経験値 |');
 P('|---|---|---|---|---|---|');
@@ -130,8 +141,8 @@ for (const [jid, j] of combat)
     P(`| ${j.name} | ${j.requires.length ? j.requires.map(q => jobsAll[q.job].name + 'Lv' + q.level).join('＋') : '-'} | ${j.expBase} | ${j.thiefFamily ? C.critRate.thiefFamily : C.critRate.normal} | ${j.retryCrit || 0} | ${expTo(j.expBase, 99).toLocaleString()} |`);
 
 P('\n## 5. このレポートから見える、決める必要がある点\n');
-P('- 上位職は、仕様書上、基本職と「HP・MPの伸び」「攻撃・防御の式」が同じ。差は、取得条件・必要経験値・リトライクリティカル・シーフ系の指定だけ（魔法職の上位職の効果は魔法の式が未決）。');
-P('- 上位職の初期レベル、基本職のレベルの引き継ぎ、取得後のHP・MPの扱いが未決。');
+P('- 上位職: HP+2/MP+1（魔法系は1.5）/Lv、攻撃補正の最大+25、職ごとの特性（ナイト=重装でも回避有効、ニンジャ=回避係数0.7、パラディン=防御×1.1）。数値は仮置き。');
+P('- 上位職は Lv1 から始まる（基本職のレベルは残る）。魔法系の強化（威力・回復）は、魔法の式が決まってから。');
 P('- 魔法職（ソーサラー・プリースト系）は、MPだけで、魔法の威力・回復の式が未決なので、強さを試算できない。');
 P('- ミス率（器用度）の式が未決のため、攻撃の期待ダメージは、ミス率ぬきの値。');
 
