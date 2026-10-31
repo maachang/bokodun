@@ -29,9 +29,9 @@ const dice = (n, m, k) => {
     return [...d].map(([v, c]) => [v, c / t]);
 };
 const lvBonus = (lv, job) => Math.floor(lv * ((job && job.levelBonusMax) || C.levelBonus.maxBonus) / C.levelBonus.maxLevel);
-const ABIL = ['dex', 'agi', 'str', 'vit', 'intel', 'mnd'];
+const ABIL = ['dex', 'agi', 'str', 'vit', 'intel', 'mnd', 'end'];
 const abilities = (race, A, B, Cc, Dd) => {
-    const base = { dex: A + B, agi: A + Cc, str: B + Dd, vit: B + Cc, intel: Cc + Dd, mnd: A + Dd }, co = races[race].coef;
+    const base = { dex: A + B, agi: A + Cc, str: B + Dd, vit: B + Cc, intel: Cc + Dd, mnd: A + Dd, end: B + Cc }, co = races[race].coef;
     const o = {};
     for (const k of ABIL) o[k] = Math.max(1, Math.floor((base[k] + 5 / 6) * co[k]));
     return o;
@@ -50,6 +50,8 @@ function magicFail(sp, stat, lv, job) {
     return Math.max(F.min, Math.min(F.max, Math.round((sp.weight / (M * C.magic.costDivisor) - F.offset) * F.scale * mj(job, 'FailRate', 1))));
 }
 const magicDmg = (sp, lv, job) => dice(sp.dice.n, sp.dice.m, sp.dice.k).reduce((s, [v, q]) => s + q * tb(sp.weight, v + magicBonus(lv, job)), 0);
+const loadMul = r => r <= 1 ? C.stamina.loadMulUnder.base + C.stamina.loadMulUnder.slope * r
+    : Math.min(C.stamina.loadMulOver.max, 1 + (r - 1) * C.stamina.loadMulOver.slope);
 const expTo = (b, lv) => { let s = 0; for (let n = 1; n < lv; n++) s += Math.round(b * Math.pow(n, 1.5)); return s; };
 
 // 1回の攻撃の期待ダメージ（クリティカル・リトライ込み）
@@ -74,10 +76,11 @@ function bestWeapon(a, lv, job, onlyLight) {
     }
     return best;
 }
-function gear(a, kind, job) {
+function gear(a, kind, job, out) {
     // kind: 'light' = 回避ありの軽装（heavy でない防具のみ）、'heavy' = 持てる最大の防具（回避なし）
     const parts = [['armors', C.defense.coef.armor], ['helms', C.defense.coef.helm], ['shields', C.defense.coef.shield]];
     let def = 0;
+    if (out) out.weight = 0;
     for (const [key, coef] of parts) {
         let b = 0;
         for (const g of EQ[key]) {
@@ -85,8 +88,10 @@ function gear(a, kind, job) {
             if (g.weight[0] > a.str) continue;
             const wt = Math.min(a.str, g.weight[1]);
             const v = dice(g.dice.n, g.dice.m, g.dice.k).reduce((s, [x, q]) => s + q * tb(wt, x), 0);
+            if (v > b && out) out.w = wt;
             b = Math.max(b, v);
         }
+        if (out) out.weight += out.w || 0, out.w = 0;
         def += coef * b;
     }
     return def * ((job && job.defenseRate) || 1);
@@ -97,8 +102,16 @@ function build(raceId, roll, lv, jobId) {
     const mp = Math.round((a.intel + a.mnd) * r.mpRate) + lv * (job.mpPerLevel ?? C.hpMp.mpPerLevel);
     const w = bestWeapon(a, lv, job), w2 = bestWeapon(a, lv, job, true), dodgeD = a.agi * (job.dodgeAgiCoef ?? C.dodge.agiCoef) + lv * C.dodge.levelCoef;
     const dl = gear(a, 'light', job), dh = gear(a, 'heavy', job), vr = a.vit / C.vitReductionDivisor;
+    const kit = {}, dhk = gear(a, 'heavy', job, kit);
+    const stamina = Math.round((a.str + a.end) * C.stamina.baseCoef) + lv * C.stamina.perLevel, limit = a.str * C.load.strCoef + lv * C.load.levelCoef;
+    const loadWt = kit.weight + (w ? w.wt : 0), ratio = loadWt / limit;
+    const slow = Math.max(C.load.minSpeedRatio, 1 - Math.max(0, ratio - 1) * 100 * C.load.overSlowPer / 100);
+    const m = loadMul(ratio), endDiv = 1 + a.end * C.stamina.enduranceDivisor;
+    const dashCost = C.stamina.dashCost * m / endDiv;
+    const atkCost = (w ? w.wt : 0) * C.stamina.attackCoef * m / endDiv;
+    const regen = (a.end * C.stamina.regenEnd + lv * C.stamina.regenLevel) / (ratio > 1 ? m : 1);
     const taken = (atk, def, dodge) => Math.max(1, atk - def - vr - dodge);
-    return { a, hp, mp, w, w2, dodgeD, dl, dh, vr, light: atk => taken(atk, dl, dodgeD / 2), heavy: atk => taken(atk, dh, job.heavyDodge ? dodgeD / 2 : 0) };
+    return { atkCost, stamina, limit, loadWt, ratio, slow, dashCost, regen, a, hp, mp, w, w2, dodgeD, dl, dh, vr, light: atk => taken(atk, dl, dodgeD / 2), heavy: atk => taken(atk, dh, job.heavyDodge ? dodgeD / 2 : 0) };
 }
 const f1 = x => (Math.round(x * 10) / 10).toFixed(1);
 const out = [];
@@ -108,7 +121,7 @@ P('# 主人公ステータス試算レポート（草案データ・仕様書の
 P('前提: 計測値は低=3 / 平均=6.75 / 高=11 のすべて同値、ボーナス平均5を均等割り。期待ダメージはミス率込み。\n');
 
 P('## 1. 種族 × 計測値（Lv99・ファイター）\n');
-P('| 種族 | 計測 | 器/敏/筋/生/知/精 | HP | MP | 剣類の期待dmg(武器) | 軽装防御 | 重装防御 | 回避D |');
+P('| 種族 | 計測 | 器/敏/筋/生/知/精/持 | HP | MP | 剣類の期待dmg(武器) | 軽装防御 | 重装防御 | 回避D |');
 P('|---|---|---|---|---|---|---|---|---|');
 for (const rid of Object.keys(races)) for (const [lab, roll] of [['低', 3], ['平均', 6.75], ['高', 11]]) {
     const s = build(rid, roll, 99, 'fighter');
@@ -155,6 +168,24 @@ for (const [jid, j] of combat.filter(([k]) => ['fighter', 'sorcerer', 'spellswor
     const s = build('human', 6.75, lv, jid), wk = C.moveSpeed.base + s.a.agi * C.moveSpeed.agiCoef;
     P(`| ${j.name} | ${lv} | ${f1(missRate(s.a, lv) * 100)} | ${f1(wk)} | ${f1(wk * C.moveSpeed.runRatio)} | ` +
         Object.values(MG).map(m => `${f1(magicDmg(m, lv, j))}/${magicCost(m, m.kind === 'heal' ? s.a.mnd : s.a.intel, lv, j)}/${magicFail(m, m.kind === 'heal' ? s.a.mnd : s.a.intel, lv, j)}`).join(' | ') + ' |');
+}
+
+P('\n## 3d. 積載・スタミナ（人間・平均。重装＝持てる最大の防具＋最強の武器）\n');
+P('| 種族 | 職業 | Lv | 持久力 | 最大スタミナ | 積載の限界 | 重量合計 | 重量比 | 速度の割合 | ダッシュ消費/秒 | ダッシュ可能秒 | 攻撃1回 | 連続攻撃回数 | 回復/秒 | 全回復秒 |');
+P('|---|---|---|---|---|---|---|---|---|---|---|---|---|---|---|');
+for (const rid of ['human', 'dwarf', 'elf', 'fairy']) for (const lv of [1, 50, 99]) {
+    const s = build(rid, 6.75, lv, 'fighter');
+    P(`| ${races[rid].name} | ファイター | ${lv} | ${s.a.end} | ${s.stamina} | ${f1(s.limit)} | ${s.loadWt} | ${f1(s.ratio)} | ${f1(s.slow * 100)}% | ${f1(s.dashCost)} | ${f1(s.stamina / s.dashCost)} | ${f1(s.atkCost)} | ${Math.floor(s.stamina / s.atkCost)} | ${f1(s.regen)} | ${f1(s.stamina / s.regen)} |`);
+}
+
+P('\n## 3e. 重量比ごとのスタミナ（人間・平均・ファイター。1戦闘 = 攻撃10回＋ダッシュ5秒 の消費が最大スタミナの何%か）\n');
+P('| Lv | 重量比 | 重量 | 最大スタミナ | ダッシュ可能秒 | 連続攻撃回数 | 1戦闘の消費% | 回復/秒 | 全回復秒 | 速度 |');
+P('|---|---|---|---|---|---|---|---|---|---|');
+for (const lv of [1, 20, 50]) for (const r of [0.6, 0.8, 1.0, 1.3, 1.6]) {
+    const s = build('human', 6.75, lv, 'fighter'), m = loadMul(r), ed = 1 + s.a.end * C.stamina.enduranceDivisor;
+    const dc = C.stamina.dashCost * m / ed, ac = s.w.wt * C.stamina.attackCoef * m / ed;
+    const rg = (s.a.end * C.stamina.regenEnd + lv * C.stamina.regenLevel) / (r > 1 ? m : 1);
+    P(`| ${lv} | ${r} | ${f1(s.limit * r)} | ${s.stamina} | ${f1(s.stamina / dc)} | ${Math.floor(s.stamina / ac)} | ${f1((ac * 10 + dc * 5) / s.stamina * 100)}% | ${f1(rg)} | ${f1(s.stamina / rg)} | ${f1(Math.max(C.load.minSpeedRatio, 1 - Math.max(0, r - 1) * C.load.overSlowPer) * 100)}% |`);
 }
 
 P('\n## 4. 上位職の差（仕様書で定義されている範囲）\n');

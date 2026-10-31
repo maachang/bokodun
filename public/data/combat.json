@@ -44,6 +44,27 @@
     "runRatio": 1.53,
     "_note": "歩く速さ = base + 敏捷度 × agiCoef。ダッシュ = 歩く速さ × runRatio。平均（敏捷度14）で既存の 8.5 / 13.0（草案）。"
   },
+  "stamina": {
+    "baseCoef": 1.5,
+    "perLevel": 1,
+    "dashCost": 3,
+    "enduranceDivisor": 0.05,
+    "loadMulUnder": { "base": 0.6, "slope": 0.4 },
+    "loadMulOver": { "slope": 2, "max": 3 },
+    "regenEnd": 0.3,
+    "regenLevel": 0.05,
+    "resumeRatio": 0.2,
+    "attackCoef": 0.2,
+    "regenPause": 1,
+    "_note": "最大スタミナ = (筋力＋持久力) × baseCoef ＋ 第一職業Lv × perLevel（種族の倍率なし）。重量比による倍率 m = 比が1以下なら base ＋ slope × 比、1を超えたら 1 ＋ (比 − 1) × slope（上限 max）。ダッシュ中の消費/秒 = dashCost × m ÷ (1 ＋ 持久力 × enduranceDivisor)。攻撃1回の消費 = 武器の重さ × attackCoef × m ÷ (1 ＋ 持久力 × enduranceDivisor)。攻撃は、当たっても、ミスしても（ぶつかっただけでも）消費する。自然回復/秒（ダッシュ・攻撃のあと regenPause 秒を除く）= (持久力 × regenEnd ＋ 第一職業Lv × regenLevel) ÷ (重量比が1を超えるとき m、以下なら 1)。0になるとダッシュも攻撃もできなくなり（歩行・防御は可）、最大値の resumeRatio まで回復するまで再開できない。重量比0.8以下を適正装備とする（暫定）。"
+  },
+  "load": {
+    "strCoef": 4,
+    "levelCoef": 0.5,
+    "overSlowPer": 0.5,
+    "minSpeedRatio": 0.6,
+    "_note": "重量合計 = 武器＋鎧＋兜＋盾の重さの和（道具は含めない）。積載の限界 = 筋力 × strCoef ＋ 第一職業Lv × levelCoef。重量比 = 重量合計 ÷ 積載の限界。限界を超えた1%につき、歩く速さ・ダッシュを overSlowPer % 下げる（下限 minSpeedRatio）（暫定）。"
+  },
   "magic": {
     "bonusMax": 15,
     "levelCoef": 0.3,
