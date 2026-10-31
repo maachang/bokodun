@@ -1,0 +1,11 @@
+{
+  "_comment": "魔法の定義（草案）。ゲーム本体（items.json の spell）はまだ参照しない。計算式は combat.json の magic、仕様は docs/character-spec.md 8.2b。燃焼・減速・貫通などの追加効果と見た目は items.json の同名の魔法に残す。回復魔法は未実装。price は魔法ギルドの価格、tier は品揃えの帯（basic=初級・mid=中級・high=上級。街の進行による解禁条件は未決）。価格は combat.json の magic.price の式（重さ² × coef × 種類の補正、10単位に丸め）。魔法は買い切りで、売却はできない。",
+  "spells": {
+    "magic_bolt": { "name": "マジックボルト", "element": "none",  "kind": "attack", "costType": "rapid",  "weight": 14, "price": 120, "tier": "basic", "dice": { "n": 1, "m": 6, "k": 3 } },
+    "fire":       { "name": "ファイア",       "element": "fire",  "kind": "attack", "costType": "single", "weight": 28, "price": 470, "tier": "mid", "dice": { "n": 2, "m": 6, "k": 3 } },
+    "spread":     { "name": "拡散弾",         "element": "ice",   "kind": "attack", "costType": "spread", "weight": 20, "price": 290, "tier": "basic", "dice": { "n": 2, "m": 6, "k": 2 }, "count": 3 },
+    "explosion":  { "name": "爆発火球",       "element": "fire",  "kind": "attack", "costType": "area",   "weight": 34, "price": 900, "tier": "high", "dice": { "n": 3, "m": 6, "k": 4 } },
+    "heal":       { "name": "ヒール",         "element": "holy",  "kind": "heal",   "costType": "heal",   "weight": 20, "price": 240, "tier": "basic", "dice": { "n": 2, "m": 6, "k": 3 } },
+    "high_heal":  { "name": "ハイヒール",     "element": "holy",  "kind": "heal",   "costType": "heal",   "weight": 40, "price": 960, "tier": "high", "dice": { "n": 3, "m": 6, "k": 5 } }
+  }
+}

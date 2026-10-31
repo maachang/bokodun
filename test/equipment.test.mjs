@@ -118,7 +118,7 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
             assert.ok(it.name && ['weapon', 'spell', 'consumable', 'key'].includes(it.kind), `${id}: kind`);
             if (it.kind === 'consumable' || it.kind === 'key') {
                 // 消耗品・鍵（docs/item-spec.md の最小セット）: 効果の種類と価格（鍵は売らないので null）
-                assert.ok(['heal_hp', 'heal_mp', 'cure_poison', 'cure_paralysis', 'revive', 'return_town', 'unlock_chest_lock'].includes(it.effect?.type), `${id}: effect.type`);
+                assert.ok(['heal_hp', 'heal_mp', 'cure_poison', 'cure_venom', 'cure_paralysis', 'revive', 'return_town', 'unlock_chest_lock'].includes(it.effect?.type), `${id}: effect.type`);
                 if (it.effect.tier !== undefined) assert.ok(['small', 'medium', 'large'].includes(it.effect.tier), `${id}: effect.tier`);
                 assert.ok(it.price === null ? it.kind === 'key' : Number.isInteger(it.price) && it.price > 0, `${id}: price`);
             } else if (it.kind === 'weapon') {

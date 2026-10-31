@@ -32,6 +32,42 @@
     "mpPerLevel": 0.5,
     "_note": "最大HP = round((筋力＋生命力) × 種族hpRate) ＋ 第一職業Lv × hpPerLevel。最大MP = round((知力＋精神力) × 種族mpRate) ＋ 第一職業Lv × mpPerLevel（草案）"
   },
+  "miss": {
+    "base": 30,
+    "dexLevelDivisor": 10,
+    "min": 1,
+    "_note": "実効器用度 = 器用度 + floor(第一職業Lv ÷ dexLevelDivisor)。ミス率(%) = max(min, base − 実効器用度)。ミスは攻撃の最初に判定し、ミスならダメージもクリティカルもない（草案）。"
+  },
+  "moveSpeed": {
+    "base": 7.1,
+    "agiCoef": 0.1,
+    "runRatio": 1.53,
+    "_note": "歩く速さ = base + 敏捷度 × agiCoef。ダッシュ = 歩く速さ × runRatio。平均（敏捷度14）で既存の 8.5 / 13.0（草案）。"
+  },
+  "magic": {
+    "bonusMax": 15,
+    "levelCoef": 0.3,
+    "costFloor": 0.5,
+    "costCeil": 3.0,
+    "costDivisor": 2,
+    "fail": { "scale": 40, "offset": 0.5, "min": 1, "max": 95, "consumeMp": true, "sameCooldown": true },
+    "price": { "coef": 0.6, "round": 10, "typeFactor": { "spread": 1.2, "area": 1.3 } },
+    "costCoef": { "rapid": 0.25, "single": 0.36, "spread": 0.6, "area": 0.53, "heal": 0.4 },
+    "_note": "魔法は武器・防具と同じ仕組み。魔法ごとに重さ(1〜50)とダイス nDm+k を持つ（public/data/magic.json）。攻撃値 = ダイス結果 + 固定値 + floor(第一職業Lv × bonusMax ÷ 99)。ダメージ（回復量）= ダメージ表[重さ][攻撃値]。基本消費MP = round(重さ × costCoef[種類])。魔法力 M = 知力（回復は精神力） + 第一職業Lv × levelCoef。倍率 = clamp(重さ ÷ (M × costDivisor), costFloor, costCeil)。消費MP = max(1, round(基本消費MP × 倍率))。魔法の発動にも失敗がある: 失敗率(%) = clamp((重さ ÷ (M × costDivisor) − offset) × scale × 職業の magicFailRate, min, max)。失敗しても MP は全額消費し（consumeMp）、連射間隔も成功時と同じ（sameCooldown）。魔法はギルドで買う（買い切り、売却不可）。価格 = round(重さ² × price.coef × price.typeFactor[種類（未指定は1）], price.round 単位)。職業・レベル・知力による使用制限はない（身の丈に合わない魔法は、消費MPが多すぎて使えない）。bonusMax / levelCoef / costFloor / 失敗率の緩和係数（既定1.0）は、職業ごとに jobs.json の magicBonusMax / magicLevelCoef / magicCostFloor / magicFailRate で上書きする（草案）。"
+  },
+  "equipmentPrice": {
+    "weapon": 1.2,
+    "armor": 1.2,
+    "helm": 0.4,
+    "shield": 0.4,
+    "diceDivisor": 7,
+    "round": 10,
+    "_note": "武器・防具の価格 = round(購入時に選んだ重さ² × 係数 × (ダイスの平均値 ÷ diceDivisor), round 単位)。重さは、購入時に自分で選ぶ（筋力で持てる範囲）。兜・盾は、防御への寄与（鎧0.6・兜盾0.2）に合わせて鎧の1/3（草案）。"
+  },
+  "rod": {
+    "magicAttackBonus": "diceResult",
+    "_note": "杖（wand / magic_staff）は、武器としては弱いので、装備すると、杖のダイス結果を魔法の攻撃値にそのまま加算する（草案）。"
+  },
   "fumble": {
     "attackDamage": 1,
     "defenseEnemyAutoCrit": true,

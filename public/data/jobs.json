@@ -1,5 +1,5 @@
 {
-  "_comment": "職業定義（草案）。上位職は hpPerLevel / mpPerLevel / levelBonusMax（基本職は combat.json の値）を持ち、第一職業を上位職にすると Lv1 から始まる。固有特性: heavyDodge=重装備でも回避が有効、dodgeAgiCoef=回避の敏捷度の係数、defenseRate=防御の倍率（数値は仮置き。動かして調整する）。仕様: docs/character-spec.md。必要経験値: Lv n → n+1 は round(expBase × n^1.5)。requires は取得条件（すべて満たす）。retryCrit はリトライクリティカルの回数。thiefFamily はクリティカル率20%の職業。",
+  "_comment": "職業定義（草案）。上位職は hpPerLevel / mpPerLevel / levelBonusMax（基本職は combat.json の値）を持ち、第一職業を上位職にすると Lv1 から始まる。魔法系の上位職は、魔法の威力プラス値 magicBonusMax・消費MP軽減の係数 magicLevelCoef・倍率の下限 magicCostFloor・魔法の失敗率の緩和係数 magicFailRate を持つ（未指定は combat.json の magic）。固有特性: heavyDodge=重装備でも回避が有効、dodgeAgiCoef=回避の敏捷度の係数、defenseRate=防御の倍率（数値は仮置き。動かして調整する）。仕様: docs/character-spec.md。必要経験値: Lv n → n+1 は round(expBase × n^1.5)。requires は取得条件（すべて満たす）。retryCrit はリトライクリティカルの回数。thiefFamily はクリティカル率20%の職業。",
   "maxLevel": 99,
   "highTierMinLevel": 20,
   "jobs": {
@@ -10,12 +10,12 @@
 
     "knight":      { "name": "ナイト",       "type": "combat", "tier": "high", "expBase": 40, "requires": [{ "job": "fighter", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1, "levelBonusMax": 25, "heavyDodge": true },
     "assassin":    { "name": "アサシン",     "type": "combat", "tier": "high", "expBase": 44, "requires": [{ "job": "thief", "level": 20 }], "retryCrit": 2, "thiefFamily": true, "hpPerLevel": 2, "mpPerLevel": 1, "levelBonusMax": 25 },
-    "wizard":      { "name": "ウィザード",   "type": "combat", "tier": "high", "expBase": 50, "requires": [{ "job": "sorcerer", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.5, "levelBonusMax": 25 },
-    "bishop":      { "name": "ビショップ",   "type": "combat", "tier": "high", "expBase": 50, "requires": [{ "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.5, "levelBonusMax": 25 },
-    "spellsword":  { "name": "魔法戦士",     "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "sorcerer", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.25, "levelBonusMax": 25 },
+    "wizard":      { "name": "ウィザード",   "type": "combat", "tier": "high", "expBase": 50, "requires": [{ "job": "sorcerer", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.5, "levelBonusMax": 25, "magicBonusMax": 35, "magicLevelCoef": 0.5, "magicCostFloor": 0.4, "magicFailRate": 0.6 },
+    "bishop":      { "name": "ビショップ",   "type": "combat", "tier": "high", "expBase": 50, "requires": [{ "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.5, "levelBonusMax": 25, "magicBonusMax": 35, "magicLevelCoef": 0.5, "magicCostFloor": 0.4, "magicFailRate": 0.6 },
+    "spellsword":  { "name": "魔法戦士",     "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "sorcerer", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.25, "levelBonusMax": 25, "magicBonusMax": 25, "magicLevelCoef": 0.4, "magicCostFloor": 0.45, "magicFailRate": 0.8 },
     "paladin":     { "name": "パラディン",   "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1, "levelBonusMax": 25, "defenseRate": 1.1 },
     "ninja":       { "name": "ニンジャ",     "type": "combat", "tier": "high", "expBase": 55, "requires": [{ "job": "fighter", "level": 20 }, { "job": "thief", "level": 20 }], "retryCrit": 3, "thiefFamily": true, "hpPerLevel": 2, "mpPerLevel": 1, "levelBonusMax": 25, "dodgeAgiCoef": 0.7 },
-    "mystic":      { "name": "ミスティック", "type": "combat", "tier": "high", "expBase": 60, "requires": [{ "job": "sorcerer", "level": 20 }, { "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.5, "levelBonusMax": 25 },
+    "mystic":      { "name": "ミスティック", "type": "combat", "tier": "high", "expBase": 60, "requires": [{ "job": "sorcerer", "level": 20 }, { "job": "priest", "level": 20 }], "retryCrit": 0, "thiefFamily": false, "hpPerLevel": 2, "mpPerLevel": 1.5, "levelBonusMax": 25, "magicBonusMax": 35, "magicLevelCoef": 0.5, "magicCostFloor": 0.4, "magicFailRate": 0.6 },
 
     "sage": {
       "name": "セージ", "type": "support", "tier": "base", "expBase": 15, "requires": [],
@@ -70,12 +70,33 @@
         { "level": 50, "effect": "craftSpecial",  "text": "特殊な武器の作成" }
       ]
     },
+    "apothecary": {
+      "name": "薬師", "type": "support", "tier": "base", "expBase": 15, "requires": [], "healItemRatePerLevel": 0.01,
+      "unlocks": [
+        { "level": 1,  "effect": "healItemUp",     "text": "回復道具（HP・MP）の効果 ＋1%（薬師Lv × 1% が、全体にかかる。Lv99 で約2倍）" },
+        { "level": 10, "effect": "cureGuard",      "text": "毒消し・麻痺治しなど、状態異常を治す道具を使うと、治した直後の短い間、同じ状態異常にかかりにくくなる（耐性が付く）" },
+        { "level": 20, "effect": "cureVenom",      "text": "毒消しで猛毒も治せる（薬師Lv20未満は、毒消しで猛毒は治せない）" },
+        { "level": 30, "effect": "healItemQuick",  "text": "回復道具を使ったあとの待ち時間が短くなる" },
+        { "level": 50, "effect": "healItemUp50",   "text": "回復道具の効果 ＋50%（倍率の式のとおり）" }
+      ]
+    },
 
     "archsage":    { "name": "大賢者",       "type": "support", "tier": "high", "expBase": 30, "requires": [{ "job": "sage", "level": 20 }], "unlocks": [] },
     "scoutmaster": { "name": "盗賊の頭領",   "type": "support", "tier": "high", "expBase": 30, "requires": [{ "job": "scout", "level": 20 }], "unlocks": [] },
     "explorer":    { "name": "探検家",       "type": "support", "tier": "high", "expBase": 36, "requires": [{ "job": "ranger", "level": 20 }, { "job": "sage", "level": 20 }], "unlocks": [] },
     "tycoon":      { "name": "大商人",       "type": "support", "tier": "high", "expBase": 24, "requires": [{ "job": "merchant", "level": 20 }], "unlocks": [] },
     "mastersmith": { "name": "名匠",         "type": "support", "tier": "high", "expBase": 36, "requires": [{ "job": "smith", "level": 20 }], "unlocks": [] },
+    "physician":   { "name": "医術師",       "type": "support", "tier": "high", "expBase": 40, "requires": [{ "job": "apothecary", "level": 20 }, { "job": "sage", "level": 20 }], "healItemRatePerLevel": 0.005,
+      "unlocks": [
+        { "level": 1,  "effect": "healItemUpHigh",   "text": "回復道具の効果の上乗せ（医術師Lv × 0.5%。薬師の分と足し算。Lv99 で約 ＋50%）" },
+        { "level": 1,  "effect": "identifyMedicine", "text": "未鑑定の薬・毒薬の鑑定" },
+        { "level": 10, "effect": "ailmentShort",     "text": "敵の状態異常攻撃（毒・麻痺など）の効果時間が短くなる" },
+        { "level": 20, "effect": "autoHealThreshold","text": "HPが低くなったとき回復道具を自動で使う閾値を選べる（autoUsable の道具が対象）" },
+        { "level": 30, "effect": "cureAll",          "text": "状態異常を治す道具が、複数の状態異常をまとめて治す" },
+        { "level": 50, "effect": "reviveUp",         "text": "蘇生の薬の効果が上がる（復帰時のHPが増える）" },
+        { "level": 70, "effect": "regenUp",          "text": "歩いている間のHPの自然回復が、わずかに増える" }
+      ]
+    },
     "alchemist":   { "name": "錬金術師",     "type": "support", "tier": "high", "expBase": 40, "requires": [{ "job": "sage", "level": 20 }, { "job": "smith", "level": 20 }],
       "unlocks": [
         { "level": 1,  "effect": "combine1",      "text": "素材の合成（＋1 まで）" },

@@ -72,10 +72,27 @@
         "price": 30
       },
       {
+        "itemId": "venom_cure",
+        "name": "猛毒消し",
+        "price": 150
+      },
+      {
         "itemId": "return_stone",
         "name": "帰還の石",
         "price": 150
       }
+    ]
+  },
+  "magic_guild": {
+    "name": "魔法ギルド",
+    "keeper": "mage_clerk_man",
+    "goods": [
+      { "spellId": "magic_bolt", "name": "マジックボルト", "price": 120 },
+      { "spellId": "heal", "name": "ヒール", "price": 240 },
+      { "spellId": "spread", "name": "拡散弾", "price": 290 },
+      { "spellId": "fire", "name": "ファイア", "price": 470 },
+      { "spellId": "explosion", "name": "爆発火球", "price": 900 },
+      { "spellId": "high_heal", "name": "ハイヒール", "price": 960 }
     ]
   }
 }

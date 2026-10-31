@@ -154,7 +154,7 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_hp",
-      "tier": "small"
+      "tier": "small", "weight": 10, "dice": { "n": 1, "m": 4, "k": 20 }
     },
     "price": 20,
     "autoUsable": true
@@ -165,7 +165,7 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_hp",
-      "tier": "medium"
+      "tier": "medium", "weight": 25, "dice": { "n": 1, "m": 4, "k": 25 }
     },
     "price": 60,
     "autoUsable": true
@@ -176,7 +176,7 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_hp",
-      "tier": "large"
+      "tier": "large", "weight": 40, "dice": { "n": 1, "m": 4, "k": 35 }
     },
     "price": 200,
     "autoUsable": true
@@ -187,7 +187,7 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_mp",
-      "tier": "small"
+      "tier": "small", "weight": 10, "dice": { "n": 1, "m": 4, "k": 16 }
     },
     "price": 25,
     "autoUsable": true
@@ -198,7 +198,7 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_mp",
-      "tier": "medium"
+      "tier": "medium", "weight": 25, "dice": { "n": 1, "m": 4, "k": 16 }
     },
     "price": 75,
     "autoUsable": true
@@ -209,7 +209,7 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_mp",
-      "tier": "large"
+      "tier": "large", "weight": 40, "dice": { "n": 1, "m": 4, "k": 30 }
     },
     "price": 250,
     "autoUsable": true
@@ -219,9 +219,20 @@
     "name": "毒消し",
     "kind": "consumable",
     "effect": {
-      "type": "cure_poison"
+      "type": "cure_poison",
+      "venomRequires": [{ "job": "apothecary", "level": 20 }, { "job": "physician", "level": 1 }]
     },
     "price": 30,
+    "autoUsable": true
+  },
+  "venom_cure": {
+    "id": "venom_cure",
+    "name": "猛毒消し",
+    "kind": "consumable",
+    "effect": {
+      "type": "cure_venom"
+    },
+    "price": 150,
     "autoUsable": true
   },
   "paralysis_cure": {
@@ -239,7 +250,7 @@
     "name": "蘇生の薬",
     "kind": "consumable",
     "effect": {
-      "type": "revive"
+      "type": "revive", "weight": 20, "dice": { "n": 1, "m": 4, "k": 14 }
     },
     "price": 500,
     "autoUsable": true

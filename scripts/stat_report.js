@@ -9,7 +9,7 @@
  *  - 攻撃は「持てる最大の重さの武器」の、期待ダメージ（ダイスの全組み合わせの平均）。
  *  - 防御は「持てる最大の重さの防具」の、期待値。回避は 0〜D の乱数の平均（D/2）。
  *  - クリティカル・リトライクリティカルは、仕様書（8.4）のとおり期待値に含める。
- *  - ミス率（器用度）、魔法の威力・回復の式は、仕様書で未決なので、含めない。
+ *  - ミス率（器用度）は期待ダメージに含める。魔法は magic.json（重さ・ダイス）と combat.json の magic の式で、威力と消費MPを出す。
  */
 const fs = require('fs');
 const path = require('path');
@@ -36,6 +36,20 @@ const abilities = (race, A, B, Cc, Dd) => {
     for (const k of ABIL) o[k] = Math.max(1, Math.floor((base[k] + 5 / 6) * co[k]));
     return o;
 };
+const missRate = (a, lv) => Math.max(C.miss.min, C.miss.base - (a.dex + Math.floor(lv / C.miss.dexLevelDivisor))) / 100;
+const MG = D('magic.json').spells;
+const mj = (job, k, d) => (job && job['magic' + k]) ?? d;
+const magicBonus = (lv, job) => Math.floor(lv * mj(job, 'BonusMax', C.magic.bonusMax) / C.levelBonus.maxLevel);
+function magicCost(sp, stat, lv, job) {
+    const M = stat + lv * mj(job, 'LevelCoef', C.magic.levelCoef), base = Math.round(sp.weight * C.magic.costCoef[sp.costType]);
+    const mul = Math.min(C.magic.costCeil, Math.max(mj(job, 'CostFloor', C.magic.costFloor), sp.weight / (M * C.magic.costDivisor)));
+    return Math.max(1, Math.round(base * mul));
+}
+function magicFail(sp, stat, lv, job) {
+    const M = stat + lv * mj(job, 'LevelCoef', C.magic.levelCoef), F = C.magic.fail;
+    return Math.max(F.min, Math.min(F.max, Math.round((sp.weight / (M * C.magic.costDivisor) - F.offset) * F.scale * mj(job, 'FailRate', 1))));
+}
+const magicDmg = (sp, lv, job) => dice(sp.dice.n, sp.dice.m, sp.dice.k).reduce((s, [v, q]) => s + q * tb(sp.weight, v + magicBonus(lv, job)), 0);
 const expTo = (b, lv) => { let s = 0; for (let n = 1; n < lv; n++) s += Math.round(b * Math.pow(n, 1.5)); return s; };
 
 // 1回の攻撃の期待ダメージ（クリティカル・リトライ込み）
@@ -55,7 +69,7 @@ function bestWeapon(a, lv, job, onlyLight) {
         if (onlyLight && !light) continue;
         let p = w.blunt ? C.critRate.blunt : (job.thiefFamily ? (light ? C.critRate.thiefFamily : C.critRate.normal * C.critRate.heavyThiefPenaltyFactor) : C.critRate.normal);
         const dn = dice(w.dice.n, w.dice.m, w.dice.k).reduce((s, [v, q]) => s + q * tb(wt, v + lvBonus(lv, job)), 0);
-        const e = expected(dn, p / 100, job.retryCrit || 0);
+        const e = expected(dn, p / 100, job.retryCrit || 0) * (1 - missRate(a, lv));
         if (!best || e > best.e) best = { id: w.id, name: w.name, wt: Math.floor(wt), dn, p, e };
     }
     return best;
@@ -91,7 +105,7 @@ const out = [];
 const P = s => out.push(s);
 
 P('# 主人公ステータス試算レポート（草案データ・仕様書の式からの試算）\n');
-P('前提: 計測値は低=3 / 平均=6.75 / 高=11 のすべて同値、ボーナス平均5を均等割り。ミス率・魔法の式は未決のため含めない。\n');
+P('前提: 計測値は低=3 / 平均=6.75 / 高=11 のすべて同値、ボーナス平均5を均等割り。期待ダメージはミス率込み。\n');
 
 P('## 1. 種族 × 計測値（Lv99・ファイター）\n');
 P('| 種族 | 計測 | 器/敏/筋/生/知/精 | HP | MP | 剣類の期待dmg(武器) | 軽装防御 | 重装防御 | 回避D |');
@@ -134,6 +148,15 @@ for (const [jid, j] of combat.filter(([, j]) => j.tier === 'high')) {
     P(`| ${j.name} | ${build('human', 6.75, 1, jid).hp} | ${build('human', 6.75, 20, jid).hp} | ${build('human', 6.75, 50, jid).hp} | ${s99.hp} | ${f1(s99.mp)} | ${f1(s99.w.e)} | ${at(s => s.hp >= bs.hp)} | ${at(s => s.w.e >= bs.w.e)} |`);
 }
 
+P('\n## 3c. 移動速度・ミス率・魔法（人間・平均。魔法は 期待ダメージ（回復量）/消費MP/失敗率%）\n');
+P('| 職業 | Lv | ミス率% | 歩く | ダッシュ | ' + Object.values(MG).map(m => m.name).join(' | ') + ' |');
+P('|---|---|---|---|---|' + Object.keys(MG).map(() => '---').join('|') + '|');
+for (const [jid, j] of combat.filter(([k]) => ['fighter', 'sorcerer', 'spellsword', 'wizard'].includes(k))) for (const lv of [1, 50, 99]) {
+    const s = build('human', 6.75, lv, jid), wk = C.moveSpeed.base + s.a.agi * C.moveSpeed.agiCoef;
+    P(`| ${j.name} | ${lv} | ${f1(missRate(s.a, lv) * 100)} | ${f1(wk)} | ${f1(wk * C.moveSpeed.runRatio)} | ` +
+        Object.values(MG).map(m => `${f1(magicDmg(m, lv, j))}/${magicCost(m, m.kind === 'heal' ? s.a.mnd : s.a.intel, lv, j)}/${magicFail(m, m.kind === 'heal' ? s.a.mnd : s.a.intel, lv, j)}`).join(' | ') + ' |');
+}
+
 P('\n## 4. 上位職の差（仕様書で定義されている範囲）\n');
 P('| 職業 | 取得条件 | expBase | クリ率（軽い武器） | リトライ | Lv99の累計経験値 |');
 P('|---|---|---|---|---|---|');
@@ -142,9 +165,8 @@ for (const [jid, j] of combat)
 
 P('\n## 5. このレポートから見える、決める必要がある点\n');
 P('- 上位職: HP+2/MP+1（魔法系は1.5）/Lv、攻撃補正の最大+25、職ごとの特性（ナイト=重装でも回避有効、ニンジャ=回避係数0.7、パラディン=防御×1.1）。数値は仮置き。');
-P('- 上位職は Lv1 から始まる（基本職のレベルは残る）。魔法系の強化（威力・回復）は、魔法の式が決まってから。');
-P('- 魔法職（ソーサラー・プリースト系）は、MPだけで、魔法の威力・回復の式が未決なので、強さを試算できない。');
-P('- ミス率（器用度）の式が未決のため、攻撃の期待ダメージは、ミス率ぬきの値。');
+P('- 上位職は Lv1 から始まる（基本職のレベルは残る）。魔法系の上位職は、魔法の威力プラス値と消費MP軽減が大きい（3c）。');
+P('- 魔法ギルドの価格・追加の魔法は未決。魔法の威力と消費MPは 3c を参照。');
 
 const text = out.join('\n') + '\n';
 if (process.argv[2]) fs.writeFileSync(process.argv[2], text); else process.stdout.write(text);
