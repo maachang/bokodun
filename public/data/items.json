@@ -214,6 +214,50 @@
     "price": 250,
     "autoUsable": true
   },
+  "stamina_herb": {
+    "id": "stamina_herb",
+    "name": "気付け草",
+    "kind": "consumable",
+    "effect": {
+      "type": "heal_stamina",
+      "tier": "small", "weight": 10, "dice": { "n": 1, "m": 4, "k": 20 }
+    },
+    "price": 25,
+    "autoUsable": true
+  },
+  "stamina_potion": {
+    "id": "stamina_potion",
+    "name": "活力の薬",
+    "kind": "consumable",
+    "effect": {
+      "type": "heal_stamina",
+      "tier": "medium", "weight": 25, "dice": { "n": 1, "m": 4, "k": 22 }
+    },
+    "price": 75,
+    "autoUsable": true
+  },
+  "stamina_elixir": {
+    "id": "stamina_elixir",
+    "name": "元気の霊薬",
+    "kind": "consumable",
+    "effect": {
+      "type": "heal_stamina",
+      "tier": "large", "weight": 40, "dice": { "n": 1, "m": 4, "k": 30 }
+    },
+    "price": 220,
+    "autoUsable": true
+  },
+  "rest_incense": {
+    "id": "rest_incense",
+    "name": "疲労回復の香",
+    "kind": "consumable",
+    "effect": {
+      "type": "regen_boost",
+      "rate": 2, "duration": 20, "cureRegenDelay": true
+    },
+    "price": 120,
+    "autoUsable": true
+  },
   "antidote": {
     "id": "antidote",
     "name": "毒消し",

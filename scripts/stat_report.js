@@ -49,7 +49,7 @@ function magicFail(sp, stat, lv, job) {
     const M = stat + lv * mj(job, 'LevelCoef', C.magic.levelCoef), F = C.magic.fail;
     return Math.max(F.min, Math.min(F.max, Math.round((sp.weight / (M * C.magic.costDivisor) - F.offset) * F.scale * mj(job, 'FailRate', 1))));
 }
-const magicDmg = (sp, lv, job) => dice(sp.dice.n, sp.dice.m, sp.dice.k).reduce((s, [v, q]) => s + q * tb(sp.weight, v + magicBonus(lv, job)), 0);
+const magicDmg = (sp, lv, job) => !sp.dice ? 0 : dice(sp.dice.n, sp.dice.m, sp.dice.k).reduce((s, [v, q]) => s + q * tb(sp.weight, v + magicBonus(lv, job)), 0);
 const loadMul = r => r <= 1 ? C.stamina.loadMulUnder.base + C.stamina.loadMulUnder.slope * r
     : Math.min(C.stamina.loadMulOver.max, 1 + (r - 1) * C.stamina.loadMulOver.slope);
 const expTo = (b, lv) => { let s = 0; for (let n = 1; n < lv; n++) s += Math.round(b * Math.pow(n, 1.5)); return s; };

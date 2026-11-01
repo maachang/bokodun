@@ -73,7 +73,7 @@
     "costDivisor": 2,
     "fail": { "scale": 40, "offset": 0.5, "min": 1, "max": 95, "consumeMp": true, "sameCooldown": true },
     "price": { "coef": 0.6, "round": 10, "typeFactor": { "spread": 1.2, "area": 1.3 } },
-    "costCoef": { "rapid": 0.25, "single": 0.36, "spread": 0.6, "area": 0.53, "heal": 0.4 },
+    "costCoef": { "rapid": 0.25, "single": 0.36, "spread": 0.6, "area": 0.53, "heal": 0.4, "support": 0.4 },
     "_note": "魔法は武器・防具と同じ仕組み。魔法ごとに重さ(1〜50)とダイス nDm+k を持つ（public/data/magic.json）。攻撃値 = ダイス結果 + 固定値 + floor(第一職業Lv × bonusMax ÷ 99)。ダメージ（回復量）= ダメージ表[重さ][攻撃値]。基本消費MP = round(重さ × costCoef[種類])。魔法力 M = 知力（回復は精神力） + 第一職業Lv × levelCoef。倍率 = clamp(重さ ÷ (M × costDivisor), costFloor, costCeil)。消費MP = max(1, round(基本消費MP × 倍率))。魔法の発動にも失敗がある: 失敗率(%) = clamp((重さ ÷ (M × costDivisor) − offset) × scale × 職業の magicFailRate, min, max)。失敗しても MP は全額消費し（consumeMp）、連射間隔も成功時と同じ（sameCooldown）。魔法はギルドで買う（買い切り、売却不可）。価格 = round(重さ² × price.coef × price.typeFactor[種類（未指定は1）], price.round 単位)。職業・レベル・知力による使用制限はない（身の丈に合わない魔法は、消費MPが多すぎて使えない）。bonusMax / levelCoef / costFloor / 失敗率の緩和係数（既定1.0）は、職業ごとに jobs.json の magicBonusMax / magicLevelCoef / magicCostFloor / magicFailRate で上書きする（草案）。"
   },
   "equipmentPrice": {
