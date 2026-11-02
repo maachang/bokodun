@@ -1998,8 +1998,11 @@ export class GameEngine {
                 tex.colorSpace = THREE.SRGBColorSpace;   // 写実的な絵なので、色をそのまま出す
                 this.npcTextures[npcId] = tex;
             }
-            const npc = new Npc(npcId, n.x * tileSize + tileSize / 2, n.z * tileSize + tileSize / 2, this.npcTextures[npcId], npcDef);
+            // マップごとに、speed / wanderRadius（歩き回り）を上書きできる（神殿の司祭を、像の前で動かさない、など）
+            const def = { ...npcDef, ...(n.speed !== undefined && { speed: n.speed }), ...(n.wanderRadius !== undefined && { wanderRadius: n.wanderRadius }) };
+            const npc = new Npc(npcId, n.x * tileSize + tileSize / 2, n.z * tileSize + tileSize / 2, this.npcTextures[npcId], def);
             if (n.id === '$shopkeeper' && shop) npc.shopId = this.mapParams.shopId;   // 話しかけて（Eキー）売買のメニューを開ける店主
+            else if (n.shopId && this.shops?.[n.shopId]) npc.shopId = n.shopId;      // マップに直接置く店主（神殿の司祭など。店の種類は shops.json の ID）
             this.npcs.push(npc);
             this.scene.add(npc.sprite);
         }

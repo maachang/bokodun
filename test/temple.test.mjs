@@ -65,3 +65,19 @@ test('神殿: 村にも神殿の建物があり、扉から、同じ神殿のマ
     assert.equal(objects[village.legend[village.layout[r][c]]].type, 'door');
     assert.equal(village.legend.D, 'dirt_road', '村の土の道の凡例は、そのまま');
 });
+
+test('神殿: 司祭は女神像の前に立って動かず、店（取引）を開く。下っ端（修道女・助祭）は話すだけ', () => {
+    const shops = readJson('public/data/shops.json');
+    const npcs = temple.npcs;
+    const statue = temple.layout.flatMap((row, r) => [...row].map((ch, c) => ({ ch, c, r })))
+        .find(({ ch }) => objects[temple.legend[ch]]?.type === 'statue');
+    const senior = npcs.find(n => n.id === 'priest_senior');
+    assert.equal(senior.shopId, 'temple');
+    assert.ok(shops.temple && shops.temple.keeper === 'priest_senior' && shops.temple.goods.length >= 1);
+    assert.equal(senior.speed, 0);
+    assert.equal(senior.wanderRadius, 0);
+    assert.equal(senior.x, statue.c, '司祭は、像の正面（同じ列）');
+    assert.ok(senior.z > statue.r && senior.z - statue.r <= 3, '司祭は、像の手前（南）');
+    for (const n of npcs.filter(n => n.id !== 'priest_senior')) assert.equal(n.shopId, undefined, `${n.id}: 下っ端は店を開かない`);
+    for (const g of shops.temple.goods) assert.equal(g.price, readJson('public/data/items.json')[g.itemId].price, `${g.itemId}: 価格`);
+});

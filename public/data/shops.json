@@ -107,15 +107,72 @@
     "name": "魔法ギルド",
     "keeper": "mage_clerk_man",
     "goods": [
-      { "spellId": "magic_bolt", "name": "マジックボルト", "price": 120 },
-      { "spellId": "heal", "name": "ヒール", "price": 240 },
-      { "spellId": "spread", "name": "拡散弾", "price": 290 },
-      { "spellId": "fire", "name": "ファイア", "price": 470 },
-      { "spellId": "explosion", "name": "爆発火球", "price": 900 },
-      { "spellId": "high_heal", "name": "ハイヒール", "price": 960 },
-      { "spellId": "refresh", "name": "リフレッシュ", "price": 190 },
-      { "spellId": "energy_veil", "name": "エナジーヴェール", "price": 350 },
-      { "spellId": "high_refresh", "name": "ハイ・リフレッシュ", "price": 780 }
+      {
+        "spellId": "magic_bolt",
+        "name": "マジックボルト",
+        "price": 120
+      },
+      {
+        "spellId": "heal",
+        "name": "ヒール",
+        "price": 240
+      },
+      {
+        "spellId": "spread",
+        "name": "拡散弾",
+        "price": 290
+      },
+      {
+        "spellId": "fire",
+        "name": "ファイア",
+        "price": 470
+      },
+      {
+        "spellId": "explosion",
+        "name": "爆発火球",
+        "price": 900
+      },
+      {
+        "spellId": "high_heal",
+        "name": "ハイヒール",
+        "price": 960
+      },
+      {
+        "spellId": "refresh",
+        "name": "リフレッシュ",
+        "price": 190
+      },
+      {
+        "spellId": "energy_veil",
+        "name": "エナジーヴェール",
+        "price": 350
+      },
+      {
+        "spellId": "high_refresh",
+        "name": "ハイ・リフレッシュ",
+        "price": 780
+      }
+    ]
+  },
+  "temple": {
+    "name": "神殿",
+    "keeper": "priest_senior",
+    "goods": [
+      {
+        "itemId": "revive_potion",
+        "name": "蘇生の薬",
+        "price": 500
+      },
+      {
+        "itemId": "antidote",
+        "name": "毒消し",
+        "price": 30
+      },
+      {
+        "itemId": "venom_cure",
+        "name": "猛毒消し",
+        "price": 150
+      }
     ]
   }
 }

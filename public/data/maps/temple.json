@@ -65,8 +65,11 @@
   "npcs": [
     {
       "id": "priest_senior",
-      "x": 7,
-      "z": 6
+      "x": 10,
+      "z": 3,
+      "speed": 0,
+      "wanderRadius": 0,
+      "shopId": "temple"
     },
     {
       "id": "priest_woman",
