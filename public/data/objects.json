@@ -2404,5 +2404,40 @@
     "radius": 0.5,
     "message": "貴族街",
     "description": "貴族街の案内標識（街のマップ用。建物の前に立てる）"
+  },
+  "stairs_stone_up": {
+    "type": "stairs",
+    "direction": "up",
+    "texture": "floorStone",
+    "solid": false,
+    "message": "階段を上る",
+    "description": "石の階段（上り）。踏むと、links の行き先（nextMap）の、spawn の位置へ移動する。向きは、通れる隣マスの反対側（links の dir で指定もできる）"
+  },
+  "stairs_stone_down": {
+    "type": "stairs",
+    "direction": "down",
+    "texture": "floorStone",
+    "solid": false,
+    "message": "階段を下りる",
+    "description": "石の下り階段。上りと同じ作りで、段が、床から下へ降りていく。使い方は上りと同じ"
+  },
+  "stairs_wood_up": {
+    "type": "stairs",
+    "direction": "up",
+    "texture": "woodFloor",
+    "solid": false,
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall",
+    "message": "階段を上る",
+    "description": "木の階段（上り。屋内の床と天井つき）"
+  },
+  "stairs_wood_down": {
+    "type": "stairs",
+    "direction": "down",
+    "texture": "woodFloor",
+    "ceilingTexture": "woodWall",
+    "solid": false,
+    "message": "階段を下りる",
+    "description": "木の下り階段（屋内の天井つき）。作りは石と同じで、段が板張りの色"
   }
 }

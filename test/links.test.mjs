@@ -19,9 +19,10 @@ test('建物の出入り: links の座標は扉・門のマスで、行き先と
             count++;
             const [c, r] = key.split(',').map(Number);
             const def = objects[map.legend[map.layout[r][c]]];
-            assert.ok(def && ['door', 'gateway', 'portal'].includes(def.type), `${id} ${key}: 扉・門・ポータルのマスではない`);
+            assert.ok(def && ['door', 'gateway', 'portal', 'stairs'].includes(def.type), `${id} ${key}: 扉・門・ポータルのマスではない`);
             assert.ok(link.nextMap === '$back' || maps[link.nextMap], `${id} ${key}: 行き先 ${link.nextMap} がない`);
             if (link.params?.shopId) assert.ok(shops[link.params.shopId], `${id} ${key}: 店の種類 ${link.params.shopId}`);
+            if (def.type === 'stairs') continue;   // 階段は、下の専用テストで調べる（戻る先ではなく、行き先での出現位置 spawn を持つ）
             if (link.nextMap === '$back') continue;   // 建物の出口（入ってきた場所へ戻る）は、戻る先の指定は要らない
             // 戻る先は、行き先のマップではなく、このマップの通れるマス
             const b = link.back;
@@ -67,5 +68,40 @@ test('マップの大きさ: 全ての行が同じ長さで、縦横とも MAP_M
         const rows = map.layout.length, cols = map.layout[0].length;
         assert.ok(rows <= MAP_MAX_SIZE && cols <= MAP_MAX_SIZE, `${id}: ${cols}x${rows} が上限 ${MAP_MAX_SIZE}x${MAP_MAX_SIZE} を超えている`);
         map.layout.forEach((row, r) => assert.equal(row.length, cols, `${id}: ${r} 行目の長さが ${cols} と違う`));
+    }
+});
+
+test('階段: 全ての階段のマスに links があり、行き先の spawn が通れるマス。行き先にも、こちらへ戻る階段がある', () => {
+    let count = 0;
+    for (const [id, map] of Object.entries(maps)) {
+        for (let r = 0; r < map.layout.length; r++) for (let c = 0; c < map.layout[r].length; c++) {
+            const def = objects[map.legend?.[map.layout[r][c]]];
+            if (!def || def.type !== 'stairs') continue;
+            count++;
+            const link = map.links?.[`${c},${r}`];
+            assert.ok(link && maps[link.nextMap], `${id} ${c},${r}: 階段の行き先（links の nextMap）がない`);
+            assert.ok(link.spawn, `${id} ${c},${r}: 行き先での出現位置（spawn）がない`);
+            const dest = maps[link.nextMap], s = link.spawn;
+            assert.ok(s.x > 0 && s.z > 0 && s.x < dest.layout[0].length - 1 && s.z < dest.layout.length - 1, `${id} ${c},${r}: spawn がマップの外`);
+            const ch = dest.layout[s.z][s.x], sd = dest.legend?.[ch] && objects[dest.legend[ch]];
+            assert.ok(ch === '0' || (sd && !sd.solid && !['stairs', 'door', 'gateway', 'portal', 'furniture', 'block'].includes(sd.type)),
+                `${id} ${c},${r}: spawn が通れないマス、または移動のマス（すぐ戻ってしまう）`);
+            if (link.dir) assert.ok(['n', 'e', 's', 'w'].includes(link.dir), `${id} ${c},${r}: dir は n/e/s/w`);
+            // 行き先のマップに、こちらへ戻る階段がある
+            const back = Object.entries(dest.links ?? {}).some(([k, l]) => {
+                const [bc, br] = k.split(',').map(Number);
+                return l.nextMap === id && objects[dest.legend?.[dest.layout[br][bc]]]?.type === 'stairs';
+            });
+            assert.ok(back, `${id} ${c},${r}: ${link.nextMap} に、こちらへ戻る階段がない`);
+        }
+    }
+    assert.ok(count >= 2, `階段の数: ${count}`);
+});
+
+test('階段: 上りと下りの定義（direction）と、段の見た目に使うテクスチャ', () => {
+    for (const [id, def] of Object.entries(objects)) {
+        if (def.type !== 'stairs') continue;
+        assert.ok(['up', 'down'].includes(def.direction), `${id}: direction`);
+        assert.ok(def.texture, `${id}: texture`);
     }
 });

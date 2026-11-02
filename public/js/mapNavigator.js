@@ -13,6 +13,7 @@ export class MapNavigator {
 
     // 移動先を決める。移動中なら null（何もしない）。
     //   nextMap が '$back' なら、記録の一番上へ戻る（記録がなければ fallbackMap へ）。link.back があれば、今のマップと戻る位置を記録する
+    //   link.spawn があれば、行き先での出現位置にする（階段: 上り下りの行き先を、双方の links で明示する）
     //   戻り値: { mapId, opts }（loadMap に渡す）
     plan(currentMapId, nextMap, link = {}, fallbackMap = null) {
         if (this.busy) return null;
@@ -23,6 +24,18 @@ export class MapNavigator {
         } else if (link.back) {
             this.stack.push({ mapId: currentMapId, spawn: link.back });
         }
-        return { mapId: nextMap, opts: { keepStack: true, params: link.params } };
+        const opts = { keepStack: true, params: link.params };
+        if (link.spawn) opts.spawn = link.spawn;   // 階段など: 行き先マップでの出現位置を、link で指定する（戻る先の記録は使わない）
+        return { mapId: nextMap, opts };
     }
+}
+
+// 階段の向き（上る・下りる方向）。dir（n/e/s/w）の指定があればそれ。なければ、通れる隣マスが1つだけのとき、その反対側（行き止まりの壁へ向かう）。それ以外は北
+//   isSolid(列, 行) は、そのマスが壁・家具などで通れないとき true。戻り値: 'n' | 'e' | 's' | 'w'
+export const STAIRS_DIRS = { n: [0, -1], e: [1, 0], s: [0, 1], w: [-1, 0] };
+export function stairsFacing(isSolid, c, r, dir) {
+    if (dir && STAIRS_DIRS[dir]) return dir;
+    const OPPOSITE = { n: 's', e: 'w', s: 'n', w: 'e' };
+    const open = Object.entries(STAIRS_DIRS).filter(([, [dx, dz]]) => !isSolid(c + dx, r + dz)).map(([k]) => k);
+    return open.length === 1 ? OPPOSITE[open[0]] : 'n';
 }

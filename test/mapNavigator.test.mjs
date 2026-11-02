@@ -11,6 +11,11 @@ async function loadNavigator() {
     fs.copyFileSync(path.join(projectRoot, 'public/js/mapNavigator.js'), tmp);
     return (await import(tmp)).MapNavigator;
 }
+async function loadStairsFacing() {
+    const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'nav-')), 'mapNavigator.mjs');
+    fs.copyFileSync(path.join(projectRoot, 'public/js/mapNavigator.js'), tmp);
+    return (await import(tmp)).stairsFacing;
+}
 
 const back = { x: 8, z: 1, angle: 3.14159 };
 
@@ -43,6 +48,26 @@ test('マップ移動: 戻る先の記録がなければ、出口は fallback �
     nav.plan('city', 'shop', { back });
     nav.clear();
     assert.equal(nav.stack.length, 0);
+});
+
+test('マップ移動: 階段（link.spawn）は、行き先での出現位置を指定し、戻る先の記録は増やさない', async () => {
+    const nav = new (await loadNavigator())();
+    const spawn = { x: 10, z: 2, angle: 3.14159 };
+    const up = nav.plan('house', 'house_2f', { spawn });
+    assert.deepEqual(up, { mapId: 'house_2f', opts: { keepStack: true, params: undefined, spawn } });
+    assert.equal(nav.stack.length, 0);
+});
+
+test('階段の向き: dir の指定が優先。通れる隣が1つだけなら、その反対側。それ以外は北', async () => {
+    const stairsFacing = await loadStairsFacing();
+    const wall = (open) => (c, r) => !open.some(([oc, or]) => oc === c && or === r);   // open の座標だけ通れる
+    // (5,5) の南（5,6）だけ通れる行き止まり → 北向き
+    assert.equal(stairsFacing(wall([[5, 6]]), 5, 5), 'n');
+    assert.equal(stairsFacing(wall([[5, 4]]), 5, 5), 's');
+    assert.equal(stairsFacing(wall([[4, 5]]), 5, 5), 'e');
+    assert.equal(stairsFacing(wall([[6, 5]]), 5, 5), 'w');
+    assert.equal(stairsFacing(wall([[5, 6], [6, 5]]), 5, 5), 'n', '通れる隣が2つ以上なら北');
+    assert.equal(stairsFacing(wall([[5, 6]]), 5, 5, 'e'), 'e', 'dir の指定が優先');
 });
 
 // GameEngine に組み込まれた動き: 読み込みの遅い（初めて開く）マップへの移動で、扉の中から毎フレーム enterMap が呼ばれても、1 回しか移動しない
@@ -87,4 +112,30 @@ test('GameEngine: 初めて開くマップの読み込み中に enterMap が繰�
     assert.equal(loads[1].mapId, 'city', '出口は、入った街へ戻る（城の玉座の間ではない）');
     assert.deepEqual(loads[1].opts.spawn, back);
     assert.equal(g.nav.busy, false, '読み込みが終わったら、次の移動を受け付ける');
+});
+
+test('GameEngine: 階段で1階と2階を行き来しても、戻る先の記録は増えず、建物の出口は、入った村へ戻る', async () => {
+    const { GameEngine, MapNavigator } = await loadEngine();
+    const readMap = (id) => JSON.parse(fs.readFileSync(path.join(projectRoot, `public/data/maps/${id}.json`), 'utf-8'));
+    const house = readMap('village_chief_house'), house2f = readMap('village_chief_house_2f');
+    const g = Object.create(GameEngine.prototype);
+    g.nav = new MapNavigator();
+    g.currentMapId = 'village';
+    g.currentMapData = { nextMap: 'grassland' };
+    const loads = [];
+    g.loadMapBody = async (mapId, opts) => { loads.push({ mapId, opts }); g.currentMapId = mapId; g.currentMapData = mapId === 'village_chief_house' ? house : house2f; };
+    const villageBack = { x: 11, z: 9, angle: 3.14159 };
+    const go = async (nextMap, link) => { g.enterMap(nextMap, link); await new Promise(r => setTimeout(r, 5)); };
+    await go('village_chief_house', { back: villageBack });                 // 村から村長の家へ
+    const up = house.links['10,1'], down = house2f.links['10,1'];
+    await go(up.nextMap, up);                                              // 階段で2階へ
+    await go(down.nextMap, down);                                          // 階段で1階へ
+    assert.equal(g.nav.stack.length, 1, '階段では、戻る先の記録は増えない');
+    assert.deepEqual(loads[1].opts.spawn, up.spawn);
+    assert.equal(loads[1].mapId, 'village_chief_house_2f');
+    assert.deepEqual(loads[2].opts.spawn, down.spawn);
+    assert.equal(loads[2].mapId, 'village_chief_house');
+    await go('$back', {});                                                 // 出口で、村へ
+    assert.equal(loads[3].mapId, 'village');
+    assert.deepEqual(loads[3].opts.spawn, villageBack);
 });

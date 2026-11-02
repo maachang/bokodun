@@ -2,7 +2,7 @@ import * as THREE from '/js/three.module.js';
 import { RetroTextureGenerator } from '/js/textures.js';
 import { Monster, Projectile } from '/js/entities.js';
 import { Npc } from '/js/npc.js';
-import { MapNavigator } from '/js/mapNavigator.js';
+import { MapNavigator, stairsFacing, STAIRS_DIRS } from '/js/mapNavigator.js';
 import { SoundFX } from '/js/audio.js';
 import { SDAssetManager } from '/js/sdAssetManager.js';
 import { ParticleSystem } from '/js/particles.js';
@@ -528,6 +528,9 @@ export class GameEngine {
                 }
                 if (objDef && objDef.type === 'crumbling_floor') {
                     holeFloorMap[r][c] = true; // Crumbling floor has a deep bottomless pit cavity instead of normal floor!
+                }
+                if (objDef && objDef.type === 'stairs' && objDef.direction === 'down') {
+                    holeFloorMap[r][c] = true; // 下り階段は、床に四角い穴を開けて、段を下へ降ろす
                 }
             }
         }
@@ -1834,6 +1837,68 @@ export class GameEngine {
                         // 壁の切れ目・開いた門: 見えない移動マス。このマスへ入ると nextMap へ移動する
                         if (objDef.floorTexture) this.addFloorTile(wx, wz, tileSize, objDef.floorTexture);
                         this.portals.push({ x: wx, z: wz, halfSize: tileSize / 2, mesh: null, link: { ...objDef, nextMap: objDef.nextMap ?? mapData.nextMap, ...mapData.links?.[`${c},${r}`] } });
+                        break;
+                    }
+
+                    case 'stairs': {
+                        // 階段（上り・下り）: 見た目は、段を積んだ箱。踏むと、links の nextMap の spawn の位置へ移動する（別の階・別の建物）。
+                        //   向き（上る・下りる方向）は、links の dir（n/e/s/w）。なければ、通れる隣マスが1つだけのとき、その反対側（行き止まりの壁へ向かう）
+                        const key = `${c},${r}`;
+                        const isSolidChar = (cc, rr) => {
+                            if (cc < 0 || rr < 0 || cc >= cols || rr >= rows) return true;
+                            const ch = mapData.layout[rr][cc];
+                            if (ch === '1') return true;
+                            const t = this.objectDefinitions[mapData.legend?.[ch]];
+                            return !!t && (t.solid === true || ['block', 'door', 'furniture'].includes(t.type));
+                        };
+                        const dirKey = stairsFacing(isSolidChar, c, r, mapData.links?.[key]?.dir);
+                        const [sdx, sdz] = STAIRS_DIRS[dirKey];
+
+                        const stairTex = this.textures[objDef.texture] || this.textures.floorStone;
+                        const STEPS = 5, total = Math.min(wallH * 0.7, 2.8), riser = total / STEPS;
+                        const group = new THREE.Group();
+                        if (objDef.direction === 'down') {
+                            // 下り階段: 上り階段と同じ作りで、段が、床から下へ降りていく（床に穴を開けて、段を下へ降ろす）。枠や黒い壁は付けない。
+                            //   段は浅く（1段 0.25）して、床の縁に隠れず、階段に見えるようにする。段ごとに、明暗を交互にして、段を見せる
+                            const DROP = 0.25, deepTotal = STEPS * DROP;
+                            for (let i = 0; i < STEPS; i++) {
+                                const k = (i % 2 === 0 ? 1.0 : 0.72) * (1 - i * 0.04);
+                                const mat = new THREE.MeshLambertMaterial({ map: stairTex, color: new THREE.Color(0xffffff).multiplyScalar(k) });
+                                const depth = tileSize / STEPS, top = -(i + 1) * DROP, h = Math.max(deepTotal + top, 0.05);   // 底は、穴の底（-deepTotal）
+                                const step = new THREE.Mesh(new THREE.BoxGeometry(depth, h, tileSize), mat);
+                                step.position.set(-tileSize / 2 + (i + 0.5) * depth, -deepTotal + h / 2, 0);
+                                group.add(step);
+                            }
+                            // 穴の壁（左右と奥）。段と同じ材質。壁がないと、浅い角度から見たとき、穴の奥の下から、空の色が透けて見える
+                            const wallMat = new THREE.MeshLambertMaterial({ map: stairTex, color: new THREE.Color(0xffffff).multiplyScalar(0.75), side: THREE.DoubleSide });
+                            for (const side of [-1, 1]) {
+                                const w = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, deepTotal), wallMat);
+                                w.position.set(0, -deepTotal / 2, side * tileSize / 2);
+                                group.add(w);
+                            }
+                            const far = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, deepTotal), wallMat);
+                            far.rotation.y = Math.PI / 2;
+                            far.position.set(tileSize / 2, -deepTotal / 2, 0);
+                            group.add(far);
+                            group.position.set(wx, 0, wz);
+                            group.rotation.y = Math.atan2(-sdz, sdx);   // ローカルの +X（奥）を、dir の向きにする
+                            this.scene.add(group);
+                        } else {
+                            // 上り階段: 段を5つ積んだ箱。上面は (i+1) × riser
+                            const stairMat = new THREE.MeshLambertMaterial({ map: stairTex });
+                            for (let i = 0; i < STEPS; i++) {
+                                const depth = tileSize / STEPS, h = (i + 1) * riser;
+                                const step = new THREE.Mesh(new THREE.BoxGeometry(depth, h, tileSize), stairMat);
+                                step.position.set(-tileSize / 2 + (i + 0.5) * depth, h / 2, 0);   // 向き（dir）に沿った位置
+                                group.add(step);
+                            }
+                            group.position.set(wx, 0, wz);
+                            group.rotation.y = Math.atan2(-sdz, sdx);   // ローカルの +X を、dir の向きにする
+                            this.scene.add(group);
+                        }
+                        if (objDef.floorTexture) this.addFloorTile(wx, wz, tileSize, objDef.floorTexture);
+                        if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
+                        this.portals.push({ x: wx, z: wz, halfSize: tileSize / 2, mesh: null, link: { ...objDef, nextMap: objDef.nextMap ?? mapData.nextMap, ...mapData.links?.[key] } });
                         break;
                     }
 

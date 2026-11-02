@@ -1,0 +1,58 @@
+{
+  "id": "village_chief_house_2f",
+  "name": "村長の家（2階）",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "village_chief_house",
+  "spawn": {
+    "x": 10,
+    "z": 2,
+    "angle": 3.14159
+  },
+  "environment": {
+    "floorType": "grass",
+    "hasCeiling": false,
+    "ambientLight": 9408660,
+    "directionalLight": 16774610,
+    "fogColor": 12373460,
+    "fogNear": 22,
+    "fogFar": 80,
+    "visibility": 0.9,
+    "skyColor": 9683955
+  },
+  "legend": {
+    "W": "wooden_wall",
+    "F": "wood_floor",
+    "u": "rug",
+    "t": "table",
+    "h": "chair",
+    "e": "bed",
+    "k": "bookshelf",
+    "S": "stairs_wood_down"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWWW",
+    "WkFFFFFFFFSW",
+    "WeFFFFFFtFFW",
+    "WFFFFuuFFFFW",
+    "WFFFFuuFFFFW",
+    "WeFFFFFFhFFW",
+    "WFFFFFFFFFFW",
+    "WWWWWWWWWWWW"
+  ],
+  "npcs": [],
+  "links": {
+    "10,1": {
+      "nextMap": "village_chief_house",
+      "message": "階段を下りる（1階へ）",
+      "dir": "n",
+      "spawn": {
+        "x": 10,
+        "z": 2,
+        "angle": 3.14159
+      }
+    }
+  }
+}
