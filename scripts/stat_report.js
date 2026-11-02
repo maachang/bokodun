@@ -194,6 +194,44 @@ P('|---|---|---|---|---|---|');
 for (const [jid, j] of combat)
     P(`| ${j.name} | ${j.requires.length ? j.requires.map(q => jobsAll[q.job].name + 'Lv' + q.level).join('＋') : '-'} | ${j.expBase} | ${j.thiefFamily ? C.critRate.thiefFamily : C.critRate.normal} | ${j.retryCrit || 0} | ${expTo(j.expBase, 99).toLocaleString()} |`);
 
+P('\n## 4b. 敵102体の全体確認（人間・平均・ファイター。プレイヤーのLv = 敵の想定Lv）\n');
+P('敵の攻撃は enemies.json の stats.attack（重さと nDm+k、敵のレベル加算つき）の期待値。被ダメージは、軽装（回避あり）と重装（回避なし）の両方。目標: 通常の敵は、プレイヤーが約5回の攻撃で倒せる／敵の1発が最大HPの約12%。ボスは、倒すまでの回数が HP倍率 × 約5回。\n');
+const ENEMIES = D('enemies.json'), RK = D('enemyRanks.json');
+const enemyDmg = e => { const a = e.stats.attack, b = lvBonus(e.stats.level); return dice(a.dice.n, a.dice.m, a.dice.k).reduce((t, [v, q]) => t + q * tb(a.weight, v + b), 0); };
+const rows = Object.entries(ENEMIES).map(([id, e]) => {
+    const s = build('human', 6.75, e.stats.level, 'fighter'), dm = enemyDmg(e);
+    const kill = e.stats.hp / s.w.e, tl = s.light(dm), th = s.heavy(dm);
+    const target = e.boss ? 5 * (e.stats.hpMul || 1) : 5;
+    return { id, e, kill, killRatio: kill / target, dm, tl, th, pl: tl / s.hp * 100, ph: th / s.hp * 100, hp: s.hp };
+}).sort((x, y) => x.e.rank - y.e.rank || x.id.localeCompare(y.id));
+P('| ランク | 敵 | 系統 | ボス | 敵HP | 倒す回数 | 敵の攻撃（重さ nDm+k） | 攻撃の期待値 | 軽装の被dmg | 軽装 %HP | 重装の被dmg | 重装 %HP |');
+P('|---|---|---|---|---|---|---|---|---|---|---|---|');
+for (const r of rows) {
+    const a = r.e.stats.attack;
+    P(`| R${r.e.rank} | ${r.e.name} | ${RK.families[r.e.family].name} | ${r.e.boss ? '★×' + r.e.stats.hpMul : ''} | ${r.e.stats.hp} | ${f1(r.kill)} | ${a.weight} ${a.dice.n}d${a.dice.m}+${a.dice.k} | ${f1(r.dm)} | ${f1(r.tl)} | ${f1(r.pl)}% | ${f1(r.th)} | ${f1(r.ph)}% |`);
+}
+P('\n### ランクごとのまとめ（通常の敵のみ）\n');
+P('| ランク | 想定Lv | 体数 | 倒す回数（最小〜最大） | 軽装 %HP（最小〜最大） | 重装 %HP（最小〜最大） |');
+P('|---|---|---|---|---|---|');
+for (let rk = 1; rk <= 10; rk++) {
+    const g = rows.filter(r => r.e.rank === rk && !r.e.boss);
+    if (!g.length) { P(`| R${rk} | ${RK.ranks[rk].level} | 0 | - | - | - |`); continue; }
+    const mm = (f) => `${f1(Math.min(...g.map(f)))}〜${f1(Math.max(...g.map(f)))}`;
+    P(`| R${rk} | ${RK.ranks[rk].level} | ${g.length} | ${mm(r => r.kill)} | ${mm(r => r.pl)}% | ${mm(r => r.ph)}% |`);
+}
+P('\n### 外れ値（目安の範囲外）\n');
+P('範囲: 通常の敵は、倒す回数 3〜8、軽装の被ダメージ 6〜20%HP。ボスは、倒す回数が目標（5 × HP倍率）の 0.6〜1.6 倍、軽装の被ダメージ 6〜20%HP。\n');
+const odd = rows.filter(r => r.killRatio < (r.e.boss ? 0.6 : 0.6) || r.killRatio > (r.e.boss ? 1.6 : 1.6) || r.pl < 6 || r.pl > 20);
+P('| 敵 | ランク | 倒す回数 | 目標 | 軽装 %HP | 理由 |');
+P('|---|---|---|---|---|---|');
+for (const r of odd) {
+    const tgt = r.e.boss ? 5 * (r.e.stats.hpMul || 1) : 5, why = [];
+    if (r.killRatio < 0.6) why.push('倒すのが早すぎる'); if (r.killRatio > 1.6) why.push('倒すのに時間がかかりすぎ');
+    if (r.pl < 6) why.push('被ダメージが小さい'); if (r.pl > 20) why.push('被ダメージが大きい');
+    P(`| ${r.e.name} | R${r.e.rank} | ${f1(r.kill)} | ${tgt} | ${f1(r.pl)}% | ${why.join('、')} |`);
+}
+if (!odd.length) P('| （なし） | | | | | |');
+
 P('\n## 5. このレポートから見える、決める必要がある点\n');
 P('- 上位職: HP+2/MP+1（魔法系は1.5）/Lv、攻撃補正の最大+25、職ごとの特性（ナイト=重装でも回避有効、ニンジャ=回避係数0.7、パラディン=防御×1.1）。数値は仮置き。');
 P('- 上位職は Lv1 から始まる（基本職のレベルは残る）。魔法系の上位職は、魔法の威力プラス値と消費MP軽減が大きい（3c）。');
