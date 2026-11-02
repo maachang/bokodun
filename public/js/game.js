@@ -3315,7 +3315,7 @@ export class GameEngine {
     // 大理石（marble〜）のテクスチャは、白く見えるように、少し自ら光らせる（照明が弱い面・影の面でも灰色にならない）
     makeLitMaterial(textureKey, texture) {
         const glow = typeof textureKey === 'string' && textureKey.startsWith('marble');
-        return new THREE.MeshLambertMaterial(glow ? { map: texture, emissive: 0xb8b8b0 } : { map: texture });
+        return new THREE.MeshLambertMaterial(glow ? { map: texture, emissive: 0x92928c } : { map: texture });
     }
 
     // オブジェクトの画像（objects.json の imageFile。/images/objects/ 以下）のテクスチャ。同じ画像は1回だけ読み込む
