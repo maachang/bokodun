@@ -3,10 +3,10 @@
 sync_sd_images.py
 
 sdServer の画像を、画像ID（sdId）で問い合わせて、更新のあった画像だけを取り込み直すツール。
- - 対象: public/data/enemies.json / npcs.json の、sdId を持つエントリ
+ - 対象: public/data/enemies.json / npcs.json / objects.json の、sdId を持つエントリ（objects.json は imageFile も持つもの）
  - 判定: sdServer の image_updated_at が、scripts/sdImages.manifest.json に保存した値と違えば更新
  - 取り込み: 透明部分を自動クロップして、エントリの画像ファイルに上書き
- - 反映: 敵は scale の幅（高さは維持）、NPC は aspect を、新しい画像の縦横比で更新
+ - 反映: 敵は scale の幅（高さは維持）、NPC・オブジェクトは aspect を、新しい画像の縦横比で更新
  - 記録: manifest に imageUpdatedAt（sdServer 側の更新時刻）と fileUpdatedAt（画像ファイルの更新時刻）を保存
 画像の URL（/uploads/…）は更新のたびに変わるため、保存するのは ID だけで、URL は毎回 API から取得する。
 
@@ -43,6 +43,10 @@ def targets():
     for k, v in json.load(open(p, encoding='utf-8')).items():
         if 'sdId' in v:
             out.append((p, k, int(v['sdId']), v['texture'].replace('/images/', '', 1), 'npc'))
+    p = os.path.join(ROOT, 'public/data/objects.json')
+    for k, v in json.load(open(p, encoding='utf-8')).items():
+        if 'sdId' in v and v.get('imageFile'):
+            out.append((p, k, int(v['sdId']), 'objects/' + v['imageFile'], 'object'))
     return out
 
 
@@ -94,7 +98,7 @@ def main():
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         im.save(dst, optimize=True)
         ratio = im.width / im.height
-        if kind == 'npc':
+        if kind in ('npc', 'object'):
             set_field(path, key, 'aspect', lambda _: str(round(ratio, 3)))
         else:
             d = json.load(open(path, encoding='utf-8'))[key]

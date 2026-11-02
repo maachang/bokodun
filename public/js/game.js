@@ -256,6 +256,8 @@ export class GameEngine {
             denseForest: denseForestTex,
             woodWall: RetroTextureGenerator.createWoodWallTexture(),
             woodFloor: RetroTextureGenerator.createWoodFloorTexture(),
+            marbleWall: RetroTextureGenerator.createMarbleWallTexture(),
+            marbleFloor: RetroTextureGenerator.createMarbleFloorTexture(),
             rug: RetroTextureGenerator.createRugTexture(),
             woodDoor: RetroTextureGenerator.createWoodDoorTexture(),
             grassTuft: RetroTextureGenerator.createGrassTuftTexture(),
@@ -1902,6 +1904,76 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'statue': {
+                        // 像（画像）: 台座の上に、画像の板が、常にこちらを向いて立つ（スプライト）。後ろに、淡い光の輪（glow）をつける
+                        const pedH = objDef.pedestalHeight ?? 0.6;
+                        const pedMat = new THREE.MeshLambertMaterial({ map: this.textures[objDef.pedestalTexture || 'marbleWall'] });
+                        const ped = new THREE.Mesh(new THREE.BoxGeometry(tileSize * 0.55, pedH, tileSize * 0.55), pedMat);
+                        ped.position.set(wx, pedH / 2, wz);
+                        this.scene.add(ped);
+                        const imgTex = this.getObjectImageTexture(objDef.imageFile);
+                        const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: imgTex, transparent: true, alphaTest: 0.05 }));
+                        sprite.center.set(0.5, 0.0);
+                        sprite.scale.set(objDef.height * (objDef.aspect || 0.5), objDef.height, 1);
+                        sprite.position.set(wx, pedH, wz);
+                        this.scene.add(sprite);
+                        if (objDef.glow) {
+                            const cv = document.createElement('canvas');
+                            cv.width = cv.height = 128;
+                            const cx = cv.getContext('2d');
+                            const grad = cx.createRadialGradient(64, 64, 4, 64, 64, 64);
+                            grad.addColorStop(0, 'rgba(255, 244, 200, 0.55)');
+                            grad.addColorStop(1, 'rgba(255, 244, 200, 0)');
+                            cx.fillStyle = grad;
+                            cx.fillRect(0, 0, 128, 128);
+                            const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: new THREE.CanvasTexture(cv), transparent: true, depthWrite: false, blending: THREE.AdditiveBlending }));
+                            halo.scale.set(objDef.height * 1.3, objDef.height * 1.3, 1);
+                            halo.position.set(wx, pedH + objDef.height * 0.5, wz - 0.05);
+                            this.scene.add(halo);
+                        }
+                        if (objDef.floorTexture ?? mapData.decorFloor) this.addFloorTile(wx, wz, tileSize, objDef.floorTexture ?? mapData.decorFloor);
+                        if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
+                        if (objDef.solid) {
+                            const rad = objDef.radius || 0.8;
+                            this.colliders.push({
+                                minX: wx - rad, maxX: wx + rad, minZ: wz - rad, maxZ: wz + rad,
+                                blocksProjectiles: objDef.blocksProjectiles === true
+                            });
+                        }
+                        break;
+                    }
+
+                    case 'wall_image': {
+                        // 壁の画像（ステンドグラスなど）: 壁のブロックの、通れる隣のマスに向いた面に、画像を貼る。画像は自ら光る材質（ガラス越しの光）
+                        const wallMat = new THREE.MeshLambertMaterial({ map: this.textures[objDef.wallTexture || 'marbleWall'] });
+                        const body = new THREE.Mesh(standardWallGeo, wallMat);
+                        body.position.set(wx, wallH / 2, wz);
+                        this.scene.add(body);
+                        if (objDef.solid) {
+                            this.colliders.push({
+                                minX: wx - tileSize / 2, maxX: wx + tileSize / 2, minZ: wz - tileSize / 2, maxZ: wz + tileSize / 2,
+                                blocksProjectiles: objDef.blocksProjectiles !== false
+                            });
+                        }
+                        const isOpen = (cc, rr) => {
+                            if (cc < 0 || rr < 0 || cc >= cols || rr >= rows) return false;
+                            const ch = mapData.layout[rr][cc];
+                            if (ch === '1') return false;
+                            const t = this.objectDefinitions[mapData.legend?.[ch]];
+                            return !t || !['block', 'door', 'wall_image'].includes(t.type);   // 像・家具の後ろの壁にも、画像を貼る
+                        };
+                        const imgMat = new THREE.MeshBasicMaterial({ map: this.getObjectImageTexture(objDef.imageFile), transparent: true, alphaTest: 0.05, side: THREE.DoubleSide });
+                        const ih = objDef.height, iw = ih * (objDef.aspect || 0.5), off = tileSize / 2 + 0.02;
+                        for (const [dx, dz] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
+                            if (!isOpen(c + dx, r + dz)) continue;
+                            const plane = new THREE.Mesh(new THREE.PlaneGeometry(iw, ih), imgMat);
+                            plane.position.set(wx + dx * off, (objDef.bottom ?? 1.0) + ih / 2, wz + dz * off);
+                            plane.rotation.y = Math.atan2(dx, dz);   // 面の向きを、開いた隣のマスのほうへ
+                            this.scene.add(plane);
+                        }
+                        break;
+                    }
+
                     case 'portal': {
                         const portalGeo = new THREE.CylinderGeometry(0.8, 0.8, 2.5, 16);
                         const portalMat = new THREE.MeshBasicMaterial({ color: objDef.color ? parseInt(objDef.color.slice(1), 16) : 0x38bdf8, wireframe: true });
@@ -3238,6 +3310,17 @@ export class GameEngine {
     }
 
     // 屋内の床（板張りなど）を 1 マス分敷く
+    // オブジェクトの画像（objects.json の imageFile。/images/objects/ 以下）のテクスチャ。同じ画像は1回だけ読み込む
+    getObjectImageTexture(file) {
+        this.objectImageTextures = this.objectImageTextures || {};
+        if (!this.objectImageTextures[file]) {
+            const tex = new THREE.TextureLoader().load(`/images/objects/${file}`);
+            tex.colorSpace = THREE.SRGBColorSpace;   // 写実的な絵なので、色をそのまま出す
+            this.objectImageTextures[file] = tex;
+        }
+        return this.objectImageTextures[file];
+    }
+
     addFloorTile(wx, wz, tileSize, textureKey) {
         const mat = new THREE.MeshLambertMaterial({ map: this.textures[textureKey] || this.textures.sand });
         const mesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), mat);

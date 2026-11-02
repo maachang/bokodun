@@ -2374,8 +2374,8 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "教会",
-    "description": "教会の案内標識（街のマップ用。建物の前に立てる）"
+    "message": "神殿",
+    "description": "神殿の案内標識（街のマップ用。建物の前に立てる）"
   },
   "smith_sign": {
     "type": "signpost",
@@ -2439,5 +2439,218 @@
     "solid": false,
     "message": "階段を下りる",
     "description": "木の下り階段（屋内の天井つき）。作りは石と同じで、段が板張りの色"
+  },
+  "goddess_statue": {
+    "type": "statue",
+    "imageFile": "goddess_statue.png",
+    "sdId": 205,
+    "aspect": 0.347,
+    "height": 4.0,
+    "pedestalHeight": 1.4,
+    "radius": 0.9,
+    "solid": true,
+    "blocksProjectiles": false,
+    "glow": true,
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall",
+    "description": "慈愛の女神の石像（画像）。台座の上に立つ。近づくと向きが変わる板ではなく、常にこちらを向く"
+  },
+  "stained_glass_plain": {
+    "type": "wall_image",
+    "imageFile": "stained_glass_plain.png",
+    "sdId": 206,
+    "aspect": 0.516,
+    "height": 4.2,
+    "bottom": 1.2,
+    "wallTexture": "marbleWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "ステンドグラス（神殿のガラス窓。壁の面に付ける画像）"
+  },
+  "stained_glass_angel": {
+    "type": "wall_image",
+    "imageFile": "stained_glass_angel.png",
+    "sdId": 207,
+    "aspect": 0.54,
+    "height": 4.2,
+    "bottom": 1.2,
+    "wallTexture": "marbleWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "ステンドグラス（天使に人々がひざまずく）"
+  },
+  "stained_glass_priestess": {
+    "type": "wall_image",
+    "imageFile": "stained_glass_priestess.png",
+    "sdId": 208,
+    "aspect": 0.538,
+    "height": 4.2,
+    "bottom": 1.2,
+    "wallTexture": "marbleWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "ステンドグラス（女性の神官が人々に施しをする）"
+  },
+  "stained_glass_prophet": {
+    "type": "wall_image",
+    "imageFile": "stained_glass_prophet.png",
+    "sdId": 209,
+    "aspect": 0.47,
+    "height": 4.2,
+    "bottom": 1.2,
+    "wallTexture": "marbleWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "ステンドグラス（髭の教祖が動物達と対話する）"
+  },
+  "temple_wall": {
+    "type": "block",
+    "texture": "marbleWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "神殿の大理石の壁"
+  },
+  "marble_floor": {
+    "type": "floor_tile",
+    "texture": "marbleFloor",
+    "ceilingTexture": "marbleWall",
+    "solid": false,
+    "description": "神殿の大理石の床（天井つき）"
+  },
+  "temple_carpet": {
+    "type": "floor_tile",
+    "texture": "rug",
+    "ceilingTexture": "marbleWall",
+    "solid": false,
+    "description": "神殿の中央の絨毯（赤地に金の縁取り）"
+  },
+  "dais_marble_1": {
+    "type": "floor_tile",
+    "texture": "marbleFloor",
+    "elevation": 0.3,
+    "ceilingTexture": "marbleWall",
+    "solid": false,
+    "description": "神殿の祭壇の大理石の段（高さ 0.3）"
+  },
+  "dais_temple_rug_1": {
+    "type": "floor_tile",
+    "texture": "rug",
+    "elevation": 0.3,
+    "ceilingTexture": "marbleWall",
+    "solid": false,
+    "description": "神殿の祭壇の絨毯の段（高さ 0.3）"
+  },
+  "dais_marble_2": {
+    "type": "floor_tile",
+    "texture": "marbleFloor",
+    "elevation": 0.6,
+    "ceilingTexture": "marbleWall",
+    "solid": false,
+    "description": "神殿の祭壇の大理石の段（高さ 0.6）"
+  },
+  "dais_temple_rug_2": {
+    "type": "floor_tile",
+    "texture": "rug",
+    "elevation": 0.6,
+    "ceilingTexture": "marbleWall",
+    "solid": false,
+    "description": "神殿の祭壇の絨毯の段（高さ 0.6）"
+  },
+  "dais_marble_3": {
+    "type": "floor_tile",
+    "texture": "marbleFloor",
+    "elevation": 0.9,
+    "ceilingTexture": "marbleWall",
+    "solid": false,
+    "description": "神殿の祭壇の大理石の段（高さ 0.9）"
+  },
+  "dais_temple_rug_3": {
+    "type": "floor_tile",
+    "texture": "rug",
+    "elevation": 0.9,
+    "ceilingTexture": "marbleWall",
+    "solid": false,
+    "description": "神殿の祭壇の絨毯の段（高さ 0.9）"
+  },
+  "temple_pillar": {
+    "type": "furniture",
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall",
+    "parts": [
+      {
+        "size": [
+          1.7,
+          0.4,
+          1.7
+        ],
+        "pos": [
+          0,
+          0.2,
+          0
+        ],
+        "color": "#d9d2bf"
+      },
+      {
+        "size": [
+          1.1,
+          4.8,
+          1.1
+        ],
+        "pos": [
+          0,
+          2.8,
+          0
+        ],
+        "color": "#efe9da"
+      },
+      {
+        "size": [
+          1.7,
+          0.4,
+          1.7
+        ],
+        "pos": [
+          0,
+          5.4,
+          0
+        ],
+        "color": "#d4a84a"
+      }
+    ],
+    "collider": [
+      1.5,
+      1.5
+    ],
+    "blocksProjectiles": true,
+    "description": "神殿の大理石の柱（金の柱頭。壁の高さ 6 の神殿用）"
+  },
+  "temple_exit": {
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "marbleWall",
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "nextMap": "$back",
+    "message": "外に出る",
+    "description": "神殿の出口の扉。近づくと開き、中へ入ると、入ってきた場所へ戻る"
+  },
+  "temple_building": {
+    "type": "block",
+    "texture": "marbleWall",
+    "roofTexture": "cityRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "白い大理石の神殿の建物（街のマップ用）"
+  },
+  "temple_door": {
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "marbleWall",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "description": "街の神殿の扉（近づくと開き、中へ入ると神殿へ移動。行き先は map の links）"
   }
 }

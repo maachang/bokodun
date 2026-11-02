@@ -1,0 +1,82 @@
+{
+  "id": "temple",
+  "name": "神殿 (Temple)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 6,
+  "nextMap": "city",
+  "spawn": {
+    "x": 10,
+    "z": 17,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "marbleWall",
+    "ambientLight": 16777215,
+    "directionalLight": 16773324,
+    "fogColor": 15985881,
+    "fogNear": 34,
+    "fogFar": 100,
+    "visibility": 1.0,
+    "skyColor": 15985881
+  },
+  "legend": {
+    "W": "temple_wall",
+    "F": "marble_floor",
+    "c": "temple_carpet",
+    "p": "temple_pillar",
+    "D": "temple_exit",
+    "G": "goddess_statue",
+    "1": "dais_marble_1",
+    "2": "dais_marble_2",
+    "4": "dais_temple_rug_1",
+    "5": "dais_temple_rug_2",
+    "a": "stained_glass_plain",
+    "b": "stained_glass_angel",
+    "e": "stained_glass_priestess",
+    "f": "stained_glass_prophet"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWaWWeWWbWWfWWaWWWW",
+    "WFFFFF2225G5222FFFFFW",
+    "WFFFF11114441111FFFFW",
+    "WFFFFFFFFFFFFFFFFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "eFFFFFFFFcccFFFFFFFFf",
+    "WFFFFpFFFcccFFFpFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "fFFFFpFFFcccFFFpFFFFe",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFpFFFcccFFFpFFFFW",
+    "aFFFFFFFFcccFFFFFFFFa",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFpFFFcccFFFpFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFFFFFFFFFFFFFFFFW",
+    "WWWWWWWWWDDDWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "priest_senior",
+      "x": 7,
+      "z": 6
+    },
+    {
+      "id": "priest_woman",
+      "x": 13,
+      "z": 9
+    },
+    {
+      "id": "priest_man",
+      "x": 7,
+      "z": 13
+    }
+  ]
+}

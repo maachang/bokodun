@@ -1716,6 +1716,59 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 神殿の大理石の壁（象牙色の石を積み、継ぎ目と淡い筋、上端に金の帯）
+    static createMarbleWallTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#cfc7b3';
+        ctx.fillRect(0, 0, 64, 64);
+        const tones = ['#ece6d6', '#e3dccb', '#f2eddf', '#dfd8c6'];
+        for (let row = 0; row < 4; row++) {
+            const y = row * 16, off = (row % 2) * 16;
+            for (let x = -16 + off; x < 64; x += 32) {
+                ctx.fillStyle = tones[(row * 2 + (x + 16) / 32) % tones.length | 0];
+                ctx.fillRect(x + 1, y + 1, 30, 14);
+                ctx.fillStyle = 'rgba(150, 140, 120, 0.22)';   // 大理石の筋
+                ctx.fillRect(x + 4, y + 5 + (x & 3), 14, 1);
+                ctx.fillRect(x + 12, y + 9, 10, 1);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
+                ctx.fillRect(x + 1, y + 1, 30, 1);
+            }
+        }
+        ctx.fillStyle = '#d4a84a';   // 金の帯
+        ctx.fillRect(0, 0, 64, 2);
+        ctx.fillStyle = '#f3d98a';
+        ctx.fillRect(0, 2, 64, 1);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // 神殿の大理石の床（象牙色と薄い灰色の市松、淡い筋、金の細い縁）
+    static createMarbleFloorTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        for (let gy = 0; gy < 2; gy++) for (let gx = 0; gx < 2; gx++) {
+            ctx.fillStyle = (gx + gy) % 2 === 0 ? '#efe9db' : '#d8d6d2';
+            ctx.fillRect(gx * 32, gy * 32, 32, 32);
+            ctx.fillStyle = 'rgba(140, 135, 125, 0.20)';
+            ctx.fillRect(gx * 32 + 5, gy * 32 + 8 + gx * 6, 18, 1);
+            ctx.fillRect(gx * 32 + 14, gy * 32 + 20, 12, 1);
+        }
+        ctx.fillStyle = 'rgba(190, 160, 80, 0.55)';   // 金の目地
+        ctx.fillRect(31, 0, 2, 64);
+        ctx.fillRect(0, 31, 64, 2);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
     // 家の中の敷物（赤地に金の縁取りと菱形の模様）
     static createRugTexture() {
         const canvas = document.createElement('canvas');
