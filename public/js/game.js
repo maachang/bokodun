@@ -252,6 +252,7 @@ export class GameEngine {
             itemShopSign: RetroTextureGenerator.createShopSignTexture('item'),
             weaponShopIcon: RetroTextureGenerator.createShopIconTexture('weapon'),
             itemShopIcon: RetroTextureGenerator.createShopIconTexture('item'),
+            templeIcon: RetroTextureGenerator.createShopIconTexture('temple'),
             forestCanopy: forestCanopyTex,
             denseForest: denseForestTex,
             woodWall: RetroTextureGenerator.createWoodWallTexture(),
@@ -571,7 +572,7 @@ export class GameEngine {
             } else if (env.ceilingTexture === 'rock') {
                 ceilTex = this.textures.rock;
             }
-            const ceilMat = new THREE.MeshLambertMaterial({ map: ceilTex });
+            const ceilMat = this.makeLitMaterial(env.ceilingTexture, ceilTex);
             const ceiling = new THREE.Mesh(ceilGeo, ceilMat);
             ceiling.rotation.x = Math.PI / 2;
             ceiling.position.set((cols * tileSize) / 2, wallH, (rows * tileSize) / 2);
@@ -616,7 +617,7 @@ export class GameEngine {
                         if (objDef.texture === 'brick') blockTex = this.textures.brick;
                         else if (objDef.texture && this.textures[objDef.texture]) blockTex = this.textures[objDef.texture];
 
-                        const mat = new THREE.MeshLambertMaterial({ map: blockTex });
+                        const mat = this.makeLitMaterial(objDef.texture, blockTex);
                         if (objDef.jagged || objDef.texture === 'mossyStone') {
                             // Natural craggy rock height variation & slight scale offsets for natural cave look
                             const rockH = wallH * (0.9 + ((r * 7 + c * 13) % 10) * 0.06);
@@ -1347,9 +1348,7 @@ export class GameEngine {
 
                     case 'floor_tile': {
                         // Ground-level custom floor tile
-                        const tileMat = new THREE.MeshLambertMaterial({
-                            map: this.textures[objDef.texture] || this.textures.sand
-                        });
+                        const tileMat = this.makeLitMaterial(objDef.texture, this.textures[objDef.texture] || this.textures.sand);
                         if (objDef.elevation > 0) {
                             // 高さのある床（階段状の高台）: 上面の高さが elevation の箱。歩いて上れる（壁ではない）
                             const stepMesh = new THREE.Mesh(new THREE.BoxGeometry(tileSize, objDef.elevation, tileSize), tileMat);
@@ -1573,7 +1572,7 @@ export class GameEngine {
 
                         const doorMat = new THREE.MeshLambertMaterial({ map: this.textures[objDef.texture] || this.textures.door });
                         const frameMat = objDef.frameTexture && this.textures[objDef.frameTexture]
-                            ? new THREE.MeshLambertMaterial({ map: this.textures[objDef.frameTexture] })
+                            ? this.makeLitMaterial(objDef.frameTexture, this.textures[objDef.frameTexture])
                             : brickMat;
                         // 屋内の戸口は、床と天井もつける
                         if (objDef.floorTexture) this.addFloorTile(wx, wz, tileSize, objDef.floorTexture);
@@ -1907,7 +1906,7 @@ export class GameEngine {
                     case 'statue': {
                         // 像（画像）: 台座の上に、画像の板が、常にこちらを向いて立つ（スプライト）。後ろに、淡い光の輪（glow）をつける
                         const pedH = objDef.pedestalHeight ?? 0.6;
-                        const pedMat = new THREE.MeshLambertMaterial({ map: this.textures[objDef.pedestalTexture || 'marbleWall'] });
+                        const pedMat = this.makeLitMaterial(objDef.pedestalTexture || 'marbleWall', this.textures[objDef.pedestalTexture || 'marbleWall']);
                         const ped = new THREE.Mesh(new THREE.BoxGeometry(tileSize * 0.55, pedH, tileSize * 0.55), pedMat);
                         ped.position.set(wx, pedH / 2, wz);
                         this.scene.add(ped);
@@ -1945,7 +1944,7 @@ export class GameEngine {
 
                     case 'wall_image': {
                         // 壁の画像（ステンドグラスなど）: 壁のブロックの、通れる隣のマスに向いた面に、画像を貼る。画像は自ら光る材質（ガラス越しの光）
-                        const wallMat = new THREE.MeshLambertMaterial({ map: this.textures[objDef.wallTexture || 'marbleWall'] });
+                        const wallMat = this.makeLitMaterial(objDef.wallTexture || 'marbleWall', this.textures[objDef.wallTexture || 'marbleWall']);
                         const body = new THREE.Mesh(standardWallGeo, wallMat);
                         body.position.set(wx, wallH / 2, wz);
                         this.scene.add(body);
@@ -3313,6 +3312,12 @@ export class GameEngine {
     }
 
     // 屋内の床（板張りなど）を 1 マス分敷く
+    // 大理石（marble〜）のテクスチャは、白く見えるように、少し自ら光らせる（照明が弱い面・影の面でも灰色にならない）
+    makeLitMaterial(textureKey, texture) {
+        const glow = typeof textureKey === 'string' && textureKey.startsWith('marble');
+        return new THREE.MeshLambertMaterial(glow ? { map: texture, emissive: 0xb8b8b0 } : { map: texture });
+    }
+
     // オブジェクトの画像（objects.json の imageFile。/images/objects/ 以下）のテクスチャ。同じ画像は1回だけ読み込む
     getObjectImageTexture(file) {
         this.objectImageTextures = this.objectImageTextures || {};
@@ -3325,7 +3330,7 @@ export class GameEngine {
     }
 
     addFloorTile(wx, wz, tileSize, textureKey) {
-        const mat = new THREE.MeshLambertMaterial({ map: this.textures[textureKey] || this.textures.sand });
+        const mat = this.makeLitMaterial(textureKey, this.textures[textureKey] || this.textures.sand);
         const mesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), mat);
         mesh.rotation.x = -Math.PI / 2;
         mesh.position.set(wx, 0.01, wz);
@@ -3334,7 +3339,7 @@ export class GameEngine {
 
     // 屋内の天井を 1 マス分張る（壁の高さ。下から見える向き）
     addCeilingTile(wx, wz, tileSize, wallH, textureKey) {
-        const mat = new THREE.MeshLambertMaterial({ map: this.textures[textureKey] || this.textures.brick });
+        const mat = this.makeLitMaterial(textureKey, this.textures[textureKey] || this.textures.brick);
         const mesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), mat);
         mesh.rotation.x = Math.PI / 2;
         mesh.position.set(wx, wallH, wz);

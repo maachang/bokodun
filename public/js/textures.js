@@ -1722,15 +1722,15 @@ export class RetroTextureGenerator {
         canvas.width = 64;
         canvas.height = 64;
         const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#cfc7b3';
+        ctx.fillStyle = '#e4dfd2';
         ctx.fillRect(0, 0, 64, 64);
-        const tones = ['#ece6d6', '#e3dccb', '#f2eddf', '#dfd8c6'];
+        const tones = ['#fbf9f3', '#f6f3ea', '#fefdfa', '#f3f0e6'];
         for (let row = 0; row < 4; row++) {
             const y = row * 16, off = (row % 2) * 16;
             for (let x = -16 + off; x < 64; x += 32) {
                 ctx.fillStyle = tones[(row * 2 + (x + 16) / 32) % tones.length | 0];
                 ctx.fillRect(x + 1, y + 1, 30, 14);
-                ctx.fillStyle = 'rgba(150, 140, 120, 0.22)';   // 大理石の筋
+                ctx.fillStyle = 'rgba(170, 165, 150, 0.18)';   // 大理石の筋
                 ctx.fillRect(x + 4, y + 5 + (x & 3), 14, 1);
                 ctx.fillRect(x + 12, y + 9, 10, 1);
                 ctx.fillStyle = 'rgba(255, 255, 255, 0.35)';
@@ -1754,9 +1754,9 @@ export class RetroTextureGenerator {
         canvas.height = 64;
         const ctx = canvas.getContext('2d');
         for (let gy = 0; gy < 2; gy++) for (let gx = 0; gx < 2; gx++) {
-            ctx.fillStyle = (gx + gy) % 2 === 0 ? '#efe9db' : '#d8d6d2';
+            ctx.fillStyle = (gx + gy) % 2 === 0 ? '#fcfaf4' : '#ecebe8';
             ctx.fillRect(gx * 32, gy * 32, 32, 32);
-            ctx.fillStyle = 'rgba(140, 135, 125, 0.20)';
+            ctx.fillStyle = 'rgba(160, 156, 146, 0.16)';
             ctx.fillRect(gx * 32 + 5, gy * 32 + 8 + gx * 6, 18, 1);
             ctx.fillRect(gx * 32 + 14, gy * 32 + 20, 12, 1);
         }
@@ -1938,6 +1938,20 @@ export class RetroTextureGenerator {
             ctx.beginPath(); ctx.moveTo(11.5, 20.5); ctx.lineTo(6.5, 25.5); ctx.stroke();
             ctx.fillStyle = '#facc15';     // 柄頭
             ctx.beginPath(); ctx.arc(5, 27, 2.2, 0, Math.PI * 2); ctx.fill();
+        } else if (kind === 'temple') {
+            // 十字架（金色。濃い縁取りと、左上のハイライト）
+            ctx.fillStyle = '#facc15';
+            ctx.strokeStyle = '#7c5a10';
+            ctx.lineWidth = 1.6;
+            ctx.beginPath();
+            ctx.moveTo(13.5, 3); ctx.lineTo(18.5, 3); ctx.lineTo(18.5, 10); ctx.lineTo(26, 10); ctx.lineTo(26, 15);
+            ctx.lineTo(18.5, 15); ctx.lineTo(18.5, 29); ctx.lineTo(13.5, 29); ctx.lineTo(13.5, 15); ctx.lineTo(6, 15);
+            ctx.lineTo(6, 10); ctx.lineTo(13.5, 10);
+            ctx.closePath();
+            ctx.fill(); ctx.stroke();
+            ctx.fillStyle = '#fef9c3';     // ハイライト
+            ctx.fillRect(14.6, 4.2, 1.4, 5);
+            ctx.fillRect(7.2, 11, 5, 1.4);
         } else {
             // 薬びん（三角フラスコ: 細い首と栓、裾の広い瓶に緑の薬と泡。丸い赤だとグローブに見えるので、形と色を変えた）
             ctx.strokeStyle = '#374151';

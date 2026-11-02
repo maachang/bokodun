@@ -162,7 +162,8 @@
         "x": 19,
         "z": 14,
         "angle": 0
-      }
+      },
+      "icon": "templeIcon"
     }
   }
 }

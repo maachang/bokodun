@@ -299,7 +299,8 @@
         "x": 21,
         "z": 39,
         "angle": 3.14159
-      }
+      },
+      "icon": "templeIcon"
     },
     "22,38": {
       "nextMap": "temple",
@@ -308,7 +309,8 @@
         "x": 22,
         "z": 39,
         "angle": 3.14159
-      }
+      },
+      "icon": "templeIcon"
     }
   },
   "legend": {
