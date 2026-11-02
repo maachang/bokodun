@@ -704,5 +704,75 @@
       "子爵ともなれば、付き合いが多くてね……見栄も楽ではないのだよ。",
       "中身より、肩書きが物を言う世の中さ。"
     ]
+  },
+  "senior_merchant_man": {
+    "name": "上級商人",
+    "sdId": 146,
+    "texture": "/images/npcs/senior_merchant_man.png",
+    "height": 2.3,
+    "aspect": 0.356,
+    "radius": 0.39,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "いらっしゃい。……ふむ、いい品が手に入ったところでね。",
+      "商人ギルドに入れば、もっと儲かるよ。"
+    ]
+  },
+  "adv_clerk_woman": {
+    "name": "冒険者ギルドの受付",
+    "sdId": 151,
+    "texture": "/images/npcs/adv_clerk_woman.png",
+    "height": 2.3,
+    "aspect": 0.292,
+    "radius": 0.35,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "冒険者の登録ですか？ ……準備中なので、少しお待ちください。",
+      "依頼の受付も、そのうち始めます。"
+    ]
+  },
+  "thief_guild_member": {
+    "name": "盗賊ギルドの下っ端",
+    "sdId": 200,
+    "texture": "/images/npcs/thief_guild_member.png",
+    "height": 2.2,
+    "aspect": 0.381,
+    "radius": 0.4,
+    "speed": 0.6,
+    "wanderRadius": 1.5,
+    "lines": [
+      "ここは、あんたみたいなのが来る所じゃねえぜ。",
+      "……何か、用か？"
+    ]
+  },
+  "thief_guild_leader": {
+    "name": "盗賊ギルドの取りまとめ",
+    "sdId": 201,
+    "texture": "/images/npcs/thief_guild_leader.png",
+    "height": 2.4,
+    "aspect": 0.342,
+    "radius": 0.39,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ボスの許しがなけりゃ、ここは通せねえ。",
+      "盗賊ギルドに入りたい？ 腕を見せてもらおうか。"
+    ]
+  },
+  "thief_guild_master": {
+    "name": "盗賊ギルドマスター",
+    "sdId": 202,
+    "texture": "/images/npcs/thief_guild_master.png",
+    "height": 2.5,
+    "aspect": 0.449,
+    "radius": 0.54,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ほう、ここまで辿り着いたか。",
+      "盗賊ギルドは、金と情報で動く。……お前は、何を売る？"
+    ]
   }
 }
