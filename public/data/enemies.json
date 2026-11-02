@@ -101,7 +101,7 @@
     "shootCooldown": 2.6,
     "shootRange": 16,
     "scale": [
-      1.39,
+      1.37,
       2.6,
       1.0
     ],
@@ -148,7 +148,7 @@
     "shootRange": 14,
     "maxArrowDistance": 13,
     "scale": [
-      1.15,
+      1.12,
       2.8,
       1.0
     ],
@@ -192,7 +192,7 @@
     "exp": 80,
     "canShoot": false,
     "scale": [
-      2.18,
+      2.21,
       2.4,
       1.0
     ],
@@ -737,7 +737,7 @@
     "sdId": 82,
     "imageFile": "insect/assassin_centipede.png",
     "scale": [
-      1.53,
+      1.49,
       1.3,
       1.0
     ],
@@ -2506,7 +2506,7 @@
     "sdId": 49,
     "imageFile": "undead/ghoul.png",
     "scale": [
-      1.19,
+      1.12,
       2.3,
       1.0
     ],
@@ -2641,7 +2641,7 @@
     "sdId": 57,
     "imageFile": "undead/vampire_lord.png",
     "scale": [
-      1.36,
+      1.5,
       2.6,
       1.0
     ],
@@ -2677,7 +2677,7 @@
     "sdId": 40,
     "imageFile": "undead/no_life_king.png",
     "scale": [
-      1.47,
+      1.86,
       3.0,
       1.0
     ],
@@ -3128,7 +3128,7 @@
     "sdId": 98,
     "imageFile": "golem/diamond_golem.png",
     "scale": [
-      3.5,
+      3.25,
       5.0,
       1.0
     ],
@@ -3560,6 +3560,796 @@
       },
       "exp": 1970,
       "hpMul": 8
+    }
+  },
+  "giant_boar": {
+    "id": "giant_boar",
+    "name": "大イノシシ",
+    "sdId": 180,
+    "imageFile": "beast/giant_boar.png",
+    "scale": [
+      1.35,
+      2.2,
+      1.0
+    ],
+    "radius": 0.5,
+    "family": "beast",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "charge",
+      "knockback"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 52,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
+  },
+  "brown_bear": {
+    "id": "brown_bear",
+    "name": "ヒグマ",
+    "sdId": 183,
+    "imageFile": "beast/brown_bear.png",
+    "scale": [
+      1.54,
+      2.6,
+      1.0
+    ],
+    "radius": 0.5,
+    "family": "beast",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "enrage"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 52,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
+  },
+  "grizzly": {
+    "id": "grizzly",
+    "name": "グリズリー",
+    "sdId": 184,
+    "imageFile": "beast/grizzly.png",
+    "scale": [
+      2.07,
+      3.2,
+      1.0
+    ],
+    "radius": 0.62,
+    "family": "beast",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "enrage",
+      "knockback"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 66,
+      "attack": {
+        "weight": 31,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 20.0
+      },
+      "exp": 506
+    }
+  },
+  "horn_rabbit": {
+    "id": "horn_rabbit",
+    "name": "一角大兎",
+    "sdId": 186,
+    "imageFile": "beast/horn_rabbit.png",
+    "scale": [
+      0.96,
+      1.4,
+      1.0
+    ],
+    "radius": 0.5,
+    "family": "beast",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "charge"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 38,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
+  },
+  "almiraj": {
+    "id": "almiraj",
+    "name": "アルミラージ",
+    "sdId": 187,
+    "imageFile": "beast/almiraj.png",
+    "scale": [
+      1.07,
+      1.6,
+      1.0
+    ],
+    "radius": 0.5,
+    "family": "beast",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "charge",
+      "evasion"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 43,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
+  },
+  "cerberus": {
+    "id": "cerberus",
+    "name": "ケルベロス",
+    "sdId": 192,
+    "imageFile": "beast/cerberus.png",
+    "scale": [
+      2.55,
+      3.4,
+      1.0
+    ],
+    "radius": 0.76,
+    "family": "beast",
+    "rank": 8,
+    "boss": false,
+    "abilities": [
+      "charge",
+      "burn"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 81,
+      "attack": {
+        "weight": 33,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 930
+    }
+  },
+  "giant_hawk": {
+    "id": "giant_hawk",
+    "name": "大鷹",
+    "sdId": 195,
+    "imageFile": "beast/giant_hawk.png",
+    "scale": [
+      3.99,
+      3.0,
+      1.0
+    ],
+    "radius": 1.2,
+    "family": "beast",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "charge"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 57,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329
+    }
+  },
+  "giant_hornet": {
+    "id": "giant_hornet",
+    "name": "巨大スズメバチ",
+    "sdId": 188,
+    "imageFile": "insect/giant_hornet.png",
+    "scale": [
+      2.69,
+      1.8,
+      1.0
+    ],
+    "radius": 0.81,
+    "family": "insect",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "venom"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 36,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
+  },
+  "dragonfly": {
+    "id": "dragonfly",
+    "name": "ドラゴンフライ",
+    "sdId": 190,
+    "imageFile": "insect/dragonfly.png",
+    "scale": [
+      2.09,
+      2.0,
+      1.0
+    ],
+    "radius": 0.63,
+    "family": "insect",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "burn"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 40,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329
+    }
+  },
+  "armored_pillbug": {
+    "id": "armored_pillbug",
+    "name": "アーマードダンゴムシ",
+    "sdId": 203,
+    "imageFile": "insect/armored_pillbug.png",
+    "scale": [
+      1.0,
+      1.2,
+      1.0
+    ],
+    "radius": 0.5,
+    "family": "insect",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "armorBreak",
+      "charge"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 30,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
+  },
+  "horned_toad": {
+    "id": "horned_toad",
+    "name": "ツノガエル",
+    "sdId": 189,
+    "imageFile": "reptile/horned_toad.png",
+    "scale": [
+      2.81,
+      2.0,
+      1.0
+    ],
+    "radius": 0.84,
+    "family": "reptile",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "poison"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 47,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
+  },
+  "lesser_vampire": {
+    "id": "lesser_vampire",
+    "name": "レッサーヴァンパイア",
+    "sdId": 181,
+    "imageFile": "undead/lesser_vampire.png",
+    "scale": [
+      0.99,
+      2.3,
+      1.0
+    ],
+    "radius": 0.5,
+    "family": "undead",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "lifesteal"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 52,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
+  },
+  "phantom": {
+    "id": "phantom",
+    "name": "ファントム",
+    "sdId": 182,
+    "imageFile": "undead/phantom.png",
+    "scale": [
+      1.29,
+      2.4,
+      1.0
+    ],
+    "radius": 0.5,
+    "weaponImmunity": "normal",
+    "family": "undead",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "curse"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 68,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329
+    }
+  },
+  "ogre_general": {
+    "id": "ogre_general",
+    "name": "オーガジェネラル",
+    "sdId": 178,
+    "imageFile": "demihuman/ogre_general.png",
+    "scale": [
+      2.8,
+      3.8,
+      1.0
+    ],
+    "radius": 0.84,
+    "family": "demihuman",
+    "rank": 7,
+    "boss": false,
+    "abilities": [
+      "knockback",
+      "enrage"
+    ],
+    "stats": {
+      "level": 50,
+      "hp": 72,
+      "attack": {
+        "weight": 21,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 8
+        },
+        "expected": 22.0
+      },
+      "exp": 707
+    }
+  },
+  "ogre_king": {
+    "id": "ogre_king",
+    "name": "オーガキング",
+    "sdId": 179,
+    "imageFile": "demihuman/ogre_king.png",
+    "scale": [
+      3.54,
+      4.2,
+      1.0
+    ],
+    "radius": 1.06,
+    "family": "demihuman",
+    "rank": 8,
+    "boss": true,
+    "abilities": [
+      "charge",
+      "enrage",
+      "knockback"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 405,
+      "attack": {
+        "weight": 33,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 930,
+      "hpMul": 5
+    }
+  },
+  "serial_killer": {
+    "id": "serial_killer",
+    "name": "殺人鬼",
+    "sdId": 198,
+    "imageFile": "human/serial_killer.png",
+    "scale": [
+      0.84,
+      2.4,
+      1.0
+    ],
+    "radius": 0.5,
+    "family": "human",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "ambush"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 66,
+      "attack": {
+        "weight": 31,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 20.0
+      },
+      "exp": 506
+    }
+  },
+  "berserker": {
+    "id": "berserker",
+    "name": "バーサーカー",
+    "sdId": 199,
+    "imageFile": "human/berserker.png",
+    "scale": [
+      1.61,
+      2.8,
+      1.0
+    ],
+    "radius": 0.5,
+    "family": "human",
+    "rank": 7,
+    "boss": false,
+    "abilities": [
+      "enrage",
+      "charge"
+    ],
+    "stats": {
+      "level": 50,
+      "hp": 72,
+      "attack": {
+        "weight": 21,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 8
+        },
+        "expected": 22.0
+      },
+      "exp": 707
+    }
+  },
+  "balor": {
+    "id": "balor",
+    "name": "バロール",
+    "sdId": 191,
+    "imageFile": "demon/balor.png",
+    "scale": [
+      1.85,
+      3.0,
+      1.0
+    ],
+    "radius": 0.56,
+    "family": "demon",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "curse"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 92,
+      "attack": {
+        "weight": 41,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 22.0
+      },
+      "exp": 506
+    }
+  },
+  "kraken": {
+    "id": "kraken",
+    "name": "クラーゲン",
+    "sdId": 197,
+    "imageFile": "demon/kraken.png",
+    "scale": [
+      4.57,
+      4.0,
+      1.0
+    ],
+    "radius": 1.37,
+    "family": "demon",
+    "rank": 7,
+    "boss": false,
+    "abilities": [
+      "pull"
+    ],
+    "stats": {
+      "level": 50,
+      "hp": 101,
+      "attack": {
+        "weight": 36,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 24.2
+      },
+      "exp": 707
+    }
+  },
+  "hydra": {
+    "id": "hydra",
+    "name": "ヒドラ",
+    "sdId": 193,
+    "imageFile": "dragon/hydra.png",
+    "scale": [
+      4.93,
+      5.5,
+      1.0
+    ],
+    "radius": 1.48,
+    "family": "dragon",
+    "rank": 8,
+    "boss": false,
+    "abilities": [
+      "regen",
+      "venom"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 130,
+      "attack": {
+        "weight": 27,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 26.4
+      },
+      "exp": 930
+    }
+  },
+  "king_hydra": {
+    "id": "king_hydra",
+    "name": "キングヒドラ",
+    "sdId": 194,
+    "imageFile": "dragon/king_hydra.png",
+    "scale": [
+      6.1,
+      7.0,
+      1.0
+    ],
+    "radius": 1.83,
+    "family": "dragon",
+    "rank": 10,
+    "boss": true,
+    "abilities": [
+      "regen",
+      "breath",
+      "enrage",
+      "venom"
+    ],
+    "stats": {
+      "level": 99,
+      "hp": 1434,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 9
+        },
+        "expected": 33.0
+      },
+      "exp": 1970,
+      "hpMul": 8
+    }
+  },
+  "water_dragon": {
+    "id": "water_dragon",
+    "name": "水龍",
+    "sdId": 196,
+    "imageFile": "dragon/water_dragon.png",
+    "scale": [
+      1.92,
+      5.0,
+      1.0
+    ],
+    "radius": 0.58,
+    "family": "dragon",
+    "rank": 7,
+    "boss": false,
+    "abilities": [
+      "breath"
+    ],
+    "stats": {
+      "level": 50,
+      "hp": 115,
+      "attack": {
+        "weight": 36,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 24.2
+      },
+      "exp": 707
+    }
+  },
+  "unicorn": {
+    "id": "unicorn",
+    "name": "ユニコーン",
+    "sdId": 185,
+    "imageFile": "fairy/unicorn.png",
+    "scale": [
+      0.98,
+      2.8,
+      1.0
+    ],
+    "radius": 0.5,
+    "family": "fairy",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "regen"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 40,
+      "attack": {
+        "weight": 29,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 5
+        },
+        "expected": 20.4
+      },
+      "exp": 329
+    }
+  },
+  "pegasus": {
+    "id": "pegasus",
+    "name": "ペガサス",
+    "sdId": 204,
+    "imageFile": "fairy/pegasus.png",
+    "scale": [
+      3.23,
+      3.0,
+      1.0
+    ],
+    "radius": 0.97,
+    "family": "fairy",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "evasion"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 36,
+      "attack": {
+        "weight": 24,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 7
+        },
+        "expected": 18.7
+      },
+      "exp": 179
     }
   }
 }

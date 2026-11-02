@@ -5,7 +5,7 @@
 
 使い方:
   python3 scripts/gen_enemy_stats.py [割り当てJSON]
-    割り当てJSON（{id: {rank, abilities, boss}}）を渡すと、rank / boss / abilities を enemies.json に取り込んでから生成する。
+    割り当てJSON（{id: {rank, abilities, boss}}）を渡すと、その敵の rank / boss / abilities を enemies.json に取り込んでから生成する（割り当てにない敵は、今の値のまま）。
     省略時は、enemies.json にある rank / family / boss から stats だけを作り直す。
   family は、imageFile のフォルダ名（slime, insect, ...）から決める。
 legacy の maxHp / attackPower / exp は触らない（game.js への反映は、あとで行う）。
@@ -62,7 +62,7 @@ def family_of(e):
 assign = json.load(open(sys.argv[1], encoding='utf-8')) if len(sys.argv) > 1 else None
 
 for eid, e in enemies.items():
-    if assign is not None:
+    if assign is not None and eid in assign:   # 割り当てにある敵だけ、rank / boss / abilities を取り込む（ない敵は、今の値のまま）
         a = assign[eid]
         abilities = list(a['abilities'])
         e.pop('weaponImmunity', None)

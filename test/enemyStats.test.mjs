@@ -17,9 +17,9 @@ const ABILITIES = new Set([
     'pack', 'rare', 'sticky', 'stealItem'
 ]);
 
-test('敵のランク・系統・特殊能力・stats が全102体に揃っている', () => {
+test('敵のランク・系統・特殊能力・stats が全ての敵に揃っている', () => {
     const list = Object.entries(enemies);
-    assert.equal(list.length, 102);
+    assert.ok(list.length >= 126, `敵の数: ${list.length}`);
     for (const [id, e] of list) {
         assert.ok(ranks.ranks[String(e.rank)], `${id}: rank ${e.rank} が表にある`);
         assert.ok(ranks.families[e.family], `${id}: family ${e.family} が表にある`);
@@ -35,12 +35,15 @@ test('敵のランク・系統・特殊能力・stats が全102体に揃って�
     }
 });
 
-test('ボスは27体で、HP倍率が仕様どおり（中ボス3 / 通常5 / 竜・エンペラー級8）', () => {
+test('ボスのHP倍率が仕様どおり（中ボス3 / 通常5 / 竜・エンペラー級8）', () => {
     const bosses = Object.entries(enemies).filter(([, e]) => e.boss);
-    assert.equal(bosses.length, 27);
-    assert.equal(bosses.filter(([, e]) => e.stats.hpMul === 3).length, 2);
-    assert.equal(bosses.filter(([, e]) => e.stats.hpMul === 8).length, 10);
-    assert.equal(bosses.filter(([, e]) => e.stats.hpMul === 5).length, 15);
+    assert.ok(bosses.length >= 27, `ボスの数: ${bosses.length}`);
+    const bh = ranks.bossHp;
+    for (const [id, e] of bosses) {
+        const want = bh.topIds.includes(id) ? bh.top : (e.rank <= bh.midMaxRank ? bh.mid : bh.normal);
+        assert.equal(e.stats.hpMul, want, `${id}: HP倍率`);
+    }
+    for (const id of bh.topIds) assert.ok(enemies[id]?.boss, `${id}: ×8 の敵はボス`);
 });
 
 test('攻撃の期待値が、ランクの目標（系統補正後）に近い', () => {

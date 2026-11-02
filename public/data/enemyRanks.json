@@ -31,7 +31,7 @@
     "normal": 5,
     "top": 8,
     "midMaxRank": 5,
-    "topIds": ["red_dragon", "green_dragon", "white_dragon", "golden_dragon", "dark_dragon", "earth_dragon", "dragon_emperor", "goblin_emperor", "no_life_king", "demon_lord"]
+    "topIds": ["red_dragon", "green_dragon", "white_dragon", "golden_dragon", "dark_dragon", "earth_dragon", "dragon_emperor", "goblin_emperor", "no_life_king", "demon_lord", "king_hydra"]
   },
   "attackDice": {
     "_note": "敵の攻撃は nDm+k。重さ（1〜50）と k（0〜maxK）を、ダメージ表の期待値が目標の出力に最も近くなるように、スクリプトで求める。",
