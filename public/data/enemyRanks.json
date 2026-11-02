@@ -1,0 +1,42 @@
+{
+  "_comment": "敵のランク表（草案）。仕様: docs/enemy-spec.md 6章。scripts/gen_enemy_stats.py が enemies.json の stats を生成するときに使う。",
+  "ranks": {
+    "1":  { "level": 1,  "hp": 38,  "attack": 13.5, "exp": 2 },
+    "2":  { "level": 5,  "hp": 38,  "attack": 14,   "exp": 22 },
+    "3":  { "level": 10, "hp": 43,  "attack": 15,   "exp": 63 },
+    "4":  { "level": 20, "hp": 52,  "attack": 17,   "exp": 179 },
+    "5":  { "level": 30, "hp": 57,  "attack": 18.5, "exp": 329 },
+    "6":  { "level": 40, "hp": 66,  "attack": 20,   "exp": 506 },
+    "7":  { "level": 50, "hp": 72,  "attack": 22,   "exp": 707 },
+    "8":  { "level": 60, "hp": 81,  "attack": 24,   "exp": 930 },
+    "9":  { "level": 80, "hp": 97,  "attack": 27,   "exp": 1431 },
+    "10": { "level": 99, "hp": 112, "attack": 30,   "exp": 1970 }
+  },
+  "families": {
+    "slime":     { "name": "スライム",   "hp": 1.2, "attack": 0.8 },
+    "insect":    { "name": "昆虫",       "hp": 0.7, "attack": 1.0 },
+    "reptile":   { "name": "爬虫類",     "hp": 1.1, "attack": 1.0 },
+    "beast":     { "name": "獣",         "hp": 1.0, "attack": 1.0 },
+    "demihuman": { "name": "亜人",       "hp": 1.0, "attack": 1.0 },
+    "human":     { "name": "人間",       "hp": 1.0, "attack": 1.0 },
+    "undead":    { "name": "アンデッド", "hp": 1.2, "attack": 1.0 },
+    "golem":     { "name": "ゴーレム",   "hp": 1.5, "attack": 1.1 },
+    "fairy":     { "name": "妖精",       "hp": 0.7, "attack": 1.1 },
+    "dragon":    { "name": "竜",         "hp": 1.6, "attack": 1.3 },
+    "demon":     { "name": "悪魔",       "hp": 1.4, "attack": 1.3 }
+  },
+  "bossHp": {
+    "_note": "ボスのHP倍率。top に挙げたボスは top、それ以外はランク midMaxRank 以下が mid、上が normal。",
+    "mid": 3,
+    "normal": 5,
+    "top": 8,
+    "midMaxRank": 5,
+    "topIds": ["red_dragon", "green_dragon", "white_dragon", "golden_dragon", "dark_dragon", "earth_dragon", "dragon_emperor", "goblin_emperor", "no_life_king", "demon_lord"]
+  },
+  "attackDice": {
+    "_note": "敵の攻撃は nDm+k。重さ（1〜50）と k（0〜maxK）を、ダメージ表の期待値が目標の出力に最も近くなるように、スクリプトで求める。",
+    "n": 2,
+    "m": 6,
+    "maxK": 10
+  }
+}

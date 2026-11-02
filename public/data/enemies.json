@@ -21,7 +21,27 @@
     "radius": 0.8,
     "senseRange": 8,
     "deathColor": "#34d399",
-    "stealth": "normal"
+    "stealth": "normal",
+    "family": "slime",
+    "rank": 1,
+    "boss": false,
+    "abilities": [
+      "split"
+    ],
+    "stats": {
+      "level": 1,
+      "hp": 46,
+      "attack": {
+        "weight": 27,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 10.8
+      },
+      "exp": 2
+    }
   },
   "skeleton": {
     "id": "skeleton",
@@ -44,7 +64,25 @@
     "y": 1.4,
     "radius": 0.8,
     "deathColor": "#e5e7eb",
-    "stealth": "low"
+    "stealth": "low",
+    "family": "undead",
+    "rank": 3,
+    "boss": false,
+    "abilities": [],
+    "stats": {
+      "level": 10,
+      "hp": 52,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "goblin": {
     "id": "goblin",
@@ -70,7 +108,27 @@
     "y": 1.3,
     "radius": 0.8,
     "deathColor": "#4ade80",
-    "stealth": "normal"
+    "stealth": "normal",
+    "family": "demihuman",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "ranged"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 38,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "goblin_archer": {
     "id": "goblin_archer",
@@ -97,7 +155,28 @@
     "y": 1.4,
     "radius": 0.8,
     "deathColor": "#4ade80",
-    "stealth": "normal"
+    "stealth": "normal",
+    "family": "demihuman",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "ranged",
+      "pack"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 38,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "mimic": {
     "id": "mimic",
@@ -120,7 +199,28 @@
     "y": 1.2,
     "radius": 0.95,
     "alwaysAware": true,
-    "deathColor": "#ef4444"
+    "deathColor": "#ef4444",
+    "family": "golem",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "ambush",
+      "rare"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 78,
+      "attack": {
+        "weight": 24,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 7
+        },
+        "expected": 18.7
+      },
+      "exp": 179
+    }
   },
   "tarantula_swamp": {
     "id": "tarantula_swamp",
@@ -144,7 +244,28 @@
     "radius": 0.95,
     "senseRange": 12,
     "deathColor": "#6b21a8",
-    "stealth": "high"
+    "stealth": "high",
+    "family": "insect",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "poison",
+      "ambush"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 30,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "parasite_wasp": {
     "id": "parasite_wasp",
@@ -168,7 +289,28 @@
     "radius": 0.8,
     "senseRange": 14,
     "deathColor": "#a3e635",
-    "stealth": "normal"
+    "stealth": "normal",
+    "family": "insect",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "paralysis"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 30,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "maria_mosquito": {
     "id": "maria_mosquito",
@@ -192,7 +334,28 @@
     "radius": 0.75,
     "senseRange": 14,
     "deathColor": "#a3e635",
-    "stealth": "high"
+    "stealth": "high",
+    "family": "insect",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "drain"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 27,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "acid_worm": {
     "id": "acid_worm",
@@ -219,7 +382,28 @@
     "radius": 0.9,
     "senseRange": 7,
     "deathColor": "#7c8a3a",
-    "stealth": "normal"
+    "stealth": "normal",
+    "family": "insect",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "burrow",
+      "burn"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 30,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "poison_moth": {
     "id": "poison_moth",
@@ -246,7 +430,28 @@
     "radius": 0.85,
     "senseRange": 14,
     "deathColor": "#a3e635",
-    "stealth": "normal"
+    "stealth": "normal",
+    "family": "insect",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "poison"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 27,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "poison_toad": {
     "id": "poison_toad",
@@ -270,7 +475,27 @@
     "radius": 0.95,
     "senseRange": 8,
     "deathColor": "#7c8a3a",
-    "stealth": "normal"
+    "stealth": "normal",
+    "family": "reptile",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "poison"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 42,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "acid_slime": {
     "id": "acid_slime",
@@ -282,7 +507,28 @@
       1.2,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "slime",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "sticky",
+      "burn"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 46,
+      "attack": {
+        "weight": 38,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 11.1
+      },
+      "exp": 22
+    }
   },
   "quicksilver_slime": {
     "id": "quicksilver_slime",
@@ -294,7 +540,28 @@
       1.2,
       1.0
     ],
-    "radius": 0.51
+    "radius": 0.51,
+    "family": "slime",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "evasion",
+      "flee"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 62,
+      "attack": {
+        "weight": 25,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 13.6
+      },
+      "exp": 179
+    }
   },
   "slime_emperor": {
     "id": "slime_emperor",
@@ -306,7 +573,30 @@
       2.2,
       1.0
     ],
-    "radius": 0.7
+    "radius": 0.7,
+    "family": "slime",
+    "rank": 6,
+    "boss": true,
+    "abilities": [
+      "split",
+      "regen",
+      "summon"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 396,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 16.0
+      },
+      "exp": 506,
+      "hpMul": 5
+    }
   },
   "ant_pawn": {
     "id": "ant_pawn",
@@ -318,7 +608,27 @@
       1.0,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "insect",
+    "rank": 1,
+    "boss": false,
+    "abilities": [
+      "pack"
+    ],
+    "stats": {
+      "level": 1,
+      "hp": 27,
+      "attack": {
+        "weight": 48,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 13.6
+      },
+      "exp": 2
+    }
   },
   "ant_knight": {
     "id": "ant_knight",
@@ -330,7 +640,28 @@
       1.5,
       1.0
     ],
-    "radius": 0.56
+    "radius": 0.56,
+    "family": "insect",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "armorBreak"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 30,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "ant_general": {
     "id": "ant_general",
@@ -342,7 +673,28 @@
       2.0,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "insect",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "summon",
+      "pack"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 40,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329
+    }
   },
   "ant_queen": {
     "id": "ant_queen",
@@ -354,7 +706,30 @@
       2.6,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "insect",
+    "rank": 7,
+    "boss": true,
+    "abilities": [
+      "summon",
+      "regen",
+      "poison"
+    ],
+    "stats": {
+      "level": 50,
+      "hp": 252,
+      "attack": {
+        "weight": 21,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 8
+        },
+        "expected": 22.0
+      },
+      "exp": 707,
+      "hpMul": 5
+    }
   },
   "assassin_centipede": {
     "id": "assassin_centipede",
@@ -366,7 +741,28 @@
       1.3,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "insect",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "venom",
+      "burrow"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 36,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "beetle_king": {
     "id": "beetle_king",
@@ -378,7 +774,30 @@
       2.4,
       1.0
     ],
-    "radius": 0.79
+    "radius": 0.79,
+    "family": "insect",
+    "rank": 6,
+    "boss": true,
+    "abilities": [
+      "armorBreak",
+      "charge",
+      "enrage"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 231,
+      "attack": {
+        "weight": 31,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 20.0
+      },
+      "exp": 506,
+      "hpMul": 5
+    }
   },
   "killer_mantis": {
     "id": "killer_mantis",
@@ -390,7 +809,28 @@
       3.0,
       1.0
     ],
-    "radius": 1.07
+    "radius": 1.07,
+    "family": "insect",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "evasion",
+      "enrage"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 46,
+      "attack": {
+        "weight": 31,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 20.0
+      },
+      "exp": 506
+    }
   },
   "scorpion": {
     "id": "scorpion",
@@ -402,7 +842,28 @@
       1.2,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "insect",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "venom",
+      "armorBreak"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 36,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "cobra": {
     "id": "cobra",
@@ -414,7 +875,27 @@
       1.5,
       1.0
     ],
-    "radius": 0.62
+    "radius": 0.62,
+    "family": "reptile",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "venom"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 47,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "snapping_turtle": {
     "id": "snapping_turtle",
@@ -426,7 +907,28 @@
       1.6,
       1.0
     ],
-    "radius": 0.64
+    "radius": 0.64,
+    "family": "reptile",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "armorBreak",
+      "regen"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 57,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "venom_snake": {
     "id": "venom_snake",
@@ -438,7 +940,28 @@
       1.4,
       1.0
     ],
-    "radius": 0.77
+    "radius": 0.77,
+    "family": "reptile",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "venom",
+      "burrow"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 63,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329
+    }
   },
   "giant_rat": {
     "id": "giant_rat",
@@ -450,7 +973,27 @@
       1.0,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "beast",
+    "rank": 1,
+    "boss": false,
+    "abilities": [
+      "pack"
+    ],
+    "stats": {
+      "level": 1,
+      "hp": 38,
+      "attack": {
+        "weight": 48,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 13.6
+      },
+      "exp": 2
+    }
   },
   "sand_rat": {
     "id": "sand_rat",
@@ -462,7 +1005,28 @@
       0.8,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "beast",
+    "rank": 1,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "burrow"
+    ],
+    "stats": {
+      "level": 1,
+      "hp": 38,
+      "attack": {
+        "weight": 48,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 13.6
+      },
+      "exp": 2
+    }
   },
   "giant_bat": {
     "id": "giant_bat",
@@ -474,7 +1038,28 @@
       1.6,
       1.0
     ],
-    "radius": 0.65
+    "radius": 0.65,
+    "family": "beast",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "drain"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 38,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "mandrill": {
     "id": "mandrill",
@@ -486,7 +1071,28 @@
       2.2,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "beast",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "enrage"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 43,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "great_wolf": {
     "id": "great_wolf",
@@ -498,7 +1104,28 @@
       2.0,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "beast",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "charge"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 52,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "fenrir": {
     "id": "fenrir",
@@ -510,7 +1137,31 @@
       4.0,
       1.0
     ],
-    "radius": 0.53
+    "radius": 0.53,
+    "family": "beast",
+    "rank": 9,
+    "boss": true,
+    "abilities": [
+      "charge",
+      "enrage",
+      "knockback",
+      "drain"
+    ],
+    "stats": {
+      "level": 80,
+      "hp": 485,
+      "attack": {
+        "weight": 22,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 7
+        },
+        "expected": 27.0
+      },
+      "exp": 1431,
+      "hpMul": 5
+    }
   },
   "snow_leopard": {
     "id": "snow_leopard",
@@ -522,7 +1173,28 @@
       1.6,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "beast",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "evasion",
+      "charge"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 57,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329
+    }
   },
   "griffon": {
     "id": "griffon",
@@ -544,7 +1216,28 @@
     "y": 2.8,
     "radius": 1.25,
     "deathColor": "#c9a24a",
-    "stealth": "normal"
+    "stealth": "normal",
+    "family": "beast",
+    "rank": 7,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "charge"
+    ],
+    "stats": {
+      "level": 50,
+      "hp": 72,
+      "attack": {
+        "weight": 21,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 8
+        },
+        "expected": 22.0
+      },
+      "exp": 707
+    }
   },
   "cockatrice": {
     "id": "cockatrice",
@@ -556,7 +1249,28 @@
       2.0,
       1.0
     ],
-    "radius": 0.61
+    "radius": 0.61,
+    "family": "beast",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "paralysis",
+      "curse"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 66,
+      "attack": {
+        "weight": 31,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 20.0
+      },
+      "exp": 506
+    }
   },
   "chimera": {
     "id": "chimera",
@@ -568,7 +1282,30 @@
       3.2,
       1.0
     ],
-    "radius": 0.71
+    "radius": 0.71,
+    "family": "beast",
+    "rank": 8,
+    "boss": true,
+    "abilities": [
+      "breath",
+      "charge",
+      "enrage"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 405,
+      "attack": {
+        "weight": 33,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 930,
+      "hpMul": 5
+    }
   },
   "manticore": {
     "id": "manticore",
@@ -580,7 +1317,28 @@
       3.0,
       1.0
     ],
-    "radius": 0.74
+    "radius": 0.74,
+    "family": "beast",
+    "rank": 8,
+    "boss": false,
+    "abilities": [
+      "ranged",
+      "venom"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 81,
+      "attack": {
+        "weight": 33,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 930
+    }
   },
   "goblin_scout": {
     "id": "goblin_scout",
@@ -592,7 +1350,28 @@
       1.6,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demihuman",
+    "rank": 1,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "flee"
+    ],
+    "stats": {
+      "level": 1,
+      "hp": 38,
+      "attack": {
+        "weight": 48,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 13.6
+      },
+      "exp": 2
+    }
   },
   "goblin_soldier": {
     "id": "goblin_soldier",
@@ -604,7 +1383,27 @@
       2.0,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demihuman",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "pack"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 38,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "goblin_king": {
     "id": "goblin_king",
@@ -616,7 +1415,30 @@
       2.6,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demihuman",
+    "rank": 5,
+    "boss": true,
+    "abilities": [
+      "summon",
+      "enrage",
+      "pack"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 171,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329,
+      "hpMul": 3
+    }
   },
   "goblin_emperor": {
     "id": "goblin_emperor",
@@ -628,7 +1450,31 @@
       3.0,
       1.0
     ],
-    "radius": 0.68
+    "radius": 0.68,
+    "family": "demihuman",
+    "rank": 8,
+    "boss": true,
+    "abilities": [
+      "summon",
+      "enrage",
+      "aoe",
+      "knockback"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 648,
+      "attack": {
+        "weight": 33,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 930,
+      "hpMul": 8
+    }
   },
   "hobgoblin_male": {
     "id": "hobgoblin_male",
@@ -640,7 +1486,28 @@
       2.6,
       1.0
     ],
-    "radius": 0.59
+    "radius": 0.59,
+    "family": "demihuman",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "enrage"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 43,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "hobgoblin_female": {
     "id": "hobgoblin_female",
@@ -652,7 +1519,28 @@
       2.4,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demihuman",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "slow"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 43,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "orc_warrior": {
     "id": "orc_warrior",
@@ -664,7 +1552,27 @@
       2.8,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demihuman",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "enrage"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 52,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "orc_general": {
     "id": "orc_general",
@@ -676,7 +1584,28 @@
       3.1,
       1.0
     ],
-    "radius": 0.64
+    "radius": 0.64,
+    "family": "demihuman",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "enrage"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 66,
+      "attack": {
+        "weight": 31,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 20.0
+      },
+      "exp": 506
+    }
   },
   "orc_king": {
     "id": "orc_king",
@@ -688,7 +1617,30 @@
       3.4,
       1.0
     ],
-    "radius": 0.76
+    "radius": 0.76,
+    "family": "demihuman",
+    "rank": 8,
+    "boss": true,
+    "abilities": [
+      "charge",
+      "enrage",
+      "knockback"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 405,
+      "attack": {
+        "weight": 33,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 930,
+      "hpMul": 5
+    }
   },
   "ogre": {
     "id": "ogre",
@@ -700,7 +1652,28 @@
       3.6,
       1.0
     ],
-    "radius": 0.65
+    "radius": 0.65,
+    "family": "demihuman",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "knockback",
+      "charge"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 66,
+      "attack": {
+        "weight": 31,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 20.0
+      },
+      "exp": 506
+    }
   },
   "cyclops": {
     "id": "cyclops",
@@ -712,7 +1685,30 @@
       5.0,
       1.0
     ],
-    "radius": 0.99
+    "radius": 0.99,
+    "family": "demihuman",
+    "rank": 8,
+    "boss": true,
+    "abilities": [
+      "knockback",
+      "charge",
+      "enrage"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 405,
+      "attack": {
+        "weight": 33,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 930,
+      "hpMul": 5
+    }
   },
   "lizardman": {
     "id": "lizardman",
@@ -724,7 +1720,28 @@
       2.7,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demihuman",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "regen",
+      "poison"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 52,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "naga_male": {
     "id": "naga_male",
@@ -736,7 +1753,28 @@
       2.8,
       1.0
     ],
-    "radius": 0.74
+    "radius": 0.74,
+    "family": "demihuman",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "venom",
+      "ranged"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 57,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329
+    }
   },
   "naga_female": {
     "id": "naga_female",
@@ -748,7 +1786,28 @@
       2.7,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demihuman",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "paralysis",
+      "silence"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 57,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329
+    }
   },
   "dark_elf": {
     "id": "dark_elf",
@@ -760,7 +1819,28 @@
       2.4,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demihuman",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "ranged",
+      "silence"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 66,
+      "attack": {
+        "weight": 31,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 20.0
+      },
+      "exp": 506
+    }
   },
   "dog_warrior_male": {
     "id": "dog_warrior_male",
@@ -772,7 +1852,28 @@
       2.0,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demihuman",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "charge"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 43,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "dog_warrior_female": {
     "id": "dog_warrior_female",
@@ -784,7 +1885,28 @@
       1.9,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demihuman",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "evasion"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 43,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "swordsman": {
     "id": "swordsman",
@@ -796,7 +1918,25 @@
       2.3,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 3,
+    "boss": false,
+    "abilities": [],
+    "stats": {
+      "level": 10,
+      "hp": 43,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "thief": {
     "id": "thief",
@@ -808,7 +1948,28 @@
       2.2,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "stealItem",
+      "flee"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 43,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "assassin": {
     "id": "assassin",
@@ -820,7 +1981,28 @@
       2.3,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "venom",
+      "evasion"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 66,
+      "attack": {
+        "weight": 31,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 20.0
+      },
+      "exp": 506
+    }
   },
   "mage": {
     "id": "mage",
@@ -832,7 +2014,27 @@
       2.3,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "ranged"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 52,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "magician": {
     "id": "magician",
@@ -844,7 +2046,27 @@
       2.3,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "ranged"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 38,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "wizard": {
     "id": "wizard",
@@ -856,7 +2078,28 @@
       2.2,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 7,
+    "boss": false,
+    "abilities": [
+      "aoe",
+      "barrier"
+    ],
+    "stats": {
+      "level": 50,
+      "hp": 72,
+      "attack": {
+        "weight": 21,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 8
+        },
+        "expected": 22.0
+      },
+      "exp": 707
+    }
   },
   "archmage": {
     "id": "archmage",
@@ -868,7 +2111,31 @@
       2.5,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 9,
+    "boss": true,
+    "abilities": [
+      "aoe",
+      "teleport",
+      "barrier",
+      "silence"
+    ],
+    "stats": {
+      "level": 80,
+      "hp": 485,
+      "attack": {
+        "weight": 22,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 7
+        },
+        "expected": 27.0
+      },
+      "exp": 1431,
+      "hpMul": 5
+    }
   },
   "mohawk_thug": {
     "id": "mohawk_thug",
@@ -880,7 +2147,25 @@
       2.4,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 2,
+    "boss": false,
+    "abilities": [],
+    "stats": {
+      "level": 5,
+      "hp": 38,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "bandit_grunt": {
     "id": "bandit_grunt",
@@ -892,7 +2177,28 @@
       2.2,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "pack",
+      "stealItem"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 38,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "bandit_leader": {
     "id": "bandit_leader",
@@ -904,7 +2210,30 @@
       2.4,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 5,
+    "boss": true,
+    "abilities": [
+      "pack",
+      "enrage",
+      "summon"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 171,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329,
+      "hpMul": 3
+    }
   },
   "bandit_boss": {
     "id": "bandit_boss",
@@ -916,7 +2245,31 @@
       2.9,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 8,
+    "boss": true,
+    "abilities": [
+      "summon",
+      "enrage",
+      "charge",
+      "knockback"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 405,
+      "attack": {
+        "weight": 33,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 930,
+      "hpMul": 5
+    }
   },
   "fallen_priest": {
     "id": "fallen_priest",
@@ -928,7 +2281,28 @@
       2.3,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "curse",
+      "silence"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 52,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "fallen_priestess": {
     "id": "fallen_priestess",
@@ -940,7 +2314,28 @@
       2.2,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "curse",
+      "regen"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 52,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "guard_light_spear": {
     "id": "guard_light_spear",
@@ -952,7 +2347,27 @@
       2.4,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "pack"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 43,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 15.0
+      },
+      "exp": 63
+    }
   },
   "guard_heavy_spear": {
     "id": "guard_heavy_spear",
@@ -964,7 +2379,28 @@
       2.6,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "armorBreak",
+      "pack"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 57,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329
+    }
   },
   "guard_elite": {
     "id": "guard_elite",
@@ -976,7 +2412,28 @@
       2.8,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "human",
+    "rank": 7,
+    "boss": false,
+    "abilities": [
+      "armorBreak",
+      "barrier"
+    ],
+    "stats": {
+      "level": 50,
+      "hp": 72,
+      "attack": {
+        "weight": 21,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 8
+        },
+        "expected": 22.0
+      },
+      "exp": 707
+    }
   },
   "zombie": {
     "id": "zombie",
@@ -988,7 +2445,28 @@
       2.3,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "undead",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "regen",
+      "poison"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 46,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
+    }
   },
   "ghost": {
     "id": "ghost",
@@ -1000,7 +2478,28 @@
       2.4,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "weaponImmunity": "normal",
+    "family": "undead",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "fly"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 62,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "ghoul": {
     "id": "ghoul",
@@ -1012,7 +2511,28 @@
       2.3,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "undead",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "paralysis",
+      "poison"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 62,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 17.0
+      },
+      "exp": 179
+    }
   },
   "banshee": {
     "id": "banshee",
@@ -1024,7 +2544,28 @@
       2.3,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "undead",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "silence"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 68,
+      "attack": {
+        "weight": 37,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 18.6
+      },
+      "exp": 329
+    }
   },
   "lich": {
     "id": "lich",
@@ -1036,7 +2577,31 @@
       2.6,
       1.0
     ],
-    "radius": 0.52
+    "radius": 0.52,
+    "family": "undead",
+    "rank": 8,
+    "boss": true,
+    "abilities": [
+      "aoe",
+      "summon",
+      "barrier",
+      "silence"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 486,
+      "attack": {
+        "weight": 33,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 930,
+      "hpMul": 5
+    }
   },
   "vampire": {
     "id": "vampire",
@@ -1048,7 +2613,28 @@
       2.4,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "undead",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "drain",
+      "curse"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 79,
+      "attack": {
+        "weight": 31,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 20.0
+      },
+      "exp": 506
+    }
   },
   "vampire_lord": {
     "id": "vampire_lord",
@@ -1060,7 +2646,31 @@
       2.6,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "undead",
+    "rank": 8,
+    "boss": true,
+    "abilities": [
+      "drain",
+      "teleport",
+      "summon",
+      "curse"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 486,
+      "attack": {
+        "weight": 33,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 930,
+      "hpMul": 5
+    }
   },
   "no_life_king": {
     "id": "no_life_king",
@@ -1072,7 +2682,31 @@
       3.0,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "undead",
+    "rank": 10,
+    "boss": true,
+    "abilities": [
+      "revive",
+      "aoe",
+      "drain",
+      "curse"
+    ],
+    "stats": {
+      "level": 99,
+      "hp": 1075,
+      "attack": {
+        "weight": 27,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 3
+        },
+        "expected": 30.0
+      },
+      "exp": 1970,
+      "hpMul": 8
+    }
   },
   "wyvern": {
     "id": "wyvern",
@@ -1084,7 +2718,28 @@
       5.0,
       1.0
     ],
-    "radius": 2.52
+    "radius": 2.52,
+    "family": "dragon",
+    "rank": 7,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "venom"
+    ],
+    "stats": {
+      "level": 50,
+      "hp": 115,
+      "attack": {
+        "weight": 38,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 4
+        },
+        "expected": 28.6
+      },
+      "exp": 707
+    }
   },
   "red_dragon": {
     "id": "red_dragon",
@@ -1096,7 +2751,31 @@
       6.5,
       1.0
     ],
-    "radius": 1.89
+    "radius": 1.89,
+    "family": "dragon",
+    "rank": 9,
+    "boss": true,
+    "abilities": [
+      "breath",
+      "fly",
+      "enrage",
+      "armorBreak"
+    ],
+    "stats": {
+      "level": 80,
+      "hp": 1242,
+      "attack": {
+        "weight": 43,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 35.1
+      },
+      "exp": 1431,
+      "hpMul": 8
+    }
   },
   "green_dragon": {
     "id": "green_dragon",
@@ -1108,7 +2787,30 @@
       6.5,
       1.0
     ],
-    "radius": 2.56
+    "radius": 2.56,
+    "family": "dragon",
+    "rank": 9,
+    "boss": true,
+    "abilities": [
+      "breath",
+      "fly",
+      "enrage"
+    ],
+    "stats": {
+      "level": 80,
+      "hp": 1242,
+      "attack": {
+        "weight": 43,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 35.1
+      },
+      "exp": 1431,
+      "hpMul": 8
+    }
   },
   "white_dragon": {
     "id": "white_dragon",
@@ -1120,7 +2822,30 @@
       6.5,
       1.0
     ],
-    "radius": 2.59
+    "radius": 2.59,
+    "family": "dragon",
+    "rank": 9,
+    "boss": true,
+    "abilities": [
+      "breath",
+      "fly",
+      "slow"
+    ],
+    "stats": {
+      "level": 80,
+      "hp": 1242,
+      "attack": {
+        "weight": 43,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 35.1
+      },
+      "exp": 1431,
+      "hpMul": 8
+    }
   },
   "golden_dragon": {
     "id": "golden_dragon",
@@ -1132,7 +2857,31 @@
       7.0,
       1.0
     ],
-    "radius": 2.64
+    "radius": 2.64,
+    "family": "dragon",
+    "rank": 10,
+    "boss": true,
+    "abilities": [
+      "breath",
+      "fly",
+      "regen",
+      "barrier"
+    ],
+    "stats": {
+      "level": 99,
+      "hp": 1434,
+      "attack": {
+        "weight": 34,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 5
+        },
+        "expected": 39.0
+      },
+      "exp": 1970,
+      "hpMul": 8
+    }
   },
   "dark_dragon": {
     "id": "dark_dragon",
@@ -1144,7 +2893,31 @@
       7.0,
       1.0
     ],
-    "radius": 2.44
+    "radius": 2.44,
+    "family": "dragon",
+    "rank": 10,
+    "boss": true,
+    "abilities": [
+      "breath",
+      "curse",
+      "drain",
+      "fly"
+    ],
+    "stats": {
+      "level": 99,
+      "hp": 1434,
+      "attack": {
+        "weight": 34,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 5
+        },
+        "expected": 39.0
+      },
+      "exp": 1970,
+      "hpMul": 8
+    }
   },
   "earth_dragon": {
     "id": "earth_dragon",
@@ -1156,7 +2929,30 @@
       5.5,
       1.0
     ],
-    "radius": 1.18
+    "radius": 1.18,
+    "family": "dragon",
+    "rank": 9,
+    "boss": true,
+    "abilities": [
+      "breath",
+      "armorBreak",
+      "knockback"
+    ],
+    "stats": {
+      "level": 80,
+      "hp": 1242,
+      "attack": {
+        "weight": 43,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 35.1
+      },
+      "exp": 1431,
+      "hpMul": 8
+    }
   },
   "dragon_emperor": {
     "id": "dragon_emperor",
@@ -1168,7 +2964,31 @@
       8.5,
       1.0
     ],
-    "radius": 2.82
+    "radius": 2.82,
+    "family": "dragon",
+    "rank": 10,
+    "boss": true,
+    "abilities": [
+      "breath",
+      "fly",
+      "revive",
+      "enrage"
+    ],
+    "stats": {
+      "level": 99,
+      "hp": 1434,
+      "attack": {
+        "weight": 34,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 5
+        },
+        "expected": 39.0
+      },
+      "exp": 1970,
+      "hpMul": 8
+    }
   },
   "wood_golem": {
     "id": "wood_golem",
@@ -1180,7 +3000,27 @@
       4.0,
       1.0
     ],
-    "radius": 0.72
+    "radius": 0.72,
+    "family": "golem",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "armorBreak"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 64,
+      "attack": {
+        "weight": 45,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 16.4
+      },
+      "exp": 63
+    }
   },
   "stone_golem": {
     "id": "stone_golem",
@@ -1192,7 +3032,28 @@
       4.5,
       1.0
     ],
-    "radius": 1.0
+    "radius": 1.0,
+    "family": "golem",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "armorBreak",
+      "knockback"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 86,
+      "attack": {
+        "weight": 29,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 5
+        },
+        "expected": 20.4
+      },
+      "exp": 329
+    }
   },
   "iron_golem": {
     "id": "iron_golem",
@@ -1204,7 +3065,28 @@
       4.8,
       1.0
     ],
-    "radius": 1.0
+    "radius": 1.0,
+    "family": "golem",
+    "rank": 7,
+    "boss": false,
+    "abilities": [
+      "armorBreak",
+      "reflect"
+    ],
+    "stats": {
+      "level": 50,
+      "hp": 108,
+      "attack": {
+        "weight": 36,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 2
+        },
+        "expected": 24.2
+      },
+      "exp": 707
+    }
   },
   "mithril_golem": {
     "id": "mithril_golem",
@@ -1216,7 +3098,30 @@
       4.8,
       1.0
     ],
-    "radius": 0.85
+    "radius": 0.85,
+    "family": "golem",
+    "rank": 9,
+    "boss": true,
+    "abilities": [
+      "armorBreak",
+      "barrier",
+      "reflect"
+    ],
+    "stats": {
+      "level": 80,
+      "hp": 728,
+      "attack": {
+        "weight": 24,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 8
+        },
+        "expected": 29.7
+      },
+      "exp": 1431,
+      "hpMul": 5
+    }
   },
   "diamond_golem": {
     "id": "diamond_golem",
@@ -1228,7 +3133,31 @@
       5.0,
       1.0
     ],
-    "radius": 1.05
+    "radius": 1.05,
+    "family": "golem",
+    "rank": 10,
+    "boss": true,
+    "abilities": [
+      "armorBreak",
+      "barrier",
+      "reflect",
+      "regen"
+    ],
+    "stats": {
+      "level": 99,
+      "hp": 840,
+      "attack": {
+        "weight": 23,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 9
+        },
+        "expected": 33.0
+      },
+      "exp": 1970,
+      "hpMul": 5
+    }
   },
   "gargoyle": {
     "id": "gargoyle",
@@ -1240,7 +3169,28 @@
       2.6,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "golem",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "ambush"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 86,
+      "attack": {
+        "weight": 29,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 5
+        },
+        "expected": 20.4
+      },
+      "exp": 329
+    }
   },
   "will_o_wisp": {
     "id": "will_o_wisp",
@@ -1252,7 +3202,28 @@
       1.4,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "fairy",
+    "rank": 2,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "evasion"
+    ],
+    "stats": {
+      "level": 5,
+      "hp": 27,
+      "attack": {
+        "weight": 48,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 15.4
+      },
+      "exp": 22
+    }
   },
   "sylph": {
     "id": "sylph",
@@ -1264,7 +3235,28 @@
       2.0,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "fairy",
+    "rank": 4,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "aoe"
+    ],
+    "stats": {
+      "level": 20,
+      "hp": 36,
+      "attack": {
+        "weight": 24,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 7
+        },
+        "expected": 18.7
+      },
+      "exp": 179
+    }
   },
   "undine": {
     "id": "undine",
@@ -1276,7 +3268,28 @@
       2.4,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "fairy",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "aoe",
+      "regen"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 40,
+      "attack": {
+        "weight": 29,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 5
+        },
+        "expected": 20.4
+      },
+      "exp": 329
+    }
   },
   "salamander": {
     "id": "salamander",
@@ -1288,7 +3301,28 @@
       1.5,
       1.0
     ],
-    "radius": 0.56
+    "radius": 0.56,
+    "family": "fairy",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "burn",
+      "ranged"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 40,
+      "attack": {
+        "weight": 29,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 5
+        },
+        "expected": 20.4
+      },
+      "exp": 329
+    }
   },
   "gnome": {
     "id": "gnome",
@@ -1300,7 +3334,28 @@
       1.5,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "fairy",
+    "rank": 3,
+    "boss": false,
+    "abilities": [
+      "burrow",
+      "armorBreak"
+    ],
+    "stats": {
+      "level": 10,
+      "hp": 30,
+      "attack": {
+        "weight": 45,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 16.4
+      },
+      "exp": 63
+    }
   },
   "jack_o_lantern": {
     "id": "jack_o_lantern",
@@ -1312,7 +3367,28 @@
       2.6,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "fairy",
+    "rank": 6,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "burn"
+    ],
+    "stats": {
+      "level": 40,
+      "hp": 46,
+      "attack": {
+        "weight": 41,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 22.0
+      },
+      "exp": 506
+    }
   },
   "dullahan": {
     "id": "dullahan",
@@ -1324,7 +3400,31 @@
       3.2,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "fairy",
+    "rank": 8,
+    "boss": true,
+    "abilities": [
+      "teleport",
+      "charge",
+      "curse",
+      "armorBreak"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 284,
+      "attack": {
+        "weight": 27,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 6
+        },
+        "expected": 26.4
+      },
+      "exp": 930,
+      "hpMul": 5
+    }
   },
   "lesser_demon": {
     "id": "lesser_demon",
@@ -1336,7 +3436,28 @@
       2.6,
       1.0
     ],
-    "radius": 0.82
+    "radius": 0.82,
+    "family": "demon",
+    "rank": 5,
+    "boss": false,
+    "abilities": [
+      "fly",
+      "ranged"
+    ],
+    "stats": {
+      "level": 30,
+      "hp": 80,
+      "attack": {
+        "weight": 50,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 24.0
+      },
+      "exp": 329
+    }
   },
   "arch_demon": {
     "id": "arch_demon",
@@ -1348,7 +3469,28 @@
       3.4,
       1.0
     ],
-    "radius": 0.55
+    "radius": 0.55,
+    "family": "demon",
+    "rank": 8,
+    "boss": false,
+    "abilities": [
+      "aoe",
+      "summon"
+    ],
+    "stats": {
+      "level": 60,
+      "hp": 113,
+      "attack": {
+        "weight": 27,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 10
+        },
+        "expected": 31.2
+      },
+      "exp": 930
+    }
   },
   "arch_devil": {
     "id": "arch_devil",
@@ -1360,7 +3502,30 @@
       3.8,
       1.0
     ],
-    "radius": 0.68
+    "radius": 0.68,
+    "family": "demon",
+    "rank": 9,
+    "boss": true,
+    "abilities": [
+      "aoe",
+      "drain",
+      "summon"
+    ],
+    "stats": {
+      "level": 80,
+      "hp": 679,
+      "attack": {
+        "weight": 43,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 1
+        },
+        "expected": 35.1
+      },
+      "exp": 1431,
+      "hpMul": 5
+    }
   },
   "demon_lord": {
     "id": "demon_lord",
@@ -1372,6 +3537,30 @@
       4.2,
       1.0
     ],
-    "radius": 0.5
+    "radius": 0.5,
+    "family": "demon",
+    "rank": 10,
+    "boss": true,
+    "abilities": [
+      "aoe",
+      "summon",
+      "drain",
+      "curse"
+    ],
+    "stats": {
+      "level": 99,
+      "hp": 1254,
+      "attack": {
+        "weight": 34,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 5
+        },
+        "expected": 39.0
+      },
+      "exp": 1970,
+      "hpMul": 8
+    }
   }
 }
