@@ -56,3 +56,12 @@ test('神殿: 大理石のテクスチャが game.js に登録されている', 
     assert.match(tex, /marbleWall: RetroTextureGenerator\.createMarbleWallTexture/);
     assert.match(tex, /marbleFloor: RetroTextureGenerator\.createMarbleFloorTexture/);
 });
+
+test('神殿: 村にも神殿の建物があり、扉から、同じ神殿のマップへ入れる', () => {
+    const village = readJson('public/data/maps/village.json');
+    const doors = Object.entries(village.links).filter(([, l]) => l.nextMap === 'temple');
+    assert.equal(doors.length, 1);
+    const [c, r] = doors[0][0].split(',').map(Number);
+    assert.equal(objects[village.legend[village.layout[r][c]]].type, 'door');
+    assert.equal(village.legend.D, 'dirt_road', '村の土の道の凡例は、そのまま');
+});
