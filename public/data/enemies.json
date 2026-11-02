@@ -2729,13 +2729,13 @@
       "level": 50,
       "hp": 115,
       "attack": {
-        "weight": 38,
+        "weight": 36,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 4
+          "k": 2
         },
-        "expected": 28.6
+        "expected": 24.2
       },
       "exp": 707
     }
@@ -2764,13 +2764,13 @@
       "level": 80,
       "hp": 1242,
       "attack": {
-        "weight": 43,
+        "weight": 24,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 1
+          "k": 8
         },
-        "expected": 35.1
+        "expected": 29.7
       },
       "exp": 1431,
       "hpMul": 8
@@ -2799,13 +2799,13 @@
       "level": 80,
       "hp": 1242,
       "attack": {
-        "weight": 43,
+        "weight": 24,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 1
+          "k": 8
         },
-        "expected": 35.1
+        "expected": 29.7
       },
       "exp": 1431,
       "hpMul": 8
@@ -2834,13 +2834,13 @@
       "level": 80,
       "hp": 1242,
       "attack": {
-        "weight": 43,
+        "weight": 24,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 1
+          "k": 8
         },
-        "expected": 35.1
+        "expected": 29.7
       },
       "exp": 1431,
       "hpMul": 8
@@ -2870,13 +2870,13 @@
       "level": 99,
       "hp": 1434,
       "attack": {
-        "weight": 34,
+        "weight": 23,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 5
+          "k": 9
         },
-        "expected": 39.0
+        "expected": 33.0
       },
       "exp": 1970,
       "hpMul": 8
@@ -2906,13 +2906,13 @@
       "level": 99,
       "hp": 1434,
       "attack": {
-        "weight": 34,
+        "weight": 23,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 5
+          "k": 9
         },
-        "expected": 39.0
+        "expected": 33.0
       },
       "exp": 1970,
       "hpMul": 8
@@ -2941,13 +2941,13 @@
       "level": 80,
       "hp": 1242,
       "attack": {
-        "weight": 43,
+        "weight": 24,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 1
+          "k": 8
         },
-        "expected": 35.1
+        "expected": 29.7
       },
       "exp": 1431,
       "hpMul": 8
@@ -2977,13 +2977,13 @@
       "level": 99,
       "hp": 1434,
       "attack": {
-        "weight": 34,
+        "weight": 23,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 5
+          "k": 9
         },
-        "expected": 39.0
+        "expected": 33.0
       },
       "exp": 1970,
       "hpMul": 8
@@ -3447,13 +3447,13 @@
       "level": 30,
       "hp": 80,
       "attack": {
-        "weight": 50,
+        "weight": 29,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 1
+          "k": 5
         },
-        "expected": 24.0
+        "expected": 20.4
       },
       "exp": 329
     }
@@ -3484,9 +3484,9 @@
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 10
+          "k": 6
         },
-        "expected": 31.2
+        "expected": 26.4
       },
       "exp": 930
     }
@@ -3514,13 +3514,13 @@
       "level": 80,
       "hp": 679,
       "attack": {
-        "weight": 43,
+        "weight": 24,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 1
+          "k": 8
         },
-        "expected": 35.1
+        "expected": 29.7
       },
       "exp": 1431,
       "hpMul": 5
@@ -3550,13 +3550,13 @@
       "level": 99,
       "hp": 1254,
       "attack": {
-        "weight": 34,
+        "weight": 23,
         "dice": {
           "n": 2,
           "m": 6,
-          "k": 5
+          "k": 9
         },
-        "expected": 39.0
+        "expected": 33.0
       },
       "exp": 1970,
       "hpMul": 8

@@ -22,8 +22,8 @@
     "undead":    { "name": "アンデッド", "hp": 1.2, "attack": 1.0 },
     "golem":     { "name": "ゴーレム",   "hp": 1.5, "attack": 1.1 },
     "fairy":     { "name": "妖精",       "hp": 0.7, "attack": 1.1 },
-    "dragon":    { "name": "竜",         "hp": 1.6, "attack": 1.3 },
-    "demon":     { "name": "悪魔",       "hp": 1.4, "attack": 1.3 }
+    "dragon":    { "name": "竜",         "hp": 1.6, "attack": 1.1 },
+    "demon":     { "name": "悪魔",       "hp": 1.4, "attack": 1.1 }
   },
   "bossHp": {
     "_note": "ボスのHP倍率。top に挙げたボスは top、それ以外はランク midMaxRank 以下が mid、上が normal。",
