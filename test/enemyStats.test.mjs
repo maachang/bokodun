@@ -10,7 +10,7 @@ const ranks = readJson('enemyRanks.json');
 
 // 仕様書 6章「特殊能力」の一覧
 const ABILITIES = new Set([
-    'fatigue', 'exhaust', 'regen', 'drain', 'lastStand', 'revive', 'armorBreak', 'enrage',
+    'fatigue', 'exhaust', 'regen', 'lifesteal', 'lastStand', 'revive', 'armorBreak', 'enrage',
     'poison', 'venom', 'paralysis', 'slow', 'burn', 'curse', 'silence', 'blind',
     'fly', 'burrow', 'teleport', 'charge', 'summon', 'split', 'flee', 'ambush',
     'ranged', 'breath', 'aoe', 'knockback', 'pull', 'reflect', 'barrier', 'evasion',
