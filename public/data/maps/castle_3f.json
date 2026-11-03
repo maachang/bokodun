@@ -1,0 +1,115 @@
+{
+  "id": "castle_3f",
+  "name": "王城 (Castle) 3F 貴族の執務室・図書館",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "castle_2f",
+  "spawn": {
+    "x": 2,
+    "z": 8,
+    "angle": -1.570795
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "brick",
+    "ambientLight": 10096512,
+    "directionalLight": 13615264,
+    "fogColor": 2761760,
+    "fogNear": 14,
+    "fogFar": 48,
+    "visibility": 0.9,
+    "skyColor": 2761760
+  },
+  "legend": {
+    "W": "brick_wall",
+    "d": "wooden_door",
+    "u": "castle_rug",
+    "k": "bookshelf_stone",
+    "t": "table_stone",
+    "h": "chair_stone",
+    "g": "cupboard_stone",
+    "s": "hearth_stone",
+    "K": "chandelier_castle_rug",
+    "L": "wall_sconce",
+    "R": "wall_banner_red",
+    "S": "stairs_stone_down"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "W000ksk00W000ksk00W000ksk00W000g000g00W",
+    "W000uuu00W000uuu00W000uuu00W0000uuu000W",
+    "W000uKu00W000uKu00W000uKu00W0000uKu000W",
+    "W000uuu00W000uuu00W000uuu00W0000uuu000W",
+    "W0000t000W0000t000W0000t000W00hth0hth0W",
+    "W0000h000W0000h000W0000h000W0000000000W",
+    "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
+    "WSuuuuuuKuuuuuuuuuuuuuuuuuKuuuuuuuuuu0W",
+    "W0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0W",
+    "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
+    "W0kk0kkkkkkkk0kkkkkkkk0kkkkkkkkk0kkk00W",
+    "W0000000000000000000000000000000000000W",
+    "W00000tt0000tt0000tt0000tt0000tt000000W",
+    "W00000hh0000hh0000hh0000hh0000hh000000W",
+    "W0000000000000000000000000000000000000W",
+    "W0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0W",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "butler",
+      "x": 5,
+      "z": 8
+    },
+    {
+      "id": "maid",
+      "x": 14,
+      "z": 8
+    },
+    {
+      "id": "mage_clerk_woman",
+      "x": 8,
+      "z": 13
+    },
+    {
+      "id": "mage_clerk_man",
+      "x": 20,
+      "z": 13
+    },
+    {
+      "id": "mage_clerk_woman",
+      "x": 29,
+      "z": 14
+    },
+    {
+      "id": "elder_man",
+      "x": 14,
+      "z": 15
+    },
+    {
+      "id": "servant_man",
+      "x": 33,
+      "z": 8
+    },
+    {
+      "id": "maid",
+      "x": 32,
+      "z": 4
+    }
+  ],
+  "links": {
+    "1,8": {
+      "nextMap": "castle_2f",
+      "message": "階段を下りる（2階へ）",
+      "dir": "w",
+      "spawn": {
+        "x": 2,
+        "z": 8,
+        "angle": -1.570795
+      }
+    }
+  }
+}

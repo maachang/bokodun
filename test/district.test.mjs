@@ -151,3 +151,44 @@ test('貴族の屋敷: 5階級とも中に入れ、階級が高いほど広く�
     assert.ok(decor('mansion_viscount').has('chandelier_mansion_rug') || decor('mansion_viscount').has('hanging_candles_mansion_rug'), '子爵: 小さな吊り飾り');
     assert.ok(![...decor('mansion_baron')].some(id => objects[id]?.type === 'hanging'), '男爵: 天井の飾りはない');
 });
+
+test('王城: 1階に厨房・武器庫・兵の待機所・下働きの食堂があり、下働き（メイド・使用人）と兵が多い。2階は事務室・会議室、3階は貴族の執務室と図書館。地下は迷宮', () => {
+    const C = Object.fromEntries(['castle', 'castle_2f', 'castle_3f', 'castle_basement'].map(id => [id, readJson(`public/data/maps/${id}.json`)]));
+    const ids = (m) => new Set(Object.values(m.legend));
+    const count = (m, f) => m.npcs.filter(n => f(n.id)).length;
+    assert.ok(ids(C.castle).has('stove_stone') && ids(C.castle).has('weapon_rack_stone') && ids(C.castle).has('bed_stone'));
+    assert.ok(count(C.castle, i => ['maid', 'servant_man', 'butler'].includes(i)) >= 12, '下働きが多い');
+    assert.ok(count(C.castle, i => i.startsWith('guard_')) >= 8, '兵が多い');
+    assert.ok(count(C.castle_2f, i => i.startsWith('adv_clerk')) >= 4, '事務の人');
+    const doors = (m) => m.layout.join('').split('').filter(ch => objects[m.legend[ch]]?.type === 'door').length;
+    assert.ok(doors(C.castle_2f) >= 8, '2階: 部屋の扉');
+    assert.ok(count(C.castle_3f, i => i.startsWith('mage_clerk')) >= 2 && ids(C.castle_3f).has('bookshelf_stone'), '3階: 図書館');
+    assert.ok(Object.values(C.castle.links).some(l => l.nextMap === 'castle_basement'));
+    const b = C.castle_basement, flat = b.layout.join('');
+    assert.ok(b.layout.length >= 25 && b.layout[0].length >= 33, '迷宮の広さ');
+    assert.ok(ids(b).has('spike_trap') && ids(b).has('treasure_chest') && ids(b).has('fire_jet_trap'), '迷宮の罠・宝箱');
+    assert.ok(Object.keys(b.enemies).length >= 3 && [...flat].filter(ch => b.enemies[ch]).length >= 12, '迷宮の敵');
+    // 入口から、床・宝箱・敵・罠のすべてに行ける（壁以外は、つながっている）
+    const [sx, sz] = [b.spawn.x, b.spawn.z], seen = new Set([`${sx},${sz}`]), q = [[sx, sz]];
+    while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (b.layout[ny]?.[nx] && b.layout[ny][nx] !== '1' && !seen.has(`${nx},${ny}`)) { seen.add(`${nx},${ny}`); q.push([nx, ny]); } } }
+    assert.equal(seen.size, [...flat].filter(ch => ch !== '1').length, '迷宮は、すべてつながっている');
+});
+
+test('屋内のマップ: 出現位置から、NPC のいる所へ、歩いて行ける（扉や壁の飾りで、部屋がふさがれていない）', () => {
+    const fs2 = fs.readdirSync(path.join(root, 'public/data/maps')).map(f => f.replace('.json', ''));
+    const bad = [];
+    for (const id of fs2) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        if (m.type !== 'indoor' || !m.npcs?.length) continue;
+        const solid = (x, y) => {
+            const ch = m.layout[y]?.[x]; if (ch === undefined) return true; if (ch === '0') return false;
+            const d = objects[m.legend[ch]]; if (!d) return false;
+            if (['door', 'stairs', 'gateway', 'portal', 'floor_tile', 'hanging'].includes(d.type)) return false;
+            return d.solid === true || ['block', 'furniture', 'wall_deco', 'wall_image', 'statue'].includes(d.type);
+        };
+        const seen = new Set([`${m.spawn.x},${m.spawn.z}`]), q = [[m.spawn.x, m.spawn.z]];
+        while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (!solid(nx, ny) && !seen.has(`${nx},${ny}`)) { seen.add(`${nx},${ny}`); q.push([nx, ny]); } } }
+        for (const n of m.npcs) if (!seen.has(`${n.x},${n.z}`)) bad.push(`${id}: ${n.id} (${n.x},${n.z})`);
+    }
+    assert.deepEqual(bad, [], `行けない所の NPC: ${bad.join(' / ')}`);
+});

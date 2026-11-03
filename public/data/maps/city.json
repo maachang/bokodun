@@ -90,18 +90,8 @@
       "z": 10
     },
     {
-      "id": "town_woman",
-      "x": 9,
-      "z": 10
-    },
-    {
       "id": "town_boy",
       "x": 12,
-      "z": 17
-    },
-    {
-      "id": "town_girl",
-      "x": 32,
       "z": 17
     },
     {
@@ -110,28 +100,13 @@
       "z": 10
     },
     {
-      "id": "town_middle_woman",
-      "x": 31,
-      "z": 10
-    },
-    {
       "id": "town_old_man",
       "x": 34,
       "z": 10
     },
     {
-      "id": "town_old_woman",
-      "x": 3,
-      "z": 10
-    },
-    {
       "id": "junior_merchant_man",
       "x": 7,
-      "z": 8
-    },
-    {
-      "id": "junior_merchant_woman",
-      "x": 28,
       "z": 8
     },
     {
@@ -145,18 +120,8 @@
       "z": 22
     },
     {
-      "id": "child_girl",
-      "x": 25,
-      "z": 22
-    },
-    {
       "id": "elder_man",
       "x": 6,
-      "z": 23
-    },
-    {
-      "id": "elder_woman",
-      "x": 35,
       "z": 23
     },
     {
@@ -178,11 +143,6 @@
       "id": "servant_man",
       "x": 14,
       "z": 10
-    },
-    {
-      "id": "maid",
-      "x": 33,
-      "z": 8
     }
   ],
   "links": {

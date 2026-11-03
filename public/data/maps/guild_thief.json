@@ -74,7 +74,7 @@
     {
       "id": "thief_guild_member",
       "x": 8,
-      "z": 6,
+      "z": 7,
       "speed": 0.4,
       "wanderRadius": 1.5
     }
