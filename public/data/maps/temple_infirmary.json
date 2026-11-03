@@ -1,0 +1,59 @@
+{
+  "id": "temple_infirmary",
+  "name": "神殿の医務室 (Infirmary)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "temple",
+  "spawn": {
+    "x": 8,
+    "z": 3,
+    "angle": 1.570795
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "marbleWall",
+    "ambientLight": 16777215,
+    "directionalLight": 16773324,
+    "fogColor": 15985881,
+    "fogNear": 24,
+    "fogFar": 70,
+    "visibility": 1.0,
+    "skyColor": 15985881
+  },
+  "legend": {
+    "W": "temple_wall",
+    "F": "marble_floor",
+    "E": "temple_exit",
+    "t": "table_marble",
+    "g": "cupboard_marble",
+    "e": "bed_marble",
+    "L": "wall_sconce_marble"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWW",
+    "WeFeFeFeFFW",
+    "LFFFFFFFFFL",
+    "WFFFFtFFFFE",
+    "WFFFFFFFFFW",
+    "WeFeFFFFgFW",
+    "WWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "priest_woman",
+      "x": 6,
+      "z": 2,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "town_old_man",
+      "x": 2,
+      "z": 2,
+      "wanderRadius": 0.4
+    }
+  ]
+}

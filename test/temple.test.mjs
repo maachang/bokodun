@@ -166,3 +166,22 @@ test('神殿の部屋の割り振り: 村は広間の端の扉から寝室と厨
     assert.ok(f2.layout.join('').split('').filter(ch => f2.legend[ch] === 'bed_marble').length >= 6, '2階: ベッド（個室・寝室）');
     assert.ok(ids('temple_village_kitchen').has('stove_stone') && ids('temple_village_bedroom').has('bed_stone'));
 });
+
+test('大神殿（グレードアップ）: 聖堂＋食堂・厨房・懺悔室・聖具室、西の扉の回廊・医務室・客室・施し所、地下納骨堂。回廊から会議室・図書室・宝物庫', () => {
+    const dests = new Set(Object.values(temple.links).map(l => l.nextMap));
+    for (const id of ['temple_kitchen', 'temple_refectory', 'temple_confession', 'temple_sacristy', 'temple_cloister', 'temple_infirmary', 'temple_guesthouse', 'temple_almonry', 'temple_crypt', 'temple_2f']) assert.ok(dests.has(id), `聖堂の扉・階段: ${id}`);
+    const cloister = readJson('public/data/maps/temple_cloister.json');
+    assert.equal(cloister.type, 'open', '回廊は、屋根のない中庭');
+    const cd = new Set(Object.values(cloister.links).map(l => l.nextMap));
+    for (const id of ['temple_chapter_house', 'temple_library', 'temple_treasury']) assert.ok(cd.has(id), `回廊から: ${id}`);
+    assert.ok(Object.values(cloister.legend).includes('plaza_fountain'), '回廊の庭の噴水');
+    // 聖堂の西の壁は回廊などへ、東の壁は食堂・厨房・懺悔室・聖具室へ（修道院の、聖堂と回廊の関係）
+    const side = (id) => Number(Object.entries(temple.links).find(([, l]) => l.nextMap === id)[0].split(',')[0]);
+    for (const id of ['temple_cloister', 'temple_infirmary', 'temple_guesthouse', 'temple_almonry']) assert.equal(side(id), 0, `${id}: 西の壁`);
+    for (const id of ['temple_kitchen', 'temple_refectory', 'temple_confession', 'temple_sacristy']) assert.equal(side(id), 20, `${id}: 東の壁`);
+    const crypt = readJson('public/data/maps/temple_crypt.json');
+    assert.ok(Object.values(crypt.legend).includes('sarcophagus_stone') && crypt.layout.join('').split('').filter(ch => crypt.legend[ch] === 'sarcophagus_stone').length >= 6, '納骨堂の石棺');
+    const library = readJson('public/data/maps/temple_library.json');
+    assert.ok(library.layout.join('').split('').filter(ch => library.legend[ch] === 'bookshelf_marble').length >= 6, '図書室の本棚');
+    assert.ok(readJson('public/data/maps/temple_infirmary.json').layout.join('').split('').filter(ch => objects[readJson('public/data/maps/temple_infirmary.json').legend[ch]]?.type === 'furniture' && readJson('public/data/maps/temple_infirmary.json').legend[ch] === 'bed_marble').length >= 6, '医務室のベッド');
+});

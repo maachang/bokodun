@@ -42,26 +42,27 @@
     "K": "chandelier_temple_large_rug",
     "L": "wall_sconce_marble",
     "R": "wall_banner_temple_tall",
-    "d": "temple_room_door"
+    "d": "temple_room_door",
+    "S": "stairs_marble_down"
   },
   "enemies": {},
   "layout": [
     "WWRWaLWeWWbWWfWLaWRWW",
-    "WUFFFF2225G5222FFFFFW",
+    "WUFFFF2225G5222FFFFSW",
     "WFFFF11114441111FFFFW",
-    "RFFFFFFFFFFFFFFFFFFFd",
+    "dFFFFFFFFFFFFFFFFFFFd",
     "WFFFFFFFFcccFFFFFFFFW",
     "eFFFFFFFFcccFFFFFFFFf",
     "WFFFFpFFFcKcFFFpFFFFW",
-    "LFFFFFFFFcccFFFFFFFFd",
+    "dFFFFFFFFcccFFFFFFFFd",
     "WFFFFFFFFcccFFFFFFFFW",
     "fFFFFpFFFcccFFFpFFFFe",
     "WFFFFFFFFcKcFFFFFFFFW",
-    "LFFFFFFFFcccFFFFFFFFd",
+    "dFFFFFFFFcccFFFFFFFFd",
     "WFFFFpFFFcccFFFpFFFFW",
     "aFFFFFFFFcccFFFFFFFFa",
     "WFFFFFFFFcKcFFFFFFFFW",
-    "RFFFFpFFFcccFFFpFFFFd",
+    "dFFFFpFFFcccFFFpFFFFd",
     "WFFFFFFFFcccFFFFFFFFW",
     "WFFFFFFFFcccFFFFFFFFW",
     "WFFFFFFFFFFFFFFFFFFFW",
@@ -132,6 +133,52 @@
         "x": 19,
         "z": 3,
         "angle": 1.570795
+      }
+    },
+    "0,3": {
+      "nextMap": "temple_guesthouse",
+      "message": "客室（巡礼者の宿）に入る",
+      "back": {
+        "x": 1,
+        "z": 3,
+        "angle": -1.570795
+      }
+    },
+    "0,7": {
+      "nextMap": "temple_infirmary",
+      "message": "医務室に入る",
+      "back": {
+        "x": 1,
+        "z": 7,
+        "angle": -1.570795
+      }
+    },
+    "0,11": {
+      "nextMap": "temple_cloister",
+      "message": "回廊に出る",
+      "back": {
+        "x": 1,
+        "z": 11,
+        "angle": -1.570795
+      }
+    },
+    "0,15": {
+      "nextMap": "temple_almonry",
+      "message": "施し所に入る",
+      "back": {
+        "x": 1,
+        "z": 15,
+        "angle": -1.570795
+      }
+    },
+    "19,1": {
+      "nextMap": "temple_crypt",
+      "message": "階段を下りる（地下納骨堂へ）",
+      "dir": "n",
+      "spawn": {
+        "x": 2,
+        "z": 2,
+        "angle": 3.14159
       }
     }
   }

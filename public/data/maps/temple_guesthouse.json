@@ -1,0 +1,62 @@
+{
+  "id": "temple_guesthouse",
+  "name": "神殿の客室・巡礼者の宿 (Guest House)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "temple",
+  "spawn": {
+    "x": 8,
+    "z": 3,
+    "angle": 1.570795
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "marbleWall",
+    "ambientLight": 16777215,
+    "directionalLight": 16773324,
+    "fogColor": 15985881,
+    "fogNear": 24,
+    "fogFar": 70,
+    "visibility": 1.0,
+    "skyColor": 15985881
+  },
+  "legend": {
+    "W": "temple_wall",
+    "F": "marble_floor",
+    "E": "temple_exit",
+    "t": "table_marble",
+    "h": "chair_marble",
+    "g": "cupboard_marble",
+    "s": "hearth_marble",
+    "X": "crate_marble",
+    "e": "bed_marble",
+    "L": "wall_sconce_marble"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWW",
+    "WeFeFeFsFgW",
+    "LFFFFFFFFFL",
+    "WFhtFFhtFFE",
+    "WFFFFFFFFFW",
+    "WeFeFFFFFXW",
+    "WWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "villager_man",
+      "x": 5,
+      "z": 4,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "merchant_woman",
+      "x": 8,
+      "z": 5,
+      "wanderRadius": 0.8
+    }
+  ]
+}

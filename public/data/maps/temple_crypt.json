@@ -1,0 +1,58 @@
+{
+  "id": "temple_crypt",
+  "name": "神殿の地下納骨堂 (Crypt)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "temple",
+  "spawn": {
+    "x": 2,
+    "z": 2,
+    "angle": 3.14159
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "brick",
+    "ambientLight": 8417370,
+    "directionalLight": 16773324,
+    "fogColor": 1314828,
+    "fogNear": 24,
+    "fogFar": 70,
+    "visibility": 0.8,
+    "skyColor": 1314828
+  },
+  "legend": {
+    "W": "brick_wall",
+    "F": "brick_floor",
+    "L": "wall_sconce",
+    "Z": "stairs_stone_up",
+    "Q": "sarcophagus_stone"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWWWW",
+    "WZFFFFFFFFFFW",
+    "LFFFFFFFFFFFL",
+    "WFFQFFQFFQFFW",
+    "WFFFFFFFFFFFW",
+    "WFFQFFQFFQFFW",
+    "LFFFFFFFFFFFL",
+    "WFFFFFFFFFFFW",
+    "WWWWWWWWWWWWW"
+  ],
+  "npcs": [],
+  "links": {
+    "1,1": {
+      "nextMap": "temple",
+      "message": "階段を上る（大神殿1階へ）",
+      "dir": "n",
+      "spawn": {
+        "x": 18,
+        "z": 2,
+        "angle": 3.14159
+      }
+    }
+  }
+}

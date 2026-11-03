@@ -1,0 +1,60 @@
+{
+  "id": "temple_treasury",
+  "name": "神殿の宝物庫 (Treasury)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "temple_cloister",
+  "spawn": {
+    "x": 3,
+    "z": 1,
+    "angle": 3.14159
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "marbleWall",
+    "ambientLight": 16777215,
+    "directionalLight": 16773324,
+    "fogColor": 15985881,
+    "fogNear": 24,
+    "fogFar": 70,
+    "visibility": 1.0,
+    "skyColor": 15985881
+  },
+  "legend": {
+    "W": "temple_wall",
+    "F": "marble_floor",
+    "E": "temple_exit",
+    "t": "table_marble",
+    "g": "cupboard_marble",
+    "X": "crate_marble",
+    "L": "wall_sconce_marble"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWEWWW",
+    "WgXFXgW",
+    "LFFFFFL",
+    "WXFtFXW",
+    "WFFFFFW",
+    "WgFFFgW",
+    "WWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "guard_spear",
+      "x": 3,
+      "z": 2,
+      "speed": 0,
+      "wanderRadius": 0
+    },
+    {
+      "id": "priest_man",
+      "x": 3,
+      "z": 4,
+      "wanderRadius": 0.5
+    }
+  ]
+}
