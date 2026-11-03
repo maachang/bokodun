@@ -3391,7 +3391,7 @@ export class GameEngine {
         const mat = this.makeLitMaterial(textureKey, this.textures[textureKey] || this.textures.sand);
         const mesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), mat);
         mesh.rotation.x = -Math.PI / 2;
-        mesh.position.set(wx, 0.01, wz);
+        mesh.position.set(wx, 0.03, wz);   // 全体の床（0）と同じ平面だと、ちらつく（z-fighting）ので、少し上げる
         this.scene.add(mesh);
     }
 
@@ -3400,7 +3400,7 @@ export class GameEngine {
         const mat = this.makeLitMaterial(textureKey, this.textures[textureKey] || this.textures.brick);
         const mesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), mat);
         mesh.rotation.x = Math.PI / 2;
-        mesh.position.set(wx, wallH, wz);
+        mesh.position.set(wx, wallH - 0.05, wz);   // 全体の天井（wallH）と同じ平面だと、動くたびにちらつく（z-fighting）ので、少し下げる
         this.scene.add(mesh);
     }
 

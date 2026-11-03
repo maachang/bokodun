@@ -80,3 +80,11 @@ test('貴族の屋敷: 街の扉から入れ、1階と2階が階段でつなが�
     }
     assert.ok(Object.values(readJson('public/data/maps/mansion.json').legend).includes('building_exit'), '1階に出口');
 });
+
+test('描画: マスごとの天井・床は、全体の天井・床と同じ平面に置かない（動くたびにちらつくため）', () => {
+    const src = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const ceil = src.match(/addCeilingTile\(wx, wz, tileSize, wallH, textureKey\) \{[\s\S]*?\n    \}/)[0];
+    assert.match(ceil, /position\.set\(wx, wallH - 0\.05, wz\)/);
+    const floor = src.match(/addFloorTile\(wx, wz, tileSize, textureKey\) \{[\s\S]*?\n    \}/)[0];
+    assert.match(floor, /position\.set\(wx, 0\.03, wz\)/);
+});
