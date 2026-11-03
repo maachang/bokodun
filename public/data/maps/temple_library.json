@@ -32,19 +32,20 @@
     "h": "chair_marble",
     "k": "bookshelf_marble",
     "L": "wall_sconce_marble",
-    "N": "hanging_candles_rug"
+    "N": "hanging_candles_rug",
+    "a": "wall_window_curtain_marble"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWW",
+    "WWWaWWWWWaW",
     "WkkFkkFkkFW",
     "LFFFFFFFFFL",
     "WFtFFFFFtFW",
-    "WFhFFFFFhFE",
+    "aFhFFFFFhFE",
     "WFFFuNuFFFW",
-    "WFtFuuuFtFW",
+    "WFtFuuuFtFa",
     "WFhFFFFFhFW",
-    "WWWWWWWWWWW"
+    "WaWWWaWWWaW"
   ],
   "npcs": [
     {

@@ -29,17 +29,18 @@
     "X": "crate",
     "L": "wall_sconce_wood",
     "R": "weapon_rack",
-    "A": "anvil"
+    "A": "anvil",
+    "a": "wall_window_wood"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWW",
+    "WWWaWWWWW",
     "WRRFRRFXW",
     "LFFFFFFFL",
     "WXFFAFFFW",
-    "WFFFFFFFW",
+    "aFFFFFFFa",
     "WFFFFFFXW",
-    "WWWWEWWWW"
+    "WaWWEWaWW"
   ],
   "npcs": [
     {

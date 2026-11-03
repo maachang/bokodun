@@ -41,7 +41,8 @@
     "K": "hanging_candles_rug",
     "L": "wall_sconce_marble",
     "d": "temple_room_door",
-    "U": "stairs_marble_up"
+    "U": "stairs_marble_up",
+    "i": "wall_window_curtain_marble"
   },
   "enemies": {},
   "layout": [
@@ -54,7 +55,7 @@
     "fFFFcccFFFe",
     "WFpFcKcFpFW",
     "LFFFcccFFFL",
-    "WWWLDDDLWWW"
+    "WiWLDDDLWiW"
   ],
   "npcs": [
     {

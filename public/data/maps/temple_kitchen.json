@@ -42,17 +42,18 @@
     "i": "prep_table_marble",
     "j": "pot_rack_marble",
     "l": "wall_utensils_marble",
-    "m": "kitchen_shelf_marble"
+    "m": "kitchen_shelf_marble",
+    "n": "wall_window_curtain_marble"
   },
   "enemies": {},
   "layout": [
-    "WWWlWWWWW",
+    "WWWlWnWWW",
     "WcoadFogW",
     "WmFbjFFFW",
     "LfFiFiFfL",
     "WFFhFhFFW",
-    "WFFFFFFFW",
-    "WWWWEWWWW"
+    "nFFFFFFFn",
+    "WnWWEWnWW"
   ],
   "npcs": [
     {

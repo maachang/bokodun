@@ -38,20 +38,21 @@
     "S": "stairs_stone_down",
     "a": "wash_stand_stone",
     "b": "bathtub_stone",
-    "c": "garderobe_stone"
+    "c": "garderobe_stone",
+    "f": "wall_window_stone"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-    "W0hh00hh0W000h0000W0k0k0000Waceb00g0g0W",
+    "WfWWWfWWWWfWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "f0hh00hh0W000h0000W0k0k0000Waceb00g0g0f",
     "W00000000W00uuu000W00000000W0000000000W",
     "W00000000W00uuu000W00uuu000W0000uuu000W",
     "W00000000W00uuu000W00uuu000W0000uuu000W",
-    "W0h0000h0W0h000h00W00utu000W0000uuu000W",
+    "f0h0000h0W0h000h00W00utu000W0000uuu000f",
     "W00000000W00000000W00000000W0000000000W",
     "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
     "W0uuuuuuKuuuuuuuuuuuuuuuuuKuuuuuuuuuuSW",
-    "W0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0W",
+    "f0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0f",
     "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
     "W0kk00kk0W00000t00W0g000g00Wabcg000000W",
     "W00000000W00000000W00000000W0000000000W",
@@ -59,7 +60,7 @@
     "W00hth000W00uuu000W00uuu000W0000uuu000W",
     "W00000000W00uuu000W00uuu000W0000uuu000W",
     "W00000000W00000000W00000000W00e0000e00W",
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    "WfWWWfWWWWfWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
   ],
   "npcs": [
     {

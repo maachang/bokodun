@@ -30,7 +30,8 @@
     "g": "cupboard",
     "X": "crate",
     "B": "barrel",
-    "L": "wall_sconce_wood"
+    "L": "wall_sconce_wood",
+    "a": "wall_window_wood"
   },
   "enemies": {},
   "layout": [
@@ -39,8 +40,8 @@
     "LFBBFBBFL",
     "WFFFFFFFW",
     "WgXFFFXgW",
-    "WFFFFFFFW",
-    "WWWWEWWWW"
+    "aFFFFFFFa",
+    "WaWWEWaWW"
   ],
   "npcs": [
     {

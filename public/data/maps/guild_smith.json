@@ -35,19 +35,20 @@
     "V": "anvil_stone",
     "s": "hearth_stone",
     "X": "crate_stone",
-    "L": "wall_sconce"
+    "L": "wall_sconce",
+    "a": "wall_window_stone"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWW",
-    "WFAFFsFFAFW",
+    "WaWWWWaWWWW",
+    "aFAFFsFFAFa",
     "WFFFFFFFFFW",
     "LFFVFFFVFFL",
     "WFFFFFFFFFW",
     "WFFCCCCCFFW",
     "LFFFFFFFFFL",
     "WFFFFFFFFFW",
-    "WWWWWEWWWWW"
+    "WaWWWEWaWWW"
   ],
   "npcs": [
     {

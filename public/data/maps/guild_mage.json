@@ -34,11 +34,12 @@
     "K": "chandelier_mansion_rug",
     "Q": "quest_board",
     "X": "crate",
-    "k": "bookshelf"
+    "k": "bookshelf",
+    "a": "wall_window_wood"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWW",
+    "WWWaWWWaWWW",
     "WkkFFFFFkkW",
     "WFFFFFFFFFW",
     "LFFCCCCCFFL",
@@ -46,7 +47,7 @@
     "WFFFFKFFFFW",
     "LFFFFuFFFFL",
     "WFFFFuFFFFW",
-    "WWWWWEWWWWW"
+    "WaWWWEWaWWW"
   ],
   "npcs": [
     {

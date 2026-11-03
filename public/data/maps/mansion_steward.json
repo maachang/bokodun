@@ -30,17 +30,18 @@
     "h": "chair",
     "k": "bookshelf",
     "g": "cupboard",
-    "L": "wall_sconce_wood"
+    "L": "wall_sconce_wood",
+    "a": "wall_window_wood"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWW",
+    "WWWaWWWWW",
     "WkkFFFkgW",
     "LFFFFFFFL",
     "WFFtFtFFW",
-    "WFFhFhFFW",
+    "aFFhFhFFa",
     "WFFFFFFFW",
-    "WWWWEWWWW"
+    "WaWWEWaWW"
   ],
   "npcs": [
     {

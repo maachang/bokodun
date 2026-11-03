@@ -30,19 +30,20 @@
     "t": "table",
     "L": "wall_sconce_wood",
     "P": "pew_wood",
-    "N": "hanging_candles_mansion_rug"
+    "N": "hanging_candles_mansion_rug",
+    "a": "wall_window_wood"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWW",
+    "WaWWWaWWW",
     "WFFFtFFFW",
     "LFFFuFFFL",
     "WFPFuFPFW",
-    "WFFFNFFFW",
+    "aFFFNFFFa",
     "WFPFuFPFW",
     "WFFFuFFFW",
     "LFFFFFFFL",
-    "WWWWEWWWW"
+    "WaWWEWaWW"
   ],
   "npcs": [
     {

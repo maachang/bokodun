@@ -31,21 +31,22 @@
     "t": "table_stone",
     "P": "temple_pew",
     "G": "goddess_statue_small",
-    "L": "wall_sconce"
+    "L": "wall_sconce",
+    "a": "wall_window_stone"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWW",
+    "WaWWWWaWWWW",
     "WFFFFGFFFFW",
     "LFFFFtFFFFL",
     "WFFFFFFFFFW",
-    "WFPPFuFPPFW",
+    "aFPPFuFPPFa",
     "WFFFFuFFFFW",
     "WFPPFuFPPFW",
     "WFFFFuFFFFW",
     "WFPPFuFPPFW",
     "LFFFFFFFFFL",
-    "WWWWWEWWWWW"
+    "WaWWWEWaWWW"
   ],
   "npcs": [
     {

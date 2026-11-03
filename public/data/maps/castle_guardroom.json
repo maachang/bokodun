@@ -34,17 +34,18 @@
     "L": "wall_sconce",
     "a": "wash_stand_stone",
     "b": "garderobe_stone",
-    "S": "stairs_stone_down"
+    "S": "stairs_stone_down",
+    "c": "wall_window_stone"
   },
   "enemies": {},
   "layout": [
-    "WWWWEWWWW",
-    "WabFFFFFW",
+    "WWWWEWcWW",
+    "WabFFFFFc",
     "WQFtFFhQW",
     "LFFhtFFFL",
     "WFFFFFFeW",
-    "WFFFFFFSW",
-    "WWWWWWWWW"
+    "cFFFFFFSW",
+    "WcWWWcWWW"
   ],
   "npcs": [
     {

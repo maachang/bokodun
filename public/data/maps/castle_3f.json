@@ -36,28 +36,29 @@
     "L": "wall_sconce",
     "R": "wall_banner_red",
     "S": "stairs_stone_down",
-    "U": "stairs_stone_up"
+    "U": "stairs_stone_up",
+    "a": "wall_window_stone"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-    "W000ksk00W000ksk00W000ksk00W000g000g00W",
+    "WaWWWWWaWWWaWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "a000ksk00W000ksk00W000ksk00W000g000g00a",
     "W000uuu00W000uuu00W000uuu00W0000uuu000W",
     "W000uKu00W000uKu00W000uKu00W0000uKu000W",
     "W000uuu00W000uuu00W000uuu00W0000uuu000W",
-    "W0000t000W0000t000W0000t000W00hth0hth0W",
+    "a0000t000W0000t000W0000t000W00hth0hth0a",
     "W0000h000W0000h000W0000h000W0000000000W",
     "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
     "WSuuuuuuKuuuuuuuuuuuuuuuuuKuuuuuuuuuuUW",
-    "d0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0W",
+    "d0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0a",
     "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
-    "W0kk0kkkkkkkk0kkkkkkkk0kkkkkkkkk0kkk00W",
+    "a0kk0kkkkkkkk0kkkkkkkk0kkkkkkkkk0kkk00W",
     "W0000000000000000000000000000000000000W",
     "W00000tt0000tt0000tt0000tt0000tt000000W",
     "W00000hh0000hh0000hh0000hh0000hh000000W",
     "W0000000000000000000000000000000000000W",
     "W0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0W",
-    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    "WaWWWaWWWaWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
   ],
   "npcs": [
     {

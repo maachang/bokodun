@@ -32,17 +32,18 @@
     "Q": "weapon_rack_stone",
     "V": "anvil_stone",
     "L": "wall_sconce",
-    "a": "water_barrel_stone"
+    "a": "water_barrel_stone",
+    "b": "wall_window_stone"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWW",
+    "WWbWWWbWW",
     "WQFsFsFQW",
     "LaFFFFFFL",
     "WFVFFFVFW",
-    "WFFFFFFFW",
+    "bFFFFFFFb",
     "WXFFFFFXW",
-    "WWWWEWWWW"
+    "WWbWEWbWW"
   ],
   "npcs": [
     {

@@ -386,3 +386,17 @@ test('扉: 壁が高い建物（大神殿など）でも、扉は標準の高さ
     }
     assert.equal(tall, 4, '壁が高く扉のあるマップ（大神殿・神殿2階・街の神殿と2階）');
 });
+
+test('窓: 普通の建物の外壁（民家・レンガの家・店・宿・神殿の建物）に、1マスおきに窓が付く。地上の部屋の外壁にも窓がある', () => {
+    const o = JSON.parse(fs.readFileSync('public/data/objects.json', 'utf8'));
+    for (const id of ['wooden_house', 'brick_house', 'shop_building', 'inn_building', 'temple_building']) {
+        assert.ok(o[id].faceParts?.length > 0, `${id}: 外壁の窓の部品`);
+        assert.equal(o[id].faceEvery, 2, `${id}: 1マスおき`);
+        assert.ok(o[id].faceParts.every(p => Math.abs(p.pos[0]) + p.size[0] / 2 <= 2 && p.pos[1] + p.size[1] / 2 <= 4), `${id}: 窓がマスと壁（高さ4）からはみ出さない`);
+    }
+    assert.equal(o.wooden_house_window.faceEvery, undefined, '位置を決めた窓（村長の家）は、1マスおきにしない');
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const withWin = ['castle_2f', 'castle_3f', 'castle_4f', 'castle_chapel', 'castle_guest_wing', 'guild_adv', 'guild_mage', 'guild_merchant', 'guild_smith', 'guild_training', 'mansion_chapel', 'temple_library', 'temple_refectory', 'temple_kitchen', 'slum_bar'];
+    for (const id of withWin) assert.ok(Object.values(rd(id).legend).some(n => n.includes('window')), `${id}: 窓`);
+    for (const id of ['temple_treasury', 'guild_thief', 'temple_confession', 'castle_prison', 'castle_basement', 'mansion_cellar', 'temple_crypt']) assert.ok(!Object.values(rd(id).legend).some(n => n.includes('window')), `${id}: 窓なし（宝物庫・盗賊ギルド・懺悔室・地下）`);
+});

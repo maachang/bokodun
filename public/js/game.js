@@ -647,7 +647,11 @@ export class GameEngine {
                             this.addStatic(roofMesh);
 
                             // 外に向いた壁の面に付く部品（窓・鎧戸など。objects.json の faceParts。座標は wall_deco と同じ）
-                            if (objDef.faceParts) {
+                            //   faceEvery（n）があれば、(列+行) が n で割り切れるマスだけに付ける（外壁に、1マスおきに窓が並ぶ）。
+                            //   隣に、位置を決めて置いた窓（faceEvery のない faceParts）があるマスには、自動では付けない
+                            const faceDefAt = (cc, rr) => this.objectDefinitions[mapData.legend?.[mapData.layout[rr]?.[cc]]];
+                            const nearFixedWindow = objDef.faceEvery && [[0, -1], [1, 0], [0, 1], [-1, 0]].some(([ex, ez]) => { const nd = faceDefAt(c + ex, r + ez); return nd && nd.faceParts && !nd.faceEvery; });
+                            if (objDef.faceParts && (!objDef.faceEvery || (c + r) % objDef.faceEvery === 0) && !nearFixedWindow) {
                                 for (const [dx, dz] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
                                     const cc = c + dx, rr = r + dz;
                                     if (cc < 0 || rr < 0 || cc >= cols || rr >= rows) continue;

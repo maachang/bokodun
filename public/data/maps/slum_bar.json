@@ -30,19 +30,20 @@
     "h": "chair_stone",
     "C": "counter_stone",
     "X": "crate_stone",
-    "L": "wall_sconce"
+    "L": "wall_sconce",
+    "a": "wall_window_stone"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWW",
+    "WWaWWWaWWWW",
     "WXFFFFFFFXW",
     "WFFFFFFFFFW",
     "LFFCCCCCFFL",
     "WFFFFFFFFFW",
-    "WFhtFFFthFW",
+    "aFhtFFFthFa",
     "WFFFFFFFFFW",
     "WFFFFFFFFFW",
-    "WWWWWEWWWWW"
+    "WaWWWEWaWWW"
   ],
   "npcs": [
     {

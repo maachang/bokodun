@@ -32,17 +32,18 @@
     "h": "chair_marble",
     "k": "bookshelf_marble",
     "g": "cupboard_marble",
-    "L": "wall_sconce_marble"
+    "L": "wall_sconce_marble",
+    "a": "wall_window_curtain_marble"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWW",
+    "WWWWaWWWW",
     "WkkgFgkkW",
     "WFFFFFFFW",
     "LFFFtFFFL",
     "WFFFhFFFW",
-    "WFFuuuFFW",
-    "WWWWEWWWW"
+    "aFFuuuFFa",
+    "WaWWEWaWW"
   ],
   "npcs": [
     {

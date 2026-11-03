@@ -45,18 +45,19 @@
     "j": "sack_pile_marble",
     "l": "pot_rack_marble",
     "m": "wall_utensils_marble",
-    "n": "kitchen_shelf_marble"
+    "n": "kitchen_shelf_marble",
+    "q": "wall_window_curtain_marble"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWmWWW",
+    "WWqWWWqWWmWWW",
     "WcFFFFFFWaofW",
-    "LFhhhhhFLblFW",
+    "LFhhhhhFLblFq",
     "WFtttttFWniFW",
     "EFuuNuuFdFFFW",
     "WFhhhhhFWFFjW",
-    "LFFFFFFFLFFFW",
-    "WWWWWWWWWWWWW"
+    "LFFFFFFFLFFFq",
+    "WqWWWqWWWqWWW"
   ],
   "npcs": [
     {

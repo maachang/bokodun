@@ -37,17 +37,18 @@
     "c": "sack_pile_stone",
     "d": "prep_table_stone",
     "f": "pot_rack_stone",
-    "i": "kitchen_shelf_stone"
+    "i": "kitchen_shelf_stone",
+    "j": "wall_window_stone"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWW",
+    "WWjWWWWWW",
     "WbFbFBBcW",
     "LFaFfFFFL",
     "WcFFdFFiW",
-    "WFFFFFFFW",
+    "jFFFFFFFj",
     "WBFFFFFBW",
-    "WWWWEWWWW"
+    "WWjWEWjWW"
   ],
   "npcs": [
     {
