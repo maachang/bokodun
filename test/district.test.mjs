@@ -40,7 +40,7 @@ test('区画: 盗賊ギルドは、どや街。一般街には、ギルド系は
 });
 
 test('区画: 貴族・司祭・枢機卿は、街（屋外）に出歩かない。屋敷・神殿の中にいる。街には使用人が、お使いで歩く', () => {
-    const NOBLE = ['duke_man', 'duke_woman', 'margrave_man', 'margrave_woman', 'marquis_man', 'marquis_woman', 'viscount_man', 'baron_man', 'baron_woman', 'priest_senior', 'cardinal', 'king', 'prince'];
+    const NOBLE = ['duke_man', 'duke_woman', 'margrave_man', 'margrave_woman', 'marquis_man', 'marquis_woman', 'viscount_man', 'baron_man', 'baron_woman', 'cardinal', 'king', 'prince'];   // 特別な存在だけ（男爵・子爵・司祭は汎用の存在なので、街にいてもよい。ただし、今は置いていない）
     for (const id of ['city', 'city_noble', 'city_slum']) for (const n of D[id].npcs) assert.ok(!NOBLE.includes(n.id), `${id}: ${n.id} は街に出歩かない`);
     const mansion = readJson('public/data/maps/mansion.json'), mansion2 = readJson('public/data/maps/mansion_2f.json');
     assert.ok(mansion.npcs.some(n => n.id === 'duke_man') && mansion2.npcs.some(n => n.id === 'duke_woman'), '公爵は、屋敷の中');
@@ -202,4 +202,11 @@ test('王城: 貴族の執務室・会議室に、働く貴族（男爵・子爵
         assert.ok(n.z >= 1 && n.z <= 6, `${n.id}: 北側の執務室の中`);
         assert.ok(['margrave', 'marquis', 'duke'].every(r => !n.id.startsWith(r)), '公爵・辺境伯・侯爵は、特別な存在なので、執務室には置かない');
     }
+});
+
+test('司祭（priest_senior）は、複数いてよいが、神殿の中（temple〜のマップ）だけにいる', () => {
+    const maps = fs.readdirSync(path.join(root, 'public/data/maps')).map(f => f.replace('.json', ''));
+    const where = maps.filter(id => readJson(`public/data/maps/${id}.json`).npcs?.some(n => n.id === 'priest_senior'));
+    assert.ok(where.length >= 1, '司祭は、どこかの神殿にいる');
+    for (const id of where) assert.ok(id.startsWith('temple'), `${id}: 司祭は神殿の中だけ`);
 });
