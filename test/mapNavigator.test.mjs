@@ -127,7 +127,7 @@ test('GameEngine: 階段で1階と2階を行き来しても、戻る先の記録
     const villageBack = { x: 11, z: 9, angle: 3.14159 };
     const go = async (nextMap, link) => { g.enterMap(nextMap, link); await new Promise(r => setTimeout(r, 5)); };
     await go('village_chief_house', { back: villageBack });                 // 村から村長の家へ
-    const up = house.links['10,1'], down = house2f.links['10,1'];
+    const up = Object.values(house.links).find(l => l.nextMap === 'village_chief_house_2f'), down = Object.values(house2f.links).find(l => l.nextMap === 'village_chief_house');
     await go(up.nextMap, up);                                              // 階段で2階へ
     await go(down.nextMap, down);                                          // 階段で1階へ
     assert.equal(g.nav.stack.length, 1, '階段では、戻る先の記録は増えない');

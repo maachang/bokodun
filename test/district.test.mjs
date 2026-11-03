@@ -210,3 +210,20 @@ test('司祭（priest_senior）は、複数いてよいが、神殿の中（temp
     assert.ok(where.length >= 1, '司祭は、どこかの神殿にいる');
     for (const id of where) assert.ok(id.startsWith('temple'), `${id}: 司祭は神殿の中だけ`);
 });
+
+test('村長の小間使い: 一般の人（街の男）の画像を流用した NPC が、村長の家と村にいる', () => {
+    assert.equal(npcs.chief_attendant.texture, npcs.town_man.texture);
+    assert.equal(npcs.chief_attendant.sdId, undefined);
+    assert.ok(readJson('public/data/maps/village_chief_house.json').npcs.some(n => n.id === 'chief_attendant'));
+    assert.ok(readJson('public/data/maps/village.json').npcs.some(n => n.id === 'chief_attendant'));
+});
+
+test('村長の家: 広間のほかに、厨房（暖炉・かまど・食器棚）と、書斎・客間・使用人の部屋があり、2階へ階段でつながる', () => {
+    const m = readJson('public/data/maps/village_chief_house.json');
+    const ids = new Set(Object.values(m.legend));
+    for (const need of ['hearth', 'stove', 'cupboard', 'bookshelf', 'bed']) assert.ok(ids.has(need), need);
+    const doors = m.layout.join('').split('').filter(ch => m.legend[ch] === 'wooden_door').length;
+    assert.ok(doors >= 4 + 2, `部屋の扉4つ＋出口2つ: ${doors}`);
+    assert.ok(Object.values(m.links).some(l => l.nextMap === 'village_chief_house_2f'));
+    assert.ok(m.npcs.some(n => n.id === 'villager_woman'), '厨房の人');
+});

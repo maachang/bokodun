@@ -6,8 +6,8 @@
   "wallHeight": 4,
   "nextMap": "village",
   "spawn": {
-    "x": 5,
-    "z": 6,
+    "x": 7,
+    "z": 8,
     "angle": 0
   },
   "environment": {
@@ -22,48 +22,61 @@
     "skyColor": 9683955
   },
   "legend": {
-    "O": "mossy_boulder",
     "W": "wooden_wall",
     "F": "wood_floor",
     "u": "rug",
     "d": "wooden_door",
-    "t": "table",
-    "h": "chair",
+    "U": "stairs_wood_up",
     "e": "bed",
     "k": "bookshelf",
+    "t": "table",
+    "h": "chair",
     "g": "cupboard",
     "s": "hearth",
-    "o": "stove",
-    "U": "stairs_wood_up"
+    "o": "stove"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWWW",
-    "WkFtWuuWFsUW",
-    "WFFFduudFtFW",
-    "WWWWWuuWFhFW",
-    "WeFFduuWWWWW",
-    "WFFuWuudFtFW",
-    "WeFFWuuWgFoW",
-    "WWWWWddWWWWW"
+    "WWWWWWWWWWWWWWWW",
+    "WFeFFWFuuUWgosFW",
+    "WFFFFdFuuFdFFFFW",
+    "WFFFFWFuuFWFtFFW",
+    "WFFFFWFuuFWFFFFW",
+    "WWWWWWFuuFWWWWWW",
+    "WeFFFWFuuFWkkFFW",
+    "WFFFFdFuuFdFtFhW",
+    "WeFFFWFuuFWFFFFW",
+    "WWWWWWWddWWWWWWW"
   ],
   "npcs": [
     {
       "id": "village_chief",
-      "x": 10,
-      "z": 3
+      "x": 7,
+      "z": 4
+    },
+    {
+      "id": "chief_attendant",
+      "x": 3,
+      "z": 7,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "villager_woman",
+      "x": 13,
+      "z": 3,
+      "wanderRadius": 0.8
     }
   ],
   "links": {
-    "5,7": {
+    "7,9": {
       "nextMap": "$back",
       "message": "外に出る"
     },
-    "6,7": {
+    "8,9": {
       "nextMap": "$back",
       "message": "外に出る"
     },
-    "10,1": {
+    "9,1": {
       "nextMap": "village_chief_house_2f",
       "message": "階段を上る（2階へ）",
       "dir": "n",
