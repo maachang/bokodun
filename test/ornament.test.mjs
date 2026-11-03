@@ -44,3 +44,18 @@ test('飾り: game.js に hanging と wall_deco の描画がある', () => {
     assert.match(src, /case 'hanging':/);
     assert.match(src, /case 'wall_deco':/);
 });
+
+test('飾り: 神殿に飾りがある（大神殿は大シャンデリアと旗、街の神殿は吊り燭台、村の神殿は壁の燭台のみ）', () => {
+    const idsOf = (m) => { const mp = readJson(`public/data/maps/${m}.json`); return new Set([...new Set(mp.layout.join(''))].map(ch => mp.legend[ch])); };
+    assert.ok(idsOf('temple').has('chandelier_temple_large_rug') && idsOf('temple').has('wall_banner_temple_tall'));
+    for (const m of ['temple_2f', 'temple_3f']) assert.ok(idsOf(m).has('chandelier_temple_rug') && idsOf(m).has('wall_banner_temple'), m);
+    assert.ok(idsOf('temple_town').has('hanging_candles_rug') && idsOf('temple_town').has('wall_sconce_marble'));
+    const v = idsOf('temple_village');
+    assert.ok(v.has('wall_sconce'));
+    assert.ok(![...v].some(id => objects[id]?.type === 'hanging'), '村の神殿に、天井の飾りはない');
+    // 天井の飾りの長さ: 大神殿（壁の高さ12）の大シャンデリアは、床から人の頭より上に下がる
+    const low = (id, wallH) => wallH + Math.min(...objects[id].parts.map(p => p.pos[1] - p.size[1] / 2));
+    assert.ok(low('chandelier_temple_large_rug', 12) > 3, '大シャンデリアの最下部');
+    assert.ok(low('chandelier_temple_rug', 6) > 3, 'シャンデリアの最下部');
+    assert.ok(low('hanging_candles_rug', 6) > 3, '吊り燭台の最下部');
+});

@@ -141,5 +141,7 @@
 - `hanging`（天井から吊るす飾り）: 箱形のパーツ（`parts`）の組み合わせ。`fromCeiling: true` で、パーツの y は、天井からの相対（下向きは負）。通り抜けられる。炎などは `basic: true`（自ら光る材質）。**周囲を照らす光源は付けない（見た目のみ）**。床・天井は、`floorTexture`・`ceilingTexture` で指定（絨毯の上は `chandelier_castle_rug`）。
 - `wall_deco`（壁の飾り）: 壁のブロックの、通れる隣のマスに向いた面に、箱形のパーツを付ける。座標は、面の中心からの相対（x: 横、y: 床からの高さ、z: 壁から手前へ）。
 - 登録: シャンデリア（`chandelier_castle`・`chandelier_castle_rug`）、壁の燭台（`wall_sconce`）、赤い旗（`wall_banner_red`、壁の高さ5用）。
-- 今回の対象は、王城（`castle`）のみ。広間の絨毯の上に、シャンデリア6基。壁に、燭台と旗。
-- 未実装（今後の候補）: 貴族の屋敷・大神殿・街の神殿・村の神殿・普通の家や店の飾り（吊りランプ、吊り燭台、カーテン）、洞窟・迷宮のたいまつ（炎のゆらめき）、周囲を照らす光源（PointLight）。
+- 王城（`castle`）: 広間の絨毯の上に、シャンデリア6基。壁に、燭台と旗。
+- 神殿: 大神殿は、大シャンデリア（`chandelier_temple_large_rug`、1階の絨毯の上に3基）と、大きな旗（`wall_banner_temple_tall`）、壁の燭台（`wall_sconce_marble`）。2階・3階は、シャンデリア（`chandelier_temple_rug`）、旗（`wall_banner_temple`）、燭台。街の神殿は、吊り燭台（`hanging_candles_rug`）と壁の燭台。村の神殿は、壁の燭台（`wall_sconce`、レンガ用）のみ。
+- 貴族の屋敷: 屋敷のマップが、まだ無いので、未対応（マップを作るときに、小シャンデリア・燭台・カーテンを入れる）。
+- 未実装（今後の候補）: 普通の家や店の飾り（吊りランプ、吊り燭台、カーテン）、洞窟・迷宮のたいまつ（炎のゆらめき）、周囲を照らす光源（PointLight）。

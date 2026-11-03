@@ -37,20 +37,22 @@
     "a": "stained_glass_plain",
     "b": "stained_glass_angel",
     "e": "stained_glass_priestess",
-    "f": "stained_glass_prophet"
+    "f": "stained_glass_prophet",
+    "K": "hanging_candles_rug",
+    "L": "wall_sconce_marble"
   },
   "enemies": {},
   "layout": [
-    "WWaWWbWWeWW",
+    "WLaWWbWWeLW",
     "WFF25G52FFW",
-    "WFF11411FFW",
+    "LFF11411FFL",
     "WFFFFFFFFFW",
-    "eFFFcccFFFf",
+    "eFFFcKcFFFf",
     "WFpFcccFpFW",
     "fFFFcccFFFe",
-    "WFpFcccFpFW",
-    "WFFFcccFFFW",
-    "WWWWDDDWWWW"
+    "WFpFcKcFpFW",
+    "LFFFcccFFFL",
+    "WWWLDDDLWWW"
   ],
   "npcs": [
     {

@@ -30,17 +30,18 @@
     "D": "temple_exit_brick",
     "w": "temple_brick_window",
     "P": "temple_pew",
-    "1": "dais_brick_1"
+    "1": "dais_brick_1",
+    "L": "wall_sconce"
   },
   "enemies": {},
   "layout": [
     "WwWWWwW",
-    "W11G11W",
+    "L11G11L",
     "wFFFFFw",
     "WPPFPPW",
     "wFFFFFw",
-    "WPPFPPW",
-    "WWWDWWW"
+    "LPPFPPL",
+    "WWLDLWW"
   ],
   "npcs": [
     {
