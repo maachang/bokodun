@@ -59,3 +59,9 @@ test('飾り: 神殿に飾りがある（大神殿は大シャンデリアと旗
     assert.ok(low('chandelier_temple_rug', 6) > 3, 'シャンデリアの最下部');
     assert.ok(low('hanging_candles_rug', 6) > 3, '吊り燭台の最下部');
 });
+
+test('階段: 下り階段は、床に穴を開けて段を降ろすので、床の指定（floorTexture）を持たない（持つと、床が穴をふさぐ）', () => {
+    for (const [id, o] of Object.entries(objects)) {
+        if (o.type === 'stairs' && o.direction === 'down') assert.equal(o.floorTexture, undefined, `${id}: floorTexture`);
+    }
+});

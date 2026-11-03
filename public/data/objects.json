@@ -2802,8 +2802,7 @@
     "texture": "marbleFloor",
     "solid": false,
     "message": "階段を下りる",
-    "description": "大理石の階段（下り）。神殿用",
-    "floorTexture": "marbleFloor",
+    "description": "大理石の階段（下り）。神殿用。床に穴を開けて段を降ろすので、床の指定（floorTexture）は付けない（付けると、穴をふさぐ）",
     "ceilingTexture": "marbleWall"
   },
   "temple_brick_wall": {
