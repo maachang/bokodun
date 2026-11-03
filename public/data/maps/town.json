@@ -38,7 +38,8 @@
     "2": "portal",
     "q": "item_shop_sign",
     "c": "church_sign",
-    "p": "plaza_stone"
+    "p": "plaza_stone",
+    "a": "outhouse"
   },
   "layout": [
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -57,7 +58,7 @@
     "Wppppppppppp====pTpppppppppW",
     "Wppppppppppp====pppppppppppW",
     "WppHHHHppppp====ppppHHHHpppW",
-    "WppHHHHppppp====ppppHHHHpppW",
+    "WpaHHHHppppp====ppppHHHHappW",
     "WppHHHHppppp====ppppHHHHpppW",
     "Wppppppppppp====pppppppppppW",
     "Wppppppppppp====pppppppppppW",

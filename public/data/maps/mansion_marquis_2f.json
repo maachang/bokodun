@@ -38,12 +38,13 @@
     "K": "chandelier_mansion_rug",
     "N": "hanging_candles_mansion_rug",
     "a": "wash_stand",
-    "b": "bathtub"
+    "b": "bathtub",
+    "c": "garderobe"
   },
   "enemies": {},
   "layout": [
     "WWWWCWWWWWWWCWWWW",
-    "WaFeugbFWFFgueFFW",
+    "WaceugbFWFFgueFFW",
     "CFFuNuFFWFFuNuFFC",
     "WFFuuuFFWFFuuuFFW",
     "WWLWdWLWRWLWdWLWW",

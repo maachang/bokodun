@@ -291,3 +291,22 @@ test('水回り: 厨房に流し台と水樽、寝室に洗面台、上流の屋
     assert.ok(has('temple_kitchen', /^sink_marble$/) && has('castle', /^sink_stone$/) && has('village_chief_house', /^sink$/));
     assert.equal(objects.well.floorTexture, undefined, '井戸は野外用');
 });
+
+test('便所: 屋敷・城・神殿の上階や個室にガーデローブ、村と町に野外便所がある。村の家（村長の家）の中には置かない', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const has = (id, pre) => Object.values(rd(id).legend).some(n => n.startsWith(pre));
+    for (const id of ['mansion_2f', 'mansion_3f', 'mansion_margrave_2f', 'mansion_marquis_2f', 'castle_4f', 'castle_guardroom', 'temple_2f', 'temple_town_2f', 'temple_guesthouse', 'temple_infirmary']) assert.ok(has(id, 'garderobe'), `${id}: ガーデローブ`);
+    for (const id of ['village', 'town']) assert.ok(has(id, 'outhouse'), `${id}: 野外便所`);
+    assert.ok(!has('village_chief_house', 'garderobe'), '村長の家の中には便所を置かない（屋外の汲み取り式）');
+});
+
+test('牢獄: 衛兵詰所の階段から降りられ、牢番・囚人・落とし穴の牢・貴族の部屋があり、階段で戻れる', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const g = rd('castle_guardroom'), p = rd('castle_prison');
+    assert.ok(Object.values(g.links).some(l => l.nextMap === 'castle_prison'), '詰所から牢獄へ');
+    assert.ok(Object.values(p.links).some(l => l.nextMap === 'castle_guardroom'), '牢獄から詰所へ');
+    const ids = p.npcs.map(n => n.id);
+    for (const id of ['gaoler', 'prisoner_thug', 'prisoner_thief', 'prisoner_debtor', 'prisoner_noble']) assert.ok(ids.includes(id), id);
+    const names = Object.values(p.legend);
+    for (const n of ['cell_door', 'straw_bed', 'pit_hatch', 'bed_stone']) assert.ok(names.includes(n), n);
+});

@@ -11661,5 +11661,480 @@
     ],
     "blocksProjectiles": false,
     "description": "井戸（石の井筒、屋根なしの滑車と桶。野外用。水がめ）"
+  },
+  "garderobe": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.3,
+          0.55,
+          0.9
+        ],
+        "pos": [
+          0,
+          0.275,
+          -1.5
+        ],
+        "color": "#8a8a90"
+      },
+      {
+        "size": [
+          1.3,
+          0.08,
+          0.9
+        ],
+        "pos": [
+          0,
+          0.59,
+          -1.5
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.5,
+          0.03,
+          0.4
+        ],
+        "pos": [
+          0,
+          0.64,
+          -1.5
+        ],
+        "color": "#1a1208"
+      },
+      {
+        "size": [
+          0.6,
+          0.5,
+          0.06
+        ],
+        "pos": [
+          0.4,
+          0.9,
+          -1.9
+        ],
+        "color": "#e8e0d0"
+      },
+      {
+        "size": [
+          0.1,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          -0.6,
+          0.45,
+          -1.05
+        ],
+        "color": "#7a4e28"
+      }
+    ],
+    "collider": [
+      1.3,
+      0.9
+    ],
+    "colliderOffset": [
+      0,
+      -1.5
+    ],
+    "blocksProjectiles": false,
+    "description": "ガーデローブ（壁際の腰掛け式の便所。穴の下は壁の中の管で外へ落とす。洗い布つき）（木の屋敷用）",
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall"
+  },
+  "garderobe_stone": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.3,
+          0.55,
+          0.9
+        ],
+        "pos": [
+          0,
+          0.275,
+          -1.5
+        ],
+        "color": "#8a8a90"
+      },
+      {
+        "size": [
+          1.3,
+          0.08,
+          0.9
+        ],
+        "pos": [
+          0,
+          0.59,
+          -1.5
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.5,
+          0.03,
+          0.4
+        ],
+        "pos": [
+          0,
+          0.64,
+          -1.5
+        ],
+        "color": "#1a1208"
+      },
+      {
+        "size": [
+          0.6,
+          0.5,
+          0.06
+        ],
+        "pos": [
+          0.4,
+          0.9,
+          -1.9
+        ],
+        "color": "#e8e0d0"
+      },
+      {
+        "size": [
+          0.1,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          -0.6,
+          0.45,
+          -1.05
+        ],
+        "color": "#7a4e28"
+      }
+    ],
+    "collider": [
+      1.3,
+      0.9
+    ],
+    "colliderOffset": [
+      0,
+      -1.5
+    ],
+    "blocksProjectiles": false,
+    "description": "ガーデローブ（壁際の腰掛け式の便所。穴の下は壁の中の管で外へ落とす。洗い布つき）（石の床・レンガの天井用）",
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick"
+  },
+  "garderobe_marble": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.3,
+          0.55,
+          0.9
+        ],
+        "pos": [
+          0,
+          0.275,
+          -1.5
+        ],
+        "color": "#8a8a90"
+      },
+      {
+        "size": [
+          1.3,
+          0.08,
+          0.9
+        ],
+        "pos": [
+          0,
+          0.59,
+          -1.5
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.5,
+          0.03,
+          0.4
+        ],
+        "pos": [
+          0,
+          0.64,
+          -1.5
+        ],
+        "color": "#1a1208"
+      },
+      {
+        "size": [
+          0.6,
+          0.5,
+          0.06
+        ],
+        "pos": [
+          0.4,
+          0.9,
+          -1.9
+        ],
+        "color": "#e8e0d0"
+      },
+      {
+        "size": [
+          0.1,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          -0.6,
+          0.45,
+          -1.05
+        ],
+        "color": "#7a4e28"
+      }
+    ],
+    "collider": [
+      1.3,
+      0.9
+    ],
+    "colliderOffset": [
+      0,
+      -1.5
+    ],
+    "blocksProjectiles": false,
+    "description": "ガーデローブ（壁際の腰掛け式の便所。穴の下は壁の中の管で外へ落とす。洗い布つき）（大理石の床・天井用）",
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall"
+  },
+  "outhouse": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.6,
+          2.0,
+          0.1
+        ],
+        "pos": [
+          0,
+          1.0,
+          -0.75
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.6,
+          2.0,
+          0.1
+        ],
+        "pos": [
+          0,
+          1.0,
+          0.75
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.1,
+          2.0,
+          1.5
+        ],
+        "pos": [
+          -0.75,
+          1.0,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.1,
+          2.0,
+          1.5
+        ],
+        "pos": [
+          0.75,
+          1.0,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.9,
+          0.12,
+          1.9
+        ],
+        "pos": [
+          0,
+          2.05,
+          0
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          0.5,
+          0.7,
+          0.06
+        ],
+        "pos": [
+          0,
+          1.0,
+          0.8
+        ],
+        "color": "#3a2a1a"
+      }
+    ],
+    "collider": [
+      1.8,
+      1.8
+    ],
+    "blocksProjectiles": false,
+    "description": "野外便所（板囲いの小屋。下は汲み取り式の穴。野外用）"
+  },
+  "cell_door": {
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "brick",
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "description": "牢屋の扉（鉄で補強した樫の扉。近づくと開く。牢の中へ入れる）"
+  },
+  "straw_bed": {
+    "type": "furniture",
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick",
+    "parts": [
+      {
+        "size": [
+          1.8,
+          0.15,
+          2.8
+        ],
+        "pos": [
+          0,
+          0.08,
+          0
+        ],
+        "color": "#b89a4a"
+      },
+      {
+        "size": [
+          1.4,
+          0.12,
+          2.2
+        ],
+        "pos": [
+          0.1,
+          0.2,
+          0
+        ],
+        "color": "#c9ae5e"
+      },
+      {
+        "size": [
+          0.5,
+          0.35,
+          0.5
+        ],
+        "pos": [
+          1.0,
+          0.18,
+          1.0
+        ],
+        "color": "#5a3a1e"
+      }
+    ],
+    "collider": [
+      1.8,
+      2.8
+    ],
+    "blocksProjectiles": false,
+    "description": "藁のねどこ（牢屋の、囚人の寝床。隅に水桶）（石の床・レンガの天井用）"
+  },
+  "pit_hatch": {
+    "type": "furniture",
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick",
+    "parts": [
+      {
+        "size": [
+          2.2,
+          0.12,
+          2.2
+        ],
+        "pos": [
+          0,
+          0.06,
+          0
+        ],
+        "color": "#3a3a40"
+      },
+      {
+        "size": [
+          1.6,
+          0.14,
+          1.6
+        ],
+        "pos": [
+          0,
+          0.1,
+          0
+        ],
+        "color": "#0a0a0c"
+      },
+      {
+        "size": [
+          1.8,
+          0.06,
+          0.1
+        ],
+        "pos": [
+          0,
+          0.18,
+          -0.5
+        ],
+        "color": "#707078"
+      },
+      {
+        "size": [
+          1.8,
+          0.06,
+          0.1
+        ],
+        "pos": [
+          0,
+          0.18,
+          0
+        ],
+        "color": "#707078"
+      },
+      {
+        "size": [
+          1.8,
+          0.06,
+          0.1
+        ],
+        "pos": [
+          0,
+          0.18,
+          0.5
+        ],
+        "color": "#707078"
+      }
+    ],
+    "collider": [
+      2.0,
+      2.0
+    ],
+    "blocksProjectiles": false,
+    "description": "床の穴の鉄格子の蓋（地下牢の落とし穴。上から入れるだけの、出口のない牢。通れない）（石の床・レンガの天井用）"
   }
 }

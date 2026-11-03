@@ -896,5 +896,70 @@
       "村長のお使いで、あちこち走り回っています。",
       "村長なら、家にいらっしゃいますよ。ご用なら、取り次ぎますけど。"
     ]
+  },
+  "gaoler": {
+    "name": "牢番",
+    "texture": "/images/npcs/guard_heavy.png",
+    "height": 2.8,
+    "aspect": 0.52,
+    "radius": 0.8,
+    "speed": 0.5,
+    "wanderRadius": 0.8,
+    "lines": [
+      "鍵は俺が持っている。勝手に牢には近づくなよ。",
+      "ここの連中は、裁きを待っているだけだ。逃げ出した者はいない。"
+    ]
+  },
+  "prisoner_debtor": {
+    "name": "借金で囚われた男",
+    "texture": "/images/npcs/town_old_man.png",
+    "height": 2.1,
+    "aspect": 0.371,
+    "radius": 0.4,
+    "speed": 0.3,
+    "wanderRadius": 0.6,
+    "lines": [
+      "借金が払えなくてな……払えるまで、ここにいるんだ。",
+      "家族に会いたいよ。"
+    ]
+  },
+  "prisoner_noble": {
+    "name": "囚われた貴族",
+    "texture": "/images/npcs/baron_man.png",
+    "height": 2.3,
+    "aspect": 0.344,
+    "radius": 0.4,
+    "speed": 0.3,
+    "wanderRadius": 0.8,
+    "lines": [
+      "私は罪人ではない。身代金か、裁きが決まるまでの、客人だ。",
+      "牢と言っても、この部屋は悪くない。……自由以外はな。"
+    ]
+  },
+  "prisoner_thug": {
+    "name": "囚われたならず者",
+    "texture": "/images/enemies/human/mohawk_thug.png",
+    "height": 2.4,
+    "aspect": 0.429,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 0.6,
+    "lines": [
+      "チッ、ここから出せよ……。",
+      "出たらまた暴れてやる、と言いたいが、腹が減って力が出ねえ。"
+    ]
+  },
+  "prisoner_thief": {
+    "name": "囚われた盗人",
+    "texture": "/images/enemies/human/thief.png",
+    "height": 2.2,
+    "aspect": 0.472,
+    "radius": 0.45,
+    "speed": 0.4,
+    "wanderRadius": 0.6,
+    "lines": [
+      "ヘマをしちまった……。",
+      "鍵さえあれば、こんな扉……。"
+    ]
   }
 }

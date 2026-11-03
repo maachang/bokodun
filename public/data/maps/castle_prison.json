@@ -1,0 +1,120 @@
+{
+  "id": "castle_prison",
+  "name": "王城の牢獄 (Castle Prison)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "castle_guardroom",
+  "spawn": {
+    "x": 2,
+    "z": 1,
+    "angle": -1.570795
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "brick",
+    "ambientLight": 7829367,
+    "directionalLight": 11184810,
+    "fogColor": 1710618,
+    "fogNear": 8,
+    "fogFar": 34,
+    "visibility": 0.75,
+    "skyColor": 1710618
+  },
+  "legend": {
+    "W": "brick_wall",
+    "F": "brick_floor",
+    "U": "stairs_stone_up",
+    "d": "wooden_door",
+    "c": "cell_door",
+    "t": "table_stone",
+    "h": "chair_stone",
+    "Q": "weapon_rack_stone",
+    "b": "barrel_stone",
+    "X": "crate_stone",
+    "s": "straw_bed",
+    "p": "pit_hatch",
+    "e": "bed_stone",
+    "u": "castle_rug",
+    "a": "wash_stand_stone",
+    "g": "garderobe_stone",
+    "L": "wall_sconce"
+  },
+  "layout": [
+    "WWWWWWWWWWWWWWWWWWWWWWWW",
+    "WUFFFFWsFFWsFFWsFFWsFFWW",
+    "WbFthQLFFFWFFFWFFFWFFFWW",
+    "WFFtFFWFFFWFFFWFFFWFFFWW",
+    "WFFFFQWFFFWFFFWFFFWFFFWW",
+    "WFFFFFWFFFWFFFWFFFWFFFWW",
+    "WWWdWWLWcWLWcWLWcWLWcWLW",
+    "WFFFFFFFFFFFFFFFFFFFFFFW",
+    "WWWdWWLWcWLWcWLWLWcWWWLW",
+    "WbbFFXWsFsWFFFWeeFFagFWW",
+    "WFFFFXLFFFWFFFWFuuuuuFWW",
+    "WFFFFFWFFFWFpFWFuhthuFWW",
+    "WFFFFFWFFFWFFFWFuuuuuFWW",
+    "WQFFFQWFFFWFFFWXFFFFFFWW",
+    "WWWWWWWWWWWWWWWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "gaoler",
+      "x": 2,
+      "z": 3,
+      "wanderRadius": 0.6
+    },
+    {
+      "id": "guard_light",
+      "x": 4,
+      "z": 4,
+      "wanderRadius": 0.6
+    },
+    {
+      "id": "guard_spear",
+      "x": 11,
+      "z": 7,
+      "wanderRadius": 1.5
+    },
+    {
+      "id": "prisoner_thug",
+      "x": 9,
+      "z": 3
+    },
+    {
+      "id": "prisoner_thief",
+      "x": 13,
+      "z": 3
+    },
+    {
+      "id": "prisoner_debtor",
+      "x": 16,
+      "z": 4
+    },
+    {
+      "id": "prisoner_debtor",
+      "x": 8,
+      "z": 12
+    },
+    {
+      "id": "prisoner_noble",
+      "x": 18,
+      "z": 10
+    }
+  ],
+  "enemies": {},
+  "links": {
+    "1,1": {
+      "nextMap": "castle_guardroom",
+      "message": "階段を上る（衛兵詰所へ）",
+      "dir": "w",
+      "spawn": {
+        "x": 6,
+        "z": 5,
+        "angle": 1.570795
+      }
+    }
+  }
+}

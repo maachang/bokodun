@@ -37,12 +37,13 @@
     "C": "wall_window_curtain_marble",
     "S": "stairs_marble_down",
     "K": "chandelier_temple_rug",
-    "a": "wash_stand_marble"
+    "a": "wash_stand_marble",
+    "b": "garderobe_marble"
   },
   "enemies": {},
   "layout": [
     "WWWWCWWWWWWWCWWWW",
-    "WaeFFFkFWakFFFeFW",
+    "WaebFFkFWakFFFeFW",
     "LFFFFFFFWFFFFFFFL",
     "WFFFFthFWFFFFthFW",
     "WWLWdWLWWWLWdWLWW",

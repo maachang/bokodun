@@ -36,12 +36,13 @@
     "L": "wall_sconce_wood",
     "R": "wall_banner_red_wood",
     "K": "chandelier_mansion_rug",
-    "a": "wash_stand"
+    "a": "wash_stand",
+    "b": "garderobe"
   },
   "enemies": {},
   "layout": [
     "WWWWCWWWWWWWCWWWWWWWCWWWW",
-    "WgaFeFFgWgaFeFFgWgaFeFFgW",
+    "WgabeFFgWgaFeFFgWgaFeFFgW",
     "WFFFFFFFWFFFFFFFWFFFFFFFW",
     "CFFuuuFFWFFuuuFFWFFuuuFFC",
     "WFFuKuFFWFFuKuFFWFFuKuFFW",
@@ -51,7 +52,7 @@
     "WFuuuuKuuuuuuuuuuuKuuuuSW",
     "WFuuuuuuuuuuKuuuuuuuuuuFW",
     "WWLWdWLWRWLWdWLWRWLWdWLWW",
-    "WaFFFFFFWaFFFFFFWaFFFFFFW",
+    "WaFFFFFFWaFFFFFFWabFFFFFW",
     "WthFFFFFWthFFFFFWthFFFFFW",
     "WFFuuuFFWFFuuuFFWFFuuuFFW",
     "CFFuKuFFWFFuKuFFWFFuKuFFC",

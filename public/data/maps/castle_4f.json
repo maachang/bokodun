@@ -37,12 +37,13 @@
     "d": "wooden_door",
     "S": "stairs_stone_down",
     "a": "wash_stand_stone",
-    "b": "bathtub_stone"
+    "b": "bathtub_stone",
+    "c": "garderobe_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-    "W0hh00hh0W000h0000W0k0k0000Wa0eb00g0g0W",
+    "W0hh00hh0W000h0000W0k0k0000Waceb00g0g0W",
     "W00000000W00uuu000W00000000W0000000000W",
     "W00000000W00uuu000W00uuu000W0000uuu000W",
     "W00000000W00uuu000W00uuu000W0000uuu000W",
@@ -52,7 +53,7 @@
     "W0uuuuuuKuuuuuuuuuuuuuuuuuKuuuuuuuuuuSW",
     "W0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0W",
     "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
-    "W0kk00kk0W00000t00W0g000g00Wab0g000000W",
+    "W0kk00kk0W00000t00W0g000g00Wabcg000000W",
     "W00000000W00000000W00000000W0000000000W",
     "W00000000W0huuuh00Whthuhth0W0000uuu000W",
     "W00hth000W00uuu000W00uuu000W0000uuu000W",

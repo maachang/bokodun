@@ -32,16 +32,18 @@
     "e": "bed_stone",
     "Q": "weapon_rack_stone",
     "L": "wall_sconce",
-    "a": "wash_stand_stone"
+    "a": "wash_stand_stone",
+    "b": "garderobe_stone",
+    "S": "stairs_stone_down"
   },
   "enemies": {},
   "layout": [
     "WWWWEWWWW",
-    "WaFFFFFFW",
+    "WabFFFFFW",
     "WQFtFFhQW",
     "LFFhtFFFL",
     "WFFFFFFeW",
-    "WFFFFFFFW",
+    "WFFFFFFSW",
     "WWWWWWWWW"
   ],
   "npcs": [
@@ -63,5 +65,17 @@
       "z": 5,
       "wanderRadius": 0.6
     }
-  ]
+  ],
+  "links": {
+    "7,5": {
+      "nextMap": "castle_prison",
+      "message": "階段を下りる（牢獄へ）",
+      "dir": "e",
+      "spawn": {
+        "x": 2,
+        "z": 1,
+        "angle": -1.570795
+      }
+    }
+  }
 }
