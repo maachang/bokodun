@@ -500,3 +500,22 @@ test('町のパブ: 町の東の家を宿屋の建物に替え、南の扉から
     for (const id of ['innkeeper', 'inn_cook', 'inn_waitress']) assert.ok(ids.includes(id), id);
     assert.ok(Object.values(p.legend).some(n => n.includes('window')), '窓');
 });
+
+test('村の宿屋・酒場: 村の東の家を広げ、南の扉から入れる。1階は酒場（村の人たち）と台所、階段で、2階の簡素な寝床へ', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const v = rd('village'), f1 = rd('village_pub'), f2 = rd('village_pub_2f');
+    const l = v.links['19,7'];
+    assert.equal(l.nextMap, 'village_pub'); assert.equal(l.icon, 'barIcon'); assert.ok(l.back);
+    assert.equal(v.legend[v.layout[7][19]], 'wooden_door');
+    assert.ok(Object.values(v.legend).includes('pub_sign'));
+    const names = Object.values(f1.legend);
+    for (const n of ['bar_counter', 'beer_keg', 'stove', 'sink', 'kitchen_hearth', 'building_exit', 'stairs_wood_up']) assert.ok(names.includes(n), n);
+    assert.ok(Object.values(f2.legend).includes('straw_bed_wood') && Object.values(f2.legend).includes('stairs_wood_down'));
+    assert.equal(Object.values(f1.links)[0].nextMap, 'village_pub_2f'); assert.equal(Object.values(f2.links)[0].nextMap, 'village_pub');
+    const ids = f1.npcs.map(s => s.id);
+    assert.ok(ids.includes('village_innkeeper') && ids.filter(i => i === 'villager_man').length >= 2, 'おかみと村の人');
+    const m = f1; const r = m.layout[1];
+    const at = x => m.legend[r[x]] || '';
+    const sx = [...r].findIndex(c => (m.legend[c] || '') === 'sink');
+    assert.ok(/^(stove|kitchen_hearth)/.test(at(sx - 1)) || /^(stove|kitchen_hearth)/.test(at(sx + 1)), '流し台の横に火の設備');
+});

@@ -1,0 +1,63 @@
+{
+  "id": "village_pub_2f",
+  "name": "村の宿屋の寝床 (Village Inn Beds)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "village_pub",
+  "spawn": {
+    "x": 6,
+    "z": 4,
+    "angle": 1.570795
+  },
+  "environment": {
+    "floorType": "grass",
+    "hasCeiling": false,
+    "ambientLight": 9408660,
+    "directionalLight": 16774610,
+    "fogColor": 12373460,
+    "fogNear": 22,
+    "fogFar": 80,
+    "visibility": 0.9,
+    "skyColor": 9683955
+  },
+  "legend": {
+    "W": "wooden_wall",
+    "F": "wood_floor",
+    "z": "straw_bed_wood",
+    "g": "cupboard",
+    "c": "wash_stand",
+    "D": "stairs_wood_down",
+    "L": "wall_sconce_wood",
+    "a": "wall_window_wood"
+  },
+  "layout": [
+    "WWaWLWaWW",
+    "WzFzFzFzW",
+    "LFFFFFFFL",
+    "WFFFFFFFW",
+    "LFFgFcFDL",
+    "WaWWWWaWW"
+  ],
+  "npcs": [
+    {
+      "id": "villager_woman",
+      "x": 4,
+      "z": 3,
+      "wanderRadius": 0.6
+    }
+  ],
+  "enemies": {},
+  "links": {
+    "7,4": {
+      "nextMap": "village_pub",
+      "message": "階段を下りる（1階の酒場へ）",
+      "dir": "e",
+      "spawn": {
+        "x": 8,
+        "z": 6,
+        "angle": 1.570795
+      }
+    }
+  }
+}

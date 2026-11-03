@@ -1,0 +1,91 @@
+{
+  "id": "village_pub",
+  "name": "村の宿屋・酒場 (Village Inn)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "village",
+  "spawn": {
+    "x": 5,
+    "z": 6,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "grass",
+    "hasCeiling": false,
+    "ambientLight": 9408660,
+    "directionalLight": 16774610,
+    "fogColor": 12373460,
+    "fogNear": 22,
+    "fogFar": 80,
+    "visibility": 0.9,
+    "skyColor": 9683955
+  },
+  "legend": {
+    "W": "wooden_wall",
+    "F": "wood_floor",
+    "E": "building_exit",
+    "U": "stairs_wood_up",
+    "t": "table",
+    "h": "chair",
+    "B": "bar_counter",
+    "k": "beer_keg",
+    "n": "kitchen_shelf",
+    "o": "stove",
+    "a": "sink",
+    "i": "kitchen_hearth",
+    "b": "barrel",
+    "L": "wall_sconce_wood",
+    "c": "wall_window_wood"
+  },
+  "layout": [
+    "WWWWWLWWWcW",
+    "WkknFFoaiFc",
+    "WFFFFFFFFFW",
+    "LFBBBBFFFFL",
+    "WFFFFFFFFbW",
+    "WhthFFhthFL",
+    "LFFFFFFFFUW",
+    "WWLWWEWWLWW"
+  ],
+  "npcs": [
+    {
+      "id": "village_innkeeper",
+      "x": 3,
+      "z": 2,
+      "wanderRadius": 0.4,
+      "oz": 0.7
+    },
+    {
+      "id": "villager_man",
+      "x": 3,
+      "z": 6,
+      "wanderRadius": 0.6
+    },
+    {
+      "id": "villager_man",
+      "x": 8,
+      "z": 6,
+      "wanderRadius": 0.6
+    },
+    {
+      "id": "elder_man",
+      "x": 7,
+      "z": 3,
+      "wanderRadius": 0.6
+    }
+  ],
+  "enemies": {},
+  "links": {
+    "9,6": {
+      "nextMap": "village_pub_2f",
+      "message": "階段を上る（2階の寝床へ）",
+      "dir": "e",
+      "spawn": {
+        "x": 6,
+        "z": 4,
+        "angle": 1.570795
+      }
+    }
+  }
+}
