@@ -98,6 +98,30 @@
       "x": 9,
       "z": 9,
       "wanderRadius": 0.4
+    },
+    {
+      "id": "adv_swordsman",
+      "x": 1,
+      "z": 6,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "adv_mage",
+      "x": 10,
+      "z": 6,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "adv_warrior",
+      "x": 1,
+      "z": 8,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "adv_wizard",
+      "x": 10,
+      "z": 8,
+      "wanderRadius": 0.8
     }
   ],
   "enemies": {},

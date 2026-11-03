@@ -473,3 +473,16 @@ test('宿屋・酒場の立て札: 扉の横の立て札にも、マーク入り
     assert.equal(o.inn_sign.texture, 'innSign'); assert.equal(o.bar_sign.texture, 'barSign');
     assert.ok(game.includes("innSign: RetroTextureGenerator.createShopSignTexture('inn')") && game.includes("barSign: RetroTextureGenerator.createShopSignTexture('bar')"));
 });
+
+test('冒険者らしい人: 冒険者ギルドと宿屋の酒場に、剣士・魔法使い・戦士・斥候・魔道士・槍使いが、数人いる（敵用の人間の画像を流用）', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const n = JSON.parse(fs.readFileSync('public/data/npcs.json', 'utf8'));
+    const advs = ['adv_swordsman', 'adv_mage', 'adv_warrior', 'adv_scout', 'adv_wizard', 'adv_lancer'];
+    for (const id of advs) {
+        assert.ok(n[id].lines.length >= 2, `${id}: セリフ`);
+        assert.ok(fs.existsSync(`public${n[id].texture}`), `${id}: 画像`);
+    }
+    const count = id => rd(id).npcs.filter(s => advs.includes(s.id)).length;
+    assert.ok(count('guild_adv') >= 4 && count('guild_adv') <= 6, '冒険者ギルド: 冒険者が数人');
+    assert.ok(count('city_inn') >= 3 && count('city_inn') <= 5, '宿屋の酒場: 冒険者が数人');
+});

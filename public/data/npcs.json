@@ -1040,5 +1040,83 @@
       "ういー……昔はな、村の長老が、いちばんの物知りだった。",
       "ひっく……ドワーフの鍛冶屋の腕は、確かだぞ。"
     ]
+  },
+  "adv_swordsman": {
+    "name": "剣士の冒険者",
+    "texture": "/images/enemies/human/swordsman.png",
+    "height": 2.4,
+    "aspect": 0.394,
+    "radius": 0.45,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "東の洞窟から戻ったところだ。ゴブリンが多くてな。",
+      "依頼の掲示板は、毎朝、見ることにしている。"
+    ]
+  },
+  "adv_mage": {
+    "name": "魔法使いの冒険者",
+    "texture": "/images/enemies/human/mage.png",
+    "height": 2.4,
+    "aspect": 0.385,
+    "radius": 0.45,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "魔法ギルドで、新しい呪文の話を聞いたの。まだ、私には早いけれど。",
+      "スライムには、火の魔法がよく効くわ。"
+    ]
+  },
+  "adv_warrior": {
+    "name": "戦士の冒険者",
+    "texture": "/images/enemies/human/berserker.png",
+    "height": 2.4,
+    "aspect": 0.576,
+    "radius": 0.6,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "腕力なら、誰にも負けん。……だが、罠だけは苦手だ。",
+      "王城の地下迷宮に行く前に、腹ごしらえだ。"
+    ]
+  },
+  "adv_scout": {
+    "name": "斥候の冒険者",
+    "texture": "/images/enemies/human/thief.png",
+    "height": 2.2,
+    "aspect": 0.472,
+    "radius": 0.45,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "罠の見分けは、俺の仕事だ。迷宮には、隠しスパイクがあるぞ。",
+      "宝箱には、気をつけろ。ミミックが混じっている。"
+    ]
+  },
+  "adv_wizard": {
+    "name": "魔道士の冒険者",
+    "texture": "/images/enemies/human/magician.png",
+    "height": 2.4,
+    "aspect": 0.34,
+    "radius": 0.45,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "地下迷宮の中央の広間には、魔法陣があるそうだ。",
+      "魔道書の写しを探している。図書館にあるだろうか。"
+    ]
+  },
+  "adv_lancer": {
+    "name": "槍使いの冒険者",
+    "texture": "/images/enemies/human/guard_heavy_spear.png",
+    "height": 2.5,
+    "aspect": 0.373,
+    "radius": 0.45,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "槍の間合いなら、狭い通路でも戦える。",
+      "報酬のいい依頼は、すぐ無くなるぞ。"
+    ]
   }
 }

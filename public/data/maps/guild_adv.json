@@ -73,6 +73,36 @@
       "speed": 0,
       "wanderRadius": 0,
       "oz": 0.725
+    },
+    {
+      "id": "adv_swordsman",
+      "x": 2,
+      "z": 4,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "adv_mage",
+      "x": 8,
+      "z": 4,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "adv_warrior",
+      "x": 3,
+      "z": 7,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "adv_scout",
+      "x": 7,
+      "z": 7,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "adv_lancer",
+      "x": 9,
+      "z": 5,
+      "wanderRadius": 0.8
     }
   ]
 }
