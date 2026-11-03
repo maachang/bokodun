@@ -433,3 +433,18 @@ test('看板: ギルド・鍛冶屋・訓練所・盗賊ギルド・酒場の入
         assert.ok(game.includes(`${icon}: RetroTextureGenerator.createShopIconTexture(`), `${icon}: テクスチャを登録`);
     }
 });
+
+test('生活水路: 街と町を水路が南北に流れ、浅瀬はなく（深い水）、橋でだけ渡れる。両岸の人にも橋を渡って行ける', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    for (const [id, col, bridges] of [['town', 9, 6], ['city', 17, 9]]) {
+        const m = rd(id), names = Object.values(m.legend);
+        assert.ok(names.includes('water') && names.includes('wood_bridge'), `${id}: 水路と橋`);
+        assert.ok(!names.includes('water_shallow'), `${id}: 浅瀬はない（橋でだけ渡る）`);
+        const at = y => m.legend[m.layout[y][col]];
+        const water = m.layout.filter((_, y) => at(y) === 'water').length, bridge = m.layout.filter((_, y) => at(y) === 'wood_bridge').length;
+        assert.ok(water >= 10, `${id}: 水路の長さ`);
+        assert.ok(bridge >= bridges, `${id}: 橋は${bridges}マス以上`);
+        // 水路の列は、水か橋だけ（橋のない所が、浅瀬や床で抜けていない）
+        for (let y = 1; y < m.layout.length - 1; y++) assert.ok(['water', 'wood_bridge'].includes(at(y)), `${id} 行${y}: 水路の列は水か橋`);
+    }
+});
