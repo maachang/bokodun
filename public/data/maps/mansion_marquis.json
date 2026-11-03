@@ -1,0 +1,95 @@
+{
+  "id": "mansion_marquis",
+  "name": "侯爵の屋敷 (Marquis's Mansion) 1F",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "city_noble",
+  "spawn": {
+    "x": 5,
+    "z": 11,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "ceilingTexture": "woodWall",
+    "ambientLight": 15259832,
+    "directionalLight": 13615264,
+    "fogColor": 4864552,
+    "fogNear": 22,
+    "fogFar": 70,
+    "visibility": 0.9,
+    "skyColor": 4864552
+  },
+  "legend": {
+    "W": "wooden_wall",
+    "F": "wood_floor",
+    "u": "rug",
+    "d": "wooden_door",
+    "U": "stairs_wood_up",
+    "t": "table",
+    "h": "chair",
+    "e": "bed",
+    "k": "bookshelf",
+    "g": "cupboard",
+    "s": "hearth",
+    "o": "stove",
+    "C": "wall_window_curtain",
+    "L": "wall_sconce_wood",
+    "K": "chandelier_mansion_rug",
+    "E": "building_exit"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWCWLWCWWWWWWWWW",
+    "WFkkFsFkkUWgosFgW",
+    "WFFFuuuFFFWFFFFFW",
+    "WFFFuuuFFFWFhthFL",
+    "CFFFuKuFFFdFFFFFW",
+    "WFFFuuuFFFWFFFFFW",
+    "LFFFuuuFFFWWWLWWW",
+    "WhthuuuhthWFFFFFW",
+    "WFFFuuuFFFWFeFFeW",
+    "CFFFuKuFFFdFFFFFW",
+    "WFFFuuuFFFWFFtFFL",
+    "WFFFuuuFFFWFeFFeW",
+    "WFFFuuuFFFWFFFFFW",
+    "WWWCLEWCWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "marquis_man",
+      "x": 8,
+      "z": 3
+    },
+    {
+      "id": "butler",
+      "x": 3,
+      "z": 11
+    },
+    {
+      "id": "maid",
+      "x": 13,
+      "z": 2
+    },
+    {
+      "id": "maid",
+      "x": 14,
+      "z": 9,
+      "wanderRadius": 0.8
+    }
+  ],
+  "links": {
+    "9,1": {
+      "nextMap": "mansion_marquis_2f",
+      "message": "階段を上る（2階へ）",
+      "dir": "n",
+      "spawn": {
+        "x": 2,
+        "z": 5,
+        "angle": -1.570795
+      }
+    }
+  }
+}

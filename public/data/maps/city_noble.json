@@ -51,17 +51,17 @@
     "WppppppppppfTpp====ppTvppHHHHHHppW",
     "Wppppppppppvppp====pppfppHHHHHHppW",
     "WppHHHHHHpppppp=FF=ppppppHHHHHHppW",
-    "WppHHHHHHpppppp=FF=ppppppHHHHHHppW",
+    "WppHHHHHHpppppp=FF=ppppppHHMHHHppW",
     "WppHHHHHHpppppp====ppppppppppppppW",
-    "WppHHHHHHpppppp====ppppppppppppppW",
+    "WppHHMHHHpppppp====ppppppppppppppW",
     "Wppppppppppppvp====pfppppppppppppW",
     "Wpppppppppppppp====pppppppHHHHHppW",
     "Wpppppppppppppp====pppppppHHHHHppW",
     "Wp========================HHHHH=pW",
-    "Wp========================HHHHH=pW",
+    "Wp========================HHMHH=pW",
     "WppHHHHpppppppp====ppppppppppppppW",
     "WppHHHHpppppppp====ppppppppppppppW",
-    "WppHHHHpppfpTpp====ppTpvpppppppppW",
+    "WppHMHHpppfpTpp====ppTpvpppppppppW",
     "Wpppppppppppppp====ppppppppppppppW",
     "WpTpppppppppppp====ppppppppppppTpW",
     "Wpppppppppppppn====ppppppppppppppW",
@@ -152,6 +152,42 @@
       "spawn": {
         "x": 20,
         "z": 2,
+        "angle": 3.14159
+      }
+    },
+    "27,13": {
+      "nextMap": "mansion_margrave",
+      "message": "辺境伯の屋敷に入る",
+      "back": {
+        "x": 27,
+        "z": 14,
+        "angle": 3.14159
+      }
+    },
+    "5,15": {
+      "nextMap": "mansion_marquis",
+      "message": "侯爵の屋敷に入る",
+      "back": {
+        "x": 5,
+        "z": 16,
+        "angle": 3.14159
+      }
+    },
+    "28,20": {
+      "nextMap": "mansion_viscount",
+      "message": "子爵の屋敷に入る",
+      "back": {
+        "x": 28,
+        "z": 21,
+        "angle": 3.14159
+      }
+    },
+    "4,23": {
+      "nextMap": "mansion_baron",
+      "message": "男爵の屋敷に入る",
+      "back": {
+        "x": 4,
+        "z": 24,
         "angle": 3.14159
       }
     }

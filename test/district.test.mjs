@@ -123,3 +123,31 @@ test('公爵の屋敷: 3階建て。1階は大広間と普通の部屋（厨房�
     for (const m of Object.values(M)) assert.ok(ids(m).includes('chandelier_mansion_rug') && ids(m).includes('wall_window_curtain'), '豪華な飾り');
     assert.ok(Object.values(M.mansion.links).some(l => l.nextMap === 'mansion_2f') && Object.values(M.mansion_2f.links).some(l => l.nextMap === 'mansion_3f'), '階段でつながる');
 });
+
+test('貴族の屋敷: 5階級とも中に入れ、階級が高いほど広く、階数が多く、飾りが豪華。貴族本人は、屋敷の中にいる', () => {
+    const noble = D.city_noble;
+    const HOUSES = [
+        { rank: 'duke', maps: ['mansion', 'mansion_2f', 'mansion_3f'], who: ['duke_man', 'duke_woman'] },
+        { rank: 'margrave', maps: ['mansion_margrave', 'mansion_margrave_2f'], who: ['margrave_man', 'margrave_woman'] },
+        { rank: 'marquis', maps: ['mansion_marquis', 'mansion_marquis_2f'], who: ['marquis_man', 'marquis_woman'] },
+        { rank: 'viscount', maps: ['mansion_viscount'], who: ['viscount_man'] },
+        { rank: 'baron', maps: ['mansion_baron'], who: ['baron_man', 'baron_woman'] },
+    ];
+    const area = (maps) => readJson(`public/data/maps/${maps[0]}.json`).layout.flat?.() ?? 0;
+    let prevFloors = Infinity, prevArea = Infinity;
+    for (const h of HOUSES) {
+        const ms = h.maps.map(id => readJson(`public/data/maps/${id}.json`));
+        assert.ok(Object.values(noble.links).some(l => l.nextMap === h.maps[0]), `${h.rank}: 貴族街の扉`);
+        const inside = new Set(ms.flatMap(m => m.npcs.map(n => n.id)));
+        for (const w of h.who) assert.ok(inside.has(w), `${h.rank}: ${w} は屋敷の中`);
+        assert.ok(Object.values(ms[0].legend).includes('building_exit'), `${h.rank}: 1階に出口`);
+        assert.ok(ms.length <= prevFloors, `${h.rank}: 階数`);
+        const a = ms[0].layout.length * ms[0].layout[0].length;
+        assert.ok(a <= prevArea, `${h.rank}: 1階の広さ`);
+        prevFloors = ms.length; prevArea = a;
+    }
+    const decor = (id) => new Set(Object.values(readJson(`public/data/maps/${id}.json`).legend));
+    assert.ok(decor('mansion').has('chandelier_mansion_rug') && decor('mansion_margrave').has('chandelier_mansion_rug'), '公爵・辺境伯: シャンデリア');
+    assert.ok(decor('mansion_viscount').has('chandelier_mansion_rug') || decor('mansion_viscount').has('hanging_candles_mansion_rug'), '子爵: 小さな吊り飾り');
+    assert.ok(![...decor('mansion_baron')].some(id => objects[id]?.type === 'hanging'), '男爵: 天井の飾りはない');
+});
