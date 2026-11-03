@@ -251,6 +251,8 @@ export class GameEngine {
             signpost: RetroTextureGenerator.createSignpostTexture(),
             weaponShopSign: RetroTextureGenerator.createShopSignTexture('weapon'),
             itemShopSign: RetroTextureGenerator.createShopSignTexture('item'),
+            innSign: RetroTextureGenerator.createShopSignTexture('inn'),
+            barSign: RetroTextureGenerator.createShopSignTexture('bar'),
             weaponShopIcon: RetroTextureGenerator.createShopIconTexture('weapon'),
             itemShopIcon: RetroTextureGenerator.createShopIconTexture('item'),
             templeIcon: RetroTextureGenerator.createShopIconTexture('temple'),

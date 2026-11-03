@@ -466,3 +466,10 @@ test('宿屋・酒場: 一般街の宿屋の建物に入口があり、1階（�
     const npcs = JSON.parse(fs.readFileSync('public/data/npcs.json', 'utf8'));
     assert.ok(npcs.innkeeper.lines.length >= 2, '店主は噂話を話す');
 });
+
+test('宿屋・酒場の立て札: 扉の横の立て札にも、マーク入りの板（宿屋＝ベッド、酒場＝ジョッキ）が付く', () => {
+    const o = JSON.parse(fs.readFileSync('public/data/objects.json', 'utf8'));
+    const game = fs.readFileSync('public/js/game.js', 'utf8');
+    assert.equal(o.inn_sign.texture, 'innSign'); assert.equal(o.bar_sign.texture, 'barSign');
+    assert.ok(game.includes("innSign: RetroTextureGenerator.createShopSignTexture('inn')") && game.includes("barSign: RetroTextureGenerator.createShopSignTexture('bar')"));
+});

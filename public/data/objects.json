@@ -8979,17 +8979,17 @@
   },
   "bar_sign": {
     "type": "signpost",
-    "texture": "signpost",
+    "texture": "barSign",
     "solid": true,
     "blocksProjectiles": false,
     "scale": [
-      1.9,
-      2.0,
+      1.3,
+      1.95,
       1.0
     ],
     "radius": 0.5,
     "message": "酒場（昼でも暗い。静かに飲んでいる客がいる）",
-    "description": "どや街の怪しい酒場の看板"
+    "description": "どや街の怪しい酒場の立て札（板にジョッキのマーク。扉の横）"
   },
   "wall_banner_red_wood": {
     "type": "wall_deco",
@@ -15958,17 +15958,17 @@
   },
   "inn_sign": {
     "type": "signpost",
-    "texture": "signpost",
+    "texture": "innSign",
     "solid": true,
     "blocksProjectiles": false,
     "scale": [
-      1.9,
-      2.0,
+      1.3,
+      1.95,
       1.0
     ],
     "radius": 0.5,
     "message": "宿屋・酒場（旅人が集まり、噂話が聞ける）",
-    "description": "宿屋・酒場の案内標識（街のマップ用。扉の横に立てる）"
+    "description": "宿屋・酒場の立て札（板にベッドのマーク。扉の横）"
   },
   "bar_counter": {
     "type": "furniture",
