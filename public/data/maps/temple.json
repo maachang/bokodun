@@ -41,7 +41,8 @@
     "U": "stairs_marble_up",
     "K": "chandelier_temple_large_rug",
     "L": "wall_sconce_marble",
-    "R": "wall_banner_temple_tall"
+    "R": "wall_banner_temple_tall",
+    "d": "temple_room_door"
   },
   "enemies": {},
   "layout": [
@@ -52,15 +53,15 @@
     "WFFFFFFFFcccFFFFFFFFW",
     "eFFFFFFFFcccFFFFFFFFf",
     "WFFFFpFFFcKcFFFpFFFFW",
-    "LFFFFFFFFcccFFFFFFFFL",
+    "LFFFFFFFFcccFFFFFFFFd",
     "WFFFFFFFFcccFFFFFFFFW",
     "fFFFFpFFFcccFFFpFFFFe",
     "WFFFFFFFFcKcFFFFFFFFW",
-    "LFFFFFFFFcccFFFFFFFFL",
+    "LFFFFFFFFcccFFFFFFFFd",
     "WFFFFpFFFcccFFFpFFFFW",
     "aFFFFFFFFcccFFFFFFFFa",
     "WFFFFFFFFcKcFFFFFFFFW",
-    "RFFFFpFFFcccFFFpFFFFR",
+    "RFFFFpFFFcccFFFpFFFFd",
     "WFFFFFFFFcccFFFFFFFFW",
     "WFFFFFFFFcccFFFFFFFFW",
     "WFFFFFFFFFFFFFFFFFFFW",
@@ -92,9 +93,36 @@
       "message": "階段を上る（2階へ）",
       "dir": "n",
       "spawn": {
-        "x": 1,
-        "z": 2,
-        "angle": 3.14159
+        "x": 2,
+        "z": 8,
+        "angle": -1.570795
+      }
+    },
+    "20,7": {
+      "nextMap": "temple_kitchen",
+      "message": "厨房に入る",
+      "back": {
+        "x": 19,
+        "z": 7,
+        "angle": 1.570795
+      }
+    },
+    "20,11": {
+      "nextMap": "temple_confession",
+      "message": "懺悔室に入る",
+      "back": {
+        "x": 19,
+        "z": 11,
+        "angle": 1.570795
+      }
+    },
+    "20,15": {
+      "nextMap": "temple_sacristy",
+      "message": "聖具室に入る",
+      "back": {
+        "x": 19,
+        "z": 15,
+        "angle": 1.570795
       }
     }
   }

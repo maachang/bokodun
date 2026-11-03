@@ -129,3 +129,23 @@ test('神殿の作り分け: 村の神殿は、レンガ・ステンドグラス
         assert.ok(d.some(x => x.type === 'wall_image') && d.some(x => x.texture === 'marbleWall'), `${id}: ステンドグラスと大理石`);
     }
 });
+
+test('大神殿: 1階は広い1つの空間と、扉でつながる部屋（厨房・懺悔室・聖具室）。2階は通路と神官たちの個室', () => {
+    const rooms = ['temple_kitchen', 'temple_confession', 'temple_sacristy'];
+    for (const id of rooms) {
+        const link = Object.entries(temple.links).find(([, l]) => l.nextMap === id);
+        assert.ok(link, `${id}: 1階の扉`);
+        const [c, r] = link[0].split(',').map(Number);
+        assert.equal(objects[temple.legend[temple.layout[r][c]]].type, 'door');
+        const m = readJson(`public/data/maps/${id}.json`);
+        assert.ok(Object.values(m.legend).some(v => objects[v]?.nextMap === '$back'), `${id}: 出口`);
+        assert.ok(m.npcs.length >= 1, `${id}: 神官`);
+        assert.ok(!Object.values(m.legend).some(v => objects[v]?.type === 'wall_image'), `${id}: ステンドグラスはない（広間だけ）`);
+    }
+    assert.ok(Object.values(readJson('public/data/maps/temple_confession.json').legend).includes('confession_grille'), '懺悔室の格子窓');
+    const f2 = readJson('public/data/maps/temple_2f.json');
+    const doors = f2.layout.join('').split('').filter(ch => objects[f2.legend[ch]]?.type === 'door').length;
+    assert.ok(doors >= 6, `2階: 個室の扉 ${doors}`);
+    assert.ok(Object.values(f2.legend).includes('bed_marble'), '2階: 個室のベッド');
+    assert.ok(f2.npcs.length >= 5, '2階: 神官たち');
+});

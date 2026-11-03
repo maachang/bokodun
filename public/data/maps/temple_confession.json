@@ -1,0 +1,57 @@
+{
+  "id": "temple_confession",
+  "name": "神殿の懺悔室 (Confessional)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "temple",
+  "spawn": {
+    "x": 4,
+    "z": 6,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "marbleWall",
+    "ambientLight": 16777215,
+    "directionalLight": 16773324,
+    "fogColor": 15985881,
+    "fogNear": 24,
+    "fogFar": 70,
+    "visibility": 1.0,
+    "skyColor": 15985881
+  },
+  "legend": {
+    "W": "temple_wall",
+    "F": "marble_floor",
+    "E": "temple_exit",
+    "u": "temple_carpet",
+    "h": "chair_marble",
+    "L": "wall_sconce_marble",
+    "G": "confession_grille",
+    "d": "temple_room_door",
+    "N": "hanging_candles_rug"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWW",
+    "WFFFWFFFW",
+    "LFhFGFhFL",
+    "WFFFWFFFW",
+    "WWdWWWdWW",
+    "WFFuuuFFW",
+    "WFFuNuFFW",
+    "WWWWEWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "priest_man",
+      "x": 6,
+      "z": 2,
+      "speed": 0,
+      "wanderRadius": 0
+    }
+  ]
+}

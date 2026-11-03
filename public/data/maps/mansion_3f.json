@@ -1,0 +1,85 @@
+{
+  "id": "mansion_3f",
+  "name": "貴族の屋敷 (Mansion) 3F お客様用の部屋",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "mansion_2f",
+  "spawn": {
+    "x": 22,
+    "z": 8,
+    "angle": 1.570795
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "ceilingTexture": "woodWall",
+    "ambientLight": 15259832,
+    "directionalLight": 13615264,
+    "fogColor": 4864552,
+    "fogNear": 22,
+    "fogFar": 70,
+    "visibility": 0.9,
+    "skyColor": 4864552
+  },
+  "legend": {
+    "W": "wooden_wall",
+    "F": "wood_floor",
+    "u": "rug",
+    "d": "wooden_door",
+    "S": "stairs_wood_down",
+    "t": "table",
+    "h": "chair",
+    "e": "bed",
+    "g": "cupboard",
+    "C": "wall_window_curtain",
+    "L": "wall_sconce_wood",
+    "R": "wall_banner_red_wood",
+    "K": "chandelier_mansion_rug"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWCWWWWWWWCWWWWWWWCWWWW",
+    "WgFFeFFgWgFFeFFgWgFFeFFgW",
+    "WFFFFFFFWFFFFFFFWFFFFFFFW",
+    "CFFuuuFFWFFuuuFFWFFuuuFFC",
+    "WFFuKuFFWFFuKuFFWFFuKuFFW",
+    "WFFuuuthWFFuuuthWFFuuuthW",
+    "WFFFFFFFWFFFFFFFWFFFFFFFW",
+    "WWLWdWLWRWLWdWLWRWLWdWLWW",
+    "WFuuuuKuuuuuuuuuuuKuuuuSW",
+    "WFuuuuuuuuuuKuuuuuuuuuuFW",
+    "WWLWdWLWRWLWdWLWRWLWdWLWW",
+    "WFFFFFFFWFFFFFFFWFFFFFFFW",
+    "WthFFFFFWthFFFFFWthFFFFFW",
+    "WFFuuuFFWFFuuuFFWFFuuuFFW",
+    "CFFuKuFFWFFuKuFFWFFuKuFFC",
+    "WFFuuuFFWFFuuuFFWFFuuuFFW",
+    "WFFFeFFgWFFFeFFgWFFFeFFgW",
+    "WWWWCWWWWWWWCWWWWWWWCWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "maid",
+      "x": 10,
+      "z": 8
+    },
+    {
+      "id": "servant_man",
+      "x": 16,
+      "z": 9
+    }
+  ],
+  "links": {
+    "23,8": {
+      "nextMap": "mansion_2f",
+      "message": "階段を下りる（2階へ）",
+      "dir": "e",
+      "spawn": {
+        "x": 22,
+        "z": 8,
+        "angle": 1.570795
+      }
+    }
+  }
+}

@@ -1,0 +1,65 @@
+{
+  "id": "temple_kitchen",
+  "name": "神殿の厨房 (Temple Kitchen)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "temple",
+  "spawn": {
+    "x": 4,
+    "z": 5,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "marbleWall",
+    "ambientLight": 16777215,
+    "directionalLight": 16773324,
+    "fogColor": 15985881,
+    "fogNear": 24,
+    "fogFar": 70,
+    "visibility": 1.0,
+    "skyColor": 15985881
+  },
+  "legend": {
+    "W": "temple_wall",
+    "F": "marble_floor",
+    "E": "temple_exit",
+    "t": "table_marble",
+    "h": "chair_marble",
+    "g": "cupboard_marble",
+    "s": "hearth_marble",
+    "o": "stove_marble",
+    "X": "crate_marble",
+    "L": "wall_sconce_marble"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWW",
+    "WgoFsFogW",
+    "WFFFFFFFW",
+    "LXFtttFXL",
+    "WFhFhFhFW",
+    "WFFFFFFFW",
+    "WWWWEWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "priest_woman",
+      "x": 2,
+      "z": 2
+    },
+    {
+      "id": "priest_woman",
+      "x": 6,
+      "z": 2
+    },
+    {
+      "id": "priest_man",
+      "x": 4,
+      "z": 5
+    }
+  ]
+}

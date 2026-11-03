@@ -109,3 +109,17 @@ test('どや街: 汚水の水路（毒沼と同じ）が橋で渡れ、怪しい
     assert.ok(Object.values(slum.links).some(l => l.nextMap === 'slum_bar'));
     for (const id of ['assassin_npc', 'thief_npc', 'thug_npc']) assert.ok(fs.existsSync(path.join(root, 'public', npcs[id].texture)), `${id}: 画像`);
 });
+
+test('公爵の屋敷: 3階建て。1階は大広間と普通の部屋（厨房・使用人の部屋）、2階以降は通路と部屋（当主・夫人・書斎／お客様用）', () => {
+    const M = Object.fromEntries(['mansion', 'mansion_2f', 'mansion_3f'].map(id => [id, readJson(`public/data/maps/${id}.json`)]));
+    const ids = (m) => [...new Set(m.layout.join(''))].map(ch => m.legend[ch]);
+    const doors = (m) => m.layout.join('').split('').filter(ch => m.legend[ch] === 'wooden_door').length;
+    assert.ok(ids(M.mansion).includes('stove') && ids(M.mansion).includes('hearth'), '厨房: 暖炉とかまど');
+    assert.ok(M.mansion.layout.join('').split('').filter(ch => M.mansion.legend[ch] === 'bed').length >= 4, '使用人の部屋: ベッド');
+    assert.ok(doors(M.mansion) >= 2, '1階: 厨房・使用人の部屋への扉');
+    assert.ok(doors(M.mansion_2f) >= 6 && doors(M.mansion_3f) >= 6, '2階以降: 部屋ごとの扉（6部屋）');
+    assert.ok(ids(M.mansion_2f).includes('hearth') && ids(M.mansion_2f).includes('bookshelf'), '2階: 書斎');
+    assert.ok(M.mansion_3f.layout.join('').split('').filter(ch => M.mansion_3f.legend[ch] === 'bed').length >= 6, '3階: お客様用の部屋のベッド');
+    for (const m of Object.values(M)) assert.ok(ids(m).includes('chandelier_mansion_rug') && ids(m).includes('wall_window_curtain'), '豪華な飾り');
+    assert.ok(Object.values(M.mansion.links).some(l => l.nextMap === 'mansion_2f') && Object.values(M.mansion_2f.links).some(l => l.nextMap === 'mansion_3f'), '階段でつながる');
+});

@@ -6,9 +6,9 @@
   "wallHeight": 6,
   "nextMap": "temple",
   "spawn": {
-    "x": 1,
-    "z": 2,
-    "angle": 3.14159
+    "x": 2,
+    "z": 8,
+    "angle": -1.570795
   },
   "environment": {
     "floorType": "stone",
@@ -26,73 +26,89 @@
   "legend": {
     "W": "temple_wall",
     "F": "marble_floor",
-    "c": "temple_carpet",
-    "p": "temple_pillar",
-    "a": "stained_glass_plain",
-    "b": "stained_glass_angel",
-    "e": "stained_glass_priestess",
-    "f": "stained_glass_prophet",
+    "u": "temple_carpet",
+    "t": "table_marble",
+    "h": "chair_marble",
+    "k": "bookshelf_marble",
+    "e": "bed_marble",
+    "L": "wall_sconce_marble",
+    "d": "temple_room_door",
+    "N": "hanging_candles_rug",
+    "C": "wall_window_curtain_marble",
     "S": "stairs_marble_down",
     "U": "stairs_marble_up",
     "K": "chandelier_temple_rug",
-    "L": "wall_sconce_marble",
     "R": "wall_banner_temple"
   },
   "enemies": {},
   "layout": [
-    "WWRWaLWeWWbWWfWLaWRWW",
-    "WSFFFFFFFFFFFFFFFFFUW",
-    "WFFFFFFFFFFFFFFFFFFFW",
-    "RFFFFFFFFFFFFFFFFFFFR",
-    "WFFFFFFFFcccFFFFFFFFW",
-    "eFFFFFFFFcccFFFFFFFFf",
-    "WFFFFpFFFcccFFFpFFFFW",
-    "LFFFFFFFFcKcFFFFFFFFL",
-    "WFFFFFFFFcccFFFFFFFFW",
-    "fFFFFpFFFcccFFFpFFFFe",
-    "WFFFFFFFFcccFFFFFFFFW",
-    "LFFFFFFFFcccFFFFFFFFL",
-    "WFFFFpFFFcccFFFpFFFFW",
-    "aFFFFFFFFcccFFFFFFFFa",
-    "WFFFFFFFFcKcFFFFFFFFW",
-    "RFFFFpFFFcccFFFpFFFFR",
-    "WFFFFFFFFcccFFFFFFFFW",
-    "WFFFFFFFFcccFFFFFFFFW",
-    "WFFFFFFFFFFFFFFFFFFFW",
-    "WWWWWWWWWWWWWWWWWWWWW"
+    "WWWWCWWWWWWWCWWWWWWWCWWWW",
+    "WFeFFFkFWFeFFFkFWFeFFFkFW",
+    "WFFuuuFFWFFuuuFFWFFuuuFFW",
+    "CFFuNuFFWFFuNuFFWFFuNuFFC",
+    "WFFuuuFFWFFuuuFFWFFuuuFFW",
+    "WFFFFFthWFFFFFthWFFFFFthW",
+    "WFFFFFFFWFFFFFFFWFFFFFFFW",
+    "WWLWdWLWRWLWdWLWRWLWdWLWW",
+    "WSuuuuKuuuuuuuuuuuKuuuuUW",
+    "WFuuuuuuuuuuKuuuuuuuuuuFW",
+    "WWLWdWLWRWLWdWLWRWLWdWLWW",
+    "WFFFFFFFWFFFFFFFWFFFFFFFW",
+    "WFFuuuthWFFuuuthWFFuuuthW",
+    "WFFuNuFFWFFuNuFFWFFuNuFFW",
+    "CFFuuuFFWFFuuuFFWFFuuuFFC",
+    "WFFFFFFFWFFFFFFFWFFFFFFFW",
+    "WFeFFFkFWFeFFFkFWFeFFFkFW",
+    "WWWWCWWWWWWWCWWWWWWWCWWWW"
   ],
   "npcs": [
     {
+      "id": "priest_man",
+      "x": 4,
+      "z": 4
+    },
+    {
       "id": "priest_woman",
-      "x": 7,
-      "z": 6
+      "x": 12,
+      "z": 4
+    },
+    {
+      "id": "priest_woman",
+      "x": 20,
+      "z": 4
     },
     {
       "id": "priest_man",
-      "x": 14,
-      "z": 10
+      "x": 12,
+      "z": 14
     },
     {
       "id": "priest_woman",
-      "x": 6,
-      "z": 13
+      "x": 20,
+      "z": 14
+    },
+    {
+      "id": "priest_woman",
+      "x": 15,
+      "z": 8,
+      "wanderRadius": 2.0
     }
   ],
   "links": {
-    "1,1": {
+    "1,8": {
       "nextMap": "temple",
       "message": "階段を下りる（1階へ）",
-      "dir": "n",
+      "dir": "w",
       "spawn": {
         "x": 1,
         "z": 2,
         "angle": 3.14159
       }
     },
-    "19,1": {
+    "23,8": {
       "nextMap": "temple_3f",
       "message": "階段を上る（3階へ）",
-      "dir": "n",
+      "dir": "e",
       "spawn": {
         "x": 9,
         "z": 2,

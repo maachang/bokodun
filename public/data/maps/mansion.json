@@ -4,10 +4,10 @@
   "type": "indoor",
   "tileSize": 4,
   "wallHeight": 5,
-  "nextMap": "city",
+  "nextMap": "city_noble",
   "spawn": {
     "x": 8,
-    "z": 11,
+    "z": 15,
     "angle": 0
   },
   "environment": {
@@ -26,34 +26,42 @@
     "W": "wooden_wall",
     "F": "wood_floor",
     "u": "rug",
-    "k": "bookshelf",
-    "s": "hearth",
+    "d": "wooden_door",
+    "E": "building_exit",
+    "U": "stairs_wood_up",
     "t": "table",
     "h": "chair",
     "e": "bed",
-    "E": "building_exit",
-    "U": "stairs_wood_up",
-    "S": "stairs_wood_down",
-    "K": "chandelier_mansion_rug",
+    "k": "bookshelf",
+    "g": "cupboard",
+    "s": "hearth",
+    "o": "stove",
+    "X": "crate",
+    "C": "wall_window_curtain",
     "L": "wall_sconce_wood",
-    "C": "wall_window_curtain"
+    "R": "wall_banner_red_wood",
+    "K": "chandelier_mansion_rug"
   },
   "enemies": {},
   "layout": [
-    "WLWCWWCWLWCWWCWLW",
-    "WkkkFFFFFFFsFFFUW",
-    "WFFFFFFuuuFFFFFFW",
-    "CFFFFFFuuuFFFFFFC",
-    "WFhthFFuKuFFFFFFW",
-    "WFFFFFFuuuFFFFFFW",
-    "LFFFFFFuuuFFFFFFL",
-    "WFhthFFuuuFFhthFW",
-    "CFFFFFFuuuFFFFFFC",
-    "WFFFFFFuKuFFFFFFW",
-    "WFFFFFFuuuFFFFFFW",
-    "LFFFFFFuuuFFFFFFL",
-    "WFFFFFFuuuFFFFFFW",
-    "WWWWWWWWEWWWWWWWW"
+    "WWWCWLRWWWRLWCWWWWWWWWWWW",
+    "WFFkkFFFsFFFkkFUWgoFsFogW",
+    "WFFFFFuuuuuFFFFFWFFFFFFFW",
+    "LFFFFFuuuuuFFFFFWFFFFFFFC",
+    "WFFFFFuuKuuFFFFFdFttttFXW",
+    "CFFFFFuuuuuFFFFFWFFFFFFFL",
+    "RFFFFFuuuuuFFFFFWFFhthFXW",
+    "WFhthFuuuuuFhthFWFFFFFFFW",
+    "LFFFFFuuuuuFFFFFWWWWLWWWW",
+    "WFFFFFuuKuuFFFFFWFFFFFFFW",
+    "RFFFFFuuuuuFFFFFWFeFFFeFC",
+    "CFFFFFuuuuuFFFFFWFFFFFFFW",
+    "WFhthFuuuuuFhthFdFFhthFFL",
+    "WFFFFFuuuuuFFFFFWFeFFFeFW",
+    "LFFFFFuuKuuFFFFFWFFFFFFFW",
+    "WFFFFFuuuuuFFFFFWFFFFFFFL",
+    "WFFFFFuuuuuFFFFFWFFFFFFgW",
+    "WWWCWWLWEWLWWCWWWWWWWWWWW"
   ],
   "npcs": [
     {
@@ -64,12 +72,29 @@
     {
       "id": "butler",
       "x": 6,
-      "z": 10
+      "z": 14
     },
     {
       "id": "maid",
       "x": 12,
-      "z": 9
+      "z": 13
+    },
+    {
+      "id": "maid",
+      "x": 19,
+      "z": 3
+    },
+    {
+      "id": "servant_man",
+      "x": 21,
+      "z": 5,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "maid",
+      "x": 20,
+      "z": 11,
+      "wanderRadius": 0.8
     },
     {
       "id": "servant_man",
@@ -83,9 +108,9 @@
       "message": "階段を上る（2階へ）",
       "dir": "n",
       "spawn": {
-        "x": 15,
-        "z": 2,
-        "angle": 3.14159
+        "x": 2,
+        "z": 8,
+        "angle": -1.570795
       }
     }
   }
