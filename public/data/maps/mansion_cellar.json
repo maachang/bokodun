@@ -1,0 +1,51 @@
+{
+  "id": "mansion_cellar",
+  "name": "地下の貯蔵庫（酒の地下室） (Cellar)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "city_noble",
+  "spawn": {
+    "x": 5,
+    "z": 4,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "ceilingTexture": "woodWall",
+    "ambientLight": 8417370,
+    "directionalLight": 13615264,
+    "fogColor": 1314828,
+    "fogNear": 14,
+    "fogFar": 44,
+    "visibility": 0.9,
+    "skyColor": 1314828
+  },
+  "legend": {
+    "W": "brick_wall",
+    "F": "brick_floor",
+    "E": "brick_exit",
+    "X": "crate_stone",
+    "B": "barrel_stone",
+    "L": "wall_sconce"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWW",
+    "WBBFBBFBBXW",
+    "LFFFFFFFFFL",
+    "WBFFFFFFFBW",
+    "WXFFFFFFFXW",
+    "WBBFFFFFBBW",
+    "WWWWWEWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "servant_man",
+      "x": 5,
+      "z": 2,
+      "wanderRadius": 0.8
+    }
+  ]
+}

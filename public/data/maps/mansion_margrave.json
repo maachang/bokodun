@@ -46,12 +46,12 @@
     "WWWCWLWLWCWWWWWWWWWWW",
     "WFkkFFsFFkkFUWgoFsogW",
     "WFFFFuuuFFFFFWFFFFFFW",
-    "LFFFFuuuFFFFFWFFttFFC",
+    "dFFFFuuuFFFFFWFFttFFd",
     "WFFFFuKuFFFFFdFhFFhFW",
     "CFFFFuuuFFFFFWFFFFFXL",
     "WFFFFuuuFFFFFWFFFFFFW",
     "WFhthuuuhthFFWWWLWWWW",
-    "LFFFFuuuFFFFFWFFFFFFW",
+    "dFFFFuuuFFFFFWFFFFFFW",
     "WFFFFuKuFFFFFWFeFFeFW",
     "CFFFFuuuFFFFFWFFFFFFC",
     "WFhthuuuhthFFdFFtFFFW",
@@ -97,6 +97,33 @@
         "x": 2,
         "z": 7,
         "angle": -1.570795
+      }
+    },
+    "0,3": {
+      "nextMap": "mansion_chapel",
+      "message": "礼拝堂に入る",
+      "back": {
+        "x": 1,
+        "z": 3,
+        "angle": -1.570795
+      }
+    },
+    "0,8": {
+      "nextMap": "mansion_steward",
+      "message": "家令の執務室に入る",
+      "back": {
+        "x": 1,
+        "z": 8,
+        "angle": -1.570795
+      }
+    },
+    "20,3": {
+      "nextMap": "mansion_pantry",
+      "message": "食料庫・酒蔵に入る",
+      "back": {
+        "x": 19,
+        "z": 3,
+        "angle": 1.570795
       }
     }
   }

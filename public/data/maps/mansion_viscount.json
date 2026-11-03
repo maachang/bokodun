@@ -44,7 +44,7 @@
   "layout": [
     "WWWCLWCWWWWWW",
     "WFkFsFkFWgogW",
-    "LFFuuuFFWFFFW",
+    "LFFuuuFFWFFFd",
     "WFFuuuFFdFthW",
     "CFFuKuFFWFFFW",
     "WFFuuuFFWWWWW",
@@ -72,5 +72,16 @@
       "z": 2,
       "wanderRadius": 0.8
     }
-  ]
+  ],
+  "links": {
+    "12,2": {
+      "nextMap": "mansion_pantry",
+      "message": "食料庫に入る",
+      "back": {
+        "x": 11,
+        "z": 2,
+        "angle": 1.570795
+      }
+    }
+  }
 }

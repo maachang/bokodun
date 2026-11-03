@@ -227,3 +227,17 @@ test('村長の家: 広間のほかに、厨房（暖炉・かまど・食器棚
     assert.ok(Object.values(m.links).some(l => l.nextMap === 'village_chief_house_2f'));
     assert.ok(m.npcs.some(n => n.id === 'villager_woman'), '厨房の人');
 });
+
+test('貴族の屋敷（グレードアップ）: 階級が高いほど、部屋が多い（食料庫・酒蔵と地下の貯蔵庫、礼拝堂、家令の執務室、武具室）', () => {
+    const rooms = (id) => new Set(Object.values(readJson(`public/data/maps/${id}.json`).links ?? {}).map(l => l.nextMap));
+    const count = (id) => [...rooms(id)].filter(r => ['mansion_pantry', 'mansion_chapel', 'mansion_steward', 'mansion_armoury'].includes(r)).length;
+    const order = ['mansion', 'mansion_margrave', 'mansion_marquis', 'mansion_viscount', 'mansion_baron'].map(count);
+    for (let i = 1; i < order.length; i++) assert.ok(order[i] <= order[i - 1], `階級が下がるほど、部屋は減る: ${order}`);
+    assert.deepEqual(order, [4, 3, 2, 1, 0]);
+    for (const id of ['mansion', 'mansion_margrave', 'mansion_marquis', 'mansion_viscount']) assert.ok(rooms(id).has('mansion_pantry'), `${id}: 食料庫・酒蔵`);
+    assert.ok(rooms('mansion_pantry').has('mansion_cellar'), '酒蔵の先に、地下の貯蔵庫');
+    for (const id of ['mansion_pantry', 'mansion_cellar', 'mansion_chapel', 'mansion_steward', 'mansion_armoury']) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        assert.ok(Object.values(m.legend).some(v => objects[v]?.nextMap === '$back'), `${id}: 出口`);
+    }
+});

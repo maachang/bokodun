@@ -47,18 +47,18 @@
     "WWWCWLRWWWRLWCWWWWWWWWWWW",
     "WFFkkFFFsFFFkkFUWgoFsFogW",
     "WFFFFFuuuuuFFFFFWFFFFFFFW",
-    "LFFFFFuuuuuFFFFFWFFFFFFFC",
+    "dFFFFFuuuuuFFFFFWFFFFFFFd",
     "WFFFFFuuKuuFFFFFdFttttFXW",
     "CFFFFFuuuuuFFFFFWFFFFFFFL",
     "RFFFFFuuuuuFFFFFWFFhthFXW",
     "WFhthFuuuuuFhthFWFFFFFFFW",
-    "LFFFFFuuuuuFFFFFWWWWLWWWW",
+    "dFFFFFuuuuuFFFFFWWWWLWWWW",
     "WFFFFFuuKuuFFFFFWFFFFFFFW",
     "RFFFFFuuuuuFFFFFWFeFFFeFC",
     "CFFFFFuuuuuFFFFFWFFFFFFFW",
     "WFhthFuuuuuFhthFdFFhthFFL",
     "WFFFFFuuuuuFFFFFWFeFFFeFW",
-    "LFFFFFuuKuuFFFFFWFFFFFFFW",
+    "dFFFFFuuKuuFFFFFWFFFFFFFW",
     "WFFFFFuuuuuFFFFFWFFFFFFFL",
     "WFFFFFuuuuuFFFFFWFFFFFFgW",
     "WWWCWWLWEWLWWCWWWWWWWWWWW"
@@ -111,6 +111,42 @@
         "x": 2,
         "z": 8,
         "angle": -1.570795
+      }
+    },
+    "0,3": {
+      "nextMap": "mansion_chapel",
+      "message": "礼拝堂に入る",
+      "back": {
+        "x": 1,
+        "z": 3,
+        "angle": -1.570795
+      }
+    },
+    "0,8": {
+      "nextMap": "mansion_steward",
+      "message": "家令の執務室に入る",
+      "back": {
+        "x": 1,
+        "z": 8,
+        "angle": -1.570795
+      }
+    },
+    "0,14": {
+      "nextMap": "mansion_armoury",
+      "message": "武具室に入る",
+      "back": {
+        "x": 1,
+        "z": 14,
+        "angle": -1.570795
+      }
+    },
+    "24,3": {
+      "nextMap": "mansion_pantry",
+      "message": "食料庫・酒蔵に入る",
+      "back": {
+        "x": 23,
+        "z": 3,
+        "angle": 1.570795
       }
     }
   }

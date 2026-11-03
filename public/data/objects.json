@@ -10253,5 +10253,211 @@
     ],
     "blocksProjectiles": false,
     "description": "石の棺（石の床・レンガの天井用。金の十字の飾り）"
+  },
+  "barrel": {
+    "type": "furniture",
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall",
+    "parts": [
+      {
+        "size": [
+          1.0,
+          1.2,
+          1.0
+        ],
+        "pos": [
+          0,
+          0.6,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.06,
+          0.08,
+          1.06
+        ],
+        "pos": [
+          0,
+          0.3,
+          0
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          1.06,
+          0.08,
+          1.06
+        ],
+        "pos": [
+          0,
+          0.9,
+          0
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          0.8,
+          0.06,
+          0.8
+        ],
+        "pos": [
+          0,
+          1.23,
+          0
+        ],
+        "color": "#5a3a1e"
+      }
+    ],
+    "collider": [
+      1.2,
+      1.2
+    ],
+    "description": "樽（酒・水）"
+  },
+  "barrel_stone": {
+    "type": "furniture",
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick",
+    "parts": [
+      {
+        "size": [
+          1.0,
+          1.2,
+          1.0
+        ],
+        "pos": [
+          0,
+          0.6,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.06,
+          0.08,
+          1.06
+        ],
+        "pos": [
+          0,
+          0.3,
+          0
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          1.06,
+          0.08,
+          1.06
+        ],
+        "pos": [
+          0,
+          0.9,
+          0
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          0.8,
+          0.06,
+          0.8
+        ],
+        "pos": [
+          0,
+          1.23,
+          0
+        ],
+        "color": "#5a3a1e"
+      }
+    ],
+    "collider": [
+      1.2,
+      1.2
+    ],
+    "description": "樽（石の床・レンガの天井用）"
+  },
+  "pew_wood": {
+    "type": "furniture",
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall",
+    "parts": [
+      {
+        "size": [
+          3.9,
+          0.12,
+          0.7
+        ],
+        "pos": [
+          0,
+          0.5,
+          0
+        ],
+        "color": "#8b5a2b"
+      },
+      {
+        "size": [
+          3.9,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          0,
+          0.95,
+          0.32
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.15,
+          1.0,
+          0.8
+        ],
+        "pos": [
+          -1.9,
+          0.5,
+          0.1
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          0.15,
+          1.0,
+          0.8
+        ],
+        "pos": [
+          1.9,
+          0.5,
+          0.1
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          3.6,
+          0.4,
+          0.1
+        ],
+        "pos": [
+          0,
+          0.2,
+          -0.05
+        ],
+        "color": "#5a3a1e"
+      }
+    ],
+    "collider": [
+      4.0,
+      1.0
+    ],
+    "blocksProjectiles": false,
+    "description": "屋敷の礼拝堂の長椅子（木の床用）"
   }
 }

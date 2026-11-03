@@ -1,0 +1,53 @@
+{
+  "id": "mansion_steward",
+  "name": "家令の執務室 (Steward's Office)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "city_noble",
+  "spawn": {
+    "x": 4,
+    "z": 5,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "ceilingTexture": "woodWall",
+    "ambientLight": 15259832,
+    "directionalLight": 13615264,
+    "fogColor": 4864552,
+    "fogNear": 22,
+    "fogFar": 70,
+    "visibility": 0.9,
+    "skyColor": 4864552
+  },
+  "legend": {
+    "W": "wooden_wall",
+    "F": "wood_floor",
+    "E": "building_exit",
+    "t": "table",
+    "h": "chair",
+    "k": "bookshelf",
+    "g": "cupboard",
+    "L": "wall_sconce_wood"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWW",
+    "WkkFFFkgW",
+    "LFFFFFFFL",
+    "WFFtFtFFW",
+    "WFFhFhFFW",
+    "WFFFFFFFW",
+    "WWWWEWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "butler",
+      "x": 4,
+      "z": 2,
+      "wanderRadius": 0.8
+    }
+  ]
+}
