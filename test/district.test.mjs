@@ -326,7 +326,7 @@ test('貴賓の居室: 王城3階の西端の扉から入り、出口で戻れ�
 test('台所: 水の出る流し台は北の壁に取り付け、すぐ横に、火の設備（かまど・暖炉・オーブン）が並ぶ。村長の家には窓がある', () => {
     const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
     const fire = n => /^(stove|hearth|oven|kitchen_hearth)/.test(n || '');
-    for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_margrave', 'mansion_marquis', 'mansion_viscount', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house', 'city_inn']) {
+    for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_margrave', 'mansion_marquis', 'mansion_viscount', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house', 'city_inn', 'town_pub']) {
         const m = rd(id), at = (x, y) => m.legend[m.layout[y]?.[x]];
         let n = 0;
         m.layout.forEach((row, y) => [...row].forEach((ch, x) => {
@@ -362,7 +362,7 @@ test('壁際の設備: かまど・オーブン・流し台・暖炉・食器棚
 
 test('厨房らしさ: 全部の台所に、調理台・台所の暖炉・鍋つり・壁の棚か道具・袋（粉・野菜）が揃う', () => {
     const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
-    for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_viscount', 'mansion_margrave', 'mansion_marquis', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house', 'castle_bakehouse', 'city_inn']) {
+    for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_viscount', 'mansion_margrave', 'mansion_marquis', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house', 'castle_bakehouse', 'city_inn', 'town_pub']) {
         const names = Object.values(rd(id).legend);
         const has = p => names.some(n => n.startsWith(p));
         assert.ok(has('prep_table'), `${id}: 調理台`);
@@ -485,4 +485,18 @@ test('冒険者らしい人: 冒険者ギルドと宿屋の酒場に、剣士・
     const count = id => rd(id).npcs.filter(s => advs.includes(s.id)).length;
     assert.ok(count('guild_adv') >= 4 && count('guild_adv') <= 6, '冒険者ギルド: 冒険者が数人');
     assert.ok(count('city_inn') >= 3 && count('city_inn') <= 5, '宿屋の酒場: 冒険者が数人');
+});
+
+test('町のパブ: 町の東の家を宿屋の建物に替え、南の扉から入れる。カウンター・暖炉・台所・倉庫があり、店主と客がいる。看板が出る', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const t = rd('town'), p = rd('town_pub');
+    const l = t.links['21,17'];
+    assert.equal(l.nextMap, 'town_pub'); assert.equal(l.icon, 'barIcon'); assert.ok(l.back);
+    assert.equal(t.legend[t.layout[17][21]], 'inn_door');
+    assert.ok(Object.values(t.legend).includes('pub_sign') && Object.values(t.legend).includes('inn_building'));
+    const names = Object.values(p.legend);
+    for (const n of ['bar_counter', 'beer_keg', 'hearth', 'building_exit', 'kitchen_hearth', 'sink', 'stove']) assert.ok(names.includes(n), n);
+    const ids = p.npcs.map(s => s.id);
+    for (const id of ['innkeeper', 'inn_cook', 'inn_waitress']) assert.ok(ids.includes(id), id);
+    assert.ok(Object.values(p.legend).some(n => n.includes('window')), '窓');
 });

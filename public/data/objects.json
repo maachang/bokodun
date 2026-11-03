@@ -16285,5 +16285,19 @@
     ],
     "blocksProjectiles": false,
     "description": "藁のねどこ（相部屋の寝床。安い客用）（木の床・天井用）"
+  },
+  "pub_sign": {
+    "type": "signpost",
+    "texture": "barSign",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.3,
+      1.95,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "パブ（町の酒場。一杯やりながら、噂話が聞ける）",
+    "description": "町のパブの立て札（板にジョッキのマーク。扉の横）"
   }
 }

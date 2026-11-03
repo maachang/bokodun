@@ -41,7 +41,10 @@
     "p": "plaza_stone",
     "a": "outhouse",
     "w": "water",
-    "b": "wood_bridge"
+    "b": "wood_bridge",
+    "I": "inn_building",
+    "N": "inn_door",
+    "M": "pub_sign"
   },
   "layout": [
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -59,10 +62,10 @@
     "Wppppppppbpp====pppppppppppW",
     "Wppppppppbpp====pTpppppppppW",
     "Wppppppppwpp====pppppppppppW",
-    "WppHHHHppwpp====ppppHHHHpppW",
-    "WpaHHHHppwpp====ppppHHHHappW",
-    "WppHHHHppwpp====ppppHHHHpppW",
-    "Wppppppppwpp====pppppppppppW",
+    "WppHHHHppwpp====ppppIIIIpppW",
+    "WpaHHHHppwpp====ppppIIIIappW",
+    "WppHHHHppwpp====ppppINIIpppW",
+    "Wppppppppwpp====ppppppMppppW",
     "Wppppppppbpp====pppppppppppW",
     "Wppppppppbpp====pppppppppppW",
     "Wppppppppwppp2pppppppppppppW",
@@ -119,6 +122,16 @@
         "angle": 3.14159
       },
       "icon": "templeIcon"
+    },
+    "21,17": {
+      "nextMap": "town_pub",
+      "message": "パブに入る",
+      "icon": "barIcon",
+      "back": {
+        "x": 21,
+        "z": 18,
+        "angle": 3.14159
+      }
     }
   }
 }
