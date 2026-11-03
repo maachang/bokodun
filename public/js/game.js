@@ -1974,6 +1974,63 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'hanging': {
+                        // 天井から吊るす飾り（シャンデリア・吊りランプ）: 箱形のパーツの組み合わせ（家具と同じ parts）。
+                        //   fromCeiling が true なら、パーツの y は、天井からの相対（下向きは負）。通り抜けられる（当たり判定なし）。
+                        //   炎などは basic: true（自ら光る材質）で、光らせる。周囲を照らす光源（PointLight）は付けない（見た目のみ）
+                        const group = new THREE.Group();
+                        for (const p of objDef.parts || []) {
+                            const mat = p.basic
+                                ? new THREE.MeshBasicMaterial({ color: p.color })
+                                : new THREE.MeshLambertMaterial({ color: p.color });
+                            const mesh = new THREE.Mesh(new THREE.BoxGeometry(p.size[0], p.size[1], p.size[2]), mat);
+                            mesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
+                            group.add(mesh);
+                        }
+                        group.position.set(wx, objDef.fromCeiling ? wallH : 0, wz);
+                        this.scene.add(group);
+                        const hangFloor = objDef.floorTexture ?? mapData.decorFloor;
+                        if (hangFloor) this.addFloorTile(wx, wz, tileSize, hangFloor);
+                        if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
+                        break;
+                    }
+
+                    case 'wall_deco': {
+                        // 壁の飾り（燭台・旗など）: 壁のブロックの、通れる隣のマスに向いた面に、箱形のパーツを付ける。
+                        //   パーツの座標は、面の中心からの相対（x: 横、y: 床からの高さ、z: 壁から手前へ）
+                        const wallMat = this.makeLitMaterial(objDef.wallTexture || 'brick', this.textures[objDef.wallTexture || 'brick']);
+                        const body = new THREE.Mesh(standardWallGeo, wallMat);
+                        body.position.set(wx, wallH / 2, wz);
+                        this.scene.add(body);
+                        this.colliders.push({
+                            minX: wx - tileSize / 2, maxX: wx + tileSize / 2, minZ: wz - tileSize / 2, maxZ: wz + tileSize / 2,
+                            blocksProjectiles: true
+                        });
+                        const isOpenDeco = (cc, rr) => {
+                            if (cc < 0 || rr < 0 || cc >= cols || rr >= rows) return false;
+                            const ch = mapData.layout[rr][cc];
+                            if (ch === '1') return false;
+                            const t = this.objectDefinitions[mapData.legend?.[ch]];
+                            return !t || !['block', 'door', 'wall_image', 'wall_deco'].includes(t.type);
+                        };
+                        for (const [dx, dz] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
+                            if (!isOpenDeco(c + dx, r + dz)) continue;
+                            const face = new THREE.Group();
+                            for (const p of objDef.parts || []) {
+                                const mat = p.basic
+                                    ? new THREE.MeshBasicMaterial({ color: p.color })
+                                    : new THREE.MeshLambertMaterial({ color: p.color });
+                                const mesh = new THREE.Mesh(new THREE.BoxGeometry(p.size[0], p.size[1], p.size[2]), mat);
+                                mesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
+                                face.add(mesh);
+                            }
+                            face.position.set(wx + dx * tileSize / 2, 0, wz + dz * tileSize / 2);
+                            face.rotation.y = Math.atan2(dx, dz);   // ローカルの +Z（手前）を、開いた隣のマスのほうへ
+                            this.scene.add(face);
+                        }
+                        break;
+                    }
+
                     case 'portal': {
                         const portalGeo = new THREE.CylinderGeometry(0.8, 0.8, 2.5, 16);
                         const portalMat = new THREE.MeshBasicMaterial({ color: objDef.color ? parseInt(objDef.color.slice(1), 16) : 0x38bdf8, wireframe: true });

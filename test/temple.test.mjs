@@ -43,7 +43,7 @@ test('神殿: 専用マップ（大神殿は壁の高さ12・天井つき・大�
 
 test('神殿: 街の神殿の扉から入れて、神殿の出口で、街の扉の前へ戻る', () => {
     const doors = Object.entries(city.links).filter(([, l]) => l.nextMap === 'temple');
-    assert.ok(doors.length >= 1);
+    assert.equal(doors.length, 1, "街の神殿の扉は1枚（十字架も1つ）");
     for (const [key, l] of doors) {
         const [c, r] = key.split(',').map(Number);
         assert.equal(objects[city.legend[city.layout[r][c]]].type, 'door', `${key}: 扉`);

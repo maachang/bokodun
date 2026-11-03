@@ -38,28 +38,31 @@
     "c": "dais_stone_1",
     "A": "dais_rug_3",
     "B": "dais_rug_2",
-    "C": "dais_rug_1"
+    "C": "dais_rug_1",
+    "K": "chandelier_castle_rug",
+    "L": "wall_sconce",
+    "R": "wall_banner_red"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWLRWWRLWWWWWWW",
     "Wkkk0WaaaAAaaaWtt0gW",
     "Wkkk0WaaaAAaaaW0h0gW",
     "W0000WbbbBBbbbW0000W",
     "W0000WcccCCcccW0000W",
     "W0000d000uu000d0000W",
-    "Wkkh0W000uu000W0000W",
+    "Wkkh0W000KK000W0000W",
     "Wt000Ws00uu00sW0000W",
-    "WWWWWWWWWuuWWWWWWWWW",
+    "WWWWWWWRLuuLRWWWWWWW",
     "W0s000000uu000000s0W",
-    "W00h0h000uu000h0h00W",
+    "L00h0h000KK000h0h00L",
     "W00ttt000uu000ttt00W",
-    "W00h0h000uu000h0h00W",
+    "R00h0h000uu000h0h00R",
+    "W00000000uu00000000W",
+    "L00000000KK00000000L",
     "W00000000uu00000000W",
     "W00000000uu00000000W",
-    "W00000000uu00000000W",
-    "W00000000uu00000000W",
-    "WWWWWWWWW22WWWWWWWWW"
+    "WWWWWWWRL22LRWWWWWWW"
   ],
   "npcs": [
     {

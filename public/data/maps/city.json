@@ -292,16 +292,6 @@
       },
       "icon": "itemShopIcon"
     },
-    "21,38": {
-      "nextMap": "temple",
-      "message": "神殿に入る",
-      "back": {
-        "x": 21,
-        "z": 39,
-        "angle": 3.14159
-      },
-      "icon": "templeIcon"
-    },
     "22,38": {
       "nextMap": "temple",
       "message": "神殿に入る",
@@ -384,7 +374,7 @@
     "Wpppppppppppppppppppppppppvvfp====pvfvpppppppppppppppppppppppppW",
     "WppHHHHppHHHHpxSSSSppJJJJppppp====pppSSSSppSSSSppSSSSppHHHHppppW",
     "WppHHHHpxHHHHpfSSSSppJJJJppppp====ppTSSSSppSSSSppSSSSppHHHHppppW",
-    "WppHHHHppHHHHppSSSSppDDJJppppp====pppSSSSppSSSSppSSSSppHHHHppppW",
+    "WppHHHHppHHHHppSSSSppJDJJppppp====pppSSSSppSSSSppSSSSppHHHHppppW",
     "Wppppppppppppp===k=====c===============a=====m=====g=====rpppppW",
     "Wpppppppppppppfx====f========f====f===========f=====f====ppxpppW",
     "WppHHHHpvHHHHppHHHHppHHHHppppp====pppSSSSppSSSSppSSSSvpSSSSppppW",
