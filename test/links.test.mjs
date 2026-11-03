@@ -24,6 +24,15 @@ test('建物の出入り: links の座標は扉・門のマスで、行き先と
             if (link.params?.shopId) assert.ok(shops[link.params.shopId], `${id} ${key}: 店の種類 ${link.params.shopId}`);
             if (def.type === 'stairs') continue;   // 階段は、下の専用テストで調べる（戻る先ではなく、行き先での出現位置 spawn を持つ）
             if (link.nextMap === '$back') continue;   // 建物の出口（入ってきた場所へ戻る）は、戻る先の指定は要らない
+            if (link.spawn) {   // 街の区画をつなぐ門: 戻る先の記録は使わず、行き先での出現位置（spawn）を、双方の links で明示する
+                const dest = maps[link.nextMap], sp = link.spawn;
+                assert.ok(sp.x > 0 && sp.z > 0 && sp.x < dest.layout[0].length - 1 && sp.z < dest.layout.length - 1, `${id} ${key}: spawn がマップの外`);
+                const sch = dest.layout[sp.z][sp.x], sdef = dest.legend?.[sch] && objects[dest.legend[sch]];
+                assert.ok(sch === '0' || (sdef && !sdef.solid && !['door', 'gateway', 'portal', 'stairs'].includes(sdef.type)), `${id} ${key}: spawn が通れない、または移動のマス`);
+                assert.ok(Object.values(dest.links ?? {}).some(l => l.nextMap === id), `${id} ${key}: ${link.nextMap} に、こちらへ戻る links がない`);
+                if (link.requires) assert.ok(items[link.requires.itemId], `${id} ${key}: requires の itemId`);   // 入場の条件（将来用）。書くなら、存在するアイテム
+                continue;
+            }
             // 戻る先は、行き先のマップではなく、このマップの通れるマス
             const b = link.back;
             assert.ok(b, `${id} ${key}: 戻る先（back）がない`);

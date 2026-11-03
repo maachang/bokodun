@@ -1,0 +1,153 @@
+{
+  "id": "city_slum",
+  "name": "どや街 (Slum)",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "city",
+  "spawn": {
+    "x": 6,
+    "z": 2,
+    "angle": 3.14159
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": false,
+    "ambientLight": 9075814,
+    "directionalLight": 16774610,
+    "fogColor": 8023642,
+    "fogNear": 16,
+    "fogFar": 55,
+    "visibility": 0.9,
+    "skyColor": 8023642
+  },
+  "decorFloor": "dirtRoad",
+  "enemies": {},
+  "legend": {
+    "W": "city_wall",
+    "r": "dirt_road",
+    "H": "wooden_house",
+    "S": "shop_building",
+    "Z": "thief_door",
+    "O": "mossy_boulder",
+    "#": "wooden_fence",
+    "X": "tall_grass",
+    "G": "district_gate",
+    "P": "poison_swamp",
+    "b": "wood_bridge",
+    "d": "shop_door",
+    "B": "bar_sign",
+    "K": "crate_out"
+  },
+  "layout": [
+    "WWWWWWGGWWWWWWWWWWWWWWWWWWWW",
+    "WrrrrrrrrrrrrrrrrrrrrrrrrrrW",
+    "WrXrrrrrrrrrrrrrrrrrrrrrrXrW",
+    "WrrrrrrrrrrrrrrrrrrrrrrrrrrW",
+    "WrHHHHrrrHHHHrrHHHHHrrHHHHrW",
+    "WrHHHHrrrHHHHrrHHHHHrrHHHHrW",
+    "WrHHHHrrrHHHHrrHHHHHrrHHHHrW",
+    "WrrrrrrrrrrrrrrrrrrrrrrrrrrW",
+    "WrrrrrrrKrrrKrOrrrrrrOrrrrrW",
+    "WrrrrrrrrrrrrrrrrrrrrrrrrrrW",
+    "WPPPPPbbPPPPPPPPPbbPPPPPPPPW",
+    "WrrrrrrrrrrrrrrrrrrrrrrrrrrW",
+    "WrHHHHrrrHHHrrrrrrrrKrrHHHrW",
+    "WrHHHHrrrHHHrrrrrrrrrrrHHHrW",
+    "WrHHHHrrrHHHrrrrSSSSSrrHHHrW",
+    "WrrrrrrrrrrrrKrrSSSSSrrrrrrW",
+    "WrrrrrrrrrrrrrrrSSZSSrrrrrrW",
+    "WrrrrrOr#####rrrrrrrrrSSSSrW",
+    "WrrrrrrrrrrrrrPPrrrrrrSSSSrW",
+    "WrHHHHHrrrrrrXPrrrrrrrSdSSrW",
+    "WrHHHHHrrrHHHHrrrrrrrrrrBrrW",
+    "WrHHHHHrrrHHHHrrrrrrrrrrrrrW",
+    "WrXrrrrrrrrrrrrrrrrrrrrrrXrW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "town_old_man",
+      "x": 5,
+      "z": 8
+    },
+    {
+      "id": "elder_woman",
+      "x": 13,
+      "z": 12
+    },
+    {
+      "id": "child_boy",
+      "x": 4,
+      "z": 9
+    },
+    {
+      "id": "town_man",
+      "x": 12,
+      "z": 18
+    },
+    {
+      "id": "thief_guild_member",
+      "x": 17,
+      "z": 18
+    },
+    {
+      "id": "thug_npc",
+      "x": 7,
+      "z": 14
+    },
+    {
+      "id": "thug_npc",
+      "x": 20,
+      "z": 7
+    },
+    {
+      "id": "thief_npc",
+      "x": 26,
+      "z": 16
+    },
+    {
+      "id": "town_old_woman",
+      "x": 21,
+      "z": 14
+    }
+  ],
+  "links": {
+    "18,16": {
+      "nextMap": "guild_thief",
+      "message": "盗賊ギルドに入る",
+      "back": {
+        "x": 18,
+        "z": 17,
+        "angle": 3.14159
+      }
+    },
+    "6,0": {
+      "nextMap": "city",
+      "message": "一般街へ",
+      "spawn": {
+        "x": 6,
+        "z": 27,
+        "angle": 0
+      }
+    },
+    "7,0": {
+      "nextMap": "city",
+      "message": "一般街へ",
+      "spawn": {
+        "x": 7,
+        "z": 27,
+        "angle": 0
+      }
+    },
+    "23,19": {
+      "nextMap": "slum_bar",
+      "message": "酒場に入る",
+      "back": {
+        "x": 23,
+        "z": 20,
+        "angle": 3.14159
+      }
+    }
+  }
+}

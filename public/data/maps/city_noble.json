@@ -1,0 +1,184 @@
+{
+  "id": "city_noble",
+  "name": "貴族街 (Noble District)",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "city",
+  "spawn": {
+    "x": 16,
+    "z": 25,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": false,
+    "ambientLight": 9408660,
+    "directionalLight": 16774610,
+    "fogColor": 11713215,
+    "fogNear": 22,
+    "fogFar": 75,
+    "visibility": 0.9,
+    "skyColor": 9018045
+  },
+  "decorFloor": "cobblestone",
+  "enemies": {},
+  "legend": {
+    "W": "city_wall",
+    "H": "brick_house",
+    "M": "mansion_door",
+    "C": "castle_gate",
+    "G": "district_gate",
+    "=": "paved_road",
+    "p": "plaza_stone",
+    "F": "plaza_fountain",
+    "T": "tree",
+    "f": "flower_bed",
+    "v": "flower_bed_blue",
+    "n": "noble_district_sign"
+  },
+  "layout": [
+    "WWWWWWWWWWWWWWWWCCWWWWWWWWWWWWWWWW",
+    "Wpppppppppppppp====ppppppppppppppW",
+    "WpTpppppppppppp====ppppppppppppTpW",
+    "WppHHHHHHHppppp====ppppppTppTppppW",
+    "WppHHHHHHHpppTp====pTppppppppppppW",
+    "WppHHHHHHHppppp====pppppppfvfppppW",
+    "WppHHHMHHHppppp====ppppppppppppppW",
+    "Wp==============================pW",
+    "Wp==============================pW",
+    "Wpppppppppppppp====ppppppppppppppW",
+    "WppppppppppfTpp====ppTvppHHHHHHppW",
+    "Wppppppppppvppp====pppfppHHHHHHppW",
+    "WppHHHHHHpppppp=FF=ppppppHHHHHHppW",
+    "WppHHHHHHpppppp=FF=ppppppHHHHHHppW",
+    "WppHHHHHHpppppp====ppppppppppppppW",
+    "WppHHHHHHpppppp====ppppppppppppppW",
+    "Wppppppppppppvp====pfppppppppppppW",
+    "Wpppppppppppppp====pppppppHHHHHppW",
+    "Wpppppppppppppp====pppppppHHHHHppW",
+    "Wp========================HHHHH=pW",
+    "Wp========================HHHHH=pW",
+    "WppHHHHpppppppp====ppppppppppppppW",
+    "WppHHHHpppppppp====ppppppppppppppW",
+    "WppHHHHpppfpTpp====ppTpvpppppppppW",
+    "Wpppppppppppppp====ppppppppppppppW",
+    "WpTpppppppppppp====ppppppppppppTpW",
+    "Wpppppppppppppn====ppppppppppppppW",
+    "WWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "duke_man",
+      "x": 8,
+      "z": 9
+    },
+    {
+      "id": "duke_woman",
+      "x": 11,
+      "z": 9
+    },
+    {
+      "id": "margrave_man",
+      "x": 24,
+      "z": 11
+    },
+    {
+      "id": "margrave_woman",
+      "x": 24,
+      "z": 13
+    },
+    {
+      "id": "marquis_man",
+      "x": 10,
+      "z": 17
+    },
+    {
+      "id": "marquis_woman",
+      "x": 11,
+      "z": 18
+    },
+    {
+      "id": "viscount_man",
+      "x": 24,
+      "z": 19
+    },
+    {
+      "id": "baron_man",
+      "x": 8,
+      "z": 23
+    },
+    {
+      "id": "baron_woman",
+      "x": 9,
+      "z": 25
+    },
+    {
+      "id": "gate_guard",
+      "x": 14,
+      "z": 1
+    },
+    {
+      "id": "gate_guard",
+      "x": 19,
+      "z": 1
+    },
+    {
+      "id": "guard_spear",
+      "x": 14,
+      "z": 18
+    },
+    {
+      "id": "guard_light",
+      "x": 19,
+      "z": 18
+    }
+  ],
+  "links": {
+    "6,6": {
+      "nextMap": "mansion",
+      "message": "公爵の屋敷に入る",
+      "back": {
+        "x": 6,
+        "z": 7,
+        "angle": 3.14159
+      }
+    },
+    "16,0": {
+      "nextMap": "castle",
+      "message": "王城に入る",
+      "back": {
+        "x": 16,
+        "z": 1,
+        "angle": 3.14159
+      }
+    },
+    "17,0": {
+      "nextMap": "castle",
+      "message": "王城に入る",
+      "back": {
+        "x": 17,
+        "z": 1,
+        "angle": 3.14159
+      }
+    },
+    "16,27": {
+      "nextMap": "city",
+      "message": "一般街へ",
+      "spawn": {
+        "x": 19,
+        "z": 2,
+        "angle": 3.14159
+      }
+    },
+    "17,27": {
+      "nextMap": "city",
+      "message": "一般街へ",
+      "spawn": {
+        "x": 20,
+        "z": 2,
+        "angle": 3.14159
+      }
+    }
+  }
+}

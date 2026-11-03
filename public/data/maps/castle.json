@@ -4,7 +4,7 @@
   "type": "open",
   "tileSize": 4,
   "wallHeight": 5,
-  "nextMap": "city",
+  "nextMap": "city_noble",
   "spawn": {
     "x": 9,
     "z": 15,

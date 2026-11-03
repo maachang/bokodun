@@ -28,7 +28,7 @@ test('村: 村長の家の外壁・屋内の床・扉・家具の定義', () => 
     assert.ok(objects.wooden_door.floorTexture && objects.wooden_door.ceilingTexture);
     for (const [id, def] of Object.entries(objects)) {
         if (def.type !== 'furniture') continue;
-        if (!id.startsWith('flower_bed')) assert.ok(def.floorTexture && def.ceilingTexture, `${id}: 屋内の家具の下にも床と天井`);   // 花壇は屋外
+        if (!id.startsWith('flower_bed') && !id.startsWith('market_stall') && id !== 'crate_out') assert.ok(def.floorTexture && def.ceilingTexture, `${id}: 屋内の家具の下にも床と天井`);   // 花壇・市場の露店・野外の木箱は屋外
         assert.ok(def.parts.length > 0, id);
         for (const p of def.parts) {
             assert.equal(p.size.length, 3, id);
@@ -104,7 +104,8 @@ test('村長の家: 家の中に部屋が複数ある（扉で仕切られた床
 });
 
 // 村・街: 川（深い水は通れない）を橋で渡れる。花壇は通れない、草は見た目だけ
-for (const id of ['village', 'city']) {
+// 街は、区画（一般街・貴族街・どや街）に分けたので、川はない（川と橋があるのは村だけ）
+for (const id of ['village']) {
     test(`${id}: 川は橋でしか渡れない。草は当たり判定なし、花壇は通れない`, () => {
         const map = readJson(`public/data/maps/${id}.json`);
         const lay = map.layout;

@@ -1,0 +1,61 @@
+{
+  "id": "guild_smith",
+  "name": "鍛冶屋 (Smithy)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "city",
+  "spawn": {
+    "x": 5,
+    "z": 7,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "ceilingTexture": "brick",
+    "ambientLight": 15259832,
+    "directionalLight": 13615264,
+    "fogColor": 2760728,
+    "fogNear": 20,
+    "fogFar": 60,
+    "visibility": 0.9,
+    "skyColor": 2760728
+  },
+  "legend": {
+    "W": "brick_wall",
+    "F": "brick_floor",
+    "E": "brick_exit",
+    "u": "rug",
+    "t": "table_stone",
+    "h": "chair_stone",
+    "C": "counter_stone",
+    "A": "weapon_rack_stone",
+    "D": "training_dummy_stone",
+    "V": "anvil_stone",
+    "s": "hearth_stone",
+    "X": "crate_stone",
+    "L": "wall_sconce"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWW",
+    "WFAFFsFFAFW",
+    "WFFFFFFFFFW",
+    "LFFVFFFVFFL",
+    "WFFFFFFFFFW",
+    "WFFCCCCCFFW",
+    "LFFFFFFFFFL",
+    "WFFFFFFFFFW",
+    "WWWWWEWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "dwarf_smith",
+      "x": 5,
+      "z": 4,
+      "speed": 0,
+      "wanderRadius": 0
+    }
+  ]
+}

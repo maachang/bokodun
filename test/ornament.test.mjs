@@ -67,7 +67,7 @@ test('階段: 下り階段は、床に穴を開けて段を降ろすので、床
 });
 
 test('貴族の屋敷: 街の扉から入れ、1階と2階が階段でつながり、小シャンデリア・カーテンつきの窓・燭台がある', () => {
-    const city = readJson('public/data/maps/city.json');
+    const city = readJson('public/data/maps/city_noble.json');
     const door = Object.entries(city.links).filter(([, l]) => l.nextMap === 'mansion');
     assert.equal(door.length, 1);
     const [c, r] = door[0][0].split(',').map(Number);

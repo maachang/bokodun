@@ -774,5 +774,44 @@
       "ほう、ここまで辿り着いたか。",
       "盗賊ギルドは、金と情報で動く。……お前は、何を売る？"
     ]
+  },
+  "assassin_npc": {
+    "name": "アサシン",
+    "texture": "/images/enemies/human/assassin.png",
+    "height": 2.3,
+    "aspect": 0.47,
+    "radius": 0.45,
+    "speed": 0.4,
+    "wanderRadius": 0,
+    "lines": [
+      "……（静かに酒を飲んでいる。目を合わせてはいけない気がする）",
+      "余計な詮索は、命を縮めるぞ。"
+    ]
+  },
+  "thief_npc": {
+    "name": "シーフ",
+    "texture": "/images/enemies/human/thief.png",
+    "height": 2.2,
+    "aspect": 0.472,
+    "radius": 0.45,
+    "speed": 0.4,
+    "wanderRadius": 0,
+    "lines": [
+      "この酒は、うまいな。……それ以外のことは、何も知らんがね。",
+      "金目の物は、懐に入れておけよ。"
+    ]
+  },
+  "thug_npc": {
+    "name": "ならず者",
+    "texture": "/images/enemies/human/mohawk_thug.png",
+    "height": 2.4,
+    "aspect": 0.429,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 1.5,
+    "lines": [
+      "おい、ここは俺たちの縄張りだ。",
+      "ケッ、ガキの来る所じゃねえぞ。"
+    ]
   }
 }
