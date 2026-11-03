@@ -2025,6 +2025,16 @@ export class RetroTextureGenerator {
             ctx.fillStyle = '#374151'; ctx.fillRect(8, 18, 16, 3); ctx.strokeRect(8, 18, 16, 3);
             ctx.fillStyle = '#7f1d1d'; ctx.fillRect(14, 21, 4, 8);
             ctx.fillStyle = '#facc15'; ctx.beginPath(); ctx.arc(16, 30, 1.6, 0, Math.PI * 2); ctx.fill();
+        } else if (kind === 'inn') {
+            // ベッドと月（宿屋）
+            ctx.fillStyle = '#8b5a2b'; ctx.strokeStyle = '#3a2a1a'; ctx.lineWidth = 1.4;
+            ctx.fillRect(3, 14, 3, 14); ctx.strokeRect(3, 14, 3, 14);          // 頭側の板
+            ctx.fillRect(4, 20, 25, 4); ctx.strokeRect(4, 20, 25, 4);          // 枠
+            ctx.fillStyle = '#e8e0d0'; ctx.fillRect(7, 15, 8, 5);              // 枕
+            ctx.fillStyle = '#6a8adf'; ctx.fillRect(14, 16, 14, 5);            // 掛け布
+            ctx.fillRect(26, 24, 3, 4); ctx.fillStyle = '#facc15';
+            ctx.beginPath(); ctx.arc(24, 8, 5, 0, Math.PI * 2); ctx.fill();    // 月
+            ctx.fillStyle = '#1f2937'; ctx.beginPath(); ctx.arc(26, 7, 4.2, 0, Math.PI * 2); ctx.fill();
         } else if (kind === 'bar') {
             // ジョッキ（酒場）
             ctx.fillStyle = '#f59e0b'; ctx.strokeStyle = '#7c2d12'; ctx.lineWidth = 1.5;

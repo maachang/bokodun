@@ -261,6 +261,7 @@ export class GameEngine {
             trainingIcon: RetroTextureGenerator.createShopIconTexture('training'),
             thiefGuildIcon: RetroTextureGenerator.createShopIconTexture('thief'),
             barIcon: RetroTextureGenerator.createShopIconTexture('bar'),
+            innIcon: RetroTextureGenerator.createShopIconTexture('inn'),
             forestCanopy: forestCanopyTex,
             denseForest: denseForestTex,
             woodWall: RetroTextureGenerator.createWoodWallTexture(),

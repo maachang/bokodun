@@ -51,7 +51,9 @@
     "3": "market_stall_green",
     "4": "market_stall_yellow",
     "w": "water",
-    "b": "wood_bridge"
+    "b": "wood_bridge",
+    "N": "inn_door",
+    "M": "inn_sign"
   },
   "layout": [
     "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW",
@@ -59,8 +61,8 @@
     "WpTppppppppppppppw====pppppppppppppppTpW",
     "WppSSSSpSSSSpIIIIw====pJJJJpSSSSpSSSSppW",
     "WppSSSSpSSSSpIIIIw====pJJJJpSSSSpSSSSppW",
-    "WppSdSSpSdSSpIIIIw====pJDJJpSdSSpSdSSppW",
-    "Wp===Q====q======b========c===a====m==pW",
+    "WppSdSSpSdSSpINIIw====pJDJJpSdSSpSdSSppW",
+    "Wp===Q====q====M=b========c===a====m==pW",
     "Wp===============b====================pW",
     "Wppppppppppppppppw====pppppppppppppppppW",
     "Wppp1pp2pp3pp4ppTw====pTpp1pp2pp3pp4pppW",
@@ -267,6 +269,16 @@
       "spawn": {
         "x": 7,
         "z": 2,
+        "angle": 3.14159
+      }
+    },
+    "14,5": {
+      "nextMap": "city_inn",
+      "message": "宿屋・酒場に入る",
+      "icon": "innIcon",
+      "back": {
+        "x": 14,
+        "z": 6,
         "angle": 3.14159
       }
     }

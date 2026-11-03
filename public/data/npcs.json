@@ -961,5 +961,84 @@
       "ヘマをしちまった……。",
       "鍵さえあれば、こんな扉……。"
     ]
+  },
+  "innkeeper": {
+    "name": "宿屋の主人",
+    "texture": "/images/npcs/merchant_man.png",
+    "height": 2.4,
+    "aspect": 0.485,
+    "radius": 0.6,
+    "speed": 0.5,
+    "wanderRadius": 0.5,
+    "lines": [
+      "いらっしゃい。ここは宿屋と酒場だ。奥の階段から、2階の部屋に泊まれる。",
+      "旅人が集まる店でね。いろんな噂が、入ってくるのさ。",
+      "王城の地下には、迷宮があるって話だ。牢獄まであるらしいぜ。"
+    ]
+  },
+  "inn_cook": {
+    "name": "宿屋の料理人",
+    "texture": "/images/npcs/villager_woman.png",
+    "height": 2.2,
+    "aspect": 0.381,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 0.6,
+    "lines": [
+      "スープを煮ているところだよ。",
+      "水路の水は、洗い物にしか使わないよ。飲み水は、井戸の水さ。"
+    ]
+  },
+  "inn_waitress": {
+    "name": "酒場の給仕",
+    "texture": "/images/npcs/town_woman.png",
+    "height": 2.2,
+    "aspect": 0.334,
+    "radius": 0.52,
+    "speed": 0.5,
+    "wanderRadius": 1.5,
+    "lines": [
+      "はい、ご注文は？",
+      "あそこの旅の人、遠くの町の噂を、よく知っているのよ。"
+    ]
+  },
+  "traveler_man": {
+    "name": "旅の男",
+    "texture": "/images/npcs/villager_man.png",
+    "height": 2.3,
+    "aspect": 0.37,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 1.0,
+    "lines": [
+      "東の洞窟には、魔物が棲みついているそうだ。気をつけな。",
+      "湿地帯の向こうに、岩山がある。岩山の先は、俺も知らない。"
+    ]
+  },
+  "traveler_merchant": {
+    "name": "旅の行商人",
+    "texture": "/images/npcs/junior_merchant_man.png",
+    "height": 2.3,
+    "aspect": 0.339,
+    "radius": 0.41,
+    "speed": 0.5,
+    "wanderRadius": 1.0,
+    "lines": [
+      "この街は、水路があって、橋ばかりだ。道に迷ったよ。",
+      "どや街の酒場には、近づかないほうがいい客がいるらしい。"
+    ]
+  },
+  "drunk_old": {
+    "name": "酔った老人",
+    "texture": "/images/npcs/town_old_man.png",
+    "height": 2.1,
+    "aspect": 0.371,
+    "radius": 0.4,
+    "speed": 0.5,
+    "wanderRadius": 0.6,
+    "lines": [
+      "ういー……昔はな、村の長老が、いちばんの物知りだった。",
+      "ひっく……ドワーフの鍛冶屋の腕は、確かだぞ。"
+    ]
   }
 }

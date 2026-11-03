@@ -326,7 +326,7 @@ test('貴賓の居室: 王城3階の西端の扉から入り、出口で戻れ�
 test('台所: 水の出る流し台は北の壁に取り付け、すぐ横に、火の設備（かまど・暖炉・オーブン）が並ぶ。村長の家には窓がある', () => {
     const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
     const fire = n => /^(stove|hearth|oven|kitchen_hearth)/.test(n || '');
-    for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_margrave', 'mansion_marquis', 'mansion_viscount', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house']) {
+    for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_margrave', 'mansion_marquis', 'mansion_viscount', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house', 'city_inn']) {
         const m = rd(id), at = (x, y) => m.legend[m.layout[y]?.[x]];
         let n = 0;
         m.layout.forEach((row, y) => [...row].forEach((ch, x) => {
@@ -362,7 +362,7 @@ test('壁際の設備: かまど・オーブン・流し台・暖炉・食器棚
 
 test('厨房らしさ: 全部の台所に、調理台・台所の暖炉・鍋つり・壁の棚か道具・袋（粉・野菜）が揃う', () => {
     const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
-    for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_viscount', 'mansion_margrave', 'mansion_marquis', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house', 'castle_bakehouse']) {
+    for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_viscount', 'mansion_margrave', 'mansion_marquis', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house', 'castle_bakehouse', 'city_inn']) {
         const names = Object.values(rd(id).legend);
         const has = p => names.some(n => n.startsWith(p));
         assert.ok(has('prep_table'), `${id}: 調理台`);
@@ -447,4 +447,22 @@ test('生活水路: 街と町を水路が南北に流れ、浅瀬はなく（深
         // 水路の列は、水か橋だけ（橋のない所が、浅瀬や床で抜けていない）
         for (let y = 1; y < m.layout.length - 1; y++) assert.ok(['water', 'wood_bridge'].includes(at(y)), `${id} 行${y}: 水路の列は水か橋`);
     }
+});
+
+test('宿屋・酒場: 一般街の宿屋の建物に入口があり、1階（酒場・台所・階段）と2階（個室・相部屋）、店主と客がいて、看板が出る', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const city = rd('city'), f1 = rd('city_inn'), f2 = rd('city_inn_2f');
+    const l = city.links['14,5'];
+    assert.equal(l.nextMap, 'city_inn'); assert.equal(l.icon, 'innIcon'); assert.ok(l.back);
+    assert.equal(city.legend[city.layout[5][14]], 'inn_door', '宿屋の建物の扉');
+    assert.ok(Object.values(city.legend).includes('inn_sign'), '宿屋の標識');
+    assert.ok(fs.readFileSync('public/js/game.js', 'utf8').includes("innIcon: RetroTextureGenerator.createShopIconTexture('inn')"));
+    const names1 = Object.values(f1.legend), names2 = Object.values(f2.legend);
+    for (const n of ['bar_counter', 'beer_keg', 'hearth', 'building_exit', 'stairs_wood_up']) assert.ok(names1.includes(n), `1階: ${n}`);
+    for (const n of ['straw_bed_wood', 'bed', 'stairs_wood_down']) assert.ok(names2.includes(n), `2階: ${n}`);
+    assert.equal(Object.values(f1.links)[0].nextMap, 'city_inn_2f'); assert.equal(Object.values(f2.links)[0].nextMap, 'city_inn');
+    const ids = f1.npcs.map(s => s.id);
+    for (const id of ['innkeeper', 'inn_cook', 'inn_waitress', 'traveler_man']) assert.ok(ids.includes(id), id);
+    const npcs = JSON.parse(fs.readFileSync('public/data/npcs.json', 'utf8'));
+    assert.ok(npcs.innkeeper.lines.length >= 2, '店主は噂話を話す');
 });

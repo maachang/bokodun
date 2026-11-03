@@ -15947,5 +15947,343 @@
       }
     ],
     "description": "石の窓（レンガの壁の面に付く。ガラスの窓に鉄の鎧戸。壁の高さ4〜5用）"
+  },
+  "inn_door": {
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "innWall",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "description": "宿屋・酒場の扉（近づくと開き、中へ入ると宿屋へ移動。行き先は map の links）"
+  },
+  "inn_sign": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "宿屋・酒場（旅人が集まり、噂話が聞ける）",
+    "description": "宿屋・酒場の案内標識（街のマップ用。扉の横に立てる）"
+  },
+  "bar_counter": {
+    "type": "furniture",
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall",
+    "parts": [
+      {
+        "size": [
+          3.9,
+          0.15,
+          1.2
+        ],
+        "pos": [
+          0,
+          1.0,
+          0
+        ],
+        "color": "#6b4423"
+      },
+      {
+        "size": [
+          3.9,
+          0.9,
+          0.2
+        ],
+        "pos": [
+          0,
+          0.45,
+          0.5
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          3.9,
+          0.9,
+          0.2
+        ],
+        "pos": [
+          0,
+          0.45,
+          -0.5
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          0.3,
+          0.3,
+          0.3
+        ],
+        "pos": [
+          -1.2,
+          1.2,
+          0.1
+        ],
+        "color": "#c9a56a"
+      },
+      {
+        "size": [
+          0.3,
+          0.3,
+          0.3
+        ],
+        "pos": [
+          -0.7,
+          1.2,
+          -0.1
+        ],
+        "color": "#c9a56a"
+      },
+      {
+        "size": [
+          0.3,
+          0.3,
+          0.3
+        ],
+        "pos": [
+          0.5,
+          1.2,
+          0.2
+        ],
+        "color": "#c9a56a"
+      },
+      {
+        "size": [
+          0.2,
+          0.35,
+          0.2
+        ],
+        "pos": [
+          1.3,
+          1.25,
+          0
+        ],
+        "color": "#2f6a3a"
+      },
+      {
+        "size": [
+          0.2,
+          0.35,
+          0.2
+        ],
+        "pos": [
+          1.6,
+          1.25,
+          0.2
+        ],
+        "color": "#7a2a2a"
+      },
+      {
+        "size": [
+          3.9,
+          0.1,
+          0.35
+        ],
+        "pos": [
+          0,
+          0.2,
+          0.75
+        ],
+        "color": "#3a2a1a"
+      }
+    ],
+    "collider": [
+      4.0,
+      1.2
+    ],
+    "blocksProjectiles": false,
+    "description": "酒場のカウンター（木のジョッキと酒びんが並ぶ。横に並べて、長いカウンターにする）"
+  },
+  "beer_keg": {
+    "type": "furniture",
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall",
+    "parts": [
+      {
+        "size": [
+          3.4,
+          0.5,
+          1.2
+        ],
+        "pos": [
+          0,
+          0.25,
+          -1.4
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          1.4,
+          1.0,
+          1.2
+        ],
+        "pos": [
+          -0.8,
+          1.0,
+          -1.4
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.5,
+          0.08,
+          1.2
+        ],
+        "pos": [
+          -0.8,
+          0.7,
+          -1.4
+        ],
+        "color": "#2a1f14"
+      },
+      {
+        "size": [
+          1.5,
+          0.08,
+          1.2
+        ],
+        "pos": [
+          -0.8,
+          1.3,
+          -1.4
+        ],
+        "color": "#2a1f14"
+      },
+      {
+        "size": [
+          1.4,
+          1.0,
+          1.2
+        ],
+        "pos": [
+          0.8,
+          1.0,
+          -1.4
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.5,
+          0.08,
+          1.2
+        ],
+        "pos": [
+          0.8,
+          0.7,
+          -1.4
+        ],
+        "color": "#2a1f14"
+      },
+      {
+        "size": [
+          1.5,
+          0.08,
+          1.2
+        ],
+        "pos": [
+          0.8,
+          1.3,
+          -1.4
+        ],
+        "color": "#2a1f14"
+      },
+      {
+        "size": [
+          0.12,
+          0.12,
+          0.4
+        ],
+        "pos": [
+          -0.8,
+          0.9,
+          -0.7
+        ],
+        "color": "#b8860b"
+      },
+      {
+        "size": [
+          0.12,
+          0.12,
+          0.4
+        ],
+        "pos": [
+          0.8,
+          0.9,
+          -0.7
+        ],
+        "color": "#b8860b"
+      }
+    ],
+    "collider": [
+      3.4,
+      1.2
+    ],
+    "colliderOffset": [
+      0,
+      -1.4
+    ],
+    "blocksProjectiles": false,
+    "description": "酒樽の台（栓つきの樽が2つ並ぶ。北の壁に寄せて置く）"
+  },
+  "straw_bed_wood": {
+    "type": "furniture",
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall",
+    "parts": [
+      {
+        "size": [
+          1.8,
+          0.15,
+          2.8
+        ],
+        "pos": [
+          0,
+          0.08,
+          0
+        ],
+        "color": "#b89a4a"
+      },
+      {
+        "size": [
+          1.4,
+          0.12,
+          2.2
+        ],
+        "pos": [
+          0.1,
+          0.2,
+          0
+        ],
+        "color": "#c9ae5e"
+      },
+      {
+        "size": [
+          0.5,
+          0.35,
+          0.5
+        ],
+        "pos": [
+          1.0,
+          0.18,
+          1.0
+        ],
+        "color": "#5a3a1e"
+      }
+    ],
+    "collider": [
+      1.8,
+      2.8
+    ],
+    "blocksProjectiles": false,
+    "description": "藁のねどこ（相部屋の寝床。安い客用）（木の床・天井用）"
   }
 }
