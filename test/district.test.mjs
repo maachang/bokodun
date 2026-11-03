@@ -400,3 +400,22 @@ test('窓: 普通の建物の外壁（民家・レンガの家・店・宿・神
     for (const id of withWin) assert.ok(Object.values(rd(id).legend).some(n => n.includes('window')), `${id}: 窓`);
     for (const id of ['temple_treasury', 'guild_thief', 'temple_confession', 'castle_prison', 'castle_basement', 'mansion_cellar', 'temple_crypt']) assert.ok(!Object.values(rd(id).legend).some(n => n.includes('window')), `${id}: 窓なし（宝物庫・盗賊ギルド・懺悔室・地下）`);
 });
+
+test('カウンターの店員: ギルド・酒場・店の、カウンターや机の奥の店員は、カウンターのすぐそばに立つ（oz でマスの中心からずらす）', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const n = JSON.parse(fs.readFileSync('public/data/npcs.json', 'utf8'));
+    for (const id of ['guild_adv', 'guild_mage', 'guild_merchant', 'guild_smith', 'slum_bar', 'shop']) {
+        const m = rd(id);
+        let found = 0;
+        for (const s of m.npcs) {
+            const below = m.legend[m.layout[s.z + 1]?.[s.x]] || '';
+            if (!(below.startsWith('counter') || (id === 'shop' && below.startsWith('table')))) continue;
+            found++;
+            const half = below.startsWith('table') ? 0.8 : 0.6, r = n[s.id]?.radius ?? 0.45;
+            const gap = 4 * (1 - (s.oz ?? 0)) - half - r;   // 店員の端から、カウンターの背中までの距離
+            assert.ok(gap >= 0.1 && gap <= 0.3, `${id} ${s.id}: カウンターのそば（すき間 ${gap.toFixed(2)}）`);
+        }
+        assert.ok(found > 0, `${id}: カウンターの奥の店員`);
+    }
+    assert.ok(fs.readFileSync('public/js/game.js', 'utf8').includes('n.oz ?? 0'), 'oz を使う');
+});

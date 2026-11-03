@@ -56,7 +56,8 @@
       "x": 5,
       "z": 4,
       "speed": 0,
-      "wanderRadius": 0
+      "wanderRadius": 0,
+      "oz": 0.682
     }
   ]
 }

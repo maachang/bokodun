@@ -55,14 +55,16 @@
       "x": 5,
       "z": 2,
       "speed": 0,
-      "wanderRadius": 0
+      "wanderRadius": 0,
+      "oz": 0.662
     },
     {
       "id": "mage_clerk_woman",
       "x": 3,
       "z": 2,
       "speed": 0,
-      "wanderRadius": 0
+      "wanderRadius": 0,
+      "oz": 0.705
     },
     {
       "id": "mage_clerk_man",
@@ -70,7 +72,8 @@
       "z": 2,
       "speed": 0,
       "wanderRadius": 0,
-      "shopId": "magic_guild"
+      "shopId": "magic_guild",
+      "oz": 0.705
     }
   ]
 }
