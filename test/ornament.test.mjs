@@ -65,3 +65,18 @@ test('階段: 下り階段は、床に穴を開けて段を降ろすので、床
         if (o.type === 'stairs' && o.direction === 'down') assert.equal(o.floorTexture, undefined, `${id}: floorTexture`);
     }
 });
+
+test('貴族の屋敷: 街の扉から入れ、1階と2階が階段でつながり、小シャンデリア・カーテンつきの窓・燭台がある', () => {
+    const city = readJson('public/data/maps/city.json');
+    const door = Object.entries(city.links).filter(([, l]) => l.nextMap === 'mansion');
+    assert.equal(door.length, 1);
+    const [c, r] = door[0][0].split(',').map(Number);
+    assert.equal(objects[city.legend[city.layout[r][c]]].type, 'door');
+    for (const id of ['mansion', 'mansion_2f']) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const used = new Set([...new Set(m.layout.join(''))].map(ch => m.legend[ch]));
+        for (const need of ['chandelier_mansion_rug', 'wall_window_curtain', 'wall_sconce_wood']) assert.ok(used.has(need), `${id}: ${need}`);
+        assert.ok(m.npcs.length >= 1);
+    }
+    assert.ok(Object.values(readJson('public/data/maps/mansion.json').legend).includes('building_exit'), '1階に出口');
+});

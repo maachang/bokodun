@@ -143,5 +143,12 @@
 - 登録: シャンデリア（`chandelier_castle`・`chandelier_castle_rug`）、壁の燭台（`wall_sconce`）、赤い旗（`wall_banner_red`、壁の高さ5用）。
 - 王城（`castle`）: 広間の絨毯の上に、シャンデリア6基。壁に、燭台と旗。
 - 神殿: 大神殿は、大シャンデリア（`chandelier_temple_large_rug`、1階の絨毯の上に3基）と、大きな旗（`wall_banner_temple_tall`）、壁の燭台（`wall_sconce_marble`）。2階・3階は、シャンデリア（`chandelier_temple_rug`）、旗（`wall_banner_temple`）、燭台。街の神殿は、吊り燭台（`hanging_candles_rug`）と壁の燭台。村の神殿は、壁の燭台（`wall_sconce`、レンガ用）のみ。
-- 貴族の屋敷: 屋敷のマップが、まだ無いので、未対応（マップを作るときに、小シャンデリア・燭台・カーテンを入れる）。
+- 貴族の屋敷（`mansion`・`mansion_2f`、17×14、壁の高さ5、木の壁・板張りの床）: 絨毯の上に小シャンデリア（`chandelier_mansion_rug`）、壁に燭台（`wall_sconce_wood`）と、カーテンつきの窓（`wall_window_curtain`、窓の両側に赤いカーテン）。
+
+## 9. 貴族の屋敷
+
+- 街の貴族街の標識（`church_sign` ではなく `noble_district_sign`、列23・行6）の上の建物（列21〜24・行3〜5）の、列22・行5に、扉（`mansion_door`）を付けた。入ると、屋敷の1階（`mansion`）。出口は、扉の前（列22・行6）へ戻る。
+- 1階: 広間。中央に赤い絨毯、左に食卓（食卓＋椅子）、右に応接の机、本棚、暖炉。公爵（`duke_man`）がいる。階段（`stairs_wood_up`、列15・行1）で、2階へ。
+- 2階: 寝室・書斎。ベッド4つ、食卓、本棚。公爵夫人（`duke_woman`）がいる。階段（`stairs_wood_down`）で、1階へ。
+- 仮の仕様: 屋敷の主は公爵（暫定）。ほかの貴族（侯爵・辺境伯など）の屋敷は、まだ無い。屋敷の中の会話・イベントは、未決。
 - 未実装（今後の候補）: 普通の家や店の飾り（吊りランプ、吊り燭台、カーテン）、洞窟・迷宮のたいまつ（炎のゆらめき）、周囲を照らす光源（PointLight）。

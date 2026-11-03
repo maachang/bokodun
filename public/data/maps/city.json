@@ -301,6 +301,15 @@
         "angle": 3.14159
       },
       "icon": "templeIcon"
+    },
+    "22,5": {
+      "nextMap": "mansion",
+      "message": "貴族の屋敷に入る",
+      "back": {
+        "x": 22,
+        "z": 6,
+        "angle": 3.14159
+      }
     }
   },
   "legend": {
@@ -333,7 +342,8 @@
     "n": "noble_district_sign",
     "J": "temple_building",
     "D": "temple_door",
-    "p": "plaza_stone"
+    "p": "plaza_stone",
+    "M": "mansion_door"
   },
   "layout": [
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -341,7 +351,7 @@
     "Wppppppppppppppppppppppppppppp====pppppppppppppppppppppppppppppW",
     "WppHHHHppHHHHpfHHHHppHHHHppppp====pppSSSSppSSSSppIIIIppSSSSppppW",
     "WppHHHHppHHHHppHHHHppHHHHppppv====TppSSSSppSSSSppIIIIppSSSSfpppW",
-    "WppHHHHppHHHHppHHHHppHHHHppppp====pppSdSSppSdSSppIIIIppSSSSvpppW",
+    "WppHHHHppHHHHppHHHHppHMHHppppp====pppSdSSppSdSSppIIIIppSSSSvpppW",
     "Wppppppppppppppppppppppnpppppp=========Q=====q=ppppNpppppppppppW",
     "Wppypppppppppppppppppppppppppp==========y===v==ppyppppvppppppppW",
     "WppHHHHppHHHHppHHHHppHHHHppppp====pppSSSSppSSSSppIIIIppSSSSppppW",
