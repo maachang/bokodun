@@ -12,6 +12,7 @@
         "weapon": "left",
         "minimap": "right",
         "enemies": "right",
+        "areaName": "overlay-top",
         "areaNav": "top",
         "hints": "bottom",
         "effectTest": "right"
@@ -28,6 +29,7 @@
         "magic": "overlay-bottom-left",
         "weapon": "overlay-bottom-left",
         "minimap": "overlay-top-right",
+        "areaName": "overlay-top",
         "areaNav": "overlay-top",
         "hints": "overlay-bottom-right",
         "effectTest": "hidden"
@@ -44,6 +46,7 @@
         "weapon": "bottom",
         "enemies": "overlay-bottom-left",
         "minimap": "overlay-top-right",
+        "areaName": "overlay-top",
         "areaNav": "top",
         "hints": "hidden",
         "effectTest": "hidden"

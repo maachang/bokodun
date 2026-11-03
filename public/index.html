@@ -604,9 +604,12 @@
             </div>
         </section>
 
-        <!-- エリア名とマップ切り替え -->
-        <section id="panel-areaNav" style="display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap;">
+        <!-- エリア名（既定は、ゲーム画面の左上に重ねる） -->
+        <section class="panel-bare" id="panel-areaName">
             <div class="badge" id="currentAreaName">エリア名</div>
+        </section>
+        <!-- マップ切り替え（開発用のボタン） -->
+        <section id="panel-areaNav" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div style="pointer-events: auto; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
                 <button class="btn-scene" onclick="window.game.loadMap('city'); this.blur();">街</button>
                 <button class="btn-scene" onclick="window.game.loadMap('village'); this.blur();">村</button>
