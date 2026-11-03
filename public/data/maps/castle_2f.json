@@ -108,6 +108,20 @@
       "id": "elder_man",
       "x": 15,
       "z": 4
+    },
+    {
+      "id": "viscount_man",
+      "x": 29,
+      "z": 3,
+      "speed": 0,
+      "wanderRadius": 0.5
+    },
+    {
+      "id": "baron_woman",
+      "x": 36,
+      "z": 3,
+      "speed": 0,
+      "wanderRadius": 0.5
     }
   ],
   "links": {

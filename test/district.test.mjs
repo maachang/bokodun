@@ -192,3 +192,14 @@ test('屋内のマップ: 出現位置から、NPC のいる所へ、歩いて�
     }
     assert.deepEqual(bad, [], `行けない所の NPC: ${bad.join(' / ')}`);
 });
+
+test('王城: 貴族の執務室・会議室に、働く貴族（男爵・子爵クラス）がいる。貴族の NPC は、汎用の存在（屋敷にも、城にもいてよい）', () => {
+    const f2 = readJson('public/data/maps/castle_2f.json'), f3 = readJson('public/data/maps/castle_3f.json');
+    const low = (m) => m.npcs.filter(n => ['baron_man', 'baron_woman', 'viscount_man'].includes(n.id)).length;
+    assert.ok(low(f3) >= 3, '執務室: 3人');
+    assert.ok(low(f2) >= 1, '会議室');
+    for (const n of f3.npcs.filter(n => n.id.startsWith('baron') || n.id.startsWith('viscount'))) {
+        assert.ok(n.z >= 1 && n.z <= 6, `${n.id}: 北側の執務室の中`);
+        assert.ok(['margrave', 'marquis', 'duke'].every(r => !n.id.startsWith(r)), '公爵・辺境伯・侯爵は、特別な存在なので、執務室には置かない');
+    }
+});
