@@ -38,12 +38,13 @@
     "S": "stairs_marble_down",
     "U": "stairs_marble_up",
     "K": "chandelier_temple_rug",
-    "R": "wall_banner_temple"
+    "R": "wall_banner_temple",
+    "a": "wash_stand_marble"
   },
   "enemies": {},
   "layout": [
     "WWWWCWWWWWWWCWWWWWWWCWWWW",
-    "WFeFFFkFWFeFFFkFWFeFFFkFW",
+    "WaeFFFkFWaeFFFkFWaeFFFkFW",
     "WFFuuuFFWFFuuuFFWFFuuuFFW",
     "CFFuNuFFWFFuNuFFWFFuNuFFC",
     "WFFuuuFFWFFuuuFFWFFuuuFFW",
@@ -53,7 +54,7 @@
     "WSuuuuKuuuuuuuuuuuKuuuuUW",
     "WFuuuuuuuuuuKuuuuuuuuuuFW",
     "WWLWdWLWRWLWdWLWRWLWdWLWW",
-    "WFFFFFFFWFFFFFFFWFFFFFFFW",
+    "WaFFFFFFWaFFFFFFWaFFFFFFW",
     "WFFuuuthWFFuuuthWFFuuuthW",
     "WFFuNuFFWFFuNuFFWFFuNuFFW",
     "CFFuuuFFWFFuuuFFWFFuuuFFC",

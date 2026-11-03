@@ -36,19 +36,20 @@
     "d": "temple_room_door",
     "C": "wall_window_curtain_marble",
     "S": "stairs_marble_down",
-    "K": "chandelier_temple_rug"
+    "K": "chandelier_temple_rug",
+    "a": "wash_stand_marble"
   },
   "enemies": {},
   "layout": [
     "WWWWCWWWWWWWCWWWW",
-    "WFeFFFkFWFkFFFeFW",
+    "WaeFFFkFWakFFFeFW",
     "LFFFFFFFWFFFFFFFL",
     "WFFFFthFWFFFFthFW",
     "WWLWdWLWWWLWdWLWW",
     "CSuuuuuuKuuuuuuFC",
     "WFuuuuuuuuuuuuuFW",
     "WWLWdWLWWWLWdWLWW",
-    "WgFFFFgFWFgFFFFFW",
+    "WgaFFFgFWagFFFFFW",
     "LFFFFFFFWFFFhtFFL",
     "WFeFeFeFWFeFFFeFW",
     "WWWWCWWWWWWWCWWWW"

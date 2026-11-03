@@ -36,13 +36,16 @@
     "X": "crate_marble",
     "L": "wall_sconce_marble",
     "d": "temple_room_door",
-    "N": "hanging_candles_rug"
+    "N": "hanging_candles_rug",
+    "a": "sink_marble",
+    "b": "water_barrel_marble",
+    "c": "wash_stand_marble"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWWWWWW",
-    "WFFFFFFFWgosW",
-    "LFhhhhhFLFFFW",
+    "WcFFFFFFWaosW",
+    "LFhhhhhFLbFFW",
     "WFtttttFWFtFW",
     "EFuuNuuFdFFFW",
     "WFhhhhhFWFFXW",

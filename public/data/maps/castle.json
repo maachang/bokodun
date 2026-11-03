@@ -48,13 +48,16 @@
     "N": "counter_stone",
     "Q": "weapon_rack_stone",
     "U": "stairs_stone_up",
-    "S": "stairs_stone_down"
+    "S": "stairs_stone_down",
+    "f": "sink_stone",
+    "i": "water_barrel_stone",
+    "j": "wash_stand_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWLRWWRLWWWWWWWWWdWWWdWWWWWWWWWWWW",
-    "Wkkk0WaaaAAaaaWtt0gWgo0s0o0gXWXQ0Q0Q0XW",
-    "Wkkk0WaaaAAaaaW0h0gW000000000W00000000W",
+    "Wkkk0WaaaAAaaaWtt0gWgo0sfo0gXWXQ0Q0Q0XW",
+    "Wkkk0WaaaAAaaaW0h0gWi00i00000W00000000W",
     "W0000WbbbBBbbbW0000W0N000000XW00000000W",
     "W0000WcccCCcccW0000W0N0ttt000W0ht0hth0W",
     "W0000d000uu000d0000W00h000h0XWX000000XW",
@@ -63,7 +66,7 @@
     "WWWWWWWRLuuLRWWWWWWWuuuuKuuuuuuuuuuuuUW",
     "W0s000000uu000000s0duuuuuuuuuuuKuuuuuuW",
     "d00h0h000KK000h0h00LWLWWdWWLWRWWWdWWLWW",
-    "W00ttt000uu000ttt00W00Q000Q00W00000000W",
+    "W00ttt000uu000ttt00Wj0Q000Q00W0000j000W",
     "R00h0h000uu000h0h00R0e0e00e0eW0e0000e0W",
     "W00000000uu00000000W000000000W00htth00W",
     "d00000000KK00000000L000htth00W00htth00W",
@@ -231,12 +234,12 @@
     {
       "id": "maid",
       "x": 35,
-      "z": 15
+      "z": 12
     },
     {
       "id": "maid",
       "x": 32,
-      "z": 15
+      "z": 12
     },
     {
       "id": "servant_man",

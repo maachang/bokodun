@@ -174,12 +174,12 @@ test('王城: 1階に厨房・武器庫・兵の待機所・下働きの食堂�
     assert.equal(seen.size, [...flat].filter(ch => ch !== '1').length, '迷宮は、すべてつながっている');
 });
 
-test('屋内のマップ: 出現位置から、NPC のいる所へ、歩いて行ける（扉や壁の飾りで、部屋がふさがれていない）', () => {
+test('マップ: 出現位置から、NPC のいる所へ、歩いて行ける（扉や壁の飾りで、部屋がふさがれていない）', () => {
     const fs2 = fs.readdirSync(path.join(root, 'public/data/maps')).map(f => f.replace('.json', ''));
     const bad = [];
     for (const id of fs2) {
         const m = readJson(`public/data/maps/${id}.json`);
-        if (m.type !== 'indoor' || !m.npcs?.length) continue;
+        if (!m.npcs?.length) continue;   // 屋内・屋外とも（城は type が open）
         const solid = (x, y) => {
             const ch = m.layout[y]?.[x]; if (ch === undefined) return true; if (ch === '0') return false;
             const d = objects[m.legend[ch]]; if (!d) return false;
@@ -188,7 +188,7 @@ test('屋内のマップ: 出現位置から、NPC のいる所へ、歩いて�
         };
         const seen = new Set([`${m.spawn.x},${m.spawn.z}`]), q = [[m.spawn.x, m.spawn.z]];
         while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (!solid(nx, ny) && !seen.has(`${nx},${ny}`)) { seen.add(`${nx},${ny}`); q.push([nx, ny]); } } }
-        for (const n of m.npcs) if (!seen.has(`${n.x},${n.z}`)) bad.push(`${id}: ${n.id} (${n.x},${n.z})`);
+        for (const n of m.npcs) if (n.id !== '$shopkeeper' && !seen.has(`${n.x},${n.z}`)) bad.push(`${id}: ${n.id} (${n.x},${n.z})`);
     }
     assert.deepEqual(bad, [], `行けない所の NPC: ${bad.join(' / ')}`);
 });
@@ -248,7 +248,7 @@ test('王城（グレードアップ）: 礼拝堂・中庭・衛兵詰所・パ
     for (const id of ['castle_chapel', 'castle_courtyard', 'castle_guardroom', 'castle_bakehouse', 'mansion_pantry', 'castle_2f', 'castle_basement']) assert.ok(dests.has(id), `1階から: ${id}`);
     const courtyard = readJson('public/data/maps/castle_courtyard.json');
     assert.equal(courtyard.type, 'open');
-    assert.ok(Object.values(courtyard.legend).includes('plaza_fountain') && Object.values(courtyard.legend).includes('training_dummy_out'), '井戸と訓練の的');
+    assert.ok(Object.values(courtyard.legend).includes('well') && Object.values(courtyard.legend).includes('training_dummy_out'), '井戸と訓練の的');
     assert.ok(Object.values(courtyard.links).some(l => l.nextMap === 'castle_smithy'), '鍛冶場');
     const f3 = readJson('public/data/maps/castle_3f.json'), f4 = readJson('public/data/maps/castle_4f.json');
     assert.ok(Object.values(f3.links).some(l => l.nextMap === 'castle_4f') && Object.values(f4.links).some(l => l.nextMap === 'castle_3f'));
@@ -274,4 +274,20 @@ test('村長の家（グレードアップ）: 広間に暖炉、居間に机と
     }
     assert.ok(Object.values(readJson('public/data/maps/village_buttery.json').legend).includes('barrel'), 'バターリー: 樽');
     assert.ok(Object.values(readJson('public/data/maps/village_pantry.json').legend).includes('crate'), 'パントリー: 木箱');
+});
+
+test('水回り: 厨房に流し台と水樽、寝室に洗面台、上流の屋敷・城・医務室に浴槽、村と城の中庭に井戸がある。家具は、部屋の床・天井に合わせた版を使う', () => {
+    const idsOf = (id) => new Set(Object.values(readJson(`public/data/maps/${id}.json`).legend));
+    const has = (id, re) => [...idsOf(id)].some(n => re.test(n));
+    for (const id of ['village_chief_house', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'mansion', 'mansion_margrave', 'mansion_marquis', 'mansion_viscount', 'mansion_baron', 'castle']) {
+        assert.ok(has(id, /^sink/), `${id}: 流し台`);
+    }
+    for (const id of ['mansion', 'mansion_margrave', 'mansion_marquis', 'temple_town_dining', 'castle']) assert.ok(has(id, /^water_barrel/), `${id}: 水樽`);
+    for (const id of ['mansion_2f', 'mansion_margrave_2f', 'mansion_marquis_2f', 'temple_infirmary', 'castle_4f']) assert.ok(has(id, /^bathtub/), `${id}: 浴槽`);
+    for (const id of ['mansion_2f', 'mansion_3f', 'temple_2f', 'temple_town_2f', 'castle_4f', 'temple_village_bedroom']) assert.ok(has(id, /^wash_stand/), `${id}: 洗面台`);
+    assert.ok(has('village', /^well$/) && has('castle_courtyard', /^well$/), '井戸');
+    // 床・天井の材質が、部屋に合う
+    assert.equal(objects.sink.floorTexture, 'woodFloor'); assert.equal(objects.sink_stone.floorTexture, 'floorStone'); assert.equal(objects.sink_marble.floorTexture, 'marbleFloor');
+    assert.ok(has('temple_kitchen', /^sink_marble$/) && has('castle', /^sink_stone$/) && has('village_chief_house', /^sink$/));
+    assert.equal(objects.well.floorTexture, undefined, '井戸は野外用');
 });

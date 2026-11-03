@@ -38,13 +38,15 @@
     "C": "wall_window_curtain",
     "L": "wall_sconce_wood",
     "K": "chandelier_mansion_rug",
-    "E": "building_exit"
+    "E": "building_exit",
+    "a": "sink",
+    "b": "water_barrel"
   },
   "enemies": {},
   "layout": [
     "WWWCWLWCWWWWWWWWW",
-    "WFkkFsFkkUWgosFgW",
-    "WFFFuuuFFFWFFFFFW",
+    "WFkkFsFkkUWgosagW",
+    "WFFFuuuFFFWbFFFFW",
     "WFFFuuuFFFWFhthFd",
     "CFFFuKuFFFdFFFFFW",
     "WFFFuuuFFFWFFFFFW",

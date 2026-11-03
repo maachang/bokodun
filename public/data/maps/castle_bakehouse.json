@@ -31,13 +31,14 @@
     "o": "stove_stone",
     "X": "crate_stone",
     "B": "barrel_stone",
-    "L": "wall_sconce"
+    "L": "wall_sconce",
+    "a": "water_barrel_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWW",
     "WoFoFBBXW",
-    "LFFFFFFFL",
+    "LFaFFFFFL",
     "WXFFtFFFW",
     "WFFFFFFFW",
     "WBFFFFFBW",

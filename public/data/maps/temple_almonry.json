@@ -30,12 +30,13 @@
     "t": "table_marble",
     "h": "chair_marble",
     "g": "cupboard_marble",
-    "X": "crate_marble"
+    "X": "crate_marble",
+    "a": "water_barrel_marble"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWW",
-    "WXFFFFFgW",
+    "WXFaFFFgW",
     "WFhhhhFFW",
     "WFtttttFE",
     "WFhhhhhFW",

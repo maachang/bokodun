@@ -38,12 +38,14 @@
     "C": "wall_window_curtain",
     "L": "wall_sconce_wood",
     "R": "wall_banner_red_wood",
-    "K": "chandelier_mansion_rug"
+    "K": "chandelier_mansion_rug",
+    "a": "wash_stand",
+    "b": "bathtub"
   },
   "enemies": {},
   "layout": [
     "WWWWCWWWWWWWCWWWWWWWCWWWW",
-    "WgFeeFFgWgFFeFFgWkkFsFkkW",
+    "WgaeebFgWgaFebFgWkkFsFkkW",
     "WFFFFFFFWFFFFFFFWFFFFFFFW",
     "CFFuuuFFWFFuuuFFWFFuuuFFC",
     "WFFuKuFFWFFuKuFFWFFuKuFFW",

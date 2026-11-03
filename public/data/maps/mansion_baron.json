@@ -36,16 +36,18 @@
     "s": "hearth",
     "o": "stove",
     "C": "wall_window_curtain",
-    "L": "wall_sconce_wood"
+    "L": "wall_sconce_wood",
+    "a": "sink",
+    "b": "wash_stand"
   },
   "enemies": {},
   "layout": [
     "WWLCWWWWWWW",
-    "WFksFkFWgoW",
+    "WFksFkFWaoW",
     "WFuuuFFdFFW",
     "WFuuuFFWFFW",
     "CFuuuFFWWWW",
-    "WhtuuthWFFW",
+    "WhtuuthWbFW",
     "LFuuuFFdgeW",
     "WFFFFFFWFFW",
     "WWWEWWWWWWW"

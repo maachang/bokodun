@@ -31,12 +31,13 @@
     "t": "table_stone",
     "X": "crate_stone",
     "k": "bookshelf_stone",
-    "w": "temple_brick_window"
+    "w": "temple_brick_window",
+    "a": "wash_stand_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWWWW",
-    "WeFFkkW",
+    "WeaFkkW",
     "WFFFFFW",
     "WFFFFFE",
     "WeFFtFW",

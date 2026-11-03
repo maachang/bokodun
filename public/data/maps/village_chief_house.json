@@ -33,17 +33,20 @@
     "h": "chair",
     "g": "cupboard",
     "s": "hearth",
-    "o": "stove"
+    "o": "stove",
+    "a": "sink",
+    "b": "water_barrel",
+    "c": "wash_stand"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWWWWWWWWW",
-    "WFeFFWsuuUWgosFW",
-    "WFFFFdFuuFdFFFFd",
+    "WFeFFWsuuUWgosaW",
+    "WFFFFdFuuFdFbFFd",
     "WFhthWFuuFWFtFFW",
     "WFFFFWFuuFWFFFFd",
     "WWWWWWFuuFWWWWWW",
-    "WeFFFWFuuFWkkFFW",
+    "WecFFWFuuFWkkFFW",
     "WFFFFdFuuFdFtFhW",
     "WeFFFWFuuFWFFFFW",
     "WWWWWWWddWWWWWWW"

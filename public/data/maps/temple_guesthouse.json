@@ -33,12 +33,13 @@
     "s": "hearth_marble",
     "X": "crate_marble",
     "e": "bed_marble",
-    "L": "wall_sconce_marble"
+    "L": "wall_sconce_marble",
+    "a": "wash_stand_marble"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWWWW",
-    "WeFeFeFsFgW",
+    "WeaeFeFsFgW",
     "LFFFFFFFFFL",
     "WFhtFFhtFFE",
     "WFFFFFFFFFW",

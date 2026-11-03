@@ -32,12 +32,13 @@
     "h": "chair_marble",
     "L": "wall_sconce_marble",
     "N": "hanging_candles_rug",
-    "g": "cupboard_marble"
+    "g": "cupboard_marble",
+    "a": "wash_stand_marble"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWWWW",
-    "WgFFFFFFFgW",
+    "WgaFFFFFFgW",
     "LFhhhhhhhFL",
     "WFtttttttFW",
     "EFhhhhhhhFW",

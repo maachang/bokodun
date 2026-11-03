@@ -31,12 +31,13 @@
     "h": "chair_stone",
     "e": "bed_stone",
     "Q": "weapon_rack_stone",
-    "L": "wall_sconce"
+    "L": "wall_sconce",
+    "a": "wash_stand_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWEWWWW",
-    "WFFFFFFFW",
+    "WaFFFFFFW",
     "WQFtFFhQW",
     "LFFhtFFFL",
     "WFFFFFFeW",

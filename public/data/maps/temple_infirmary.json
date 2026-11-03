@@ -30,12 +30,14 @@
     "t": "table_marble",
     "g": "cupboard_marble",
     "e": "bed_marble",
-    "L": "wall_sconce_marble"
+    "L": "wall_sconce_marble",
+    "a": "wash_stand_marble",
+    "b": "bathtub_marble"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWWWW",
-    "WeFeFeFeFFW",
+    "WeaeFeFebFW",
     "LFFFFFFFFFL",
     "WFFFFtFFFFE",
     "WFFFFFFFFFW",

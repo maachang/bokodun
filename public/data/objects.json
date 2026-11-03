@@ -10534,5 +10534,1132 @@
       0.9
     ],
     "description": "訓練用の的（野外用。床・天井は付けない）"
+  },
+  "sink": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.9,
+          0.9,
+          1.0
+        ],
+        "pos": [
+          0,
+          0.45,
+          -1.4
+        ],
+        "color": "#8a8a90"
+      },
+      {
+        "size": [
+          1.9,
+          0.08,
+          1.1
+        ],
+        "pos": [
+          0,
+          0.94,
+          -1.4
+        ],
+        "color": "#a0a0a8"
+      },
+      {
+        "size": [
+          1.2,
+          0.05,
+          0.7
+        ],
+        "pos": [
+          0,
+          0.98,
+          -1.4
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          1.0,
+          0.03,
+          0.5
+        ],
+        "pos": [
+          0,
+          1.0,
+          -1.4
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          0.2,
+          0.4,
+          0.2
+        ],
+        "pos": [
+          0.7,
+          1.2,
+          -1.55
+        ],
+        "color": "#6b4423"
+      }
+    ],
+    "collider": [
+      1.9,
+      1.0
+    ],
+    "blocksProjectiles": false,
+    "description": "流し台（石の台に水を張った洗い桶）。台所用（木の屋敷用）",
+    "colliderOffset": [
+      0,
+      -1.4
+    ],
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall"
+  },
+  "sink_stone": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.9,
+          0.9,
+          1.0
+        ],
+        "pos": [
+          0,
+          0.45,
+          -1.4
+        ],
+        "color": "#8a8a90"
+      },
+      {
+        "size": [
+          1.9,
+          0.08,
+          1.1
+        ],
+        "pos": [
+          0,
+          0.94,
+          -1.4
+        ],
+        "color": "#a0a0a8"
+      },
+      {
+        "size": [
+          1.2,
+          0.05,
+          0.7
+        ],
+        "pos": [
+          0,
+          0.98,
+          -1.4
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          1.0,
+          0.03,
+          0.5
+        ],
+        "pos": [
+          0,
+          1.0,
+          -1.4
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          0.2,
+          0.4,
+          0.2
+        ],
+        "pos": [
+          0.7,
+          1.2,
+          -1.55
+        ],
+        "color": "#6b4423"
+      }
+    ],
+    "collider": [
+      1.9,
+      1.0
+    ],
+    "blocksProjectiles": false,
+    "description": "流し台（石の台に水を張った洗い桶）。台所用（石の床・レンガの天井用）",
+    "colliderOffset": [
+      0,
+      -1.4
+    ],
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick"
+  },
+  "sink_marble": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.9,
+          0.9,
+          1.0
+        ],
+        "pos": [
+          0,
+          0.45,
+          -1.4
+        ],
+        "color": "#8a8a90"
+      },
+      {
+        "size": [
+          1.9,
+          0.08,
+          1.1
+        ],
+        "pos": [
+          0,
+          0.94,
+          -1.4
+        ],
+        "color": "#a0a0a8"
+      },
+      {
+        "size": [
+          1.2,
+          0.05,
+          0.7
+        ],
+        "pos": [
+          0,
+          0.98,
+          -1.4
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          1.0,
+          0.03,
+          0.5
+        ],
+        "pos": [
+          0,
+          1.0,
+          -1.4
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          0.2,
+          0.4,
+          0.2
+        ],
+        "pos": [
+          0.7,
+          1.2,
+          -1.55
+        ],
+        "color": "#6b4423"
+      }
+    ],
+    "collider": [
+      1.9,
+      1.0
+    ],
+    "blocksProjectiles": false,
+    "description": "流し台（石の台に水を張った洗い桶）。台所用（大理石の床・天井用）",
+    "colliderOffset": [
+      0,
+      -1.4
+    ],
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall"
+  },
+  "water_barrel": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.0,
+          1.2,
+          1.0
+        ],
+        "pos": [
+          0,
+          0.6,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.06,
+          0.08,
+          1.06
+        ],
+        "pos": [
+          0,
+          0.3,
+          0
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          1.06,
+          0.08,
+          1.06
+        ],
+        "pos": [
+          0,
+          0.9,
+          0
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          0.8,
+          0.04,
+          0.8
+        ],
+        "pos": [
+          0,
+          1.22,
+          0
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          0.08,
+          0.5,
+          0.08
+        ],
+        "pos": [
+          0.35,
+          1.4,
+          0.1
+        ],
+        "color": "#5a3a1e"
+      }
+    ],
+    "collider": [
+      1.2,
+      1.2
+    ],
+    "blocksProjectiles": false,
+    "description": "水樽（ひしゃくつき）（木の屋敷用）",
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall"
+  },
+  "water_barrel_stone": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.0,
+          1.2,
+          1.0
+        ],
+        "pos": [
+          0,
+          0.6,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.06,
+          0.08,
+          1.06
+        ],
+        "pos": [
+          0,
+          0.3,
+          0
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          1.06,
+          0.08,
+          1.06
+        ],
+        "pos": [
+          0,
+          0.9,
+          0
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          0.8,
+          0.04,
+          0.8
+        ],
+        "pos": [
+          0,
+          1.22,
+          0
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          0.08,
+          0.5,
+          0.08
+        ],
+        "pos": [
+          0.35,
+          1.4,
+          0.1
+        ],
+        "color": "#5a3a1e"
+      }
+    ],
+    "collider": [
+      1.2,
+      1.2
+    ],
+    "blocksProjectiles": false,
+    "description": "水樽（ひしゃくつき）（石の床・レンガの天井用）",
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick"
+  },
+  "water_barrel_marble": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.0,
+          1.2,
+          1.0
+        ],
+        "pos": [
+          0,
+          0.6,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.06,
+          0.08,
+          1.06
+        ],
+        "pos": [
+          0,
+          0.3,
+          0
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          1.06,
+          0.08,
+          1.06
+        ],
+        "pos": [
+          0,
+          0.9,
+          0
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          0.8,
+          0.04,
+          0.8
+        ],
+        "pos": [
+          0,
+          1.22,
+          0
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          0.08,
+          0.5,
+          0.08
+        ],
+        "pos": [
+          0.35,
+          1.4,
+          0.1
+        ],
+        "color": "#5a3a1e"
+      }
+    ],
+    "collider": [
+      1.2,
+      1.2
+    ],
+    "blocksProjectiles": false,
+    "description": "水樽（ひしゃくつき）（大理石の床・天井用）",
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall"
+  },
+  "wash_stand": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          0.1,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          -0.5,
+          0.45,
+          -1.5
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.1,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          0.5,
+          0.45,
+          -1.5
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.3,
+          0.08,
+          0.7
+        ],
+        "pos": [
+          0,
+          0.92,
+          -1.5
+        ],
+        "color": "#8b5a2b"
+      },
+      {
+        "size": [
+          0.8,
+          0.15,
+          0.5
+        ],
+        "pos": [
+          -0.1,
+          1.03,
+          -1.5
+        ],
+        "color": "#d8d8e0"
+      },
+      {
+        "size": [
+          0.6,
+          0.03,
+          0.4
+        ],
+        "pos": [
+          -0.1,
+          1.1,
+          -1.5
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          0.25,
+          0.45,
+          0.25
+        ],
+        "pos": [
+          0.45,
+          1.2,
+          -1.5
+        ],
+        "color": "#c8c8d0"
+      },
+      {
+        "size": [
+          0.5,
+          0.7,
+          0.04
+        ],
+        "pos": [
+          0.0,
+          1.5,
+          -1.9
+        ],
+        "color": "#e8e0d0"
+      }
+    ],
+    "collider": [
+      1.4,
+      0.9
+    ],
+    "blocksProjectiles": false,
+    "description": "洗面台（水差しと洗い鉢、手ぬぐい）（木の屋敷用）",
+    "colliderOffset": [
+      0,
+      -1.5
+    ],
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall"
+  },
+  "wash_stand_stone": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          0.1,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          -0.5,
+          0.45,
+          -1.5
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.1,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          0.5,
+          0.45,
+          -1.5
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.3,
+          0.08,
+          0.7
+        ],
+        "pos": [
+          0,
+          0.92,
+          -1.5
+        ],
+        "color": "#8b5a2b"
+      },
+      {
+        "size": [
+          0.8,
+          0.15,
+          0.5
+        ],
+        "pos": [
+          -0.1,
+          1.03,
+          -1.5
+        ],
+        "color": "#d8d8e0"
+      },
+      {
+        "size": [
+          0.6,
+          0.03,
+          0.4
+        ],
+        "pos": [
+          -0.1,
+          1.1,
+          -1.5
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          0.25,
+          0.45,
+          0.25
+        ],
+        "pos": [
+          0.45,
+          1.2,
+          -1.5
+        ],
+        "color": "#c8c8d0"
+      },
+      {
+        "size": [
+          0.5,
+          0.7,
+          0.04
+        ],
+        "pos": [
+          0.0,
+          1.5,
+          -1.9
+        ],
+        "color": "#e8e0d0"
+      }
+    ],
+    "collider": [
+      1.4,
+      0.9
+    ],
+    "blocksProjectiles": false,
+    "description": "洗面台（水差しと洗い鉢、手ぬぐい）（石の床・レンガの天井用）",
+    "colliderOffset": [
+      0,
+      -1.5
+    ],
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick"
+  },
+  "wash_stand_marble": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          0.1,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          -0.5,
+          0.45,
+          -1.5
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.1,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          0.5,
+          0.45,
+          -1.5
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.3,
+          0.08,
+          0.7
+        ],
+        "pos": [
+          0,
+          0.92,
+          -1.5
+        ],
+        "color": "#8b5a2b"
+      },
+      {
+        "size": [
+          0.8,
+          0.15,
+          0.5
+        ],
+        "pos": [
+          -0.1,
+          1.03,
+          -1.5
+        ],
+        "color": "#d8d8e0"
+      },
+      {
+        "size": [
+          0.6,
+          0.03,
+          0.4
+        ],
+        "pos": [
+          -0.1,
+          1.1,
+          -1.5
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          0.25,
+          0.45,
+          0.25
+        ],
+        "pos": [
+          0.45,
+          1.2,
+          -1.5
+        ],
+        "color": "#c8c8d0"
+      },
+      {
+        "size": [
+          0.5,
+          0.7,
+          0.04
+        ],
+        "pos": [
+          0.0,
+          1.5,
+          -1.9
+        ],
+        "color": "#e8e0d0"
+      }
+    ],
+    "collider": [
+      1.4,
+      0.9
+    ],
+    "blocksProjectiles": false,
+    "description": "洗面台（水差しと洗い鉢、手ぬぐい）（大理石の床・天井用）",
+    "colliderOffset": [
+      0,
+      -1.5
+    ],
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall"
+  },
+  "bathtub": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.7,
+          0.75,
+          2.9
+        ],
+        "pos": [
+          0,
+          0.375,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.4,
+          0.05,
+          2.6
+        ],
+        "pos": [
+          0,
+          0.72,
+          0
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          1.8,
+          0.08,
+          3.0
+        ],
+        "pos": [
+          0,
+          0.78,
+          0
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          1.5,
+          0.06,
+          2.7
+        ],
+        "pos": [
+          0,
+          0.8,
+          0
+        ],
+        "color": "#4a8ad0"
+      }
+    ],
+    "collider": [
+      1.8,
+      3.0
+    ],
+    "blocksProjectiles": false,
+    "description": "木の浴槽（湯を張る桶）（木の屋敷用）",
+    "floorTexture": "woodFloor",
+    "ceilingTexture": "woodWall"
+  },
+  "bathtub_stone": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.7,
+          0.75,
+          2.9
+        ],
+        "pos": [
+          0,
+          0.375,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.4,
+          0.05,
+          2.6
+        ],
+        "pos": [
+          0,
+          0.72,
+          0
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          1.8,
+          0.08,
+          3.0
+        ],
+        "pos": [
+          0,
+          0.78,
+          0
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          1.5,
+          0.06,
+          2.7
+        ],
+        "pos": [
+          0,
+          0.8,
+          0
+        ],
+        "color": "#4a8ad0"
+      }
+    ],
+    "collider": [
+      1.8,
+      3.0
+    ],
+    "blocksProjectiles": false,
+    "description": "木の浴槽（湯を張る桶）（石の床・レンガの天井用）",
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick"
+  },
+  "bathtub_marble": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          1.7,
+          0.75,
+          2.9
+        ],
+        "pos": [
+          0,
+          0.375,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          1.4,
+          0.05,
+          2.6
+        ],
+        "pos": [
+          0,
+          0.72,
+          0
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          1.8,
+          0.08,
+          3.0
+        ],
+        "pos": [
+          0,
+          0.78,
+          0
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          1.5,
+          0.06,
+          2.7
+        ],
+        "pos": [
+          0,
+          0.8,
+          0
+        ],
+        "color": "#4a8ad0"
+      }
+    ],
+    "collider": [
+      1.8,
+      3.0
+    ],
+    "blocksProjectiles": false,
+    "description": "木の浴槽（湯を張る桶）（大理石の床・天井用）",
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall"
+  },
+  "well": {
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          2.0,
+          0.9,
+          0.4
+        ],
+        "pos": [
+          0,
+          0.45,
+          -0.8
+        ],
+        "color": "#8a8a90"
+      },
+      {
+        "size": [
+          2.0,
+          0.9,
+          0.4
+        ],
+        "pos": [
+          0,
+          0.45,
+          0.8
+        ],
+        "color": "#8a8a90"
+      },
+      {
+        "size": [
+          0.4,
+          0.9,
+          1.2
+        ],
+        "pos": [
+          -0.8,
+          0.45,
+          0
+        ],
+        "color": "#8a8a90"
+      },
+      {
+        "size": [
+          0.4,
+          0.9,
+          1.2
+        ],
+        "pos": [
+          0.8,
+          0.45,
+          0
+        ],
+        "color": "#8a8a90"
+      },
+      {
+        "size": [
+          1.2,
+          0.05,
+          1.2
+        ],
+        "pos": [
+          0,
+          0.6,
+          0
+        ],
+        "color": "#4a8ad0"
+      },
+      {
+        "size": [
+          0.15,
+          2.3,
+          0.15
+        ],
+        "pos": [
+          -0.95,
+          1.15,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.15,
+          2.3,
+          0.15
+        ],
+        "pos": [
+          0.95,
+          1.15,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          2.1,
+          0.15,
+          0.15
+        ],
+        "pos": [
+          0,
+          2.3,
+          0
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.3,
+          0.35,
+          0.3
+        ],
+        "pos": [
+          0,
+          1.4,
+          0
+        ],
+        "color": "#6b4423"
+      }
+    ],
+    "collider": [
+      2.2,
+      2.2
+    ],
+    "blocksProjectiles": false,
+    "description": "井戸（石の井筒、屋根なしの滑車と桶。野外用。水がめ）"
   }
 }

@@ -33,13 +33,15 @@
     "s": "hearth_stone",
     "o": "stove_stone",
     "X": "crate_stone",
-    "w": "temple_brick_window"
+    "w": "temple_brick_window",
+    "a": "sink_stone",
+    "b": "water_barrel_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWWWW",
-    "WgosFXW",
-    "WFFFFFW",
+    "WgosaXW",
+    "WbFFFFW",
     "EFFtFFW",
     "WFhFhFW",
     "WFFFFXW",

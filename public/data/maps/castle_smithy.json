@@ -31,13 +31,14 @@
     "X": "crate_stone",
     "Q": "weapon_rack_stone",
     "V": "anvil_stone",
-    "L": "wall_sconce"
+    "L": "wall_sconce",
+    "a": "water_barrel_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWW",
     "WQFsFsFQW",
-    "LFFFFFFFL",
+    "LaFFFFFFL",
     "WFVFFFVFW",
     "WFFFFFFFW",
     "WXFFFFFXW",
