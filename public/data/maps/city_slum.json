@@ -125,7 +125,8 @@
         "x": 18,
         "z": 17,
         "angle": 3.14159
-      }
+      },
+      "icon": "thiefGuildIcon"
     },
     "6,0": {
       "nextMap": "city",
@@ -152,7 +153,8 @@
         "x": 23,
         "z": 20,
         "angle": 3.14159
-      }
+      },
+      "icon": "barIcon"
     }
   }
 }

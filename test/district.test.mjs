@@ -419,3 +419,17 @@ test('カウンターの店員: ギルド・酒場・店の、カウンターや
     }
     assert.ok(fs.readFileSync('public/js/game.js', 'utf8').includes('n.oz ?? 0'), 'oz を使う');
 });
+
+test('看板: ギルド・鍛冶屋・訓練所・盗賊ギルド・酒場の入口にも、店と同じ看板（アイコン）が出る', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const game = fs.readFileSync('public/js/game.js', 'utf8');
+    const expected = { guild_adv: 'advGuildIcon', guild_mage: 'mageGuildIcon', guild_merchant: 'merchantGuildIcon', guild_smith: 'smithIcon', guild_training: 'trainingIcon', guild_thief: 'thiefGuildIcon', slum_bar: 'barIcon' };
+    const links = [...Object.values(rd('city').links), ...Object.values(rd('city_slum').links)];
+    for (const [dest, icon] of Object.entries(expected)) {
+        const l = links.find(x => x.nextMap === dest);
+        assert.ok(l, `${dest}: 入口`);
+        assert.equal(l.icon, icon, `${dest}: アイコン`);
+        assert.ok(l.back, `${dest}: 看板は、戻る側（back）の面に出る`);
+        assert.ok(game.includes(`${icon}: RetroTextureGenerator.createShopIconTexture(`), `${icon}: テクスチャを登録`);
+    }
+});
