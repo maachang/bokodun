@@ -27,16 +27,19 @@
     "W": "temple_brick_wall",
     "F": "temple_brick_floor",
     "G": "goddess_statue_small",
-    "D": "temple_exit_brick"
+    "D": "temple_exit_brick",
+    "w": "temple_brick_window",
+    "P": "temple_pew",
+    "1": "dais_brick_1"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWW",
-    "WFFGFFW",
-    "WFFFFFW",
-    "WFFFFFW",
-    "WFFFFFW",
-    "WFFFFFW",
+    "WwWWWwW",
+    "W11G11W",
+    "wFFFFFw",
+    "WPPFPPW",
+    "wFFFFFw",
+    "WPPFPPW",
     "WWWDWWW"
   ],
   "npcs": [

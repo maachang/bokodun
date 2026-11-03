@@ -161,7 +161,15 @@ for (const id of ['village', 'city']) {
     });
 }
 
-test('街: 飾り（花壇・草）の下は石畳（decorFloor）', () => {
-    const city = readJson('public/data/maps/city.json');
-    assert.equal(city.decorFloor, 'pavedRoad');
+test('街・町: 飾り（花壇・草）の下は広場の敷石（decorFloor）。道路（paved_road）だけ速度ボーナスがあり、広場の敷石にはない', () => {
+    const objects = readJson('public/data/objects.json');
+    for (const id of ['city', 'town']) {
+        const map = readJson(`public/data/maps/${id}.json`);
+        assert.equal(map.decorFloor, 'cobblestone', id);
+        assert.equal(map.legend['='], 'paved_road');
+        assert.equal(map.legend.p, 'plaza_stone');
+        assert.ok(map.layout.join('').includes('=') && map.layout.join('').includes('p'), `${id}: 道路と広場がある`);
+    }
+    assert.ok(objects.paved_road.speedBonus > 1);
+    assert.equal(objects.plaza_stone.speedBonus, undefined);
 });

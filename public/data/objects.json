@@ -2831,5 +2831,104 @@
     "nextMap": "$back",
     "message": "外に出る",
     "description": "村の神殿の出口の扉"
+  },
+  "plaza_stone": {
+    "type": "floor_tile",
+    "texture": "cobblestone",
+    "solid": false,
+    "description": "街・町の広場の敷石（道路ではないので、移動速度ボーナスなし。道路は paved_road）"
+  },
+  "temple_brick_window": {
+    "type": "block",
+    "texture": "brickWindow",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "村の神殿のレンガ壁の窓（木の枠の普通の窓。ステンドグラスではない）"
+  },
+  "temple_pew": {
+    "type": "furniture",
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick",
+    "parts": [
+      {
+        "size": [
+          3.9,
+          0.12,
+          0.7
+        ],
+        "pos": [
+          0,
+          0.5,
+          0
+        ],
+        "color": "#8b5a2b"
+      },
+      {
+        "size": [
+          3.9,
+          0.9,
+          0.1
+        ],
+        "pos": [
+          0,
+          0.95,
+          0.32
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.15,
+          1.0,
+          0.8
+        ],
+        "pos": [
+          -1.9,
+          0.5,
+          0.1
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          0.15,
+          1.0,
+          0.8
+        ],
+        "pos": [
+          1.9,
+          0.5,
+          0.1
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          3.6,
+          0.4,
+          0.1
+        ],
+        "pos": [
+          0,
+          0.2,
+          -0.05
+        ],
+        "color": "#5a3a1e"
+      }
+    ],
+    "collider": [
+      4.0,
+      1.0
+    ],
+    "blocksProjectiles": false,
+    "description": "教会の長椅子（長い腰掛けと背もたれ。祭壇のほうを向いて並べる）"
+  },
+  "dais_brick_1": {
+    "type": "floor_tile",
+    "texture": "floorStone",
+    "elevation": 0.3,
+    "ceilingTexture": "brick",
+    "solid": false,
+    "description": "村の神殿の像の前の石の段（高さ 0.3、1段）"
   }
 }

@@ -44,6 +44,26 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // レンガ壁に、木の枠の窓（十字の桟つき、ステンドグラスではない普通のガラス）を付けたテクスチャ（村の神殿の窓）
+    static createBrickWindowTexture() {
+        const texture = this.createBrickTexture();
+        const ctx = texture.image.getContext('2d');
+        ctx.fillStyle = '#4a2f18';              // 木の枠
+        ctx.fillRect(18, 12, 28, 38);
+        const grad = ctx.createLinearGradient(0, 15, 0, 47);
+        grad.addColorStop(0, '#d6ecfa');         // 外の明るい空
+        grad.addColorStop(1, '#8fb8d8');
+        ctx.fillStyle = grad;
+        ctx.fillRect(21, 15, 22, 32);
+        ctx.fillStyle = '#4a2f18';              // 十字の桟
+        ctx.fillRect(31, 15, 2, 32);
+        ctx.fillRect(21, 30, 22, 2);
+        ctx.fillStyle = '#6b4423';              // 窓の下の敷居
+        ctx.fillRect(16, 50, 32, 3);
+        texture.needsUpdate = true;
+        return texture;
+    }
+
     static createStoneFloorTexture() {
         const canvas = document.createElement('canvas');
         canvas.width = 64;

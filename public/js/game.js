@@ -222,6 +222,7 @@ export class GameEngine {
 
         this.textures = {
             brick: RetroTextureGenerator.createBrickTexture(),
+            brickWindow: RetroTextureGenerator.createBrickWindowTexture(),
             floorStone: RetroTextureGenerator.createStoneFloorTexture(),
             grass: RetroTextureGenerator.createGrassTexture(),
             sand: RetroTextureGenerator.createSandTexture(),
