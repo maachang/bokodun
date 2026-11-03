@@ -1,0 +1,120 @@
+{
+  "id": "town",
+  "name": "白壁の町 (Town)",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "grassland",
+  "spawn": {
+    "x": 13,
+    "z": 19,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": false,
+    "ambientLight": 9408660,
+    "directionalLight": 16774610,
+    "fogColor": 11713215,
+    "fogNear": 22,
+    "fogFar": 75,
+    "visibility": 0.9,
+    "skyColor": 9018045
+  },
+  "decorFloor": "pavedRoad",
+  "enemies": {},
+  "legend": {
+    "W": "city_wall",
+    "S": "shop_building",
+    "d": "shop_door",
+    "J": "temple_building",
+    "D": "temple_door",
+    "H": "brick_house",
+    "=": "paved_road",
+    "F": "plaza_fountain",
+    "T": "tree",
+    "f": "flower_bed",
+    "v": "flower_bed_blue",
+    "2": "portal",
+    "q": "item_shop_sign",
+    "c": "church_sign"
+  },
+  "layout": [
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WT========================TW",
+    "W==========================W",
+    "W==SSSS=============JJJJ===W",
+    "W==SSSS=============JJJJ===W",
+    "W==SdSS=============JDJJ===W",
+    "W=====q=ff=======vvc=======W",
+    "W==========================W",
+    "W=========T================W",
+    "W==========================W",
+    "W==========================W",
+    "W============F=============W",
+    "W==========================W",
+    "W================T=========W",
+    "W==========================W",
+    "W==HHHH=============HHHH===W",
+    "W==HHHH=============HHHH===W",
+    "W==HHHH=============HHHH===W",
+    "W==========================W",
+    "W==========================W",
+    "W==========================W",
+    "W============2=============W",
+    "WT========================TW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "town_man",
+      "x": 10,
+      "z": 12
+    },
+    {
+      "id": "town_woman",
+      "x": 17,
+      "z": 9
+    },
+    {
+      "id": "town_boy",
+      "x": 8,
+      "z": 18
+    },
+    {
+      "id": "town_old_woman",
+      "x": 22,
+      "z": 12
+    },
+    {
+      "id": "child_girl",
+      "x": 12,
+      "z": 15
+    }
+  ],
+  "links": {
+    "4,5": {
+      "nextMap": "shop",
+      "params": {
+        "shopId": "item_shop"
+      },
+      "message": "道具屋に入る",
+      "back": {
+        "x": 4,
+        "z": 6,
+        "angle": 3.14159
+      },
+      "icon": "itemShopIcon"
+    },
+    "21,5": {
+      "nextMap": "temple_town",
+      "message": "神殿に入る",
+      "back": {
+        "x": 21,
+        "z": 6,
+        "angle": 3.14159
+      },
+      "icon": "templeIcon"
+    }
+  }
+}

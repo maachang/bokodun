@@ -4,7 +4,7 @@
   "type": "indoor",
   "tileSize": 4,
   "wallHeight": 6,
-  "nextMap": "city",
+  "nextMap": "town",
   "spawn": {
     "x": 5,
     "z": 7,
