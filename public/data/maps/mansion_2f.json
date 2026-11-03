@@ -57,6 +57,16 @@
       "id": "duke_woman",
       "x": 8,
       "z": 6
+    },
+    {
+      "id": "maid_head",
+      "x": 12,
+      "z": 5
+    },
+    {
+      "id": "maid",
+      "x": 4,
+      "z": 5
     }
   ],
   "links": {

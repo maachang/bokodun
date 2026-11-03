@@ -39,13 +39,25 @@ test('区画: 盗賊ギルドは、どや街。一般街には、ギルド系は
     for (const g of ['guild_adv', 'guild_mage', 'guild_merchant', 'guild_training', 'guild_smith', 'temple']) assert.ok(dests.has(g), g);
 });
 
-test('区画: 貴族は貴族街に、一般の住人は一般街にいる（NPC の置き場）', () => {
+test('区画: 貴族・司祭・枢機卿は、街（屋外）に出歩かない。屋敷・神殿の中にいる。街には使用人が、お使いで歩く', () => {
+    const NOBLE = ['duke_man', 'duke_woman', 'margrave_man', 'margrave_woman', 'marquis_man', 'marquis_woman', 'viscount_man', 'baron_man', 'baron_woman', 'priest_senior', 'cardinal', 'king', 'prince'];
+    for (const id of ['city', 'city_noble', 'city_slum']) for (const n of D[id].npcs) assert.ok(!NOBLE.includes(n.id), `${id}: ${n.id} は街に出歩かない`);
+    const mansion = readJson('public/data/maps/mansion.json'), mansion2 = readJson('public/data/maps/mansion_2f.json');
+    assert.ok(mansion.npcs.some(n => n.id === 'duke_man') && mansion2.npcs.some(n => n.id === 'duke_woman'), '公爵は、屋敷の中');
     const ids = (m) => m.npcs.map(n => n.id);
-    for (const n of ['duke_man', 'duke_woman', 'margrave_man', 'marquis_man', 'viscount_man', 'baron_man']) {
-        assert.ok(ids(D.city_noble).includes(n), n);
-        assert.ok(!ids(D.city).includes(n), `${n}: 一般街にはいない`);
-    }
+    for (const n of ['servant_man', 'maid']) { assert.ok(ids(D.city).includes(n), `${n}: 一般街（買い出し）`); assert.ok(ids(D.city_noble).includes(n), `${n}: 貴族街`); }
     for (const m of Object.values(D)) for (const n of m.npcs ?? []) assert.ok(npcs[n.id], n.id);
+});
+
+test('区画: 王や貴族の周りに、使用人（執事・メイド・使用人）がいる。画像がある', () => {
+    for (const id of ['castle', 'mansion', 'mansion_2f']) {
+        const ids = readJson(`public/data/maps/${id}.json`).npcs.map(n => n.id);
+        assert.ok(ids.some(n => ['maid', 'maid_head', 'butler', 'servant_man'].includes(n)), `${id}: 使用人`);
+    }
+    for (const id of ['servant_man', 'maid_head', 'maid', 'butler', 'street_woman']) {
+        assert.ok(Number.isInteger(npcs[id].sdId) && fs.existsSync(path.join(root, 'public', npcs[id].texture)), `${id}: sdId・画像`);
+    }
+    assert.ok(D.city_slum.npcs.some(n => n.id === 'street_woman'));
 });
 
 test('区画: 貴族街の公爵の屋敷の扉から、屋敷に入れる。入場の条件（requires）は、まだデータに書かない', () => {
@@ -53,10 +65,26 @@ test('区画: 貴族街の公爵の屋敷の扉から、屋敷に入れる。入
     for (const m of Object.values(D)) for (const l of Object.values(m.links ?? {})) assert.equal(l.requires, undefined, '条件の動作は未実装なので、データには書かない');
 });
 
-test('貴族街: 王城（北の城門）に近いほど、高い階級の貴族が住む（公爵 < 辺境伯 < 侯爵 < 子爵 < 男爵 の順に、北から南へ）', () => {
-    const z = (id) => D.city_noble.npcs.find(n => n.id === id).z;
-    const order = ['duke_man', 'margrave_man', 'marquis_man', 'viscount_man', 'baron_man'].map(z);
-    for (let i = 1; i < order.length; i++) assert.ok(order[i] > order[i - 1], `階級の順: ${order}`);
+test('貴族街: 王城（北の城門）に近いほど、高い階級の屋敷。公爵の屋敷（扉つき）が、一番北', () => {
+    const lay = D.city_noble.layout, seen = new Set(), blocks = [];
+    lay.forEach((row, r) => [...row].forEach((ch, c) => {
+        if (!'HM'.includes(ch) || seen.has(`${c},${r}`)) return;
+        const stack = [[c, r]], cells = [];
+        seen.add(`${c},${r}`);
+        while (stack.length) {
+            const [x, y] = stack.pop(); cells.push([x, y]);
+            for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+                const k = `${x + dx},${y + dy}`, cc = lay[y + dy]?.[x + dx];
+                if (cc && 'HM'.includes(cc) && !seen.has(k)) { seen.add(k); stack.push([x + dx, y + dy]); }
+            }
+        }
+        blocks.push({ top: Math.min(...cells.map(p => p[1])), size: cells.length, door: cells.some(([x, y]) => lay[y][x] === 'M') });
+    }));
+    assert.equal(blocks.length, 5, '5階級の屋敷');
+    blocks.sort((a, b) => a.top - b.top);
+    assert.ok(blocks[0].door, '一番北が、公爵の屋敷（扉つき）');
+    assert.ok(blocks[0].size >= Math.max(...blocks.map(b => b.size)), '公爵の屋敷が、一番広い');
+    assert.ok(blocks[4].size <= Math.min(...blocks.map(b => b.size)), '男爵の屋敷が、一番小さい');
 });
 
 test('一般街: 市場に、日よけの屋根つきの露店（野外用）が並ぶ', () => {

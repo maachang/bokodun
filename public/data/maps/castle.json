@@ -104,6 +104,28 @@
       "id": "guard_light",
       "x": 2,
       "z": 4
+    },
+    {
+      "id": "maid",
+      "x": 8,
+      "z": 5
+    },
+    {
+      "id": "maid",
+      "x": 11,
+      "z": 5
+    },
+    {
+      "id": "butler",
+      "x": 8,
+      "z": 6,
+      "speed": 0,
+      "wanderRadius": 0
+    },
+    {
+      "id": "servant_man",
+      "x": 11,
+      "z": 6
     }
   ]
 }

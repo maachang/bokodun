@@ -110,6 +110,11 @@
       "id": "town_old_woman",
       "x": 21,
       "z": 14
+    },
+    {
+      "id": "street_woman",
+      "x": 21,
+      "z": 18
     }
   ],
   "links": {

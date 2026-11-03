@@ -69,51 +69,6 @@
   ],
   "npcs": [
     {
-      "id": "duke_man",
-      "x": 8,
-      "z": 9
-    },
-    {
-      "id": "duke_woman",
-      "x": 11,
-      "z": 9
-    },
-    {
-      "id": "margrave_man",
-      "x": 24,
-      "z": 11
-    },
-    {
-      "id": "margrave_woman",
-      "x": 24,
-      "z": 13
-    },
-    {
-      "id": "marquis_man",
-      "x": 10,
-      "z": 17
-    },
-    {
-      "id": "marquis_woman",
-      "x": 11,
-      "z": 18
-    },
-    {
-      "id": "viscount_man",
-      "x": 24,
-      "z": 19
-    },
-    {
-      "id": "baron_man",
-      "x": 8,
-      "z": 23
-    },
-    {
-      "id": "baron_woman",
-      "x": 9,
-      "z": 25
-    },
-    {
       "id": "gate_guard",
       "x": 14,
       "z": 1
@@ -132,6 +87,26 @@
       "id": "guard_light",
       "x": 19,
       "z": 18
+    },
+    {
+      "id": "servant_man",
+      "x": 14,
+      "z": 9
+    },
+    {
+      "id": "maid",
+      "x": 20,
+      "z": 9
+    },
+    {
+      "id": "maid",
+      "x": 14,
+      "z": 21
+    },
+    {
+      "id": "servant_man",
+      "x": 21,
+      "z": 21
     }
   ],
   "links": {

@@ -813,5 +813,75 @@
       "おい、ここは俺たちの縄張りだ。",
       "ケッ、ガキの来る所じゃねえぞ。"
     ]
+  },
+  "servant_man": {
+    "name": "貴族の使用人",
+    "sdId": 212,
+    "texture": "/images/npcs/servant_man.png",
+    "height": 2.3,
+    "aspect": 0.316,
+    "radius": 0.35,
+    "speed": 0.6,
+    "wanderRadius": 1.5,
+    "lines": [
+      "お屋敷のご用事で、買い出しに参りました。",
+      "旦那様をお待たせするわけには、まいりません。"
+    ]
+  },
+  "maid_head": {
+    "name": "メイド長",
+    "sdId": 213,
+    "texture": "/images/npcs/maid_head.png",
+    "height": 2.3,
+    "aspect": 0.343,
+    "radius": 0.35,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "そこ、ほこりが残っていますよ。やり直しなさい。",
+      "まったく、最近の若い子は……。"
+    ]
+  },
+  "maid": {
+    "name": "貴族のメイド",
+    "sdId": 214,
+    "texture": "/images/npcs/maid.png",
+    "height": 2.2,
+    "aspect": 0.301,
+    "radius": 0.35,
+    "speed": 0.6,
+    "wanderRadius": 1.5,
+    "lines": [
+      "いらっしゃいませ。御用でしたら、お申し付けください。",
+      "メイド長には、ないしょにしてくださいね。"
+    ]
+  },
+  "butler": {
+    "name": "執事",
+    "sdId": 215,
+    "texture": "/images/npcs/butler.png",
+    "height": 2.4,
+    "aspect": 0.317,
+    "radius": 0.35,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "私は、このお屋敷に仕えて、五十年になります。",
+      "旦那様のお客様ですな。ようこそ、おいでくださいました。"
+    ]
+  },
+  "street_woman": {
+    "name": "場末の女",
+    "sdId": 210,
+    "texture": "/images/npcs/street_woman.png",
+    "height": 2.3,
+    "aspect": 0.314,
+    "radius": 0.35,
+    "speed": 0.4,
+    "wanderRadius": 0.8,
+    "lines": [
+      "……あら、お兄さん。こんな所に、何の用？",
+      "ここは、あんたみたいな堅気の来る所じゃないよ。"
+    ]
   }
 }
