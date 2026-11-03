@@ -11,7 +11,7 @@ const shops = readJson('public/data/shops.json');
 const city = readJson('public/data/maps/city.json');
 const slum = readJson('public/data/maps/city_slum.json');
 const cityOf = (id) => (id === 'guild_thief' ? slum : city);   // 盗賊ギルドは、どや街
-const GUILDS = { guild_adv: ['adv_guild_master', 'adv_clerk_man', 'adv_clerk_woman'], guild_mage: ['mage_guild_master', 'mage_clerk_woman', 'mage_clerk_man'], guild_merchant: ['merchant_master_man', 'merchant_master_woman'], guild_training: ['trainer'], guild_smith: ['dwarf_smith'], guild_thief: ['thief_guild_master', 'thief_guild_leader', 'thief_guild_member'] };
+const GUILDS = { guild_adv: ['adv_clerk_man', 'adv_clerk_woman'], guild_mage: ['mage_clerk_woman', 'mage_clerk_man'], guild_merchant: ['merchant_clerk_man', 'merchant_clerk_woman'], guild_training: ['trainer'], guild_smith: ['dwarf_smith'], guild_thief: ['thief_guild_member'] };
 
 test('ギルド系の建物: 街の扉から入れ、出口で扉の前へ戻る。盗賊ギルドの扉だけ、看板がなく壁と同じ見た目（隠し扉）', () => {
     for (const id of Object.keys(GUILDS)) {
@@ -37,6 +37,7 @@ test('ギルド系の建物: 窓口の NPC は建物の中にいて、街の道�
             assert.ok(ids.includes(w), `${id}: ${w}`);
             assert.ok(![city, slum].some(c => c.npcs.some(n => n.id === w) && w !== 'thief_guild_member'), `${w}: 街の道には置かない`);
         }
+        if (id === 'guild_thief') continue;   // 盗賊ギルドには窓口がない（ギルド長は、奥の隠し部屋）
         const boss = m.npcs[0];
         assert.equal(boss.speed, 0, `${id}: 窓口は動かない`);
     }

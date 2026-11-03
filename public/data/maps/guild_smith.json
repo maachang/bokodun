@@ -45,7 +45,7 @@
     "WFFFFFFFFFW",
     "LFFVFFFVFFL",
     "WFFFFFFFFFW",
-    "WFFCCCCCFFW",
+    "WCCCCCCCCCW",
     "LFFFFFFFFFL",
     "WFFFFFFFFFW",
     "WaWWWEWaWWW"
@@ -57,7 +57,8 @@
       "z": 4,
       "speed": 0,
       "wanderRadius": 0,
-      "oz": 0.682
+      "oz": 0.682,
+      "behindCounter": true
     }
   ]
 }

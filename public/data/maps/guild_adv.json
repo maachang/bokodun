@@ -35,15 +35,16 @@
     "Q": "quest_board",
     "X": "crate",
     "k": "bookshelf",
-    "a": "wall_window_wood"
+    "a": "wall_window_wood",
+    "d": "wooden_door"
   },
   "enemies": {},
   "layout": [
     "WWaWWWaWWWW",
     "WQFFFFFFFQW",
     "WFFFFFFFFFW",
-    "LFFCCCCCFFL",
-    "WFFFFuFFFFW",
+    "LCCCCCCCCCL",
+    "WFFFFuFFFFd",
     "WFFFFKFFFFW",
     "LFhtFuFthFL",
     "WFFFFuFFFFW",
@@ -51,20 +52,13 @@
   ],
   "npcs": [
     {
-      "id": "adv_guild_master",
-      "x": 5,
-      "z": 2,
-      "speed": 0,
-      "wanderRadius": 0,
-      "oz": 0.688
-    },
-    {
       "id": "adv_clerk_man",
       "x": 3,
       "z": 2,
       "speed": 0,
       "wanderRadius": 0,
-      "oz": 0.71
+      "oz": 0.71,
+      "behindCounter": true
     },
     {
       "id": "adv_clerk_woman",
@@ -72,7 +66,8 @@
       "z": 2,
       "speed": 0,
       "wanderRadius": 0,
-      "oz": 0.725
+      "oz": 0.725,
+      "behindCounter": true
     },
     {
       "id": "adv_swordsman",
@@ -104,5 +99,16 @@
       "z": 5,
       "wanderRadius": 0.8
     }
-  ]
+  ],
+  "links": {
+    "10,4": {
+      "nextMap": "guild_adv_master",
+      "message": "ギルド長の部屋に入る",
+      "back": {
+        "x": 9,
+        "z": 4,
+        "angle": 1.570795
+      }
+    }
+  }
 }

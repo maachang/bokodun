@@ -35,7 +35,8 @@
     "V": "anvil_stone",
     "s": "hearth_stone",
     "X": "crate_stone",
-    "L": "wall_sconce"
+    "L": "wall_sconce",
+    "d": "brick_room_door"
   },
   "enemies": {},
   "layout": [
@@ -43,27 +44,13 @@
     "WFFFFFFFFFW",
     "WFFFFuFFFFW",
     "LFhtFuFthFL",
-    "WFFFFuFFFFW",
+    "WFFFFuFFFFd",
     "WXFFFFFFFXW",
     "LFhtFFFthFL",
     "WFFFFFFFFFW",
     "WWWWWEWWWWW"
   ],
   "npcs": [
-    {
-      "id": "thief_guild_master",
-      "x": 5,
-      "z": 1,
-      "speed": 0,
-      "wanderRadius": 0
-    },
-    {
-      "id": "thief_guild_leader",
-      "x": 7,
-      "z": 2,
-      "speed": 0,
-      "wanderRadius": 0
-    },
     {
       "id": "thief_guild_member",
       "x": 3,
@@ -78,5 +65,16 @@
       "speed": 0.4,
       "wanderRadius": 1.5
     }
-  ]
+  ],
+  "links": {
+    "10,4": {
+      "nextMap": "guild_thief_master",
+      "message": "奥の隠し部屋に入る",
+      "back": {
+        "x": 9,
+        "z": 4,
+        "angle": 1.570795
+      }
+    }
+  }
 }

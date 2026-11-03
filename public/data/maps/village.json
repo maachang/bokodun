@@ -56,7 +56,9 @@
     "Y": "well",
     "a": "outhouse",
     "b": "wooden_house_window",
-    "M": "pub_sign"
+    "M": "pub_sign",
+    "K": "inn_sign",
+    "Z": "inn_guide_sign"
   },
   "enemies": {},
   "layout": [
@@ -68,10 +70,10 @@
     "#xy0T0000000000000000y0#",
     "#0HH000x0HbHHbH0X0HHH00#",
     "#0HH00000bHHHHba00HdH00#",
-    "#0vf00000HbddbH00000M0a#",
+    "#0vf00000HbddbH000K0M0a#",
     "#T000000fv0CC0vf0000000#",
     "#XXx0yx000NDD00O00y0Tx0#",
-    "#0000T00x00DD0Yx00T00x0#",
+    "#0000T00x00DDZYx00T00x0#",
     "#DDDDDDDDDDDDDDDDDDDDDD#",
     "#DDDDDDDDDDDDDDDDDDDDDD#",
     "#0XX0xQ0yy0DDN00x0c0000#",

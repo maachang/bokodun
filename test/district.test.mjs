@@ -188,7 +188,7 @@ test('マップ: 出現位置から、NPC のいる所へ、歩いて行ける�
         };
         const seen = new Set([`${m.spawn.x},${m.spawn.z}`]), q = [[m.spawn.x, m.spawn.z]];
         while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (!solid(nx, ny) && !seen.has(`${nx},${ny}`)) { seen.add(`${nx},${ny}`); q.push([nx, ny]); } } }
-        for (const n of m.npcs) if (n.id !== '$shopkeeper' && !seen.has(`${n.x},${n.z}`)) bad.push(`${id}: ${n.id} (${n.x},${n.z})`);
+        for (const n of m.npcs) if (n.id !== '$shopkeeper' && !n.behindCounter && !seen.has(`${n.x},${n.z}`)) bad.push(`${id}: ${n.id} (${n.x},${n.z})`);   // カウンターの奥の店員（behindCounter）は、客が入れない所にいる（別のテストで確認）
     }
     assert.deepEqual(bad, [], `行けない所の NPC: ${bad.join(' / ')}`);
 });
@@ -518,4 +518,49 @@ test('村の宿屋・酒場: 村の東の家を広げ、南の扉から入れる
     const at = x => m.legend[r[x]] || '';
     const sx = [...r].findIndex(c => (m.legend[c] || '') === 'sink');
     assert.ok(/^(stove|kitchen_hearth)/.test(at(sx - 1)) || /^(stove|kitchen_hearth)/.test(at(sx + 1)), '流し台の横に火の設備');
+});
+
+test('村の宿屋の看板: 扉の左右に、宿屋（ベッド）と酒場（ジョッキ）の立て札が並び、道にも宿屋の案内の立て札がある', () => {
+    const v = JSON.parse(fs.readFileSync('public/data/maps/village.json', 'utf8'));
+    const at = (x, y) => v.legend[v.layout[y][x]];
+    assert.equal(at(18, 8), 'inn_sign'); assert.equal(at(20, 8), 'pub_sign'); assert.equal(at(19, 7), 'wooden_door');
+    assert.ok(Object.values(v.legend).includes('inn_guide_sign'), '道の案内の立て札');
+    const o = JSON.parse(fs.readFileSync('public/data/objects.json', 'utf8'));
+    assert.equal(o.inn_guide_sign.texture, 'innSign');
+});
+
+test('カウンター: ギルド・酒場・パブ・店のカウンターは、壁から壁までつながり、客はカウンターの奥に入れない。奥の店員は、客が入れない所にいる', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const objects = JSON.parse(fs.readFileSync('public/data/objects.json', 'utf8'));
+    for (const id of ['guild_adv', 'guild_mage', 'guild_merchant', 'guild_smith', 'slum_bar', 'city_inn', 'town_pub', 'village_pub', 'shop']) {
+        const m = rd(id);
+        const solid = (x, y) => {
+            const ch = m.layout[y]?.[x]; if (ch === undefined) return true; if (ch === '0') return false;
+            const d = objects[m.legend[ch]]; if (!d) return false;
+            if (['door', 'stairs', 'gateway', 'portal', 'floor_tile', 'hanging'].includes(d.type)) return false;
+            return d.solid === true || ['block', 'furniture', 'wall_deco', 'wall_image', 'statue'].includes(d.type);
+        };
+        const seen = new Set([`${m.spawn.x},${m.spawn.z}`]), q = [[m.spawn.x, m.spawn.z]];
+        while (q.length) { const [x, y] = q.shift(); for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const nx = x + dx, ny = y + dy; if (!solid(nx, ny) && !seen.has(`${nx},${ny}`)) { seen.add(`${nx},${ny}`); q.push([nx, ny]); } } }
+        const staff = m.npcs.filter(s => s.id === '$shopkeeper' || s.behindCounter);
+        assert.ok(staff.length > 0, `${id}: カウンターの奥の店員`);
+        for (const s of staff) assert.ok(!seen.has(`${s.x},${s.z}`), `${id}: ${s.id} は、客が入れない所にいる`);
+        for (const s of m.npcs.filter(s => !staff.includes(s))) assert.ok(seen.has(`${s.x},${s.z}`), `${id}: ${s.id} は、客が行ける所にいる`);
+    }
+});
+
+test('ギルド長の部屋: 冒険者・魔法・商人ギルドは、東の壁の扉（列10・行4）から、盗賊ギルドは奥の隠し扉から、ギルド長の部屋に入れる。ギルド長は、受付のカウンターにはいない', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const MASTERS = { guild_adv: ['guild_adv_master', ['adv_guild_master']], guild_mage: ['guild_mage_master', ['mage_guild_master']], guild_merchant: ['guild_merchant_master', ['merchant_master_man', 'merchant_master_woman']], guild_thief: ['guild_thief_master', ['thief_guild_master', 'thief_guild_leader']] };
+    for (const [g, [room, who]] of Object.entries(MASTERS)) {
+        const m = rd(g), r = rd(room);
+        const l = m.links['10,4'];
+        assert.equal(l.nextMap, room, `${g}: ギルド長の部屋への扉`);
+        assert.ok(l.back, `${g}: 戻る位置`);
+        assert.ok(/door/.test(m.legend[m.layout[4][10]]), `${g}: 扉`);
+        assert.ok(Object.values(r.legend).some(n => /exit/.test(n)), `${room}: 出口`);
+        const ids = r.npcs.map(s => s.id);
+        for (const w of who) { assert.ok(ids.includes(w), `${room}: ${w}`); assert.ok(!m.npcs.some(s => s.id === w), `${g}: ${w} は受付にいない`); }
+        for (const s of r.npcs) assert.equal(s.speed, 0, `${room}: ${s.id} は動かない`);
+    }
 });

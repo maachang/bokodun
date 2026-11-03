@@ -35,15 +35,16 @@
     "Q": "quest_board",
     "X": "crate",
     "k": "bookshelf",
-    "a": "wall_window_wood"
+    "a": "wall_window_wood",
+    "d": "wooden_door"
   },
   "enemies": {},
   "layout": [
     "WWWaWWWaWWW",
     "WXXFFFFFXXW",
     "WFFFFFFFFFW",
-    "LFFCCCCCFFL",
-    "WFFFFuFFFFW",
+    "LCCCCCCCCCL",
+    "WFFFFuFFFFd",
     "WXFFFKFFFXW",
     "LFhtFuFthFL",
     "WFFFFuFFFFW",
@@ -51,20 +52,22 @@
   ],
   "npcs": [
     {
-      "id": "merchant_master_man",
+      "id": "merchant_clerk_man",
       "x": 4,
       "z": 2,
       "speed": 0,
       "wanderRadius": 0,
-      "oz": 0.688
+      "oz": 0.71,
+      "behindCounter": true
     },
     {
-      "id": "merchant_master_woman",
+      "id": "merchant_clerk_woman",
       "x": 6,
       "z": 2,
       "speed": 0,
       "wanderRadius": 0,
-      "oz": 0.665
+      "oz": 0.708,
+      "behindCounter": true
     },
     {
       "id": "senior_merchant_man",
@@ -73,5 +76,16 @@
       "speed": 0.4,
       "wanderRadius": 1.5
     }
-  ]
+  ],
+  "links": {
+    "10,4": {
+      "nextMap": "guild_merchant_master",
+      "message": "ギルド長の部屋に入る",
+      "back": {
+        "x": 9,
+        "z": 4,
+        "angle": 1.570795
+      }
+    }
+  }
 }

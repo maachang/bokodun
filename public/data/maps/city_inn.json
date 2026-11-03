@@ -51,7 +51,7 @@
     "WbWWWLWbWWWWWWWWW",
     "WFkkFnFFsFFWfoaiW",
     "LFFFFFFFFhhLFFlFb",
-    "WFBBBBBFFFFdFjjFW",
+    "WBBBBBBBBBBdFjjFW",
     "bFFFFFFFFFFWFFFXW",
     "WFFFFuuFFFFWnFFyW",
     "LFhthuuhthFLWWWWL",
@@ -68,13 +68,15 @@
       "z": 2,
       "wanderRadius": 0.4,
       "speed": 0.3,
-      "oz": 0.7
+      "oz": 0.7,
+      "behindCounter": true
     },
     {
       "id": "inn_cook",
       "x": 13,
       "z": 2,
-      "wanderRadius": 0.6
+      "wanderRadius": 0.6,
+      "behindCounter": true
     },
     {
       "id": "inn_waitress",

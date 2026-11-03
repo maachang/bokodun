@@ -35,15 +35,16 @@
     "Q": "quest_board",
     "X": "crate",
     "k": "bookshelf",
-    "a": "wall_window_wood"
+    "a": "wall_window_wood",
+    "d": "wooden_door"
   },
   "enemies": {},
   "layout": [
     "WWWaWWWaWWW",
     "WkkFFFFFkkW",
     "WFFFFFFFFFW",
-    "LFFCCCCCFFL",
-    "WFFFFuFFFFW",
+    "LCCCCCCCCCL",
+    "WFFFFuFFFFd",
     "WFFFFKFFFFW",
     "LFFFFuFFFFL",
     "WFFFFuFFFFW",
@@ -51,20 +52,13 @@
   ],
   "npcs": [
     {
-      "id": "mage_guild_master",
-      "x": 5,
-      "z": 2,
-      "speed": 0,
-      "wanderRadius": 0,
-      "oz": 0.662
-    },
-    {
       "id": "mage_clerk_woman",
       "x": 3,
       "z": 2,
       "speed": 0,
       "wanderRadius": 0,
-      "oz": 0.705
+      "oz": 0.705,
+      "behindCounter": true
     },
     {
       "id": "mage_clerk_man",
@@ -73,7 +67,19 @@
       "speed": 0,
       "wanderRadius": 0,
       "shopId": "magic_guild",
-      "oz": 0.705
+      "oz": 0.705,
+      "behindCounter": true
     }
-  ]
+  ],
+  "links": {
+    "10,4": {
+      "nextMap": "guild_mage_master",
+      "message": "ギルド長の部屋に入る",
+      "back": {
+        "x": 9,
+        "z": 4,
+        "angle": 1.570795
+      }
+    }
+  }
 }

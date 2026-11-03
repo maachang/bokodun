@@ -42,7 +42,7 @@
     "WWWWWLWWWcW",
     "WkknFFoaiFc",
     "WFFFFFFFFFW",
-    "LFBBBBFFFFL",
+    "LBBBBBBBBBL",
     "WFFFFFFFFbW",
     "WhthFFhthFL",
     "LFFFFFFFFUW",
@@ -54,7 +54,8 @@
       "x": 3,
       "z": 2,
       "wanderRadius": 0.4,
-      "oz": 0.7
+      "oz": 0.7,
+      "behindCounter": true
     },
     {
       "id": "villager_man",
@@ -71,7 +72,7 @@
     {
       "id": "elder_man",
       "x": 7,
-      "z": 3,
+      "z": 4,
       "wanderRadius": 0.6
     }
   ],

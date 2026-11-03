@@ -1,0 +1,62 @@
+{
+  "id": "guild_thief_master",
+  "name": "盗賊ギルド長の隠し部屋 (Guild Master Hideout)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "guild_thief",
+  "spawn": {
+    "x": 1,
+    "z": 3,
+    "angle": -1.570795
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "ceilingTexture": "brick",
+    "ambientLight": 10126952,
+    "directionalLight": 13615264,
+    "fogColor": 2760728,
+    "fogNear": 20,
+    "fogFar": 60,
+    "visibility": 0.9,
+    "skyColor": 2760728
+  },
+  "legend": {
+    "W": "brick_wall",
+    "F": "brick_floor",
+    "E": "brick_exit",
+    "u": "rug",
+    "t": "table_stone",
+    "k": "bookshelf_stone",
+    "g": "cupboard_stone",
+    "K": "hanging_candles_rug",
+    "L": "wall_sconce"
+  },
+  "layout": [
+    "WWWWLWWWW",
+    "WkkgFkkgW",
+    "LFFuuuFFL",
+    "EFFuKuFtW",
+    "LFFuuuFFL",
+    "WFFFFFFFW",
+    "WWWWLWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "thief_guild_master",
+      "x": 5,
+      "z": 3,
+      "speed": 0,
+      "wanderRadius": 0
+    },
+    {
+      "id": "thief_guild_leader",
+      "x": 3,
+      "z": 3,
+      "speed": 0,
+      "wanderRadius": 0
+    }
+  ],
+  "enemies": {}
+}
