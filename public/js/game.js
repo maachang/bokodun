@@ -559,7 +559,7 @@ export class GameEngine {
                 const cellMesh = new THREE.Mesh(cellGeo, baseFloorMat);
                 cellMesh.rotation.x = -Math.PI / 2;
                 cellMesh.position.set(wx, 0, wz);
-                this.scene.add(cellMesh);
+                this.addStatic(cellMesh);
             }
         }
 
@@ -577,7 +577,7 @@ export class GameEngine {
             const ceiling = new THREE.Mesh(ceilGeo, ceilMat);
             ceiling.rotation.x = Math.PI / 2;
             ceiling.position.set((cols * tileSize) / 2, wallH, (rows * tileSize) / 2);
-            this.scene.add(ceiling);
+            this.addStatic(ceiling);
         }
 
         // Shared reusable materials & geometries
@@ -625,14 +625,14 @@ export class GameEngine {
                             const rockGeo = new THREE.BoxGeometry(tileSize * 1.02, rockH, tileSize * 1.02);
                             const rock = new THREE.Mesh(rockGeo, mat);
                             rock.position.set(wx, rockH / 2, wz);
-                            this.scene.add(rock);
+                            this.addStatic(rock);
                         } else if (objDef.hasRoof) {
                             // Buildings with European pitched roofs (Village wood or City brick/stone houses)
                             const houseH = wallH * 0.92;
                             const houseGeo = new THREE.BoxGeometry(tileSize, houseH, tileSize);
                             const house = new THREE.Mesh(houseGeo, mat);
                             house.position.set(wx, houseH / 2, wz);
-                            this.scene.add(house);
+                            this.addStatic(house);
 
                             // Triangular pitched roof capping the building (Slate blue for city or terracotta for village)
                             const roofH = tileSize * 0.48;
@@ -644,11 +644,11 @@ export class GameEngine {
                             const roofMesh = new THREE.Mesh(roofGeo, roofMat);
                             roofMesh.rotation.y = Math.PI / 4;
                             roofMesh.position.set(wx, houseH + roofH / 2, wz);
-                            this.scene.add(roofMesh);
+                            this.addStatic(roofMesh);
                         } else {
                             const wall = new THREE.Mesh(standardWallGeo, mat);
                             wall.position.set(wx, wallH / 2, wz);
-                            this.scene.add(wall);
+                            this.addStatic(wall);
                         }
                         if (objDef.solid) {
                             this.colliders.push({
@@ -775,7 +775,7 @@ export class GameEngine {
                         const postMat = new THREE.MeshLambertMaterial({ map: this.textures.woodWall });
                         const postMesh = new THREE.Mesh(postGeo, postMat);
                         postMesh.position.set(wx, fenceH * 1.08 / 2, wz);
-                        this.scene.add(postMesh);
+                        this.addStatic(postMesh);
 
                         // If it has connections, draw matching fence panels
                         if (isWestFence || isEastFence || (!isNorthFence && !isSouthFence)) {
@@ -783,7 +783,7 @@ export class GameEngine {
                             const fGeo = new THREE.PlaneGeometry(fenceW, fenceH);
                             const fMesh = new THREE.Mesh(fGeo, fenceMat);
                             fMesh.position.set(wx, fenceH / 2, wz);
-                            this.scene.add(fMesh);
+                            this.addStatic(fMesh);
                         }
                         if (isNorthFence || isSouthFence) {
                             // Vertical Z plane
@@ -791,7 +791,7 @@ export class GameEngine {
                             const fMesh = new THREE.Mesh(fGeo, fenceMat);
                             fMesh.rotation.y = Math.PI / 2;
                             fMesh.position.set(wx, fenceH / 2, wz);
-                            this.scene.add(fMesh);
+                            this.addStatic(fMesh);
                         }
 
                         if (objDef.solid) {
@@ -1354,7 +1354,7 @@ export class GameEngine {
                             // 高さのある床（階段状の高台）: 上面の高さが elevation の箱。歩いて上れる（壁ではない）
                             const stepMesh = new THREE.Mesh(new THREE.BoxGeometry(tileSize, objDef.elevation, tileSize), tileMat);
                             stepMesh.position.set(wx, objDef.elevation / 2, wz);
-                            this.scene.add(stepMesh);
+                            this.addStatic(stepMesh);
                             this.raisedFloors.push({
                                 minX: wx - tileSize / 2, maxX: wx + tileSize / 2,
                                 minZ: wz - tileSize / 2, maxZ: wz + tileSize / 2,
@@ -1367,7 +1367,7 @@ export class GameEngine {
                         // Wood bridge and paths are slightly raised above water/grass
                         const elev = (objDef.texture === 'woodBridge') ? 0.04 : 0.01;
                         tileMesh.position.set(wx, elev, wz);
-                        this.scene.add(tileMesh);
+                        this.addStatic(tileMesh);
                         }
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);   // 屋内の床は天井もつける
 
@@ -1673,7 +1673,7 @@ export class GameEngine {
                             group.add(mesh);
                         }
                         group.position.set(wx, 0, wz);
-                        this.scene.add(group);
+                        this.addStatic(group);
                         const furnitureFloor = objDef.floorTexture ?? mapData.decorFloor;   // 屋外の街では、飾りの下も石畳（map の decorFloor）
                         if (furnitureFloor) this.addFloorTile(wx, wz, tileSize, furnitureFloor);
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
@@ -1988,7 +1988,7 @@ export class GameEngine {
                             group.add(mesh);
                         }
                         group.position.set(wx, objDef.fromCeiling ? wallH : 0, wz);
-                        this.scene.add(group);
+                        this.addStatic(group);
                         const hangFloor = objDef.floorTexture ?? mapData.decorFloor;
                         if (hangFloor) this.addFloorTile(wx, wz, tileSize, hangFloor);
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
@@ -2001,7 +2001,7 @@ export class GameEngine {
                         const wallMat = this.makeLitMaterial(objDef.wallTexture || 'brick', this.textures[objDef.wallTexture || 'brick']);
                         const body = new THREE.Mesh(standardWallGeo, wallMat);
                         body.position.set(wx, wallH / 2, wz);
-                        this.scene.add(body);
+                        this.addStatic(body);
                         this.colliders.push({
                             minX: wx - tileSize / 2, maxX: wx + tileSize / 2, minZ: wz - tileSize / 2, maxZ: wz + tileSize / 2,
                             blocksProjectiles: true
@@ -2026,7 +2026,7 @@ export class GameEngine {
                             }
                             face.position.set(wx + dx * tileSize / 2, 0, wz + dz * tileSize / 2);
                             face.rotation.y = Math.atan2(dx, dz);   // ローカルの +Z（手前）を、開いた隣のマスのほうへ
-                            this.scene.add(face);
+                            this.addStatic(face);
                         }
                         break;
                     }
@@ -2043,6 +2043,9 @@ export class GameEngine {
                 }
             }
         }
+
+        // 動かない部品（床・天井・壁・家具など）を、材質ごとに1つにまとめる（描画の回数を減らして、CPU の負荷を下げる）
+        this.mergeStaticMeshes();
 
         // 村人（NPC）: マップの npcs（{ id: npcs.json の ID, x, z: マスの位置 }）。マスの上の床や家具とは独立に置く
         const shop = this.shops?.[this.mapParams.shopId];   // 汎用の店マップ: 入った店の種類（店名・店主）
@@ -3392,7 +3395,56 @@ export class GameEngine {
         const mesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), mat);
         mesh.rotation.x = -Math.PI / 2;
         mesh.position.set(wx, 0.03, wz);   // 全体の床（0）と同じ平面だと、ちらつく（z-fighting）ので、少し上げる
-        this.scene.add(mesh);
+        this.addStatic(mesh);
+    }
+
+    // 動かない部品として、シーンに足す（あとで mergeStaticMeshes が、材質ごとにまとめる）。
+    //   動くもの（扉・罠・水・敵・宝箱など）には使わない
+    addStatic(obj) {
+        obj.userData.static = true;
+        this.scene.add(obj);
+    }
+
+    // addStatic で足した部品（グループの中の部品も）を、同じ材質ごとに、1つのメッシュにまとめる。
+    //   1マスごとに別々のメッシュだと、描画の命令が1フレームに数百〜千回を超え、CPU が重くなる。見た目は変わらない。
+    //   半透明な材質・配列の材質は、描画の順番が崩れるので、まとめずに、そのまま残す
+    mergeStaticMeshes() {
+        const meshes = [];
+        const groups = [];
+        for (const obj of [...this.scene.children]) {
+            if (!obj.userData?.static) continue;
+            if (obj.isMesh) meshes.push(obj);
+            else if (obj.isGroup) { groups.push(obj); obj.traverse(o => { if (o.isMesh) meshes.push(o); }); }
+        }
+        const buckets = new Map();
+        for (const mesh of meshes) {
+            const m = mesh.material;
+            if (!m || Array.isArray(m) || (m.transparent && !(m.alphaTest > 0))) continue;   // 半透明は、描画の順番が崩れるので、まとめない（切り抜き: alphaTest つきは、まとめてよい）
+            const key = [m.type, m.map?.uuid, m.color?.getHex(), m.emissive?.getHex?.(), m.side, m.opacity, m.alphaTest, m.depthWrite, m.wireframe].join('|');
+            if (!buckets.has(key)) buckets.set(key, { material: m, items: [] });
+            buckets.get(key).items.push(mesh);
+        }
+        for (const { material, items } of buckets.values()) {
+            const pos = [], nor = [], uv = [];
+            for (const mesh of items) {
+                mesh.updateWorldMatrix(true, false);
+                let g = mesh.geometry.index ? mesh.geometry.toNonIndexed() : mesh.geometry.clone();
+                g.applyMatrix4(mesh.matrixWorld);
+                pos.push(g.attributes.position.array);
+                nor.push(g.attributes.normal.array);
+                uv.push(g.attributes.uv.array);
+                g.dispose();
+            }
+            const cat = (arrs) => { const out = new Float32Array(arrs.reduce((n, a) => n + a.length, 0)); let o = 0; for (const a of arrs) { out.set(a, o); o += a.length; } return out; };
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.BufferAttribute(cat(pos), 3));
+            geo.setAttribute('normal', new THREE.BufferAttribute(cat(nor), 3));
+            geo.setAttribute('uv', new THREE.BufferAttribute(cat(uv), 2));
+            const merged = new THREE.Mesh(geo, material);
+            this.scene.add(merged);
+            for (const mesh of items) mesh.removeFromParent();
+        }
+        for (const g of groups) if (g.children.length === 0) g.removeFromParent();
     }
 
     // 屋内の天井を 1 マス分張る（壁の高さ。下から見える向き）
@@ -3401,7 +3453,7 @@ export class GameEngine {
         const mesh = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), mat);
         mesh.rotation.x = Math.PI / 2;
         mesh.position.set(wx, wallH - 0.05, wz);   // 全体の天井（wallH）と同じ平面だと、動くたびにちらつく（z-fighting）ので、少し下げる
-        this.scene.add(mesh);
+        this.addStatic(mesh);
     }
 
     movePlayer(dx, dz) {
