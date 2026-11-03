@@ -29,18 +29,19 @@
     "h": "chair",
     "e": "bed",
     "k": "bookshelf",
-    "S": "stairs_wood_down"
+    "S": "stairs_wood_down",
+    "a": "wall_window_wood"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWWW",
+    "WWWWWaWWaWWW",
     "WkFFFFFFFFSW",
     "WeFFFFFFtFFW",
-    "WFFFFuuFFFFW",
-    "WFFFFuuFFFFW",
+    "WFFFFuuFFFFa",
+    "aFFFFuuFFFFW",
     "WeFFFFFFhFFW",
     "WFFFFFFFFFFW",
-    "WWWWWWWWWWWW"
+    "WWWWWaWWaWWW"
   ],
   "npcs": [],
   "links": {

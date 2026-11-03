@@ -36,18 +36,20 @@
     "o": "stove",
     "a": "sink",
     "b": "water_barrel",
-    "c": "wash_stand"
+    "c": "wash_stand",
+    "f": "oven",
+    "i": "wall_window_wood"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWWWWWWW",
-    "WFeFFWsuuUWgosaW",
-    "WFFFFdFuuFdFbFFd",
-    "WFhthWFuuFWFtFFW",
+    "WWWWWWWiiWWWWWWW",
+    "WFeFFWsuuUWfosaW",
+    "iFFFFdFuuFdFbFFd",
+    "WFhthWFuuFWFtFFi",
     "WFFFFWFuuFWFFFFd",
     "WWWWWWFuuFWWWWWW",
     "WecFFWFuuFWkkFFW",
-    "WFFFFdFuuFdFtFhW",
+    "iFFFFdFuuFdFtFhi",
     "WeFFFWFuuFWFFFFW",
     "WWWWWWWddWWWWWWW"
   ],

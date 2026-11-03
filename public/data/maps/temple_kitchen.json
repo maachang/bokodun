@@ -35,12 +35,13 @@
     "X": "crate_marble",
     "L": "wall_sconce_marble",
     "a": "sink_marble",
-    "b": "water_barrel_marble"
+    "b": "water_barrel_marble",
+    "c": "oven_marble"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWW",
-    "WgoasFogW",
+    "WcoasFogW",
     "WFFbFFFFW",
     "LXFtFtFXL",
     "WFFhFhFFW",

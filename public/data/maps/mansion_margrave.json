@@ -42,12 +42,13 @@
     "K": "chandelier_mansion_rug",
     "a": "sink",
     "b": "water_barrel",
-    "c": "wash_stand"
+    "c": "wash_stand",
+    "f": "oven"
   },
   "enemies": {},
   "layout": [
     "WWWCWLWLWCWWWWWWWWWWW",
-    "WFkkFFsFFkkFUWgoasogW",
+    "WFkkFFsFFkkFUWfoasogW",
     "WFFFFuuuFFFFFWbFFFFFW",
     "dFFFFuuuFFFFFWFFttFFd",
     "WFFFFuKuFFFFFdFhFFhFW",

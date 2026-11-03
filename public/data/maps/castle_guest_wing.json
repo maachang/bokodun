@@ -1,0 +1,119 @@
+{
+  "id": "castle_guest_wing",
+  "name": "王城の貴賓の居室 (Royal Guest Wing)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "castle_3f",
+  "spawn": {
+    "x": 1,
+    "z": 7,
+    "angle": -1.570795
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "brick",
+    "ambientLight": 10096512,
+    "directionalLight": 13615264,
+    "fogColor": 2761760,
+    "fogNear": 14,
+    "fogFar": 48,
+    "visibility": 0.9,
+    "skyColor": 2761760
+  },
+  "legend": {
+    "W": "brick_wall",
+    "E": "brick_exit",
+    "d": "wooden_door",
+    "e": "bed_stone",
+    "a": "wash_stand_stone",
+    "c": "garderobe_stone",
+    "g": "cupboard_stone",
+    "u": "castle_rug",
+    "K": "chandelier_castle_rug",
+    "t": "table_stone",
+    "h": "chair_stone",
+    "s": "hearth_stone",
+    "k": "bookshelf_stone",
+    "b": "bathtub_stone",
+    "f": "sink_stone",
+    "j": "water_barrel_stone",
+    "L": "wall_sconce"
+  },
+  "layout": [
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "Wee0ac0ggWee0ac0g0gWee0ac0ggW",
+    "W00000000W000000000W00000000W",
+    "L00uKu000L000uKu000L00uKu000W",
+    "W00uuu000W000uuu000W00uuu000W",
+    "W00hth000W000hth000W00hth000W",
+    "WWLWWWdLWWWWLWWWdWWWWLWWWdLWW",
+    "E000000000000000000000000000W",
+    "WWLWdWWLWWWWLdWWLWWWWLWWdWLWW",
+    "We0e0ge0eWk000s000kW0b0f0b0jW",
+    "W00000000W00uuuuu00W00000000W",
+    "L00000000L00httth00L00000000W",
+    "W00hth000W00uuKuu00W00000000W",
+    "W00000000Wg0000000gW0gg000ggW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "viscount_man",
+      "x": 3,
+      "z": 2,
+      "wanderRadius": 1.0
+    },
+    {
+      "id": "baron_woman",
+      "x": 13,
+      "z": 4,
+      "wanderRadius": 1.0
+    },
+    {
+      "id": "baron_man",
+      "x": 14,
+      "z": 10,
+      "wanderRadius": 1.0
+    },
+    {
+      "id": "maid_head",
+      "x": 5,
+      "z": 10,
+      "wanderRadius": 1.0
+    },
+    {
+      "id": "maid",
+      "x": 2,
+      "z": 11,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "maid",
+      "x": 18,
+      "z": 7,
+      "wanderRadius": 0.5
+    },
+    {
+      "id": "butler",
+      "x": 10,
+      "z": 7,
+      "wanderRadius": 1.0
+    },
+    {
+      "id": "servant_man",
+      "x": 7,
+      "z": 12,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "guard_heavy",
+      "x": 24,
+      "z": 7,
+      "wanderRadius": 1.0
+    }
+  ],
+  "enemies": {}
+}

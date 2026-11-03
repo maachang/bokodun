@@ -35,12 +35,13 @@
     "X": "crate_stone",
     "w": "temple_brick_window",
     "a": "sink_stone",
-    "b": "water_barrel_stone"
+    "b": "water_barrel_stone",
+    "c": "oven_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWWWW",
-    "WgosaXW",
+    "WcosaXW",
     "WbFFFFW",
     "EFFtFFW",
     "WFhFhFW",

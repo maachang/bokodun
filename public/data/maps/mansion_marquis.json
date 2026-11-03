@@ -40,12 +40,13 @@
     "K": "chandelier_mansion_rug",
     "E": "building_exit",
     "a": "sink",
-    "b": "water_barrel"
+    "b": "water_barrel",
+    "c": "oven"
   },
   "enemies": {},
   "layout": [
     "WWWCWLWCWWWWWWWWW",
-    "WFkkFsFkkUWgosagW",
+    "WFkkFsFkkUWcosagW",
     "WFFFuuuFFFWbFFFFW",
     "WFFFuuuFFFWFhthFd",
     "CFFFuKuFFFdFFFFFW",

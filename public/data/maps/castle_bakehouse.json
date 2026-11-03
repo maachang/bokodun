@@ -32,12 +32,13 @@
     "X": "crate_stone",
     "B": "barrel_stone",
     "L": "wall_sconce",
-    "a": "water_barrel_stone"
+    "a": "water_barrel_stone",
+    "b": "oven_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWW",
-    "WoFoFBBXW",
+    "WbFbFBBXW",
     "LFaFFFFFL",
     "WXFFtFFFW",
     "WFFFFFFFW",

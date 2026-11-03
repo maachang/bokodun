@@ -49,7 +49,7 @@
     "W0000h000W0000h000W0000h000W0000000000W",
     "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
     "WSuuuuuuKuuuuuuuuuuuuuuuuuKuuuuuuuuuuUW",
-    "W0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0W",
+    "d0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0W",
     "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
     "W0kk0kkkkkkkk0kkkkkkkk0kkkkkkkkk0kkk00W",
     "W0000000000000000000000000000000000000W",
@@ -141,6 +141,15 @@
         "x": 36,
         "z": 8,
         "angle": 1.570795
+      }
+    },
+    "0,9": {
+      "nextMap": "castle_guest_wing",
+      "message": "貴賓の居室に入る",
+      "back": {
+        "x": 1,
+        "z": 9,
+        "angle": -1.570795
       }
     }
   }

@@ -645,6 +645,26 @@ export class GameEngine {
                             roofMesh.rotation.y = Math.PI / 4;
                             roofMesh.position.set(wx, houseH + roofH / 2, wz);
                             this.addStatic(roofMesh);
+
+                            // 外に向いた壁の面に付く部品（窓・鎧戸など。objects.json の faceParts。座標は wall_deco と同じ）
+                            if (objDef.faceParts) {
+                                for (const [dx, dz] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
+                                    const cc = c + dx, rr = r + dz;
+                                    if (cc < 0 || rr < 0 || cc >= cols || rr >= rows) continue;
+                                    const nt = this.objectDefinitions[mapData.legend?.[mapData.layout[rr][cc]]];
+                                    if (nt && ['block', 'door', 'wall_image', 'wall_deco'].includes(nt.type)) continue;
+                                    const face = new THREE.Group();
+                                    for (const p of objDef.faceParts) {
+                                        const pm = p.basic ? new THREE.MeshBasicMaterial({ color: p.color }) : new THREE.MeshLambertMaterial({ color: p.color });
+                                        const pmesh = new THREE.Mesh(new THREE.BoxGeometry(p.size[0], p.size[1], p.size[2]), pm);
+                                        pmesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
+                                        face.add(pmesh);
+                                    }
+                                    face.position.set(wx + dx * tileSize / 2, 0, wz + dz * tileSize / 2);
+                                    face.rotation.y = Math.atan2(dx, dz);
+                                    this.addStatic(face);
+                                }
+                            }
                         } else {
                             const wall = new THREE.Mesh(standardWallGeo, mat);
                             wall.position.set(wx, wallH / 2, wz);

@@ -310,3 +310,36 @@ test('牢獄: 衛兵詰所の階段から降りられ、牢番・囚人・落と
     const names = Object.values(p.legend);
     for (const n of ['cell_door', 'straw_bed', 'pit_hatch', 'bed_stone']) assert.ok(names.includes(n), n);
 });
+
+test('貴賓の居室: 王城3階の西端の扉から入り、出口で戻れる。客室3・居間・随行の部屋・浴室があり、公爵〜侯爵は置かない', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const f3 = rd('castle_3f'), w = rd('castle_guest_wing');
+    assert.equal(f3.links['0,9'].nextMap, 'castle_guest_wing');
+    assert.ok(f3.links['0,9'].back, '出口で戻る位置（back）');
+    assert.ok(Object.values(w.legend).includes('brick_exit'), '出口');
+    const flat = w.layout.join('');
+    assert.equal((flat.match(/c/g) || []).length, 3, '客室3つ分のガーデローブ');
+    for (const n of ['hearth_stone', 'bathtub_stone', 'bed_stone']) assert.ok(Object.values(w.legend).includes(n), n);
+    for (const s of w.npcs) assert.ok(!/^(duke|margrave|marquis|cardinal)/.test(s.id), `${s.id}: 特別な貴族は城に置かない`);
+});
+
+test('台所: 水の出る流し台は北の壁に取り付け、すぐ横に、火の設備（かまど・暖炉・オーブン）が並ぶ。村長の家には窓がある', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const fire = n => /^(stove|hearth|oven)/.test(n || '');
+    for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_margrave', 'mansion_marquis', 'mansion_viscount', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house']) {
+        const m = rd(id), at = (x, y) => m.legend[m.layout[y]?.[x]];
+        let n = 0;
+        m.layout.forEach((row, y) => [...row].forEach((ch, x) => {
+            if (!(m.legend[ch] || '').startsWith('sink')) return;
+            n++;
+            assert.ok(['brick_wall', 'wooden_wall', 'marble_wall'].some(w => at(x, y - 1) === w) || /wall/.test(at(x, y - 1)), `${id} (${x},${y}): 流し台は北の壁に付く`);
+            assert.ok(fire(at(x - 1, y)) || fire(at(x + 1, y)), `${id} (${x},${y}): 流し台の横に火の設備`);
+        }));
+        assert.ok(n > 0, `${id}: 流し台`);
+    }
+    const o = JSON.parse(fs.readFileSync('public/data/objects.json', 'utf8'));
+    for (const s of ['stove', 'stove_stone', 'stove_marble']) assert.ok(o[s].parts.every(p => p.pos[2] <= 0), `${s}: 北の壁に寄せた向き（部品が壁側）`);
+    const hall = rd('village_chief_house');
+    for (const id of [hall, rd('village_chief_house_2f')]) assert.ok(Object.values(id.legend).includes('wall_window_wood'));
+    assert.ok(Object.values(rd('village').legend).includes('wooden_house_window'), '村長の家の外の窓');
+});

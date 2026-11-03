@@ -51,12 +51,13 @@
     "S": "stairs_stone_down",
     "f": "sink_stone",
     "i": "water_barrel_stone",
-    "j": "wash_stand_stone"
+    "j": "wash_stand_stone",
+    "l": "oven_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWLRWWRLWWWWWWWWWdWWWdWWWWWWWWWWWW",
-    "Wkkk0WaaaAAaaaWtt0gWgo0sfo0gXWXQ0Q0Q0XW",
+    "Wkkk0WaaaAAaaaWtt0gWlo0sfo0gXWXQ0Q0Q0XW",
     "Wkkk0WaaaAAaaaW0h0gWi00i00000W00000000W",
     "W0000WbbbBBbbbW0000W0N000000XW00000000W",
     "W0000WcccCCcccW0000W0N0ttt000W0ht0hth0W",
