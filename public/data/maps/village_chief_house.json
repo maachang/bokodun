@@ -38,10 +38,10 @@
   "enemies": {},
   "layout": [
     "WWWWWWWWWWWWWWWW",
-    "WFeFFWFuuUWgosFW",
-    "WFFFFdFuuFdFFFFW",
-    "WFFFFWFuuFWFtFFW",
-    "WFFFFWFuuFWFFFFW",
+    "WFeFFWsuuUWgosFW",
+    "WFFFFdFuuFdFFFFd",
+    "WFhthWFuuFWFtFFW",
+    "WFFFFWFuuFWFFFFd",
     "WWWWWWFuuFWWWWWW",
     "WeFFFWFuuFWkkFFW",
     "WFFFFdFuuFdFtFhW",
@@ -84,6 +84,24 @@
         "x": 10,
         "z": 2,
         "angle": 3.14159
+      }
+    },
+    "15,2": {
+      "nextMap": "village_buttery",
+      "message": "バターリー（酒・食器の部屋）に入る",
+      "back": {
+        "x": 14,
+        "z": 2,
+        "angle": 1.570795
+      }
+    },
+    "15,4": {
+      "nextMap": "village_pantry",
+      "message": "パントリー（食料の部屋）に入る",
+      "back": {
+        "x": 14,
+        "z": 4,
+        "angle": 1.570795
       }
     }
   }

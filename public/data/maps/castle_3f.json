@@ -35,7 +35,8 @@
     "K": "chandelier_castle_rug",
     "L": "wall_sconce",
     "R": "wall_banner_red",
-    "S": "stairs_stone_down"
+    "S": "stairs_stone_down",
+    "U": "stairs_stone_up"
   },
   "enemies": {},
   "layout": [
@@ -47,7 +48,7 @@
     "W0000t000W0000t000W0000t000W00hth0hth0W",
     "W0000h000W0000h000W0000h000W0000000000W",
     "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
-    "WSuuuuuuKuuuuuuuuuuuuuuuuuKuuuuuuuuuu0W",
+    "WSuuuuuuKuuuuuuuuuuuuuuuuuKuuuuuuuuuuUW",
     "W0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0W",
     "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
     "W0kk0kkkkkkkk0kkkkkkkk0kkkkkkkkk0kkk00W",
@@ -130,6 +131,16 @@
         "x": 2,
         "z": 8,
         "angle": -1.570795
+      }
+    },
+    "37,8": {
+      "nextMap": "castle_4f",
+      "message": "階段を上る（4階 王の居住区へ）",
+      "dir": "e",
+      "spawn": {
+        "x": 36,
+        "z": 8,
+        "angle": 1.570795
       }
     }
   }

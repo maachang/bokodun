@@ -1,0 +1,83 @@
+{
+  "id": "castle_courtyard",
+  "name": "王城の中庭 (Courtyard)",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "castle",
+  "spawn": {
+    "x": 18,
+    "z": 7,
+    "angle": 1.570795
+  },
+  "environment": {
+    "floorType": "grass",
+    "hasCeiling": false,
+    "ambientLight": 9408660,
+    "directionalLight": 16774610,
+    "fogColor": 12373460,
+    "fogNear": 22,
+    "fogFar": 80,
+    "visibility": 0.9,
+    "skyColor": 9683955
+  },
+  "legend": {
+    "W": "brick_wall",
+    "E": "building_exit",
+    "p": "plaza_stone",
+    "H": "brick_house",
+    "d": "wooden_door",
+    "w": "plaza_fountain",
+    "D": "training_dummy_out",
+    "T": "tree"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWWWWWWWWWWWW",
+    "W000000000p000000000W",
+    "W00HHHH000p000HHHH00W",
+    "W00HHHH000p000HHHH00W",
+    "W00HdHH000p0T0HHHH00W",
+    "W000000000p000000000W",
+    "W0T0000000p0000000T0W",
+    "WpppppppppwpppppppppE",
+    "W000000000p000000000W",
+    "W000000000p000000000W",
+    "W000000000p000D0D000W",
+    "W0000000T0p000000000W",
+    "W0T0000000p000D0D000W",
+    "W000000000p000000000W",
+    "WWWWWWWWWWWWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "guard_light",
+      "x": 15,
+      "z": 11,
+      "wanderRadius": 1.5
+    },
+    {
+      "id": "guard_spear",
+      "x": 9,
+      "z": 5,
+      "wanderRadius": 1.5
+    },
+    {
+      "id": "servant_man",
+      "x": 11,
+      "z": 8,
+      "wanderRadius": 1.5
+    }
+  ],
+  "links": {
+    "4,4": {
+      "nextMap": "castle_smithy",
+      "message": "鍛冶場に入る",
+      "back": {
+        "x": 4,
+        "z": 5,
+        "angle": 0
+      }
+    }
+  }
+}

@@ -1,0 +1,48 @@
+{
+  "id": "village_buttery",
+  "name": "村長の家のバターリー（酒・食器の部屋）",
+  "type": "open",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "village_chief_house",
+  "spawn": {
+    "x": 1,
+    "z": 3,
+    "angle": -1.570795
+  },
+  "environment": {
+    "floorType": "grass",
+    "hasCeiling": false,
+    "ambientLight": 9408660,
+    "directionalLight": 16774610,
+    "fogColor": 12373460,
+    "fogNear": 22,
+    "fogFar": 80,
+    "visibility": 0.9,
+    "skyColor": 9683955
+  },
+  "legend": {
+    "W": "wooden_wall",
+    "F": "wood_floor",
+    "d": "wooden_door",
+    "g": "cupboard",
+    "B": "barrel",
+    "t": "table"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWW",
+    "WgBBBgW",
+    "WFFFFFW",
+    "dFFtFFW",
+    "WFFFFFW",
+    "WWWWWWW"
+  ],
+  "npcs": [],
+  "links": {
+    "0,3": {
+      "nextMap": "$back",
+      "message": "外に出る"
+    }
+  }
+}

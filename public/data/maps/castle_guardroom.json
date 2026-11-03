@@ -1,0 +1,66 @@
+{
+  "id": "castle_guardroom",
+  "name": "王城の衛兵詰所 (Guardroom)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "castle",
+  "spawn": {
+    "x": 4,
+    "z": 1,
+    "angle": 3.14159
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "brick",
+    "ambientLight": 10096512,
+    "directionalLight": 13615264,
+    "fogColor": 2761760,
+    "fogNear": 14,
+    "fogFar": 48,
+    "visibility": 0.9,
+    "skyColor": 2761760
+  },
+  "legend": {
+    "W": "brick_wall",
+    "F": "brick_floor",
+    "E": "brick_exit",
+    "t": "table_stone",
+    "h": "chair_stone",
+    "e": "bed_stone",
+    "Q": "weapon_rack_stone",
+    "L": "wall_sconce"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWEWWWW",
+    "WFFFFFFFW",
+    "WQFtFFhQW",
+    "LFFhtFFFL",
+    "WFFFFFFeW",
+    "WFFFFFFFW",
+    "WWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "guard_light",
+      "x": 3,
+      "z": 4,
+      "wanderRadius": 0.6
+    },
+    {
+      "id": "guard_spear",
+      "x": 6,
+      "z": 3,
+      "wanderRadius": 0.6
+    },
+    {
+      "id": "guard_light",
+      "x": 5,
+      "z": 5,
+      "wanderRadius": 0.6
+    }
+  ]
+}

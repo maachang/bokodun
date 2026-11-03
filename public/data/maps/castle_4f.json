@@ -1,0 +1,134 @@
+{
+  "id": "castle_4f",
+  "name": "王城 (Castle) 4F 王の居住区",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "castle_3f",
+  "spawn": {
+    "x": 36,
+    "z": 8,
+    "angle": 1.570795
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "brick",
+    "ambientLight": 10096512,
+    "directionalLight": 13615264,
+    "fogColor": 2761760,
+    "fogNear": 14,
+    "fogFar": 48,
+    "visibility": 0.9,
+    "skyColor": 2761760
+  },
+  "legend": {
+    "W": "brick_wall",
+    "u": "castle_rug",
+    "t": "table_stone",
+    "h": "chair_stone",
+    "k": "bookshelf_stone",
+    "g": "cupboard_stone",
+    "e": "bed_stone",
+    "L": "wall_sconce",
+    "R": "wall_banner_red",
+    "K": "chandelier_castle_rug",
+    "d": "wooden_door",
+    "S": "stairs_stone_down"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "W0hh00hh0W000h0000W0k0k0000W00e000g0g0W",
+    "W00000000W00uuu000W00000000W0000000000W",
+    "W00000000W00uuu000W00uuu000W0000uuu000W",
+    "W00000000W00uuu000W00uuu000W0000uuu000W",
+    "W0h0000h0W0h000h00W00utu000W0000uuu000W",
+    "W00000000W00000000W00000000W0000000000W",
+    "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
+    "W0uuuuuuKuuuuuuuuuuuuuuuuuKuuuuuuuuuuSW",
+    "W0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0W",
+    "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
+    "W0kk00kk0W00000t00W0g000g00W000g000000W",
+    "W00000000W00000000W00000000W0000000000W",
+    "W00000000W0huuuh00Whthuhth0W0000uuu000W",
+    "W00hth000W00uuu000W00uuu000W0000uuu000W",
+    "W00000000W00uuu000W00uuu000W0000uuu000W",
+    "W00000000W00000000W00000000W00e0000e00W",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "butler",
+      "x": 5,
+      "z": 3
+    },
+    {
+      "id": "butler",
+      "x": 13,
+      "z": 5
+    },
+    {
+      "id": "maid",
+      "x": 11,
+      "z": 8
+    },
+    {
+      "id": "maid_head",
+      "x": 22,
+      "z": 8
+    },
+    {
+      "id": "maid",
+      "x": 33,
+      "z": 13
+    },
+    {
+      "id": "maid",
+      "x": 22,
+      "z": 12
+    },
+    {
+      "id": "servant_man",
+      "x": 30,
+      "z": 8
+    },
+    {
+      "id": "guard_heavy",
+      "x": 14,
+      "z": 9,
+      "speed": 0,
+      "wanderRadius": 0
+    },
+    {
+      "id": "guard_heavy",
+      "x": 12,
+      "z": 9,
+      "speed": 0,
+      "wanderRadius": 0
+    },
+    {
+      "id": "maid",
+      "x": 5,
+      "z": 13
+    },
+    {
+      "id": "maid",
+      "x": 13,
+      "z": 15
+    }
+  ],
+  "links": {
+    "37,8": {
+      "nextMap": "castle_3f",
+      "message": "階段を下りる（3階へ）",
+      "dir": "e",
+      "spawn": {
+        "x": 36,
+        "z": 8,
+        "angle": 1.570795
+      }
+    }
+  }
+}

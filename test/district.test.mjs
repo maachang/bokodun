@@ -241,3 +241,37 @@ test('貴族の屋敷（グレードアップ）: 階級が高いほど、部屋
         assert.ok(Object.values(m.legend).some(v => objects[v]?.nextMap === '$back'), `${id}: 出口`);
     }
 });
+
+test('王城（グレードアップ）: 礼拝堂・中庭・衛兵詰所・パン焼き所・食料庫（1階の扉）と、4階の王の居住区（広間→控えの間→接見の間→私室→奥の部屋）', () => {
+    const castle = readJson('public/data/maps/castle.json');
+    const dests = new Set(Object.values(castle.links).map(l => l.nextMap));
+    for (const id of ['castle_chapel', 'castle_courtyard', 'castle_guardroom', 'castle_bakehouse', 'mansion_pantry', 'castle_2f', 'castle_basement']) assert.ok(dests.has(id), `1階から: ${id}`);
+    const courtyard = readJson('public/data/maps/castle_courtyard.json');
+    assert.equal(courtyard.type, 'open');
+    assert.ok(Object.values(courtyard.legend).includes('plaza_fountain') && Object.values(courtyard.legend).includes('training_dummy_out'), '井戸と訓練の的');
+    assert.ok(Object.values(courtyard.links).some(l => l.nextMap === 'castle_smithy'), '鍛冶場');
+    const f3 = readJson('public/data/maps/castle_3f.json'), f4 = readJson('public/data/maps/castle_4f.json');
+    assert.ok(Object.values(f3.links).some(l => l.nextMap === 'castle_4f') && Object.values(f4.links).some(l => l.nextMap === 'castle_3f'));
+    const doors = f4.layout.join('').split('').filter(ch => objects[f4.legend[ch]]?.type === 'door').length;
+    assert.ok(doors >= 8, `4階: 部屋の扉 ${doors}`);
+    const used = new Set(Object.values(f4.legend));
+    assert.ok(used.has('bed_stone') && used.has('bookshelf_stone') && used.has('cupboard_stone'), '寝室・書斎・衣装棚');
+    const ids = f4.npcs.map(n => n.id);
+    assert.ok(ids.includes('butler') && ids.includes('maid_head') && ids.includes('guard_heavy'), '執事・メイド長・衛兵');
+    assert.ok(!ids.includes('king') && !ids.includes('prince'), '王・王子は、玉座の間にいる（4階には置かない）');
+});
+
+test('村長の家（グレードアップ）: 広間に暖炉、居間に机と椅子、厨房の先にバターリー（酒・食器）とパントリー（食料）の2部屋', () => {
+    const m = readJson('public/data/maps/village_chief_house.json');
+    const dests = Object.values(m.links).map(l => l.nextMap);
+    assert.ok(dests.includes('village_buttery') && dests.includes('village_pantry'));
+    const hall = m.layout.slice(1, 9).map(r => r.slice(6, 10)).join('');
+    assert.ok([...hall].some(ch => m.legend[ch] === 'hearth'), '広間の暖炉');
+    for (const id of ['village_buttery', 'village_pantry']) {
+        const r = readJson(`public/data/maps/${id}.json`);
+        assert.ok(Object.values(r.links).some(l => l.nextMap === '$back'), `${id}: 出口`);
+        assert.ok(Object.values(r.legend).includes('cupboard'));
+    }
+    assert.ok(Object.values(readJson('public/data/maps/village_buttery.json').legend).includes('barrel'), 'バターリー: 樽');
+    assert.ok(Object.values(readJson('public/data/maps/village_pantry.json').legend).includes('crate'), 'パントリー: 木箱');
+});

@@ -1,0 +1,65 @@
+{
+  "id": "castle_chapel",
+  "name": "王城の礼拝堂 (Royal Chapel)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "castle",
+  "spawn": {
+    "x": 5,
+    "z": 9,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "brick",
+    "ambientLight": 10096512,
+    "directionalLight": 13615264,
+    "fogColor": 2761760,
+    "fogNear": 14,
+    "fogFar": 48,
+    "visibility": 0.9,
+    "skyColor": 2761760
+  },
+  "legend": {
+    "W": "brick_wall",
+    "F": "brick_floor",
+    "E": "brick_exit",
+    "u": "castle_rug",
+    "t": "table_stone",
+    "P": "temple_pew",
+    "G": "goddess_statue_small",
+    "L": "wall_sconce"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWW",
+    "WFFFFGFFFFW",
+    "LFFFFtFFFFL",
+    "WFFFFFFFFFW",
+    "WFPPFuFPPFW",
+    "WFFFFuFFFFW",
+    "WFPPFuFPPFW",
+    "WFFFFuFFFFW",
+    "WFPPFuFPPFW",
+    "LFFFFFFFFFL",
+    "WWWWWEWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "priest_man",
+      "x": 4,
+      "z": 2,
+      "speed": 0,
+      "wanderRadius": 0
+    },
+    {
+      "id": "priest_woman",
+      "x": 6,
+      "z": 3,
+      "wanderRadius": 0.6
+    }
+  ]
+}

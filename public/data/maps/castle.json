@@ -52,7 +52,7 @@
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWLRWWRLWWWWWWWWWWWWWWWWWWWWWWWWWW",
+    "WWWWWWWLRWWRLWWWWWWWWWdWWWdWWWWWWWWWWWW",
     "Wkkk0WaaaAAaaaWtt0gWgo0s0o0gXWXQ0Q0Q0XW",
     "Wkkk0WaaaAAaaaW0h0gW000000000W00000000W",
     "W0000WbbbBBbbbW0000W0N000000XW00000000W",
@@ -62,14 +62,14 @@
     "Wt000Ws00uu00sW0000WWLWWdWWLWRWWWdWLLWW",
     "WWWWWWWRLuuLRWWWWWWWuuuuKuuuuuuuuuuuuUW",
     "W0s000000uu000000s0duuuuuuuuuuuKuuuuuuW",
-    "L00h0h000KK000h0h00LWLWWdWWLWRWWWdWWLWW",
+    "d00h0h000KK000h0h00LWLWWdWWLWRWWWdWWLWW",
     "W00ttt000uu000ttt00W00Q000Q00W00000000W",
     "R00h0h000uu000h0h00R0e0e00e0eW0e0000e0W",
     "W00000000uu00000000W000000000W00htth00W",
-    "L00000000KK00000000L000htth00W00htth00W",
+    "d00000000KK00000000L000htth00W00htth00W",
     "W00000000uu00000000W0e00hh00eW0e0000e0W",
     "WS0000000uu00000000W000000000Wg000000gW",
-    "WWWWWWWRL22LRWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    "WWWWdWWRL22LRWWWWWWWWWWWWWWWWWWWWWWWWWW"
   ],
   "npcs": [
     {
@@ -278,6 +278,51 @@
         "x": 2,
         "z": 2,
         "angle": 3.14159
+      }
+    },
+    "22,0": {
+      "nextMap": "castle_bakehouse",
+      "message": "パン焼き所・醸造所に入る",
+      "back": {
+        "x": 22,
+        "z": 1,
+        "angle": 3.14159
+      }
+    },
+    "26,0": {
+      "nextMap": "mansion_pantry",
+      "message": "食料庫・酒蔵に入る",
+      "back": {
+        "x": 26,
+        "z": 1,
+        "angle": 3.14159
+      }
+    },
+    "0,10": {
+      "nextMap": "castle_chapel",
+      "message": "礼拝堂に入る",
+      "back": {
+        "x": 1,
+        "z": 10,
+        "angle": -1.570795
+      }
+    },
+    "0,14": {
+      "nextMap": "castle_courtyard",
+      "message": "中庭に出る",
+      "back": {
+        "x": 1,
+        "z": 14,
+        "angle": -1.570795
+      }
+    },
+    "4,17": {
+      "nextMap": "castle_guardroom",
+      "message": "衛兵詰所に入る",
+      "back": {
+        "x": 4,
+        "z": 16,
+        "angle": 0
       }
     }
   }
