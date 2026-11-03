@@ -1,0 +1,71 @@
+{
+  "id": "temple_3f",
+  "name": "大神殿 (Great Temple) 3F 枢機卿の間",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 6,
+  "nextMap": "temple_2f",
+  "spawn": {
+    "x": 9,
+    "z": 2,
+    "angle": 3.14159
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "marbleWall",
+    "ambientLight": 16777215,
+    "directionalLight": 16773324,
+    "fogColor": 15985881,
+    "fogNear": 34,
+    "fogFar": 100,
+    "visibility": 1.0,
+    "skyColor": 15985881
+  },
+  "legend": {
+    "W": "temple_wall",
+    "F": "marble_floor",
+    "c": "temple_carpet",
+    "p": "temple_pillar",
+    "a": "stained_glass_plain",
+    "b": "stained_glass_angel",
+    "e": "stained_glass_priestess",
+    "f": "stained_glass_prophet",
+    "S": "stairs_marble_down"
+  },
+  "enemies": {},
+  "layout": [
+    "WWaWWeWWbWW",
+    "WFFFFFFFFSW",
+    "WFFFFFFFFFW",
+    "WFFFFcFFFFW",
+    "eFpFFcFFpFf",
+    "WFFFFcFFFFW",
+    "fFpFFcFFpFe",
+    "WFFFFcFFFFW",
+    "WFFFFcFFFFW",
+    "WWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "cardinal",
+      "x": 5,
+      "z": 3,
+      "speed": 0,
+      "wanderRadius": 0
+    }
+  ],
+  "links": {
+    "9,1": {
+      "nextMap": "temple_2f",
+      "message": "階段を下りる（2階へ）",
+      "dir": "n",
+      "spawn": {
+        "x": 19,
+        "z": 2,
+        "angle": 3.14159
+      }
+    }
+  }
+}

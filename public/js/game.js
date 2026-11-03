@@ -1907,7 +1907,7 @@ export class GameEngine {
                         // 像（画像）: 台座の上に、画像の板が、常にこちらを向いて立つ（スプライト）。後ろに、淡い光の輪（glow）をつける
                         const pedH = objDef.pedestalHeight ?? 0.6;
                         const pedMat = this.makeLitMaterial(objDef.pedestalTexture || 'marbleWall', this.textures[objDef.pedestalTexture || 'marbleWall']);
-                        const ped = new THREE.Mesh(new THREE.BoxGeometry(tileSize * 0.55, pedH, tileSize * 0.55), pedMat);
+                        const ped = new THREE.Mesh(new THREE.BoxGeometry(objDef.pedestalWidth ?? tileSize * 0.55, pedH, objDef.pedestalWidth ?? tileSize * 0.55), pedMat);   // 台座の幅は、pedestalWidth で指定（特大・小の像用）
                         ped.position.set(wx, pedH / 2, wz);
                         this.scene.add(ped);
                         const imgTex = this.getObjectImageTexture(objDef.imageFile);

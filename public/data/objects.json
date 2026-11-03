@@ -2652,5 +2652,184 @@
     "solid": true,
     "interactionDistance": 2.2,
     "description": "街の神殿の扉（近づくと開き、中へ入ると神殿へ移動。行き先は map の links）"
+  },
+  "goddess_statue_large": {
+    "type": "statue",
+    "imageFile": "goddess_statue.png",
+    "sdId": 205,
+    "aspect": 0.347,
+    "height": 8.0,
+    "pedestalHeight": 2.8,
+    "radius": 1.8,
+    "solid": true,
+    "blocksProjectiles": false,
+    "glow": true,
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall",
+    "description": "女神像（特大。普通の2倍）。城のある街の神殿用",
+    "pedestalWidth": 3.2
+  },
+  "goddess_statue_small": {
+    "type": "statue",
+    "imageFile": "goddess_statue.png",
+    "sdId": 205,
+    "aspect": 0.347,
+    "height": 2.0,
+    "pedestalHeight": 0.7,
+    "radius": 0.5,
+    "solid": true,
+    "blocksProjectiles": false,
+    "glow": true,
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick",
+    "description": "女神像（小。普通の半分）。村の神殿用",
+    "pedestalWidth": 1.4,
+    "pedestalTexture": "floorStone"
+  },
+  "stained_glass_plain_large": {
+    "type": "wall_image",
+    "imageFile": "stained_glass_plain.png",
+    "sdId": 206,
+    "aspect": 0.516,
+    "height": 7.2,
+    "bottom": 2.4,
+    "wallTexture": "marbleWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "ステンドグラス（神殿のガラス窓。壁の面に付ける画像）（壁の高さ12の大神殿用・大）"
+  },
+  "stained_glass_angel_large": {
+    "type": "wall_image",
+    "imageFile": "stained_glass_angel.png",
+    "sdId": 207,
+    "aspect": 0.54,
+    "height": 7.2,
+    "bottom": 2.4,
+    "wallTexture": "marbleWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "ステンドグラス（天使に人々がひざまずく）（壁の高さ12の大神殿用・大）"
+  },
+  "stained_glass_priestess_large": {
+    "type": "wall_image",
+    "imageFile": "stained_glass_priestess.png",
+    "sdId": 208,
+    "aspect": 0.538,
+    "height": 7.2,
+    "bottom": 2.4,
+    "wallTexture": "marbleWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "ステンドグラス（女性の神官が人々に施しをする）（壁の高さ12の大神殿用・大）"
+  },
+  "stained_glass_prophet_large": {
+    "type": "wall_image",
+    "imageFile": "stained_glass_prophet.png",
+    "sdId": 209,
+    "aspect": 0.47,
+    "height": 7.2,
+    "bottom": 2.4,
+    "wallTexture": "marbleWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "ステンドグラス（髭の教祖が動物達と対話する）（壁の高さ12の大神殿用・大）"
+  },
+  "temple_pillar_tall": {
+    "type": "furniture",
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall",
+    "parts": [
+      {
+        "size": [
+          2.4,
+          0.6,
+          2.4
+        ],
+        "pos": [
+          0,
+          0.3,
+          0
+        ],
+        "color": "#f0ece0"
+      },
+      {
+        "size": [
+          1.6,
+          10.2,
+          1.6
+        ],
+        "pos": [
+          0,
+          5.7,
+          0
+        ],
+        "color": "#fbf9f3"
+      },
+      {
+        "size": [
+          2.4,
+          0.6,
+          2.4
+        ],
+        "pos": [
+          0,
+          11.7,
+          0
+        ],
+        "color": "#d4a84a"
+      }
+    ],
+    "collider": [
+      2.0,
+      2.0
+    ],
+    "blocksProjectiles": true,
+    "description": "神殿の大理石の柱（金の柱頭。壁の高さ 12 の大神殿用）"
+  },
+  "stairs_marble_up": {
+    "type": "stairs",
+    "direction": "up",
+    "texture": "marbleFloor",
+    "solid": false,
+    "message": "階段を上る",
+    "description": "大理石の階段（上り）。神殿用",
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall"
+  },
+  "stairs_marble_down": {
+    "type": "stairs",
+    "direction": "down",
+    "texture": "marbleFloor",
+    "solid": false,
+    "message": "階段を下りる",
+    "description": "大理石の階段（下り）。神殿用",
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall"
+  },
+  "temple_brick_wall": {
+    "type": "block",
+    "texture": "brick",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "村の神殿のレンガ壁"
+  },
+  "temple_brick_floor": {
+    "type": "floor_tile",
+    "texture": "floorStone",
+    "ceilingTexture": "brick",
+    "solid": false,
+    "description": "村の神殿の石の床（天井はレンガ）"
+  },
+  "temple_exit_brick": {
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "brick",
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "nextMap": "$back",
+    "message": "外に出る",
+    "description": "村の神殿の出口の扉"
   }
 }

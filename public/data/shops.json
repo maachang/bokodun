@@ -155,7 +155,7 @@
     ]
   },
   "temple": {
-    "name": "神殿",
+    "name": "大神殿",
     "keeper": "priest_senior",
     "goods": [
       {
@@ -172,6 +172,33 @@
         "itemId": "venom_cure",
         "name": "猛毒消し",
         "price": 150
+      }
+    ]
+  },
+  "temple_town": {
+    "name": "神殿",
+    "keeper": "priest_man",
+    "goods": [
+      {
+        "itemId": "revive_potion",
+        "name": "蘇生の薬",
+        "price": 500
+      },
+      {
+        "itemId": "antidote",
+        "name": "毒消し",
+        "price": 30
+      }
+    ]
+  },
+  "temple_village": {
+    "name": "小さな神殿",
+    "keeper": "priest_woman",
+    "goods": [
+      {
+        "itemId": "antidote",
+        "name": "毒消し",
+        "price": 30
       }
     ]
   }

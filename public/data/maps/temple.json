@@ -1,9 +1,9 @@
 {
   "id": "temple",
-  "name": "神殿 (Temple)",
+  "name": "大神殿 (Great Temple) 1F",
   "type": "indoor",
   "tileSize": 4,
-  "wallHeight": 6,
+  "wallHeight": 12,
   "nextMap": "city",
   "spawn": {
     "x": 10,
@@ -27,22 +27,23 @@
     "W": "temple_wall",
     "F": "marble_floor",
     "c": "temple_carpet",
-    "p": "temple_pillar",
+    "p": "temple_pillar_tall",
     "D": "temple_exit",
-    "G": "goddess_statue",
+    "G": "goddess_statue_large",
     "1": "dais_marble_1",
     "2": "dais_marble_2",
     "4": "dais_temple_rug_1",
     "5": "dais_temple_rug_2",
-    "a": "stained_glass_plain",
-    "b": "stained_glass_angel",
-    "e": "stained_glass_priestess",
-    "f": "stained_glass_prophet"
+    "a": "stained_glass_plain_large",
+    "b": "stained_glass_angel_large",
+    "e": "stained_glass_priestess_large",
+    "f": "stained_glass_prophet_large",
+    "U": "stairs_marble_up"
   },
   "enemies": {},
   "layout": [
     "WWWWaWWeWWbWWfWWaWWWW",
-    "WFFFFF2225G5222FFFFFW",
+    "WUFFFF2225G5222FFFFFW",
     "WFFFF11114441111FFFFW",
     "WFFFFFFFFFFFFFFFFFFFW",
     "WFFFFFFFFcccFFFFFFFFW",
@@ -81,5 +82,17 @@
       "x": 7,
       "z": 13
     }
-  ]
+  ],
+  "links": {
+    "1,1": {
+      "nextMap": "temple_2f",
+      "message": "階段を上る（2階へ）",
+      "dir": "n",
+      "spawn": {
+        "x": 1,
+        "z": 2,
+        "angle": 3.14159
+      }
+    }
+  }
 }

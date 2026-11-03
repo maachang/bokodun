@@ -1,0 +1,100 @@
+{
+  "id": "temple_2f",
+  "name": "大神殿 (Great Temple) 2F",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 6,
+  "nextMap": "temple",
+  "spawn": {
+    "x": 1,
+    "z": 2,
+    "angle": 3.14159
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "marbleWall",
+    "ambientLight": 16777215,
+    "directionalLight": 16773324,
+    "fogColor": 15985881,
+    "fogNear": 34,
+    "fogFar": 100,
+    "visibility": 1.0,
+    "skyColor": 15985881
+  },
+  "legend": {
+    "W": "temple_wall",
+    "F": "marble_floor",
+    "c": "temple_carpet",
+    "p": "temple_pillar",
+    "a": "stained_glass_plain",
+    "b": "stained_glass_angel",
+    "e": "stained_glass_priestess",
+    "f": "stained_glass_prophet",
+    "S": "stairs_marble_down",
+    "U": "stairs_marble_up"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWaWWeWWbWWfWWaWWWW",
+    "WSFFFFFFFFFFFFFFFFFUW",
+    "WFFFFFFFFFFFFFFFFFFFW",
+    "WFFFFFFFFFFFFFFFFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "eFFFFFFFFcccFFFFFFFFf",
+    "WFFFFpFFFcccFFFpFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "fFFFFpFFFcccFFFpFFFFe",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFpFFFcccFFFpFFFFW",
+    "aFFFFFFFFcccFFFFFFFFa",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFpFFFcccFFFpFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFFFFFcccFFFFFFFFW",
+    "WFFFFFFFFFFFFFFFFFFFW",
+    "WWWWWWWWWWWWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "priest_woman",
+      "x": 7,
+      "z": 6
+    },
+    {
+      "id": "priest_man",
+      "x": 14,
+      "z": 10
+    },
+    {
+      "id": "priest_woman",
+      "x": 6,
+      "z": 13
+    }
+  ],
+  "links": {
+    "1,1": {
+      "nextMap": "temple",
+      "message": "階段を下りる（1階へ）",
+      "dir": "n",
+      "spawn": {
+        "x": 1,
+        "z": 2,
+        "angle": 3.14159
+      }
+    },
+    "19,1": {
+      "nextMap": "temple_3f",
+      "message": "階段を上る（3階へ）",
+      "dir": "n",
+      "spawn": {
+        "x": 9,
+        "z": 2,
+        "angle": 3.14159
+      }
+    }
+  }
+}

@@ -156,7 +156,7 @@
       "icon": "itemShopIcon"
     },
     "19,15": {
-      "nextMap": "temple",
+      "nextMap": "temple_village",
       "message": "神殿に入る",
       "back": {
         "x": 19,
