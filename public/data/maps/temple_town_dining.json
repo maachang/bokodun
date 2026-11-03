@@ -39,16 +39,22 @@
     "N": "hanging_candles_rug",
     "a": "sink_marble",
     "b": "water_barrel_marble",
-    "c": "wash_stand_marble"
+    "c": "wash_stand_marble",
+    "f": "kitchen_hearth_marble",
+    "i": "prep_table_marble",
+    "j": "sack_pile_marble",
+    "l": "pot_rack_marble",
+    "m": "wall_utensils_marble",
+    "n": "kitchen_shelf_marble"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWWWWWW",
-    "WcFFFFFFWaosW",
-    "LFhhhhhFLbFFW",
-    "WFtttttFWFtFW",
+    "WWWWWWWWWmWWW",
+    "WcFFFFFFWaofW",
+    "LFhhhhhFLblFW",
+    "WFtttttFWniFW",
     "EFuuNuuFdFFFW",
-    "WFhhhhhFWFFXW",
+    "WFhhhhhFWFFjW",
     "LFFFFFFFLFFFW",
     "WWWWWWWWWWWWW"
   ],

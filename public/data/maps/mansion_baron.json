@@ -38,14 +38,18 @@
     "C": "wall_window_curtain",
     "L": "wall_sconce_wood",
     "a": "sink",
-    "b": "wash_stand"
+    "b": "wash_stand",
+    "c": "pot_rack",
+    "f": "wall_utensils",
+    "i": "kitchen_shelf",
+    "j": "prep_table"
   },
   "enemies": {},
   "layout": [
-    "WWLCWWWWWWW",
+    "WWLCWWWWfWW",
     "WFksFkFWaoW",
-    "WFuuuFFdFFW",
-    "WFuuuFFWFFW",
+    "WFuuuFFdcFW",
+    "WFuuuFFWijW",
     "CFuuuFFWWWW",
     "WhtuuthWbFW",
     "LFuuuFFdgeW",

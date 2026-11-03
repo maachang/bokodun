@@ -33,14 +33,18 @@
     "B": "barrel_stone",
     "L": "wall_sconce",
     "a": "water_barrel_stone",
-    "b": "oven_stone"
+    "b": "oven_stone",
+    "c": "sack_pile_stone",
+    "d": "prep_table_stone",
+    "f": "pot_rack_stone",
+    "i": "kitchen_shelf_stone"
   },
   "enemies": {},
   "layout": [
     "WWWWWWWWW",
-    "WbFbFBBXW",
-    "LFaFFFFFL",
-    "WXFFtFFFW",
+    "WbFbFBBcW",
+    "LFaFfFFFL",
+    "WcFFdFFiW",
     "WFFFFFFFW",
     "WBFFFFFBW",
     "WWWWEWWWW"

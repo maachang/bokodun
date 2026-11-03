@@ -1600,7 +1600,10 @@ export class GameEngine {
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
                         const doorThickness = 0.45;
                         const doorW = tileSize * 0.75;
-                        const doorGeo = new THREE.BoxGeometry(doorW, wallH, doorThickness);
+                        // 扉の高さ: 壁が高い建物（大神殿など）で、扉が細長くならないよう、標準の高さで頭打ちにする。
+                        //   objects.json の doorHeight で個別に指定もできる。扉の上から天井までは、枠と同じ材質のまぐさでふさぐ
+                        const doorH = Math.min(wallH, objDef.doorHeight ?? (wallH <= 5 ? wallH : 4.5));
+                        const doorGeo = new THREE.BoxGeometry(doorW, doorH, doorThickness);
                         const doorMesh = new THREE.Mesh(doorGeo, doorMat);
 
                         // Door Frame Pillars on both sides
@@ -1612,7 +1615,7 @@ export class GameEngine {
                         if (isVertical) {
                             // North-South passage door (oriented along Z)
                             doorMesh.rotation.y = Math.PI / 2;
-                            doorMesh.position.set(0, wallH / 2, 0);
+                            doorMesh.position.set(0, doorH / 2, 0);
 
                             const pillar1 = new THREE.Mesh(pillarGeo, frameMat);
                             pillar1.rotation.y = Math.PI / 2;
@@ -1627,7 +1630,7 @@ export class GameEngine {
                             doorGroup.add(pillar2);
                         } else {
                             // East-West passage door (oriented along X)
-                            doorMesh.position.set(0, wallH / 2, 0);
+                            doorMesh.position.set(0, doorH / 2, 0);
 
                             const pillar1 = new THREE.Mesh(pillarGeo, frameMat);
                             pillar1.position.set(-(doorW / 2 + pillarW / 2), wallH / 2, 0);
@@ -1638,6 +1641,15 @@ export class GameEngine {
                             doorGroup.add(doorMesh);
                             doorGroup.add(pillar1);
                             doorGroup.add(pillar2);
+                        }
+
+                        // まぐさ（扉の上から天井まで）
+                        if (wallH > doorH + 1e-6) {
+                            const lintelH = wallH - doorH;
+                            const lintel = new THREE.Mesh(new THREE.BoxGeometry(doorW, lintelH, doorThickness), frameMat);
+                            if (isVertical) lintel.rotation.y = Math.PI / 2;
+                            lintel.position.set(0, doorH + lintelH / 2, 0);
+                            doorGroup.add(lintel);
                         }
 
                         doorGroup.position.set(wx, 0, wz);
@@ -1657,9 +1669,9 @@ export class GameEngine {
                             mesh: doorMesh,
                             collider: collider,
                             isOpen: false,
-                            targetY: wallH / 2,
-                            baseY: wallH / 2,
-                            openY: wallH * 1.45,
+                            targetY: doorH / 2,
+                            baseY: doorH / 2,
+                            openY: doorH * 1.45,
                             x: wx,
                             z: wz,
                             link: { ...objDef, ...mapData.links?.[`${c},${r}`] },   // 行き先（nextMap）があれば、開いた扉の中へ入ると、そのマップへ移動する。マスごとの指定は map の links
@@ -1692,14 +1704,34 @@ export class GameEngine {
                             mesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
                             group.add(mesh);
                         }
+                        // 壁に寄せた家具（colliderOffset の奥行き方向が 0.5 より大きい物）は、背中が、隣の壁に付く向きに回す。
+                        //   定義の向き（offset の符号の側が背中）の側に壁があれば、そのまま。なければ、北・南・西・東の順で、壁のある側へ回す
+                        let fOffX = (objDef.colliderOffset || [0, 0])[0], fOffZ = (objDef.colliderOffset || [0, 0])[1];
+                        let fCw = objDef.collider ? objDef.collider[0] : 0, fCd = objDef.collider ? objDef.collider[1] : 0;
+                        if (Math.abs(fOffZ) > 0.5 && fOffX === 0 && objDef.autoTurn !== false) {
+                            const isWallAt = (cc, rr) => {
+                                if (cc < 0 || rr < 0 || cc >= cols || rr >= rows) return false;
+                                const wt = this.objectDefinitions[mapData.legend?.[mapData.layout[rr][cc]]];
+                                return !!wt && ['block', 'wall_deco', 'wall_image'].includes(wt.type);
+                            };
+                            const own = fOffZ < 0 ? [0, -1] : [0, 1];
+                            const wallDir = isWallAt(c + own[0], r + own[1]) ? own
+                                : [[0, -1], [0, 1], [-1, 0], [1, 0]].find(([dx, dz]) => isWallAt(c + dx, r + dz));
+                            if (wallDir) {
+                                const sgn = fOffZ < 0 ? -1 : 1, depthOff = Math.abs(fOffZ);
+                                group.rotation.y = Math.atan2(sgn * wallDir[0], sgn * wallDir[1]);
+                                fOffX = depthOff * wallDir[0]; fOffZ = depthOff * wallDir[1];
+                                if (wallDir[0] !== 0) { const t = fCw; fCw = fCd; fCd = t; }   // 東西の壁なら、当たり判定の幅と奥行きを入れ替える
+                            }
+                        }
                         group.position.set(wx, 0, wz);
                         this.addStatic(group);
                         const furnitureFloor = objDef.floorTexture ?? mapData.decorFloor;   // 屋外の街では、飾りの下も石畳（map の decorFloor）
                         if (furnitureFloor) this.addFloorTile(wx, wz, tileSize, furnitureFloor);
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
                         if (objDef.collider) {
-                            const [cw, cd] = objDef.collider;
-                            const [ox, oz] = objDef.colliderOffset || [0, 0];
+                            const cw = fCw, cd = fCd;
+                            const ox = fOffX, oz = fOffZ;
                             this.colliders.push({
                                 minX: wx + ox - cw / 2, maxX: wx + ox + cw / 2,
                                 minZ: wz + oz - cd / 2, maxZ: wz + oz + cd / 2,

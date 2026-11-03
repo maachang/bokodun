@@ -36,14 +36,20 @@
     "L": "wall_sconce_marble",
     "a": "sink_marble",
     "b": "water_barrel_marble",
-    "c": "oven_marble"
+    "c": "oven_marble",
+    "d": "kitchen_hearth_marble",
+    "f": "sack_pile_marble",
+    "i": "prep_table_marble",
+    "j": "pot_rack_marble",
+    "l": "wall_utensils_marble",
+    "m": "kitchen_shelf_marble"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWWWW",
-    "WcoasFogW",
-    "WFFbFFFFW",
-    "LXFtFtFXL",
+    "WWWlWWWWW",
+    "WcoadFogW",
+    "WmFbjFFFW",
+    "LfFiFiFfL",
     "WFFhFhFFW",
     "WFFFFFFFW",
     "WWWWEWWWW"

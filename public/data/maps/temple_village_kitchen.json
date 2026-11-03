@@ -36,16 +36,22 @@
     "w": "temple_brick_window",
     "a": "sink_stone",
     "b": "water_barrel_stone",
-    "c": "oven_stone"
+    "c": "oven_stone",
+    "d": "kitchen_hearth_stone",
+    "f": "sack_pile_stone",
+    "i": "prep_table_stone",
+    "j": "pot_rack_stone",
+    "l": "wall_utensils_stone",
+    "m": "kitchen_shelf_stone"
   },
   "enemies": {},
   "layout": [
-    "WWWWWWW",
-    "WcosaXW",
-    "WbFFFFW",
-    "EFFtFFW",
+    "WWWWlWW",
+    "WcodafW",
+    "WbFjFmW",
+    "EFFiFFW",
     "WFhFhFW",
-    "WFFFFXW",
+    "WFFFFfW",
     "WWWwWWW"
   ],
   "npcs": [

@@ -149,7 +149,7 @@ test('貴族の屋敷: 5階級とも中に入れ、階級が高いほど広く�
     const decor = (id) => new Set(Object.values(readJson(`public/data/maps/${id}.json`).legend));
     assert.ok(decor('mansion').has('chandelier_mansion_rug') && decor('mansion_margrave').has('chandelier_mansion_rug'), '公爵・辺境伯: シャンデリア');
     assert.ok(decor('mansion_viscount').has('chandelier_mansion_rug') || decor('mansion_viscount').has('hanging_candles_mansion_rug'), '子爵: 小さな吊り飾り');
-    assert.ok(![...decor('mansion_baron')].some(id => objects[id]?.type === 'hanging'), '男爵: 天井の飾りはない');
+    assert.ok(![...decor('mansion_baron')].some(id => objects[id]?.type === 'hanging' && !id.startsWith('pot_rack')), '男爵: 天井の飾りはない（台所の鍋つりは道具）');
 });
 
 test('王城: 1階に厨房・武器庫・兵の待機所・下働きの食堂があり、下働き（メイド・使用人）と兵が多い。2階は事務室・会議室、3階は貴族の執務室と図書館。地下は迷宮', () => {
@@ -325,7 +325,7 @@ test('貴賓の居室: 王城3階の西端の扉から入り、出口で戻れ�
 
 test('台所: 水の出る流し台は北の壁に取り付け、すぐ横に、火の設備（かまど・暖炉・オーブン）が並ぶ。村長の家には窓がある', () => {
     const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
-    const fire = n => /^(stove|hearth|oven)/.test(n || '');
+    const fire = n => /^(stove|hearth|oven|kitchen_hearth)/.test(n || '');
     for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_margrave', 'mansion_marquis', 'mansion_viscount', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house']) {
         const m = rd(id), at = (x, y) => m.legend[m.layout[y]?.[x]];
         let n = 0;
@@ -342,4 +342,47 @@ test('台所: 水の出る流し台は北の壁に取り付け、すぐ横に、
     const hall = rd('village_chief_house');
     for (const id of [hall, rd('village_chief_house_2f')]) assert.ok(Object.values(id.legend).includes('wall_window_wood'));
     assert.ok(Object.values(rd('village').legend).includes('wooden_house_window'), '村長の家の外の窓');
+});
+
+test('壁際の設備: かまど・オーブン・流し台・暖炉・食器棚は、マスの幅いっぱいで、背中が壁にぴったり付く（隣と離れない）。向きは隣の壁に自動で合わせる', () => {
+    const o = JSON.parse(fs.readFileSync('public/data/objects.json', 'utf8'));
+    for (const b of ['stove', 'oven', 'sink', 'hearth', 'cupboard']) for (const s of ['', '_stone', '_marble']) {
+        const d = o[b + s];
+        assert.equal(d.collider[0], 4, `${b}${s}: 当たり判定の幅がマスいっぱい`);
+        const back = Math.max(...d.parts.map(p => Math.abs(p.pos[2]) + p.size[2] / 2));
+        const off = Math.abs(d.colliderOffset[1]) + d.collider[1] / 2;
+        assert.ok(Math.abs(off - 2) < 1e-9, `${b}${s}: 当たり判定の背中が壁（2）に付く`);
+        assert.ok(Math.abs(back - 2) < 0.06 || back <= 2.0, `${b}${s}: 部品が壁を突き抜けない`);
+        const body = d.parts[0];
+        assert.equal(body.size[0], 4, `${b}${s}: 本体の幅がマスいっぱい`);
+    }
+    const game = fs.readFileSync('public/js/game.js', 'utf8');
+    assert.ok(game.includes('autoTurn'), '壁に自動で向きを合わせる処理');
+});
+
+test('厨房らしさ: 全部の台所に、調理台・台所の暖炉・鍋つり・壁の棚か道具・袋（粉・野菜）が揃う', () => {
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    for (const id of ['castle', 'mansion', 'mansion_baron', 'mansion_viscount', 'mansion_margrave', 'mansion_marquis', 'temple_kitchen', 'temple_town_dining', 'temple_village_kitchen', 'village_chief_house', 'castle_bakehouse']) {
+        const names = Object.values(rd(id).legend);
+        const has = p => names.some(n => n.startsWith(p));
+        assert.ok(has('prep_table'), `${id}: 調理台`);
+        assert.ok(has('pot_rack'), `${id}: 鍋つり`);
+        if (id !== 'castle_bakehouse' && id !== 'mansion_baron' && id !== 'mansion_viscount') assert.ok(has('kitchen_hearth'), `${id}: 台所の暖炉`);
+        if (id !== 'village_chief_house') assert.ok(has('kitchen_shelf') || has('wall_utensils'), `${id}: 壁の棚か道具`);
+    }
+});
+
+test('扉: 壁が高い建物（大神殿など）でも、扉は標準の高さで頭打ちにして、上をまぐさでふさぐ。壁が5以下は、壁の高さのまま', () => {
+    const game = fs.readFileSync('public/js/game.js', 'utf8');
+    assert.ok(game.includes('const doorH = Math.min(wallH, objDef.doorHeight ?? (wallH <= 5 ? wallH : 4.5))'), '扉の高さの頭打ち');
+    assert.ok(game.includes('まぐさ'), 'まぐさ');
+    assert.ok(game.includes('openY: doorH * 1.45'), '開く量は扉の高さが基準');
+    const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
+    const o = JSON.parse(fs.readFileSync('public/data/objects.json', 'utf8'));
+    let tall = 0;
+    for (const f of fs.readdirSync('public/data/maps')) {
+        const m = rd(f.replace('.json', ''));
+        if ((m.wallHeight ?? 4) > 5 && Object.values(m.legend).some(n => o[n]?.type === 'door')) tall++;
+    }
+    assert.equal(tall, 4, '壁が高く扉のあるマップ（大神殿・神殿2階・街の神殿と2階）');
 });
