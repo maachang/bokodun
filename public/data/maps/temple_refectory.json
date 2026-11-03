@@ -1,0 +1,62 @@
+{
+  "id": "temple_refectory",
+  "name": "神殿の食堂 (Refectory)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "temple",
+  "spawn": {
+    "x": 2,
+    "z": 5,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "marbleWall",
+    "ambientLight": 16777215,
+    "directionalLight": 16773324,
+    "fogColor": 15985881,
+    "fogNear": 24,
+    "fogFar": 70,
+    "visibility": 1.0,
+    "skyColor": 15985881
+  },
+  "legend": {
+    "W": "temple_wall",
+    "F": "marble_floor",
+    "E": "temple_exit",
+    "u": "temple_carpet",
+    "t": "table_marble",
+    "h": "chair_marble",
+    "L": "wall_sconce_marble",
+    "N": "hanging_candles_rug",
+    "g": "cupboard_marble"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWWWWWW",
+    "WgFFFFFFFgW",
+    "LFhhhhhhhFL",
+    "WFtttttttFW",
+    "EFhhhhhhhFW",
+    "WFFFuNuFFFW",
+    "LFFFFFFFFFL",
+    "WWWWWWWWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "priest_man",
+      "x": 3,
+      "z": 6,
+      "wanderRadius": 1.0
+    },
+    {
+      "id": "priest_woman",
+      "x": 7,
+      "z": 5,
+      "wanderRadius": 1.0
+    }
+  ]
+}

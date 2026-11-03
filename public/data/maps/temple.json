@@ -49,7 +49,7 @@
     "WWRWaLWeWWbWWfWLaWRWW",
     "WUFFFF2225G5222FFFFFW",
     "WFFFF11114441111FFFFW",
-    "RFFFFFFFFFFFFFFFFFFFR",
+    "RFFFFFFFFFFFFFFFFFFFd",
     "WFFFFFFFFcccFFFFFFFFW",
     "eFFFFFFFFcccFFFFFFFFf",
     "WFFFFpFFFcKcFFFpFFFFW",
@@ -122,6 +122,15 @@
       "back": {
         "x": 19,
         "z": 15,
+        "angle": 1.570795
+      }
+    },
+    "20,3": {
+      "nextMap": "temple_refectory",
+      "message": "食堂に入る",
+      "back": {
+        "x": 19,
+        "z": 3,
         "angle": 1.570795
       }
     }

@@ -31,7 +31,8 @@
     "w": "temple_brick_window",
     "P": "temple_pew",
     "1": "dais_brick_1",
-    "L": "wall_sconce"
+    "L": "wall_sconce",
+    "d": "brick_room_door"
   },
   "enemies": {},
   "layout": [
@@ -39,7 +40,7 @@
     "L11G11L",
     "wFFFFFw",
     "WPPFPPW",
-    "wFFFFFw",
+    "dFFFFFd",
     "LPPFPPL",
     "WWLDLWW"
   ],
@@ -52,5 +53,25 @@
       "wanderRadius": 0,
       "shopId": "temple_village"
     }
-  ]
+  ],
+  "links": {
+    "0,4": {
+      "nextMap": "temple_village_bedroom",
+      "message": "寝室に入る",
+      "back": {
+        "x": 1,
+        "z": 4,
+        "angle": -1.570795
+      }
+    },
+    "6,4": {
+      "nextMap": "temple_village_kitchen",
+      "message": "厨房に入る",
+      "back": {
+        "x": 5,
+        "z": 4,
+        "angle": 1.570795
+      }
+    }
+  }
 }

@@ -92,10 +92,11 @@ test('神殿の作り分け: 像の大きさは、大神殿が普通の2倍、�
     assert.equal(h('temple_village') * 2, h('temple_town'));
 });
 
-test('神殿の作り分け: 広さは、大神殿 > 街の神殿 > 村の神殿。大神殿だけ階段があり、3階に枢機卿（話すだけ）がいる', () => {
+test('神殿の作り分け: 広さは、大神殿 > 街の神殿 > 村の神殿。大神殿は3階建て・街の神殿は2階建て・村の神殿は1階。3階に枢機卿（話すだけ）がいる', () => {
     const area = (id) => maps[id].layout.length * maps[id].layout[0].length;
     assert.ok(area('temple') > area('temple_town') && area('temple_town') > area('temple_village'));
-    for (const id of ['temple_town', 'temple_village']) assert.ok(!cells(maps[id]).some(x => x.def?.type === 'stairs'), `${id}: 階段なし`);
+    assert.ok(!cells(maps.temple_village).some(x => x.def?.type === 'stairs'), '村の神殿: 階段なし（1階だけ）');
+    assert.ok(cells(maps.temple_town).some(x => x.def?.type === 'stairs'), '街の神殿: 2階への階段');
     assert.ok(cells(maps.temple).some(x => x.def?.type === 'stairs'));
     const cardinal = maps.temple_3f.npcs.find(n => n.id === 'cardinal');
     assert.ok(cardinal && cardinal.shopId === undefined, '枢機卿は話すだけ');
@@ -131,7 +132,7 @@ test('神殿の作り分け: 村の神殿は、レンガ・ステンドグラス
 });
 
 test('大神殿: 1階は広い1つの空間と、扉でつながる部屋（厨房・懺悔室・聖具室）。2階は通路と神官たちの個室', () => {
-    const rooms = ['temple_kitchen', 'temple_confession', 'temple_sacristy'];
+    const rooms = ['temple_kitchen', 'temple_refectory', 'temple_confession', 'temple_sacristy'];
     for (const id of rooms) {
         const link = Object.entries(temple.links).find(([, l]) => l.nextMap === id);
         assert.ok(link, `${id}: 1階の扉`);
@@ -148,4 +149,20 @@ test('大神殿: 1階は広い1つの空間と、扉でつながる部屋（厨�
     assert.ok(doors >= 6, `2階: 個室の扉 ${doors}`);
     assert.ok(Object.values(f2.legend).includes('bed_marble'), '2階: 個室のベッド');
     assert.ok(f2.npcs.length >= 5, '2階: 神官たち');
+});
+
+test('神殿の部屋の割り振り: 村は広間の端の扉から寝室と厨房、街は1階に食堂と厨房・2階に個室と寝室', () => {
+    const v = maps.temple_village, t = maps.temple_town;
+    assert.ok(['temple_village_bedroom', 'temple_village_kitchen'].every(id => Object.values(v.links).some(l => l.nextMap === id)));
+    for (const [key] of Object.entries(v.links)) {
+        const [c, r] = key.split(',').map(Number);
+        assert.ok(c === 0 || c === v.layout[0].length - 1, `${key}: 広間の端（左右の壁）の扉`);
+        assert.equal(objects[v.legend[v.layout[r][c]]].type, 'door');
+    }
+    assert.ok(Object.values(t.links).some(l => l.nextMap === 'temple_town_dining') && Object.values(t.links).some(l => l.nextMap === 'temple_town_2f'));
+    const ids = (id) => new Set(Object.values(readJson(`public/data/maps/${id}.json`).legend));
+    assert.ok(ids('temple_town_dining').has('table_marble') && ids('temple_town_dining').has('stove_marble'), '食堂と厨房');
+    const f2 = readJson('public/data/maps/temple_town_2f.json');
+    assert.ok(f2.layout.join('').split('').filter(ch => f2.legend[ch] === 'bed_marble').length >= 6, '2階: ベッド（個室・寝室）');
+    assert.ok(ids('temple_village_kitchen').has('stove_stone') && ids('temple_village_bedroom').has('bed_stone'));
 });

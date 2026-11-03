@@ -1,0 +1,82 @@
+{
+  "id": "temple_town_2f",
+  "name": "街の神殿 (Temple) 2F 個室・寝室",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 6,
+  "nextMap": "temple_town",
+  "spawn": {
+    "x": 2,
+    "z": 5,
+    "angle": -1.570795
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "marbleWall",
+    "ambientLight": 16777215,
+    "directionalLight": 16773324,
+    "fogColor": 15985881,
+    "fogNear": 34,
+    "fogFar": 100,
+    "visibility": 1.0,
+    "skyColor": 15985881
+  },
+  "legend": {
+    "W": "temple_wall",
+    "F": "marble_floor",
+    "u": "temple_carpet",
+    "t": "table_marble",
+    "h": "chair_marble",
+    "k": "bookshelf_marble",
+    "g": "cupboard_marble",
+    "e": "bed_marble",
+    "L": "wall_sconce_marble",
+    "d": "temple_room_door",
+    "C": "wall_window_curtain_marble",
+    "S": "stairs_marble_down",
+    "K": "chandelier_temple_rug"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWCWWWWWWWCWWWW",
+    "WFeFFFkFWFkFFFeFW",
+    "LFFFFFFFWFFFFFFFL",
+    "WFFFFthFWFFFFthFW",
+    "WWLWdWLWWWLWdWLWW",
+    "CSuuuuuuKuuuuuuFC",
+    "WFuuuuuuuuuuuuuFW",
+    "WWLWdWLWWWLWdWLWW",
+    "WgFFFFgFWFgFFFFFW",
+    "LFFFFFFFWFFFhtFFL",
+    "WFeFeFeFWFeFFFeFW",
+    "WWWWCWWWWWWWCWWWW"
+  ],
+  "npcs": [
+    {
+      "id": "priest_man",
+      "x": 12,
+      "z": 2,
+      "wanderRadius": 0.8
+    },
+    {
+      "id": "priest_woman",
+      "x": 4,
+      "z": 9,
+      "wanderRadius": 0.8
+    }
+  ],
+  "links": {
+    "1,5": {
+      "nextMap": "temple_town",
+      "message": "階段を下りる（1階へ）",
+      "dir": "w",
+      "spawn": {
+        "x": 2,
+        "z": 1,
+        "angle": 3.14159
+      }
+    }
+  }
+}

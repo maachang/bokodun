@@ -10178,5 +10178,15 @@
       1.4
     ],
     "description": "かまど（南の壁に寄せて置く）（石の床・レンガの天井用）"
+  },
+  "brick_room_door": {
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "brick",
+    "floorTexture": "floorStone",
+    "ceilingTexture": "brick",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "description": "村の神殿の部屋の扉（近づくと開く。links があれば、行き先の部屋へ移動）"
   }
 }

@@ -39,14 +39,16 @@
     "e": "stained_glass_priestess",
     "f": "stained_glass_prophet",
     "K": "hanging_candles_rug",
-    "L": "wall_sconce_marble"
+    "L": "wall_sconce_marble",
+    "d": "temple_room_door",
+    "U": "stairs_marble_up"
   },
   "enemies": {},
   "layout": [
     "WLaWWbWWeLW",
-    "WFF25G52FFW",
+    "WUF25G52FFW",
     "LFF11411FFL",
-    "WFFFFFFFFFW",
+    "WFFFFFFFFFd",
     "eFFFcKcFFFf",
     "WFpFcccFpFW",
     "fFFFcccFFFe",
@@ -73,5 +75,26 @@
       "x": 2,
       "z": 6
     }
-  ]
+  ],
+  "links": {
+    "10,3": {
+      "nextMap": "temple_town_dining",
+      "message": "食堂に入る",
+      "back": {
+        "x": 9,
+        "z": 3,
+        "angle": 1.570795
+      }
+    },
+    "1,1": {
+      "nextMap": "temple_town_2f",
+      "message": "階段を上る（2階へ）",
+      "dir": "n",
+      "spawn": {
+        "x": 2,
+        "z": 5,
+        "angle": -1.570795
+      }
+    }
+  }
 }

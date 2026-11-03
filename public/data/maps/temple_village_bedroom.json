@@ -1,0 +1,47 @@
+{
+  "id": "temple_village_bedroom",
+  "name": "村の神殿の寝室 (Bedroom)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 5,
+  "nextMap": "temple_village",
+  "spawn": {
+    "x": 4,
+    "z": 3,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "stone",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "brick",
+    "ambientLight": 15261904,
+    "directionalLight": 16773324,
+    "fogColor": 9076336,
+    "fogNear": 16,
+    "fogFar": 50,
+    "visibility": 1.0,
+    "skyColor": 9076336
+  },
+  "legend": {
+    "W": "temple_brick_wall",
+    "F": "temple_brick_floor",
+    "E": "temple_exit_brick",
+    "e": "bed_stone",
+    "t": "table_stone",
+    "X": "crate_stone",
+    "k": "bookshelf_stone",
+    "w": "temple_brick_window"
+  },
+  "enemies": {},
+  "layout": [
+    "WWWWWWW",
+    "WeFFkkW",
+    "WFFFFFW",
+    "WFFFFFE",
+    "WeFFtFW",
+    "WFFFFXW",
+    "WWWwWWW"
+  ],
+  "npcs": []
+}
