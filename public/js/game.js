@@ -4,6 +4,7 @@ import { Monster, Projectile } from '/js/entities.js';
 import { Npc } from '/js/npc.js';
 import { MapNavigator, stairsFacing, STAIRS_DIRS } from '/js/mapNavigator.js';
 import { worldNeighbor, edgeCrossing, clampToWorld } from '/js/world.js';
+import { groundStepOk } from '/js/enemyBehavior.js';
 import { SoundFX } from '/js/audio.js';
 import { SDAssetManager } from '/js/sdAssetManager.js';
 import { ParticleSystem } from '/js/particles.js';
@@ -610,6 +611,15 @@ export class GameEngine {
         }
     }
 
+    // 地上の敵が、(x, z) へ進めないか: 崖（上り 2 段以上・下り 3 段以上）、毒沼・溶岩などのダメージ床
+    monsterTerrainBlocked(m, x, z) {
+        if (this.heightMap && !groundStepOk((px, pz) => this.heightLevelAt(px, pz), m.x, m.z, x, z)) return true;
+        for (const t of this.terrainGrid) {
+            if (t.damagePerSec > 0 && x >= t.minX && x <= t.maxX && z >= t.minZ && z <= t.maxZ) return true;
+        }
+        return false;
+    }
+
     // 高い所から落ちたときのダメージ（levels: 落ちた段の数。1 段の段差は、落下にしない）
     applyHeightFall(levels) {
         const dmg = Math.round((levels - 1) * this.fallDamagePerLevel);
@@ -853,6 +863,7 @@ export class GameEngine {
                     const enemyDef = this.enemyDefinitions[enemyType];
                     const m = new Monster(enemyType, wx, wz, this.textures, enemyDef);
                     m.floorY = this.heightLevelAtTile(r, c) * this.heightStep;
+                    m.terrainBlock = (mm, x, z) => this.monsterTerrainBlocked(mm, x, z);   // 地上の敵は、崖・毒沼へ進まない
                     m.sprite.position.y = m.floorY;
                     this.monsters.push(m);
                     this.scene.add(m.sprite);
@@ -2669,7 +2680,7 @@ export class GameEngine {
     aimProjectileHeight(p, dirX, dirZ) {
         const y0 = this.getFloorHeight(this.player.x, this.player.z) + 1.3;
         let vy = 0;
-        if (this.heightMap) {
+        if (this.heightMap || this.monsters.some(m => m.flying)) {
             let best = null, bestD = 40;
             for (const m of this.monsters) {
                 if (!m.active) continue;
@@ -2680,7 +2691,7 @@ export class GameEngine {
                 best = m; bestD = d;
             }
             if (best) {
-                const ty = (best.floorY ?? 0) + 0.9;   // 敵の胴の高さ
+                const ty = (best.floorY ?? 0) + (best.baseY ?? 0) + 0.9;   // 敵の胴の高さ（飛んでいる敵は、飛んでいる高さ）
                 vy = (ty - y0) / (bestD / p.speed);
             }
         }
@@ -3594,7 +3605,7 @@ export class GameEngine {
                     if (!m.active || p.hitMonsters.has(m)) continue;
                     const distM = Math.hypot(m.x - p.x, m.z - p.z);
                     // 起伏のあるマップでは、高さも合っているときだけ当たる（敵の胴の高さ ±1.6）
-                    if (this.heightMap && Math.abs(p.y - ((m.floorY ?? 0) + 0.9)) > 1.6) continue;
+                    if ((this.heightMap || m.flying) && Math.abs(p.y - ((m.floorY ?? 0) + (m.baseY ?? 0) + 0.9)) > 1.6) continue;
                     if (distM < m.radius + p.radius) {
                         if (this.hitMonsterWithProjectile(p, m)) break;
                     }
@@ -3602,7 +3613,8 @@ export class GameEngine {
             } else {
                 // Check enemy projectile (arrow or magic) hit player
                 const distP = Math.hypot(this.player.x - p.x, this.player.z - p.z);
-                if (distP < this.player.radius + p.radius) {
+                const pFloor = this.player.floorY ?? 0;
+                if (distP < this.player.radius + p.radius && p.y >= pFloor - 0.3 && p.y <= pFloor + 2.4) {   // 高さが合っているときだけ当たる
                     this.playerTakeDamage(p.damage, new THREE.Vector3(p.dirX, 0, p.dirZ));
                     if (p.sourceMonster) {
                         this.notifyEnemyEngaged(p.sourceMonster);
@@ -3614,6 +3626,10 @@ export class GameEngine {
                         this.sound.playExplosion();
                         this.particles.spawnBurst(p.x, p.y, p.z, 0x84cc16, 20, 3.5);
                         this.addPopup(`猛毒ブレス被弾! -${p.damage}`, '#a3e635');
+                    } else if (p.type === 'breath_fire') {
+                        this.sound.playExplosion();
+                        this.particles.spawnBurst(p.x, p.y, p.z, 0xff6a00, 20, 3.5);
+                        this.addPopup(`炎のブレス被弾! -${p.damage}`, '#fb923c');
                     } else if (p.type === 'poison_dust') {
                         this.sound.playExplosion();
                         this.particles.spawnBurst(p.x, p.y, p.z, 0xd946ef, 16, 3.0);
@@ -3963,6 +3979,21 @@ export class GameEngine {
     }
 
     updateCombat(dt) {
+        // 群れ（pack）: 仲間の 1 体が、プレイヤーを見つけたら、近くの仲間も、すぐ追ってくる
+        this.packTimer = (this.packTimer ?? 0) - dt;
+        if (this.packTimer <= 0) {
+            this.packTimer = 0.5;
+            for (const a of this.monsters) {
+                if (!a.active || a.state !== 'chase' || !a.profile?.pack) continue;
+                for (const b of this.monsters) {
+                    if (b === a || !b.active || b.state === 'chase' || !b.profile?.pack) continue;
+                    // 狼（relentless）は、追っている間、離れた仲間まで呼び寄せる（逃げると、列になって追ってくる）。縄張りのある敵（クマ・鳥）は、仲間を呼ばない
+                    const joinR = a.profile.relentless ? a.profile.relentless.joinRadius : 16;
+                    if (b.profile?.territory) continue;
+                    if (Math.hypot(a.x - b.x, a.z - b.z) < joinR) { b.state = 'chase'; b.lostTimer = 0; }
+                }
+            }
+        }
         for (let i = this.monsters.length - 1; i >= 0; i--) {
             const m = this.monsters[i];
             m.floorY = this.getFloorHeight(m.x, m.z);
@@ -3975,8 +4006,9 @@ export class GameEngine {
             const dist = Math.hypot(dx, dz);
             const bumpThreshold = this.player.radius + m.radius;
 
-            // 倒れている最中の敵は攻撃も当たり判定もしない
-            if (m.active && dist < bumpThreshold && this.player.attackCooldown <= 0) {
+            // 倒れている最中の敵は攻撃も当たり判定もしない。飛んでいる敵・高低差のある相手とは、高さが合っているときだけ、ぶつかる
+            const vDiff = ((m.floorY ?? 0) + (m.baseY ?? 0) + 0.9) - ((this.player.floorY ?? 0) + 0.9);
+            if (m.active && dist < bumpThreshold && Math.abs(vDiff) < 1.7 && this.player.attackCooldown <= 0) {
                 this.resolveYsBump(m, dx, dz, dist);
             }
 
@@ -4074,7 +4106,7 @@ export class GameEngine {
         } else if (isCharging) {
             // Normal charge: Mutual damage (player takes half, enemy takes standard)
             const pDmg = Math.floor(this.player.attackPower * damageScale + Math.random() * randomBonus);
-            const mDmg = Math.floor(monster.attackPower * 0.5);
+            const mDmg = Math.floor(monster.attackPower * 0.5 * (monster.isDashing ? 1.5 : 1));
 
             this.sound.playAttack(heavySound);
             const isDead = monster.takeDamage(pDmg, { x: nx, z: nz }, knockScale);
@@ -4087,19 +4119,19 @@ export class GameEngine {
             if (isDead) this.gainExp(monster.exp);
         } else {
             // Enemy hits player (player is standing still, stopped, or backing away)
-            const mDmg = monster.attackPower;
-            this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz));
+            const mDmg = Math.floor(monster.attackPower * (monster.isDashing ? 1.5 : 1));   // 突進中は、威力が 1.5 倍
+            this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz), monster.isDashing ? 2.0 : 1.0);   // 突進は、大きく吹き飛ばす
             this.notifyEnemyEngaged(monster);
         }
     }
 
-    playerTakeDamage(amount, knockDir) {
+    playerTakeDamage(amount, knockDir, knockScale = 1.0) {
         if (this.player.isInvincible) return;
 
         this.player.hp = Math.max(0, this.player.hp - amount);
         this.player.isInvincible = true;
         this.player.invincibleTimer = 0.35;
-        this.player.knockback.copy(knockDir).multiplyScalar(8);
+        this.player.knockback.copy(knockDir).multiplyScalar(8 * knockScale);
 
         this.sound.playHurt();
         this.flashDamageScreen();

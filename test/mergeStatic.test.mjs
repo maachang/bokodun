@@ -7,7 +7,7 @@ import path from 'node:path';
 const projectRoot = process.cwd();
 async function load() {
     const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-'));
-    for (const f of ['game', 'textures', 'entities', 'npc', 'mapNavigator', 'world', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'sdAssetManager', 'three.module']) {
+    for (const f of ['game', 'textures', 'entities', 'npc', 'mapNavigator', 'world', 'enemyBehavior', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'sdAssetManager', 'three.module']) {
         fs.writeFileSync(path.join(dir, `${f}.js`), fs.readFileSync(path.join(projectRoot, `public/js/${f}.js`), 'utf-8').replaceAll("'/js/", "'./"));
     }
     return { ...(await import(path.join(dir, 'game.js'))), THREE: await import(path.join(dir, 'three.module.js')) };

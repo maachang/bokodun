@@ -1,4 +1,5 @@
 import * as THREE from '/js/three.module.js';
+import { deriveProfile, diveHeight } from '/js/enemyBehavior.js';
 
 // 隠密（索敵）仕様の定数
 // ※ 索敵状態は「見える／見えない（描画）」の制御にのみ使う。移動・攻撃・射撃の AI は索敵状態に関係なく従来どおり距離で動く
@@ -37,6 +38,11 @@ export class Monster {
         this.alwaysAware = false;
         this.stealth = 'normal';
         this.deathColor = 0xffffff; // 死亡時の粒子の色（enemies.json の deathColor で上書き）
+        this.profile = null;        // 敵の特徴（deriveProfile の結果）
+        this.flying = false;        // 空を飛ぶ（川・崖・毒沼に関係なく動き、見えなくても感知する）
+        this.shootSpeed = null;     // 遠距離攻撃の弾の速さ・威力（null は、種類ごとの既定）
+        this.shootDamage = null;
+        this.terrainBlock = null;   // 地上の敵が、その位置へ行けないか（崖・毒沼）を返す関数。game.js が入れる
 
         if (enemyDef) {
             this.senseRange = enemyDef.senseRange ?? SENSE_DEFAULT_RANGE;
@@ -58,6 +64,24 @@ export class Monster {
             this.shootRange = enemyDef.shootRange || 15;
             this.maxArrowDistance = enemyDef.maxArrowDistance || 13;
             this.aiType = enemyDef.aiType || (this.canShoot ? 'ranged_maintain' : 'walk_chase');
+            // 敵の特徴（飛ぶ・突進・大ジャンプ・遠距離攻撃・群れ・怒り・逃走・回避・再生）を、能力や個別の指定から決める
+            this.profile = deriveProfile({ ...enemyDef, id: enemyDef.id ?? enemyType });
+            this.aiType = this.profile.aiType;
+            this.flying = this.profile.flying;
+            if (this.profile.relentless) {   // 狼: 一定の、そこそこ速い速さ
+                this.speed = Math.max(this.speed, this.profile.relentless.speed);
+                this.baseSpeed = this.speed;
+            }
+            if (this.profile.shoot) {
+                const sh = this.profile.shoot;
+                this.canShoot = true;
+                this.shootType = sh.type;
+                this.shootRange = sh.range;
+                this.shootCooldown = sh.cooldown;
+                this.shootSpeed = sh.speed;
+                this.shootDamage = sh.damage;
+                if (!enemyDef.canShoot) this.shootTimer = Math.random() * 2;
+            }
             
             // texture 未指定で imageFile がある敵は、敵の type（id）をテクスチャキーにして、imageFile から読み込む
             const texKey = enemyDef.texture || (enemyDef.imageFile ? enemyType : 'slime');
@@ -180,6 +204,26 @@ export class Monster {
         this.isLeaping = false;
         this.leapVelocityY = 0;
         this.leapTargetDir = { x: 0, z: 0 };
+        // 特徴による動きの状態
+        this.enraged = false;       // 怒り（体力が半分を切ると、速くなる）
+        this.evadeTimer = 2 + Math.random() * 2;   // 回避（横へ跳ぶ）までの時間
+        this.diveState = 'approach';   // 飛ぶ敵: approach(接近) / dive(急降下) / climb(上昇)
+        this.diveTimer = 0;
+        this.diveCooldown = 1.0 + Math.random();
+        this.diveDir = { x: 0, z: 0 };
+        this.chargeState = 'walk';     // 突進: walk / windup(溜め) / dash(突進) / rest / stun
+        this.chargeTimer = 0;
+        this.chargeCooldown = 1.0 + Math.random();
+        this.chargeDir = { x: 0, z: 0 };
+        this.chargeDist = 0;
+        this.isDashing = false;        // 突進中（当たると、ダメージ・ノックバックが大きい）
+        this.hopRest = 0;              // 大ジャンプの着地後の休み
+        this.homeX = x;                // 生まれた場所（縄張り・巡回の中心）
+        this.homeZ = z;
+        this.provokedTimer = 0;        // 攻撃されてから、縄張りの外でも追う時間
+        this.idleTimer = 0;
+        this.idleTarget = null;
+        this.patrolAngle = Math.random() * Math.PI * 2;
     }
 
     update(dt, player, colliders, projectiles, soundFx, scene, visibility = 1.0) {
@@ -203,7 +247,8 @@ export class Monster {
         } else {
             // 状態異常の色: 燃焼=赤み / 鈍足=青み
             const burning = this.burnTimer > 0, slowed = this.slowTimer > 0;
-            this.spriteMat.color.setRGB(slowed ? 0.6 : 1, burning ? 0.6 : (slowed ? 0.85 : 1), burning ? 0.5 : (slowed ? 1.2 : 1));
+            const en = this.enraged ? 0.7 : 1;   // 怒り: 赤みがかる
+            this.spriteMat.color.setRGB(slowed ? 0.6 : 1, (burning ? 0.6 : (slowed ? 0.85 : 1)) * en, (burning ? 0.5 : (slowed ? 1.2 : 1)) * en);
             this.sprite.visible = true;
         }
 
@@ -217,6 +262,21 @@ export class Monster {
 
         // 索敵: 見える／見えない（描画）の制御のみ。AI（移動・攻撃・射撃）は従来どおり下の距離判定で動く
         this.updateAwareness(dt, dx, dz, dist, player, colliders, visibility);
+        // 狼: 見失っても、追跡をやめない
+        if (this.profile?.relentless && this.state === 'chase') this.lostTimer = 0;
+        // 縄張り・巡回: 追うかどうかは、プレイヤーが、縄張り（生まれた場所のまわり）に入っているかで決まる
+        this.provokedTimer = Math.max(0, this.provokedTimer - dt);
+        const terr = this.profile?.territory;
+        if (terr) {
+            const dh = Math.hypot(player.x - this.homeX, player.z - this.homeZ);
+            const leash = terr.radius * (terr.leash ?? 1.5);
+            if (this.state === 'chase') {
+                if (dh > leash && !(this.provokedTimer > 0 && dh <= leash * 1.6)) { this.state = 'unaware'; this.lostTimer = 0; }
+            } else if (dh <= terr.radius) {
+                this.state = 'chase'; this.lostTimer = 0;   // 縄張りに入られた: 攻撃開始
+            }
+            if (this.state === 'chase') this.lostTimer = 0;
+        }
         const drawRange = this.senseRange * SENSE_DRAW_SCALE * visibility * STEALTH_DRAW_MULT[this.stealth];
         // 発見済みの敵は常に描画する。ただし隠密性が高い敵は、発見済みでも描画距離を超えると見えない
         const shown = (this.state === 'chase' && this.stealth !== 'high') || (dist <= drawRange);
@@ -241,6 +301,70 @@ export class Monster {
 
         // 鈍足: AI の時間の進みを遅くして、移動・攻撃・射撃・アニメーションをまとめてゆっくりにする
         if (this.slowTimer > 0) dt *= this.slowScale;
+
+        // 縄張りのある敵が、プレイヤーを追っていない間の動き: 守る（クマ: 縄張りの中をうろつく）／巡回する（鳥: 範囲を飛び回る）
+        if (terr && this.state !== 'chase') {
+            const moveTo = (tx, tz, sp) => {
+                const ddx = tx - this.x, ddz = tz - this.z, dd = Math.hypot(ddx, ddz);
+                if (dd < 0.3) return true;
+                const nx = this.x + ddx / dd * sp * dt, nz = this.z + ddz / dd * sp * dt;
+                if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx;
+                if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz;
+                return false;
+            };
+            if (terr.mode === 'patrol') {
+                // 巡回: 生まれた場所を中心に、円を描いて飛ぶ
+                const R = terr.radius * 0.55;
+                this.patrolAngle += dt * (this.speed * 0.9) / Math.max(2, R);
+                const H = this.profile.flightHeight ?? 2.0;
+                this.baseY += ((H + Math.sin(this.aiTimer * 2.5) * 0.3) - this.baseY) * Math.min(1, dt * 2);
+                moveTo(this.homeX + Math.cos(this.patrolAngle) * R, this.homeZ + Math.sin(this.patrolAngle) * R, this.speed * 1.1);
+                const flap = 1.0 + Math.sin(this.aiTimer * 9.0) * 0.08;
+                this.sprite.scale.set(this.baseScaleX * flap, this.baseScaleY * (2.0 - flap), 1);
+            } else {
+                // 守る: 縄張りの中を、ゆっくりうろつく（追跡から戻ったときは、中心の方へ戻る）
+                this.idleTimer -= dt;
+                const farFromHome = Math.hypot(this.x - this.homeX, this.z - this.homeZ) > terr.radius * 0.5;
+                if (!this.idleTarget || this.idleTimer <= 0 || farFromHome) {
+                    const a = Math.random() * Math.PI * 2, r = Math.random() * terr.radius * 0.4;
+                    this.idleTarget = { x: this.homeX + Math.cos(a) * r, z: this.homeZ + Math.sin(a) * r };
+                    this.idleTimer = 3 + Math.random() * 3;
+                }
+                const arrived = moveTo(this.idleTarget.x, this.idleTarget.z, this.speed * (farFromHome ? 0.9 : 0.4));
+                if (arrived) this.idleTimer = Math.min(this.idleTimer, 0.5);
+                this.baseY = Math.abs(Math.sin(this.aiTimer * 5.0)) * 0.08;
+            }
+            this.sprite.position.set(this.x, this.baseY + this.floorY, this.z);
+            return;
+        }
+
+        // 特徴による動きの変化: 再生・怒り・逃走・回避
+        const pr = this.profile;
+        if (pr) {
+            if (pr.regen && this.hp < this.maxHp && this.hitTimer <= 0) this.hp = Math.min(this.maxHp, this.hp + this.maxHp * 0.015 * dt);
+            if (pr.enrage) {
+                const en = this.hp < this.maxHp * 0.5;
+                if (en !== this.enraged) { this.enraged = en; this.speed = this.baseSpeed * (en ? 1.35 : 1); }
+            }
+            // 逃走: 体力が 3 割を切ると、プレイヤーから逃げる
+            if (pr.flee && this.hp < this.maxHp * 0.3 && dist < 18 && this.knockback.lengthSq() < 0.1) {
+                const nx = this.x - dirX * this.speed * 1.6 * dt, nz = this.z - dirZ * this.speed * 1.6 * dt;
+                if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx;
+                if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz;
+                this.baseY = this.flying ? this.baseY : Math.abs(Math.sin(this.aiTimer * 10)) * 0.12;
+                this.sprite.position.set(this.x, this.baseY + this.floorY, this.z);
+                return;
+            }
+            // 回避: 近づかれると、ときどき、横へ素早く跳ぶ
+            if (pr.evasion && dist < 7 && dist > 1.2) {
+                this.evadeTimer -= dt;
+                if (this.evadeTimer <= 0) {
+                    this.evadeTimer = 3 + Math.random() * 1.5;
+                    const sd = Math.random() < 0.5 ? 1 : -1;
+                    this.knockback.set(-dirZ * sd * 9, 0, dirX * sd * 9);
+                }
+            }
+        }
 
         // =========================================================================
         // Distinct Movement AI Patterns
@@ -464,7 +588,7 @@ export class Monster {
                     this.sprite.scale.set(this.baseScaleX * flap, this.baseScaleY * (2.0 - flap), 1);
 
                     // High altitude floating
-                    this.baseY = 1.6 + Math.sin(this.aiTimer * 3.5) * 0.4;
+                    this.baseY = (this.profile?.flightHeight ?? 1.6) + Math.sin(this.aiTimer * 3.5) * 0.4;
 
                     // Maintain comfortable distance around 6.0 ~ 11.0m
                     let moveSpeed = 0;
@@ -495,6 +619,151 @@ export class Monster {
                         if (!this.checkWallCollision(nextX, this.z, colliders)) this.x = nextX;
                         if (!this.checkWallCollision(this.x, nextZ, colliders)) this.z = nextZ;
                     }
+                }
+                break;
+            }
+
+            case 'flying_dive': {
+                // 飛ぶ敵（近接）: 高い所を飛んで近づき、プレイヤーの頭上から急降下で襲いかかり、また上昇する。
+                //   高い所にいる間は、当たらない（近接の攻撃が届かない）。魔法・弓で撃ち落とせる
+                if (dist < 26 && this.knockback.lengthSq() < 0.1) {
+                    const H = this.profile?.flightHeight ?? 2.0;
+                    const flap = 1.0 + Math.sin(this.aiTimer * 14.0) * 0.1;
+                    this.sprite.scale.set(this.baseScaleX * flap, this.baseScaleY * (2.0 - flap), 1);
+                    const hover = H + Math.sin(this.aiTimer * 3.0) * 0.3;
+                    const moveBy = (vx, vz) => {
+                        const nx = this.x + vx * dt, nz = this.z + vz * dt;
+                        if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx;
+                        if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz;
+                    };
+                    if (this.diveState === 'approach') {
+                        this.baseY += (hover - this.baseY) * Math.min(1, dt * 3);
+                        if (dist > 6.5) moveBy(dirX * this.speed, dirZ * this.speed);
+                        else moveBy(-dirZ * this.speed * 0.6, dirX * this.speed * 0.6);   // 頭上を旋回
+                        this.diveCooldown -= dt;
+                        if (this.diveCooldown <= 0 && dist < 9) {
+                            this.diveState = 'dive'; this.diveTimer = 0;
+                            this.diveDir = { x: dirX, z: dirZ };
+                            this.diveFrom = this.baseY;
+                            this.diveSpeed = Math.min(16, Math.max(this.speed * 2.2, dist / 0.6));   // 発見した位置へ、急降下の間に届く速さ
+                        }
+                    } else if (this.diveState === 'dive') {
+                        // 急降下: 発見したときのプレイヤーの方向へ、速く進みながら、プレイヤーの胴の高さまで降りる
+                        this.diveTimer += dt;
+                        const t = this.diveTimer / 0.7;
+                        const pFloor = player.floorY ?? this.floorY;
+                        const low = Math.max(0, pFloor - this.floorY) + 0.1;   // プレイヤーの足元の高さ（この敵から見た）
+                        this.baseY = diveHeight(this.diveFrom ?? H, low, t);
+                        moveBy(this.diveDir.x * this.diveSpeed, this.diveDir.z * this.diveSpeed);
+                        if (this.diveTimer >= 0.7) { this.diveState = 'climb'; this.diveTimer = 0; }
+                    } else {
+                        // 上昇: プレイヤーから離れながら、元の高さへ戻る
+                        this.diveTimer += dt;
+                        this.baseY += (hover - this.baseY) * Math.min(1, dt * 2.5);
+                        moveBy(-this.diveDir.x * this.speed * 0.9, -this.diveDir.z * this.speed * 0.9);
+                        if (this.diveTimer >= 1.1) { this.diveState = 'approach'; this.diveCooldown = 1.6 + Math.random() * 1.2; }
+                    }
+                }
+                break;
+            }
+
+            case 'charge_dash': {
+                // 突進する敵（イノシシなど）: 近づく → 立ち止まって溜める（地面を蹴る）→ 一直線に猪突猛進（壁にぶつかるまで）→ ぶつかるとスタン
+                this.isDashing = (this.chargeState === 'dash');
+                const ch = this.profile?.charge ?? { windup: 0.9, dash: 12, speed: 3.2, stun: 1.3 };
+                const moveBy = (vx, vz) => {
+                    const nx = this.x + vx * dt, nz = this.z + vz * dt;
+                    let blocked = false;
+                    if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx; else blocked = true;
+                    if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz; else blocked = true;
+                    return blocked;
+                };
+                if (dist < 22 && this.knockback.lengthSq() < 0.1) {
+                    this.chargeCooldown -= dt;
+                    if (this.chargeState === 'walk') {
+                        if (dist > 1.0) {
+                            moveBy(dirX * this.speed * 0.9, dirZ * this.speed * 0.9);
+                            this.baseY = Math.abs(Math.sin(this.aiTimer * 8.0)) * 0.1;
+                        }
+                        if (this.chargeCooldown <= 0 && dist < 12 && dist > 3.5) { this.chargeState = 'windup'; this.chargeTimer = ch.windup; }
+                    } else if (this.chargeState === 'windup') {
+                        // 溜め: 立ち止まり、体を揺らして地面を蹴る。攻撃の予告
+                        this.chargeTimer -= dt;
+                        this.sprite.position.x = this.x + Math.sin(this.aiTimer * 50) * 0.08;
+                        this.baseY = Math.abs(Math.sin(this.aiTimer * 18.0)) * 0.12;
+                        this.sprite.scale.set(this.baseScaleX * (1 + Math.sin(this.aiTimer * 30) * 0.05), this.baseScaleY * (1 - Math.sin(this.aiTimer * 30) * 0.05), 1);
+                        if (this.chargeTimer <= 0) {
+                            this.chargeState = 'dash'; this.chargeDist = 0; this.isDashing = true;
+                            this.chargeDir = { x: dirX, z: dirZ };   // 溜めが終わった瞬間の、プレイヤーの方向へ（途中で曲がらない）
+                        }
+                    } else if (this.chargeState === 'dash') {
+                        this.isDashing = true;
+                        const v = this.speed * ch.speed;
+                        const before = { x: this.x, z: this.z };
+                        const blocked = moveBy(this.chargeDir.x * v, this.chargeDir.z * v);
+                        this.chargeDist += Math.hypot(this.x - before.x, this.z - before.z);
+                        this.baseY = Math.abs(Math.sin(this.aiTimer * 16.0)) * 0.15;
+                        this.sprite.scale.set(this.baseScaleX * 1.1, this.baseScaleY * 0.92, 1);
+                        if (blocked) { this.chargeState = 'stun'; this.chargeTimer = ch.stun; this.isDashing = false; }   // 壁・崖にぶつかって、目を回す
+                        else if (this.chargeDist >= ch.dash) { this.chargeState = 'rest'; this.chargeTimer = 0.8; this.isDashing = false; }
+                    } else if (this.chargeState === 'stun' || this.chargeState === 'rest') {
+                        this.chargeTimer -= dt;
+                        this.baseY = 0;
+                        if (this.chargeState === 'stun') this.sprite.scale.set(this.baseScaleX * 0.95, this.baseScaleY * 1.0, 1);
+                        if (this.chargeTimer <= 0) { this.chargeState = 'walk'; this.chargeCooldown = 1.4 + Math.random(); }
+                    }
+                } else {
+                    this.isDashing = false;
+                }
+                break;
+            }
+
+            case 'big_hop': {
+                // 大きく跳ぶ敵（兎など）: 1 回の跳躍が、とても遠い。着地して少し休み、また跳ぶ。近づくと、プレイヤーの頭上へ飛び込む
+                if (dist < 24 && this.knockback.lengthSq() < 0.1) {
+                    const hp = this.profile?.hop ?? { range: 9, height: 4.6 };
+                    const G = 18;
+                    if (this.isLeaping) {
+                        this.leapVelocityY -= G * dt;
+                        this.baseY += this.leapVelocityY * dt;
+                        const nx = this.x + this.leapTargetDir.x * this.leapSpeed * dt, nz = this.z + this.leapTargetDir.z * this.leapSpeed * dt;
+                        if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx;
+                        if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz;
+                        this.sprite.scale.set(this.baseScaleX * 0.88, this.baseScaleY * 1.2, 1);
+                        if (this.baseY <= 0) {
+                            this.baseY = 0; this.isLeaping = false; this.leapVelocityY = 0;
+                            this.hopRest = 0.45 + Math.random() * 0.3;
+                            this.sprite.scale.set(this.baseScaleX * 1.3, this.baseScaleY * 0.7, 1);
+                        }
+                    } else {
+                        this.hopRest -= dt;
+                        const squash = 1 + Math.sin(this.aiTimer * 8) * 0.04;
+                        this.sprite.scale.set(this.baseScaleX * squash, this.baseScaleY * (2 - squash), 1);
+                        if (this.hopRest <= 0 && dist > 0.8) {
+                            // 跳ぶ距離: プレイヤーまでの距離（上限 hop.range）。滞空時間から、水平の速さを決める
+                            const hopDist = Math.min(hp.range, Math.max(2.5, dist));
+                            const vy = Math.sqrt(2 * G * (hp.height * 0.6));
+                            const airtime = 2 * vy / G;
+                            this.isLeaping = true;
+                            this.leapVelocityY = vy;
+                            this.leapSpeed = hopDist / airtime;
+                            this.leapTargetDir = { x: dirX, z: dirZ };
+                        }
+                    }
+                }
+                break;
+            }
+
+            case 'pack_chase': {
+                // 狼: 一定の速さで、どこまでも追ってくる。近づいても、止まらず、まとわりつく（攻撃は、ぶつかる）
+                if (dist < 60 && this.knockback.lengthSq() < 0.1) {
+                    if (dist > 0.9) {
+                        const nx = this.x + dirX * this.speed * dt, nz = this.z + dirZ * this.speed * dt;
+                        if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx;
+                        if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz;
+                    }
+                    this.baseY = Math.abs(Math.sin(this.aiTimer * 11.0)) * 0.14;
+                    this.sprite.scale.set(this.baseScaleX * (1 + Math.sin(this.aiTimer * 11) * 0.04), this.baseScaleY * (1 - Math.sin(this.aiTimer * 11) * 0.04), 1);
                 }
                 break;
             }
@@ -552,8 +821,8 @@ export class Monster {
                 const dirZ = dz / dist;
 
                 const isArrow = (this.shootType === 'arrow');
-                const projSpeed = isArrow ? 12 : 8; // Arrows fly fast
-                const projDmg = isArrow ? 10 : 8;
+                const projSpeed = this.shootSpeed ?? (isArrow ? 12 : 8); // Arrows fly fast
+                const projDmg = this.shootDamage ?? (isArrow ? 10 : 8);
                 const maxDist = isArrow ? (this.maxArrowDistance || 13) : 0;
 
                 const proj = new Projectile(this.x, this.z, dirX, dirZ, false, projSpeed, projDmg, {
@@ -561,7 +830,11 @@ export class Monster {
                     maxDistance: maxDist,
                     sourceMonster: this
                 });
-                proj.setHeight(1.3 + this.floorY);   // 高い所に立っている敵は、その高さから撃つ
+                // 弾は、この敵の高さ（飛んでいれば、飛んでいる高さ）から出て、プレイヤーの胴の高さへ、上下にも狙いをつける
+                const startY = this.floorY + this.baseY + 1.0;
+                const targetY = (player.floorY ?? 0) + 1.0;
+                const vy = Math.max(-9, Math.min(9, (targetY - startY) / Math.max(0.2, dist / projSpeed)));
+                proj.setHeight(startY, vy);
                 projectiles.push(proj);
                 if (scene) scene.add(proj.mesh);
 
@@ -603,6 +876,16 @@ export class Monster {
         const range = this.senseRange * visibility;
         const keepRange = range * SENSE_DRAW_SCALE;
         const toPlayer = Math.atan2(dx, dz);
+        // 飛ぶ敵: 上空から見下ろすので、壁や視野角に関係なく、感知距離（の 1.3 倍）に入れば気づく
+        if (this.flying) {
+            if (dist <= range * 1.3 || (this.state === 'chase' && dist <= keepRange)) {
+                this.state = 'chase'; this.lostTimer = 0; this.facing = toPlayer;
+            } else if (this.state === 'chase') {
+                this.lostTimer += dt;
+                if (this.lostTimer >= LOST_TIME) this.state = 'unaware';
+            }
+            return;
+        }
 
         let sees = false;
         let keepSight = false;
@@ -636,6 +919,8 @@ export class Monster {
     }
 
     checkWallCollision(x, z, colliders) {
+        // 地上の敵は、崖（上り 2 段以上・下り 3 段以上）や、毒沼・溶岩へは進まない。飛ぶ敵・大ジャンプの空中は、地形に関係なく動ける
+        if (this.terrainBlock && !this.flying && !(this.isLeaping && this.baseY > 0.4) && this.terrainBlock(this, x, z)) return true;
         for (const c of colliders) {
             if (c.disabled) continue;
             if (x >= c.minX - this.radius && x <= c.maxX + this.radius &&
@@ -696,6 +981,7 @@ export class Monster {
     takeDamage(amount, knockDir, knockScale = 1.0) {
         this.hp -= amount;
         this.hitTimer = HIT_FLASH_TIME;
+        this.provokedTimer = 8;   // 攻撃されたら、縄張りの外へ逃げられても、しばらく追う
         // 被弾したら状態にかかわらず即追跡
         this.state = 'chase';
         this.lostTimer = 0;
@@ -809,6 +1095,16 @@ export class Projectile {
             const mistMat = new THREE.MeshBasicMaterial({ color: 0x4ade80, wireframe: true });
             this.aura = new THREE.Mesh(mistGeo, mistMat);
             this.mesh.add(this.aura);
+        } else if (this.type === 'breath_fire') {
+            // 炎のブレス（ドラゴン・ドラゴンフライなど）: 赤橙の炎の塊
+            this.color = 0xff6a00;
+            this.trailColor = 0xffb347;
+            this.lifeTime = 1.4;
+            const fireGeo = new THREE.DodecahedronGeometry(0.5, 1);
+            const fireMat = new THREE.MeshBasicMaterial({ color: 0xff7a1a, wireframe: true });
+            this.aura = new THREE.Mesh(fireGeo, fireMat);
+            this.mesh.add(this.aura);
+            this.mesh.add(new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffe08a })));
         } else if (this.type === 'poison_dust') {
             // Poison Moth Spores / Toxic Dust Cluster
             this.color = 0xd946ef;

@@ -10,7 +10,8 @@ const projectRoot = process.cwd();
 // 一時コピーの import を実パスに読み替えてロードする
 async function loadMonster() {
     const src = fs.readFileSync(path.join(projectRoot, 'public/js/entities.js'), 'utf-8')
-        .replace("'/js/three.module.js'", JSON.stringify(path.join(projectRoot, 'public/js/three.module.js')));
+        .replace("'/js/three.module.js'", JSON.stringify(path.join(projectRoot, 'public/js/three.module.js')))
+        .replace("'/js/enemyBehavior.js'", JSON.stringify(path.join(projectRoot, 'public/js/enemyBehavior.js')));
     const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'stealth-')), 'entities.mjs');
     fs.writeFileSync(tmp, src);
     return (await import(tmp)).Monster;
