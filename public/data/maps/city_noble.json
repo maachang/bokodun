@@ -107,6 +107,26 @@
       "id": "servant_man",
       "x": 21,
       "z": 21
+    },
+    {
+      "id": "cat_walk",
+      "x": 9,
+      "z": 8
+    },
+    {
+      "id": "cat_walk_tail",
+      "x": 22,
+      "z": 25
+    },
+    {
+      "id": "black_cat_walk",
+      "x": 8,
+      "z": 20
+    },
+    {
+      "id": "cat_sleep",
+      "x": 3,
+      "z": 19
     }
   ],
   "links": {

@@ -1211,5 +1211,87 @@
       "enemy": "mohawk_thug",
       "line": "「話しかけたな？ 運が悪かったな、兄ちゃん！」"
     }
+  },
+  "cat_walk": {
+    "name": "猫",
+    "texture": "/images/npcs/cat_walk.png",
+    "height": 0.9,
+    "aspect": 0.51,
+    "radius": 0.3,
+    "speed": 1.1,
+    "wanderRadius": 4.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "にゃあ。",
+      "……にゃ？"
+    ]
+  },
+  "cat_walk_tail": {
+    "name": "猫",
+    "texture": "/images/npcs/cat_walk_tail.png",
+    "height": 1.0,
+    "aspect": 0.324,
+    "radius": 0.3,
+    "speed": 1.1,
+    "wanderRadius": 4.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "にゃーん。",
+      "ごろごろ……"
+    ]
+  },
+  "cat_sleep": {
+    "name": "寝ている猫",
+    "texture": "/images/npcs/cat_sleep.png",
+    "height": 0.55,
+    "aspect": 1.407,
+    "radius": 0.3,
+    "speed": 0,
+    "wanderRadius": 0,
+    "speechRadius": 2.0,
+    "lines": [
+      "……すぴー。"
+    ]
+  },
+  "black_cat_walk": {
+    "name": "黒猫",
+    "texture": "/images/npcs/black_cat_walk.png",
+    "height": 0.85,
+    "aspect": 0.394,
+    "radius": 0.3,
+    "speed": 1.2,
+    "wanderRadius": 4.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "にゃあ。",
+      "……ふにゃ。"
+    ]
+  },
+  "black_cat_walk_tail": {
+    "name": "黒猫",
+    "texture": "/images/npcs/black_cat_walk_tail.png",
+    "height": 1.0,
+    "aspect": 0.292,
+    "radius": 0.3,
+    "speed": 1.2,
+    "wanderRadius": 4.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "にゃーお。",
+      "……にゃ。"
+    ]
+  },
+  "black_cat_sleep": {
+    "name": "寝ている黒猫",
+    "texture": "/images/npcs/black_cat_sleep.png",
+    "height": 0.5,
+    "aspect": 1.85,
+    "radius": 0.3,
+    "speed": 0,
+    "wanderRadius": 0,
+    "speechRadius": 2.0,
+    "lines": [
+      "……すぴー。"
+    ]
   }
 }

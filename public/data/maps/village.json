@@ -132,6 +132,26 @@
       "id": "chief_attendant",
       "x": 13,
       "z": 9
+    },
+    {
+      "id": "cat_walk",
+      "x": 7,
+      "z": 6
+    },
+    {
+      "id": "cat_walk_tail",
+      "x": 17,
+      "z": 4
+    },
+    {
+      "id": "black_cat_walk",
+      "x": 12,
+      "z": 4
+    },
+    {
+      "id": "cat_sleep",
+      "x": 15,
+      "z": 15
     }
   ],
   "links": {

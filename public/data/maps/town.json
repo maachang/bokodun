@@ -97,6 +97,26 @@
       "id": "child_girl",
       "x": 12,
       "z": 15
+    },
+    {
+      "id": "cat_walk",
+      "x": 7,
+      "z": 8
+    },
+    {
+      "id": "cat_walk_tail",
+      "x": 20,
+      "z": 20
+    },
+    {
+      "id": "black_cat_walk",
+      "x": 11,
+      "z": 6
+    },
+    {
+      "id": "cat_sleep",
+      "x": 21,
+      "z": 7
     }
   ],
   "links": {

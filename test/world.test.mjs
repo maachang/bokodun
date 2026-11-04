@@ -354,3 +354,19 @@ test('どや街の襲撃者: ふつうの住民と同じ見た目・セリフで
     const placed = m.npcs.filter(n => npcs[n.id]?.ambush);
     assert.ok(placed.length >= 3, `どや街の襲撃者: ${placed.length}`);
 });
+
+test('猫（NPC）: 村・町・街・貴族街・どや街にいる。寝ている猫は動かず（speed 0・wanderRadius 0）、ほかの猫は歩き回る', () => {
+    const npcs = readJson('public/data/npcs.json');
+    const sleepers = Object.entries(npcs).filter(([id]) => /cat_sleep$/.test(id));
+    const walkers = Object.entries(npcs).filter(([id]) => /^(black_)?cat_walk/.test(id));
+    assert.ok(sleepers.length >= 2 && walkers.length >= 4);
+    for (const [id, d] of sleepers) assert.ok(d.speed === 0 && d.wanderRadius === 0, `${id}: 寝ている猫は動かない`);
+    for (const [id, d] of walkers) assert.ok(d.speed > 0 && d.wanderRadius > 0, `${id}: 歩く猫は動く`);
+    for (const [, d] of Object.entries(npcs).filter(([id]) => /cat_/.test(id))) assert.ok(fs.existsSync(path.join(root, 'public', d.texture)), d.texture);
+    for (const id of ['village', 'town', 'city', 'city_noble', 'city_slum']) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const cats = m.npcs.filter(n => /cat_/.test(n.id));
+        assert.ok(cats.filter(n => /sleep/.test(n.id)).length >= 1, `${id}: 寝ている猫`);
+        assert.ok(cats.filter(n => /walk/.test(n.id)).length >= 2, `${id}: 歩く猫`);
+    }
+});

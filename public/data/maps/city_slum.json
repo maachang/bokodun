@@ -157,6 +157,26 @@
       "id": "slum_mob_man",
       "x": 14,
       "z": 15
+    },
+    {
+      "id": "black_cat_walk",
+      "x": 25,
+      "z": 21
+    },
+    {
+      "id": "black_cat_walk_tail",
+      "x": 8,
+      "z": 6
+    },
+    {
+      "id": "cat_walk",
+      "x": 25,
+      "z": 3
+    },
+    {
+      "id": "black_cat_sleep",
+      "x": 10,
+      "z": 3
     }
   ],
   "links": {
