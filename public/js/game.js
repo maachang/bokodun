@@ -4190,15 +4190,23 @@ export class GameEngine {
     }
 
     updateUI(dt = 0) {
-        document.getElementById('hpBar').style.width = `${(this.player.hp / this.player.maxHp) * 100}%`;
-        document.getElementById('hpText').innerText = `${Math.ceil(this.player.hp)}/${this.player.maxHp}`;
-        document.getElementById('mpBar').style.width = `${(this.player.mp / this.player.maxMp) * 100}%`;
-        document.getElementById('mpText').innerText = `${Math.floor(this.player.mp)}/${this.player.maxMp}`;
-        document.getElementById('levelText').innerText = `Lv.${this.player.level}`;
-        document.getElementById('expText').innerText = `EXP: ${this.player.exp}`;
-        const goldEl = document.getElementById('goldText');
-        if (goldEl) goldEl.innerText = `${this.player.gold || 0} G`;
-        document.getElementById('monsterCount').innerText = `敵残数: ${this.monsters.filter(m => m.active).length}`;
+        // 値が変わったときだけ DOM に書く（毎フレームの書き込みは、再計算・再描画を起こすため。要素も一度だけ取得して使い回す）
+        const ui = this._uiCache || (this._uiCache = { els: {}, vals: {} });
+        const put = (id, prop, val) => {
+            if (ui.vals[id] === val) return;
+            const el = ui.els[id] || (ui.els[id] = document.getElementById(id));
+            if (!el) return;
+            ui.vals[id] = val;
+            if (prop === 'width') el.style.width = val; else el.innerText = val;
+        };
+        put('hpBar', 'width', `${(this.player.hp / this.player.maxHp) * 100}%`);
+        put('hpText', 'text', `${Math.ceil(this.player.hp)}/${this.player.maxHp}`);
+        put('mpBar', 'width', `${(this.player.mp / this.player.maxMp) * 100}%`);
+        put('mpText', 'text', `${Math.floor(this.player.mp)}/${this.player.maxMp}`);
+        put('levelText', 'text', `Lv.${this.player.level}`);
+        put('expText', 'text', `EXP: ${this.player.exp}`);
+        put('goldText', 'text', `${this.player.gold || 0} G`);
+        put('monsterCount', 'text', `敵残数: ${this.monsters.filter(m => m.active).length}`);
 
         // Update active enemy status cards stacked above player HP/MP (Ys-style Target Info)
         const enemyListEl = document.getElementById('enemyHudList');
