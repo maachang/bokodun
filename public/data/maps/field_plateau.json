@@ -21,7 +21,7 @@
     "skyColor": 10473712
   },
   "legend": {
-    "F": "dense_forest",
+    "F": "broadleaf_wall",
     "d": "dry_tuft",
     "g": "grass_tuft",
     "T": "grass_tree"

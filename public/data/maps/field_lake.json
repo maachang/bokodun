@@ -21,7 +21,7 @@
     "skyColor": 10473704
   },
   "legend": {
-    "F": "dense_forest",
+    "F": "broadleaf_wall",
     "T": "riverside_tree",
     "P": "water",
     "~": "water_shallow",
