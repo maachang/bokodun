@@ -20,7 +20,7 @@ async function load() {
     fs.writeFileSync(ent, src);
     return { Monster: (await import(ent)).Monster, deriveProfile: (await import(eb)).deriveProfile };
 }
-const KNOWN_AI = new Set(['stationary', 'ranged_maintain', 'bounce_leap', 'hop_pounce', 'stalker_spider', 'flying_chase', 'flying_ranged', 'worm_burrow', 'walk_chase', 'flying_dive', 'charge_dash', 'big_hop', 'pack_chase', 'cat_ambush', 'bear_rush']);
+const KNOWN_AI = new Set(['stationary', 'ranged_maintain', 'bounce_leap', 'hop_pounce', 'stalker_spider', 'flying_chase', 'flying_ranged', 'worm_burrow', 'walk_chase', 'flying_dive', 'charge_dash', 'big_hop', 'pack_chase', 'cat_ambush', 'bear_rush', 'raptor_dive']);
 
 test('敵の特徴: 全 enemies.json の敵に、動き方（aiType）が決まる。飛ぶ・突進・大ジャンプ・遠距離攻撃が、能力から決まる', async () => {
     const { deriveProfile } = await load();
@@ -28,7 +28,7 @@ test('敵の特徴: 全 enemies.json の敵に、動き方（aiType）が決ま�
     for (const [id, d] of Object.entries(defs)) {
         const p = deriveProfile({ ...d, id });
         assert.ok(KNOWN_AI.has(p.aiType), `${id}: aiType ${p.aiType}`);
-        if ((d.abilities || []).includes('fly')) { assert.ok(p.flying, `${id}: 飛ぶ`); assert.ok(p.flightHeight > 0, `${id}: 飛ぶ高さ`); assert.ok(/^flying/.test(p.aiType), `${id}: 飛ぶ動き ${p.aiType}`); fly++; }
+        if ((d.abilities || []).includes('fly')) { assert.ok(p.flying, `${id}: 飛ぶ`); assert.ok(p.flightHeight > 0, `${id}: 飛ぶ高さ`); assert.ok(/^flying|^raptor/.test(p.aiType), `${id}: 飛ぶ動き ${p.aiType}`); fly++; }
         if (p.charge) charge++;
         if (p.hop) hop++;
         if (p.shoot) { assert.ok(p.shoot.range > 0 && p.shoot.cooldown > 0, `${id}: 遠距離攻撃の定義`); shoot++; }
@@ -38,7 +38,8 @@ test('敵の特徴: 全 enemies.json の敵に、動き方（aiType）が決ま�
     // 個別の例
     assert.equal(deriveProfile({ ...defs.giant_boar, id: 'giant_boar' }).aiType, 'charge_dash', '大イノシシは突進');
     assert.equal(deriveProfile({ ...defs.horn_rabbit, id: 'horn_rabbit' }).aiType, 'big_hop', '兎は大ジャンプ');
-    assert.equal(deriveProfile({ ...defs.griffon, id: 'griffon' }).aiType, 'flying_dive', 'グリフォンは飛んで急降下');
+    assert.equal(deriveProfile({ ...defs.griffon, id: 'griffon' }).aiType, 'raptor_dive', 'グリフォンは、猛禽（舞い上がって滑空攻撃）');
+    assert.equal(deriveProfile({ ...defs.giant_hornet, id: 'giant_hornet' }).aiType, 'flying_dive', '虫は、飛んで急降下');
     assert.equal(deriveProfile({ ...defs.red_dragon, id: 'red_dragon' }).aiType, 'flying_ranged', 'ドラゴンは飛んで、ブレスを吐く');
     assert.equal(deriveProfile({ ...defs.red_dragon, id: 'red_dragon' }).shoot.type, 'breath_fire');
 });
@@ -76,9 +77,9 @@ test('飛ぶ敵: 壁や視野角に関係なく、感知距離に入れば気づ
     assert.equal(ground.state, 'unaware', '地上の敵は、背後だと気づかない');
 });
 
-test('飛ぶ敵（近接）: 高い所を飛び、プレイヤーへ急降下して、また上昇する', async () => {
+test('飛ぶ敵（近接・虫）: 高い所を飛び、プレイヤーへ急降下して、また上昇する', async () => {
     const { Monster } = await load();
-    const m = new Monster('giant_hawk', 0, 0, tex, { ...defs.giant_hawk, id: 'giant_hawk' });
+    const m = new Monster('giant_hornet', 0, 0, tex, { ...defs.giant_hornet, id: 'giant_hornet' });
     m.state = 'chase';
     let maxY = 0, minAfter = 99, dived = false;
     sim(m, P(8, 0), 14, (mm) => {
@@ -88,6 +89,42 @@ test('飛ぶ敵（近接）: 高い所を飛び、プレイヤーへ急降下し
     });
     assert.ok(maxY >= 1.4, `高く飛ぶ: ${maxY}`);
     assert.ok(dived && minAfter < 0.9, `急降下して、プレイヤーの高さまで降りる: ${minAfter}`);
+});
+
+test('猛禽（鷹・グリフォン）: 獲物と認識すると、まず高く舞い上がり、滑空して速く突っ込む。よけられると、低い所で隙ができ（被ダメージが増え）、当たったときは、すぐ舞い上がる', async () => {
+    const { Monster, deriveProfile } = await load();
+    for (const id of ['giant_hawk', 'griffon']) {
+        const p = deriveProfile({ ...defs[id], id });
+        assert.equal(p.aiType, 'raptor_dive', id);
+        assert.ok(p.raptor.high >= 4 && p.raptor.glideSpeed >= 12 && p.raptor.vulnerable > 1.3, id);
+    }
+    const run = (hit) => {
+        const h = new Monster('giant_hawk', 0, 0, tex, { ...defs.giant_hawk, id: 'giant_hawk' });
+        h.state = 'chase';
+        const projs = [];
+        const seq = [];
+        let maxY = 0, minGlideY = 99, maxV = 0, recoverY = null, recoverDur = 0, vuln = 1, lastX = 0, lastZ = 0;
+        for (let t = 0; t < 30; t += 0.05) {
+            lastX = h.x; lastZ = h.z;
+            h.update(0.05, P(6, 0), [], projs, null, null, 1.0);
+            if (h.raptorState === 'glide' && hit) h.dashHit = true;   // game.js が、当たったときに立てる
+            if (seq[seq.length - 1] !== h.raptorState) seq.push(h.raptorState);
+            maxY = Math.max(maxY, h.baseY);
+            if (h.raptorState === 'glide') { minGlideY = Math.min(minGlideY, h.baseY); maxV = Math.max(maxV, Math.hypot(h.x - lastX, h.z - lastZ) / 0.05); }
+            if (h.raptorState === 'recover') { recoverDur += 0.05; recoverY = h.baseY; vuln = Math.max(vuln, h.damageTakenScale); }
+        }
+        return { seq, maxY, minGlideY, maxV, recoverDur, recoverY, vuln };
+    };
+    const dodged = run(false), hit = run(true);
+    assert.ok(dodged.maxY >= 4.5, `まず、高く舞い上がる: ${dodged.maxY}`);
+    assert.deepEqual(dodged.seq.slice(0, 3), ['climb', 'glide', 'recover'], `舞い上がり → 滑空 → 隙: ${dodged.seq}`);
+    assert.ok(dodged.maxV >= 12, `滑空は、速い: ${dodged.maxV}`);
+    assert.ok(dodged.minGlideY < 1.0, `プレイヤーの高さまで降りる: ${dodged.minGlideY}`);
+    assert.ok(dodged.vuln >= 1.4 && dodged.recoverY < 1.0, `よけられると、低い所で、被ダメージが増える: ${dodged.vuln} / 高さ ${dodged.recoverY}`);
+    assert.ok(dodged.seq.filter(x => x === 'glide').length >= 3, '繰り返し、狙ってくる');
+    // 当たったときは、隙が短い（すぐ舞い上がる）
+    const cyc = (r) => r.recoverDur / r.seq.filter(x => x === 'recover').length;
+    assert.ok(cyc(hit) < cyc(dodged) * 0.6, `当たったときの隙: ${cyc(hit)} / よけられたとき: ${cyc(dodged)}`);
 });
 
 test('突進: 近づく → 立ち止まって溜める → 一直線に突進（威力は、突進中だけ）→ 壁にぶつかるとスタン', async () => {
@@ -255,9 +292,9 @@ test('鳥: 一定の範囲を巡回していて、その範囲に入られると
     assert.ok(far < 15, `巡回の範囲を出ない: ${far}`);
     assert.ok(maxBase > 1.2, `飛んでいる: ${maxBase}`);
     let dived = false;
-    for (let t = 0; t < 8; t += 0.05) { h.update(0.05, P(54, 50), [], projs, null, null, 1.0); if (h.diveState === 'dive') dived = true; }
+    for (let t = 0; t < 8; t += 0.05) { h.update(0.05, P(54, 50), [], projs, null, null, 1.0); if (h.raptorState === 'glide') dived = true; }
     assert.equal(h.state, 'chase', '範囲に入ると攻撃開始');
-    assert.ok(dived, '急降下する');
+    assert.ok(dived, '舞い上がって、滑空攻撃する');
 });
 
 test('イノシシ: ブルブル震えて溜め → ロケットスタートで、かなり速く突き抜ける。よけられると、息切れして、長く動けず、被ダメージが増える（弱い）', async () => {

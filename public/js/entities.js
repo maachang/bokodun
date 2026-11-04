@@ -226,6 +226,9 @@ export class Monster {
         this.awayHops = 0;
         this.damageTakenScale = 1;     // 受けるダメージの倍率（イノシシが、突進をよけられて息切れしている間は、大きくなる）
         this.dashHit = false;          // 今回の突進が、プレイヤーに当たったか（game.js が立てる）
+        this.raptorState = 'climb';    // 猛禽: climb(舞い上がり・旋回) / glide(滑空攻撃) / recover(隙)
+        this.raptorTimer = 0;
+        this.raptorRecover = 1.8;
         this.rushState = 'chase';      // クマ: chase(近づく) / rush(連打) / recover(間)
         this.rushTimer = 0;
         this.homeX = x;                // 生まれた場所（縄張り・巡回の中心）
@@ -320,6 +323,7 @@ export class Monster {
 
         // 縄張りのある敵が、プレイヤーを追っていない間の動き: 守る（クマ: 縄張りの中をうろつく）／巡回する（鳥: 範囲を飛び回る）
         if (terr && this.state !== 'chase') {
+            this.raptorState = 'climb'; this.raptorTimer = 0; this.isDashing = false; this.damageTakenScale = 1;   // 次に狙うときは、また、舞い上がるところから
             const moveTo = (tx, tz, sp) => {
                 const ddx = tx - this.x, ddz = tz - this.z, dd = Math.hypot(ddx, ddz);
                 if (dd < 0.3) return true;
@@ -680,6 +684,67 @@ export class Monster {
                         moveBy(-this.diveDir.x * this.speed * 0.9, -this.diveDir.z * this.speed * 0.9);
                         if (this.diveTimer >= 1.1) { this.diveState = 'approach'; this.diveCooldown = 1.6 + Math.random() * 1.2; }
                     }
+                }
+                break;
+            }
+
+            case 'raptor_dive': {
+                // 猛禽（鷹など）: 獲物（プレイヤー）を見つけると、まず高く舞い上がり（上空で、プレイヤーのまわりを旋回して、狙う）、
+                //   飛び出す瞬間のプレイヤーの方向へ、滑空して、速い速さで突っ込む（途中で曲がらないので、横へよければ、よけられる）。
+                //   よけられると、低い所で、隙ができる（被ダメージが増え、近接で反撃できる）。当たったときは、すぐ舞い上がる
+                const rp = this.profile?.raptor ?? { high: 5, wait: 1.5, glideSpeed: 14, glideTime: 0.9, recover: 1.8, hitRecover: 0.6, vulnerable: 1.5 };
+                if (dist < 40 && this.knockback.lengthSq() < 0.1) {
+                    const flapRate = this.raptorState === 'climb' ? 16 : 9;
+                    const flap = 1.0 + Math.sin(this.aiTimer * flapRate) * 0.1;
+                    this.sprite.scale.set(this.baseScaleX * flap, this.baseScaleY * (2.0 - flap), 1);
+                    const moveBy = (vx, vz) => {
+                        const nx = this.x + vx * dt, nz = this.z + vz * dt;
+                        if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx;
+                        if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz;
+                    };
+                    const pFloor = Math.max(0, (player.floorY ?? this.floorY) - this.floorY);
+                    if (this.raptorState === 'climb') {
+                        // 舞い上がり、上空で旋回して狙う
+                        this.isDashing = false; this.damageTakenScale = 1;
+                        const high = rp.high + pFloor;
+                        this.baseY += Math.min(high - this.baseY, 4.5 * dt);
+                        if (dist > 10) moveBy(dirX * this.speed * 1.6, dirZ * this.speed * 1.6);
+                        else if (dist < 6) moveBy(-dirX * this.speed, -dirZ * this.speed);
+                        else moveBy(-dirZ * this.speed * 0.9, dirX * this.speed * 0.9);   // 旋回
+                        if (this.baseY >= high - 0.4) {
+                            this.raptorTimer += dt;
+                            if (this.raptorTimer >= rp.wait && dist < 16) {   // 狙い定めて、滑空へ
+                                this.raptorState = 'glide'; this.raptorTimer = 0; this.dashHit = false;
+                                this.glideDir = { x: dirX, z: dirZ };
+                                this.glideFrom = this.baseY;
+                                this.glideSpeed = Math.max(rp.glideSpeed, dist / (rp.glideTime * 0.75));   // 発見した位置の少し先まで届く速さ
+                            }
+                        }
+                    } else if (this.raptorState === 'glide') {
+                        this.isDashing = true;
+                        this.raptorTimer += dt;
+                        const t = this.raptorTimer / rp.glideTime;
+                        const low = pFloor + 0.2;
+                        this.baseY = diveHeight(this.glideFrom, low, Math.min(1, t * 1.15));   // 滑空: 高い所から、プレイヤーの高さまで、滑るように降りる
+                        moveBy(this.glideDir.x * this.glideSpeed, this.glideDir.z * this.glideSpeed);
+                        this.sprite.scale.set(this.baseScaleX * 1.15, this.baseScaleY * 0.8, 1);   // 翼をたたんで、細く
+                        if (this.raptorTimer >= rp.glideTime) {
+                            this.isDashing = false;
+                            this.raptorState = 'recover'; this.raptorTimer = 0;
+                            // よけられた（当たらなかった）: 低い所で隙。当たった: すぐ舞い上がる
+                            this.damageTakenScale = this.dashHit ? 1 : rp.vulnerable;
+                            this.raptorRecover = this.dashHit ? rp.hitRecover : rp.recover;
+                        }
+                    } else {
+                        // 隙: 低い所で、ゆっくり向きを直し、体勢を立て直す
+                        this.raptorTimer += dt;
+                        const low = pFloor + (this.dashHit ? 0.8 : 0.3);
+                        this.baseY += (low - this.baseY) * Math.min(1, dt * 4);
+                        moveBy(-this.glideDir.x * this.speed * 0.3, -this.glideDir.z * this.speed * 0.3);
+                        if (this.raptorTimer >= this.raptorRecover) { this.raptorState = 'climb'; this.raptorTimer = 0; this.damageTakenScale = 1; }
+                    }
+                } else {
+                    this.isDashing = false;
                 }
                 break;
             }

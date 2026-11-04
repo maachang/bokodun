@@ -6,6 +6,7 @@
 //     flightHeight  飛ぶ高さ（地面から。既定は大きさで決まる）
 //     charge        { windup, dash, speed, stun } 突進（猪突猛進）の溜め時間・走る距離・速さ倍率・壁にぶつかったときのスタン
 //     hop           { range, height, rest } 兎: 低く速いリズムで跳ぶときの 1 回の距離・高さ・着地後の休み
+//     raptor        { high, wait, glideSpeed, glideTime, recover, hitRecover, vulnerable } 猛禽: 舞い上がって、滑空で突っ込む。よけられると隙ができる
 //     rush          { flurry, flurryScale, cool } クマ: 攻撃を始めると、近くで連打（1 回は小さく、回数が多い）
 //     cat           { range, height, rest, flurry, flurryScale, away, cool } 猫系: 隠密・低く長く跳ぶ・近くで連続攻撃・ヒットアンドアウェイ
 //     relentless    { speed, joinRadius } 一定の速さで追跡をやめない・仲間が合流する（狼）
@@ -99,10 +100,18 @@ export function deriveProfile(def = {}) {
     //   まともに近づいて戦うと、体力がどんどん削られる。離れて、魔法・弓で倒すのが、有利。連打のあと、少し間を置いて、また連打する
     if (def.rush || (/bear|grizzly/.test(id) && !p.flying && def.rush !== false)) p.rush = { flurry: 2.6, flurryScale: 0.5, cool: 1.2, ...(def.rush || {}) };
 
+    // 猛禽（鷹・鷲・グリフォンなどの、鳥の頂点）: プレイヤーを獲物と認識すると、まず高く舞い上がり、そこから滑空して、速い速さで突っ込んでくる。
+    //   滑空の向きは、飛び出す瞬間に決まる（途中で曲がらない）ので、よけられる。よけられると、低い所で隙ができ（被ダメージが増え）、近接で反撃できる。
+    //   高い所にいる間は、近接が届かない（魔法・弓で撃ち落とす）。high: 高さ、wait: 高い所で狙う時間、glide: 滑空の速さと時間、recover: よけられたあとの隙、vulnerable: 隙の間の被ダメージ倍率
+    if (def.raptor || (p.flying && /hawk|eagle|falcon|griffon/.test(id) && def.raptor !== false)) {
+        p.raptor = { high: 5.0, wait: 1.5, glideSpeed: 14, glideTime: 0.9, recover: 1.8, hitRecover: 0.6, vulnerable: 1.5, ...(def.raptor || {}) };
+    }
+
     // 動き方（aiType）を決める。個別の指定があれば、それを優先する（ただし、飛ぶ敵が walk_chase の指定のままなら、飛ぶ動きにする）
     if (p.aiType === 'walk_chase' && p.flying) p.aiType = null;
     if (!p.aiType) {
-        if (p.flying) p.aiType = p.shoot ? 'flying_ranged' : 'flying_dive';
+        if (p.raptor) p.aiType = 'raptor_dive';
+        else if (p.flying) p.aiType = p.shoot ? 'flying_ranged' : 'flying_dive';
         else if (p.cat) p.aiType = 'cat_ambush';
         else if (p.hop) p.aiType = 'big_hop';
         else if (p.relentless) p.aiType = 'pack_chase';
