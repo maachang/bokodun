@@ -290,7 +290,7 @@ test('全マップ: 住民（NPC）と敵は、毒沼・溶岩などのダメー
 });
 
 // 村・町・街・貴族街の起伏: 高さがついても、歩ける所は、起伏がないときと同じだけ行ける。扉・看板・噴水・橋は高さ 0。建物は平らな土台
-for (const id of ['village', 'town', 'city', 'city_noble', 'city_slum']) {
+for (const id of ['village', 'town', 'city', 'city_noble', 'city_slum', 'castle_courtyard', 'temple_cloister']) {
     test(`${id}: 高低差があっても、歩ける範囲が変わらない。扉・看板・噴水・出入口は高さ 0。屋根つきの建物は、同じ高さの土台`, () => {
         const m = readJson(`public/data/maps/${id}.json`);
         const lay = m.layout, R = lay.length, C = lay[0].length;
