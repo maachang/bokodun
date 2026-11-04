@@ -16454,7 +16454,7 @@
   "conifer_wall": {
     "type": "tree_wall",
     "texture": "fConiferWall",
-    "aspect": 1.376,
+    "aspect": 1.247,
     "height": 5.2,
     "solid": true,
     "description": "針葉樹林の壁（向きの固定した板で立てる。連ねて壁にする。sdServer 画像）"

@@ -15,8 +15,8 @@
     "ambientLight": 16773328,
     "directionalLight": 16771248,
     "fogColor": 15258784,
-    "fogNear": 25,
-    "fogFar": 80,
+    "fogNear": 12,
+    "fogFar": 38,
     "visibility": 1.0,
     "skyColor": 15258784
   },

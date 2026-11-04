@@ -519,6 +519,15 @@ export class GameEngine {
         this.scene.fog.near = b.from.fogNear + (b.to.fogNear - b.from.fogNear) * k;
         this.scene.fog.far = b.from.fogFar + (b.to.fogFar - b.from.fogFar) * k;
         this.scene.background = b.from.sky.clone().lerp(b.to.sky, k);
+        this.fitCameraFar();
+    }
+
+    // 霧で見えなくなる距離より先は描画しない（カメラの描画距離を霧の終わりに合わせる。CPU 負荷の軽減）
+    fitCameraFar() {
+        const far = Math.min(100, (this.scene.fog?.far ?? 96) + 4);
+        if (Math.abs(this.camera.far - far) < 0.5) return;
+        this.camera.far = far;
+        this.camera.updateProjectionMatrix();
     }
 
     // 世界の並びの中のマップなら、隣のマップがある方向の外側に、隣の地面を遠くまで敷く。隣がない方向は、何も描かない（空だけ）
@@ -635,6 +644,7 @@ export class GameEngine {
         this.ambientLight.color.setHex(env.ambientLight || 0x555555);
         this.dirLight.color.setHex(env.directionalLight || 0xffffff);
         this.scene.fog = new THREE.Fog(env.fogColor || 0x000000, env.fogNear || 10, env.fogFar || 50);
+        this.fitCameraFar();
         // 地形ごとの視界係数（敵の感知距離・未発見の敵の描画距離に掛かる。未指定は 1.0）
         this.visibility = env.visibility ?? 1.0;
         this.scene.background = new THREE.Color(env.skyColor || 0x000000);
