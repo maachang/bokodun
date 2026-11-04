@@ -16313,5 +16313,19 @@
     "radius": 0.5,
     "message": "宿屋・酒場は、東の家（道の右の奥）",
     "description": "村の道に立てる、宿屋・酒場の案内の立て札（板にベッドのマーク）"
+  },
+  "cactus": {
+    "type": "tree",
+    "texture": "cactus",
+    "aspect": 0.67,
+    "solid": true,
+    "description": "砂漠のサボテン（柱に腕、頂に花）"
+  },
+  "dead_tree": {
+    "type": "tree",
+    "texture": "deadTree",
+    "aspect": 1.0,
+    "solid": true,
+    "description": "砂漠の枯れ木（葉のない、ねじれた枝）"
   }
 }

@@ -1,0 +1,6 @@
+{
+  "mapSize": 64,
+  "grid": [
+    ["field_grass", "field_desert"]
+  ]
+}

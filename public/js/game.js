@@ -3,6 +3,7 @@ import { RetroTextureGenerator } from '/js/textures.js';
 import { Monster, Projectile } from '/js/entities.js';
 import { Npc } from '/js/npc.js';
 import { MapNavigator, stairsFacing, STAIRS_DIRS } from '/js/mapNavigator.js';
+import { worldNeighbor, edgeCrossing, clampToWorld } from '/js/world.js';
 import { SoundFX } from '/js/audio.js';
 import { SDAssetManager } from '/js/sdAssetManager.js';
 import { ParticleSystem } from '/js/particles.js';
@@ -247,6 +248,8 @@ export class GameEngine {
             goblinArcher: RetroTextureGenerator.createGoblinArcherTexture(),
             tree: RetroTextureGenerator.createTreeTexture(),
             swampTree: RetroTextureGenerator.createSwampTreeTexture(),
+            cactus: RetroTextureGenerator.createCactusTexture(),
+            deadTree: RetroTextureGenerator.createDeadTreeTexture(),
             boulder: RetroTextureGenerator.createBoulderTexture(),
             signpost: RetroTextureGenerator.createSignpostTexture(),
             weaponShopSign: RetroTextureGenerator.createShopSignTexture('weapon'),
@@ -448,6 +451,76 @@ export class GameEngine {
         this.scene.add(this.camera);
     }
 
+    // 地面の種類から、地面のテクスチャを返す
+    floorTextureOf(floorType) {
+        if (floorType === 'grass') return this.textures.grass;
+        if (floorType === 'sand') return this.textures.sand;
+        if (floorType === 'water') return this.textures.water;
+        if (floorType === 'swamp') return this.textures.swampGround;
+        return this.textures.floorStone;
+    }
+
+    // 今の空・霧・光の色を控える（端の移動で、色を滑らかに切り替えるため）
+    snapshotEnv() {
+        const fog = this.scene.fog;
+        return {
+            ambient: this.ambientLight.color.clone(),
+            dir: this.dirLight.color.clone(),
+            fogColor: fog ? fog.color.clone() : new THREE.Color(0),
+            fogNear: fog ? fog.near : 10,
+            fogFar: fog ? fog.far : 50,
+            sky: this.scene.background?.isColor ? this.scene.background.clone() : new THREE.Color(0)
+        };
+    }
+
+    // 色の切り替えを、k（0〜1）の分だけ進める
+    applyEnvBlend(k) {
+        const b = this.envBlend;
+        if (!b) return;
+        this.ambientLight.color.copy(b.from.ambient).lerp(b.to.ambient, k);
+        this.dirLight.color.copy(b.from.dir).lerp(b.to.dir, k);
+        this.scene.fog.color.copy(b.from.fogColor).lerp(b.to.fogColor, k);
+        this.scene.fog.near = b.from.fogNear + (b.to.fogNear - b.from.fogNear) * k;
+        this.scene.fog.far = b.from.fogFar + (b.to.fogFar - b.from.fogFar) * k;
+        this.scene.background = b.from.sky.clone().lerp(b.to.sky, k);
+    }
+
+    // 世界の並びの中のマップなら、隣のマップがある方向の外側に、隣の地面を遠くまで敷く。隣がない方向は、何も描かない（空だけ）
+    async buildOutsideGround(mapId, cols, rows, tileSize) {
+        const world = this.world;
+        if (!world || !world.grid?.some(r => r.includes(mapId))) return;
+        const W = cols * tileSize, D = rows * tileSize, FAR = 400;
+        const floorOf = async (dir) => {
+            const nid = worldNeighbor(world, mapId, dir);
+            if (!nid) return null;
+            let nd = this.mapCache[nid];
+            if (!nd) {
+                try { nd = await (await fetch(`/data/maps/${nid}.json`)).json(); this.mapCache[nid] = nd; } catch { return null; }
+            }
+            return nd.environment?.floorType;
+        };
+        // 各方向の、地面の四角（中心 x, z と大きさ w, d）。角は、南北の隣の地面にする
+        const strips = {
+            north: [W / 2, -FAR / 2, W + FAR * 2, FAR],
+            south: [W / 2, D + FAR / 2, W + FAR * 2, FAR],
+            west: [-FAR / 2, D / 2, FAR, D],
+            east: [W + FAR / 2, D / 2, FAR, D]
+        };
+        for (const dir of Object.keys(strips)) {
+            if (!worldNeighbor(world, mapId, dir)) continue;
+            const ft = await floorOf(dir);
+            const [cx, cz, w, d] = strips[dir];
+            const tex = this.floorTextureOf(ft).clone();
+            tex.wrapS = tex.wrapT = THREE.RepeatWrapping;
+            tex.repeat.set(w / tileSize, d / tileSize);
+            tex.needsUpdate = true;
+            const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshLambertMaterial({ map: tex }));
+            mesh.rotation.x = -Math.PI / 2;
+            mesh.position.set(cx, -0.01, cz);
+            this.scene.add(mesh);
+        }
+    }
+
     // 建物などへの出入り: 行き先 nextMap へ移動する。扉・門のマスごとの指定は、マップの links（"列,行": { nextMap, message, params, back }）
     //   nextMap が '$back' なら、直前に入った場所の、link.back の位置へ戻る（建物の出口用）。params は行き先マップへ渡す値（店の種類など）
     enterMap(nextMap, link = {}) {
@@ -475,6 +548,12 @@ export class GameEngine {
         if (!this.objectDefinitions) {
             await this.loadObjectDefinitions();
         }
+        // 外のマップの世界の並び（world.json）。端の移動に使う。読めなければ、端の移動はなし
+        if (this.world === undefined) {
+            try { this.world = await (await fetch('/data/world.json')).json(); } catch { this.world = null; }
+        }
+        // 端の移動のときは、空と霧と光の色を、前のマップから数秒かけて切り替える
+        const prevEnv = opts.edgeBlend ? this.snapshotEnv() : null;
 
         let mapData = this.mapCache[mapId];
         if (!mapData) {
@@ -523,6 +602,11 @@ export class GameEngine {
         // 地形ごとの視界係数（敵の感知距離・未発見の敵の描画距離に掛かる。未指定は 1.0）
         this.visibility = env.visibility ?? 1.0;
         this.scene.background = new THREE.Color(env.skyColor || 0x000000);
+        this.envBlend = null;
+        if (prevEnv) {
+            this.envBlend = { t: 0, dur: 3, from: prevEnv, to: this.snapshotEnv() };
+            this.applyEnvBlend(0);
+        }
 
         const rows = mapData.layout.length;
         const cols = mapData.layout[0].length;
@@ -550,11 +634,7 @@ export class GameEngine {
         }
 
         // 1. Grid-based Floor Generation (carving holes for sunken water tiles and crumbling pitfall cavities)
-        let baseFloorTex = this.textures.floorStone;
-        if (env.floorType === 'grass') baseFloorTex = this.textures.grass;
-        else if (env.floorType === 'sand') baseFloorTex = this.textures.sand;
-        else if (env.floorType === 'water') baseFloorTex = this.textures.water;
-        else if (env.floorType === 'swamp') baseFloorTex = this.textures.swampGround;
+        const baseFloorTex = this.floorTextureOf(env.floorType);
 
         const baseFloorMat = new THREE.MeshLambertMaterial({ map: baseFloorTex });
         const cellGeo = new THREE.PlaneGeometry(tileSize, tileSize);
@@ -572,6 +652,9 @@ export class GameEngine {
                 this.addStatic(cellMesh);
             }
         }
+
+        // 外のマップ（world.json にあるマップ）: 隣のマップがある方向は、端の外へ、隣の地面が遠くまで続く（外に出ると、隣のマップへ切り替わる）
+        await this.buildOutsideGround(mapId, cols, rows, tileSize);
 
         // Ceiling mesh if specified
         this.strikeEffects.setCeilingHeight(env.hasCeiling ? wallH : null);
@@ -3204,6 +3287,27 @@ export class GameEngine {
             const a = this.cameraShake.amp * Math.max(0, this.cameraShake.time / this.cameraShake.duration);
             this.camera.position.x += (Math.random() - 0.5) * 2 * a;
             this.camera.position.y += (Math.random() - 0.5) * 2 * a;
+        }
+
+        // 外のマップの端: 隣のマップがない端の外へは出られず、隣がある端の外へ出ると、隣のマップへ切り替わる
+        const worldMap = this.currentMapData;
+        if (this.world && worldMap?.layout && !this.nav.busy && this.world.grid?.some(r => r.includes(this.currentMapId))) {
+            const ts = worldMap.tileSize || 4;
+            const W = worldMap.layout[0].length * ts, D = worldMap.layout.length * ts;
+            const cl = clampToWorld(this.world, this.currentMapId, this.player.x, this.player.z, W, D, this.player.radius);
+            this.player.x = cl.x; this.player.z = cl.z;
+            const cross = edgeCrossing(this.world, this.currentMapId, this.player.x, this.player.z, W, D);
+            if (cross && cross.mapId) {
+                this.loadMap(cross.mapId, { keepStack: true, edgeBlend: true, spawn: { x: cross.x / ts - 0.5, z: cross.z / ts - 0.5, angle: this.player.angle } });
+                return;
+            }
+        }
+        // 端の移動のあと、空・霧・光の色を、数秒かけて、新しいマップの色にする
+        if (this.envBlend) {
+            this.envBlend.t += dt;
+            const k = Math.min(1, this.envBlend.t / this.envBlend.dur);
+            this.applyEnvBlend(k);
+            if (k >= 1) this.envBlend = null;
         }
 
         // Update Portal Animation & Check

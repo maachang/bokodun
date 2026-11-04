@@ -1709,6 +1709,56 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 砂漠のサボテン（緑の柱に、2 本の腕。透明な背景のスプライト）
+    static createCactusTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 96;
+        const ctx = canvas.getContext('2d');
+        const body = '#3f8a3a', dark = '#2c6a2a', light = '#5aa84c';
+        const box = (x, y, w, h) => {
+            ctx.fillStyle = body; ctx.fillRect(x, y, w, h);
+            ctx.fillStyle = dark; ctx.fillRect(x + w - 3, y, 3, h);
+            ctx.fillStyle = light; ctx.fillRect(x + 2, y, 2, h);
+        };
+        box(24, 12, 16, 84);   // 幹
+        box(8, 44, 8, 26);     // 左の腕（縦）
+        box(8, 62, 18, 8);     // 左の腕（横）
+        box(48, 30, 8, 28);    // 右の腕（縦）
+        box(38, 50, 18, 8);    // 右の腕（横）
+        ctx.fillStyle = '#e8e0b0';   // とげ
+        for (let y = 18; y < 92; y += 10) { ctx.fillRect(22, y, 2, 2); ctx.fillRect(40, y + 4, 2, 2); }
+        ctx.fillStyle = '#e86a8a'; ctx.fillRect(28, 8, 8, 5);   // 頂の花
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
+    // 砂漠の枯れ木（葉のない、ねじれた枝）
+    static createDeadTreeTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 96;
+        canvas.height = 96;
+        const ctx = canvas.getContext('2d');
+        const bark = '#6b5238', dark = '#4a3826';
+        const seg = (x, y, w, h) => { ctx.fillStyle = bark; ctx.fillRect(x, y, w, h); ctx.fillStyle = dark; ctx.fillRect(x + w - 2, y, 2, h); };
+        seg(42, 40, 12, 56);   // 幹
+        seg(34, 28, 8, 20);    // 左の太い枝
+        seg(22, 18, 14, 6);
+        seg(54, 22, 8, 24);    // 右の太い枝
+        seg(60, 12, 16, 6);
+        seg(46, 10, 6, 32);    // 中央の枝
+        seg(14, 10, 6, 14);    // 小枝
+        seg(76, 6, 6, 14);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
     // 家の中の板張りの床（明るい木目の縦板）
     static createWoodFloorTexture() {
         const canvas = document.createElement('canvas');
