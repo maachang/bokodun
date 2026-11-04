@@ -36,6 +36,32 @@
     "jagged": true,
     "description": "断崖の岩（高さに凹凸のある、灰色の自然の岩肌。岩山向け。レンガ調ではない）"
   },
+  "pyramid_stone": {
+    "type": "floor_tile",
+    "texture": "cliffSand",
+    "solid": false,
+    "description": "ピラミッドの石の段（砂岩の面。歩いて上れる）"
+  },
+  "pyramid_door": {
+    "type": "door",
+    "texture": "door",
+    "frameTexture": "cliffSand",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "description": "ピラミッドの入口の扉"
+  },
+  "pyramid_exit": {
+    "type": "door",
+    "texture": "door",
+    "frameTexture": "cliffSand",
+    "floorTexture": "cliffSand",
+    "ceilingTexture": "cliffSand",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "nextMap": "$back",
+    "message": "外に出る",
+    "description": "ピラミッドの内側の出口"
+  },
   "mossy_stone_wall": {
     "type": "block",
     "texture": "mossyStone",

@@ -370,3 +370,46 @@ test('猫（NPC）: 村・町・街・貴族街・どや街にいる。寝てい
         assert.ok(cats.filter(n => /walk/.test(n.id)).length >= 2, `${id}: 歩く猫`);
     }
 });
+
+test('ピラミッド: 砂漠に、段のあるピラミッド（1 段ずつ高く、歩いて上れる）と入口の扉。中の墓所は、入口から、すべての宝箱へ歩いて行ける', () => {
+    const d = readJson('public/data/maps/field_desert.json');
+    const lv = (r, c) => parseInt(d.heights[r][c], 36);
+    const pc = Object.entries(d.legend).filter(([, v]) => v === 'pyramid_stone').map(([k]) => k);
+    assert.ok(pc.length >= 1);
+    const cells = [];
+    for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) if (pc.includes(d.layout[r][c])) cells.push([r, c]);
+    assert.ok(cells.length >= 100, `ピラミッドの石の段: ${cells.length} マス`);
+    const top = Math.max(...cells.map(([r, c]) => lv(r, c)));
+    assert.ok(top >= 6, `ピラミッドの高さ（段）: ${top}`);
+    // 入口の扉（高さ 0）と、扉からの出入口の定義
+    const doorCh = Object.entries(d.legend).find(([, v]) => v === 'pyramid_door')[0];
+    let door = null;
+    for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) if (d.layout[r][c] === doorCh) door = [r, c];
+    assert.ok(door && lv(door[0], door[1]) === 0, '入口の扉は高さ 0');
+    const link = d.links[`${door[1]},${door[0]}`];
+    assert.equal(link.nextMap, 'pyramid');
+    // 中の墓所
+    const m = readJson('public/data/maps/pyramid.json');
+    assert.equal(m.type, 'indoor');
+    const exit = Object.entries(m.links).find(([, v]) => v.nextMap === '$back');
+    assert.ok(exit, '出口');
+    const enemyCh = new Set(Object.keys(m.enemies));
+    const pass = (r, c) => { if (m.layout[r][c] === '0' || enemyCh.has(m.layout[r][c])) return true; const o = objects[m.legend[m.layout[r][c]]]; return !!o && (!o.solid || o.type === 'chest' || o.type === 'door') || (o?.type === 'furniture'); };
+    const seen = new Set([`${m.spawn.z},${m.spawn.x}`]);
+    const q = [[m.spawn.z, m.spawn.x]];
+    while (q.length) {
+        const [r, c] = q.shift();
+        for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const nr = r + dr, nc = c + dc;
+            if (nr < 0 || nc < 0 || nr >= m.layout.length || nc >= m.layout[0].length || seen.has(`${nr},${nc}`) || !pass(nr, nc)) continue;
+            seen.add(`${nr},${nc}`); q.push([nr, nc]);
+        }
+    }
+    const chests = [];
+    for (let r = 0; r < m.layout.length; r++) for (let c = 0; c < m.layout[0].length; c++) if (m.legend[m.layout[r][c]] === 'treasure_chest') chests.push([r, c]);
+    assert.ok(chests.length >= 3);
+    assert.ok(chests.every(([r, c]) => seen.has(`${r},${c}`)), 'すべての宝箱に歩いて行ける');
+    const [ex, ez] = exit[0].split(',').map(Number);
+    assert.ok(seen.has(`${ez},${ex}`), '出口に行ける');
+    assert.ok([...enemyCh].length >= 2);
+});

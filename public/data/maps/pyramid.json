@@ -1,0 +1,62 @@
+{
+  "id": "pyramid",
+  "name": "ピラミッドの墓所 (Pyramid Tomb)",
+  "type": "indoor",
+  "tileSize": 4,
+  "wallHeight": 4,
+  "nextMap": "field_desert",
+  "spawn": {
+    "x": 8,
+    "z": 14,
+    "angle": 0
+  },
+  "environment": {
+    "floorType": "desert",
+    "hasCeiling": true,
+    "footstep": "stone",
+    "ceilingTexture": "cliffSand",
+    "ambientLight": 9072456,
+    "directionalLight": 13214826,
+    "fogColor": 1840138,
+    "fogNear": 6,
+    "fogFar": 30,
+    "visibility": 0.7,
+    "skyColor": 1840138
+  },
+  "legend": {
+    "1": "cliff_sandstone_wall",
+    "E": "pyramid_exit",
+    "S": "sarcophagus_stone",
+    "T": "treasure_chest"
+  },
+  "enemies": {
+    "K": "skeleton",
+    "Z": "zombie",
+    "X": "scorpion"
+  },
+  "layout": [
+    "11111111111111111",
+    "111110T000T011111",
+    "11111000000011111",
+    "111110X0S0X011111",
+    "11111000000011111",
+    "10001000000010001",
+    "1T0011110111100T1",
+    "10Z01111011110Z01",
+    "10001111011110001",
+    "11000000000000011",
+    "11100K00000K00111",
+    "11100000000000111",
+    "11100000X00000111",
+    "11111111011111111",
+    "11111111011111111",
+    "11111111011111111",
+    "11111111E11111111"
+  ],
+  "links": {
+    "8,16": {
+      "nextMap": "$back",
+      "message": "外に出る"
+    }
+  }
+}
