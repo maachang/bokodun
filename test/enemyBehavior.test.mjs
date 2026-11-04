@@ -375,3 +375,111 @@ test('クマ: 縄張りの中でウロウロし、攻撃を始めると、近く
     assert.ok(states.filter(x => x === 'rush').length >= 2 && states.includes('recover'), `ラッシュを繰り返す: ${states}`);
     assert.ok([...scales].every(x => x < 0.7), `1 回の威力は小さい: ${[...scales]}`);
 });
+
+test('個性（能力から自動）: 状態異常・盾持ち・召喚・瞬間移動・潜る・待ち伏せ・範囲攻撃・盗む・生命力吸収が、能力から決まる', async () => {
+    const { deriveProfile } = await load();
+    const pf = (id) => deriveProfile({ ...defs[id], id });
+    assert.ok(pf('cobra').inflict.some(f => f.type === 'poison'), 'コブラは毒');
+    assert.ok(pf('naga_female').inflict.some(f => f.type === 'paralysis') && pf('naga_female').inflict.some(f => f.type === 'silence'), 'ナーガ（雌）は、麻痺・沈黙');
+    assert.ok(pf('fallen_priest').inflict.some(f => f.type === 'curse'), '堕落した司祭は、呪い');
+    assert.ok(pf('hobgoblin_female').inflict.some(f => f.type === 'slow'), '鈍足');
+    assert.ok(pf('vampire').lifesteal > 0, '生命力を吸う');
+    assert.ok(pf('stone_golem').guard && pf('guard_elite').guard && pf('snapping_turtle').guard, '盾持ち');
+    assert.equal(pf('slime_emperor').summon.type, 'slime');
+    assert.equal(pf('ant_queen').summon.type, 'ant_pawn');
+    assert.equal(pf('goblin_king').summon.type, 'goblin_scout');
+    assert.ok(pf('archmage').blink && pf('vampire_lord').blink, '瞬間移動');
+    assert.ok(pf('assassin_centipede').burrow && pf('sand_rat').burrow, '潜る');
+    assert.ok(pf('serial_killer').ambushHide, '待ち伏せ');
+    assert.ok(pf('wizard').slam && pf('lich').slam, '範囲攻撃');
+    assert.ok(pf('thief').steal && pf('bandit_grunt').steal, '盗む');
+    assert.ok(!pf('slime').guard && !pf('slime').summon, '無関係の敵には付かない');
+});
+
+test('盾持ち: 正面からの近接・矢は防ぐ（ダメージ 1/4）。魔法・背後からは防げない。向きを変えるのが遅いので、回り込める', async () => {
+    const { Monster } = await load();
+    const g = new Monster('stone_golem', 0, 0, tex, { ...defs.stone_golem, id: 'stone_golem' });
+    g.state = 'chase'; g.speed = 0; g.facing = Math.atan2(8, 0);
+    // プレイヤーは +x 側（正面）。攻撃の向きは、プレイヤーから敵へ（-x）
+    for (let i = 0; i < 20; i++) g.update(0.05, P(8, 0), [], [], null, null, 1.0);
+    const hit = (dir) => { g.hp = g.maxHp = 1000; g.takeDamage(100, dir, 1); return { lost: 1000 - g.hp, blocked: g.lastBlocked }; };
+    const front = hit({ x: -1, z: 0 });
+    const behind = hit({ x: 1, z: 0 });
+    const magic = hit({ x: -1, z: 0, magic: true });
+    assert.ok(front.blocked && front.lost <= 26, `正面は防ぐ: ${front.lost}`);
+    assert.ok(!behind.blocked && behind.lost >= 99, `背後は防げない: ${behind.lost}`);
+    assert.ok(!magic.blocked && magic.lost >= 99, `魔法は防げない: ${magic.lost}`);
+    // プレイヤーが、素早く背後へ回り込む（向きが追いつかない）
+    g.facing = Math.atan2(8, 0);   // 今は +x を向いている
+    for (let i = 0; i < 6; i++) g.update(0.05, P(-8, 0), [], [], null, null, 1.0);   // 0.3 秒で、反対側へ
+    const circled = hit({ x: 1, z: 0 });   // 背後（+x 側）から、攻撃
+    assert.ok(!circled.blocked && circled.lost >= 99, `回り込めば効く（向きは、まだ ${g.facing.toFixed(2)}）: ${circled.lost}`);
+});
+
+test('召喚: 追跡中に、一定の間隔で、仲間を呼ぶ（最大数まで）', async () => {
+    const { Monster } = await load();
+    const m = new Monster('slime_emperor', 0, 0, tex, { ...defs.slime_emperor, id: 'slime_emperor' });
+    m.state = 'chase'; m.summonTimer = 0; m.speed = 0;
+    const calls = [];
+    m.summonHook = (owner, type, max) => calls.push([type, max]);
+    for (let t = 0; t < 30; t += 0.05) m.update(0.05, P(8, 0), [], [], null, null, 1.0);
+    assert.ok(calls.length >= 2, `30 秒で ${calls.length} 回呼ぶ`);
+    assert.equal(calls[0][0], 'slime');
+    assert.ok(calls[0][1] >= 2);
+    const idle = new Monster('slime_emperor', 0, 0, tex, { ...defs.slime_emperor, id: 'slime_emperor' });
+    const c2 = []; idle.summonHook = (...a) => c2.push(a); idle.summonTimer = 0;
+    for (let t = 0; t < 5; t += 0.05) idle.update(0.05, P(80, 0), [], [], null, null, 1.0);
+    assert.equal(c2.length, 0, '気づいていない間は、呼ばない');
+});
+
+test('範囲攻撃: プレイヤーの足元に、予兆の赤い輪が出て、少しあとに、その位置を攻撃する（輪が消える）', async () => {
+    const { Monster } = await load();
+    const m = new Monster('wizard', 0, 0, tex, { ...defs.wizard, id: 'wizard' });
+    m.state = 'chase'; m.slamCool = 0; m.speed = 0; m.canShoot = false;
+    const added = [], removed = [];
+    const scene = { add: (o) => { added.push(o); o.parent = scene; }, remove: (o) => removed.push(o) };
+    const hits = [];
+    m.slamHook = (owner, pos, radius, mult) => hits.push({ pos: { ...pos }, radius, mult });
+    const player = P(7, 0);
+    let ringSeen = false;
+    for (let t = 0; t < 3; t += 0.05) {
+        m.update(0.05, player, [], [], null, scene, 1.0);
+        if (m.slamMesh) ringSeen = true;
+        if (t < 0.6) player.x = 7;   // 予兆の間に、動く
+        else player.x = 14;          // 輪の外へ出る（よける）
+    }
+    assert.ok(ringSeen && added.length >= 1, '予兆の輪が出る');
+    assert.ok(hits.length >= 1 && Math.abs(hits[0].pos.x - 7) < 0.5, `輪の位置は、狙った時点のプレイヤーの足元: ${hits[0]?.pos.x}`);
+    assert.ok(removed.length >= 1 && !m.slamMesh, '攻撃のあと、輪が消える');
+});
+
+test('瞬間移動: 少し光って（予兆）、プレイヤーの背後へ移動する', async () => {
+    const { Monster } = await load();
+    const m = new Monster('archmage', 0, 0, tex, { ...defs.archmage, id: 'archmage' });
+    m.state = 'chase'; m.blinkTimer = 0; m.speed = 0; m.canShoot = false;
+    const player = { ...P(8, 0), angle: -Math.PI / 2 };   // +x 向き（前方 = +x）。背後は -x 側
+    let winded = false;
+    for (let t = 0; t < 3; t += 0.05) { m.update(0.05, player, [], [], null, null, 1.0); if (m.blinkState === 'wind') winded = true; }
+    assert.ok(winded, '予兆');
+    assert.ok(m.x > 8 + 1.5 - 4.5 && m.x < 8 - 2.5 || m.x < 8, `プレイヤーの背後へ: ${m.x}`);
+});
+
+test('潜る: 地中を、姿を消し、攻撃も受けずに近づき、近くで飛び出す。待ち伏せ: 近づかれるまで隠れていて、不意打ちする', async () => {
+    const { Monster } = await load();
+    const w = new Monster('sand_rat', 0, 0, tex, { ...defs.sand_rat, id: 'sand_rat' });
+    w.state = 'chase';
+    let under = false, untouch = false, emerged = false, cloakAlpha = 1;
+    for (let t = 0; t < 12; t += 0.05) {
+        w.update(0.05, P(14, 0), [], [], null, null, 1.0);
+        if (w.burrowState === 'under') { under = true; untouch = untouch || w.untouchable; cloakAlpha = Math.min(cloakAlpha, w.appearAlpha); }
+        if (under && w.burrowState === 'up') emerged = true;
+    }
+    assert.ok(under && untouch, '潜っている間は、触れない');
+    assert.ok(cloakAlpha < 0.2, `姿が消える: ${cloakAlpha}`);
+    assert.ok(emerged, '近くで飛び出す');
+    const a = new Monster('serial_killer', 0, 0, tex, { ...defs.serial_killer, id: 'serial_killer' });
+    for (let i = 0; i < 40; i++) a.update(0.05, P(12, 0), [], [], null, null, 1.0);
+    assert.ok(a.ambushHidden && a.appearAlpha < 0.2 && a.x === 0, '遠くでは、隠れて動かない');
+    for (let i = 0; i < 6; i++) a.update(0.05, P(3, 0), [], [], null, null, 1.0);
+    assert.ok(!a.ambushHidden && a.state === 'chase' && a.hitScale > 1, `近づくと、不意打ち（威力 ${a.hitScale}）`);
+});

@@ -219,13 +219,25 @@ export class Monster {
         this.chargeDist = 0;
         this.isDashing = false;        // 突進中（当たると、ダメージ・ノックバックが大きい）
         this.hopRest = 0;              // 大ジャンプの着地後の休み
-        this.cloaked = false;          // 猫系: 姿を消している（隠密）
+        this.cloaked = !!this.profile?.ambushHide;   // 猫系・潜る・待ち伏せ: 姿を消している（隠密）
         this.hitScale = 1;             // 攻撃の威力の倍率（猫系の連続攻撃は、1 回が小さい）
         this.catState = 'stalk';       // 猫系: stalk(狙う) / flurry(近くで連続攻撃) / away(離れる)
         this.catTimer = 0;
         this.awayHops = 0;
         this.damageTakenScale = 1;     // 受けるダメージの倍率（イノシシが、突進をよけられて息切れしている間は、大きくなる）
         this.dashHit = false;          // 今回の突進が、プレイヤーに当たったか（game.js が立てる）
+        this.summonTimer = 4 + Math.random() * 4;   // 召喚: 次に仲間を呼ぶまで
+        this.summonHook = null;        // game.js が入れる: (owner, 種類, 最大数) → 仲間を出す
+        this.slamHook = null;          // game.js が入れる: (owner, 位置, 半径, 威力の倍率) → 範囲攻撃を当てる
+        this.slamState = 'idle'; this.slamTimer = 0; this.slamCool = 3 + Math.random() * 3; this.slamPos = null; this.slamMesh = null; this.slamScene = null;
+        this.blinkState = 'idle'; this.blinkTimer = 3 + Math.random() * 3;   // 瞬間移動
+        this.burrowState = 'up'; this.burrowTimer = 0;   // 潜る: up(地上) / under(地中)
+        this.untouchable = false;      // 地中にいる間は、攻撃も受けず、ぶつかりもしない
+        this.ambushHidden = !!this.profile?.ambushHide;   // 待ち伏せ: 姿を隠して動かない
+        this.ambushBoost = 0;          // 不意打ちの威力 1.5 倍の残り時間
+        this.fleeing = false;          // 盗んで逃げている
+        this.stolenGold = 0;           // 盗んだお金（倒すと、取り返せる）
+        this.lastBlocked = false;      // 直前の攻撃を、ガードで防いだか
         this.raptorState = 'climb';    // 猛禽: climb(舞い上がり・旋回) / glide(滑空攻撃) / recover(隙)
         this.raptorTimer = 0;
         this.raptorRecover = 1.8;
@@ -359,8 +371,89 @@ export class Monster {
             return;
         }
 
+        // 待ち伏せ: 姿を隠して動かず、近づかれた瞬間に、不意打ちで襲いかかる
+        if (this.ambushHidden) {
+            if (dist <= (this.profile.ambushHide?.reveal ?? 4.5)) {
+                this.ambushHidden = false; this.cloaked = false; this.state = 'chase'; this.lostTimer = 0;
+                this.ambushBoost = 1.5; this.hitScale = 1.5;   // 最初の 1.5 秒は、威力 1.5 倍
+                this.stun(0.2);
+            } else {
+                this.sprite.position.set(this.x, this.baseY + this.floorY, this.z);
+                return;
+            }
+        }
+        if (this.ambushBoost > 0) { this.ambushBoost -= dt; if (this.ambushBoost <= 0) this.hitScale = 1; }
+
         // 特徴による動きの変化: 再生・怒り・逃走・回避
         const pr = this.profile;
+        // 個性（特殊能力）: 召喚・範囲攻撃・瞬間移動・潜る（追跡状態のとき）
+        if (pr && this.state === 'chase') {
+            if (pr.summon && this.summonHook) {
+                this.summonTimer -= dt;
+                if (this.summonTimer <= 0 && dist < 24) { this.summonTimer = pr.summon.every * (0.9 + Math.random() * 0.3); this.summonHook(this, pr.summon.type, pr.summon.max); }
+            }
+            if (pr.slam && this.slamHook) {
+                if (this.slamState === 'idle') {
+                    this.slamCool -= dt;
+                    if (this.slamCool <= 0 && dist < pr.slam.range) {
+                        // プレイヤーの足元に、赤い輪（予兆）を出す。少しあとに、その範囲を攻撃する（輪の外へ出れば、よけられる）
+                        this.slamState = 'wind'; this.slamTimer = pr.slam.windup; this.slamPos = { x: player.x, z: player.z };
+                        if (scene) {
+                            const ring = new THREE.Mesh(new THREE.RingGeometry(pr.slam.radius * 0.9, pr.slam.radius, 40), new THREE.MeshBasicMaterial({ color: 0xef4444, transparent: true, opacity: 0.7, side: THREE.DoubleSide }));
+                            ring.rotation.x = -Math.PI / 2;
+                            ring.position.set(player.x, (player.floorY ?? this.floorY) + 0.08, player.z);
+                            scene.add(ring); this.slamMesh = ring; this.slamScene = scene;
+                        }
+                    }
+                } else {
+                    this.slamTimer -= dt;
+                    if (this.slamMesh) this.slamMesh.material.opacity = 0.35 + 0.35 * Math.abs(Math.sin(this.aiTimer * 14));
+                    if (this.slamTimer <= 0) {
+                        this.slamHook(this, this.slamPos, pr.slam.radius, pr.slam.mult);
+                        this.clearSlam();
+                        this.slamState = 'idle'; this.slamCool = pr.slam.cool * (0.9 + Math.random() * 0.3);
+                    }
+                }
+            }
+            if (pr.blink) {
+                if (this.blinkState === 'idle') {
+                    this.blinkTimer -= dt;
+                    if (this.blinkTimer <= 0 && dist < 16 && dist > 2.5) { this.blinkState = 'wind'; this.blinkTimer = pr.blink.windup; }
+                } else {
+                    // 予兆: 点滅して、光る。終わると、プレイヤーの背後へ移動する
+                    this.blinkTimer -= dt;
+                    this.spriteMat.color.setRGB(1.6, 1.2, 2.2);
+                    this.spriteMat.opacity = this.appearAlpha * (0.4 + 0.6 * Math.abs(Math.sin(this.aiTimer * 30)));
+                    if (this.blinkTimer <= 0) {
+                        const a = player.angle ?? 0;
+                        const nx = player.x + Math.sin(a) * pr.blink.behind, nz = player.z + Math.cos(a) * pr.blink.behind;
+                        if (!this.checkWallCollision(nx, nz, colliders)) { this.x = nx; this.z = nz; }
+                        this.blinkState = 'idle'; this.blinkTimer = pr.blink.every * (0.9 + Math.random() * 0.3);
+                        this.spriteMat.opacity = this.appearAlpha;
+                    }
+                }
+            }
+            if (pr.burrow) {
+                const bw = pr.burrow;
+                if (this.burrowState === 'up') {
+                    this.burrowTimer -= dt;
+                    if (this.burrowTimer <= 0 && dist > bw.surface + 1.5) { this.burrowState = 'under'; this.burrowTimer = bw.cool; this.cloaked = true; this.untouchable = true; }
+                } else {
+                    // 地中: 姿を消し、攻撃も受けず、プレイヤーへ近づく。近くで、飛び出す
+                    this.burrowTimer -= dt;
+                    const bdx = player.x - this.x, bdz = player.z - this.z, bd = Math.hypot(bdx, bdz) || 1;
+                    if (bd > bw.surface * 0.6) { const nx = this.x + bdx / bd * this.speed * bw.speed * dt, nz = this.z + bdz / bd * this.speed * bw.speed * dt; if (!this.checkWallCollisionOnly(nx, this.z, colliders)) this.x = nx; if (!this.checkWallCollisionOnly(this.x, nz, colliders)) this.z = nz; }
+                    this.baseY = 0;
+                    if (dist <= bw.surface && this.burrowTimer <= 0) {
+                        this.burrowState = 'up'; this.burrowTimer = bw.stay; this.cloaked = false; this.untouchable = false;
+                        this.hitScale = 1.3; this.ambushBoost = Math.max(this.ambushBoost, 1.0);   // 飛び出しの一撃は、強い
+                        this.stun(0.15);
+                    }
+                    this.sprite.position.set(this.x, this.baseY + this.floorY, this.z);
+                    return;
+                }
+            }
+        }
         if (pr) {
             if (pr.regen && this.hp < this.maxHp && this.hitTimer <= 0) this.hp = Math.min(this.maxHp, this.hp + this.maxHp * 0.015 * dt);
             if (pr.enrage) {
@@ -368,7 +461,7 @@ export class Monster {
                 if (en !== this.enraged) { this.enraged = en; this.speed = this.baseSpeed * (en ? 1.35 : 1); }
             }
             // 逃走: 体力が 3 割を切ると、プレイヤーから逃げる
-            if (pr.flee && this.hp < this.maxHp * 0.3 && dist < 18 && this.knockback.lengthSq() < 0.1) {
+            if (((pr.flee && this.hp < this.maxHp * 0.3) || this.fleeing) && dist < 40 && this.knockback.lengthSq() < 0.1) {
                 const nx = this.x - dirX * this.speed * 1.6 * dt, nz = this.z - dirZ * this.speed * 1.6 * dt;
                 if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx;
                 if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz;
@@ -1034,6 +1127,25 @@ export class Monster {
         this.sprite.position.z = this.z;
     }
 
+    // 範囲攻撃の予兆（赤い輪）を消す
+    clearSlam() {
+        if (this.slamMesh) {
+            this.slamMesh.parent?.remove(this.slamMesh);
+            this.slamMesh.geometry.dispose?.(); this.slamMesh.material.dispose?.();
+            this.slamMesh = null;
+        }
+        this.slamState = 'idle';
+    }
+
+    // 壁だけ（崖・毒沼は無視）の判定。地中を進む敵が使う
+    checkWallCollisionOnly(x, z, colliders) {
+        for (const c of colliders) {
+            if (c.disabled) continue;
+            if (x >= c.minX - this.radius && x <= c.maxX + this.radius && z >= c.minZ - this.radius && z <= c.maxZ + this.radius) return true;
+        }
+        return false;
+    }
+
     // 壁(colliders)に遮られず、このモンスターからプレイヤーが見えるか
     hasLineOfSight(px, pz, dist, colliders) {
         const steps = Math.ceil(dist / 0.4);
@@ -1090,7 +1202,13 @@ export class Monster {
             }
         } else {
             // chase: 視線が通り感知圏内にいる間は発見済みを維持。見失って一定時間で未発見に戻る
-            this.facing = toPlayer;
+            const gd = this.profile?.guard;
+            if (gd) {   // 盾持ちは、向きを変えるのが遅い（横や背後へ回り込めば、盾で防がれない）
+                let d = toPlayer - this.facing;
+                d = Math.atan2(Math.sin(d), Math.cos(d));
+                const maxTurn = gd.turn * dt;
+                this.facing += Math.max(-maxTurn, Math.min(maxTurn, d));
+            } else this.facing = toPlayer;
             if (keepSight) {
                 this.lostTimer = 0;
             } else {
@@ -1162,6 +1280,14 @@ export class Monster {
     // knockScale: ノックバックの強さの倍率（既定 1.0。大剣・メイスなどが大きくする）
     takeDamage(amount, knockDir, knockScale = 1.0) {
         amount = amount * (this.damageTakenScale ?? 1);
+        // 盾持ち: 正面からの近接・矢は、防ぐ（ダメージが減る）。魔法（knockDir.magic）は防げない
+        this.lastBlocked = false;
+        const gd = this.profile?.guard;
+        if (gd && knockDir && !knockDir.magic) {
+            const len = Math.hypot(knockDir.x, knockDir.z) || 1;
+            const dot = (knockDir.x * Math.sin(this.facing) + knockDir.z * Math.cos(this.facing)) / len;
+            if (dot < -Math.cos(gd.arc / 2 * Math.PI / 180)) { amount *= gd.reduction; this.lastBlocked = true; }
+        }
         this.hp -= amount;
         this.hitTimer = HIT_FLASH_TIME;
         this.provokedTimer = 8;   // 攻撃されたら、縄張りの外へ逃げられても、しばらく追う
@@ -1183,6 +1309,7 @@ export class Monster {
     // 死亡演出の更新。終了（スプライトを消してよい）なら true を返す
     //   0〜0.1秒: 白フラッシュ / 0.1〜0.7秒: 横倒し（飛行の敵は先に落下） / 0.7〜1.3秒: 半透明になって消える
     updateDeath(dt) {
+        if (this.slamMesh) this.clearSlam();
         this.deathTimer += dt;
         const t = this.deathTimer;
         const mat = this.spriteMat;

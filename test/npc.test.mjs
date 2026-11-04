@@ -168,3 +168,46 @@ test('ゲーム: 起伏のあるマップで、村人の足元は、地面の高
     for (let i = 0; i < 3; i++) g.updateNpcs(0.05);
     assert.ok(Math.abs(g.npcs[0].sprite.position.y - 0.9) < 1e-6, `高台の上 ${g.npcs[0].sprite.position.y}`);
 });
+
+test('ゲーム: プレイヤーの状態異常（毒・火傷は継続ダメージ、鈍足・麻痺・沈黙・呪い）。敵の攻撃で、確率でかかり、時間で治る。盗む・生命力吸収', async () => {
+    const { GameEngine } = await loadGame();
+    const g = Object.create(GameEngine.prototype);
+    const popups = [];
+    g.addPopup = (t) => popups.push(t);
+    g.sound = { playHurt() {} };
+    g.particles = { spawnBurst() {} };
+    g.player = { hp: 100, maxHp: 100, attackPower: 20, gold: 100, x: 0, z: 0, floorY: 0, status: {}, isInvincible: false, magicCooldown: 0 };
+    // 毒: 0.5 秒ごとの継続ダメージ。時間が切れたら、治る
+    assert.ok(g.applyPlayerStatus('poison', { t: 3, dps: 4 }));
+    assert.ok(popups.some(t => t.includes('毒')));
+    assert.equal(g.applyPlayerStatus('poison', { t: 1, dps: 4 }), false, 'すでに毒なら、新規ではない');
+    assert.equal(g.player.status.poison.t, 3, '長いほうの時間');
+    for (let i = 0; i < 40; i++) g.updatePlayerStatus(0.05);   // 2 秒
+    assert.ok(g.player.hp <= 94 && g.player.hp >= 90, `毒のダメージ: ${100 - g.player.hp}`);
+    for (let i = 0; i < 40; i++) g.updatePlayerStatus(0.05);   // 合計 4 秒（3 秒で治る）
+    assert.equal(g.player.status.poison, undefined, '3 秒で治る');
+    // 呪い: 攻撃力が下がる
+    g.applyPlayerStatus('curse', { t: 5, scale: 0.7 });
+    assert.equal(Math.round(g.playerAttackPower()), 14);
+    // 敵の攻撃: 毒・麻痺・沈黙・鈍足・呪いが、確率でかかる（確率 1 にして確認）。生命力吸収
+    g.player.status = {};
+    const monster = { hp: 50, maxHp: 100, profile: { inflict: [{ type: 'poison', chance: 1, t: 5, dps: 3 }, { type: 'paralysis', chance: 1, t: 1 }, { type: 'silence', chance: 1, t: 5 }, { type: 'slow', chance: 1, t: 4, scale: 0.5 }], lifesteal: 0.5 }, fleeing: false, stolenGold: 0 };
+    g.onPlayerHitBy(monster, 20);
+    for (const k of ['poison', 'paralysis', 'silence', 'slow']) assert.ok(g.player.status[k]?.t > 0, `${k} がかかる`);
+    assert.equal(monster.hp, 60, '生命力吸収（与えたダメージの 50%）');
+    // 盗む: お金の一部を盗んで、逃げる
+    const thief = { hp: 10, maxHp: 10, profile: { inflict: [], lifesteal: 0, steal: true }, fleeing: false, stolenGold: 0 };
+    g.onPlayerHitBy(thief, 5);
+    assert.ok(thief.fleeing && thief.stolenGold === 20 && g.player.gold === 80, `盗む: ${thief.stolenGold}, 残り ${g.player.gold}`);
+    g.onPlayerHitBy(thief, 5);
+    assert.equal(g.player.gold, 80, '逃げている間は、さらに盗まない');
+    // 麻痺・沈黙の間は、魔法が使えない
+    g.getMagicItem = () => ({ kind: 'spell', cooldown: 1 });
+    let cast = false;
+    g.castStrike = () => { cast = true; }; g.shootProjectiles = () => { cast = true; };
+    g.player.mp = 100; g.player.selectedMagic = 0;
+    g.player.status = { paralysis: { t: 1 } }; g.useMagic();
+    assert.equal(cast, false, '麻痺: 使えない');
+    g.player.status = { silence: { t: 3 } }; g.useMagic();
+    assert.equal(cast, false, '沈黙: 呪文は使えない');
+});

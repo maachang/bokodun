@@ -57,6 +57,7 @@ export class GameEngine {
             maxMp: 60,
             mp: 60,
             gold: 0,
+            status: {},         // 状態異常（poison・burn: 継続ダメージ / slow / paralysis / silence / curse）。{ 種類: { t: 残り秒, dps / scale } }
             exp: 0,
             level: 1,
             attackPower: 15,
@@ -611,6 +612,51 @@ export class GameEngine {
         }
     }
 
+    // 敵に、ゲーム側の処理（地形・召喚・範囲攻撃）をつなぐ
+    attachMonsterHooks(m) {
+        m.terrainBlock = (mm, x, z) => this.monsterTerrainBlocked(mm, x, z);   // 地上の敵は、崖・毒沼へ進まない
+        m.summonHook = (owner, type, max) => this.summonMinion(owner, type, max);
+        m.slamHook = (owner, pos, radius, mult) => this.slamAttack(owner, pos, radius, mult);
+    }
+
+    // 召喚: 敵（owner）が、仲間（type）を 1 体、近くに呼ぶ。呼んだ数（生きている手下）が max 以上なら、呼ばない
+    summonMinion(owner, type, max) {
+        const alive = this.monsters.filter(x => x.active && x.minionOf === owner).length;
+        if (alive >= max) return null;
+        const def = this.enemyDefinitions?.[type];
+        if (!def) return null;
+        for (let i = 0; i < 8; i++) {
+            const a = Math.random() * Math.PI * 2, r = 2.2 + Math.random() * 1.2;
+            const x = owner.x + Math.cos(a) * r, z = owner.z + Math.sin(a) * r;
+            if (this.isInsideWall(x, z) || this.monsterTerrainBlocked({ x: owner.x, z: owner.z }, x, z)) continue;
+            const m = new Monster(type, x, z, this.textures, { ...def, id: type });
+            m.floorY = this.getFloorHeight(x, z);
+            m.sprite.position.set(x, m.floorY, z);
+            m.minionOf = owner;
+            m.state = 'chase'; m.lostTimer = 0; m.appearAlpha = 1; m.spriteMat.opacity = 1;
+            this.attachMonsterHooks(m);
+            this.monsters.push(m);
+            this.scene.add(m.sprite);
+            this.particles.spawnBurst(x, m.floorY + 1.0, z, 0xa855f7, 12, 3.0);
+            this.addPopup(`${owner.name}が、仲間を呼んだ！`, '#c084fc', owner.x, owner.z);
+            return m;
+        }
+        return null;
+    }
+
+    // 範囲攻撃: 予兆の輪（pos を中心に、半径 radius）の中に、プレイヤーがいれば、ダメージを与える
+    slamAttack(owner, pos, radius, mult) {
+        this.particles.spawnBurst(pos.x, (this.player.floorY ?? 0) + 0.3, pos.z, 0xef4444, 24, 5.0);
+        this.sound.playBigExplosion?.();
+        const d = Math.hypot(this.player.x - pos.x, this.player.z - pos.z);
+        if (d <= radius && !this.player.isFalling) {
+            const dmg = Math.max(1, Math.floor(owner.attackPower * mult));
+            const k = d > 0.01 ? new THREE.Vector3((this.player.x - pos.x) / d, 0, (this.player.z - pos.z) / d) : new THREE.Vector3(0, 0, 0);
+            this.addPopup(`範囲攻撃! -${dmg}`, '#ef4444');
+            this.playerTakeDamage(dmg, k, 1.2, owner);
+        }
+    }
+
     // 地上の敵が、(x, z) へ進めないか: 崖（上り 2 段以上・下り 3 段以上）、毒沼・溶岩などのダメージ床
     monsterTerrainBlocked(m, x, z) {
         if (this.heightMap && !groundStepOk((px, pz) => this.heightLevelAt(px, pz), m.x, m.z, x, z)) return true;
@@ -618,6 +664,68 @@ export class GameEngine {
             if (t.damagePerSec > 0 && x >= t.minX && x <= t.maxX && z >= t.minZ && z <= t.maxZ) return true;
         }
         return false;
+    }
+
+    // 攻撃力（呪いの間は、下がる）
+    playerAttackPower() {
+        const c = this.player.status?.curse;
+        return this.player.attackPower * (c?.t > 0 ? (c.scale ?? 0.7) : 1);
+    }
+
+    // プレイヤーを状態異常にする。type: poison / burn / slow / paralysis / silence / curse。すでに同じ状態なら、長いほうの時間にする
+    applyPlayerStatus(type, opt = {}) {
+        const names = { poison: '毒', burn: '火傷', slow: '鈍足', paralysis: '麻痺', silence: '沈黙', curse: '呪い' };
+        const colors = { poison: '#a3e635', burn: '#fb923c', slow: '#60a5fa', paralysis: '#fde047', silence: '#a78bfa', curse: '#c084fc' };
+        this.player.status ??= {};
+        const cur = this.player.status[type];
+        const t = opt.t ?? 4;
+        const fresh = !(cur?.t > 0);
+        this.player.status[type] = { ...opt, t: Math.max(cur?.t ?? 0, t), tick: cur?.tick ?? 0.5 };
+        if (fresh) this.addPopup(`${names[type] ?? type}！`, colors[type] ?? '#ffffff');
+        return fresh;
+    }
+
+    // 状態異常の経過（毎フレーム）: 毒・火傷は、0.5 秒ごとに継続ダメージ。時間が切れたら、治る
+    updatePlayerStatus(dt) {
+        const st = this.player.status;
+        if (!st) return;
+        for (const type of Object.keys(st)) {
+            const e = st[type];
+            e.t -= dt;
+            if (e.t <= 0) { delete st[type]; continue; }
+            if ((type === 'poison' || type === 'burn') && e.dps) {
+                e.tick -= dt;
+                if (e.tick <= 0) {
+                    e.tick += 0.5;
+                    const dmg = Math.max(1, Math.round(e.dps * 0.5));
+                    this.player.hp = Math.max(0, this.player.hp - dmg);
+                    this.sound.playHurt?.();
+                    this.particles.spawnBurst(this.player.x, (this.player.floorY ?? 0) + 1.0, this.player.z, type === 'poison' ? 0xa3e635 : 0xfb923c, 4, 1.5);
+                    if (this.player.hp <= 0) {
+                        this.player.status = {};
+                        this.addPopup(type === 'poison' ? 'GAME OVER! 毒で力尽きた…' : 'GAME OVER! 火傷で力尽きた…', '#ef4444');
+                        setTimeout(() => { this.player.hp = this.player.maxHp; this.loadMap(this.currentMapId); }, 1000);
+                        return;
+                    }
+                }
+            }
+        }
+    }
+
+    // 敵の攻撃が当たったとき: その敵の特徴（profile.inflict）に応じて、一定の確率で、状態異常にする。生命力を吸う敵は、与えたダメージの一部を回復する
+    onPlayerHitBy(monster, damage) {
+        const pr = monster?.profile;
+        if (!pr) return;
+        // 盗む: お金の一部を盗んで、逃げる（倒すと、取り返せる）
+        if (pr.steal && !monster.fleeing && (this.player.gold ?? 0) > 0) {
+            const amount = Math.min(this.player.gold, Math.max(5, Math.floor(this.player.gold * 0.2)));
+            this.player.gold -= amount; monster.stolenGold += amount; monster.fleeing = true;
+            this.addPopup(`ゴールドを盗まれた！ -${amount}G`, '#facc15');
+        }
+        for (const f of pr.inflict ?? []) {
+            if (Math.random() < f.chance) this.applyPlayerStatus(f.type, f);
+        }
+        if (pr.lifesteal > 0 && damage > 0) monster.hp = Math.min(monster.maxHp, monster.hp + damage * pr.lifesteal);
     }
 
     // 高い所から落ちたときのダメージ（levels: 落ちた段の数。1 段の段差は、落下にしない）
@@ -863,7 +971,7 @@ export class GameEngine {
                     const enemyDef = this.enemyDefinitions[enemyType];
                     const m = new Monster(enemyType, wx, wz, this.textures, enemyDef);
                     m.floorY = this.heightLevelAtTile(r, c) * this.heightStep;
-                    m.terrainBlock = (mm, x, z) => this.monsterTerrainBlocked(mm, x, z);   // 地上の敵は、崖・毒沼へ進まない
+                    this.attachMonsterHooks(m);
                     m.sprite.position.y = m.floorY;
                     this.monsters.push(m);
                     this.scene.add(m.sprite);
@@ -2479,6 +2587,7 @@ export class GameEngine {
         this.player.heightLevel = this.heightLevelAt(this.player.x, this.player.z);
         this.player.floorY = this.getFloorHeight(this.player.x, this.player.z);   // 起伏のある所へ出たときは、目線の高さを、すぐ合わせる
 
+        if (!opts.edgeBlend) this.player.status = {};   // 場面が変わったら（端の移動を除く）、状態異常は治る
         // Reset inputs on scene transition to prevent stuck keys
         // （端を越える移動のときは、歩き続けられるよう、リセットしない。押しているキーは、そのまま生かす）
         if (!opts.edgeBlend) Object.keys(this.keys).forEach(k => this.keys[k] = false);
@@ -2673,6 +2782,12 @@ export class GameEngine {
         const item = this.getMagicItem();
         if (!item) return;
         if (this.player.magicCooldown > 0) return;
+        if (this.player.status?.paralysis?.t > 0) return;   // 麻痺: 何もできない
+        if (item.kind === 'spell' && this.player.status?.silence?.t > 0) {   // 沈黙: 呪文が使えない（弓は使える）
+            this.player.magicCooldown = 0.5;
+            this.addPopup('沈黙… 魔法が使えない', '#a78bfa');
+            return;
+        }
 
         if (item.kind === 'spell') {
             const focus = this.getFocusItem();
@@ -2722,7 +2837,7 @@ export class GameEngine {
     shootArrow(item, cls) {
         const dirX = -Math.sin(this.player.angle);
         const dirZ = -Math.cos(this.player.angle);
-        const damage = Math.floor(this.player.attackPower * cls.damageScale * (item.powerScale ?? 1) + Math.random() * (item.randomBonus ?? 0));
+        const damage = Math.floor(this.playerAttackPower() * cls.damageScale * (item.powerScale ?? 1) + Math.random() * (item.randomBonus ?? 0));
         const arrow = new Projectile(this.player.x + dirX * 0.8, this.player.z + dirZ * 0.8, dirX, dirZ, true, cls.projectileSpeed, damage, {
             type: 'arrow',
             maxDistance: cls.range
@@ -2775,8 +2890,8 @@ export class GameEngine {
         const hitColor = isArrow ? 0xd4d4d8 : new THREE.Color(p.visual?.hit ?? '#ff5500').getHex();
         this.particles.spawnBurst(p.x, p.y, p.z, hitColor, isArrow ? 8 : 16, isArrow ? 2.5 : 5.0);
 
-        const isDead = m.takeDamage(p.damage, { x: p.dirX, z: p.dirZ });
-        this.addPopup(`${p.label || 'ファイア'}! -${p.damage}`, '#f97316', m.x, m.z);
+        const isDead = m.takeDamage(p.damage, { x: p.dirX, z: p.dirZ, magic: !isArrow });
+        this.addPopup(m.lastBlocked ? 'ガード!' : `${p.label || 'ファイア'}! -${p.damage}`, m.lastBlocked ? '#94a3b8' : '#f97316', m.x, m.z);
         if (!isDead && p.status && m.applyStatus(p.status)) {
             this.addPopup(p.status.type === 'burn' ? '燃焼!' : '鈍足!', p.status.type === 'burn' ? '#fb923c' : '#7dd3fc', m.x, m.z);
         }
@@ -3396,7 +3511,7 @@ export class GameEngine {
 
         // Player Move Direction
         const moveDir = new THREE.Vector3();
-        if (!this.player.isFalling) {
+        if (!this.player.isFalling && !(this.player.status?.paralysis?.t > 0)) {   // 麻痺の間は、動けない
             if (this.keys.forward) moveDir.z -= 1;
             if (this.keys.backward) moveDir.z += 1;
             if (this.keys.left) moveDir.x -= 1;
@@ -3421,6 +3536,8 @@ export class GameEngine {
                     }
                 }
             }
+
+            if (this.player.status?.slow?.t > 0) speedMod *= this.player.status.slow.scale ?? 0.55;   // 鈍足
 
             // Rotate move direction by player's view angle
             const sin = Math.sin(this.player.angle);
@@ -3622,7 +3739,7 @@ export class GameEngine {
             if (p.isPlayer) {
                 // Check player fireball hit monster
                 for (const m of this.monsters) {
-                    if (!m.active || p.hitMonsters.has(m)) continue;
+                    if (!m.active || m.untouchable || p.hitMonsters.has(m)) continue;
                     const distM = Math.hypot(m.x - p.x, m.z - p.z);
                     // 起伏のあるマップでは、高さも合っているときだけ当たる（敵の胴の高さ ±1.6）
                     if ((this.heightMap || m.flying) && Math.abs(p.y - ((m.floorY ?? 0) + (m.baseY ?? 0) + 0.9)) > 1.6) continue;
@@ -3635,7 +3752,7 @@ export class GameEngine {
                 const distP = Math.hypot(this.player.x - p.x, this.player.z - p.z);
                 const pFloor = this.player.floorY ?? 0;
                 if (distP < this.player.radius + p.radius && p.y >= pFloor - 0.3 && p.y <= pFloor + 2.4) {   // 高さが合っているときだけ当たる
-                    this.playerTakeDamage(p.damage, new THREE.Vector3(p.dirX, 0, p.dirZ));
+                    this.playerTakeDamage(p.damage, new THREE.Vector3(p.dirX, 0, p.dirZ), 1.0, p.sourceMonster ?? null);
                     if (p.sourceMonster) {
                         this.notifyEnemyEngaged(p.sourceMonster);
                     }
@@ -3674,6 +3791,7 @@ export class GameEngine {
         this.strikeEffects.update(dt);
 
         // Update Monsters and Ys-style "Bump Combat"
+        this.updatePlayerStatus(dt);
         this.updateCombat(dt);
 
         // 村人（歩き回る）
@@ -3846,7 +3964,7 @@ export class GameEngine {
         m.scale = [npc.sprite.scale.x, npc.sprite.scale.y, 1];
         m.floorY = this.getFloorHeight(npc.x, npc.z);
         m.sprite.position.set(npc.x, m.floorY, npc.z);
-        m.terrainBlock = (mm, x, z) => this.monsterTerrainBlocked(mm, x, z);
+        this.attachMonsterHooks(m);
         m.state = 'chase'; m.lostTimer = 0; m.appearAlpha = 1; m.spriteMat.opacity = 1;
         m.provokedTimer = 8;
         m.stun(0.45);   // 正体を現す一瞬の間
@@ -4057,7 +4175,7 @@ export class GameEngine {
 
             // 倒れている最中の敵は攻撃も当たり判定もしない。飛んでいる敵・高低差のある相手とは、高さが合っているときだけ、ぶつかる
             const vDiff = ((m.floorY ?? 0) + (m.baseY ?? 0) + 0.9) - ((this.player.floorY ?? 0) + 0.9);
-            if (m.active && dist < bumpThreshold && Math.abs(vDiff) < 1.7 && this.player.attackCooldown <= 0) {
+            if (m.active && !m.untouchable && dist < bumpThreshold && Math.abs(vDiff) < 1.7 && this.player.attackCooldown <= 0) {
                 this.resolveYsBump(m, dx, dz, dist);
             }
 
@@ -4065,6 +4183,7 @@ export class GameEngine {
                 // 死亡演出: 効果音・粒子を出しつつ、倒れて消えるアニメーションが終わってから削除する
                 if (!m.deathStarted) {
                     m.deathStarted = true;
+                    if (m.stolenGold > 0) { this.player.gold += m.stolenGold; this.addPopup(`ゴールドを取り返した！ +${m.stolenGold}G`, '#facc15'); m.stolenGold = 0; }
                     this.sound.playEnemyDeath();
                     this.particles.spawnBurst(m.x, 1.0, m.z, m.deathColor, 14, 3.5);
                 }
@@ -4142,19 +4261,19 @@ export class GameEngine {
 
         if (isHalfOffset) {
             // CRITICAL HALF-OFFSET HIT: Player takes 0 damage, monster takes full + bonus damage!
-            const damage = Math.floor(this.player.attackPower * 1.5 * damageScale + Math.random() * 5);
+            const damage = Math.floor(this.playerAttackPower() * 1.5 * damageScale + Math.random() * 5);
             this.sound.playAttack(true);
             const isDead = monster.takeDamage(damage, { x: nx, z: nz }, knockScale);
             applyWeaponEffects(isDead, true);
             this.playerHitFeedback({ crit: true, killed: isDead, heavy: heavySound });
             this.particles.spawnBurst(monster.x, 1.2, monster.z, 0xfbbf24, 12, 4.0);
-            this.addPopup(`半ずらし会心! -${damage}`, '#fbbf24', monster.x, monster.z);
+            this.addPopup(monster.lastBlocked ? 'ガード!' : `半ずらし会心! -${damage}`, monster.lastBlocked ? '#94a3b8' : '#fbbf24', monster.x, monster.z);
             this.notifyEnemyEngaged(monster);
 
             if (isDead) this.gainExp(monster.exp);
         } else if (isCharging) {
             // Normal charge: Mutual damage (player takes half, enemy takes standard)
-            const pDmg = Math.floor(this.player.attackPower * damageScale + Math.random() * randomBonus);
+            const pDmg = Math.floor(this.playerAttackPower() * damageScale + Math.random() * randomBonus);
             if (monster.isDashing) monster.dashHit = true;   // 突進が当たった（よけられていない）
             const mDmg = Math.floor(monster.attackPower * 0.5 * (monster.isDashing ? 1.5 : 1) * (monster.hitScale ?? 1));
 
@@ -4162,8 +4281,8 @@ export class GameEngine {
             const isDead = monster.takeDamage(pDmg, { x: nx, z: nz }, knockScale);
             applyWeaponEffects(isDead, false);
             this.playerHitFeedback({ crit: false, killed: isDead, heavy: heavySound });
-            this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz));
-            this.addPopup(`ボコッ! -${pDmg}`, '#ffffff', monster.x, monster.z);
+            this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz), 1.0, monster);
+            this.addPopup(monster.lastBlocked ? 'ガード!' : `ボコッ! -${pDmg}`, monster.lastBlocked ? '#94a3b8' : '#ffffff', monster.x, monster.z);
             this.notifyEnemyEngaged(monster);
 
             if (isDead) this.gainExp(monster.exp);
@@ -4171,13 +4290,14 @@ export class GameEngine {
             // Enemy hits player (player is standing still, stopped, or backing away)
             if (monster.isDashing) monster.dashHit = true;   // 突進が当たった（よけられていない）
             const mDmg = Math.max(1, Math.floor(monster.attackPower * (monster.isDashing ? 1.5 : 1) * (monster.hitScale ?? 1)));   // 突進中は、威力が 1.5 倍。猫系の連続攻撃は、1 回が小さい
-            this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz), monster.isDashing ? 2.0 : 1.0);   // 突進は、大きく吹き飛ばす
+            this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz), monster.isDashing ? 2.0 : 1.0, monster);   // 突進は、大きく吹き飛ばす
             this.notifyEnemyEngaged(monster);
         }
     }
 
-    playerTakeDamage(amount, knockDir, knockScale = 1.0) {
+    playerTakeDamage(amount, knockDir, knockScale = 1.0, source = null) {
         if (this.player.isInvincible) return;
+        if (source) this.onPlayerHitBy(source, amount);   // 状態異常・生命力吸収
 
         this.player.hp = Math.max(0, this.player.hp - amount);
         this.player.isInvincible = true;
@@ -4481,6 +4601,8 @@ export class GameEngine {
         put('levelText', 'text', `Lv.${this.player.level}`);
         put('expText', 'text', `EXP: ${this.player.exp}`);
         put('goldText', 'text', `${this.player.gold || 0} G`);
+        const names = { poison: '毒', burn: '火傷', slow: '鈍足', paralysis: '麻痺', silence: '沈黙', curse: '呪い' };
+        put('playerStatus', 'text', Object.keys(this.player.status ?? {}).map(k => `${names[k] ?? k}${Math.ceil(this.player.status[k].t)}`).join(' '));
         put('monsterCount', 'text', `敵残数: ${this.monsters.filter(m => m.active).length}`);
 
         // Update active enemy status cards stacked above player HP/MP (Ys-style Target Info)

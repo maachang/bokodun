@@ -7,6 +7,8 @@
 //     charge        { windup, dash, speed, stun } 突進（猪突猛進）の溜め時間・走る距離・速さ倍率・壁にぶつかったときのスタン
 //     hop           { range, height, rest } 兎: 低く速いリズムで跳ぶときの 1 回の距離・高さ・着地後の休み
 //     raptor        { high, wait, glideSpeed, glideTime, recover, hitRecover, vulnerable } 猛禽: 舞い上がって、滑空で突っ込む。よけられると隙ができる
+//     inflict       [{ type, chance, t, dps / scale }] プレイヤーへの状態異常（poison・burn・slow・paralysis・silence・curse）
+//     guard / summon / blink / burrow / slam  盾持ち・召喚・瞬間移動・潜る・範囲攻撃（上の各コメント参照）
 //     rush          { flurry, flurryScale, cool } クマ: 攻撃を始めると、近くで連打（1 回は小さく、回数が多い）
 //     cat           { range, height, rest, flurry, flurryScale, away, cool } 猫系: 隠密・低く長く跳ぶ・近くで連続攻撃・ヒットアンドアウェイ
 //     relentless    { speed, joinRadius } 一定の速さで追跡をやめない・仲間が合流する（狼）
@@ -99,6 +101,41 @@ export function deriveProfile(def = {}) {
     // クマ（rush）: 縄張りの中を、うろうろしているが、攻撃を始めると、近くで、**連打（ラッシュ）**する。1 回は小さいが、攻撃回数が多く、
     //   まともに近づいて戦うと、体力がどんどん削られる。離れて、魔法・弓で倒すのが、有利。連打のあと、少し間を置いて、また連打する
     if (def.rush || (/bear|grizzly/.test(id) && !p.flying && def.rush !== false)) p.rush = { flurry: 2.6, flurryScale: 0.5, cool: 1.2, ...(def.rush || {}) };
+
+    // 状態異常（プレイヤーへ）: 攻撃が当たったとき、能力に応じて、一定の確率で、プレイヤーを状態異常にする
+    //   poison=毒（継続ダメージ）/ burn=火傷（継続ダメージ）/ slow=鈍足 / paralysis=麻痺（少しの間、動けない）/ silence=沈黙（魔法が使えない）/ curse=呪い（攻撃力が下がる）
+    p.inflict = [];
+    if (ab.has('venom')) p.inflict.push({ type: 'poison', chance: 0.55, t: 8, dps: 4 });
+    else if (ab.has('poison')) p.inflict.push({ type: 'poison', chance: 0.45, t: 6, dps: 3 });
+    if (ab.has('burn')) p.inflict.push({ type: 'burn', chance: 0.4, t: 4, dps: 4 });
+    if (ab.has('paralysis')) p.inflict.push({ type: 'paralysis', chance: 0.3, t: 1.0 });
+    if (ab.has('silence')) p.inflict.push({ type: 'silence', chance: 0.4, t: 5 });
+    if (ab.has('slow')) p.inflict.push({ type: 'slow', chance: 0.5, t: 4, scale: 0.55 });
+    if (ab.has('curse')) p.inflict.push({ type: 'curse', chance: 0.4, t: 8, scale: 0.7 });
+    if (def.inflict) p.inflict = def.inflict;
+    p.lifesteal = ab.has('lifesteal') ? 0.35 : 0;   // 与えたダメージの 35% を、自分が回復する
+
+    // 盾持ち（guard）: 盾・甲羅・硬い体で、正面からの近接・矢を防ぐ（ダメージ 1/4）。向きを変えるのが遅いので、横や背後へ回り込めば、効く。
+    //   魔法は、防げない（魔法で倒すか、回り込んで攻撃する）。arc: 防ぐ範囲の角度、reduction: 防いだときに残るダメージの割合、turn: 向きを変える速さ（ラジアン/秒）
+    if (def.guard || (/guard_heavy|guard_elite|golem|turtle|pillbug|beetle|ant_knight/.test(id) && def.guard !== false)) {
+        p.guard = { arc: 120, reduction: 0.25, turn: 1.6, ...(def.guard || {}) };
+    }
+    // 召喚（summon）: 戦っている間、一定の間隔で、仲間（手下）を呼ぶ。数が増えると、戦いが面倒になるので、呼んでいる本体を、先に倒したい
+    if (def.summon || (ab.has('summon') && def.summon !== false)) {
+        const fam = def.family, byId = [[/slime/, 'slime'], [/ant_/, 'ant_pawn'], [/goblin|hobgoblin/, 'goblin_scout'], [/bandit/, 'bandit_grunt'], [/lich|vampire|no_life|no_life_king/, 'skeleton'], [/demon|devil/, 'lesser_demon']];
+        const minion = (byId.find(([re]) => re.test(id)) ?? [null, fam === 'undead' ? 'skeleton' : 'goblin_scout'])[1];
+        p.summon = { type: minion, every: 11, max: 3, ...(def.summon || {}) };
+    }
+    // 瞬間移動（teleport）: 一定の間隔で、少し光って（予兆）、プレイヤーの背後へ移動する
+    if (def.blink || (ab.has('teleport') && def.blink !== false)) p.blink = { every: 7, windup: 0.7, behind: 3.5, ...(def.blink || {}) };
+    // 潜る（burrow）: 地中を、姿を消して近づき（その間は、攻撃も受けない）、近くで飛び出して、しばらく戦い、また潜る
+    if (def.burrow || (ab.has('burrow') && def.burrow !== false)) p.burrow = { surface: 2.8, stay: 3.0, cool: 3.0, speed: 1.4, ...(def.burrow || {}) };
+    // 待ち伏せ（ambush）: 姿を隠して動かず、近づかれた瞬間に、不意打ちで襲いかかる（最初の 1.5 秒は、威力 1.5 倍）。ミミック・クモは、専用の動きがある
+    if (ab.has('ambush') && !p.burrow && !/mimic|tarantula|gargoyle/.test(id) && def.ambush !== false) p.ambushHide = { reveal: 4.5 };
+    // 範囲攻撃（aoe）: プレイヤーの足元に、赤い輪（予兆）を出し、少しあとに、その範囲を攻撃する。輪の外へ出れば、よけられる
+    if (def.slam || (ab.has('aoe') && def.slam !== false)) p.slam = { radius: 3.4, windup: 1.1, cool: 7, mult: 1.3, range: 12, ...(def.slam || {}) };
+    // 盗む（stealItem）: 攻撃が当たると、お金の一部を盗んで、逃げる（倒すと、取り返せる）
+    p.steal = ab.has('stealItem');
 
     // 猛禽（鷹・鷲・グリフォンなどの、鳥の頂点）: プレイヤーを獲物と認識すると、まず高く舞い上がり、そこから滑空して、速い速さで突っ込んでくる。
     //   滑空の向きは、飛び出す瞬間に決まる（途中で曲がらない）ので、よけられる。よけられると、低い所で隙ができ（被ダメージが増え）、近接で反撃できる。
