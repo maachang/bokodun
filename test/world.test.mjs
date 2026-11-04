@@ -338,3 +338,19 @@ for (const id of ['village', 'town', 'city', 'city_noble', 'city_slum', 'castle_
         }
     });
 }
+
+test('どや街の襲撃者: ふつうの住民と同じ見た目・セリフで、話しかけると、襲いかかる（ambush）。敵の定義がある', () => {
+    const npcs = readJson('public/data/npcs.json');
+    const enemies = readJson('public/data/enemies.json');
+    const m = readJson('public/data/maps/city_slum.json');
+    const amb = Object.entries(npcs).filter(([, d]) => d.ambush);
+    assert.ok(amb.length >= 3, '襲撃者の種類');
+    for (const [id, d] of amb) {
+        assert.ok(enemies[d.ambush.enemy], `${id}: 敵 ${d.ambush.enemy}`);
+        assert.ok(d.ambush.line && d.lines.length >= 1, `${id}: セリフ`);
+        // 見た目は、ふつうの住民（同じ絵）と同じ
+        assert.ok(Object.entries(npcs).some(([k, o]) => !o.ambush && o.texture === d.texture && o.height === d.height), `${id}: ふつうの住民と同じ絵・大きさ`);
+    }
+    const placed = m.npcs.filter(n => npcs[n.id]?.ambush);
+    assert.ok(placed.length >= 3, `どや街の襲撃者: ${placed.length}`);
+});

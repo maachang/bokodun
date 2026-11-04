@@ -137,6 +137,26 @@
       "id": "street_woman",
       "x": 14,
       "z": 3
+    },
+    {
+      "id": "slum_mob_man",
+      "x": 3,
+      "z": 18
+    },
+    {
+      "id": "slum_mob_woman",
+      "x": 21,
+      "z": 2
+    },
+    {
+      "id": "slum_mob_middle",
+      "x": 25,
+      "z": 8
+    },
+    {
+      "id": "slum_mob_man",
+      "x": 14,
+      "z": 15
     }
   ],
   "links": {

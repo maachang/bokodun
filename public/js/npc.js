@@ -14,6 +14,7 @@ export class Npc {
         this.type = npcId;
         this.name = def.name;
         this.lines = def.lines || [];
+        this.ambush = def.ambush || null;   // 襲撃者: 話しかけると正体を現して襲いかかる（{ enemy: 敵の ID, line: そのときのセリフ }）。見た目も、ふだんのセリフも、ふつうの住民と同じ
         this.radius = def.radius ?? 0.45;
         this.speed = def.speed ?? 0.8;
         this.wanderRadius = def.wanderRadius ?? 0;

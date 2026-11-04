@@ -3833,6 +3833,34 @@ export class GameEngine {
         this.renderShopMenu();
     }
 
+    // 襲撃者（ambush の住民）が、正体を現す: 住民を消し、同じ姿・同じ位置に、敵（ambush.enemy）を出して、すぐ襲いかからせる。
+    //   見た目（絵・大きさ）は、住民のまま。倒すまで、ふつうの住民の姿で襲ってくる
+    revealAmbusher(npc) {
+        const type = npc.ambush.enemy;
+        const def = this.enemyDefinitions?.[type];
+        if (!def) return;
+        const m = new Monster(type, npc.x, npc.z, this.textures, { ...def, id: type });
+        m.spriteMat.map = npc.sprite.material.map;                 // 住民の絵のまま
+        m.spriteMat.needsUpdate = true;
+        m.sprite.scale.copy(npc.sprite.scale);
+        m.baseScaleX = npc.sprite.scale.x; m.baseScaleY = npc.sprite.scale.y;
+        m.scale = [npc.sprite.scale.x, npc.sprite.scale.y, 1];
+        m.floorY = this.getFloorHeight(npc.x, npc.z);
+        m.sprite.position.set(npc.x, m.floorY, npc.z);
+        m.terrainBlock = (mm, x, z) => this.monsterTerrainBlocked(mm, x, z);
+        m.state = 'chase'; m.lostTimer = 0; m.appearAlpha = 1; m.spriteMat.opacity = 1;
+        m.provokedTimer = 8;
+        m.stun(0.45);   // 正体を現す一瞬の間
+        this.monsters.push(m);
+        this.scene.add(m.sprite);
+        this.scene.remove(npc.sprite);
+        const i = this.npcs.indexOf(npc);
+        if (i >= 0) this.npcs.splice(i, 1);
+        this.addPopup(npc.ambush.line, '#ef4444', npc.x, npc.z);
+        this.sound.playHurt?.();
+        this.particles.spawnBurst(npc.x, npc.floorY ?? 1.2, npc.z, 0xef4444, 10, 3.0);
+    }
+
     // 近くの村人のセリフ（いなければ null）
     nearbyNpcSpeech() {
         let found = null;
@@ -4249,6 +4277,13 @@ export class GameEngine {
         for (const n of this.npcs ?? []) {
             if (n.shopId && Math.hypot(this.player.x - n.x, this.player.z - n.z) <= (n.speechRadius ?? 3)) {
                 this.openShopMenu(n.shopId);
+                return true;
+            }
+        }
+        // 0b. 話しかけた住民が、襲撃者（ambush）だった: 正体を現して、襲いかかる
+        for (const n of this.npcs ?? []) {
+            if (n.ambush && Math.hypot(this.player.x - n.x, this.player.z - n.z) <= 3.0) {
+                this.revealAmbusher(n);
                 return true;
             }
         }

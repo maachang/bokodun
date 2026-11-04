@@ -1160,5 +1160,56 @@
       "いらっしゃいませ。取引のご相談ですか？",
       "ギルド長は、奥の部屋におります。"
     ]
+  },
+  "slum_mob_man": {
+    "name": "街の男",
+    "texture": "/images/npcs/town_man.png",
+    "height": 2.3,
+    "aspect": 0.457,
+    "radius": 0.41,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "今日も、冷えやがる。",
+      "ここらで見ねえ顔だな。"
+    ],
+    "ambush": {
+      "enemy": "bandit_grunt",
+      "line": "「……いい身なりだな。置いていきな！」"
+    }
+  },
+  "slum_mob_woman": {
+    "name": "街の女",
+    "texture": "/images/npcs/town_woman.png",
+    "height": 2.2,
+    "aspect": 0.334,
+    "radius": 0.52,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "あら、旅の人？ 気をつけなよ。",
+      "この辺は、夜は物騒でね。"
+    ],
+    "ambush": {
+      "enemy": "thief",
+      "line": "「ごめんなさいねぇ……これも、仕事なのよ」"
+    }
+  },
+  "slum_mob_middle": {
+    "name": "街の中年男",
+    "texture": "/images/npcs/town_middle_man.png",
+    "height": 2.3,
+    "aspect": 0.37,
+    "radius": 0.42,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "……何か用かい。",
+      "この街は、見た目ほど甘くないぜ。"
+    ],
+    "ambush": {
+      "enemy": "mohawk_thug",
+      "line": "「話しかけたな？ 運が悪かったな、兄ちゃん！」"
+    }
   }
 }
