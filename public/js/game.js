@@ -2049,6 +2049,26 @@ export class GameEngine {
                         }
                         group.position.set(wx, 0, wz);
                         this.addStatic(group);
+                        // 家具の上に、花などの画像（plants: 花壇の花）を植える。マスの位置から決まる配置（毎回同じ）
+                        if (objDef.plants) {
+                            const pl = objDef.plants;
+                            const tex = this.textures[pl.texture] || this.textures.grassTuft;
+                            const n = pl.count || 4;
+                            for (let i = 0; i < n; i++) {
+                                const h1 = Math.sin((r * 12.9898 + c * 78.233 + i * 37.719) * 43758.5453) * 43758.5453;
+                                const h2 = Math.sin((r * 39.346 + c * 11.135 + i * 83.155) * 24634.6345) * 24634.6345;
+                                const fx = h1 - Math.floor(h1), fz = h2 - Math.floor(h2);
+                                // 2×2 のマス目の中で、少しずらす（重ならずに、花壇いっぱいに並ぶ）
+                                const gx = (i % 2 ? 1 : -1) * (pl.spread / 4) + (fx - 0.5) * 0.25;
+                                const gz = (i < 2 ? -1 : 1) * (pl.spread / 4) + (fz - 0.5) * 0.25;
+                                const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex }));
+                                sp.center.set(0.5, 0.0);
+                                const k = 0.9 + fx * 0.25;
+                                sp.scale.set(pl.scale[0] * k, pl.scale[1] * k, 1);
+                                sp.position.set(wx + gx, (pl.y ?? 0.3), wz + gz);
+                                this.scene.add(sp);
+                            }
+                        }
                         const furnitureFloor = objDef.floorTexture ?? mapData.decorFloor;   // 屋外の街では、飾りの下も石畳（map の decorFloor）
                         if (furnitureFloor) this.addFloorTile(wx, wz, tileSize, furnitureFloor);
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);

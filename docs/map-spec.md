@@ -748,3 +748,14 @@
 - `summon`（仲間を呼ぶ）・`aoe`（範囲攻撃）・`lifesteal`・`venom`/`poison`/`paralysis`/`curse`/`silence`/`slow`（プレイヤーへの状態異常）・`barrier`・`reflect`・`teleport`・`burrow`/`ambush`（潜る・待ち伏せ）・`stealItem`・`pull`・`revive`・`split`・`sticky`。
 - 水中の敵（クラーゲン・水龍）が、水の中を動くこと。
 - 敵が、急流に流されること。
+
+## 28. 村・町・街の草と花
+
+実装済み:
+- **村**: 草（`grass_tuft`）→ 草原の草（`meadow_grass`）、背の高い草（`tall_grass`）→ 道に生える雑草（`road_weed`）、野の花（`wild_flowers`）→ 道端の花々（`roadside_flowers`）。
+- **スラム街**（`city_slum`）: 背の高い草 → 道に生える雑草（`road_weed`）。
+- **花壇**（`flower_bed`・`flower_bed_blue`。村・町・街・貴族街・神殿の回廊に、計 38 か所）: 立体の小さな花（箱）をやめ、**レンガの縁と土の上に、花の画像を 4 株植える**形に変えた（`flower_bed` は紫の花 `flowerbed_flower`、`flower_bed_blue` は薄紫の花 `lavender_flower`）。家具の定義に、`plants`（画像の花）を足せる仕組みを追加した。
+- 町・街（`town`・`city`・`city_noble`）には、もともと、草や花の飾り（`plant`）はなく、花壇だけ。
+
+未実装:
+- 町・街の広場や道ばたに、草・花を新しく足すこと。
