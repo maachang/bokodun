@@ -155,48 +155,16 @@ test('ゲーム: 起伏のあるマップで、村人の足元は、地面の高
     g.player = { x: 90, z: 90, radius: 0.4, angle: 0 };
     g.mapData = { tileSize: 4 };
     g.heightStep = 0.5;
-    g.objectDefinitions = {};
     g.heightMap = [[0, 0, 0], [0, 2, 3], [0, 1, 0]];
-    g.computeHeightCorners({ layout: ['000', '000', '000'], legend: {} }, 3, 3);
-    const spots = [[1, 1], [1, 2], [2, 1], [0, 0]];
+    // 高さ 2 段（1.0）、3 段（1.5）、1 段（0.5）、0 段の位置に立つ村人
+    const spots = [[1, 1, 1.0], [1, 2, 1.5], [2, 1, 0.5], [0, 0, 0]];
     g.npcs = spots.map(([r, c]) => new Npc('t', c * 4 + 2, r * 4 + 2, { isTexture: true }, def));
     for (let i = 0; i < 5; i++) g.updateNpcs(0.05);
-    spots.forEach(([r, c], i) => {
-        const n = g.npcs[i];
-        const ground = g.getFloorHeight(n.x, n.z);
-        assert.ok(Math.abs(n.sprite.position.y - ground) < 1e-6, `(${r},${c}) 足元 ${n.sprite.position.y}（地面 ${ground}）`);
-        // 坂の中の高さなので、マスの高さ（段 × 0.5）の前後 1 段分に収まる
-        assert.ok(Math.abs(ground - g.heightMap[r][c] * 0.5) <= 0.5 + 1e-6, `(${r},${c}) 地面 ${ground}`);
-    });
+    spots.forEach(([r, c, y], i) => assert.ok(Math.abs(g.npcs[i].sprite.position.y - y) < 1e-6, `(${r},${c}) 足元 ${g.npcs[i].sprite.position.y}（地面 ${y}）`));
     // 王城の高台の段（raisedFloors）の上でも、1 回だけ
-    g.heightMap = null; g.heightCorners = null;
+    g.heightMap = null;
     g.raisedFloors = [{ minX: 0, maxX: 4, minZ: 0, maxZ: 4, height: 0.9 }];
     g.npcs = [new Npc('t', 2, 2, { isTexture: true }, def)];
     for (let i = 0; i < 3; i++) g.updateNpcs(0.05);
     assert.ok(Math.abs(g.npcs[0].sprite.position.y - 0.9) < 1e-6, `高台の上 ${g.npcs[0].sprite.position.y}`);
-});
-
-test('ゲーム: 起伏の地面は、なめらかな坂（段差 1 の境で、地面の高さが、飛ばない）。扉・橋などは、平らなまま', async () => {
-    const { GameEngine } = await loadGame();
-    const g = Object.create(GameEngine.prototype);
-    g.raisedFloors = []; g.mapData = { tileSize: 4 }; g.heightStep = 0.5;
-    g.objectDefinitions = { d: { type: 'door' } };
-    // 3 段までの、なだらかな斜面（段差 1 まで）。中ほどの 1 マスは、扉（平ら）
-    g.heightMap = [[0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3], [0, 1, 2, 3]];
-    g.computeHeightCorners({ layout: ['0000', '0d00', '0000', '0000'], legend: { d: 'd' } }, 4, 4);
-    // 段差 1 の境（マスの境）をまたいでも、地面の高さが連続している（階段状の飛びがない）
-    for (let z = 2; z < 15; z += 3) for (let c = 1; c < 4; c++) {
-        const b = c * 4;
-        assert.ok(Math.abs(g.getFloorHeight(b - 0.001, z) - g.getFloorHeight(b + 0.001, z)) < 0.02, `境 x=${b} z=${z}: ${g.getFloorHeight(b - 0.001, z)} / ${g.getFloorHeight(b + 0.001, z)}`);
-    }
-    // 坂の途中は、段（0.5 ごと）の間の高さ
-    const mid = g.getFloorHeight(7, 14);
-    assert.ok(mid > 0.5 && mid < 1.0, `坂の途中の高さ ${mid}`);
-    // 扉のマス（r=1,c=1, 高さ 1 段）は、平ら（四隅が、そのマスの高さ 0.5）
-    const k = g.heightCorners[1][1];
-    assert.ok(k.every(v => Math.abs(v - 0.5) < 1e-9), `扉のマスの角: ${k}`);
-    // 崖（段差 2 以上）の境は、高さが飛んでよい
-    g.heightMap = [[0, 3], [0, 3]];
-    g.computeHeightCorners({ layout: ['00', '00'], legend: {} }, 2, 2);
-    assert.ok(Math.abs(g.getFloorHeight(3.999, 2) - g.getFloorHeight(4.001, 2)) > 1, '崖');
 });

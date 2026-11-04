@@ -565,110 +565,47 @@ export class GameEngine {
         return this.heightLevelAtTile(Math.floor(z / ts), Math.floor(x / ts));
     }
 
-    // 起伏のある地面の、各マスの 4 つの角の高さ（ワールド座標の高さ）を決める。順番は [北西, 北東, 南西, 南東]
-    //   階段状ではなく、なめらかな坂にする: 角の高さは、その角のまわりの 4 マスのうち、段差 1 までで辺がつながっているマスの、平均。
-    //   段差 1 の隣どうしは、同じ角の高さになる（すきまなくつながる）。段差 2 以上は崖（別々の高さのまま）。
-    //   扉・看板・噴水・橋・水などは、平らなまま（角の高さ＝そのマスの高さ）。まわりのマスは、それに合わせて下がる
-    computeHeightCorners(mapData, rows, cols) {
-        const step = this.heightStep, H = this.heightMap;
-        const flatTypes = new Set(['door', 'signpost', 'fountain', 'portal', 'liquid_tile', 'gateway']);
-        const flat = (r, c) => {
-            const d = this.objectDefinitions?.[mapData.legend?.[mapData.layout[r]?.[c]]];
-            return !!d && (flatTypes.has(d.type) || d.texture === 'woodBridge');
-        };
-        const inMap = (r, c) => r >= 0 && c >= 0 && r < rows && c < cols;
-        const lv = (r, c) => H[r]?.[c] ?? 0;
-        this.heightCorners = Array.from({ length: rows }, () => new Array(cols));
-        for (let r = 0; r < rows; r++) {
-            for (let c = 0; c < cols; c++) {
-                const h = lv(r, c), arr = [];
-                for (let dr = 0; dr < 2; dr++) {
-                    for (let dc = 0; dc < 2; dc++) {
-                        if (flat(r, c)) { arr.push(h * step); continue; }
-                        const cells = [[r + dr - 1, c + dc - 1], [r + dr - 1, c + dc], [r + dr, c + dc - 1], [r + dr, c + dc]].filter(([a, b]) => inMap(a, b));
-                        const comp = [[r, c]];
-                        for (let i = 0; i < comp.length; i++) {
-                            for (const [a, b] of cells) {
-                                if (comp.some(([x, y]) => x === a && y === b)) continue;
-                                if (Math.abs(a - comp[i][0]) + Math.abs(b - comp[i][1]) === 1 && Math.abs(lv(a, b) - lv(comp[i][0], comp[i][1])) <= 1) comp.push([a, b]);
-                            }
-                        }
-                        const flats = comp.filter(([a, b]) => flat(a, b));
-                        const v = flats.length ? Math.min(...flats.map(([a, b]) => lv(a, b))) : comp.reduce((t, [a, b]) => t + lv(a, b), 0) / comp.length;
-                        arr.push(v * step);
-                    }
-                }
-                this.heightCorners[r][c] = arr;
-            }
-        }
-    }
-
-    // そのマスの上面が、高さ 0 より高い角を持つか（持つなら、平らな地面ではなく、起伏の地面で描く）
-    tileRaised(r, c) {
-        const k = this.heightCorners?.[r]?.[c];
-        return !!k && (k[0] > 1e-6 || k[1] > 1e-6 || k[2] > 1e-6 || k[3] > 1e-6);
-    }
-
-    // 飾りを置く高さ: 壁・建物（block）は、土台が浮かないよう、4 つの角の最も低い高さ。そのほかは、マスの中心の高さ
-    tileLift(r, c, objDef) {
-        const k = this.heightCorners?.[r]?.[c];
-        if (!k) return 0;
-        if (objDef?.type === 'block') return Math.min(...k);
-        return (k[0] + k[1] + k[2] + k[3]) / 4;
-    }
-
-    // 起伏のある地面を作る: 高くなっているマスの、なめらかな上面（4 つの角の高さで、斜めにする）と、崖（段差 2 以上）の面
+    // 起伏のある地面: 高くなっているマスの上面と、低い隣との境の側面を作る。
+    //   段差 1 は、地面と同じ模様の側面（歩いて上れる）。段差 2 以上は、崖（岩肌。mapData.cliffTexture、省略は cliffGray）
     buildHeightTerrain(mapData, rows, cols, tileSize, baseFloorMat) {
         const step = this.heightStep;
-        const cliffMat = new THREE.MeshLambertMaterial({ map: this.textures[mapData.cliffTexture] || this.textures.cliffGray, side: THREE.DoubleSide });
+        const cliffMat = new THREE.MeshLambertMaterial({ map: this.textures[mapData.cliffTexture] || this.textures.cliffGray });
         // 高さごとに、地面の明るさを変える（低い所は少し暗く、高い所は明るく）。起伏が、見て分かるようにする
         let maxLv = 1;
         for (const row of this.heightMap) for (const v of row) if (v > maxLv) maxLv = v;
         const tintOf = (lv) => 0.82 + 0.18 * Math.min(1, lv / maxLv);
-        const topMats = new Map();
-        const matFor = (lv) => {
-            if (!topMats.has(lv)) {
+        const topMats = new Map(), sideMats = new Map();
+        const matFor = (cache, lv, k) => {
+            if (!cache.has(lv)) {
                 const m = baseFloorMat.clone();
-                m.color.setScalar(tintOf(lv));
-                topMats.set(lv, m);
+                m.color.setScalar(tintOf(lv) * k);
+                cache.set(lv, m);
             }
-            return topMats.get(lv);
+            return cache.get(lv);
         };
         baseFloorMat.color.setScalar(tintOf(0));   // 高さ 0 の平らな地面も、同じ基準にそろえる
-        const quad = (p, mat, uv) => {   // p: 4 つの頂点 [a, b, c, d]（a-b-c-d の順に、ぐるっと一周）
-            const g = new THREE.BufferGeometry();
-            g.setAttribute('position', new THREE.Float32BufferAttribute(p.flat(), 3));
-            g.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
-            g.setIndex([0, 1, 2, 0, 2, 3]);
-            g.computeVertexNormals();
-            this.addStatic(new THREE.Mesh(g, mat));
-        };
+        const topGeo = new THREE.PlaneGeometry(tileSize, tileSize);
+        const dirs = [[0, 1, 0], [0, -1, Math.PI], [1, 0, Math.PI / 2], [-1, 0, -Math.PI / 2]];   // [dx(列), dz(行), 向き]
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
-                const k = this.heightCorners[r][c];
-                const x0 = c * tileSize, x1 = x0 + tileSize, z0 = r * tileSize, z1 = z0 + tileSize;
-                if (this.tileRaised(r, c)) {
-                    const lvl = Math.round(((k[0] + k[1] + k[2] + k[3]) / 4) / step);
-                    // 北西 → 南西 → 南東 → 北東（上から見て反時計回り＝上向き）
-                    quad([[x0, k[0], z0], [x0, k[2], z1], [x1, k[3], z1], [x1, k[1], z0]], matFor(lvl), [0, 0, 0, 1, 1, 1, 1, 0]);
-                }
-                // 崖（このマスが、隣より 2 段以上高い辺）: 上の縁（このマスの角）から、下の縁（隣の角）まで
                 const h = this.heightLevelAtTile(r, c);
-                const edges = [
-                    [-1, 0, [0, 1], [2, 3], [x0, z0, x1, z0]],   // 北: このマスの 北西・北東 / 北の隣の 南西・南東
-                    [1, 0, [2, 3], [0, 1], [x0, z1, x1, z1]],    // 南
-                    [0, -1, [0, 2], [1, 3], [x0, z0, x0, z1]],   // 西
-                    [0, 1, [1, 3], [0, 2], [x1, z0, x1, z1]],    // 東
-                ];
-                for (const [dr, dc, mine, theirs, [ax, az, bx, bz]] of edges) {
-                    const nr = r + dr, nc = c + dc;
-                    if (nr < 0 || nc < 0 || nr >= rows || nc >= cols) continue;
-                    if (h - this.heightLevelAtTile(nr, nc) < 2) continue;
-                    const nk = this.heightCorners[nr][nc];
-                    const ta = k[mine[0]], tb = k[mine[1]], ba = nk[theirs[0]], bb = nk[theirs[1]];
-                    if (ta - ba < 0.01 && tb - bb < 0.01) continue;
-                    const len = Math.hypot(bx - ax, bz - az), hh = Math.max(ta - ba, tb - bb);
-                    quad([[ax, ta, az], [ax, ba, az], [bx, bb, bz], [bx, tb, bz]], cliffMat, [0, 0, 0, hh / tileSize, len / tileSize, hh / tileSize, len / tileSize, 0]);
+                if (h <= 0) continue;
+                const wx = c * tileSize + tileSize / 2;
+                const wz = r * tileSize + tileSize / 2;
+                const top = new THREE.Mesh(topGeo, matFor(topMats, h, 1.0));
+                top.rotation.x = -Math.PI / 2;
+                top.position.set(wx, h * step, wz);
+                this.addStatic(top);
+                for (const [dx, dz, rotY] of dirs) {
+                    const nh = this.heightLevelAtTile(r + dz, c + dx);
+                    const inMap = r + dz >= 0 && r + dz < rows && c + dx >= 0 && c + dx < cols;
+                    if (!inMap || nh >= h) continue;
+                    const drop = h - nh;
+                    const faceH = drop * step;
+                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMat : matFor(sideMats, h, 0.78));
+                    face.rotation.y = rotY;
+                    face.position.set(wx + dx * tileSize / 2, nh * step + faceH / 2, wz + dz * tileSize / 2);
+                    this.addStatic(face);
                 }
             }
         }
@@ -856,9 +793,6 @@ export class GameEngine {
         this.fallDamagePerLevel = mapData.fallDamagePerLevel ?? 8;
         if (mapData.heights) {
             this.heightMap = mapData.heights.map(row => Array.from(row, ch => parseInt(ch, 36) || 0));
-            this.computeHeightCorners(mapData, rows, cols);
-        } else {
-            this.heightCorners = null;
         }
 
         // 1. Grid-based Floor Generation (carving holes for sunken water tiles and crumbling pitfall cavities)
@@ -870,7 +804,7 @@ export class GameEngine {
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 if (waterMap[r][c] || holeFloorMap[r][c]) continue; // Water and crumbling pits do not have base floor at Y=0!
-                if (this.tileRaised(r, c)) continue;   // 高くなっている所は、下の面を描かない（buildHeightTerrain が、斜めの上面と崖を作る）
+                if (this.heightLevelAtTile(r, c) > 0) continue;   // 高くなっている所は、下の面を描かない（buildHeightTerrain が、上面と側面を作る）
 
                 const wx = c * tileSize + tileSize / 2;
                 const wz = r * tileSize + tileSize / 2;
@@ -928,7 +862,7 @@ export class GameEngine {
                 if (enemyType && this.enemyDefinitions && this.enemyDefinitions[enemyType]) {
                     const enemyDef = this.enemyDefinitions[enemyType];
                     const m = new Monster(enemyType, wx, wz, this.textures, enemyDef);
-                    m.floorY = this.getFloorHeight(wx, wz);
+                    m.floorY = this.heightLevelAtTile(r, c) * this.heightStep;
                     m.terrainBlock = (mm, x, z) => this.monsterTerrainBlocked(mm, x, z);   // 地上の敵は、崖・毒沼へ進まない
                     m.sprite.position.y = m.floorY;
                     this.monsters.push(m);
@@ -944,7 +878,7 @@ export class GameEngine {
                     continue;
                 }
 
-                const liftH = this.tileLift(r, c, objDef);
+                const liftH = this.heightLevelAtTile(r, c) * this.heightStep;
                 if (liftH > 0 && LIFT_TYPES.has(objDef.type) && !(objDef.type === 'floor_tile' && objDef.elevation > 0)) {
                     this.scene.add = function (o) { o.position.y += liftH; return origSceneAdd.call(this, o); };
                 }
@@ -3790,16 +3724,7 @@ export class GameEngine {
     // 村人が、その位置に立てないか（壁・家具などの当たり判定、水、プレイヤー、ほかの村人）
     // その位置にある、高さのある床の高さ（なければ 0）
     getFloorHeight(x, z) {
-        let h = 0;
-        if (this.heightCorners) {
-            // 起伏: マスの 4 つの角の高さから、なめらかに（双一次補間）
-            const ts = this.mapData?.tileSize || 4;
-            const rows = this.heightCorners.length, cols = this.heightCorners[0].length;
-            const r = Math.min(rows - 1, Math.max(0, Math.floor(z / ts))), c = Math.min(cols - 1, Math.max(0, Math.floor(x / ts)));
-            const u = Math.min(1, Math.max(0, x / ts - c)), v = Math.min(1, Math.max(0, z / ts - r));
-            const k = this.heightCorners[r][c];
-            h = (k[0] * (1 - u) + k[1] * u) * (1 - v) + (k[2] * (1 - u) + k[3] * u) * v;
-        }
+        let h = this.heightMap ? this.heightLevelAt(x, z) * this.heightStep : 0;
         for (const t of this.raisedFloors ?? []) {
             if (x >= t.minX && x <= t.maxX && z >= t.minZ && z <= t.maxZ) h = Math.max(h, t.height);
         }
