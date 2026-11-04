@@ -117,6 +117,16 @@
     "slowdown": 0.65,
     "description": "浅瀬（エメラルドグリーンの透き通る水面・歩行可能）"
   },
+  "river_rapids": {
+    "type": "liquid_tile",
+    "texture": "shallowWater",
+    "solid": false,
+    "depth": 0.35,
+    "slowdown": 0.8,
+    "current": [0, 1],
+    "currentSpeed": 3.6,
+    "description": "急流（浅いが、流れが速く、乗ると下流（南）へ流される。流れの向きは current、速さは currentSpeed。まだ暫定の値）"
+  },
   "sand_tile": {
     "type": "floor_tile",
     "texture": "sand",

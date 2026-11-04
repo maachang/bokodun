@@ -138,8 +138,8 @@ for (const id of ['field_mountain', 'field_desert', 'field_snow', 'field_grass',
     });
 }
 
-test('なだらかな地域（山道以外のすべて）: 隣り合うマスの段差は 1 まで', () => {
-    for (const id of ['field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_plateau', 'field_peak', 'field_arid', 'field_volcano', 'field_riverside']) {
+test('なだらかな地域（崖のある 山道・高原・岩山の頂・乾燥地帯 以外）: 隣り合うマスの段差は 1 まで', () => {
+    for (const id of ['field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_volcano', 'field_riverside']) {
         const h = readJson(`public/data/maps/${id}.json`).heights;
         for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) {
             if (c < 63) assert.ok(Math.abs(levelOf(h[r][c]) - levelOf(h[r][c + 1])) <= 1, `${id}: ${r},${c}`);
@@ -206,3 +206,14 @@ for (const id of ['field_mountain', 'field_desert', 'field_snow', 'field_grass',
         assert.deepEqual(sizes.length, 1, `${id}: 分かれた領域の大きさ ${sizes.sort((a, b) => b - a).slice(0, 6)}`);
     });
 }
+
+test('高原・岩山の頂・乾燥地帯・山道: 崖（段差 2 以上）がある。ただし、上り口（坂）もあって、全体はつながっている', () => {
+    for (const id of ['field_plateau', 'field_peak', 'field_arid', 'field_mountain']) {
+        const h = readJson(`public/data/maps/${id}.json`).heights;
+        let cliffs = 0;
+        for (let r = 0; r < 63; r++) for (let c = 0; c < 63; c++) {
+            if (Math.abs(levelOf(h[r][c]) - levelOf(h[r][c + 1])) >= 2 || Math.abs(levelOf(h[r][c]) - levelOf(h[r + 1][c])) >= 2) cliffs++;
+        }
+        assert.ok(cliffs >= 25, `${id}: 崖のマス ${cliffs}`);
+    }
+});

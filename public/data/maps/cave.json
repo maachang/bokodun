@@ -25,7 +25,7 @@
   },
   "legend": {
     "1": "mossy_stone_wall",
-    "R": "rock_jagged",
+    "R": "cliff_rock_jagged",
     "D": "dungeon_door",
     "P": "water",
     "~": "water_shallow",

@@ -569,6 +569,20 @@ export class GameEngine {
     buildHeightTerrain(mapData, rows, cols, tileSize, baseFloorMat) {
         const step = this.heightStep;
         const cliffMat = new THREE.MeshLambertMaterial({ map: this.textures[mapData.cliffTexture] || this.textures.cliffGray });
+        // 高さごとに、地面の明るさを変える（低い所は少し暗く、高い所は明るく）。起伏が、見て分かるようにする
+        let maxLv = 1;
+        for (const row of this.heightMap) for (const v of row) if (v > maxLv) maxLv = v;
+        const tintOf = (lv) => 0.82 + 0.18 * Math.min(1, lv / maxLv);
+        const topMats = new Map(), sideMats = new Map();
+        const matFor = (cache, lv, k) => {
+            if (!cache.has(lv)) {
+                const m = baseFloorMat.clone();
+                m.color.setScalar(tintOf(lv) * k);
+                cache.set(lv, m);
+            }
+            return cache.get(lv);
+        };
+        baseFloorMat.color.setScalar(tintOf(0));   // 高さ 0 の平らな地面も、同じ基準にそろえる
         const topGeo = new THREE.PlaneGeometry(tileSize, tileSize);
         const dirs = [[0, 1, 0], [0, -1, Math.PI], [1, 0, Math.PI / 2], [-1, 0, -Math.PI / 2]];   // [dx(列), dz(行), 向き]
         for (let r = 0; r < rows; r++) {
@@ -577,7 +591,7 @@ export class GameEngine {
                 if (h <= 0) continue;
                 const wx = c * tileSize + tileSize / 2;
                 const wz = r * tileSize + tileSize / 2;
-                const top = new THREE.Mesh(topGeo, baseFloorMat);
+                const top = new THREE.Mesh(topGeo, matFor(topMats, h, 1.0));
                 top.rotation.x = -Math.PI / 2;
                 top.position.set(wx, h * step, wz);
                 this.addStatic(top);
@@ -587,7 +601,7 @@ export class GameEngine {
                     if (!inMap || nh >= h) continue;
                     const drop = h - nh;
                     const faceH = drop * step;
-                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMat : baseFloorMat);
+                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMat : matFor(sideMats, h, 0.78));
                     face.rotation.y = rotY;
                     face.position.set(wx + dx * tileSize / 2, nh * step + faceH / 2, wz + dz * tileSize / 2);
                     this.addStatic(face);
@@ -2178,6 +2192,7 @@ export class GameEngine {
                             slowdown: objDef.slowdown || 0.65,
                             damagePerSec: objDef.damagePerSec || 0,
                             hazardType: objDef.hazardType,
+                            current: objDef.current ? { x: objDef.current[0], z: objDef.current[1], speed: objDef.currentSpeed ?? 3 } : null,   // 急流: 乗ると、この向きへ流される
                             isWater: true
                         });
                         break;
@@ -3435,12 +3450,21 @@ export class GameEngine {
         // Calculate terrain special effects (Hazards, MP Regen, Spikes)
         let playerFloorDepth = 0;
         let inWater = false;
+        const wasInCurrent = this.player.inCurrent;
+        this.player.inCurrent = false;
         if (this.terrainGrid) {
             for (const t of this.terrainGrid) {
                 if (this.player.x >= t.minX && this.player.x <= t.maxX &&
                     this.player.z >= t.minZ && this.player.z <= t.maxZ) {
                     playerFloorDepth = Math.max(playerFloorDepth, t.depth || 0);
                     if (t.isWater) inWater = true;
+                    // 急流: 下流へ流される（壁や崖には、止められる。流されて 3 段以上の崖は降りられない）
+                    if (t.current) {
+                        const cl = Math.hypot(t.current.x, t.current.z) || 1;
+                        this.movePlayer(t.current.x / cl * t.current.speed * dt, t.current.z / cl * t.current.speed * dt);
+                        if (!wasInCurrent) this.addPopup('急流に流される！', '#38bdf8');
+                        this.player.inCurrent = true;
+                    }
 
                     // 1. Hazard floor damage (Lava / Poison)
                     if (t.damagePerSec && t.damagePerSec > 0) {
@@ -4544,11 +4568,16 @@ export class GameEngine {
     }
 
     start() {
-        const loop = () => {
+        // 描画の上限は 60fps（120Hz・144Hz の画面で、必要以上に回さない。CPU の負荷を下げる）
+        const MIN_FRAME_MS = 1000 / 60 - 1;
+        let last = 0;
+        const loop = (now) => {
+            requestAnimationFrame(loop);
+            if (now - last < MIN_FRAME_MS) return;
+            last = now;
             const dt = Math.min(0.1, this.clock.getDelta());
             this.update(dt);
             this.render();
-            requestAnimationFrame(loop);
         };
         requestAnimationFrame(loop);
     }
