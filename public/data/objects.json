@@ -16316,49 +16316,54 @@
   },
   "cactus": {
     "type": "tree",
-    "texture": "cactus",
-    "aspect": 0.67,
+    "texture": "fCactus",
+    "aspect": 0.512,
+    "height": 3.4,
     "solid": true,
-    "description": "砂漠のサボテン（柱に腕、頂に花）"
+    "description": "砂漠・荒野のサボテン（背の高い柱状。sdServer 画像）"
   },
   "dead_tree": {
     "type": "tree",
-    "texture": "deadTree",
-    "aspect": 1.0,
+    "texture": "fOddTree",
+    "aspect": 0.93,
+    "height": 3.4,
     "solid": true,
-    "description": "砂漠の枯れ木（葉のない、ねじれた枝）"
+    "description": "砂漠・荒野の珍しい木（幹が太く低い。sdServer 画像）"
   },
   "snow_pine": {
     "type": "tree",
-    "texture": "snowPine",
-    "aspect": 0.75,
+    "texture": "fTundraConifers",
+    "aspect": 0.809,
+    "height": 5.5,
     "solid": true,
-    "description": "雪をかぶった松（極寒の地）"
+    "description": "寒冷地の針葉樹（数本の固まり。sdServer 画像）"
   },
   "dark_tree": {
     "type": "tree",
-    "texture": "darkTree",
-    "aspect": 0.75,
+    "texture": "fJungleTree",
+    "aspect": 0.887,
+    "height": 6.0,
     "solid": true,
-    "description": "樹海の太い木（暗い緑の葉とつる）"
+    "description": "樹海の大木（sdServer 画像）"
   },
   "palm": {
     "type": "tree",
-    "texture": "palm",
-    "aspect": 0.75,
+    "texture": "fPalm",
+    "aspect": 0.523,
+    "height": 7.5,
     "solid": true,
-    "description": "ヤシの木（南国）"
+    "description": "ヤシの木（背が高い南国の木。sdServer 画像）"
   },
   "fern": {
     "type": "plant",
-    "texture": "fern",
-    "count": 5,
+    "texture": "fFern",
+    "count": 3,
     "scale": [
-      1.2,
-      0.9
+      1.7,
+      1.45
     ],
     "spread": 3.0,
-    "description": "しだ（森の下草。見た目だけで、当たり判定なし）"
+    "description": "しだ（森の下草。見た目だけで、当たり判定なし。sdServer 画像）"
   },
   "reed": {
     "type": "plant",
@@ -16381,5 +16386,137 @@
     ],
     "spread": 3.2,
     "description": "高原の乾いた草（見た目だけで、当たり判定なし）"
+  },
+  "succulent": {
+    "type": "tree",
+    "texture": "fSucculent",
+    "aspect": 0.57,
+    "height": 1.8,
+    "solid": true,
+    "description": "砂漠の多肉植物（sdServer 画像）"
+  },
+  "grass_tree": {
+    "type": "tree",
+    "texture": "fGrassTree",
+    "aspect": 0.922,
+    "height": 5.2,
+    "solid": true,
+    "description": "草原の広葉樹（sdServer 画像）"
+  },
+  "tropical_tree": {
+    "type": "tree",
+    "texture": "fTropicalTree",
+    "aspect": 0.809,
+    "height": 5.8,
+    "solid": true,
+    "description": "南国の木（sdServer 画像）"
+  },
+  "riverside_tree": {
+    "type": "tree",
+    "texture": "fRiversideTree",
+    "aspect": 0.766,
+    "height": 5.5,
+    "solid": true,
+    "description": "水辺の木（根が張る。sdServer 画像）"
+  },
+  "swamp_tree_a": {
+    "type": "tree",
+    "texture": "fSwampTreeA",
+    "aspect": 0.887,
+    "height": 5.2,
+    "solid": true,
+    "description": "湿地の木（sdServer 画像）"
+  },
+  "swamp_tree_dead": {
+    "type": "tree",
+    "texture": "fSwampTreeDead",
+    "aspect": 0.875,
+    "height": 5.2,
+    "solid": true,
+    "description": "湿地の枯れた根の木（sdServer 画像）"
+  },
+  "forest_hedge_wall": {
+    "type": "tree",
+    "texture": "fHedgeWall",
+    "aspect": 1.43,
+    "height": 4.4,
+    "solid": true,
+    "description": "茂みの壁（並べて壁にする。sdServer 画像）"
+  },
+  "broadleaf_wall": {
+    "type": "tree",
+    "texture": "fBroadleafWall",
+    "aspect": 1.274,
+    "height": 5.2,
+    "solid": true,
+    "description": "広葉樹林の壁（並べて壁にする。sdServer 画像）"
+  },
+  "conifer_wall": {
+    "type": "tree",
+    "texture": "fConiferWall",
+    "aspect": 1.376,
+    "height": 5.2,
+    "solid": true,
+    "description": "針葉樹林の壁（並べて壁にする。sdServer 画像）"
+  },
+  "tundra_wall": {
+    "type": "tree",
+    "texture": "fTundraWall",
+    "aspect": 1.058,
+    "height": 5.5,
+    "solid": true,
+    "description": "ツンドラの針葉樹林の壁（並べて壁にする。sdServer 画像）"
+  },
+  "mountain_rock_a": {
+    "type": "boulder",
+    "texture": "fRockA",
+    "solid": true,
+    "blocksProjectiles": true,
+    "scale": [
+      7.53,
+      8.0,
+      1.0
+    ],
+    "radius": 2.2,
+    "description": "山の巨岩（山岳地帯のレンガ調の岩の代わりに大きく置く。sdServer 画像）"
+  },
+  "mountain_rock_b": {
+    "type": "boulder",
+    "texture": "fRockB",
+    "solid": true,
+    "blocksProjectiles": true,
+    "scale": [
+      7.82,
+      8.0,
+      1.0
+    ],
+    "radius": 2.2,
+    "description": "山の巨岩（山岳地帯のレンガ調の岩の代わりに大きく置く。sdServer 画像）"
+  },
+  "mountain_rock_c": {
+    "type": "boulder",
+    "texture": "fRockC",
+    "solid": true,
+    "blocksProjectiles": true,
+    "scale": [
+      7.44,
+      8.0,
+      1.0
+    ],
+    "radius": 2.2,
+    "description": "山の巨岩（山岳地帯のレンガ調の岩の代わりに大きく置く。sdServer 画像）"
+  },
+  "mountain_rock_d": {
+    "type": "boulder",
+    "texture": "fRockD",
+    "solid": true,
+    "blocksProjectiles": true,
+    "scale": [
+      8.1,
+      8.0,
+      1.0
+    ],
+    "radius": 2.2,
+    "description": "山の巨岩（山岳地帯のレンガ調の岩の代わりに大きく置く。sdServer 画像）"
   }
 }

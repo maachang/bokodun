@@ -1709,56 +1709,6 @@ export class RetroTextureGenerator {
         return texture;
     }
 
-    // 砂漠のサボテン（緑の柱に、2 本の腕。透明な背景のスプライト）
-    static createCactusTexture() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 64;
-        canvas.height = 96;
-        const ctx = canvas.getContext('2d');
-        const body = '#3f8a3a', dark = '#2c6a2a', light = '#5aa84c';
-        const box = (x, y, w, h) => {
-            ctx.fillStyle = body; ctx.fillRect(x, y, w, h);
-            ctx.fillStyle = dark; ctx.fillRect(x + w - 3, y, 3, h);
-            ctx.fillStyle = light; ctx.fillRect(x + 2, y, 2, h);
-        };
-        box(24, 12, 16, 84);   // 幹
-        box(8, 44, 8, 26);     // 左の腕（縦）
-        box(8, 62, 18, 8);     // 左の腕（横）
-        box(48, 30, 8, 28);    // 右の腕（縦）
-        box(38, 50, 18, 8);    // 右の腕（横）
-        ctx.fillStyle = '#e8e0b0';   // とげ
-        for (let y = 18; y < 92; y += 10) { ctx.fillRect(22, y, 2, 2); ctx.fillRect(40, y + 4, 2, 2); }
-        ctx.fillStyle = '#e86a8a'; ctx.fillRect(28, 8, 8, 5);   // 頂の花
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.colorSpace = THREE.SRGBColorSpace;
-        texture.magFilter = THREE.NearestFilter;
-        texture.minFilter = THREE.NearestFilter;
-        return texture;
-    }
-
-    // 砂漠の枯れ木（葉のない、ねじれた枝）
-    static createDeadTreeTexture() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 96;
-        canvas.height = 96;
-        const ctx = canvas.getContext('2d');
-        const bark = '#6b5238', dark = '#4a3826';
-        const seg = (x, y, w, h) => { ctx.fillStyle = bark; ctx.fillRect(x, y, w, h); ctx.fillStyle = dark; ctx.fillRect(x + w - 2, y, 2, h); };
-        seg(42, 40, 12, 56);   // 幹
-        seg(34, 28, 8, 20);    // 左の太い枝
-        seg(22, 18, 14, 6);
-        seg(54, 22, 8, 24);    // 右の太い枝
-        seg(60, 12, 16, 6);
-        seg(46, 10, 6, 32);    // 中央の枝
-        seg(14, 10, 6, 14);    // 小枝
-        seg(76, 6, 6, 14);
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.colorSpace = THREE.SRGBColorSpace;
-        texture.magFilter = THREE.NearestFilter;
-        texture.minFilter = THREE.NearestFilter;
-        return texture;
-    }
-
     // 外のマップの地面（雪・森の落ち葉・岩の地面・白い砂・乾いた草）: 基本色に、色違いの斑点を散らす（毎回同じ模様）
     static createSpeckleFloorTexture(base, tones, count = 90) {
         const canvas = document.createElement('canvas');
@@ -1799,64 +1749,11 @@ export class RetroTextureGenerator {
         return texture;
     }
 
-    // 雪をかぶった松（三段の枝に、雪）
-    static createSnowPineTexture() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 96; canvas.height = 128;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#5a4030'; ctx.fillRect(42, 96, 12, 32);
-        [[10, 82, 76, 22], [20, 56, 56, 22], [30, 30, 36, 22], [38, 8, 20, 20]].forEach(([x, y, w, h]) => {
-            ctx.fillStyle = '#2f5a45'; ctx.fillRect(x, y, w, h);
-            ctx.fillStyle = '#244a38'; ctx.fillRect(x + w - 8, y, 8, h);
-            ctx.fillStyle = '#f4f8fc'; ctx.fillRect(x, y, w, 7);   // 枝の上の雪
-            ctx.fillRect(x + 6, y + 7, 10, 4);
-        });
-        return RetroTextureGenerator.spriteTexture(canvas);
-    }
-
-    // 樹海の太い木（太い幹と、暗い緑の、重なる葉）
-    static createDarkTreeTexture() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 96; canvas.height = 128;
-        const ctx = canvas.getContext('2d');
-        ctx.fillStyle = '#3a2a1a'; ctx.fillRect(36, 70, 24, 58);
-        ctx.fillStyle = '#2a1e12'; ctx.fillRect(52, 70, 8, 58);
-        ctx.fillStyle = '#4a3624'; ctx.fillRect(30, 118, 36, 10);   // 根もと
-        [[6, 40, 84, 44, '#1d3a22'], [14, 18, 68, 36, '#244a2a'], [26, 2, 44, 28, '#2c5832']].forEach(([x, y, w, h, c]) => {
-            ctx.fillStyle = c; ctx.fillRect(x, y, w, h);
-            ctx.fillStyle = 'rgba(0,0,0,0.25)'; ctx.fillRect(x + w - 12, y, 12, h);
-            ctx.fillStyle = 'rgba(120,180,90,0.25)'; ctx.fillRect(x + 4, y + 3, 14, 4);
-        });
-        ctx.fillStyle = '#5f8a3a';   // つる
-        for (let x = 14; x < 84; x += 14) ctx.fillRect(x, 70, 2, 18 + (x % 3) * 6);
-        return RetroTextureGenerator.spriteTexture(canvas);
-    }
-
-    // ヤシの木（曲がった幹と、広がる葉）
-    static createPalmTexture() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 96; canvas.height = 128;
-        const ctx = canvas.getContext('2d');
-        [[44, 100, 10, 28], [46, 76, 10, 26], [48, 52, 10, 26], [50, 30, 10, 24]].forEach(([x, y, w, h]) => {
-            ctx.fillStyle = '#8a6a40'; ctx.fillRect(x, y, w, h);
-            ctx.fillStyle = '#6a4e2c'; ctx.fillRect(x + w - 3, y, 3, h);
-            ctx.fillStyle = '#a58455'; ctx.fillRect(x, y + 6, w, 2);
-        });
-        const leaf = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(x, y, w, h); };
-        [[8, 26, 40, 8], [2, 34, 30, 8], [50, 18, 38, 8], [64, 26, 28, 8], [30, 10, 40, 8], [24, 4, 24, 8]].forEach(([x, y, w, h], i) => leaf(x, y, w, h, i % 2 ? '#3f9a46' : '#2e8038'));
-        ctx.fillStyle = '#5a3a1a'; ctx.fillRect(48, 36, 6, 6); ctx.fillRect(56, 38, 6, 6);   // ヤシの実
-        return RetroTextureGenerator.spriteTexture(canvas);
-    }
-
-    // しだ（森の下草。見た目だけの植物）
-    static createFernTexture() {
-        const canvas = document.createElement('canvas');
-        canvas.width = 48; canvas.height = 32;
-        const ctx = canvas.getContext('2d');
-        [[22, 4, 4, 28], [12, 12, 10, 4], [4, 18, 12, 4], [26, 10, 10, 4], [34, 16, 12, 4], [8, 24, 10, 4], [30, 22, 12, 4]].forEach(([x, y, w, h], i) => {
-            ctx.fillStyle = i % 2 ? '#3f7a34' : '#2f6228'; ctx.fillRect(x, y, w, h);
-        });
-        return RetroTextureGenerator.spriteTexture(canvas);
+    // sdServer から取り込んだ、外のマップ用の画像（/images/objects/field/）。写実的な絵なので、色をそのまま出し、縮小は滑らかにする
+    static createFieldImageTexture(name) {
+        const texture = new THREE.TextureLoader().load(`/images/objects/field/${name}.png`);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        return texture;
     }
 
     // 水辺の葦（細長い茎と、穂）

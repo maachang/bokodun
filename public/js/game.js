@@ -248,11 +248,26 @@ export class GameEngine {
             goblinArcher: RetroTextureGenerator.createGoblinArcherTexture(),
             tree: RetroTextureGenerator.createTreeTexture(),
             swampTree: RetroTextureGenerator.createSwampTreeTexture(),
-            cactus: RetroTextureGenerator.createCactusTexture(),
-            snowPine: RetroTextureGenerator.createSnowPineTexture(),
-            darkTree: RetroTextureGenerator.createDarkTreeTexture(),
-            palm: RetroTextureGenerator.createPalmTexture(),
-            fern: RetroTextureGenerator.createFernTexture(),
+            fGrassTree: RetroTextureGenerator.createFieldImageTexture('grass_tree'),
+            fSwampTreeA: RetroTextureGenerator.createFieldImageTexture('swamp_tree_a'),
+            fSwampTreeDead: RetroTextureGenerator.createFieldImageTexture('swamp_tree_dead'),
+            fTropicalTree: RetroTextureGenerator.createFieldImageTexture('tropical_tree'),
+            fPalm: RetroTextureGenerator.createFieldImageTexture('palm'),
+            fRiversideTree: RetroTextureGenerator.createFieldImageTexture('riverside_tree'),
+            fHedgeWall: RetroTextureGenerator.createFieldImageTexture('forest_hedge_wall'),
+            fCactus: RetroTextureGenerator.createFieldImageTexture('cactus'),
+            fSucculent: RetroTextureGenerator.createFieldImageTexture('succulent'),
+            fConiferWall: RetroTextureGenerator.createFieldImageTexture('conifer_wall'),
+            fOddTree: RetroTextureGenerator.createFieldImageTexture('desert_odd_tree'),
+            fTundraConifers: RetroTextureGenerator.createFieldImageTexture('tundra_conifers'),
+            fBroadleafWall: RetroTextureGenerator.createFieldImageTexture('broadleaf_wall'),
+            fTundraWall: RetroTextureGenerator.createFieldImageTexture('tundra_wall'),
+            fJungleTree: RetroTextureGenerator.createFieldImageTexture('jungle_tree'),
+            fFern: RetroTextureGenerator.createFieldImageTexture('fern'),
+            fRockA: RetroTextureGenerator.createFieldImageTexture('rock_a'),
+            fRockB: RetroTextureGenerator.createFieldImageTexture('rock_b'),
+            fRockC: RetroTextureGenerator.createFieldImageTexture('rock_c'),
+            fRockD: RetroTextureGenerator.createFieldImageTexture('rock_d'),
             reed: RetroTextureGenerator.createReedTexture(),
             dryTuft: RetroTextureGenerator.createDryTuftTexture(),
             snowGround: RetroTextureGenerator.createSpeckleFloorTexture('#f4f8ff', ['#ffffff', '#e2eaf4', '#eaf0f8']),
@@ -263,7 +278,6 @@ export class GameEngine {
             tundraGround: RetroTextureGenerator.createSpeckleFloorTexture('#8d8a70', ['#7a785e', '#a09c80', '#a8a48c', '#6f7a66']),
             redEarthGround: RetroTextureGenerator.createSpeckleFloorTexture('#c0703f', ['#a85a34', '#d48a58', '#b8663a', '#dc9a68']),
             ashGround: RetroTextureGenerator.createSpeckleFloorTexture('#3a3430', ['#2a2522', '#4a423c', '#554a42', '#1f1b19']),
-            deadTree: RetroTextureGenerator.createDeadTreeTexture(),
             boulder: RetroTextureGenerator.createBoulderTexture(),
             signpost: RetroTextureGenerator.createSignpostTexture(),
             weaponShopSign: RetroTextureGenerator.createShopSignTexture('weapon'),
@@ -950,7 +964,8 @@ export class GameEngine {
                         const treeMat = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.tree });
                         const tree = new THREE.Sprite(treeMat);
                         tree.center.set(0.5, 0.0);
-                        const scaleVar = 4.8 + ((r * 5 + c * 3) % 4) * 0.5;
+                        const baseH = objDef.height ?? 4.8;   // 木の高さ（省略時は標準の木）。ばらつきは、高さに比例
+                        const scaleVar = baseH + ((r * 5 + c * 3) % 4) * 0.5 * (baseH / 4.8);
                         tree.scale.set(scaleVar * (objDef.aspect ?? (899 / 893)), scaleVar, 1);   // aspect: 画像の幅/高さ（省略時は標準の木）
                         // Sink tree base slightly into grass (-0.08) so trunk roots naturally penetrate the terrain
                         tree.position.set(wx, -0.08, wz);
@@ -989,7 +1004,7 @@ export class GameEngine {
 
                     case 'boulder': {
                         // Mossy natural boulder sprite with ground shadow & projectile blocking
-                        const boulderMat = new THREE.SpriteMaterial({ map: this.textures.boulder });
+                        const boulderMat = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.boulder });
                         const boulder = new THREE.Sprite(boulderMat);
                         boulder.center.set(0.5, 0.0);
                         const bScale = objDef.scale || [2.6, 2.0, 1.0];
