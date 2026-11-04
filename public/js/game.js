@@ -2649,6 +2649,29 @@ export class GameEngine {
         }
     }
 
+    // プレイヤーの弾の、発射の高さを決める。起伏のあるマップでは、目の前（正面の ±25 度）の最も近い敵へ、
+    //   上下にも狙いをつける（高い所から、低い所の敵へ撃ち下ろす／低い所から、高い所の敵へ撃ち上げる）。敵がいなければ、水平に飛ぶ
+    aimProjectileHeight(p, dirX, dirZ) {
+        const y0 = this.getFloorHeight(this.player.x, this.player.z) + 1.3;
+        let vy = 0;
+        if (this.heightMap) {
+            let best = null, bestD = 40;
+            for (const m of this.monsters) {
+                if (!m.active) continue;
+                const dx = m.x - this.player.x, dz = m.z - this.player.z;
+                const d = Math.hypot(dx, dz);
+                if (d < 0.5 || d >= bestD) continue;
+                if ((dx * dirX + dz * dirZ) / d < Math.cos(25 * Math.PI / 180)) continue;   // 正面の外
+                best = m; bestD = d;
+            }
+            if (best) {
+                const ty = (best.floorY ?? 0) + 0.9;   // 敵の胴の高さ
+                vy = (ty - y0) / (bestD / p.speed);
+            }
+        }
+        p.setHeight(y0, vy);
+    }
+
     // 弓: 重力で落ちる矢を放つ（MP 不要。射程はクラスの range）
     shootArrow(item, cls) {
         const dirX = -Math.sin(this.player.angle);
@@ -2659,6 +2682,7 @@ export class GameEngine {
             maxDistance: cls.range
         });
         arrow.label = cls.name;
+        this.aimProjectileHeight(arrow, dirX, dirZ);
         this.projectiles.push(arrow);
         this.scene.add(arrow.mesh);
         this.sound.playBowShoot();
@@ -2689,6 +2713,7 @@ export class GameEngine {
                 label: w.name,
                 soundKind: w.sound
             });
+            this.aimProjectileHeight(fireball, dirX, dirZ);
             this.projectiles.push(fireball);
             this.scene.add(fireball.mesh);
         }
@@ -3533,11 +3558,19 @@ export class GameEngine {
             const p = this.projectiles[i];
             p.update(dt, this.colliders, this.particles);
 
+            // 起伏のあるマップ: 弾が、地面（崖の面・斜面）にぶつかったら消える
+            if (this.heightMap && p.active && p.y < this.getFloorHeight(p.x, p.z)) {
+                p.active = false;
+                this.particles.spawnBurst(p.x, p.y, p.z, p.color ?? 0xb08d58, 8, 2.5);
+            }
+
             if (p.isPlayer) {
                 // Check player fireball hit monster
                 for (const m of this.monsters) {
                     if (!m.active || p.hitMonsters.has(m)) continue;
                     const distM = Math.hypot(m.x - p.x, m.z - p.z);
+                    // 起伏のあるマップでは、高さも合っているときだけ当たる（敵の胴の高さ ±1.6）
+                    if (this.heightMap && Math.abs(p.y - ((m.floorY ?? 0) + 0.9)) > 1.6) continue;
                     if (distM < m.radius + p.radius) {
                         if (this.hitMonsterWithProjectile(p, m)) break;
                     }
@@ -3850,8 +3883,13 @@ export class GameEngine {
                 break;
             }
         }
-        // 起伏: 2 段以上高い所へは、歩いて上れない（崖）。1 段までの段差は上れる
-        const climbOk = (x, z, dirX, dirZ) => !this.heightMap || this.heightLevelAt(x + dirX * r, z + dirZ * r) - this.heightLevelAt(this.player.x, this.player.z) <= 1;
+        // 起伏: 2 段以上高い所へは、歩いて上れない（崖）。1 段までの段差は上れる。
+        //   降りるのは、1 段は普通に、2 段は飛び降りて（ダメージ）降りられる。3 段以上の高さからは、降りられない（崖の縁で止まる）
+        const climbOk = (x, z, dirX, dirZ) => {
+            if (!this.heightMap) return true;
+            const diff = this.heightLevelAt(x + dirX * r, z + dirZ * r) - this.heightLevelAt(this.player.x, this.player.z);
+            return diff <= 1 && diff >= -2;
+        };
         if (canMoveX && !climbOk(nextX, this.player.z, Math.sign(dx), 0)) canMoveX = false;
         if (canMoveX) this.player.x = nextX;
 

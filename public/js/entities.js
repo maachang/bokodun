@@ -561,6 +561,7 @@ export class Monster {
                     maxDistance: maxDist,
                     sourceMonster: this
                 });
+                proj.setHeight(1.3 + this.floorY);   // 高い所に立っている敵は、その高さから撃つ
                 projectiles.push(proj);
                 if (scene) scene.add(proj.mesh);
 
@@ -868,6 +869,13 @@ export class Projectile {
         this.mesh.position.set(this.x, this.y, this.z);
     }
 
+    // 高さを決める。y: 発射時の高さ、vy: 上下の速さ（負は下向き。起伏のあるマップで、下にいる敵へ飛ばす）
+    setHeight(y, vy = 0) {
+        this.y = y;
+        this.vy = vy;
+        this.mesh.position.y = y;
+    }
+
     update(dt, colliders, particles) {
         this.lifeTime -= dt;
         if (this.lifeTime <= 0) {
@@ -907,6 +915,10 @@ export class Projectile {
         this.z += this.dirZ * this.speed * dt;
         this.mesh.position.x = this.x;
         this.mesh.position.z = this.z;
+        if (this.vy) {   // 上下にも進む（高い所から、低い所の敵へ）
+            this.y += this.vy * dt;
+            this.mesh.position.y = this.y;
+        }
 
         // Aura spin for magic/fireball
         if (this.aura && !this.noSpin) {

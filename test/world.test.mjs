@@ -178,3 +178,31 @@ test('山道: スポーンから、段差 1 までの道をたどって、すべ
     }
     assert.ok(cliffs >= 30, `崖のマス: ${cliffs}`);
 });
+
+// 落ちても詰まない: 段差 1 までの道でつながらない、小さな窪み（落ちたら上れない穴）が、ない
+for (const id of ['field_mountain', 'field_desert', 'field_snow']) {
+    test(`${id}: 歩けるマスは、段差 1 までの道で、すべて 1 つにつながる（崖から落ちても、歩いて戻れる）`, () => {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const lay = m.layout;
+        const enemyCh = new Set(Object.keys(m.enemies || {}));
+        const pass = (r, c) => { if (lay[r][c] === '0' || enemyCh.has(lay[r][c])) return true; const d = objects[m.legend[lay[r][c]]]; return !d || (!d.solid && d.type !== 'furniture'); };
+        const lv = (r, c) => parseInt(m.heights[r][c], 36);
+        const seen = new Set();
+        const sizes = [];
+        for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) {
+            if (seen.has(`${r},${c}`) || !pass(r, c)) continue;
+            const q = [[r, c]]; seen.add(`${r},${c}`); let n = 0;
+            while (q.length) {
+                const [a, b] = q.pop(); n++;
+                for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+                    const x = a + dr, y = b + dc;
+                    if (x < 0 || y < 0 || x >= 64 || y >= 64 || seen.has(`${x},${y}`) || !pass(x, y)) continue;
+                    if (Math.abs(lv(x, y) - lv(a, b)) > 1) continue;
+                    seen.add(`${x},${y}`); q.push([x, y]);
+                }
+            }
+            sizes.push(n);
+        }
+        assert.deepEqual(sizes.length, 1, `${id}: 分かれた領域の大きさ ${sizes.sort((a, b) => b - a).slice(0, 6)}`);
+    });
+}
