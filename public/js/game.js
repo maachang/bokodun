@@ -3752,7 +3752,6 @@ export class GameEngine {
         for (const n of this.npcs ?? []) {
             n.floorY = this.getFloorHeight(n.x, n.z);
             n.update(dt, (x, z, r) => this.isNpcBlocked(n, x, z, r));
-            n.sprite.position.y += this.getFloorHeight(n.x, n.z);   // 高台の上では足元も上げる
         }
     }
 

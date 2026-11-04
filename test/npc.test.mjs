@@ -146,3 +146,25 @@ test('ゲーム: 村人は壁・水・プレイヤー・ほかの村人の位置
         assert.equal(g.nearbyNpcSpeech(), null);
     });
 });
+
+test('ゲーム: 起伏のあるマップで、村人の足元は、地面の高さに合う（二重に持ち上げて、浮かない）', async () => {
+    const { GameEngine, Npc } = await loadGame();
+    const def = { name: '太郎', lines: [], radius: 0.45, speed: 0, wanderRadius: 0, height: 2, aspect: 0.4 };
+    const g = Object.create(GameEngine.prototype);
+    g.colliders = []; g.terrainGrid = []; g.monsters = []; g.raisedFloors = [];
+    g.player = { x: 90, z: 90, radius: 0.4, angle: 0 };
+    g.mapData = { tileSize: 4 };
+    g.heightStep = 0.5;
+    g.heightMap = [[0, 0, 0], [0, 2, 3], [0, 1, 0]];
+    // 高さ 2 段（1.0）、3 段（1.5）、1 段（0.5）、0 段の位置に立つ村人
+    const spots = [[1, 1, 1.0], [1, 2, 1.5], [2, 1, 0.5], [0, 0, 0]];
+    g.npcs = spots.map(([r, c]) => new Npc('t', c * 4 + 2, r * 4 + 2, { isTexture: true }, def));
+    for (let i = 0; i < 5; i++) g.updateNpcs(0.05);
+    spots.forEach(([r, c, y], i) => assert.ok(Math.abs(g.npcs[i].sprite.position.y - y) < 1e-6, `(${r},${c}) 足元 ${g.npcs[i].sprite.position.y}（地面 ${y}）`));
+    // 王城の高台の段（raisedFloors）の上でも、1 回だけ
+    g.heightMap = null;
+    g.raisedFloors = [{ minX: 0, maxX: 4, minZ: 0, maxZ: 4, height: 0.9 }];
+    g.npcs = [new Npc('t', 2, 2, { isTexture: true }, def)];
+    for (let i = 0; i < 3; i++) g.updateNpcs(0.05);
+    assert.ok(Math.abs(g.npcs[0].sprite.position.y - 0.9) < 1e-6, `高台の上 ${g.npcs[0].sprite.position.y}`);
+});
