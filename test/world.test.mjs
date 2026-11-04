@@ -119,7 +119,7 @@ for (const id of ['field_grass', 'field_plateau', 'field_mountain', 'field_lake'
 
 // 起伏（高さの段 heights）: 山道・砂漠・極寒
 const levelOf = (ch) => parseInt(ch, 36);
-for (const id of ['field_mountain', 'field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_plateau', 'field_peak', 'field_arid', 'field_volcano', 'field_riverside']) {
+for (const id of ['field_mountain', 'field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_plateau', 'field_peak', 'field_arid', 'field_volcano', 'field_riverside', 'field_swamp']) {
     test(`${id}: 高さの表は 64×64。隣へ続く端は、高さ 0（隣とずれない）`, () => {
         const m = readJson(`public/data/maps/${id}.json`);
         assert.equal(m.heights.length, 64);
@@ -139,7 +139,7 @@ for (const id of ['field_mountain', 'field_desert', 'field_snow', 'field_grass',
 }
 
 test('なだらかな地域（崖のある 山道・高原・岩山の頂・乾燥地帯 以外）: 隣り合うマスの段差は 1 まで', () => {
-    for (const id of ['field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_volcano', 'field_riverside']) {
+    for (const id of ['field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_volcano', 'field_riverside', 'field_swamp']) {
         const h = readJson(`public/data/maps/${id}.json`).heights;
         for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) {
             if (c < 63) assert.ok(Math.abs(levelOf(h[r][c]) - levelOf(h[r][c + 1])) <= 1, `${id}: ${r},${c}`);
@@ -180,7 +180,7 @@ test('山道: スポーンから、段差 1 までの道をたどって、すべ
 });
 
 // 落ちても詰まない: 段差 1 までの道でつながらない、小さな窪み（落ちたら上れない穴）が、ない
-for (const id of ['field_mountain', 'field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_plateau', 'field_peak', 'field_arid', 'field_volcano', 'field_riverside']) {
+for (const id of ['field_mountain', 'field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_plateau', 'field_peak', 'field_arid', 'field_volcano', 'field_riverside', 'field_swamp']) {
     test(`${id}: 歩けるマスは、段差 1 までの道で、すべて 1 つにつながる（崖から落ちても、歩いて戻れる）`, () => {
         const m = readJson(`public/data/maps/${id}.json`);
         const lay = m.layout;
@@ -216,4 +216,22 @@ test('高原・岩山の頂・乾燥地帯・山道: 崖（段差 2 以上）が
         }
         assert.ok(cliffs >= 25, `${id}: 崖のマス ${cliffs}`);
     }
+});
+
+test('湿地帯（field_swamp）: 広い毒沼があり、板道が毒沼の上にかかり、毒沼を踏まずに歩いて回れる。毒は、継続ダメージ', () => {
+    const m = readJson('public/data/maps/field_swamp.json');
+    const poisonCh = Object.entries(m.legend).filter(([, v]) => v === 'poison_swamp').map(([k]) => k);
+    const plankCh = Object.entries(m.legend).filter(([, v]) => v === 'wood_bridge').map(([k]) => k);
+    const count = (chs) => m.layout.join('').split('').filter(ch => chs.includes(ch)).length;
+    assert.ok(count(poisonCh) >= 400, `毒沼のマス: ${count(poisonCh)}`);
+    assert.ok(count(plankCh) >= 20, `板道のマス: ${count(plankCh)}`);
+    assert.ok(objects.poison_swamp.damagePerSec > 0 && objects.poison_swamp.hazardType === 'poison');
+    // 毒沼は、高さ 0（沼の底）。小島（高まり）は、1 段以上ある
+    const lv = (r, c) => parseInt(m.heights[r][c], 36);
+    let maxLv = 0;
+    for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) {
+        if (poisonCh.includes(m.layout[r][c])) assert.equal(lv(r, c), 0, `毒沼は高さ 0: ${r},${c}`);
+        maxLv = Math.max(maxLv, lv(r, c));
+    }
+    assert.ok(maxLv >= 3, `小島の高まり: ${maxLv}`);
 });
