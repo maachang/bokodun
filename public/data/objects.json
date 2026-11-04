@@ -16436,36 +16436,36 @@
     "description": "湿地の枯れた根の木（sdServer 画像）"
   },
   "forest_hedge_wall": {
-    "type": "tree",
+    "type": "tree_wall",
     "texture": "fHedgeWall",
     "aspect": 1.43,
     "height": 4.4,
     "solid": true,
-    "description": "茂みの壁（並べて壁にする。sdServer 画像）"
+    "description": "茂みの壁（向きの固定した板で立てる。連ねて壁にする。sdServer 画像）"
   },
   "broadleaf_wall": {
-    "type": "tree",
+    "type": "tree_wall",
     "texture": "fBroadleafWall",
     "aspect": 1.274,
     "height": 5.2,
     "solid": true,
-    "description": "広葉樹林の壁（並べて壁にする。sdServer 画像）"
+    "description": "広葉樹林の壁（向きの固定した板で立てる。連ねて壁にする。sdServer 画像）"
   },
   "conifer_wall": {
-    "type": "tree",
+    "type": "tree_wall",
     "texture": "fConiferWall",
     "aspect": 1.376,
     "height": 5.2,
     "solid": true,
-    "description": "針葉樹林の壁（並べて壁にする。sdServer 画像）"
+    "description": "針葉樹林の壁（向きの固定した板で立てる。連ねて壁にする。sdServer 画像）"
   },
   "tundra_wall": {
-    "type": "tree",
+    "type": "tree_wall",
     "texture": "fTundraWall",
     "aspect": 1.058,
     "height": 5.5,
     "solid": true,
-    "description": "ツンドラの針葉樹林の壁（並べて壁にする。sdServer 画像）"
+    "description": "ツンドラの針葉樹林の壁（向きの固定した板で立てる。連ねて壁にする。sdServer 画像）"
   },
   "mountain_rock_a": {
     "type": "boulder",

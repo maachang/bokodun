@@ -815,6 +815,53 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'tree_wall': {
+                        // 林の壁（画像の木々を、向きの固定した板で壁にする）。画像を普通のスプライトで出すと、常にこちらを向いて、壁にならない。
+                        // 壁の外側（隣が同じ林の壁でない、マップの中の側）の面に、板を立てる。板は、動かず、向きも変わらない。
+                        // 1 マスの林の壁は、両側に板が立つ。連なる林の壁は、並んだ板が少し重なって、つながって見える
+                        const wallTex = this.textures[objDef.texture] || this.textures.forestCanopy;
+                        this.treeWallMats = this.treeWallMats || new Map();
+                        let panelMat = this.treeWallMats.get(wallTex);
+                        if (!panelMat) {
+                            panelMat = new THREE.MeshLambertMaterial({ map: wallTex, transparent: true, alphaTest: 0.35, side: THREE.DoubleSide });
+                            this.treeWallMats.set(wallTex, panelMat);
+                        }
+                        const panelH = (objDef.height ?? wallH * 1.4) * (0.9 + ((r * 7 + c * 13) % 5) * 0.05);
+                        const panelW = Math.max(tileSize * 1.5, panelH * (objDef.aspect ?? 1));
+                        const wallTypeAt = (cc, rr) => this.objectDefinitions[mapData.legend?.[mapData.layout[rr]?.[cc]]]?.type;
+                        // [列の差, 行の差, 板の向き（法線）の回転]。板の法線は、標準で +Z（南）向き
+                        for (const [dx, dz, rotY] of [[0, 1, 0], [0, -1, Math.PI], [1, 0, Math.PI / 2], [-1, 0, -Math.PI / 2]]) {
+                            const nc = c + dx, nr = r + dz;
+                            if (nc < 0 || nr < 0 || nc >= cols || nr >= rows) continue;   // マップの外側には、板を立てない
+                            if (wallTypeAt(nc, nr) === 'tree_wall') continue;               // 隣も林の壁の面は、内側
+                            const inset = tileSize / 2 - 0.1 - ((r + c) % 2) * 0.06;         // 隣の板との、重なりのちらつき（z-fighting）を避ける
+                            const panel = new THREE.Mesh(new THREE.PlaneGeometry(panelW, panelH), panelMat);
+                            panel.rotation.y = rotY;
+                            panel.position.set(wx + dx * inset, panelH / 2, wz + dz * inset);
+                            this.addStatic(panel);
+                        }
+                        // 出っ張りの角（凹んだ角）: 斜め向かいがマップの中で、林の壁でなく、その間の 2 マスが林の壁（かマップの外）のとき、
+                        //   2 枚の板の間に穴があくので、斜めの板で埋める（マップの四隅など）
+                        const isWallOrOut = (cc, rr) => cc < 0 || rr < 0 || cc >= cols || rr >= rows || wallTypeAt(cc, rr) === 'tree_wall';
+                        for (const [dx, dz] of [[1, 1], [1, -1], [-1, 1], [-1, -1]]) {
+                            const dc = c + dx, dr = r + dz;
+                            if (dc < 0 || dr < 0 || dc >= cols || dr >= rows || isWallOrOut(dc, dr)) continue;
+                            if (!isWallOrOut(c + dx, r) || !isWallOrOut(c, r + dz)) continue;
+                            const diag = new THREE.Mesh(new THREE.PlaneGeometry(tileSize * 1.7, panelH), panelMat);
+                            diag.rotation.y = Math.atan2(dx, dz);
+                            diag.position.set(wx + dx * tileSize * 0.2, panelH / 2, wz + dz * tileSize * 0.2);
+                            this.addStatic(diag);
+                        }
+                        if (objDef.solid) {
+                            this.colliders.push({
+                                minX: wx - tileSize / 2, maxX: wx + tileSize / 2,
+                                minZ: wz - tileSize / 2, maxZ: wz + tileSize / 2,
+                                blocksProjectiles: objDef.blocksProjectiles !== false
+                            });
+                        }
+                        break;
+                    }
+
                     case 'dense_forest': {
                         // Completely organic bumpy treeline canopy with transparent uneven top
                         // Check which edges need trees (inward facing towards open ground)
