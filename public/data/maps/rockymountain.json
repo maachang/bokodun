@@ -22,8 +22,8 @@
     "skyColor": 4011338
   },
   "legend": {
-    "1": "rock_jagged",
-    "R": "rock_wall",
+    "1": "cliff_rock_jagged",
+    "R": "cliff_rock_wall",
     "W": "brick_wall",
     "T": "tree",
     "L": "lava",

@@ -25,7 +25,7 @@
     "F": "dense_forest",
     "B": "barrier",
     "T": "tree",
-    "R": "rock_wall",
+    "R": "cliff_rock_wall",
     "W": "brick_wall",
     "P": "water",
     "~": "water_shallow",

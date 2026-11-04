@@ -31,7 +31,7 @@
     "N": "swamp_signpost",
     "M": "magic_circle",
     "2": "portal",
-    "1": "rock_wall"
+    "1": "cliff_rock_wall"
   },
   "enemies": {
     "S": "tarantula_swamp",
