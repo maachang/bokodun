@@ -23,7 +23,7 @@
   "legend": {
     "F": "tundra_wall",
     "P": "snow_pine",
-    "d": "dry_tuft"
+    "d": "highland_grass"
   },
   "enemies": {
     "W": "great_wolf",

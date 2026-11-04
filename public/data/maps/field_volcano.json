@@ -24,7 +24,7 @@
     "R": "rock_wall",
     "L": "lava",
     "D": "dead_tree",
-    "d": "dry_tuft"
+    "d": "arid_grass"
   },
   "enemies": {
     "S": "salamander",

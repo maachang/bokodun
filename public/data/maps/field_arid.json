@@ -24,7 +24,7 @@
     "R": "rock_wall",
     "C": "cactus",
     "D": "dead_tree",
-    "d": "dry_tuft",
+    "d": "arid_grass",
     "S": "succulent"
   },
   "enemies": {

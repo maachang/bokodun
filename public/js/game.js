@@ -264,6 +264,14 @@ export class GameEngine {
             fTundraWall: RetroTextureGenerator.createFieldImageTexture('tundra_wall'),
             fJungleTree: RetroTextureGenerator.createFieldImageTexture('jungle_tree'),
             fFern: RetroTextureGenerator.createFieldImageTexture('fern'),
+            fRoadWeed: RetroTextureGenerator.createFieldImageTexture('road_weed'),
+            fHighlandWeed: RetroTextureGenerator.createFieldImageTexture('highland_weed'),
+            fMarshWeed: RetroTextureGenerator.createFieldImageTexture('marsh_weed'),
+            fMeadowGrass: RetroTextureGenerator.createFieldImageTexture('meadow_grass'),
+            fMarshGrass: RetroTextureGenerator.createFieldImageTexture('marsh_grass'),
+            fHighlandGrass: RetroTextureGenerator.createFieldImageTexture('highland_grass'),
+            fAridGrass: RetroTextureGenerator.createFieldImageTexture('arid_grass'),
+            fAridGrassThick: RetroTextureGenerator.createFieldImageTexture('arid_grass_thick'),
             fRockA: RetroTextureGenerator.createFieldImageTexture('rock_a'),
             fRockB: RetroTextureGenerator.createFieldImageTexture('rock_b'),
             fRockC: RetroTextureGenerator.createFieldImageTexture('rock_c'),
@@ -2325,7 +2333,8 @@ export class GameEngine {
         this.player.fallVelocityY = 0;
 
         // Reset inputs on scene transition to prevent stuck keys
-        Object.keys(this.keys).forEach(k => this.keys[k] = false);
+        // （端を越える移動のときは、歩き続けられるよう、リセットしない。押しているキーは、そのまま生かす）
+        if (!opts.edgeBlend) Object.keys(this.keys).forEach(k => this.keys[k] = false);
 
         // Check if player spawns inside a collider and push out safely
         for (const c of this.colliders) {

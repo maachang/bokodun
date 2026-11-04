@@ -23,8 +23,8 @@
   "legend": {
     "F": "broadleaf_wall",
     "T": "grass_tree",
-    "g": "grass_tuft",
-    "t": "tall_grass",
+    "g": "meadow_grass",
+    "t": "road_weed",
     "w": "wild_flowers"
   },
   "enemies": {

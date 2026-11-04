@@ -22,7 +22,7 @@
   },
   "legend": {
     "R": "rock_wall",
-    "d": "dry_tuft"
+    "d": "highland_weed"
   },
   "enemies": {
     "F": "griffon",

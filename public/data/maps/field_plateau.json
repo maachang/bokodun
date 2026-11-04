@@ -22,8 +22,8 @@
   },
   "legend": {
     "F": "broadleaf_wall",
-    "d": "dry_tuft",
-    "g": "grass_tuft",
+    "d": "highland_grass",
+    "g": "highland_weed",
     "T": "grass_tree"
   },
   "enemies": {
