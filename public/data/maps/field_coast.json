@@ -24,7 +24,7 @@
     "R": "rock_wall",
     "P": "water",
     "~": "water_shallow",
-    "e": "reed",
+    "e": "cattail_single",
     "M": "palm"
   },
   "enemies": {

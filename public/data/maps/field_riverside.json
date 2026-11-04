@@ -26,9 +26,9 @@
     "P": "water",
     "~": "water_shallow",
     "=": "wood_bridge",
-    "e": "reed",
+    "e": "cattail_cluster",
     "g": "meadow_grass",
-    "w": "wild_flowers",
+    "w": "roadside_flowers",
     "Y": "grass_tree"
   },
   "enemies": {

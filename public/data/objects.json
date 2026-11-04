@@ -16429,6 +16429,78 @@
     "spread": 3.0,
     "description": "乾燥地の茂み草（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
   },
+  "cattail_cluster": {
+    "type": "plant",
+    "texture": "fCattailCluster",
+    "count": 3,
+    "scale": [1.3, 1.9],
+    "spread": 3.0,
+    "description": "池のガマの穂（群生）（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+  },
+  "cattail_single": {
+    "type": "plant",
+    "texture": "fCattailSingle",
+    "count": 3,
+    "scale": [0.61, 2.0],
+    "spread": 3.0,
+    "description": "池のガマの穂（1 株）（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+  },
+  "path_flower": {
+    "type": "plant",
+    "texture": "fPathFlower",
+    "count": 3,
+    "scale": [0.99, 1.3],
+    "spread": 3.0,
+    "description": "道に咲く白い花（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+  },
+  "bush_flower": {
+    "type": "plant",
+    "texture": "fBushFlower",
+    "count": 3,
+    "scale": [1.28, 1.4],
+    "spread": 3.0,
+    "description": "雑草系の、花つきの茂み（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+  },
+  "lavender_flower": {
+    "type": "plant",
+    "texture": "fLavenderFlower",
+    "count": 3,
+    "scale": [1.24, 1.5],
+    "spread": 3.0,
+    "description": "薄紫の花（茎の長い花）（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+  },
+  "roadside_flowers": {
+    "type": "plant",
+    "texture": "fRoadsideFlowers",
+    "count": 3,
+    "scale": [1.28, 1.0],
+    "spread": 3.0,
+    "description": "道端の花々（赤い花など、種類が多い）（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+  },
+  "weed_flower": {
+    "type": "plant",
+    "texture": "fWeedFlower",
+    "count": 3,
+    "scale": [0.87, 1.3],
+    "spread": 3.0,
+    "description": "雑草の小さな白い花（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+  },
+  "marsh_flower": {
+    "type": "plant",
+    "texture": "fMarshFlower",
+    "count": 3,
+    "scale": [1.17, 1.5],
+    "spread": 3.0,
+    "description": "湿地の毒々しい花（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+  },
+  "flowerbed_flower": {
+    "type": "plant",
+    "texture": "fFlowerbedFlower",
+    "count": 3,
+    "scale": [1.03, 1.0],
+    "spread": 3.0,
+    "description": "花壇の花（紫の密集した花）（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+  },
   "reed": {
     "type": "plant",
     "texture": "reed",
