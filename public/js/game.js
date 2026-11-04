@@ -845,7 +845,7 @@ export class GameEngine {
 
         // Spawn objects based on map layout & legend
         // 起伏のあるマップ: 高くなっているマスに置く、木・草・壁などは、そのマスの高さだけ持ち上げて置く（scene.add を、その間だけ差し替える）
-        const LIFT_TYPES = new Set(['block', 'tree', 'boulder', 'plant', 'tree_wall', 'furniture', 'floor_tile']);
+        const LIFT_TYPES = new Set(['block', 'tree', 'boulder', 'plant', 'tree_wall', 'furniture', 'floor_tile', 'wooden_fence']);
         const origSceneAdd = this.scene.add;
         const unlift = () => { if (this.scene.add !== origSceneAdd) this.scene.add = origSceneAdd; };
         for (let r = 0; r < rows; r++) {

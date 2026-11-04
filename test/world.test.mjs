@@ -288,3 +288,53 @@ test('全マップ: 住民（NPC）と敵は、毒沼・溶岩などのダメー
         }
     }
 });
+
+// 村・町・街・貴族街の起伏: 高さがついても、歩ける所は、起伏がないときと同じだけ行ける。扉・看板・噴水・橋は高さ 0。建物は平らな土台
+for (const id of ['village', 'town', 'city', 'city_noble', 'city_slum']) {
+    test(`${id}: 高低差があっても、歩ける範囲が変わらない。扉・看板・噴水・出入口は高さ 0。屋根つきの建物は、同じ高さの土台`, () => {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const lay = m.layout, R = lay.length, C = lay[0].length;
+        const lv = (r, c) => parseInt(m.heights[r][c], 36);
+        assert.equal(m.heights.length, R);
+        assert.ok(m.heights.every(row => /^[0-9a-z]+$/.test(row) && row.length === C));
+        assert.ok(m.heights.join('').split('').some(ch => ch !== '0'), '起伏がある');
+        const enemyCh = new Set(Object.keys(m.enemies || {}));
+        const defOf = (r, c) => objects[m.legend[lay[r][c]]];
+        const pass = (r, c) => { if (lay[r][c] === '0' || enemyCh.has(lay[r][c])) return true; const d = defOf(r, c); return !d || (!d.solid && d.type !== 'furniture' && !d.damagePerSec); };
+        const bfs = (useHeights) => {
+            const seen = new Set([`${m.spawn.z},${m.spawn.x}`]);
+            const q = [[m.spawn.z, m.spawn.x]];
+            while (q.length) {
+                const [r, c] = q.shift();
+                for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+                    const nr = r + dr, nc = c + dc;
+                    if (nr < 0 || nc < 0 || nr >= R || nc >= C || seen.has(`${nr},${nc}`) || !pass(nr, nc)) continue;
+                    if (useHeights && Math.abs(lv(nr, nc) - lv(r, c)) > 1) continue;
+                    seen.add(`${nr},${nc}`); q.push([nr, nc]);
+                }
+            }
+            return seen;
+        };
+        assert.equal(bfs(true).size, bfs(false).size, `${id}: 起伏で、行けなくなった所がある`);
+        for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+            const d = defOf(r, c);
+            if (d && ['door', 'signpost', 'fountain', 'portal', 'liquid_tile', 'gateway'].includes(d.type)) assert.equal(lv(r, c), 0, `${id}: ${d.type} は高さ 0 (${r},${c})`);
+        }
+        for (const k of Object.keys(m.links || {})) { const [x, z] = k.split(',').map(Number); assert.equal(lv(z, x), 0, `${id}: 出入口 ${k} は高さ 0`); }
+        // 屋根つきの建物（つながったブロック）は、同じ高さ
+        const roofed = (r, c) => { const d = defOf(r, c); return d?.type === 'block' && d.hasRoof; };
+        const seen = new Set();
+        for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
+            if (!roofed(r, c) || seen.has(`${r},${c}`)) continue;
+            const st = [[r, c]]; seen.add(`${r},${c}`); const hs = new Set();
+            while (st.length) {
+                const [a, b] = st.pop(); hs.add(lv(a, b));
+                for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+                    const x = a + dr, y = b + dc;
+                    if (x >= 0 && y >= 0 && x < R && y < C && roofed(x, y) && !seen.has(`${x},${y}`)) { seen.add(`${x},${y}`); st.push([x, y]); }
+                }
+            }
+            assert.equal(hs.size, 1, `${id}: 建物 (${r},${c}) の土台の高さがそろっていない: ${[...hs]}`);
+        }
+    });
+}
