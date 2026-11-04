@@ -20,7 +20,7 @@ async function load() {
     fs.writeFileSync(ent, src);
     return { Monster: (await import(ent)).Monster, deriveProfile: (await import(eb)).deriveProfile };
 }
-const KNOWN_AI = new Set(['stationary', 'ranged_maintain', 'bounce_leap', 'hop_pounce', 'stalker_spider', 'flying_chase', 'flying_ranged', 'worm_burrow', 'walk_chase', 'flying_dive', 'charge_dash', 'big_hop', 'pack_chase']);
+const KNOWN_AI = new Set(['stationary', 'ranged_maintain', 'bounce_leap', 'hop_pounce', 'stalker_spider', 'flying_chase', 'flying_ranged', 'worm_burrow', 'walk_chase', 'flying_dive', 'charge_dash', 'big_hop', 'pack_chase', 'cat_ambush', 'bear_rush']);
 
 test('敵の特徴: 全 enemies.json の敵に、動き方（aiType）が決まる。飛ぶ・突進・大ジャンプ・遠距離攻撃が、能力から決まる', async () => {
     const { deriveProfile } = await load();
@@ -110,18 +110,68 @@ test('突進: 近づく → 立ち止まって溜める → 一直線に突進�
     assert.ok(boar.x < 14, '壁を突き抜けない');
 });
 
-test('大ジャンプ（兎）: 1 回の跳躍で、遠くまで飛ぶ。滞空中は、地面より上にいる', async () => {
-    const { Monster } = await load();
-    const r = new Monster('horn_rabbit', 0, 0, tex, { ...defs.horn_rabbit, id: 'horn_rabbit' });
-    r.state = 'chase'; r.hopRest = 0;
-    let maxJump = 0, startX = null, maxH = 0;
-    sim(r, P(20, 0), 6, (m) => {
-        if (m.isLeaping && startX === null) startX = m.x;
-        if (m.isLeaping) { maxJump = Math.max(maxJump, m.x - startX); maxH = Math.max(maxH, m.baseY); }
-        if (!m.isLeaping) startX = null;
-    });
-    assert.ok(maxJump >= 6, `1 回の跳躍の距離: ${maxJump}`);
-    assert.ok(maxH >= 1.5, `跳ぶ高さ: ${maxH}`);
+// 兎・猫の跳躍を、シミュレーションして計る（跳躍ごとの、距離・高さ・回数）
+function measureHops(m, player, sec) {
+    const projs = [];
+    const hops = [];
+    let cur = null;
+    for (let t = 0; t < sec; t += 0.05) {
+        m.update(0.05, player, [], projs, null, null, 1.0);
+        if (m.isLeaping && !cur) cur = { x0: m.x, z0: m.z, h: 0 };
+        if (cur) { cur.h = Math.max(cur.h, m.baseY); cur.x1 = m.x; cur.z1 = m.z; }
+        if (!m.isLeaping && cur) { hops.push({ dist: Math.hypot(cur.x1 - cur.x0, cur.z1 - cur.z0), h: cur.h }); cur = null; }
+    }
+    return hops;
+}
+
+test('兎: 低く、速いリズムで、ぴょんぴょん跳んで近づく。上位種（アルミラージ）は、1 回の跳躍が少し長い', async () => {
+    const { Monster, deriveProfile } = await load();
+    const hr = new Monster('horn_rabbit', 0, 0, tex, { ...defs.horn_rabbit, id: 'horn_rabbit' });
+    const al = new Monster('almiraj', 0, 0, tex, { ...defs.almiraj, id: 'almiraj' });
+    for (const m of [hr, al]) { m.state = 'chase'; m.hopRest = 0; }
+    const hh = measureHops(hr, P(22, 0), 5), ah = measureHops(al, P(22, 0), 5);
+    const avg = (a, k) => a.reduce((t, x) => t + x[k], 0) / a.length;
+    assert.ok(hh.length >= 4, `速いリズム（5 秒で ${hh.length} 回）`);
+    assert.ok(avg(hh, 'h') > 0.5 && avg(hh, 'h') < 1.3, `低く跳ぶ: ${avg(hh, 'h')}`);
+    assert.ok(avg(hh, 'dist') > 3 && avg(hh, 'dist') < 6, `1 回の距離: ${avg(hh, 'dist')}`);
+    assert.ok(avg(ah, 'dist') > avg(hh, 'dist') * 1.2, `上位種は、跳ぶ距離が長い: ${avg(ah, 'dist')} / ${avg(hh, 'dist')}`);
+    assert.ok(deriveProfile({ ...defs.almiraj, id: 'almiraj' }).hop.range > deriveProfile({ ...defs.horn_rabbit, id: 'horn_rabbit' }).hop.range);
+});
+
+test('猫系（ユキヒョウ）: 攻撃体制で姿を消し、低く長く跳んで近づき、近くで連続攻撃（1 回は小さい）、跳んで離れる（ヒットアンドアウェイ）', async () => {
+    const { Monster, deriveProfile } = await load();
+    assert.equal(deriveProfile({ ...defs.snow_leopard, id: 'snow_leopard' }).aiType, 'cat_ambush');
+    const c = new Monster('snow_leopard', 0, 0, tex, { ...defs.snow_leopard, id: 'snow_leopard' });
+    const rabbit = new Monster('horn_rabbit', 0, 0, tex, { ...defs.horn_rabbit, id: 'horn_rabbit' });
+    // 攻撃体制に入るまでは、姿を現している。入ると、隠密で消える
+    c.state = 'chase'; c.hopRest = 0;
+    const player = P(24, 0);
+    const projs = [];
+    let cloakedSeen = false, minAlpha = 1, flurry = false, flurryScale = 1, away = false, revealedInFlurry = false, maxH = 0;
+    let hops = [];
+    const states = [];
+    for (let t = 0; t < 40; t += 0.05) {
+        // プレイヤーに近づいたら（跳躍で、近くへ来たら）、その場に留まる（歩かない）
+        c.update(0.05, player, [], projs, null, null, 1.0);
+        if (c.cloaked) { cloakedSeen = true; minAlpha = Math.min(minAlpha, c.appearAlpha); }
+        if (c.catState === 'flurry') { flurry = true; flurryScale = c.hitScale; if (c.appearAlpha > 0.8) revealedInFlurry = true; }
+        if (c.catState === 'away') away = true;
+        maxH = Math.max(maxH, c.baseY);
+        if (states[states.length - 1] !== c.catState) states.push(c.catState);
+    }
+    assert.ok(cloakedSeen && minAlpha < 0.15, `隠密で消える（最小の透明度 ${minAlpha}）`);
+    assert.ok(flurry && flurryScale < 1, `近くで連続攻撃（1 回の威力の倍率 ${flurryScale}）`);
+    assert.ok(revealedInFlurry, '連続攻撃の間は、姿を現す');
+    assert.ok(away, '攻撃のあと、跳んで離れる');
+    assert.ok(maxH < 1.2, `低く跳ぶ: ${maxH}`);
+    for (const st of ['stalk', 'flurry', 'away']) assert.ok(states.includes(st), `状態 ${st}: ${states}`);
+    assert.ok(states.filter(x => x === 'flurry').length >= 2, `ヒットアンドアウェイを繰り返す: ${states}`);
+    // 跳ぶ距離は、兎より長い
+    const c2 = new Monster('snow_leopard', 0, 0, tex, { ...defs.snow_leopard, id: 'snow_leopard' });
+    c2.state = 'chase'; c2.hopRest = 0; rabbit.state = 'chase'; rabbit.hopRest = 0;
+    const ch = measureHops(c2, P(22, 0), 3), rh = measureHops(rabbit, P(22, 0), 3);
+    const avg = (a, k) => a.reduce((t, x) => t + x[k], 0) / a.length;
+    assert.ok(ch.length >= 1 && avg(ch, 'dist') > avg(rh, 'dist') * 1.8, `猫系の跳ぶ距離は、兎より、ずっと長い: ${avg(ch, 'dist')} / ${avg(rh, 'dist')}`);
 });
 
 test('遠距離攻撃: 高い所から、低い所のプレイヤーへ、下向きに撃つ。弾の高さは、撃った敵の高さから', async () => {
@@ -208,4 +258,83 @@ test('鳥: 一定の範囲を巡回していて、その範囲に入られると
     for (let t = 0; t < 8; t += 0.05) { h.update(0.05, P(54, 50), [], projs, null, null, 1.0); if (h.diveState === 'dive') dived = true; }
     assert.equal(h.state, 'chase', '範囲に入ると攻撃開始');
     assert.ok(dived, '急降下する');
+});
+
+test('イノシシ: ブルブル震えて溜め → ロケットスタートで、かなり速く突き抜ける。よけられると、息切れして、長く動けず、被ダメージが増える（弱い）', async () => {
+    const { Monster, deriveProfile } = await load();
+    const p = deriveProfile({ ...defs.giant_boar, id: 'giant_boar' });
+    assert.equal(p.aiType, 'charge_dash');
+    assert.ok(p.charge.speed >= 5 && p.charge.rest >= 2 && p.charge.vulnerable > 1.3, JSON.stringify(p.charge));
+    const b = new Monster('giant_boar', 0, 0, tex, { ...defs.giant_boar, id: 'giant_boar' });
+    b.state = 'chase'; b.chargeCooldown = 0;
+    // プレイヤーを突き抜ける（壁なし）: 当たらない（dashHit のまま false）= よけられた
+    const projs = [];
+    let windupShake = false, maxV = 0, lastX = 0, restState = null, restDur = 0, vulnerable = 1, dashed = false;
+    for (let t = 0; t < 14; t += 0.05) {
+        lastX = b.x;
+        b.update(0.05, P(8, 0), [], projs, null, null, 1.0);
+        if (b.chargeState === 'windup' && Math.abs(b.sprite.position.x - b.x) > 0.01) windupShake = true;
+        if (b.chargeState === 'dash') { dashed = true; maxV = Math.max(maxV, (b.x - lastX) / 0.05); }
+        if (b.chargeState === 'rest') { restDur += 0.05; vulnerable = Math.max(vulnerable, b.damageTakenScale); }
+    }
+    assert.ok(windupShake, '溜めの間、ブルブル震える');
+    assert.ok(dashed && maxV > b.baseSpeed * 6, `ロケットスタートで、かなり速い: ${maxV}（通常 ${b.baseSpeed}）`);
+    assert.ok(restDur >= 2.0, `よけられると、長く息切れする: ${restDur} 秒`);
+    assert.ok(vulnerable >= 1.5, `息切れの間は、被ダメージが増える: ${vulnerable}`);
+    // 息切れの間に、魔法を当てると、ダメージが大きい。立て直したあとは、ふつう
+    const c = new Monster('giant_boar', 0, 0, tex, { ...defs.giant_boar, id: 'giant_boar' });
+    c.damageTakenScale = 1.6; const hp0 = c.hp; c.takeDamage(10, { x: 1, z: 0 }, 1);
+    assert.ok(hp0 - c.hp >= 15.9, `被ダメージ 1.6 倍: ${hp0 - c.hp}`);
+    // 当てたとき（dashHit）は、すぐ立て直す
+    const d = new Monster('giant_boar', 0, 0, tex, { ...defs.giant_boar, id: 'giant_boar' });
+    d.state = 'chase'; d.chargeCooldown = 0;
+    let hitRest = 0, rests = 0, prevState = '';
+    for (let t = 0; t < 14; t += 0.05) {
+        d.update(0.05, P(8, 0), [], projs, null, null, 1.0);
+        if (d.chargeState === 'dash') d.dashHit = true;   // game.js が当たったときに立てる
+        if (d.chargeState === 'rest') { hitRest += 0.05; if (prevState !== 'rest') rests++; }
+        prevState = d.chargeState;
+    }
+    assert.ok(rests >= 1 && hitRest / rests < 1.1, `当てたときは、すぐ立て直す: 1 回 ${hitRest / rests} 秒`);
+});
+
+test('狼: 索敵範囲が、ふつうの敵の倍。仲間を呼ぶ距離も長い（相当しつこい）', async () => {
+    const { Monster, deriveProfile } = await load();
+    const w = new Monster('great_wolf', 0, 0, tex, { ...defs.great_wolf, id: 'great_wolf', senseRange: 10 });
+    const g = new Monster('goblin_soldier', 0, 0, tex, { ...defs.goblin_soldier, id: 'goblin_soldier', senseRange: 10 });
+    assert.equal(w.senseRange, 20, `狼の索敵範囲 ${w.senseRange}`);
+    assert.equal(g.senseRange, 10);
+    assert.ok(deriveProfile({ ...defs.fenrir, id: 'fenrir' }).relentless.joinRadius >= 30);
+    // 距離 15（ふつうの敵が気づかない）でも、狼は気づく
+    w.facing = 0; g.facing = 0; w.speed = 0; g.speed = 0;
+    for (let i = 0; i < 30; i++) { w.update(0.05, P(0, 15), [], [], null, null, 1.0); g.update(0.05, P(0, 15), [], [], null, null, 1.0); }
+    assert.equal(w.state, 'chase', '距離 15 でも、狼は気づく');
+    assert.equal(g.state, 'unaware');
+});
+
+test('クマ: 縄張りの中でウロウロし、攻撃を始めると、近くで連打（ラッシュ）。1 回は小さいが、回数が多い。連打のあと、間を置いて、また連打', async () => {
+    const { Monster, deriveProfile } = await load();
+    for (const id of ['brown_bear', 'grizzly']) {
+        const p = deriveProfile({ ...defs[id], id });
+        assert.equal(p.aiType, 'bear_rush', id);
+        assert.ok(p.rush.flurry >= 2 && p.rush.flurryScale < 0.7, JSON.stringify(p.rush));
+        assert.equal(p.territory.mode, 'guard', id);
+    }
+    const b = new Monster('brown_bear', 0, 0, tex, { ...defs.brown_bear, id: 'brown_bear' });
+    // 縄張りの外では、ウロウロ（攻撃しない）
+    const projs = [];
+    for (let t = 0; t < 4; t += 0.05) b.update(0.05, P(30, 0), [], projs, null, null, 1.0);
+    assert.equal(b.state, 'unaware');
+    assert.ok(Math.hypot(b.x, b.z) < 11, 'ウロウロ（縄張りの中）');
+    // 縄張りに入ると、攻撃。ラッシュ → 間 → ラッシュ
+    const states = [], scales = new Set();
+    const pl = P(5, 0);
+    for (let t = 0; t < 14; t += 0.05) {
+        b.update(0.05, pl, [], projs, null, null, 1.0);
+        if (states[states.length - 1] !== b.rushState) states.push(b.rushState);
+        if (b.rushState === 'rush') scales.add(b.hitScale);
+    }
+    assert.equal(b.state, 'chase');
+    assert.ok(states.filter(x => x === 'rush').length >= 2 && states.includes('recover'), `ラッシュを繰り返す: ${states}`);
+    assert.ok([...scales].every(x => x < 0.7), `1 回の威力は小さい: ${[...scales]}`);
 });

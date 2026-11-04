@@ -68,9 +68,10 @@ export class Monster {
             this.profile = deriveProfile({ ...enemyDef, id: enemyDef.id ?? enemyType });
             this.aiType = this.profile.aiType;
             this.flying = this.profile.flying;
-            if (this.profile.relentless) {   // 狼: 一定の、そこそこ速い速さ
+            if (this.profile.relentless) {   // 狼: 一定の、そこそこ速い速さ。索敵範囲は、ふつうの敵の倍（相当しつこい）
                 this.speed = Math.max(this.speed, this.profile.relentless.speed);
                 this.baseSpeed = this.speed;
+                this.senseRange *= this.profile.relentless.senseScale ?? 1;
             }
             if (this.profile.shoot) {
                 const sh = this.profile.shoot;
@@ -218,6 +219,15 @@ export class Monster {
         this.chargeDist = 0;
         this.isDashing = false;        // 突進中（当たると、ダメージ・ノックバックが大きい）
         this.hopRest = 0;              // 大ジャンプの着地後の休み
+        this.cloaked = false;          // 猫系: 姿を消している（隠密）
+        this.hitScale = 1;             // 攻撃の威力の倍率（猫系の連続攻撃は、1 回が小さい）
+        this.catState = 'stalk';       // 猫系: stalk(狙う) / flurry(近くで連続攻撃) / away(離れる)
+        this.catTimer = 0;
+        this.awayHops = 0;
+        this.damageTakenScale = 1;     // 受けるダメージの倍率（イノシシが、突進をよけられて息切れしている間は、大きくなる）
+        this.dashHit = false;          // 今回の突進が、プレイヤーに当たったか（game.js が立てる）
+        this.rushState = 'chase';      // クマ: chase(近づく) / rush(連打) / recover(間)
+        this.rushTimer = 0;
         this.homeX = x;                // 生まれた場所（縄張り・巡回の中心）
         this.homeZ = z;
         this.provokedTimer = 0;        // 攻撃されてから、縄張りの外でも追う時間
@@ -289,9 +299,11 @@ export class Monster {
             : (this.stealth === 'high' && dist > fadeStart)
                 ? Math.min(1, Math.max(0, (drawRange - dist) / (drawRange - fadeStart)))
                 : 1;
+        // 猫系が隠密で姿を消している間は、ほとんど見えない（攻撃されたとき・近くで攻撃するときは、現れる）
+        const cloakAlpha = (this.cloaked && this.hitTimer <= 0) ? 0.04 : targetAlpha;
         // 現れる・消えるときは、目標の透明度へ APPEAR_FADE_TIME かけて滑らかに近づける（突然出てこない）
-        const step = dt / APPEAR_FADE_TIME;
-        this.appearAlpha += Math.max(-step, Math.min(step, targetAlpha - this.appearAlpha));
+        const step = dt / (this.cloaked ? 0.25 : APPEAR_FADE_TIME);
+        this.appearAlpha += Math.max(-step, Math.min(step, cloakAlpha - this.appearAlpha));
         this.spriteMat.opacity = this.appearAlpha;
         this.sprite.visible = this.appearAlpha > 0.01;
 
@@ -304,6 +316,7 @@ export class Monster {
 
         // 鈍足: AI の時間の進みを遅くして、移動・攻撃・射撃・アニメーションをまとめてゆっくりにする
         if (this.slowTimer > 0) dt *= this.slowScale;
+        this.shakeX = 0;   // 震え（突進の溜め）は、毎フレーム、溜めの間だけ入れ直す
 
         // 縄張りのある敵が、プレイヤーを追っていない間の動き: 守る（クマ: 縄張りの中をうろつく）／巡回する（鳥: 範囲を飛び回る）
         if (terr && this.state !== 'chase') {
@@ -672,9 +685,10 @@ export class Monster {
             }
 
             case 'charge_dash': {
-                // 突進する敵（イノシシなど）: 近づく → 立ち止まって溜める（地面を蹴る）→ 一直線に猪突猛進（壁にぶつかるまで）→ ぶつかるとスタン
+                // 突進する敵（イノシシなど）: 近づく → 立ち止まって溜める（ブルブル震えて地面を蹴る）→ ロケットスタートで、一直線に猪突猛進（途中で曲がらず、
+                //   プレイヤーを突き抜けて攻撃）→ 壁にぶつかるとスタン。よけられる（当たらずに突き抜ける）と、息切れして、長く動けず、受けるダメージが増える（弱い）
                 this.isDashing = (this.chargeState === 'dash');
-                const ch = this.profile?.charge ?? { windup: 0.9, dash: 12, speed: 3.2, stun: 1.3 };
+                const ch = this.profile?.charge ?? { windup: 0.9, dash: 12, speed: 3.2, stun: 1.3, rest: 0.8, vulnerable: 1 };
                 const moveBy = (vx, vz) => {
                     const nx = this.x + vx * dt, nz = this.z + vz * dt;
                     let blocked = false;
@@ -685,36 +699,44 @@ export class Monster {
                 if (dist < 22 && this.knockback.lengthSq() < 0.1) {
                     this.chargeCooldown -= dt;
                     if (this.chargeState === 'walk') {
+                        this.damageTakenScale = 1;
                         if (dist > 1.0) {
                             moveBy(dirX * this.speed * 0.9, dirZ * this.speed * 0.9);
                             this.baseY = Math.abs(Math.sin(this.aiTimer * 8.0)) * 0.1;
                         }
                         if (this.chargeCooldown <= 0 && dist < 12 && dist > 3.5) { this.chargeState = 'windup'; this.chargeTimer = ch.windup; }
                     } else if (this.chargeState === 'windup') {
-                        // 溜め: 立ち止まり、体を揺らして地面を蹴る。攻撃の予告
+                        // 溜め（攻撃体制）: 立ち止まり、ブルブルと震えて、地面を蹴る。攻撃の予告
                         this.chargeTimer -= dt;
-                        this.sprite.position.x = this.x + Math.sin(this.aiTimer * 50) * 0.08;
-                        this.baseY = Math.abs(Math.sin(this.aiTimer * 18.0)) * 0.12;
-                        this.sprite.scale.set(this.baseScaleX * (1 + Math.sin(this.aiTimer * 30) * 0.05), this.baseScaleY * (1 - Math.sin(this.aiTimer * 30) * 0.05), 1);
+                        this.shakeX = Math.sin(this.aiTimer * 60) * 0.12;   // ブルブル震える（最後に、位置へ足す）
+                        this.baseY = Math.abs(Math.sin(this.aiTimer * 22.0)) * 0.12;
+                        this.sprite.scale.set(this.baseScaleX * (1 + Math.sin(this.aiTimer * 34) * 0.07), this.baseScaleY * (1 - Math.sin(this.aiTimer * 34) * 0.07), 1);
                         if (this.chargeTimer <= 0) {
-                            this.chargeState = 'dash'; this.chargeDist = 0; this.isDashing = true;
+                            this.chargeState = 'dash'; this.chargeDist = 0; this.isDashing = true; this.dashHit = false;
                             this.chargeDir = { x: dirX, z: dirZ };   // 溜めが終わった瞬間の、プレイヤーの方向へ（途中で曲がらない）
                         }
                     } else if (this.chargeState === 'dash') {
                         this.isDashing = true;
-                        const v = this.speed * ch.speed;
+                        // ロケットスタート: 走り出しの最初の 3 マスは、さらに速い
+                        const v = this.speed * ch.speed * (this.chargeDist < 3 ? 1.5 : 1);
                         const before = { x: this.x, z: this.z };
                         const blocked = moveBy(this.chargeDir.x * v, this.chargeDir.z * v);
                         this.chargeDist += Math.hypot(this.x - before.x, this.z - before.z);
                         this.baseY = Math.abs(Math.sin(this.aiTimer * 16.0)) * 0.15;
                         this.sprite.scale.set(this.baseScaleX * 1.1, this.baseScaleY * 0.92, 1);
-                        if (blocked) { this.chargeState = 'stun'; this.chargeTimer = ch.stun; this.isDashing = false; }   // 壁・崖にぶつかって、目を回す
-                        else if (this.chargeDist >= ch.dash) { this.chargeState = 'rest'; this.chargeTimer = 0.8; this.isDashing = false; }
+                        if (blocked) { this.chargeState = 'stun'; this.chargeTimer = ch.stun; this.isDashing = false; this.damageTakenScale = ch.vulnerable ?? 1; }   // 壁・崖にぶつかって、目を回す
+                        else if (this.chargeDist >= ch.dash) {
+                            this.chargeState = 'rest'; this.isDashing = false;
+                            // 当たらずに突き抜けた（よけられた）: 息切れして、長く動けず、被ダメージが増える。当てたときは、すぐ立て直す
+                            if (this.dashHit) { this.chargeTimer = 0.8; this.damageTakenScale = 1; }
+                            else { this.chargeTimer = ch.rest ?? 0.8; this.damageTakenScale = ch.vulnerable ?? 1; }
+                        }
                     } else if (this.chargeState === 'stun' || this.chargeState === 'rest') {
                         this.chargeTimer -= dt;
                         this.baseY = 0;
                         if (this.chargeState === 'stun') this.sprite.scale.set(this.baseScaleX * 0.95, this.baseScaleY * 1.0, 1);
-                        if (this.chargeTimer <= 0) { this.chargeState = 'walk'; this.chargeCooldown = 1.4 + Math.random(); }
+                        else this.sprite.scale.set(this.baseScaleX * 1.05, this.baseScaleY * 0.93, 1);   // 息切れ（うなだれる）
+                        if (this.chargeTimer <= 0) { this.chargeState = 'walk'; this.chargeCooldown = 1.4 + Math.random(); this.damageTakenScale = 1; }
                     }
                 } else {
                     this.isDashing = false;
@@ -725,7 +747,7 @@ export class Monster {
             case 'big_hop': {
                 // 大きく跳ぶ敵（兎など）: 1 回の跳躍が、とても遠い。着地して少し休み、また跳ぶ。近づくと、プレイヤーの頭上へ飛び込む
                 if (dist < 24 && this.knockback.lengthSq() < 0.1) {
-                    const hp = this.profile?.hop ?? { range: 9, height: 4.6 };
+                    const hp = this.profile?.hop ?? { range: 4.5, height: 0.9, rest: 0.26 };
                     const G = 18;
                     if (this.isLeaping) {
                         this.leapVelocityY -= G * dt;
@@ -736,7 +758,7 @@ export class Monster {
                         this.sprite.scale.set(this.baseScaleX * 0.88, this.baseScaleY * 1.2, 1);
                         if (this.baseY <= 0) {
                             this.baseY = 0; this.isLeaping = false; this.leapVelocityY = 0;
-                            this.hopRest = 0.45 + Math.random() * 0.3;
+                            this.hopRest = (hp.rest ?? 0.26) * (0.8 + Math.random() * 0.4);   // 着地して、すぐ次の跳躍（速いリズム）
                             this.sprite.scale.set(this.baseScaleX * 1.3, this.baseScaleY * 0.7, 1);
                         }
                     } else {
@@ -746,13 +768,104 @@ export class Monster {
                         if (this.hopRest <= 0 && dist > 0.8) {
                             // 跳ぶ距離: プレイヤーまでの距離（上限 hop.range）。滞空時間から、水平の速さを決める
                             const hopDist = Math.min(hp.range, Math.max(2.5, dist));
-                            const vy = Math.sqrt(2 * G * (hp.height * 0.6));
+                            const vy = Math.sqrt(2 * G * hp.height);   // hp.height は、跳ぶ高さ（頂点）
                             const airtime = 2 * vy / G;
                             this.isLeaping = true;
                             this.leapVelocityY = vy;
                             this.leapSpeed = hopDist / airtime;
                             this.leapTargetDir = { x: dirX, z: dirZ };
                         }
+                    }
+                }
+                break;
+            }
+
+            case 'cat_ambush': {
+                // 猫系: 攻撃体制（追跡状態）に入ると、隠密で姿を消し、低く・長く跳んで近づく（不意打ち）。近くでは、姿を現し、噛みつき・ひっかきを
+                //   素早く何度も繰り出す（1 回の威力は小さい）。しばらくすると、跳んで離れて、また姿を消す（しつこく攻撃せず、ヒットアンドアウェイ）
+                const ct = this.profile?.cat ?? { range: 11, height: 0.8, rest: 0.3, flurry: 1.0, flurryScale: 0.55, away: 7, cool: 2.5 };
+                const G = 18;
+                if (this.state !== 'chase' || dist > 28) { this.cloaked = false; this.hitScale = 1; this.catState = 'stalk'; break; }
+                const hopTo = (tx, tz, distance) => {
+                    const vy = Math.sqrt(2 * G * ct.height), airtime = 2 * vy / G;
+                    this.isLeaping = true; this.leapVelocityY = vy;
+                    this.leapSpeed = distance / airtime; this.leapTargetDir = { x: tx, z: tz };
+                };
+                if (this.isLeaping) {
+                    this.leapVelocityY -= G * dt;
+                    this.baseY += this.leapVelocityY * dt;
+                    const nx = this.x + this.leapTargetDir.x * this.leapSpeed * dt, nz = this.z + this.leapTargetDir.z * this.leapSpeed * dt;
+                    if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx;
+                    if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz;
+                    this.sprite.scale.set(this.baseScaleX * 1.12, this.baseScaleY * 0.85, 1);   // 低く、伸びて跳ぶ
+                    if (this.baseY <= 0) {
+                        this.baseY = 0; this.isLeaping = false; this.leapVelocityY = 0;
+                        this.hopRest = ct.rest * (0.8 + Math.random() * 0.4);
+                        this.sprite.scale.set(this.baseScaleX * 1.1, this.baseScaleY * 0.82, 1);
+                    }
+                } else {
+                    this.hopRest -= dt;
+                    if (this.catState === 'stalk') {
+                        this.cloaked = true; this.hitScale = 1;
+                        this.sprite.scale.set(this.baseScaleX, this.baseScaleY * 0.88, 1);   // 低く構える
+                        if (this.hopRest <= 0) {
+                            if (dist < 3.4) { this.catState = 'flurry'; this.catTimer = ct.flurry; this.cloaked = false; this.hitScale = ct.flurryScale; }
+                            else hopTo(dirX, dirZ, Math.min(ct.range, Math.max(2.4, dist - 1.0)));
+                        }
+                    } else if (this.catState === 'flurry') {
+                        // 近くで、噛みつき・ひっかき。相手にまとわりつく
+                        this.cloaked = false; this.hitScale = ct.flurryScale;
+                        this.catTimer -= dt;
+                        const touch = (this.radius + (player.radius ?? 0.4)) * 0.85;   // ぶつかる（攻撃が当たる）距離まで寄る
+                        if (dist > touch) {
+                            const nx = this.x + dirX * Math.max(this.speed * 1.6, 3.0) * dt, nz = this.z + dirZ * Math.max(this.speed * 1.6, 3.0) * dt;
+                            if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx;
+                            if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz;
+                        }
+                        const claw = 1 + Math.sin(this.aiTimer * 40) * 0.12;   // ひっかきの素早い動き
+                        this.sprite.scale.set(this.baseScaleX * claw, this.baseScaleY * (2 - claw), 1);
+                        this.baseY = Math.abs(Math.sin(this.aiTimer * 20)) * 0.18;
+                        if (this.catTimer <= 0) { this.catState = 'away'; this.awayHops = 2; this.hitScale = 1; this.cloaked = true; this.hopRest = 0; }
+                    } else {
+                        // 離れる: 跳んで離れて、姿を消す。しばらくして、また狙う
+                        this.cloaked = true; this.hitScale = 1;
+                        if (this.hopRest <= 0) {
+                            if (this.awayHops > 0) { hopTo(-dirX, -dirZ, ct.away); this.awayHops--; }
+                            else { this.catState = 'stalk'; this.hopRest = ct.cool * (0.8 + Math.random() * 0.5); }
+                        }
+                    }
+                }
+                break;
+            }
+
+            case 'bear_rush': {
+                // クマ: 近づくと（攻撃を始めると）、ラッシュ（連打）。1 回の威力は小さいが、回数が多い。連打のあとは、少し間を置き、また連打する
+                const rs = this.profile?.rush ?? { flurry: 2.6, flurryScale: 0.5, cool: 1.2 };
+                if (dist < 20 && this.knockback.lengthSq() < 0.1) {
+                    const touch = (this.radius + (player.radius ?? 0.4)) * 0.85;
+                    const step = (sp) => {
+                        const nx = this.x + dirX * sp * dt, nz = this.z + dirZ * sp * dt;
+                        if (!this.checkWallCollision(nx, this.z, colliders)) this.x = nx;
+                        if (!this.checkWallCollision(this.x, nz, colliders)) this.z = nz;
+                    };
+                    if (this.rushState === 'chase') {
+                        this.hitScale = 1;
+                        if (dist > touch) step(this.speed);
+                        this.baseY = Math.abs(Math.sin(this.aiTimer * 7.0)) * 0.1;
+                        if (dist <= touch + 0.6) { this.rushState = 'rush'; this.rushTimer = rs.flurry; this.hitScale = rs.flurryScale; }
+                    } else if (this.rushState === 'rush') {
+                        this.hitScale = rs.flurryScale;
+                        this.rushTimer -= dt;
+                        if (dist > touch) step(this.speed * 1.4);   // 連打の間、相手にまとわりつく
+                        const claw = 1 + Math.sin(this.aiTimer * 30) * 0.1;   // 両手の連打
+                        this.sprite.scale.set(this.baseScaleX * claw, this.baseScaleY * (2 - claw), 1);
+                        this.baseY = Math.abs(Math.sin(this.aiTimer * 16)) * 0.12;
+                        if (this.rushTimer <= 0) { this.rushState = 'recover'; this.rushTimer = rs.cool; this.hitScale = 1; }
+                    } else {
+                        this.hitScale = 1;
+                        this.rushTimer -= dt;
+                        this.baseY = 0;
+                        if (this.rushTimer <= 0) this.rushState = 'chase';
                     }
                 }
                 break;
@@ -852,7 +965,7 @@ export class Monster {
             }
         }
 
-        this.sprite.position.x = this.x;
+        this.sprite.position.x = this.x + (this.shakeX || 0);
         this.sprite.position.z = this.z;
     }
 
@@ -983,6 +1096,7 @@ export class Monster {
 
     // knockScale: ノックバックの強さの倍率（既定 1.0。大剣・メイスなどが大きくする）
     takeDamage(amount, knockDir, knockScale = 1.0) {
+        amount = amount * (this.damageTakenScale ?? 1);
         this.hp -= amount;
         this.hitTimer = HIT_FLASH_TIME;
         this.provokedTimer = 8;   // 攻撃されたら、縄張りの外へ逃げられても、しばらく追う

@@ -4155,7 +4155,8 @@ export class GameEngine {
         } else if (isCharging) {
             // Normal charge: Mutual damage (player takes half, enemy takes standard)
             const pDmg = Math.floor(this.player.attackPower * damageScale + Math.random() * randomBonus);
-            const mDmg = Math.floor(monster.attackPower * 0.5 * (monster.isDashing ? 1.5 : 1));
+            if (monster.isDashing) monster.dashHit = true;   // 突進が当たった（よけられていない）
+            const mDmg = Math.floor(monster.attackPower * 0.5 * (monster.isDashing ? 1.5 : 1) * (monster.hitScale ?? 1));
 
             this.sound.playAttack(heavySound);
             const isDead = monster.takeDamage(pDmg, { x: nx, z: nz }, knockScale);
@@ -4168,7 +4169,8 @@ export class GameEngine {
             if (isDead) this.gainExp(monster.exp);
         } else {
             // Enemy hits player (player is standing still, stopped, or backing away)
-            const mDmg = Math.floor(monster.attackPower * (monster.isDashing ? 1.5 : 1));   // 突進中は、威力が 1.5 倍
+            if (monster.isDashing) monster.dashHit = true;   // 突進が当たった（よけられていない）
+            const mDmg = Math.max(1, Math.floor(monster.attackPower * (monster.isDashing ? 1.5 : 1) * (monster.hitScale ?? 1)));   // 突進中は、威力が 1.5 倍。猫系の連続攻撃は、1 回が小さい
             this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz), monster.isDashing ? 2.0 : 1.0);   // 突進は、大きく吹き飛ばす
             this.notifyEnemyEngaged(monster);
         }

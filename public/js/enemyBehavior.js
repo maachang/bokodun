@@ -5,7 +5,9 @@
 //     flying        true で空を飛ぶ（川・崖・毒沼・高低差に関係なく動け、見えなくても感知する）
 //     flightHeight  飛ぶ高さ（地面から。既定は大きさで決まる）
 //     charge        { windup, dash, speed, stun } 突進（猪突猛進）の溜め時間・走る距離・速さ倍率・壁にぶつかったときのスタン
-//     hop           { range, height } 大きく跳ぶときの 1 回の距離と高さ
+//     hop           { range, height, rest } 兎: 低く速いリズムで跳ぶときの 1 回の距離・高さ・着地後の休み
+//     rush          { flurry, flurryScale, cool } クマ: 攻撃を始めると、近くで連打（1 回は小さく、回数が多い）
+//     cat           { range, height, rest, flurry, flurryScale, away, cool } 猫系: 隠密・低く長く跳ぶ・近くで連続攻撃・ヒットアンドアウェイ
 //     relentless    { speed, joinRadius } 一定の速さで追跡をやめない・仲間が合流する（狼）
 //     territory     { radius, mode, leash } 縄張り（guard=縄張りに入ると攻撃 / patrol=範囲を巡回、入ると攻撃 / roam=住民のようにうろつき、攻撃されたときだけ追う）
 //     shoot         { type, range, cooldown, speed, damage } 遠距離攻撃
@@ -59,19 +61,31 @@ export function deriveProfile(def = {}) {
 
     // 突進（猪突猛進）: charge の能力を持つ、地上の敵。大きく跳ぶ兎は別（big_hop）
     const isRabbit = /rabbit|almiraj/.test(id);
-    if (isRabbit) {
-        p.hop = { range: 9, height: 4.6, ...(def.hop || {}) };
+    const isCat = /leopard|panther|tiger|lion|cheetah|^cat/.test(id) && !p.flying;
+    if (def.cat || isCat) {
+        // 猫系: 攻撃体制に入ると、隠密で姿を消し、低く・長く跳んで近づき（不意打ち）、近くでは噛みつき・ひっかきで、素早く何度も攻撃し、
+        //   すぐ離れて、また姿を消す（ヒットアンドアウェイ）。range: 1 回の跳躍の距離、height: 跳ぶ高さ、rest: 着地後の休み、
+        //   flurry: 近くで攻撃し続ける時間、flurryScale: 1 回あたりの威力の倍率（攻撃回数が多い分、小さい）、away: 離れる跳躍の距離、cool: 次に狙うまでの間
+        p.cat = { range: 11, height: 0.8, rest: 0.3, flurry: 1.0, flurryScale: 0.55, away: 7, cool: 2.5, ...(def.cat || {}) };
+    } else if (isRabbit) {
+        // 兎: 低く、速いリズムで、ぴょんぴょん跳んで近づく。上位種（アルミラージ）は、1 回の跳躍が、少し長い
+        const upper = /almiraj/.test(id);
+        p.hop = { range: upper ? 6.5 : 4.5, height: upper ? 1.1 : 0.9, rest: upper ? 0.22 : 0.26, ...(def.hop || {}) };
     } else if (def.charge) {
-        p.charge = { windup: 0.9, dash: 13, speed: 3.2, stun: 1.3, ...def.charge };
-    } else if (ab.has('charge') && !p.flying) {
+        p.charge = { windup: 0.9, dash: 13, speed: 3.2, stun: 1.3, rest: 0.8, vulnerable: 1.0, ...def.charge };
+    } else if (ab.has('charge') && !p.flying && !p.cat) {
         const heavy = /boar|bear|ogre|cyclops|beetle|pillbug|orc_king|bandit_boss|berserker/.test(id);
-        p.charge = { windup: heavy ? 1.0 : 0.8, dash: heavy ? 14 : 11, speed: heavy ? 3.4 : 3.0, stun: heavy ? 1.5 : 1.1 };
+        p.charge = { windup: heavy ? 1.0 : 0.8, dash: heavy ? 14 : 11, speed: heavy ? 3.4 : 3.0, stun: heavy ? 1.5 : 1.1, rest: 0.8, vulnerable: 1.0 };
+        // イノシシ: ブルブル震えて溜め（攻撃体制）→ ロケットスタートで、かなり速く突っ込み、突き抜けて攻撃する。
+        //   よけられる（当たらずに突き抜ける）と、息切れして、長く動けず、被ダメージが増える（弱い）。当てたときは、すぐ立て直す
+        if (/boar/.test(id)) p.charge = { windup: 1.1, dash: 18, speed: 6, stun: 1.8, rest: 2.2, vulnerable: 1.6 };
     }
 
     // 狼（relentless）: 一定のそこそこ速い速さで、どこまでも追ってくる（見失っても追跡をやめない）。追っている間に、近くの仲間（群れ）が合流して、列になって追ってくる（トレイン）
     //   突進（charge）の代わりに、この追跡を使う。個別の指定: relentless: { speed, joinRadius }
-    if (def.relentless) p.relentless = { speed: 4.8, joinRadius: 24, ...def.relentless };
-    else if (/wolf|fenrir/.test(id) && def.relentless !== false) p.relentless = { speed: 4.8, joinRadius: 24 };
+    //   索敵範囲（senseScale 倍）も、追跡（見失わない・仲間を呼ぶ距離 joinRadius）も、ふつうの敵の倍ほど。相当しつこい
+    if (def.relentless) p.relentless = { speed: 4.8, joinRadius: 36, senseScale: 2, ...def.relentless };
+    else if (/wolf|fenrir/.test(id) && def.relentless !== false) p.relentless = { speed: 4.8, joinRadius: 36, senseScale: 2 };
     if (p.relentless) { p.charge = null; p.pack = true; }
 
     // 縄張り（territory）: クマは、自分の縄張り（生まれた場所のまわり）に入られると、攻撃を始める（縄張りの外へ出ると、追うのをやめて、戻る）。
@@ -81,12 +95,18 @@ export function deriveProfile(def = {}) {
     else if (/bear|grizzly/.test(id) && !p.flying) p.territory = { radius: 11, mode: 'guard', leash: 1.5 };
     else if (p.flying && /hawk|griffon|eagle|bird|pegasus/.test(id)) p.territory = { radius: 15, mode: 'patrol', leash: 1.6 };
 
+    // クマ（rush）: 縄張りの中を、うろうろしているが、攻撃を始めると、近くで、**連打（ラッシュ）**する。1 回は小さいが、攻撃回数が多く、
+    //   まともに近づいて戦うと、体力がどんどん削られる。離れて、魔法・弓で倒すのが、有利。連打のあと、少し間を置いて、また連打する
+    if (def.rush || (/bear|grizzly/.test(id) && !p.flying && def.rush !== false)) p.rush = { flurry: 2.6, flurryScale: 0.5, cool: 1.2, ...(def.rush || {}) };
+
     // 動き方（aiType）を決める。個別の指定があれば、それを優先する（ただし、飛ぶ敵が walk_chase の指定のままなら、飛ぶ動きにする）
     if (p.aiType === 'walk_chase' && p.flying) p.aiType = null;
     if (!p.aiType) {
         if (p.flying) p.aiType = p.shoot ? 'flying_ranged' : 'flying_dive';
+        else if (p.cat) p.aiType = 'cat_ambush';
         else if (p.hop) p.aiType = 'big_hop';
         else if (p.relentless) p.aiType = 'pack_chase';
+        else if (p.rush) p.aiType = 'bear_rush';
         else if (p.charge) p.aiType = 'charge_dash';
         else if (p.shoot) p.aiType = 'ranged_maintain';
         else p.aiType = 'walk_chase';
