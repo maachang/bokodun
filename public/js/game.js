@@ -1597,7 +1597,7 @@ export class GameEngine {
                         // Wall-mounted interactive door
                         // Detect wall orientation: check if walls are on Left/Right (horizontal door) or Top/Bottom (vertical door)
                         // 壁は '1'、または凡例が壁ブロック（type: block）の文字
-                        const isWallChar = (ch) => ch === '1' || ['block', 'door'].includes(this.objectDefinitions[mapData.legend?.[ch]]?.type);   // 並んだ扉は、隣の扉も壁として数える
+                        const isWallChar = (ch) => ch === '1' || ['block', 'door', 'wall_deco', 'wall_image'].includes(this.objectDefinitions[mapData.legend?.[ch]]?.type);   // 並んだ扉は、隣の扉も壁として数える
                         const isWallLeft = (c > 0 && isWallChar(mapData.layout[r][c - 1]));
                         const isWallRight = (c < cols - 1 && isWallChar(mapData.layout[r][c + 1]));
                         const isWallTop = (r > 0 && isWallChar(mapData.layout[r - 1][c]));

@@ -564,3 +564,25 @@ test('ギルド長の部屋: 冒険者・魔法・商人ギルドは、東の壁
         for (const s of r.npcs) assert.equal(s.speed, 0, `${room}: ${s.id} は動かない`);
     }
 });
+
+// 扉の向き: game.js と同じ判定（壁の飾り・壁画も壁として数える）で、扉の板が通り道をふさがない向きになる
+test('全マップの扉: 壁にはさまれた向きと、人が通る向きが合っている（壁の飾りが両側にあっても壁に見えない）', () => {
+    const dir = path.join(root, 'public/data/maps');
+    const bad = [];
+    for (const f of fs.readdirSync(dir).filter(n => n.endsWith('.json'))) {
+        const m = readJson(`public/data/maps/${f}`);
+        if (!m.layout || !m.legend) continue;
+        const isWall = (r, c) => {
+            const ch = m.layout[r]?.[c];
+            if (ch === undefined) return false;
+            return ch === '1' || ['block', 'door', 'wall_deco', 'wall_image'].includes(objects[m.legend[ch]]?.type);
+        };
+        m.layout.forEach((row, r) => [...row].forEach((ch, c) => {
+            if (objects[m.legend[ch]]?.type !== 'door') return;
+            const L = isWall(r, c - 1), R = isWall(r, c + 1), T = isWall(r - 1, c), B = isWall(r + 1, c);
+            // 扉は、壁（飾り含む）に左右か上下ではさまれている（はさまれていないと板の向きが決まらず、壁に見える）
+            if (!((L && R) || (T && B))) bad.push(`${f}(${c},${r})`);
+        }));
+    }
+    assert.deepEqual(bad, []);
+});
