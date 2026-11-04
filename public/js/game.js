@@ -249,6 +249,17 @@ export class GameEngine {
             tree: RetroTextureGenerator.createTreeTexture(),
             swampTree: RetroTextureGenerator.createSwampTreeTexture(),
             cactus: RetroTextureGenerator.createCactusTexture(),
+            snowPine: RetroTextureGenerator.createSnowPineTexture(),
+            darkTree: RetroTextureGenerator.createDarkTreeTexture(),
+            palm: RetroTextureGenerator.createPalmTexture(),
+            fern: RetroTextureGenerator.createFernTexture(),
+            reed: RetroTextureGenerator.createReedTexture(),
+            dryTuft: RetroTextureGenerator.createDryTuftTexture(),
+            snowGround: RetroTextureGenerator.createSpeckleFloorTexture('#f4f8ff', ['#ffffff', '#e2eaf4', '#eaf0f8']),
+            forestGround: RetroTextureGenerator.createSpeckleFloorTexture('#2c3a22', ['#1f2b18', '#3a4a2a', '#4a3a22', '#55402a']),
+            rockGround: RetroTextureGenerator.createSpeckleFloorTexture('#6e6a66', ['#59554f', '#85807a', '#4a4642']),
+            whiteSand: RetroTextureGenerator.createSpeckleFloorTexture('#fff6d8', ['#fffbe8', '#f0e6c4', '#faf0d0']),
+            dryGrassGround: RetroTextureGenerator.createSpeckleFloorTexture('#a89a52', ['#8f8240', '#bcae64', '#7d7338', '#c9bb70']),
             deadTree: RetroTextureGenerator.createDeadTreeTexture(),
             boulder: RetroTextureGenerator.createBoulderTexture(),
             signpost: RetroTextureGenerator.createSignpostTexture(),
@@ -457,6 +468,11 @@ export class GameEngine {
         if (floorType === 'sand') return this.textures.sand;
         if (floorType === 'water') return this.textures.water;
         if (floorType === 'swamp') return this.textures.swampGround;
+        if (floorType === 'snow') return this.textures.snowGround;
+        if (floorType === 'forest') return this.textures.forestGround;
+        if (floorType === 'rock') return this.textures.rockGround;
+        if (floorType === 'whiteSand') return this.textures.whiteSand;
+        if (floorType === 'dryGrass') return this.textures.dryGrassGround;
         return this.textures.floorStone;
     }
 

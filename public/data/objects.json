@@ -16327,5 +16327,59 @@
     "aspect": 1.0,
     "solid": true,
     "description": "砂漠の枯れ木（葉のない、ねじれた枝）"
+  },
+  "snow_pine": {
+    "type": "tree",
+    "texture": "snowPine",
+    "aspect": 0.75,
+    "solid": true,
+    "description": "雪をかぶった松（極寒の地）"
+  },
+  "dark_tree": {
+    "type": "tree",
+    "texture": "darkTree",
+    "aspect": 0.75,
+    "solid": true,
+    "description": "樹海の太い木（暗い緑の葉とつる）"
+  },
+  "palm": {
+    "type": "tree",
+    "texture": "palm",
+    "aspect": 0.75,
+    "solid": true,
+    "description": "ヤシの木（南国）"
+  },
+  "fern": {
+    "type": "plant",
+    "texture": "fern",
+    "count": 5,
+    "scale": [
+      1.2,
+      0.9
+    ],
+    "spread": 3.0,
+    "description": "しだ（森の下草。見た目だけで、当たり判定なし）"
+  },
+  "reed": {
+    "type": "plant",
+    "texture": "reed",
+    "count": 4,
+    "scale": [
+      1.0,
+      1.6
+    ],
+    "spread": 3.0,
+    "description": "水辺の葦（見た目だけで、当たり判定なし）"
+  },
+  "dry_tuft": {
+    "type": "plant",
+    "texture": "dryTuft",
+    "count": 5,
+    "scale": [
+      1.2,
+      1.0
+    ],
+    "spread": 3.2,
+    "description": "高原の乾いた草（見た目だけで、当たり判定なし）"
   }
 }
