@@ -270,6 +270,7 @@ export class GameEngine {
             fRockD: RetroTextureGenerator.createFieldImageTexture('rock_d'),
             reed: RetroTextureGenerator.createReedTexture(),
             dryTuft: RetroTextureGenerator.createDryTuftTexture(),
+            desertSand: RetroTextureGenerator.createDesertSandTexture(),
             snowGround: RetroTextureGenerator.createSpeckleFloorTexture('#f4f8ff', ['#ffffff', '#e2eaf4', '#eaf0f8']),
             forestGround: RetroTextureGenerator.createSpeckleFloorTexture('#2c3a22', ['#1f2b18', '#3a4a2a', '#4a3a22', '#55402a']),
             rockGround: RetroTextureGenerator.createSpeckleFloorTexture('#6e6a66', ['#59554f', '#85807a', '#4a4642']),
@@ -483,6 +484,7 @@ export class GameEngine {
     floorTextureOf(floorType) {
         if (floorType === 'grass') return this.textures.grass;
         if (floorType === 'sand') return this.textures.sand;
+        if (floorType === 'desert') return this.textures.desertSand;
         if (floorType === 'water') return this.textures.water;
         if (floorType === 'swamp') return this.textures.swampGround;
         if (floorType === 'snow') return this.textures.snowGround;
@@ -2015,11 +2017,9 @@ export class GameEngine {
                         this.scene.add(waterMesh);
                         this.waterMeshes.push(waterMesh);
 
-                        // If lava, add a warm point light and rising 3D heat wisps/smoke
+                        // If lava, add rising 3D heat wisps/smoke
+                        // （溶岩 1 マスごとの点光源は置かない: 火山では 566 個になり、GPU の上限を超えて、地面などの材質が描画されなくなるため）
                         if (isLava) {
-                            const lavaLight = new THREE.PointLight(0xff4500, 1.4, tileSize * 2.8);
-                            lavaLight.position.set(wx, 0.5, wz);
-                            this.scene.add(lavaLight);
 
                             // Spawn 3 layered billboard sprites per lava tile that rise vertically and face player
                             const hazeMat = new THREE.SpriteMaterial({

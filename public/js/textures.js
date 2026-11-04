@@ -1710,6 +1710,51 @@ export class RetroTextureGenerator {
     }
 
     // 外のマップの地面（雪・森の落ち葉・岩の地面・白い砂・乾いた草）: 基本色に、色違いの斑点を散らす（毎回同じ模様）
+    // 砂漠の地面: 明るい金色の砂に、風がつくる波状の筋（砂紋）と、まばらな小石。継ぎ目なく並ぶ
+    static createDesertSandTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#e6c882';
+        ctx.fillRect(0, 0, 64, 64);
+        let seed = 777;
+        const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+        const tones = ['#edd391', '#dfbf78', '#f2dc9e', '#d9b86f'];
+        ctx.globalAlpha = 0.4;
+        for (let x = 0; x < 64; x += 4) {
+            for (let y = 0; y < 64; y += 4) {
+                ctx.fillStyle = tones[Math.floor(rnd() * tones.length)];
+                ctx.fillRect(x, y, 4, 4);
+            }
+        }
+        ctx.globalAlpha = 1;
+        // 砂紋（波の筋）: 暗い筋の上に明るい筋を重ねる。周期は 64 を割り切るので継ぎ目が出ない
+        for (let band = 0; band < 2; band++) {
+            const base = band * 32 + 10;
+            const phase = band * 1.7;
+            for (let x = 0; x < 64; x++) {
+                const y = Math.round(base + 4 * Math.sin((x / 64) * Math.PI * 2 + phase));
+                ctx.fillStyle = 'rgba(170, 125, 55, 0.16)';
+                ctx.fillRect(x, y, 1, 1);
+                ctx.fillStyle = 'rgba(255, 246, 215, 0.5)';
+                ctx.fillRect(x, y - 1, 1, 1);
+            }
+        }
+        // まばらな小石と砂粒
+        for (let i = 0; i < 7; i++) {
+            ctx.fillStyle = '#b08d58';
+            ctx.fillRect(Math.floor(rnd() * 62), Math.floor(rnd() * 62), 2, 1);
+        }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
     static createSpeckleFloorTexture(base, tones, count = 90) {
         const canvas = document.createElement('canvas');
         canvas.width = 64;

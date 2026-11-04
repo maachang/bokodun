@@ -10,7 +10,7 @@
     "angle": 0
   },
   "environment": {
-    "floorType": "sand",
+    "floorType": "desert",
     "hasCeiling": false,
     "ambientLight": 16773328,
     "directionalLight": 16771248,
