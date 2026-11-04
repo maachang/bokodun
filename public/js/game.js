@@ -3732,6 +3732,8 @@ export class GameEngine {
     }
 
     isNpcBlocked(self, x, z, radius) {
+        // 起伏のあるマップ: 村人も、崖（上り 2 段以上・下り 3 段以上）へは、進まない
+        if (this.heightMap && self && !groundStepOk((px, pz) => this.heightLevelAt(px, pz), self.x, self.z, x, z)) return true;
         for (const c of this.colliders) {
             if (c.disabled) continue;
             if (x >= c.minX - radius && x <= c.maxX + radius && z >= c.minZ - radius && z <= c.maxZ + radius) return true;
@@ -4009,7 +4011,7 @@ export class GameEngine {
                     if (b === a || !b.active || b.state === 'chase' || !b.profile?.pack) continue;
                     // 狼（relentless）は、追っている間、離れた仲間まで呼び寄せる（逃げると、列になって追ってくる）。縄張りのある敵（クマ・鳥）は、仲間を呼ばない
                     const joinR = a.profile.relentless ? a.profile.relentless.joinRadius : 16;
-                    if (b.profile?.territory) continue;
+                    if (b.profile?.territory && b.profile.territory.mode !== 'roam') continue;
                     if (Math.hypot(a.x - b.x, a.z - b.z) < joinR) { b.state = 'chase'; b.lostTimer = 0; }
                 }
             }

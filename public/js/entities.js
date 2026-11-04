@@ -270,7 +270,10 @@ export class Monster {
         if (terr) {
             const dh = Math.hypot(player.x - this.homeX, player.z - this.homeZ);
             const leash = terr.radius * (terr.leash ?? 1.5);
-            if (this.state === 'chase') {
+            if (terr.mode === 'roam') {
+                // 住民のようにうろつく（ネズミなど）: 攻撃されている間（provokedTimer）だけ、追う
+                if (this.state === 'chase' && (this.provokedTimer <= 0 || dh > leash)) { this.state = 'unaware'; this.lostTimer = 0; }
+            } else if (this.state === 'chase') {
                 if (dh > leash && !(this.provokedTimer > 0 && dh <= leash * 1.6)) { this.state = 'unaware'; this.lostTimer = 0; }
             } else if (dh <= terr.radius) {
                 this.state = 'chase'; this.lostTimer = 0;   // 縄張りに入られた: 攻撃開始
@@ -324,13 +327,14 @@ export class Monster {
             } else {
                 // 守る: 縄張りの中を、ゆっくりうろつく（追跡から戻ったときは、中心の方へ戻る）
                 this.idleTimer -= dt;
-                const farFromHome = Math.hypot(this.x - this.homeX, this.z - this.homeZ) > terr.radius * 0.5;
+                const roam = terr.mode === 'roam';   // 住民のように、広い範囲を、ふつうの速さでうろつく
+                const farFromHome = Math.hypot(this.x - this.homeX, this.z - this.homeZ) > terr.radius * (roam ? 1.0 : 0.5);
                 if (!this.idleTarget || this.idleTimer <= 0 || farFromHome) {
-                    const a = Math.random() * Math.PI * 2, r = Math.random() * terr.radius * 0.4;
+                    const a = Math.random() * Math.PI * 2, r = Math.random() * terr.radius * (roam ? 0.9 : 0.4);
                     this.idleTarget = { x: this.homeX + Math.cos(a) * r, z: this.homeZ + Math.sin(a) * r };
                     this.idleTimer = 3 + Math.random() * 3;
                 }
-                const arrived = moveTo(this.idleTarget.x, this.idleTarget.z, this.speed * (farFromHome ? 0.9 : 0.4));
+                const arrived = moveTo(this.idleTarget.x, this.idleTarget.z, this.speed * (farFromHome ? 0.9 : (roam ? 0.65 : 0.4)));
                 if (arrived) this.idleTimer = Math.min(this.idleTimer, 0.5);
                 this.baseY = Math.abs(Math.sin(this.aiTimer * 5.0)) * 0.08;
             }

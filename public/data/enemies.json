@@ -977,6 +977,12 @@
     "family": "beast",
     "rank": 1,
     "boss": false,
+    "speed": 2.2,
+    "territory": {
+      "radius": 7,
+      "mode": "roam",
+      "leash": 3
+    },
     "abilities": [
       "pack"
     ],

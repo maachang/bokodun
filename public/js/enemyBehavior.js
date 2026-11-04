@@ -7,7 +7,7 @@
 //     charge        { windup, dash, speed, stun } 突進（猪突猛進）の溜め時間・走る距離・速さ倍率・壁にぶつかったときのスタン
 //     hop           { range, height } 大きく跳ぶときの 1 回の距離と高さ
 //     relentless    { speed, joinRadius } 一定の速さで追跡をやめない・仲間が合流する（狼）
-//     territory     { radius, mode, leash } 縄張り（guard=縄張りに入ると攻撃 / patrol=範囲を巡回、入ると攻撃）
+//     territory     { radius, mode, leash } 縄張り（guard=縄張りに入ると攻撃 / patrol=範囲を巡回、入ると攻撃 / roam=住民のようにうろつき、攻撃されたときだけ追う）
 //     shoot         { type, range, cooldown, speed, damage } 遠距離攻撃
 
 // 能力から決まる、遠距離攻撃の種類

@@ -22,7 +22,9 @@
     "skyColor": 8023642
   },
   "decorFloor": "dirtRoad",
-  "enemies": {},
+  "enemies": {
+    "g": "giant_rat"
+  },
   "legend": {
     "W": "city_wall",
     "r": "dirt_road",
@@ -41,28 +43,28 @@
   },
   "layout": [
     "WWWWWWGGWWWWWWWWWWWWWWWWWWWW",
-    "WrrrrrrrrrrrrrrrrrrrrrrrrrrW",
-    "WrXrrrrrrrrrrrrrrrrrrrrrrXrW",
-    "WrrrrrrrrrrrrrrrrrrrrrrrrrrW",
+    "WrrrrrrrrrrrPPPPrrrrrrrrrrrW",
+    "WrXrrrrrrrrrPPPPrrrrrrrrrXrW",
+    "WrrrrrrrrrrrrrrrrrrrrgrrrrrW",
     "WrHHHHrrrHHHHrrHHHHHrrHHHHrW",
     "WrHHHHrrrHHHHrrHHHHHrrHHHHrW",
-    "WrHHHHrrrHHHHrrHHHHHrrHHHHrW",
+    "WrHHHHrrrHHHHgrHHHHHrrHHHHrW",
     "WrrrrrrrrrrrrrrrrrrrrrrrrrrW",
     "WrrrrrrrKrrrKrOrrrrrrOrrrrrW",
-    "WrrrrrrrrrrrrrrrrrrrrrrrrrrW",
+    "WrrrrrrrrrgrrrrrrrrrrrrrrgrW",
     "WPPPPPbbPPPPPPPPPbbPPPPPPPPW",
-    "WrrrrrrrrrrrrrrrrrrrrrrrrrrW",
-    "WrHHHHrrrHHHrrrrrrrrKrrHHHrW",
-    "WrHHHHrrrHHHrrrrrrrrrrrHHHrW",
+    "WrrrrrrrrrrrgrrrrrrrrrrrrrrW",
+    "WrHHHHrrrHHHrPPPPPrrKrrHHHrW",
+    "WrHHHHrrrHHHrPPPPPrrrgrHHHrW",
     "WrHHHHrrrHHHrrrrSSSSSrrHHHrW",
     "WrrrrrrrrrrrrKrrSSSSSrrrrrrW",
     "WrrrrrrrrrrrrrrrSSZSSrrrrrrW",
     "WrrrrrOr#####rrrrrrrrrSSSSrW",
-    "WrrrrrrrrrrrrrPPrrrrrrSSSSrW",
-    "WrHHHHHrrrrrrXPrrrrrrrSdSSrW",
-    "WrHHHHHrrrHHHHrrrrrrrrrrBrrW",
-    "WrHHHHHrrrHHHHrrrrrrrrrrrrrW",
-    "WrXrrrrrrrrrrrrrrrrrrrrrrXrW",
+    "WrrrrrrrrrrrrrPPPPrrrrSSSSrW",
+    "WrHHHHHrrrrrrXPPPPrrrrSdSSrW",
+    "WrHHHHHrrrHHHHPPPPrrrrrrBrrW",
+    "WrHHHHHrrgHHHHPPPPrrrrrrrrrW",
+    "WrXrrrrrrrrgrrrrrrrrgrrrrXrW",
     "WWWWWWWWWWWWWWWWWWWWWWWWWWWW"
   ],
   "npcs": [
@@ -74,7 +76,7 @@
     {
       "id": "elder_woman",
       "x": 13,
-      "z": 12
+      "z": 11
     },
     {
       "id": "child_boy",
@@ -89,7 +91,7 @@
     {
       "id": "thief_guild_member",
       "x": 17,
-      "z": 18
+      "z": 17
     },
     {
       "id": "thug_npc",
@@ -115,6 +117,26 @@
       "id": "street_woman",
       "x": 21,
       "z": 18
+    },
+    {
+      "id": "street_woman",
+      "x": 9,
+      "z": 20
+    },
+    {
+      "id": "street_woman",
+      "x": 13,
+      "z": 8
+    },
+    {
+      "id": "street_woman",
+      "x": 21,
+      "z": 21
+    },
+    {
+      "id": "street_woman",
+      "x": 14,
+      "z": 3
     }
   ],
   "links": {
@@ -156,5 +178,33 @@
       },
       "icon": "barIcon"
     }
-  }
+  },
+  "heights": [
+    "0000000000000000000000000000",
+    "0111111111110000111111111110",
+    "0122222222210000122222222210",
+    "0122211222221111233333333210",
+    "0121111112222222333333333210",
+    "0111111112222333333333333210",
+    "0111111111222333333333333210",
+    "0111111111222233333333333210",
+    "0111111111222222222222222210",
+    "0111111111111111111111111110",
+    "0000000000000000000000000000",
+    "0111111111111111111111111110",
+    "0111111111111000001222222210",
+    "0111111111111000001222222210",
+    "0111111111111111112222222210",
+    "0111111111111222221112222210",
+    "0111110111111112210111222210",
+    "0111100011111111111111222210",
+    "0111000001111100001111212210",
+    "0111000001111100001111101210",
+    "0111000000111100001111112210",
+    "0110000000011100001111122210",
+    "0000000000001111111111111110",
+    "0000000000000000000000000000"
+  ],
+  "heightStep": 0.5,
+  "fallDamagePerLevel": 6
 }

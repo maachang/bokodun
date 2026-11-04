@@ -235,3 +235,56 @@ test('湿地帯（field_swamp）: 広い毒沼があり、板道が毒沼の上�
     }
     assert.ok(maxLv >= 3, `小島の高まり: ${maxLv}`);
 });
+
+test('どや街（city_slum）: 高低差・毒の沼・うろつく大ねずみ・立ちんぼの女性。歩けるマスは、段差 1 までの道で、すべて、スポーンからつながり、扉・ゲートにも行ける', () => {
+    const m = readJson('public/data/maps/city_slum.json');
+    const enemies = readJson('public/data/enemies.json');
+    const lay = m.layout;
+    const R = lay.length, C = lay[0].length;
+    const lv = (r, c) => parseInt(m.heights[r][c], 36);
+    assert.equal(m.heights.length, R);
+    assert.ok(m.heights.every(row => row.length === C), '高さの表の大きさ');
+    assert.ok(m.heights.join('').split('').some(ch => ch >= '2'), '高低差がある');
+    const poison = Object.entries(m.legend).filter(([, v]) => v === 'poison_swamp').map(([k]) => k);
+    assert.ok(lay.join('').split('').filter(ch => poison.includes(ch)).length >= 30, '毒の沼');
+    // 毒の沼・橋は高さ 0
+    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) if (poison.includes(lay[r][c])) assert.equal(lv(r, c), 0, `毒の沼は高さ 0: ${r},${c}`);
+    // 大ねずみは、住民のようにうろつく（roam）。攻撃されたときだけ追う
+    assert.equal(enemies.giant_rat.territory.mode, 'roam');
+    const ratCh = Object.entries(m.enemies).filter(([, v]) => v === 'giant_rat').map(([k]) => k);
+    assert.ok(lay.join('').split('').filter(ch => ratCh.includes(ch)).length >= 5, '大ねずみが、複数いる');
+    assert.ok(m.npcs.filter(n => n.id === 'street_woman').length >= 4, '立ちんぼの女性');
+    // 歩ける道
+    const enemyCh = new Set(Object.keys(m.enemies));
+    const pass = (r, c) => { if (lay[r][c] === '0' || enemyCh.has(lay[r][c])) return true; const d = objects[m.legend[lay[r][c]]]; return !d || (!d.solid && d.type !== 'furniture' && !d.damagePerSec); };
+    const seen = new Set([`${m.spawn.z},${m.spawn.x}`]);
+    const q = [[m.spawn.z, m.spawn.x]];
+    while (q.length) {
+        const [r, c] = q.shift();
+        for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const nr = r + dr, nc = c + dc;
+            if (nr < 0 || nc < 0 || nr >= R || nc >= C || seen.has(`${nr},${nc}`) || !pass(nr, nc)) continue;
+            if (Math.abs(lv(nr, nc) - lv(r, c)) > 1) continue;
+            seen.add(`${nr},${nc}`); q.push([nr, nc]);
+        }
+    }
+    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) if (pass(r, c)) assert.ok(seen.has(`${r},${c}`), `歩ける所へ行けない: ${r},${c}`);
+    for (const k of Object.keys(m.links)) {
+        const [x, z] = k.split(',').map(Number);
+        assert.ok(seen.has(`${z},${x}`) || seen.has(`${z + 1},${x}`) || seen.has(`${z - 1},${x}`), `扉・ゲート ${k} へ行ける`);
+        assert.equal(lv(z, x), 0, `扉・ゲートは高さ 0: ${k}`);
+    }
+});
+
+test('全マップ: 住民（NPC）と敵は、毒沼・溶岩などのダメージ床の上に置かれない（置かれると、そこから動けない）', () => {
+    const dir = path.join(root, 'public/data/maps');
+    for (const f of fs.readdirSync(dir).filter(n => n.endsWith('.json'))) {
+        const m = readJson(`public/data/maps/${f}`);
+        const hazard = (r, c) => { const d = objects[m.legend?.[m.layout[r]?.[c]]]; return !!d && d.damagePerSec > 0; };
+        for (const n of m.npcs || []) assert.ok(!hazard(Math.floor(n.z), Math.floor(n.x)), `${f}: ${n.id} が、ダメージ床の上 (${n.x},${n.z})`);
+        const enemyCh = new Set(Object.keys(m.enemies || {}));
+        for (let r = 0; r < m.layout.length; r++) for (let c = 0; c < m.layout[0].length; c++) {
+            if (enemyCh.has(m.layout[r][c]) && m.legend?.[m.layout[r][c]]) assert.fail(`${f}: 敵の文字 ${m.layout[r][c]} が、飾りの文字と衝突`);
+        }
+    }
+});
