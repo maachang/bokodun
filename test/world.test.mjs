@@ -119,7 +119,7 @@ for (const id of ['field_grass', 'field_plateau', 'field_mountain', 'field_lake'
 
 // 起伏（高さの段 heights）: 山道・砂漠・極寒
 const levelOf = (ch) => parseInt(ch, 36);
-for (const id of ['field_mountain', 'field_desert', 'field_snow']) {
+for (const id of ['field_mountain', 'field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_plateau', 'field_peak', 'field_arid', 'field_volcano', 'field_riverside']) {
     test(`${id}: 高さの表は 64×64。隣へ続く端は、高さ 0（隣とずれない）`, () => {
         const m = readJson(`public/data/maps/${id}.json`);
         assert.equal(m.heights.length, 64);
@@ -138,8 +138,8 @@ for (const id of ['field_mountain', 'field_desert', 'field_snow']) {
     });
 }
 
-test('砂漠・極寒: 隣り合うマスの段差は 1 まで（なだらかな起伏）', () => {
-    for (const id of ['field_desert', 'field_snow']) {
+test('なだらかな地域（山道以外のすべて）: 隣り合うマスの段差は 1 まで', () => {
+    for (const id of ['field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_plateau', 'field_peak', 'field_arid', 'field_volcano', 'field_riverside']) {
         const h = readJson(`public/data/maps/${id}.json`).heights;
         for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) {
             if (c < 63) assert.ok(Math.abs(levelOf(h[r][c]) - levelOf(h[r][c + 1])) <= 1, `${id}: ${r},${c}`);
@@ -180,12 +180,12 @@ test('山道: スポーンから、段差 1 までの道をたどって、すべ
 });
 
 // 落ちても詰まない: 段差 1 までの道でつながらない、小さな窪み（落ちたら上れない穴）が、ない
-for (const id of ['field_mountain', 'field_desert', 'field_snow']) {
+for (const id of ['field_mountain', 'field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_plateau', 'field_peak', 'field_arid', 'field_volcano', 'field_riverside']) {
     test(`${id}: 歩けるマスは、段差 1 までの道で、すべて 1 つにつながる（崖から落ちても、歩いて戻れる）`, () => {
         const m = readJson(`public/data/maps/${id}.json`);
         const lay = m.layout;
         const enemyCh = new Set(Object.keys(m.enemies || {}));
-        const pass = (r, c) => { if (lay[r][c] === '0' || enemyCh.has(lay[r][c])) return true; const d = objects[m.legend[lay[r][c]]]; return !d || (!d.solid && d.type !== 'furniture'); };
+        const pass = (r, c) => { if (lay[r][c] === '0' || enemyCh.has(lay[r][c])) return true; const d = objects[m.legend[lay[r][c]]]; return !d || (!d.solid && d.type !== 'furniture' && !d.damagePerSec); };   // 溶岩などのダメージ床は、歩く道に数えない
         const lv = (r, c) => parseInt(m.heights[r][c], 36);
         const seen = new Set();
         const sizes = [];
