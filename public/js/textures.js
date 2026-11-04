@@ -1710,6 +1710,51 @@ export class RetroTextureGenerator {
     }
 
     // 外のマップの地面（雪・森の落ち葉・岩の地面・白い砂・乾いた草）: 基本色に、色違いの斑点を散らす（毎回同じ模様）
+    // 自然の岩肌（断崖）: レンガのような規則正しい並びではなく、不ぞろいにひび割れた岩の面。継ぎ目なく並ぶ
+    //   tones: 岩の面の色（複数）、crack: ひびの色
+    static createCliffTexture(tones, crack, seedStart = 2024) {
+        const S = 128;
+        const canvas = document.createElement('canvas');
+        canvas.width = S; canvas.height = S;
+        const ctx = canvas.getContext('2d');
+        let seed = seedStart;
+        const rnd = () => { seed = (seed * 1103515245 + 12345) & 0x7fffffff; return seed / 0x7fffffff; };
+        // 岩の面の中心点（縦に長く割れた岩の面になるよう、縦方向を縮めて距離を測る）
+        const pts = [];
+        for (let i = 0; i < 14; i++) pts.push({ x: rnd() * S, y: rnd() * S, tone: tones[Math.floor(rnd() * tones.length)], shade: 0.8 + rnd() * 0.4 });
+        const img = ctx.createImageData(S, S);
+        const hex = (h) => [parseInt(h.slice(1, 3), 16), parseInt(h.slice(3, 5), 16), parseInt(h.slice(5, 7), 16)];
+        const crk = hex(crack);
+        for (let y = 0; y < S; y++) {
+            for (let x = 0; x < S; x++) {
+                let d1 = 1e9, d2 = 1e9, best = null;
+                for (const p of pts) {
+                    let dx = Math.abs(x - p.x); if (dx > S / 2) dx = S - dx;
+                    let dy = Math.abs(y - p.y); if (dy > S / 2) dy = S - dy;
+                    const d = Math.hypot(dx * 1.0, dy * 0.4);
+                    if (d < d1) { d2 = d1; d1 = d; best = p; } else if (d < d2) d2 = d;
+                }
+                const edge = d2 - d1;   // 小さいほど、面と面の境目（ひび）
+                const base = hex(best.tone);
+                // 岩の面の上側を明るく、下側を暗く、ざらつきを足す
+                const lit = best.shade * (1 + (((best.y - y + S * 1.5) % S) / S - 0.5) * 0.18) + (rnd() - 0.5) * 0.12;
+                let r = base[0] * lit, g = base[1] * lit, b = base[2] * lit;
+                if (edge < 1.0) { r = crk[0]; g = crk[1]; b = crk[2]; }
+                else if (edge < 2.4) { const k = 0.75 + (edge - 1.0) / 1.4 * 0.25; r *= k; g *= k; b *= k; }
+                const i = (y * S + x) * 4;
+                img.data[i] = Math.max(0, Math.min(255, r)); img.data[i + 1] = Math.max(0, Math.min(255, g)); img.data[i + 2] = Math.max(0, Math.min(255, b)); img.data[i + 3] = 255;
+            }
+        }
+        ctx.putImageData(img, 0, 0);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.colorSpace = THREE.SRGBColorSpace;
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
     // 砂漠の地面: 明るい金色の砂に、風がつくる波状の筋（砂紋）と、まばらな小石。継ぎ目なく並ぶ
     static createDesertSandTexture() {
         const canvas = document.createElement('canvas');

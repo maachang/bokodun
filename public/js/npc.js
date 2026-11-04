@@ -63,7 +63,7 @@ export class Npc {
             }
         }
         const bob = this.state === 'walk' ? Math.abs(Math.sin(this.walkTime * BOB_FREQ)) * BOB_AMP : 0;
-        this.sprite.position.set(this.x, bob, this.z);
+        this.sprite.position.set(this.x, bob + (this.floorY || 0), this.z);
     }
 
     startIdle() {

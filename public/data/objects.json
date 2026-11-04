@@ -11,6 +11,24 @@
     "solid": true,
     "description": "自然の岩壁"
   },
+  "cliff_rock_wall": {
+    "type": "block",
+    "texture": "cliffGray",
+    "solid": true,
+    "description": "断崖の岩壁（灰色の自然の岩肌。山・海岸の通れない所。レンガ調ではない）"
+  },
+  "cliff_sandstone_wall": {
+    "type": "block",
+    "texture": "cliffSand",
+    "solid": true,
+    "description": "断崖の岩壁（赤茶色の砂岩。砂漠・乾燥地帯の通れない所）"
+  },
+  "cliff_volcanic_wall": {
+    "type": "block",
+    "texture": "cliffDark",
+    "solid": true,
+    "description": "断崖の岩壁（黒っぽい火山岩。火山の通れない所）"
+  },
   "mossy_stone_wall": {
     "type": "block",
     "texture": "mossyStone",

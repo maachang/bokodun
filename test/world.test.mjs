@@ -116,3 +116,65 @@ for (const id of ['field_grass', 'field_plateau', 'field_mountain', 'field_lake'
         assert.ok(bridge.every(([r, c]) => seen.has(`${r},${c}`)), `${id}: すべての橋に歩いて行ける`);
     });
 }
+
+// 起伏（高さの段 heights）: 山道・砂漠・極寒
+const levelOf = (ch) => parseInt(ch, 36);
+for (const id of ['field_mountain', 'field_desert', 'field_snow']) {
+    test(`${id}: 高さの表は 64×64。隣へ続く端は、高さ 0（隣とずれない）`, () => {
+        const m = readJson(`public/data/maps/${id}.json`);
+        assert.equal(m.heights.length, 64);
+        for (const row of m.heights) assert.match(row, /^[0-9a-z]{64}$/);
+        assert.ok(m.heightStep > 0, `${id}: 段の高さ`);
+        assert.ok(m.heights.join('').split('').some(ch => ch !== '0'), `${id}: 起伏がある`);
+        let row = -1, col = -1;
+        world.grid.forEach((rw, r) => { if (rw.includes(id)) { row = r; col = rw.indexOf(id); } });
+        const has = (dr, dc) => !!world.grid[row + dr]?.[col + dc];
+        for (let i = 0; i < 64; i++) {
+            if (has(-1, 0)) assert.equal(levelOf(m.heights[0][i]), 0, `${id}: 北の端 ${i}`);
+            if (has(1, 0)) assert.equal(levelOf(m.heights[63][i]), 0, `${id}: 南の端 ${i}`);
+            if (has(0, -1)) assert.equal(levelOf(m.heights[i][0]), 0, `${id}: 西の端 ${i}`);
+            if (has(0, 1)) assert.equal(levelOf(m.heights[i][63]), 0, `${id}: 東の端 ${i}`);
+        }
+    });
+}
+
+test('砂漠・極寒: 隣り合うマスの段差は 1 まで（なだらかな起伏）', () => {
+    for (const id of ['field_desert', 'field_snow']) {
+        const h = readJson(`public/data/maps/${id}.json`).heights;
+        for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) {
+            if (c < 63) assert.ok(Math.abs(levelOf(h[r][c]) - levelOf(h[r][c + 1])) <= 1, `${id}: ${r},${c}`);
+            if (r < 63) assert.ok(Math.abs(levelOf(h[r][c]) - levelOf(h[r + 1][c])) <= 1, `${id}: ${r},${c}`);
+        }
+    }
+});
+
+test('山道: スポーンから、段差 1 までの道をたどって、すべての橋と、東の端・南の端へ行ける（崖を通らずに）', () => {
+    const m = readJson('public/data/maps/field_mountain.json');
+    const lay = m.layout;
+    const defOf = (r, c) => objects[m.legend[lay[r][c]]];
+    const enemyCh = new Set(Object.keys(m.enemies || {}));
+    const pass = (r, c) => { if (lay[r][c] === '0' || enemyCh.has(lay[r][c])) return true; const d = defOf(r, c); return !!d && !d.solid && d.type !== 'furniture'; };
+    const lv = (r, c) => levelOf(m.heights[r][c]);
+    const seen = new Set([`${m.spawn.z},${m.spawn.x}`]);
+    const q = [[m.spawn.z, m.spawn.x]];
+    while (q.length) {
+        const [r, c] = q.shift();
+        for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const nr = r + dr, nc = c + dc;
+            if (nr < 0 || nc < 0 || nr >= 64 || nc >= 64 || seen.has(`${nr},${nc}`) || !pass(nr, nc)) continue;
+            if (Math.abs(lv(nr, nc) - lv(r, c)) > 1) continue;
+            seen.add(`${nr},${nc}`); q.push([nr, nc]);
+        }
+    }
+    const bridges = [];
+    for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) if (defOf(r, c)?.texture === 'woodBridge') bridges.push([r, c]);
+    assert.ok(bridges.length > 0 && bridges.every(([r, c]) => seen.has(`${r},${c}`)), 'すべての橋に歩いて行ける');
+    assert.ok([...seen].some(k => k.endsWith(',63')), '東の端（岩山の頂へ）に着く');
+    assert.ok([...seen].some(k => k.startsWith('63,')), '南の端（湖畔へ）に着く');
+    // 崖（段差 2 以上）が、実際にある
+    let cliffs = 0;
+    for (let r = 0; r < 63; r++) for (let c = 0; c < 63; c++) {
+        if (Math.abs(lv(r, c) - lv(r, c + 1)) >= 2 || Math.abs(lv(r, c) - lv(r + 1, c)) >= 2) cliffs++;
+    }
+    assert.ok(cliffs >= 30, `崖のマス: ${cliffs}`);
+});

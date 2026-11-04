@@ -176,6 +176,7 @@ export class Monster {
         this.baseScaleX = this.scale[0];
         this.baseScaleY = this.scale[1];
         this.baseY = 0.0;
+        this.floorY = 0;   // 立っている地面の高さ（起伏のあるマップで、game.js が毎フレーム入れる）
         this.isLeaping = false;
         this.leapVelocityY = 0;
         this.leapTargetDir = { x: 0, z: 0 };
@@ -234,7 +235,7 @@ export class Monster {
         // スタン中は AI（移動・攻撃・射撃）を止める
         if (this.stunTimer > 0) {
             this.stunTimer -= dt;
-            this.sprite.position.set(this.x, this.baseY, this.z);
+            this.sprite.position.set(this.x, this.baseY + this.floorY, this.z);
             return;
         }
 
@@ -539,7 +540,7 @@ export class Monster {
         }
 
         // Apply vertical position (hopping / leaping height)
-        this.sprite.position.y = this.baseY;
+        this.sprite.position.y = this.baseY + this.floorY;
 
         // Projectile shooting logic for Archer / Mage
         const effectiveShootRange = this.shootRange || 15;
@@ -727,7 +728,7 @@ export class Monster {
         const eased = p * p;
         mat.rotation = this.deathTiltDir * (Math.PI / 2) * eased;
         this.sprite.scale.set(this.baseScaleX, this.baseScaleY * (1.0 - 0.2 * eased), 1);
-        this.sprite.position.y = this.baseY * (1.0 - eased);
+        this.sprite.position.y = this.baseY * (1.0 - eased) + this.floorY;
 
         // 半透明になって消える
         if (t > DEATH_FALL_END) {

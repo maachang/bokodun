@@ -21,7 +21,7 @@
     "skyColor": 8042736
   },
   "legend": {
-    "R": "rock_wall",
+    "R": "cliff_rock_wall",
     "d": "highland_weed"
   },
   "enemies": {

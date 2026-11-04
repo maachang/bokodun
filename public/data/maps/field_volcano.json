@@ -21,7 +21,7 @@
     "skyColor": 2757648
   },
   "legend": {
-    "R": "rock_wall",
+    "R": "cliff_volcanic_wall",
     "L": "lava",
     "D": "dead_tree",
     "d": "arid_grass"

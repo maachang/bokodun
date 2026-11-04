@@ -288,6 +288,9 @@ export class GameEngine {
             reed: RetroTextureGenerator.createReedTexture(),
             dryTuft: RetroTextureGenerator.createDryTuftTexture(),
             desertSand: RetroTextureGenerator.createDesertSandTexture(),
+            cliffGray: RetroTextureGenerator.createCliffTexture(['#7d7a78', '#6c6967', '#8a8683', '#5e5b5a', '#928e88'], '#2a2827'),
+            cliffSand: RetroTextureGenerator.createCliffTexture(['#b8845a', '#a67448', '#c4936a', '#97653d', '#cfa07a'], '#4a2e1c', 31),
+            cliffDark: RetroTextureGenerator.createCliffTexture(['#4a4344', '#3b3536', '#574f50', '#2f2a2b', '#625858'], '#120f10', 77),
             snowGround: RetroTextureGenerator.createSpeckleFloorTexture('#f4f8ff', ['#ffffff', '#e2eaf4', '#eaf0f8']),
             forestGround: RetroTextureGenerator.createSpeckleFloorTexture('#2c3a22', ['#1f2b18', '#3a4a2a', '#4a3a22', '#55402a']),
             rockGround: RetroTextureGenerator.createSpeckleFloorTexture('#6e6a66', ['#59554f', '#85807a', '#4a4642']),
@@ -549,6 +552,68 @@ export class GameEngine {
         this.camera.updateProjectionMatrix();
     }
 
+    // マス (行 r, 列 c) の高さの段（起伏のないマップは 0。マップの外は 0）
+    heightLevelAtTile(r, c) {
+        return this.heightMap?.[r]?.[c] ?? 0;
+    }
+
+    // ワールド座標 (x, z) の高さの段
+    heightLevelAt(x, z) {
+        if (!this.heightMap) return 0;
+        const ts = this.mapData?.tileSize || 4;
+        return this.heightLevelAtTile(Math.floor(z / ts), Math.floor(x / ts));
+    }
+
+    // 起伏のある地面: 高くなっているマスの上面と、低い隣との境の側面を作る。
+    //   段差 1 は、地面と同じ模様の側面（歩いて上れる）。段差 2 以上は、崖（岩肌。mapData.cliffTexture、省略は cliffGray）
+    buildHeightTerrain(mapData, rows, cols, tileSize, baseFloorMat) {
+        const step = this.heightStep;
+        const cliffMat = new THREE.MeshLambertMaterial({ map: this.textures[mapData.cliffTexture] || this.textures.cliffGray });
+        const topGeo = new THREE.PlaneGeometry(tileSize, tileSize);
+        const dirs = [[0, 1, 0], [0, -1, Math.PI], [1, 0, Math.PI / 2], [-1, 0, -Math.PI / 2]];   // [dx(列), dz(行), 向き]
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                const h = this.heightLevelAtTile(r, c);
+                if (h <= 0) continue;
+                const wx = c * tileSize + tileSize / 2;
+                const wz = r * tileSize + tileSize / 2;
+                const top = new THREE.Mesh(topGeo, baseFloorMat);
+                top.rotation.x = -Math.PI / 2;
+                top.position.set(wx, h * step, wz);
+                this.addStatic(top);
+                for (const [dx, dz, rotY] of dirs) {
+                    const nh = this.heightLevelAtTile(r + dz, c + dx);
+                    const inMap = r + dz >= 0 && r + dz < rows && c + dx >= 0 && c + dx < cols;
+                    if (!inMap || nh >= h) continue;
+                    const drop = h - nh;
+                    const faceH = drop * step;
+                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMat : baseFloorMat);
+                    face.rotation.y = rotY;
+                    face.position.set(wx + dx * tileSize / 2, nh * step + faceH / 2, wz + dz * tileSize / 2);
+                    this.addStatic(face);
+                }
+            }
+        }
+    }
+
+    // 高い所から落ちたときのダメージ（levels: 落ちた段の数。1 段の段差は、落下にしない）
+    applyHeightFall(levels) {
+        const dmg = Math.round((levels - 1) * this.fallDamagePerLevel);
+        if (dmg <= 0) return;
+        this.player.hp = Math.max(0, this.player.hp - dmg);
+        this.sound.playHurt();
+        this.flashDamageScreen();
+        this.particles.spawnBurst(this.player.x, this.player.floorY ?? 0, this.player.z, 0xb08d58, 16, 4.0);
+        this.addPopup(`高所から落下！ -${dmg}`, '#ef4444');
+        if (this.player.hp <= 0) {
+            this.addPopup('GAME OVER! 崖から落ちて力尽きた…', '#ef4444');
+            setTimeout(() => {
+                this.player.hp = this.player.maxHp;
+                this.loadMap(this.currentMapId);
+            }, 1500);
+        }
+    }
+
     // 世界の並びの中のマップなら、隣のマップがある方向の外側に、隣の地面を遠くまで敷く。隣がない方向は、何も描かない（空だけ）
     async buildOutsideGround(mapId, cols, rows, tileSize) {
         const world = this.world;
@@ -698,6 +763,14 @@ export class GameEngine {
             }
         }
 
+        // 起伏のあるマップ: heights（1 マス 1 文字の高さの段。0〜9、a〜z。省略は 0）を読み込む。段の高さは heightStep（省略は 1.0）
+        this.heightMap = null;
+        this.heightStep = mapData.heightStep ?? 1.0;
+        this.fallDamagePerLevel = mapData.fallDamagePerLevel ?? 8;
+        if (mapData.heights) {
+            this.heightMap = mapData.heights.map(row => Array.from(row, ch => parseInt(ch, 36) || 0));
+        }
+
         // 1. Grid-based Floor Generation (carving holes for sunken water tiles and crumbling pitfall cavities)
         const baseFloorTex = this.floorTextureOf(env.floorType);
 
@@ -707,6 +780,7 @@ export class GameEngine {
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 if (waterMap[r][c] || holeFloorMap[r][c]) continue; // Water and crumbling pits do not have base floor at Y=0!
+                if (this.heightLevelAtTile(r, c) > 0) continue;   // 高くなっている所は、下の面を描かない（buildHeightTerrain が、上面と側面を作る）
 
                 const wx = c * tileSize + tileSize / 2;
                 const wz = r * tileSize + tileSize / 2;
@@ -717,6 +791,8 @@ export class GameEngine {
                 this.addStatic(cellMesh);
             }
         }
+
+        if (this.heightMap) this.buildHeightTerrain(mapData, rows, cols, tileSize, baseFloorMat);
 
         // 外のマップ（world.json にあるマップ）: 隣のマップがある方向は、端の外へ、隣の地面が遠くまで続く（外に出ると、隣のマップへ切り替わる）
         await this.buildOutsideGround(mapId, cols, rows, tileSize);
@@ -744,8 +820,13 @@ export class GameEngine {
         const standardWallGeo = new THREE.BoxGeometry(tileSize, wallH, tileSize);
 
         // Spawn objects based on map layout & legend
+        // 起伏のあるマップ: 高くなっているマスに置く、木・草・壁などは、そのマスの高さだけ持ち上げて置く（scene.add を、その間だけ差し替える）
+        const LIFT_TYPES = new Set(['block', 'tree', 'boulder', 'plant', 'tree_wall', 'furniture', 'floor_tile']);
+        const origSceneAdd = this.scene.add;
+        const unlift = () => { if (this.scene.add !== origSceneAdd) this.scene.add = origSceneAdd; };
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
+                unlift();
                 const char = mapData.layout[r][c];
                 if (char === '0' || char === ' ') continue;
 
@@ -757,6 +838,8 @@ export class GameEngine {
                 if (enemyType && this.enemyDefinitions && this.enemyDefinitions[enemyType]) {
                     const enemyDef = this.enemyDefinitions[enemyType];
                     const m = new Monster(enemyType, wx, wz, this.textures, enemyDef);
+                    m.floorY = this.heightLevelAtTile(r, c) * this.heightStep;
+                    m.sprite.position.y = m.floorY;
                     this.monsters.push(m);
                     this.scene.add(m.sprite);
                     continue;
@@ -768,6 +851,11 @@ export class GameEngine {
 
                 if (!objDef) {
                     continue;
+                }
+
+                const liftH = this.heightLevelAtTile(r, c) * this.heightStep;
+                if (liftH > 0 && LIFT_TYPES.has(objDef.type) && !(objDef.type === 'floor_tile' && objDef.elevation > 0)) {
+                    this.scene.add = function (o) { o.position.y += liftH; return origSceneAdd.call(this, o); };
                 }
 
                 switch (objDef.type) {
@@ -2304,6 +2392,8 @@ export class GameEngine {
             }
         }
 
+        unlift();   // 持ち上げ用に差し替えた scene.add を元に戻す
+
         // 動かない部品（床・天井・壁・家具など）を、材質ごとに1つにまとめる（描画の回数を減らして、CPU の負荷を下げる）
         this.mergeStaticMeshes();
 
@@ -2340,6 +2430,8 @@ export class GameEngine {
         this.player.isFalling = false;
         this.player.fallDepth = 0;
         this.player.fallVelocityY = 0;
+        this.player.heightLevel = this.heightLevelAt(this.player.x, this.player.z);
+        this.player.floorY = this.getFloorHeight(this.player.x, this.player.z);   // 起伏のある所へ出たときは、目線の高さを、すぐ合わせる
 
         // Reset inputs on scene transition to prevent stuck keys
         // （端を越える移動のときは、歩き続けられるよう、リセットしない。押しているキーは、そのまま生かす）
@@ -3539,7 +3631,7 @@ export class GameEngine {
     // 村人が、その位置に立てないか（壁・家具などの当たり判定、水、プレイヤー、ほかの村人）
     // その位置にある、高さのある床の高さ（なければ 0）
     getFloorHeight(x, z) {
-        let h = 0;
+        let h = this.heightMap ? this.heightLevelAt(x, z) * this.heightStep : 0;
         for (const t of this.raisedFloors ?? []) {
             if (x >= t.minX && x <= t.maxX && z >= t.minZ && z <= t.maxZ) h = Math.max(h, t.height);
         }
@@ -3563,6 +3655,7 @@ export class GameEngine {
 
     updateNpcs(dt) {
         for (const n of this.npcs ?? []) {
+            n.floorY = this.getFloorHeight(n.x, n.z);
             n.update(dt, (x, z, r) => this.isNpcBlocked(n, x, z, r));
             n.sprite.position.y += this.getFloorHeight(n.x, n.z);   // 高台の上では足元も上げる
         }
@@ -3757,6 +3850,9 @@ export class GameEngine {
                 break;
             }
         }
+        // 起伏: 2 段以上高い所へは、歩いて上れない（崖）。1 段までの段差は上れる
+        const climbOk = (x, z, dirX, dirZ) => !this.heightMap || this.heightLevelAt(x + dirX * r, z + dirZ * r) - this.heightLevelAt(this.player.x, this.player.z) <= 1;
+        if (canMoveX && !climbOk(nextX, this.player.z, Math.sign(dx), 0)) canMoveX = false;
         if (canMoveX) this.player.x = nextX;
 
         // Z collision
@@ -3769,7 +3865,15 @@ export class GameEngine {
                 break;
             }
         }
+        if (canMoveZ && !climbOk(this.player.x, nextZ, 0, Math.sign(dz))) canMoveZ = false;
         if (canMoveZ) this.player.z = nextZ;
+        // 起伏: 2 段以上低い所へ降りたら、落下（高さに応じたダメージ）
+        if (this.heightMap) {
+            const lv = this.heightLevelAt(this.player.x, this.player.z);
+            const prev = this.player.heightLevel ?? lv;
+            if (prev - lv >= 2) this.applyHeightFall(prev - lv);
+            this.player.heightLevel = lv;
+        }
 
         // 生きている敵は障害物（突き抜けられない）。敵に近づく方向の移動だけ、敵の円の縁まで押し戻して横へ滑らせる。
         // 突進の攻撃判定（距離 player.radius + m.radius 未満）が成立するよう、縁は攻撃判定の距離より内側（80%）にする。
@@ -3799,6 +3903,7 @@ export class GameEngine {
     updateCombat(dt) {
         for (let i = this.monsters.length - 1; i >= 0; i--) {
             const m = this.monsters[i];
+            m.floorY = this.getFloorHeight(m.x, m.z);
             m.update(dt, this.player, this.colliders, this.projectiles, this.sound, this.scene, this.visibility ?? 1.0);
             this.processBurn(m);
 

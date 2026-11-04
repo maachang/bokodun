@@ -21,7 +21,7 @@
     "skyColor": 8308976
   },
   "legend": {
-    "R": "rock_wall",
+    "R": "cliff_rock_wall",
     "P": "water",
     "~": "water_shallow",
     "e": "cattail_single",
