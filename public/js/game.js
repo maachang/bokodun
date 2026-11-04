@@ -260,6 +260,9 @@ export class GameEngine {
             rockGround: RetroTextureGenerator.createSpeckleFloorTexture('#6e6a66', ['#59554f', '#85807a', '#4a4642']),
             whiteSand: RetroTextureGenerator.createSpeckleFloorTexture('#fff6d8', ['#fffbe8', '#f0e6c4', '#faf0d0']),
             dryGrassGround: RetroTextureGenerator.createSpeckleFloorTexture('#a89a52', ['#8f8240', '#bcae64', '#7d7338', '#c9bb70']),
+            tundraGround: RetroTextureGenerator.createSpeckleFloorTexture('#8d8a70', ['#7a785e', '#a09c80', '#a8a48c', '#6f7a66']),
+            redEarthGround: RetroTextureGenerator.createSpeckleFloorTexture('#c0703f', ['#a85a34', '#d48a58', '#b8663a', '#dc9a68']),
+            ashGround: RetroTextureGenerator.createSpeckleFloorTexture('#3a3430', ['#2a2522', '#4a423c', '#554a42', '#1f1b19']),
             deadTree: RetroTextureGenerator.createDeadTreeTexture(),
             boulder: RetroTextureGenerator.createBoulderTexture(),
             signpost: RetroTextureGenerator.createSignpostTexture(),
@@ -473,6 +476,9 @@ export class GameEngine {
         if (floorType === 'rock') return this.textures.rockGround;
         if (floorType === 'whiteSand') return this.textures.whiteSand;
         if (floorType === 'dryGrass') return this.textures.dryGrassGround;
+        if (floorType === 'tundra') return this.textures.tundraGround;
+        if (floorType === 'redEarth') return this.textures.redEarthGround;
+        if (floorType === 'ash') return this.textures.ashGround;
         return this.textures.floorStone;
     }
 

@@ -1,8 +1,9 @@
 {
   "mapSize": 64,
   "grid": [
-    ["field_snow", "field_forest", "field_mountain"],
-    ["field_grass", "field_desert", "field_lake"],
-    ["field_tropical", "field_coast", "field_plateau"]
+    ["field_snow", "field_forest", "field_mountain", "field_peak"],
+    ["field_grass", "field_desert", "field_lake", "field_volcano"],
+    ["field_tropical", "field_coast", "field_plateau"],
+    ["field_tundra", "field_arid", "field_riverside"]
   ]
 }
