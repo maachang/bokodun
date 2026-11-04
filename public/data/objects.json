@@ -16582,7 +16582,7 @@
   "broadleaf_wall": {
     "type": "tree_wall",
     "texture": "fBroadleafWall",
-    "aspect": 1.274,
+    "aspect": 0.935,
     "height": 5.2,
     "solid": true,
     "description": "広葉樹林の壁（向きの固定した板で立てる。連ねて壁にする。sdServer 画像）"
