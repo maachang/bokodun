@@ -457,6 +457,17 @@ def build():
                 fd.line([(cx - nx_ * half, cy - ny_ * half), (cx + nx_ * half, cy + ny_ * half)], fill=255, width=BRIDGE_WIDTH)
                 nextf += ford_every
         deep = np.asarray(deep) > 0; ford = (np.asarray(ford) > 0) & deep
+        # 橋が、斜めにしかつながらない所（川が斜めに流れる所で、2 マス幅の線が階段状になる）は、斜めの隙間を埋めて、4 近傍でつなぐ（斜めの隙間は、通れない）
+        for _ in range(3):
+            add = []
+            for y, x in zip(*np.nonzero(ford)):
+                for dy, dx in ((1, 1), (1, -1)):
+                    yy, xx = y + dy, x + dx
+                    if 0 <= yy < H and 0 <= xx < W and ford[yy, xx] and not ford[y, xx] and not ford[yy, x]:
+                        for py, px in ((y, xx), (yy, x)):
+                            if deep[py, px]: add.append((py, px)); break
+            if not add: break
+            for py, px in add: ford[py, px] = True
         river[deep] = np.maximum(river[deep], 1)
         river[ford] = 2
     river[~land] = 0

@@ -37,7 +37,7 @@ BIOME_FLOOR = {SNOW: 's', CONIFER: 'u', FOREST: 'f', GRASS: 'g', DESERT: 'd', RO
 BIOME_NAME = {SNOW: '北の雪山', CONIFER: '針葉樹の裾野', FOREST: '大森林', GRASS: '草原', DESERT: '砂地', ROCK: '岩山', TROPICAL: '南国', SEA: '海岸'}
 # 環境（空・霧・光）: 既存の外マップから、地形ごとに借りる
 TROPICAL_ENV = {'ambientLight': 0xffffff, 'directionalLight': 0xfff2c8, 'fogColor': 0xb8e8e0, 'fogNear': 30, 'fogFar': 105, 'visibility': 1.0, 'skyColor': 0x4fd0e8}   # 南国: 青緑がかった、明るい空と霧
-DARK_FOREST_ENV = {'ambientLight': 0x2c4234, 'directionalLight': 0x586e58, 'fogColor': 0x07100b, 'fogNear': 5, 'fogFar': 28, 'visibility': 0.4, 'skyColor': 0x07100b}
+DARK_FOREST_ENV = {'ambientLight': 0x6a8870, 'directionalLight': 0xaec0a2, 'fogColor': 0x1e3026, 'fogNear': 9, 'fogFar': 44, 'visibility': 0.65, 'skyColor': 0x1e3026}
 ENV_FROM = {SNOW: 'field_snow', CONIFER: 'field_tundra', FOREST: 'field_swamp', GRASS: 'field_grass', DESERT: 'field_desert', ROCK: 'field_mountain', TROPICAL: 'field_tropical', SEA: 'field_coast'}
 
 
@@ -158,6 +158,9 @@ def build_tiles(t):
     put(t['deep'] & ~lake, 'Q')
     put(lake & t['deep'], 'Q'); put(lake & t['deep'] & (d_nonlake >= 3), 'O')
     put(t['shallow'], 'q')
+    # 橋のたもと（橋から 2 マス以内）は、通れる物（木・柱）を置かない。木が橋の出入り口をふさがない
+    near_bridge = T.box_mean(t['bridge'].astype(np.float32), 2) > 0
+    for ch in SOLID_CH: obj[near_bridge & land & (obj == ord(ch))] = ord('0')
     put(t['bridge'], 'Z')                                                       # 川の橋
     sea = ~land
     trop_near = T.box_mean((biome == TROPICAL).astype(np.float32), 8) > 0.02
@@ -216,7 +219,7 @@ def main():
             if dom == TROPICAL:
                 env.update(TROPICAL_ENV)
             if not sea_frac > 0.35 and dom == FOREST:
-                env.update(DARK_FOREST_ENV)   # 大森林: 真っ暗（数マス先は、巨木のシルエットだけ）
+                env.update(DARK_FOREST_ENV)   # 大森林: だいぶ薄暗い（大湿原より、少し暗い。近くは見え、遠くは霧に沈む）
             layout = [''.join(chr(v) for v in row) for row in o]
             heights = [''.join(CH36[min(35, int(v))] for v in row) for row in el]
             floor_layer = [''.join(chr(v) for v in row) for row in fl]

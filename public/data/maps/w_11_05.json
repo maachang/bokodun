@@ -12,13 +12,13 @@
  "environment": {
   "floorType": "forest",
   "hasCeiling": false,
-  "ambientLight": 2900532,
-  "directionalLight": 5795416,
-  "fogColor": 462859,
-  "fogNear": 5,
-  "fogFar": 28,
-  "visibility": 0.4,
-  "skyColor": 462859
+  "ambientLight": 6981744,
+  "directionalLight": 11452578,
+  "fogColor": 1978406,
+  "fogNear": 9,
+  "fogFar": 44,
+  "visibility": 0.65,
+  "skyColor": 1978406
  },
  "legend": {
   "G": "grass_tree",
@@ -234,7 +234,7 @@
   "0000000000e00000000QQQQ0mm0000e000000000000e00000e0000000000e0e0",
   "00e0Ke00K0m0m0000k0ZZZZkkv00WeK000K0W00000e0W0Ke0eK0K0W000K0K0K0",
   "0e0000000v0m000G000QQQQk0m0000e000e0000000000000000e000000000e00",
-  "We00Ke0000000000G0G0QQk00000K000W000W0W0W0W00e00W0W0W0e0W0K000W0",
+  "We00Ke0000000000G000QQk00000K000W000W0W0W0W00e00W0W0W0e0W0K000W0",
   "m000e00000000w00m000QQQ00000000000000ee0000000000000000000e0e000"
  ]
 }

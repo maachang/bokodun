@@ -853,7 +853,7 @@ test('世界の森: 林の壁（tree_wall）は使わない。森は ID 217・21
     assert.ok(game.includes('objDef.colliderHalf ?? 0.6') && game.includes('this.treeMats'), '幹の太さ・材質の共有');
 });
 
-test('大森林: 巨木（3 倍）・真っ暗・起伏が激しい・目印を置かない。岩山や崖にはしない（普通の、通れる起伏）。敵は出さない', () => {
+test('大森林: 巨木（3 倍）・だいぶ薄暗い・起伏が激しい・目印を置かない。岩山や崖にはしない（普通の、通れる起伏）。敵は出さない', () => {
     let forestMeshes = 0, trees = 0, tiles = 0, landmarks = 0, maxLevel = 0;
     for (const id of world.grid.flat().filter(Boolean)) {
         const m = readJson(`public/data/maps/${id}.json`);
@@ -861,7 +861,8 @@ test('大森林: 巨木（3 倍）・真っ暗・起伏が激しい・目印を�
         for (const ft of Object.values(m.floorLegend)) assert.notEqual(ft, 'darkRock', `${id}: 暗い岩肌の地面は使わない`);
         if (!m.name.startsWith('大森林')) continue;
         forestMeshes++;
-        assert.ok(m.environment.fogNear <= 6 && m.environment.fogFar <= 30 && m.environment.visibility <= 0.5, `${id}: 真っ暗（霧 ${m.environment.fogNear}〜${m.environment.fogFar}・視界 ${m.environment.visibility}）`);
+        assert.ok(m.environment.fogNear <= 10 && m.environment.fogFar <= 46 && m.environment.visibility <= 0.7, `${id}: 薄暗い（霧 ${m.environment.fogNear}〜${m.environment.fogFar}・視界 ${m.environment.visibility}）`);
+        assert.ok(m.environment.ambientLight > 0x303030 && m.environment.ambientLight < 0x808080, `${id}: 真っ暗ではない（環境光 ${m.environment.ambientLight.toString(16)}）`);
         assert.deepEqual(m.enemies ?? {}, {}, `${id}: 敵は出さない`);
         const lay = m.layout.join('');
         for (const [ch, name] of Object.entries(m.legend)) {
@@ -940,4 +941,46 @@ test('南国の作り込み: ジャングルの木（2 倍）・ヤシの林・�
     assert.ok(maxLevel >= 8, `ゆるい丘（最大 ${maxLevel} 段）`);
     for (const n of ['tropical_forest_a', 'tropical_forest_b', 'tropical_palm_forest']) assert.ok(4 - 2 * objects[n].colliderHalf >= 1.6, `${n}: 木の間は通れる`);
     assert.ok(Math.abs(objects.tropical_forest_a.height - objects.tropical_tree.height * 2) < 1e-6 && Math.abs(objects.tropical_palm_forest.height - objects.palm.height * 2) < 1e-6, '2 倍');
+});
+
+test('川の橋: すべての橋が、両岸をつなぐ（橋のマスが 4 近傍でつながり、橋の両端が、通れる陸に触れる）。橋のたもとに木を置かない', () => {
+    const M = world.mapSize;
+    const maps = new Map();
+    world.grid.forEach((rw, j) => rw.forEach((id, i) => { if (id) maps.set(`${j},${i}`, readJson(`public/data/maps/${id}.json`)); }));
+    const info = (y, x) => {   // 世界のマス (y, x): { solid, bridge, level }
+        const m = maps.get(`${Math.floor(y / M)},${Math.floor(x / M)}`);
+        if (!m) return { solid: true, bridge: false, level: 0 };
+        const r = y % M, c = x % M, ch = m.layout[r][c];
+        const d = ch === '0' ? null : objects[m.legend[ch]];
+        return {
+            solid: !!d && (d.type === 'tree' || d.type === 'tree_wall' || d.type === 'boulder' || d.type === 'sea_tile' || (d.type === 'liquid_tile' && d.solid)),
+            bridge: !!d && d.type === 'bridge_deck' && !!d.waterBelow, level: levelOf(m.heights[r][c])
+        };
+    };
+    const bridges = [];
+    maps.forEach((m, key) => {
+        const [j, i] = key.split(',').map(Number);
+        const zc = Object.entries(m.legend).filter(([, v]) => v === 'plank_bridge').map(([k]) => k);
+        for (let r = 0; r < M; r++) for (let c = 0; c < M; c++) if (zc.includes(m.layout[r][c])) bridges.push([j * M + r, i * M + c]);
+    });
+    assert.ok(bridges.length > 200, `橋のマス: ${bridges.length}`);
+    const seen = new Set(); let comps = 0, broken = [];
+    for (const [y0, x0] of bridges) {
+        if (seen.has(`${y0},${x0}`)) continue;
+        comps++;
+        const q = [[y0, x0]]; seen.add(`${y0},${x0}`); const contacts = [];
+        for (let h = 0; h < q.length; h++) {
+            const [y, x] = q[h];
+            for (const [dy, dx] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+                const ny = y + dy, nx = x + dx, a = info(ny, nx), cur = info(y, x);
+                if (a.bridge) { if (!seen.has(`${ny},${nx}`)) { seen.add(`${ny},${nx}`); q.push([ny, nx]); } }
+                else if (!a.solid && Math.abs(a.level - cur.level) <= 1) contacts.push([ny, nx]);
+            }
+        }
+        let far = 0;
+        for (const a of contacts) for (const b of contacts) far = Math.max(far, Math.abs(a[0] - b[0]) + Math.abs(a[1] - b[1]));
+        if (far < 3) broken.push(`${y0},${x0}（${q.length} マス）`);
+    }
+    assert.deepEqual(broken, [], `両岸をつなげない橋: ${broken.join(' / ')}`);
+    assert.ok(comps >= 30, `橋の数: ${comps}`);
 });
