@@ -985,11 +985,12 @@ test('川の橋: すべての橋が、両岸をつなぐ（橋のマスが 4 近
     assert.ok(comps >= 30, `橋の数: ${comps}`);
 });
 
-test('端の向こうの景色: 隣のマップの地形（高さ・地面の種類・水）を、端から 16 マスの幅で描く。端が高くても、高い所から下へ落ちるように見えない', () => {
+test('端の向こうの景色: 隣のマップの地形（高さ・地面の種類・水）を、端から 16〜32 マスの幅で描く。端が高くても、高い所から下へ落ちるように見えない', () => {
     const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
     assert.ok(game.includes('buildNeighborTerrain(dir, nd, cols, rows, tileSize)'), '隣の地形を描く');
-    assert.ok(game.includes('export const OUTSIDE_TERRAIN_DEPTH = 16;'), '幅');
-    assert.ok(game.includes('TAPER = 6') && game.includes('(DEPTH - k) / TAPER'), '最後の 6 マスで、高さを 0 へ下げる');
+    assert.ok(game.includes('OUTSIDE_TERRAIN_MIN_DEPTH = 16') && game.includes('OUTSIDE_TERRAIN_MAX_DEPTH = 32'), '幅（16〜32）');
+    assert.ok(game.includes('Math.min(parseInt(nd.heights[tr]?.[tc]') && game.includes('DEPTH - k)'), '1 マスに 1 段までの傾きで、0 へ下げる（高い端で、急な崖にならない）');
+    assert.ok(game.includes('edgeMax + 2'), '境の高さに合わせて、幅を決める');
     assert.ok(game.includes('nd.floorLayer') && game.includes("def.type === 'liquid_tile'") && game.includes('waterBelow'), '地面の種類と水');
     assert.ok(game.includes("await Promise.all(['north', 'south', 'west', 'east']"), '隣のマップを、同時に読み込む');
     // 端の高さが 3 段以上の境は、たくさんある（この描画が効く）
@@ -999,4 +1000,13 @@ test('端の向こうの景色: 隣のマップの地形（高さ・地面の種
         for (let i = 0; i < 64; i++) if (levelOf(m.heights[0][i]) >= 3) high++;
     }
     assert.ok(high > 1000, `端が高い所: ${high}`);
+});
+
+test('大森林などの負荷: 前のマップの木が溜まらない（マップごとに空にする）・動かないスプライトは行列を更新しない・霧より遠い木・草は隠す・草の材質を共有・ミニマップの壁は使い回す', () => {
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const body = game.slice(game.indexOf('async loadMapBody'), game.indexOf('async loadMapBody') + 6000);
+    assert.ok(body.includes('this.treeSprites = [];') && body.includes('this.cullSprites = [];'), 'マップごとに、木・草の一覧を空にする（前のマップの木が溜まって、毎フレームの処理が増えていた）');
+    assert.ok((game.match(/matrixAutoUpdate = false/g) || []).length >= 3, '木・影・草の行列は、毎フレーム更新しない');
+    assert.ok(game.includes('this.scene.fog.far * 1.1') && game.includes('this.cullSprites'), '霧より遠い木・影・草は隠す');
+    assert.ok(game.includes('this.plantMats') && game.includes('this.minimapBase'), '草の材質の共有・ミニマップの壁の使い回し');
 });

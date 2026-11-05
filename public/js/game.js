@@ -14,8 +14,9 @@ import { StrikeEffectSystem } from '/js/strikeEffect.js';
 // テスト用: 走る速さ（Shift）の倍率。広い世界を、すばやく見て回るため。通常の速さに戻すときは 1 にする（歩く速さは、そのまま）
 export const TEST_RUN_SPEED_SCALE = 5;
 
-// 端の向こうに描く、隣のマップの地形の幅（マス）。最後の 6 マスで、なだらかに高さ 0 へ下げる
-export const OUTSIDE_TERRAIN_DEPTH = 16;
+// 端の向こうに描く、隣のマップの地形の幅（マス）。最小 16・最大 32。境の高さに合わせて広げ、1 マスに 1 段までの傾きで、高さ 0 へ下げる（高い所の端で、急な崖にならない）
+export const OUTSIDE_TERRAIN_MIN_DEPTH = 16;
+export const OUTSIDE_TERRAIN_MAX_DEPTH = 32;
 
 // 被弾リアクション（突進の命中時）の調整値
 //   ヒットストップ: 命中した瞬間にゲームの時間を一瞬止める（秒）。重い武器・会心・撃破で長くなる
@@ -873,7 +874,7 @@ export class GameEngine {
             mesh.position.set(cx, -0.01, cz);
             this.scene.add(mesh);
         }
-        // 端の向こうの、隣のマップの地形（高さ・地面の種類・水）を、端から OUTSIDE_TERRAIN_DEPTH マスの幅で描く（端が高い所で、高い所から下へ落ちるように見えないため）
+        // 端の向こうの、隣のマップの地形（高さ・地面の種類・水）を、端から 16〜32 マスの幅で描く（端が高い所で、高い所から下へ落ちるように見えないため）
         for (const dir of Object.keys(strips)) {
             const nid = worldNeighbor(world, mapId, dir);
             if (!nid) continue;
@@ -883,10 +884,9 @@ export class GameEngine {
         }
     }
 
-    // 隣のマップ nd の、境から OUTSIDE_TERRAIN_DEPTH マスぶんの地形を、このマップの外側に描く。
-    //   高さは、隣のマップの heights（最後の 6 マスで、なだらかに 0 へ下げる）。地面は floorLayer の種類。水（川・湖・海）は、水面。木・草は、描かない。
+    // 隣のマップ nd の、境から 16〜32 マス（境の高さに合わせる）の地形を、このマップの外側に描く。
+    //   高さは、隣のマップの heights（境の高さに合わせて広げ、1 マスに 1 段までの傾きで、なだらかに 0 へ下げる）。地面は floorLayer の種類。水（川・湖・海）は、水面。木・草は、描かない。
     buildNeighborTerrain(dir, nd, cols, rows, ts) {
-        const DEPTH = OUTSIDE_TERRAIN_DEPTH, TAPER = 6;
         const W = cols * ts, D = rows * ts;
         const nrows = nd.layout.length, ncols = nd.layout[0].length;
         const step = nd.heightStep ?? 1;
@@ -909,6 +909,13 @@ export class GameEngine {
             if (dir === 'south') return [i * ts + ts / 2, D + k * ts + ts / 2];
             return [i * ts + ts / 2, -k * ts - ts / 2];
         };
+        // 幅: 境の高さ（最大の段）に合わせる。1 マスに 1 段までの傾きで 0 へ下げるので、高い端ほど、広く描く
+        let edgeMax = 0;
+        for (let i = 0; i < along; i++) {
+            const [tr, tc] = tileAt(0, i);
+            edgeMax = Math.max(edgeMax, parseInt(nd.heights[tr]?.[tc] ?? '0', 36) || 0);
+        }
+        const DEPTH = Math.min(OUTSIDE_TERRAIN_MAX_DEPTH, Math.max(OUTSIDE_TERRAIN_MIN_DEPTH, edgeMax + 2));
         const info = [];   // [k][i] = { h, water, shallow, ft }
         for (let k = 0; k < DEPTH; k++) {
             const row = [];
@@ -917,10 +924,10 @@ export class GameEngine {
                 const ch = nd.layout[tr]?.[tc] ?? '0';
                 const def = ch === '0' ? null : this.objectDefinitions?.[nd.legend?.[ch]];
                 const isWater = !!def && (def.type === 'liquid_tile' || def.type === 'sea_tile' || !!def.waterBelow);
-                const f = Math.min(1, Math.max(0, (DEPTH - k) / TAPER));
-                const lv = parseInt(nd.heights[tr]?.[tc] ?? '0', 36) || 0;
+                // 高さ（段）: 隣の高さと、「境からの距離ぶんだけ、1 マスに 1 段で下がる線」の、低いほう（なだらかに 0 へ）
+                const lv = Math.min(parseInt(nd.heights[tr]?.[tc] ?? '0', 36) || 0, DEPTH - k);
                 const fch = nd.floorLayer?.[tr]?.[tc];
-                row.push({ h: lv * step * f, water: isWater, shallow: !!def && (def.texture === 'shallowWater' || !!def.waterBelow), ft: (fch !== undefined && nd.floorLegend?.[fch]) || nd.environment?.floorType });
+                row.push({ h: lv * step, water: isWater, shallow: !!def && (def.texture === 'shallowWater' || !!def.waterBelow), ft: (fch !== undefined && nd.floorLegend?.[fch]) || nd.environment?.floorType });
             }
             info.push(row);
         }
@@ -1032,6 +1039,9 @@ export class GameEngine {
         this.waterMeshes = [];
         this.seaCells = [];
         this.heatHazePlanes = [];
+        this.treeSprites = [];   // 木のスプライト（前のマップの木が溜まって、毎フレームの処理が増えないよう、マップごとに空にする）
+        this.cullSprites = [];   // 遠くで隠す飾りのスプライト（草・花）
+        this.minimapBase = null; // ミニマップの、動かない部分（壁）の絵
         this.torchGlows = [];   // 松明の光（光だまり・光の輪）。ゆらぎのアニメーション用
         this.fountains = [];
         this.chompers = [];
@@ -1484,7 +1494,6 @@ export class GameEngine {
                             });
                         }
                         const { far: treeMat, near: treeMatNear } = this.treeMats.get(texKey);
-                        this.treeSprites = this.treeSprites || [];
                         const tree = new THREE.Sprite(treeMat);
                         tree.center.set(0.5, 0.0);
                         const baseH = objDef.height ?? 4.8;   // 木の高さ（省略時は標準の木）。ばらつきは、高さに比例
@@ -1493,7 +1502,7 @@ export class GameEngine {
                         // Sink tree base slightly into grass (-0.08) so trunk roots naturally penetrate the terrain
                         tree.position.set(wx, -0.08, wz);
                         this.scene.add(tree);
-                        this.treeSprites.push({ sprite: tree, far: treeMat, near: treeMatNear });
+                        tree.updateMatrix(); tree.matrixAutoUpdate = false;   // 動かない: 毎フレームの行列の計算をしない
 
                         // Ground contact shadow under the tree trunk（大きい木ほど、広い影。1 つの影の材質・形を共有）
                         if (!this.treeShadowMat) {
@@ -1516,6 +1525,8 @@ export class GameEngine {
                         shadowMesh.scale.set(shadowK, shadowK, 1);
                         shadowMesh.position.set(wx, 0.012, wz);
                         this.scene.add(shadowMesh);
+                        shadowMesh.updateMatrix(); shadowMesh.matrixAutoUpdate = false;
+                        this.treeSprites.push({ sprite: tree, shadow: shadowMesh, far: treeMat, near: treeMatNear, vis: true });
                         if (objDef.solid) {
                             const half = objDef.colliderHalf ?? 0.6;   // 幹の当たり判定の半幅（大きな木ほど、太い）
                             this.colliders.push({
@@ -2526,12 +2537,17 @@ export class GameEngine {
                             const h2 = Math.sin((r * 39.346 + c * 11.135 + i * 83.155) * 24634.6345) * 24634.6345;
                             const fx = h1 - Math.floor(h1);
                             const fz = h2 - Math.floor(h2);
-                            const sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: plantTex }));
+                            // 同じ画像の草は、材質を共有する（草が大量になるため。1 枚ごとに作ると、重い）
+                            this.plantMats = this.plantMats || new Map();
+                            if (!this.plantMats.has(plantTex)) this.plantMats.set(plantTex, new THREE.SpriteMaterial({ map: plantTex }));
+                            const sprite = new THREE.Sprite(this.plantMats.get(plantTex));
                             sprite.center.set(0.5, 0.0);
                             const k = 0.8 + fx * 0.5;   // 大きさのばらつき
                             sprite.scale.set(pw * k, ph * k, 1);
                             sprite.position.set(wx + (fx - 0.5) * spread, -0.02, wz + (fz - 0.5) * spread);
                             this.scene.add(sprite);
+                            sprite.updateMatrix(); sprite.matrixAutoUpdate = false;   // 動かない
+                            this.cullSprites.push(sprite);
                         }
                         break;
                     }
@@ -4025,10 +4041,19 @@ export class GameEngine {
         this.player.floorY = (this.player.floorY ?? targetFloorY) + (targetFloorY - (this.player.floorY ?? targetFloorY)) * Math.min(1, dt * 10);
         const eyeHeight = 1.8 + this.player.floorY - playerFloorDepth - (this.player.isFalling ? this.player.fallDepth : 0);
         // 木の描画: 近い木は従来どおり、遠い木は切り抜き（遠景で、壁の木と重なると四角く欠けるため）。境目で、ちらつかないよう、ヒステリシスをつける（距離は暫定）
+        // 霧で見えなくなる距離（霧の遠さ×1.1）より遠い木・影・草は、隠す（描画する数を減らす。大森林は、木が大量にある）
+        const cullD2 = this.scene.fog ? (this.scene.fog.far * 1.1) ** 2 : Infinity;
         for (const t of this.treeSprites || []) {
             const dx = t.sprite.position.x - this.player.x, dz = t.sprite.position.z - this.player.z, d2 = dx * dx + dz * dz;
             const wantNear = t.isNear ? d2 < 42 * 42 : d2 < 40 * 40;
             if (wantNear !== t.isNear) { t.isNear = wantNear; t.sprite.material = wantNear ? t.near : t.far; }
+            const vis = d2 < cullD2;
+            if (vis !== t.vis) { t.vis = vis; t.sprite.visible = vis; if (t.shadow) t.shadow.visible = vis; }
+        }
+        for (const sp of this.cullSprites || []) {
+            const dx = sp.position.x - this.player.x, dz = sp.position.z - this.player.z;
+            const vis = dx * dx + dz * dz < cullD2;
+            if (vis !== sp.visible) sp.visible = vis;
         }
         this.camera.position.set(this.player.x, eyeHeight, this.player.z);
         this.camera.rotation.set(0, 0, 0);
@@ -5067,12 +5092,20 @@ export class GameEngine {
         const scaleX = w / (cols * tileSize);
         const scaleZ = h / (rows * tileSize);
 
-        // Draw walls
-        ctx.fillStyle = '#475569';
-        for (const c of this.colliders) {
-            ctx.fillRect(c.minX * scaleX, c.minZ * scaleZ,
-                (c.maxX - c.minX) * scaleX, (c.maxZ - c.minZ) * scaleZ);
+        // Draw walls: 動かない壁は、マップごとに 1 回だけ別の canvas に描いて、使い回す（大森林は、壁（木）が 700〜2000 個あり、毎フレーム描くと、重い）
+        const baseKey = `${this.currentMapId}:${this.colliders.length}`;
+        if (!this.minimapBase || this.minimapBase.key !== baseKey) {
+            const cv = document.createElement('canvas');
+            cv.width = w; cv.height = h;
+            const bctx = cv.getContext('2d');
+            bctx.fillStyle = '#475569';
+            for (const c of this.colliders) {
+                bctx.fillRect(c.minX * scaleX, c.minZ * scaleZ,
+                    (c.maxX - c.minX) * scaleX, (c.maxZ - c.minZ) * scaleZ);
+            }
+            this.minimapBase = { key: baseKey, canvas: cv };
         }
+        ctx.drawImage(this.minimapBase.canvas, 0, 0);
 
         // Draw Portal
         for (const portal of this.portals) {
