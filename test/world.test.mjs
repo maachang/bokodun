@@ -992,6 +992,7 @@ test('端の向こうの景色: 隣のマップの地形（高さ・地面の種
     assert.ok(game.includes('Math.min(parseInt(nd.heights[tr]?.[tc]') && game.includes('DEPTH - k)'), '1 マスに 1 段までの傾きで、0 へ下げる（高い端で、急な崖にならない）');
     assert.ok(game.includes('edgeMax + 2'), '境の高さに合わせて、幅を決める');
     assert.ok(game.includes('nd.floorLayer') && game.includes("def.type === 'liquid_tile'") && game.includes('waterBelow'), '地面の種類と水');
+    assert.ok(game.includes('vertexColors: true') && game.includes('buildIndices') && game.includes('floorColor(t.ft)'), 'なめらかな 1 枚の面（頂点の高さ・色は、まわりのマスの平均。1 マスずつの板にしない）');
     assert.ok(game.includes("await Promise.all(['north', 'south', 'west', 'east']"), '隣のマップを、同時に読み込む');
     // 端の高さが 3 段以上の境は、たくさんある（この描画が効く）
     let high = 0;

@@ -895,22 +895,12 @@ export class GameEngine {
         const step = nd.heightStep ?? 1;
         const horizontal = (dir === 'east' || dir === 'west');   // 境が縦（東西）なら、境に沿って行を並べる
         const along = horizontal ? rows : cols;
-        this.outsideMats = this.outsideMats || new Map();
-        const matOf = (key, make) => { if (!this.outsideMats.has(key)) this.outsideMats.set(key, make()); return this.outsideMats.get(key); };
-        const floorMat = (ft) => matOf('f:' + ft, () => new THREE.MeshLambertMaterial({ map: this.floorTextureOf(ft) }));
-        const waterMat = (shallow) => matOf(shallow ? 'w:s' : 'w:d', () => new THREE.MeshLambertMaterial({ map: shallow ? this.textures.shallowWater : this.textures.water }));
         // 隣のマップのマス（境から k 番目・境に沿って i 番目）
         const tileAt = (k, i) => {
             if (dir === 'east') return [i, k];
             if (dir === 'west') return [i, ncols - 1 - k];
             if (dir === 'south') return [k, i];
             return [nrows - 1 - k, i];
-        };
-        const worldXZ = (k, i) => {
-            if (dir === 'east') return [W + k * ts + ts / 2, i * ts + ts / 2];
-            if (dir === 'west') return [-k * ts - ts / 2, i * ts + ts / 2];
-            if (dir === 'south') return [i * ts + ts / 2, D + k * ts + ts / 2];
-            return [i * ts + ts / 2, -k * ts - ts / 2];
         };
         // 幅: 境の高さ（最大の段）に合わせる。1 マスに 1 段までの傾きで 0 へ下げるので、高い端ほど、広く描く
         let edgeMax = 0;
@@ -934,56 +924,75 @@ export class GameEngine {
             }
             info.push(row);
         }
-        const geo = new THREE.PlaneGeometry(ts, ts);
-        const faceDirs = [[0, 1, 0], [0, -1, Math.PI], [1, 0, Math.PI / 2], [-1, 0, -Math.PI / 2]];   // [dx(x 方向), dz(z 方向), 板の向き]
-        // 境に沿う向き・境から離れる向きを、世界の x, z の向きへ
-        const outward = dir === 'east' ? [1, 0] : dir === 'west' ? [-1, 0] : dir === 'south' ? [0, 1] : [0, -1];
-        const alongV = horizontal ? [0, 1] : [1, 0];
-        let waterAny = false;
-        const faceGeos = new Map();
-        const addFace = (wx, wz, dx, dz, rotY, yLow, yHigh, mat) => {
-            if (yHigh - yLow < 0.02) return;
-            const hKey = Math.round((yHigh - yLow) * 50) / 50;   // 高さが近い板は、形を共有する（板が大量になるため）
-            if (!faceGeos.has(hKey)) faceGeos.set(hKey, new THREE.PlaneGeometry(ts, hKey));
-            const face = new THREE.Mesh(faceGeos.get(hKey), mat);
-            face.rotation.y = rotY;
-            face.position.set(wx + dx * ts / 2, (yLow + yHigh) / 2, wz + dz * ts / 2);
-            this.addStatic(face);
+        // なめらかな 1 枚の面（頂点の高さ・色は、まわりのマスの平均）。1 マスずつの板にすると、雪と草の境や 1 段の段差が、四角い板になり、遠くで宙に浮いて見えた。
+        //   水（川・湖・海）のマスは、高さ 0・青い色。頂点は、境の線の上（k: 境から離れる向き・i: 境に沿う向き）に、(DEPTH+1)×(along+1) 個
+        const FLOOR_COLOR = { grass: 0x5b7f3a, snow: 0xe6edf5, forest: 0x55663a, desert: 0xd6be82, rock: 0x77706a, whiteSand: 0xece4c8, tundra: 0x8d8a70, dryGrass: 0xa89a52, redEarth: 0xc0703f, ash: 0x4a4440, ice: 0xaad7f0, swamp: 0x3a4a30, sand: 0xd8c690 };
+        const WATER_DEEP = 0x2a4fa0, WATER_SHALLOW = 0x6fbad8;
+        const cornerXZ = (k, i) => {
+            if (dir === 'east') return [W + k * ts, i * ts];
+            if (dir === 'west') return [-k * ts, i * ts];
+            if (dir === 'south') return [i * ts, D + k * ts];
+            return [i * ts, -k * ts];
         };
-        const rotOf = (dx, dz) => faceDirs.find(f => f[0] === dx && f[1] === dz)[2];
-        for (let k = 0; k < DEPTH; k++) {
-            for (let i = 0; i < along; i++) {
-                const t = info[k][i];
-                const [wx, wz] = worldXZ(k, i);
-                if (t.water) {
-                    const m = new THREE.Mesh(geo, waterMat(t.shallow));
-                    m.rotation.x = -Math.PI / 2; m.position.set(wx, 0.003, wz);
-                    this.addStatic(m); waterAny = true;
-                    continue;
+        // 地面の色: 床のテクスチャの平均の色（実際の床と、同じ色合いにする）。取れなければ、上の表の色
+        this.outsideColors = this.outsideColors || new Map();
+        const floorColor = (ft) => {
+            if (!this.outsideColors.has(ft)) {
+                let col = new THREE.Color(FLOOR_COLOR[ft] ?? 0x5b7f3a);
+                try {
+                    const img = this.floorTextureOf(ft)?.image;
+                    if (img && (img.width || img.naturalWidth)) {
+                        const cv = document.createElement('canvas'); cv.width = cv.height = 1;
+                        const cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, 1, 1);
+                        const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
+                        col = new THREE.Color(r / 255, g / 255, b / 255);
+                        col.convertSRGBToLinear();
+                    }
+                } catch { /* テクスチャが取れなければ、表の色 */ }
+                this.outsideColors.set(ft, col);
+            }
+            return this.outsideColors.get(ft);
+        };
+        const colOf = (t) => t.water ? new THREE.Color(t.shallow ? WATER_SHALLOW : WATER_DEEP) : floorColor(t.ft).clone();
+        const nV = (DEPTH + 1) * (along + 1);
+        const pos = new Float32Array(nV * 3), colr = new Float32Array(nV * 3);
+        for (let k = 0; k <= DEPTH; k++) {
+            for (let i = 0; i <= along; i++) {
+                let hs = 0, n = 0; const c = new THREE.Color(0, 0, 0);
+                for (const [tk, ti] of [[k - 1, i - 1], [k - 1, i], [k, i - 1], [k, i]]) {
+                    const t = info[tk]?.[ti];
+                    if (!t) continue;   // 範囲の外のマスは、数えない
+                    hs += t.water ? 0 : t.h; n++; c.add(colOf(t));
                 }
-                const mat = floorMat(t.ft);
-                const top = new THREE.Mesh(geo, mat);
-                top.rotation.x = -Math.PI / 2; top.position.set(wx, t.h + 0.004, wz);
-                this.addStatic(top);
-                // 側面: 隣のマス（境に沿う 2 方向・境から離れる向き）より高ければ、その向きに板を立てる
-                const nbrs = [[alongV[0], alongV[1], k, i + 1], [-alongV[0], -alongV[1], k, i - 1], [outward[0], outward[1], k + 1, i]];
-                for (const [dx, dz, nk, ni] of nbrs) {
-                    const n = info[nk]?.[ni];
-                    const nh = n ? (n.water ? 0 : n.h) : 0;
-                    addFace(wx, wz, dx, dz, rotOf(dx, dz), nh, t.h, mat);
-                }
-                // 境（このマップの端のマスとの継ぎ目）: 隣の最初のマスが、このマップの端のマスより高ければ、境に板を立てる（端のマスの側から見える）
-                if (k === 0) {
-                    const cr = horizontal ? i : (dir === 'south' ? rows - 1 : 0), cc = horizontal ? (dir === 'east' ? cols - 1 : 0) : i;
-                    const hc = this.heightLevelAtTile(cr, cc) * this.heightStep;
-                    addFace(wx, wz, -outward[0], -outward[1], rotOf(-outward[0], -outward[1]), hc, t.h, mat);
-                }
+                const idx = k * (along + 1) + i;
+                const [wx, wz] = cornerXZ(k, i);
+                pos[idx * 3] = wx; pos[idx * 3 + 1] = (n ? hs / n : 0) + 0.01; pos[idx * 3 + 2] = wz;
+                if (n) c.multiplyScalar(1 / n);
+                colr[idx * 3] = c.r; colr[idx * 3 + 1] = c.g; colr[idx * 3 + 2] = c.b;
             }
         }
-        if (waterAny) {   // 水の模様のアニメーションを動かすための、見えない目印
-            const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.01, 0.01), waterMat(false));
-            flag.visible = false; this.scene.add(flag); this.waterMeshes.push(flag);
-        }
+        // 面の向き: 4 方向で、頂点の並びの向きが違う。上から見て表になる並びに、そろえる（法線を後から反転すると、裏表の判定とずれて、暗くなる）
+        const buildIndices = (flip) => {
+            const idx = [];
+            for (let k = 0; k < DEPTH; k++) {
+                for (let i = 0; i < along; i++) {
+                    const a = k * (along + 1) + i, b = a + 1, c2 = a + (along + 1), d = c2 + 1;
+                    if (flip) idx.push(a, b, c2, b, d, c2); else idx.push(a, c2, b, b, c2, d);
+                }
+            }
+            return idx;
+        };
+        const geo = new THREE.BufferGeometry();
+        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+        geo.setAttribute('color', new THREE.BufferAttribute(colr, 3));
+        geo.setIndex(buildIndices(false));
+        geo.computeVertexNormals();
+        if (geo.attributes.normal.getY(Math.floor(nV / 2)) < 0) { geo.setIndex(buildIndices(true)); geo.computeVertexNormals(); }
+        this.outsideMats = this.outsideMats || new Map();
+        if (!this.outsideMats.has('smooth')) this.outsideMats.set('smooth', new THREE.MeshLambertMaterial({ vertexColors: true }));
+        const mesh = new THREE.Mesh(geo, this.outsideMats.get('smooth'));
+        mesh.matrixAutoUpdate = false;
+        this.scene.add(mesh);
     }
 
     // 建物などへの出入り: 行き先 nextMap へ移動する。扉・門のマスごとの指定は、マップの links（"列,行": { nextMap, message, params, back }）
