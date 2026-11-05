@@ -24,16 +24,70 @@ LEGEND = {
     'A': 'cactus', 'X': 'dead_tree', 'U': 'succulent', 'M': 'palm',
     'R': 'mountain_rock_a', 'S': 'mountain_rock_b', 'B': 'mountain_rock_c', 'H': 'mountain_rock_d',
     'm': 'meadow_grass', 'e': 'fern', 'h': 'highland_grass', 'v': 'weed_flower', 'k': 'cattail_cluster', 'l': 'lavender_flower', 'i': 'arid_grass', 'o': 'highland_weed', 'w': 'roadside_flowers', 'p': 'path_flower', 'b': 'bush_flower',
+    'T': 'forest_tree_a', 'V': 'forest_tree_b', 'W': 'great_tree_a', 'K': 'great_tree_b',      # 森: 217・218 の木（2 倍）・大森林: 3 倍。林の壁（F・C・N）は、使わない
     'c': 'cliff_rock_wall', 'Y': 'tropical_tree', 'E': 'mine_entrance', 't': 'mine_cart',
     'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge',
 }
-SOLID_CH = set('FCNPDGAXUMRSBHcYEt')          # 通れない物体（端のマスには置かない）
+SOLID_CH = set('FCNPDGAXUMRSBHcYEtTVWK')          # 通れない物体（端のマスには置かない）
 # 地面の種類（floorLayer の文字 → environment.floorType と同じ名前）
 FLOOR = {'g': 'grass', 's': 'snow', 'f': 'forest', 'd': 'desert', 'r': 'rock', 'w': 'whiteSand', 'u': 'tundra', 'i': 'ice', 'm': 'redEarth', 'a': 'ash'}
 BIOME_FLOOR = {SNOW: 's', CONIFER: 'u', FOREST: 'f', GRASS: 'g', DESERT: 'd', ROCK: 'r', TROPICAL: 'g', SEA: 'g'}
 BIOME_NAME = {SNOW: '北の雪山', CONIFER: '針葉樹の裾野', FOREST: '大森林', GRASS: '草原', DESERT: '砂地', ROCK: '岩山', TROPICAL: '南国', SEA: '海岸'}
 # 環境（空・霧・光）: 既存の外マップから、地形ごとに借りる
-ENV_FROM = {SNOW: 'field_snow', CONIFER: 'field_tundra', FOREST: 'field_forest', GRASS: 'field_grass', DESERT: 'field_desert', ROCK: 'field_mountain', TROPICAL: 'field_tropical', SEA: 'field_coast'}
+DARK_FOREST_ENV = {'ambientLight': 0x2c4234, 'directionalLight': 0x586e58, 'fogColor': 0x07100b, 'fogNear': 5, 'fogFar': 28, 'visibility': 0.4, 'skyColor': 0x07100b}
+ENV_FROM = {SNOW: 'field_snow', CONIFER: 'field_tundra', FOREST: 'field_swamp', GRASS: 'field_grass', DESERT: 'field_desert', ROCK: 'field_mountain', TROPICAL: 'field_tropical', SEA: 'field_coast'}
+
+
+def build_maze(fo):
+    """大森林の天然の迷宮。3×3 マスを 1 区画（ユニット）として、奇数番目の区画が部屋（通路）、その間が壁か通路。
+    迷路は、深追いの探索（DFS）で、全部の部屋が 1 本の道でつながる（行き止まりと遠回りがある）。少しだけ壁を抜いて、輪（ループ）を作る。
+    森の外へは、ところどころ（25%）出入り口を開ける。戻り値: ユニットの種類（0 迷路でない・1 部屋・2 開いた通路・3 横の壁・4 縦の壁・5 柱）"""
+    import random
+    S = 3
+    nu, nv = W // S, H // S
+    kind = np.zeros((nv, nu), np.uint8)
+    # 部屋にできるのは、3×3 マスが全部、森（水・断崖などのない所）の、奇数番目の区画
+    f = fo[:nv * S, :nu * S].reshape(nv, S, nu, S).all(axis=(1, 3))
+    active = np.zeros((nv, nu), bool)
+    active[1::2, 1::2] = f[1::2, 1::2]
+    # 隣り合う部屋（2 区画先）の間を、グラフにする
+    rnd = random.Random(2026)
+    nodes = [(v, u) for v, u in zip(*np.nonzero(active))]
+    seen = set(); open_edges = set()
+    order = nodes[:]; rnd.shuffle(order)
+    for start in order:
+        if start in seen: continue
+        stack = [start]; seen.add(start)
+        while stack:
+            v, u = stack[-1]
+            nbrs = [(v + dv, u + du, v + dv // 2, u + du // 2) for dv, du in ((2, 0), (-2, 0), (0, 2), (0, -2)) if 0 <= v + dv < nv and 0 <= u + du < nu and active[v + dv, u + du] and (v + dv, u + du) not in seen]
+            if not nbrs: stack.pop(); continue
+            nv_, nu_, ev, eu = nbrs[rnd.randrange(len(nbrs))]
+            open_edges.add((ev, eu)); seen.add((nv_, nu_)); stack.append((nv_, nu_))
+    # 輪（ループ）: 壁を少しだけ抜く
+    for v, u in nodes:
+        for dv, du in ((2, 0), (0, 2)):
+            if 0 <= v + dv < nv and 0 <= u + du < nu and active[v + dv, u + du] and rnd.random() < 0.07:
+                open_edges.add((v + dv // 2, u + du // 2))
+    # 種類を決める
+    for v, u in nodes: kind[v, u] = 1
+    near = np.zeros((nv, nu), bool)
+    for v, u in nodes:
+        near[max(0, v - 1):v + 2, max(0, u - 1):u + 2] = True
+    for v in range(nv):
+        for u in range(nu):
+            if not near[v, u] or kind[v, u] == 1: continue
+            if v % 2 == 0 and u % 2 == 0: kind[v, u] = 5                        # 柱
+            elif v % 2 == 1 and u % 2 == 0: kind[v, u] = 2 if (v, u) in open_edges else 4   # 左右の部屋の間: 縦の壁
+            elif v % 2 == 0 and u % 2 == 1: kind[v, u] = 2 if (v, u) in open_edges else 3   # 上下の部屋の間: 横の壁
+    # 森の外へ向かう、壁になる所（片側だけが部屋）: 25% を出入り口にする
+    for v in range(nv):
+        for u in range(nu):
+            if kind[v, u] in (3, 4) and (v, u) not in open_edges:
+                a = [(v + 1, u), (v - 1, u)] if kind[v, u] == 3 else [(v, u + 1), (v, u - 1)]
+                ok = [active[x, y] for x, y in a if 0 <= x < nv and 0 <= y < nu]
+                if ok.count(True) == 1 and rnd.random() < 0.25: kind[v, u] = 2
+    return kind
 
 
 def build_tiles(t):
@@ -65,7 +119,8 @@ def build_tiles(t):
     sn = free & (biome == SNOW)
     cl = np.abs(T.fbm(61, (34, 12, 4)) - 0.5) < 0.034                       # 断崖の線（尾根・段）
     ice_hi = T.fbm(62, (30, 10, 4)); ice_lo = T.fbm(63, (22, 8, 3)); bare = T.fbm(64, (18, 6, 3))
-    put(sn & (elev < 12) & (patch > 0.5) & (u2 < 0.75), 'C')                  # 裾野の、雪をかぶった針葉樹林
+    forest_tree = lambda mask, k: (put(mask & (k < 0.5), 'T'), put(mask & (k >= 0.5), 'V'))
+    forest_tree(sn & (elev < 12) & (patch > 0.5) & (u2 < 0.32), u3)               # 裾野の木（2 倍の木を、1 本ずつ）
     put(sn & (elev < 12) & (u < 0.10) & (obj == ord('0')), 'P')
     put(sn & (elev >= 12) & (elev < 24) & (u < 0.025), 'P')
     put(sn & (elev >= 14) & cl & (u3 < 0.88), 'c')                              # 断崖の壁（ところどころ切れて、峠になる）
@@ -73,22 +128,26 @@ def build_tiles(t):
     fl(sn & (elev < 14) & (ice_lo > 0.74), 'i')                                # 凍った湖
     fl(sn & (elev >= 24) & (bare > 0.25), 'r')                                  # 高い所は、岩肌
     co = free & (biome == CONIFER)
-    put(co & (u < 0.06), 'P'); put(co & (patch > 0.52) & (u2 < 0.7), 'C')
+    put(co & (u < 0.06), 'P'); forest_tree(co & (patch > 0.52) & (u2 < 0.34), u3)
 
-    # --- 西の大森林 ---
+    # --- 西の大森林: 天然の迷宮（217・218 の木を 3 倍。真っ暗。起伏が激しい。目印を減らし、同じような木が続く）---
     fo = free & (biome == FOREST)
-    dens = T.fbm(71, (90, 30, 10))
-    clearing = dens < 0.36; core = dens > 0.60
-    trail = np.abs(T.fbm(72, (70, 24, 8)) - 0.5) < 0.017                      # 獣道
-    put(fo & (u3 < 0.14 + 0.12 * core), 'e')
-    put(fo & clearing & (u < 0.12), 'h')
-    put(fo & clearing & (u3 > 0.93) & (u3 < 0.955), 'v'); put(fo & clearing & (u3 >= 0.955) & (u3 < 0.975), 'w'); put(fo & clearing & (u3 >= 0.975) & (u3 < 0.99), 'l')
-    put(fo & ~clearing & (u < 0.04 + 0.05 * core), 'D')
-    put(fo & clearing & (u3 > 0.995), 'G')
-    put(fo & ((core & (patch2 > 0.5) & (u2 < 0.8)) | (~clearing & ~core & (patch2 > 0.62) & (u2 < 0.7))), 'F')
-    put(fo & trail, '0')
-    fl(fo & clearing, 'g'); fl(fo & trail, 'u')
-    fl(fo & (T.fbm(73, (14, 5, 3)) > 0.7), 'u')                                # ところどころ、土
+    maze_kind = build_maze(fo)
+    S = 3
+    mk = np.zeros((H, W), np.uint8)
+    mk[:maze_kind.shape[0] * S, :maze_kind.shape[1] * S] = np.kron(maze_kind, np.ones((S, S), np.uint8))
+    lx = (xs_.astype(int) % S); ly = (ys_.astype(int) % S)
+    hs = u2                                                                       # ばらつき（壁の、中心線以外のマスに木を置くか）
+    wall_tree = (((mk == 3) & ((ly == 1) | (hs < 0.55))) |                        # 横の壁: 中心の行は、必ず木（すき間なし）
+                 ((mk == 4) & ((lx == 1) | (hs < 0.55))) |                        # 縦の壁: 中心の列は、必ず木
+                 ((mk == 5) & ((lx == 1) | (ly == 1) | (hs < 0.5))))              # 柱: 中心の十字は、必ず木
+    in_maze = fo & (mk > 0)
+    put(fo & (u3 < 0.10), 'e')                                                    # 下草（シダ）。目印になる花・断崖・空き地は、置かない
+    put(in_maze & wall_tree & (u < 0.5), 'W'); put(in_maze & wall_tree & (u >= 0.5), 'K')   # 巨木（3 倍）
+    # 迷路の外の森（迷路にならない端・川のそば）: 木は少なめ（通れる）
+    out_maze = fo & (mk == 0)
+    put(out_maze & (u2 < 0.12) & (u < 0.5), 'W'); put(out_maze & (u2 < 0.12) & (u >= 0.5), 'K')
+    fl(fo, 'f')
 
     # --- 草原 ---
     gr = free & (biome == GRASS)
@@ -107,7 +166,7 @@ def build_tiles(t):
     fl(tr & (sandy > 0.62), 'w')
     put(tr & (u3 < 0.14), 'e'); put(tr & (u < 0.05), 'b'); put(tr & (u2 < 0.02), 'w'); put(tr & (u2 >= 0.02) & (u2 < 0.03), 'p')
     put(tr & (u2 > 0.965), 'Y'); put(tr & (u2 > 0.92) & (u2 <= 0.965), 'M')
-    put(tr & (patch2 > 0.6) & (u3 > 0.45), 'F')                                 # ジャングルの茂み
+    forest_tree(tr & (patch2 > 0.6) & (u3 > 0.55), u)                            # ジャングルの茂み（2 倍の木）
 
     # --- 東の山々と炭鉱 ---
     ro = free & (biome == ROCK)
@@ -200,6 +259,8 @@ def main():
             base_ch = max(floor_counts, key=floor_counts.get)
             env = dict(envs[SEA if sea_frac > 0.35 else dom])
             env['floorType'] = FLOOR[base_ch]
+            if not sea_frac > 0.35 and dom == FOREST:
+                env.update(DARK_FOREST_ENV)   # 大森林: 真っ暗（数マス先は、巨木のシルエットだけ）
             layout = [''.join(chr(v) for v in row) for row in o]
             heights = [''.join(CH36[min(35, int(v))] for v in row) for row in el]
             floor_layer = [''.join(chr(v) for v in row) for row in fl]

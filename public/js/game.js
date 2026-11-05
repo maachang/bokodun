@@ -1361,8 +1361,17 @@ export class GameEngine {
                     }
 
                     case 'tree': {
-                        const treeMat = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.tree, transparent: false, alphaTest: 0.4 });   // 遠い木: 切り抜き。透明な画素が奥行きを書いて、奥の壁の木を四角く隠すのを防ぐ
-                        const treeMatNear = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.tree });   // 近い木: 従来の（なめらかな）描画
+                        // 木のスプライト。同じ画像の材質（遠い木＝切り抜き・近い木＝なめらか）と、足元の影は、全部の木で共有する（森は、木が大量になるため）
+                        this.treeMats = this.treeMats || new Map();
+                        const texKey = objDef.texture;
+                        if (!this.treeMats.has(texKey)) {
+                            const tx = this.textures[texKey] || this.textures.tree;
+                            this.treeMats.set(texKey, {
+                                far: new THREE.SpriteMaterial({ map: tx, transparent: false, alphaTest: 0.4 }),   // 遠い木: 切り抜き。透明な画素が奥行きを書いて、奥の壁の木を四角く隠すのを防ぐ
+                                near: new THREE.SpriteMaterial({ map: tx })                                      // 近い木: 従来の（なめらかな）描画
+                            });
+                        }
+                        const { far: treeMat, near: treeMatNear } = this.treeMats.get(texKey);
                         this.treeSprites = this.treeSprites || [];
                         const tree = new THREE.Sprite(treeMat);
                         tree.center.set(0.5, 0.0);
@@ -1374,32 +1383,32 @@ export class GameEngine {
                         this.scene.add(tree);
                         this.treeSprites.push({ sprite: tree, far: treeMat, near: treeMatNear });
 
-                        // Ground contact shadow under the tree trunk
-                        const shadowCanvas = document.createElement('canvas');
-                        shadowCanvas.width = 32;
-                        shadowCanvas.height = 32;
-                        const sCtx = shadowCanvas.getContext('2d');
-                        const grad = sCtx.createRadialGradient(16, 16, 2, 16, 16, 16);
-                        grad.addColorStop(0, 'rgba(10, 25, 10, 0.65)');
-                        grad.addColorStop(0.5, 'rgba(15, 30, 15, 0.35)');
-                        grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                        sCtx.fillStyle = grad;
-                        sCtx.fillRect(0, 0, 32, 32);
-
-                        const shadowTex = new THREE.CanvasTexture(shadowCanvas);
-                        const shadowMat = new THREE.MeshBasicMaterial({
-                            map: shadowTex,
-                            transparent: true,
-                            depthWrite: false
-                        });
-                        const shadowMesh = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 2.4), shadowMat);
+                        // Ground contact shadow under the tree trunk（大きい木ほど、広い影。1 つの影の材質・形を共有）
+                        if (!this.treeShadowMat) {
+                            const shadowCanvas = document.createElement('canvas');
+                            shadowCanvas.width = 32;
+                            shadowCanvas.height = 32;
+                            const sCtx = shadowCanvas.getContext('2d');
+                            const grad = sCtx.createRadialGradient(16, 16, 2, 16, 16, 16);
+                            grad.addColorStop(0, 'rgba(10, 25, 10, 0.65)');
+                            grad.addColorStop(0.5, 'rgba(15, 30, 15, 0.35)');
+                            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                            sCtx.fillStyle = grad;
+                            sCtx.fillRect(0, 0, 32, 32);
+                            this.treeShadowMat = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shadowCanvas), transparent: true, depthWrite: false });
+                            this.treeShadowGeo = new THREE.PlaneGeometry(2.4, 2.4);
+                        }
+                        const shadowMesh = new THREE.Mesh(this.treeShadowGeo, this.treeShadowMat);
                         shadowMesh.rotation.x = -Math.PI / 2;
+                        const shadowK = Math.min(3, Math.max(1, baseH / 5.2));
+                        shadowMesh.scale.set(shadowK, shadowK, 1);
                         shadowMesh.position.set(wx, 0.012, wz);
                         this.scene.add(shadowMesh);
                         if (objDef.solid) {
+                            const half = objDef.colliderHalf ?? 0.6;   // 幹の当たり判定の半幅（大きな木ほど、太い）
                             this.colliders.push({
-                                minX: wx - 0.6, maxX: wx + 0.6,
-                                minZ: wz - 0.6, maxZ: wz + 0.6
+                                minX: wx - half, maxX: wx + half,
+                                minZ: wz - half, maxZ: wz + half
                             });
                         }
                         break;

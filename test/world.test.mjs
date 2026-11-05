@@ -821,3 +821,58 @@ test('世界の川: 本流・支流・三角州に加えて、山（雪山の麓
     const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
     assert.ok(game.includes('objDef.waterBelow') && game.includes('objDef.railOnWater'), '橋の下の水・水の側の手すり');
 });
+
+test('世界の森: 林の壁（tree_wall）は使わない。森は ID 217・218 の木を 2 倍、大森林は 3 倍にして 1 本ずつ並べ、大森林は薄暗い（大湿原の環境）', () => {
+    let walls = 0, great = 0, forestTrees = 0, greatMeshes = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const lay = m.layout.join('');
+        for (const [ch, name] of Object.entries(m.legend)) {
+            const n = lay.split(ch).length - 1;
+            if (objects[name]?.type === 'tree_wall') walls += n;
+            if (name.startsWith('great_tree')) great += n;
+            if (name.startsWith('forest_tree')) forestTrees += n;
+        }
+        if (m.name.startsWith('大森林')) {
+            greatMeshes++;
+            assert.ok(m.environment.fogFar <= 45 && m.environment.visibility <= 0.7, `${id}: 大森林は薄暗い（霧 ${m.environment.fogFar}・視界 ${m.environment.visibility}）`);
+        }
+    }
+    assert.equal(walls, 0, `林の壁: ${walls}`);
+    assert.ok(great > 5000 && forestTrees > 2000, `巨木 ${great}・森の木 ${forestTrees}`);
+    assert.ok(greatMeshes >= 10, `大森林のマップ: ${greatMeshes}`);
+    // 217・218 の木を、拡大して使う（高さ: 通常の木 5.2 の、2 倍・3 倍）
+    assert.equal(objects.forest_tree_a.texture, 'fGrassTree'); assert.equal(objects.forest_tree_b.texture, 'fSwampTreeA');
+    assert.equal(objects.great_tree_a.texture, 'fGrassTree'); assert.equal(objects.great_tree_b.texture, 'fSwampTreeA');
+    assert.ok(Math.abs(objects.forest_tree_a.height - objects.grass_tree.height * 2) < 1e-6);
+    assert.ok(Math.abs(objects.great_tree_a.height - objects.grass_tree.height * 3) < 1e-6);
+    assert.ok(objects.great_tree_a.colliderHalf > objects.forest_tree_a.colliderHalf, '巨木は幹が太い');
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    assert.ok(game.includes('objDef.colliderHalf ?? 0.6') && game.includes('this.treeMats'), '幹の太さ・材質の共有');
+});
+
+test('大森林は、天然の迷宮: 巨木の壁の迷路（通路は 3 マス幅）・真っ暗・起伏が激しい・目印（花・断崖・空き地）を置かない。敵は出さない', () => {
+    let forestMeshes = 0, trees = 0, tiles = 0, landmarks = 0, maxLevel = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        if (!m.name.startsWith('大森林')) continue;
+        forestMeshes++;
+        assert.ok(m.environment.fogNear <= 6 && m.environment.fogFar <= 30 && m.environment.visibility <= 0.5, `${id}: 真っ暗（霧 ${m.environment.fogNear}〜${m.environment.fogFar}・視界 ${m.environment.visibility}）`);
+        assert.deepEqual(m.enemies ?? {}, {}, `${id}: 敵は出さない`);
+        const lay = m.layout.join('');
+        for (const [ch, name] of Object.entries(m.legend)) {
+            const n = lay.split(ch).length - 1;
+            if (name.startsWith('great_tree')) trees += n;
+            if (['cliff_rock_wall', 'wild_flowers', 'weed_flower', 'lavender_flower', 'roadside_flowers'].includes(name)) landmarks += n;
+        }
+        tiles += 4096;
+        for (const row of m.heights) for (const ch of row) maxLevel = Math.max(maxLevel, levelOf(ch));
+    }
+    assert.ok(forestMeshes >= 10, `大森林のマップ: ${forestMeshes}`);
+    const ratio = trees / tiles;
+    assert.ok(ratio > 0.2 && ratio < 0.5, `巨木の割合（迷路の壁）: ${(ratio * 100).toFixed(1)}%`);
+    assert.ok(landmarks / tiles < 0.01, `目印（断崖・花）は、森の外との境にだけ少しある: ${landmarks}（${(landmarks / tiles * 100).toFixed(2)}%）`);
+    assert.ok(maxLevel >= 18, `起伏が激しい（最大 ${maxLevel} 段）`);
+    const src = fs.readFileSync(path.join(root, 'scripts/world/gen_world.py'), 'utf-8');
+    assert.ok(src.includes('def build_maze') && src.includes('DARK_FOREST_ENV'), '迷路の生成と、暗い環境');
+});

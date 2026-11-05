@@ -412,7 +412,7 @@ def build():
     ys, xs = np.mgrid[0:H, 0:W].astype(np.float32)
     ix, iy = xs / sx, ys / sy
     def blur(m, r): return gauss(m, r)
-    w_snow = blur(biome == SNOW, 22); w_con = blur(biome == CONIFER, 22); w_rock = blur(biome == ROCK, 22)
+    w_snow = blur(biome == SNOW, 22); w_con = blur(biome == CONIFER, 22); w_rock = blur(biome == ROCK, 22); w_for = blur(biome == FOREST, 16)
     # 雪山（連峰）: 山（ガウス）に、尾根の線（ridged noise）と谷を重ねて、尖った峰と尾根・谷・峠を作る
     e_snow = np.clip((250 - iy) / 200, 0, 1) * 7
     peaks = np.zeros((H, W), np.float32)
@@ -437,8 +437,11 @@ def build():
     e_con = 3 + 6 * fbm(41, (60, 20, 8))
     plains = 4.0 * fbm(43, (96, 32, 10))
     plains = np.where(biome == TROPICAL, plains * 0.35, plains)   # 南国は、平ら
-    wsum = w_snow + w_con + w_rock
-    mount = (w_snow * e_snow + w_con * e_con + w_rock * e_rock)
+    # 西の大森林: 起伏を激しく（短い周期の丘と、尾根・谷）。木が密なので、地形でも通りにくくなる
+    ridgeF = (1 - np.abs(2 * fbm(46, (34, 12, 4)) - 1)) ** 2
+    e_for = 3 + 13 * fbm(45, (28, 10, 4)) + 9 * ridgeF
+    wsum = w_snow + w_con + w_rock + w_for
+    mount = (w_snow * e_snow + w_con * e_con + w_rock * e_rock + w_for * e_for)
     elev = mount + plains * np.clip(1 - wsum, 0, 1)
     elev = np.where(land, elev, 0)
     elev = np.clip(elev, 0, MAX_LEVEL).round().astype(np.int32)
