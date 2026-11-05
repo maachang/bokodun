@@ -142,6 +142,7 @@ test('なだらかな地域（崖のある 山道・高原・岩山の頂・乾�
     for (const id of ['field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_volcano', 'field_riverside', 'field_swamp']) {
         const h = readJson(`public/data/maps/${id}.json`).heights;
         for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) {
+            if (id === 'field_desert' && r >= 34 && r <= 60 && c >= 18 && c <= 44) continue;   // ピラミッドの段の壁（3 段分）は、わざと登れない
             if (c < 63) assert.ok(Math.abs(levelOf(h[r][c]) - levelOf(h[r][c + 1])) <= 1, `${id}: ${r},${c}`);
             if (r < 63) assert.ok(Math.abs(levelOf(h[r][c]) - levelOf(h[r + 1][c])) <= 1, `${id}: ${r},${c}`);
         }
@@ -318,9 +319,9 @@ for (const id of ['village', 'town', 'city', 'city_noble', 'city_slum', 'castle_
         assert.equal(bfs(true).size, bfs(false).size, `${id}: 起伏で、行けなくなった所がある`);
         for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) {
             const d = defOf(r, c);
-            if (d && ['door', 'signpost', 'fountain', 'portal', 'liquid_tile', 'gateway'].includes(d.type)) assert.equal(lv(r, c), 0, `${id}: ${d.type} は高さ 0 (${r},${c})`);
+            if (d && !d.lift && ['door', 'signpost', 'fountain', 'portal', 'liquid_tile', 'gateway'].includes(d.type)) assert.equal(lv(r, c), 0, `${id}: ${d.type} は高さ 0 (${r},${c})`);
         }
-        for (const k of Object.keys(m.links || {})) { const [x, z] = k.split(',').map(Number); assert.equal(lv(z, x), 0, `${id}: 出入口 ${k} は高さ 0`); }
+        for (const k of Object.keys(m.links || {})) { const [x, z] = k.split(',').map(Number); if (defOf(z, x)?.lift) continue; assert.equal(lv(z, x), 0, `${id}: 出入口 ${k} は高さ 0`); }
         // 屋根つきの建物（つながったブロック）は、同じ高さ
         const roofed = (r, c) => { const d = defOf(r, c); return d?.type === 'block' && d.hasRoof; };
         const seen = new Set();
@@ -385,9 +386,30 @@ test('ピラミッド: 砂漠に、段のあるピラミッド（1 段ずつ高�
     const doorCh = Object.entries(d.legend).find(([, v]) => v === 'pyramid_door')[0];
     let door = null;
     for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) if (d.layout[r][c] === doorCh) door = [r, c];
-    assert.ok(door && lv(door[0], door[1]) === 0, '入口の扉は高さ 0');
+    assert.ok(door && lv(door[0], door[1]) >= 10, '入口の扉は、頂上にある');
+    assert.ok(objects[d.legend[doorCh]].lift, '頂上の扉は、高さだけ持ち上げる（lift）');
     const link = d.links[`${door[1]},${door[0]}`];
     assert.equal(link.nextMap, 'pyramid');
+    // 登る仕掛け: 段の壁（3 段分）は登れず、各段の 1 か所の階段だけで、頂上の扉の前まで行ける。階段は、4 か所（地面→1 段目→2 段目→3 段目→頂上）
+    const solidAt = (r, c) => { const o = objects[d.legend[d.layout[r][c]]]; return !!o && o.solid && o.type !== 'floor_tile'; };
+    const reach = (stepMax) => {
+        const seen = new Set(['34,34']); const q = [[34, 34]];
+        while (q.length) {
+            const [r, c] = q.shift();
+            for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+                const nr = r + dr, nc = c + dc;
+                if (nr < 0 || nc < 0 || nr >= 64 || nc >= 64 || seen.has(`${nr},${nc}`) || solidAt(nr, nc)) continue;
+                if (lv(nr, nc) - lv(r, c) > stepMax) continue;
+                seen.add(`${nr},${nc}`); q.push([nr, nc]);
+            }
+        }
+        return seen;
+    };
+    assert.ok(reach(1).has(`${door[0] + 1},${door[1]}`), '地面から、階段だけで、頂上の扉の前まで行ける');
+    assert.ok(!reach(0).has(`${door[0] + 1},${door[1]}`), '段の壁は、登れない');
+    let stairs = 0;
+    for (const [r, c] of cells) { const l = lv(r, c); if (l % 3 !== 0) stairs++; }
+    assert.equal(stairs, 8, '階段の切り込み（4 か所 × 2 マス）');
     // 中の墓所
     const m = readJson('public/data/maps/pyramid.json');
     assert.equal(m.type, 'indoor');

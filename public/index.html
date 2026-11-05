@@ -386,6 +386,19 @@
             color: #ffffff;
         }
 
+        /* マップ切り替えのセレクトボックス（地域のまとまりごと） */
+        .sel-scene {
+            background: #1e293b;
+            color: #38bdf8;
+            border: 1px solid #0284c7;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            font-family: inherit;
+        }
+        .sel-scene:hover { border-color: #38bdf8; }
+
         .btn-workshop {
             background: #8b5cf6;
             color: #ffffff;
@@ -612,32 +625,44 @@
         <!-- マップ切り替え（開発用のボタン） -->
         <section id="panel-areaNav" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div style="pointer-events: auto; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
-                <button class="btn-scene" onclick="window.game.loadMap('city'); this.blur();">街</button>
-                <button class="btn-scene" onclick="window.game.loadMap('village'); this.blur();">村</button>
-                <button class="btn-scene" onclick="window.game.loadMap('town'); this.blur();">町</button>
-                <button class="btn-scene" onclick="window.game.loadMap('castle'); this.blur();">王城</button>
-                <button class="btn-scene" onclick="window.game.loadMap('grassland'); this.blur();">草原</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_grass'); this.blur();">草原の道</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_desert'); this.blur();">砂漠</button>
-                <button class="btn-scene" onclick="window.game.loadMap('pyramid'); this.blur();">ピラミッド</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_snow'); this.blur();">極寒</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_forest'); this.blur();">樹海</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_mountain'); this.blur();">山道</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_lake'); this.blur();">湖畔</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_tropical'); this.blur();">南国</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_coast'); this.blur();">海岸</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_plateau'); this.blur();">高原</button>
-                <button class="btn-scene" onclick="window.game.loadMap('swamp'); this.blur();">湿地帯</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_swamp'); this.blur();">大湿地</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_riverside'); this.blur();">川辺</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_tundra'); this.blur();">ツンドラ</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_arid'); this.blur();">荒野</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_peak'); this.blur();">岩山の頂</button>
-                <button class="btn-scene" onclick="window.game.loadMap('field_volcano'); this.blur();">火山</button>
-                <button class="btn-scene" onclick="window.game.loadMap('rockymountain'); this.blur();">岩山</button>
-                <button class="btn-scene" onclick="window.game.loadMap('cave'); this.blur();">洞窟</button>
-                <button class="btn-scene" onclick="window.game.loadMap('dungeon'); this.blur();">地下迷宮</button>
-                <button class="btn-scene" onclick="window.game.loadMap('giant_test'); this.blur();">巨大試験場</button>
+                <select class="sel-scene" title="村・町・街・城" onchange="if (this.value) window.game.loadMap(this.value); this.selectedIndex = 0; this.blur();">
+                    <option value="">村・町・街・城</option>
+                    <option value="city">街</option>
+                    <option value="village">村</option>
+                    <option value="town">町</option>
+                    <option value="castle">王城</option>
+                </select>
+                <select class="sel-scene" title="最初のテストマップ" onchange="if (this.value) window.game.loadMap(this.value); this.selectedIndex = 0; this.blur();">
+                    <option value="">最初のテストマップ</option>
+                    <option value="grassland">草原</option>
+                    <option value="swamp">湿地帯</option>
+                    <option value="rockymountain">岩山</option>
+                    <option value="cave">洞窟</option>
+                    <option value="dungeon">地下迷宮</option>
+                    <option value="giant_test">巨大試験場</option>
+                </select>
+                <select class="sel-scene" title="外マップ（64×64）" onchange="if (this.value) window.game.loadMap(this.value); this.selectedIndex = 0; this.blur();">
+                    <option value="">外マップ（64×64）</option>
+                    <option value="field_grass">草原の道</option>
+                    <option value="field_desert">砂漠</option>
+                    <option value="field_snow">極寒</option>
+                    <option value="field_forest">樹海</option>
+                    <option value="field_mountain">山道</option>
+                    <option value="field_lake">湖畔</option>
+                    <option value="field_tropical">南国</option>
+                    <option value="field_coast">海岸</option>
+                    <option value="field_plateau">高原</option>
+                    <option value="field_swamp">大湿地</option>
+                    <option value="field_riverside">川辺</option>
+                    <option value="field_tundra">ツンドラ</option>
+                    <option value="field_arid">荒野</option>
+                    <option value="field_peak">岩山の頂</option>
+                    <option value="field_volcano">火山</option>
+                </select>
+                <select class="sel-scene" title="遺跡" onchange="if (this.value) window.game.loadMap(this.value); this.selectedIndex = 0; this.blur();">
+                    <option value="">遺跡</option>
+                    <option value="pyramid">ピラミッド</option>
+                </select>
                 <button class="btn-workshop" onclick="openWorkshop(); this.blur();">🎨 AI工房 (sdServer)</button>
             </div>
         </section>

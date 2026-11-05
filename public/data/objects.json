@@ -48,7 +48,8 @@
     "frameTexture": "cliffSand",
     "solid": true,
     "interactionDistance": 2.2,
-    "description": "ピラミッドの入口の扉"
+    "lift": true,
+    "description": "ピラミッドの頂上の入口の扉（高い所に立つので、高さだけ持ち上げる）"
   },
   "pyramid_exit": {
     "type": "door",

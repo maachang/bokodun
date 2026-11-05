@@ -988,7 +988,7 @@ export class GameEngine {
                 }
 
                 const liftH = this.heightLevelAtTile(r, c) * this.heightStep;
-                if (liftH > 0 && LIFT_TYPES.has(objDef.type) && !(objDef.type === 'floor_tile' && objDef.elevation > 0)) {
+                if (liftH > 0 && (LIFT_TYPES.has(objDef.type) || objDef.lift) && !(objDef.type === 'floor_tile' && objDef.elevation > 0)) {   // lift: true の定義（頂上の入口の扉など）は、種類に関係なく、高さだけ持ち上げる
                     this.scene.add = function (o) { o.position.y += liftH; return origSceneAdd.call(this, o); };
                 }
 
