@@ -30,12 +30,13 @@
     "w": "plaza_fountain",
     "f": "flower_bed",
     "v": "flower_bed_blue",
-    "T": "tree"
+    "T": "tree",
+    "C": "treasure_chest"
   },
   "enemies": {},
   "layout": [
     "WWWLWWWdWWWLWWW",
-    "WpppppppppppppW",
+    "WppppppppppppCW",
     "WpppppppppppppW",
     "Lpp000000000ppL",
     "Wpp0T00000T0ppW",
@@ -99,7 +100,7 @@
   },
   "heights": [
     "000000000000000",
-    "011111111111110",
+    "011111111111340",
     "012222222222210",
     "012222222222210",
     "012222111122210",
@@ -113,5 +114,14 @@
     "000000000000000"
   ],
   "heightStep": 0.5,
-  "fallDamagePerLevel": 6
+  "fallDamagePerLevel": 6,
+  "gimmickBoxes": [
+    {
+      "name": "walkway",
+      "r0": 0,
+      "c0": 10,
+      "r1": 3,
+      "c1": 14
+    }
+  ]
 }
