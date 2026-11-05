@@ -984,3 +984,19 @@ test('川の橋: すべての橋が、両岸をつなぐ（橋のマスが 4 近
     assert.deepEqual(broken, [], `両岸をつなげない橋: ${broken.join(' / ')}`);
     assert.ok(comps >= 30, `橋の数: ${comps}`);
 });
+
+test('端の向こうの景色: 隣のマップの地形（高さ・地面の種類・水）を、端から 16 マスの幅で描く。端が高くても、高い所から下へ落ちるように見えない', () => {
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    assert.ok(game.includes('buildNeighborTerrain(dir, nd, cols, rows, tileSize)'), '隣の地形を描く');
+    assert.ok(game.includes('export const OUTSIDE_TERRAIN_DEPTH = 16;'), '幅');
+    assert.ok(game.includes('TAPER = 6') && game.includes('(DEPTH - k) / TAPER'), '最後の 6 マスで、高さを 0 へ下げる');
+    assert.ok(game.includes('nd.floorLayer') && game.includes("def.type === 'liquid_tile'") && game.includes('waterBelow'), '地面の種類と水');
+    assert.ok(game.includes("await Promise.all(['north', 'south', 'west', 'east']"), '隣のマップを、同時に読み込む');
+    // 端の高さが 3 段以上の境は、たくさんある（この描画が効く）
+    let high = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        for (let i = 0; i < 64; i++) if (levelOf(m.heights[0][i]) >= 3) high++;
+    }
+    assert.ok(high > 1000, `端が高い所: ${high}`);
+});

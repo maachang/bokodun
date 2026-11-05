@@ -14,6 +14,9 @@ import { StrikeEffectSystem } from '/js/strikeEffect.js';
 // テスト用: 走る速さ（Shift）の倍率。広い世界を、すばやく見て回るため。通常の速さに戻すときは 1 にする（歩く速さは、そのまま）
 export const TEST_RUN_SPEED_SCALE = 5;
 
+// 端の向こうに描く、隣のマップの地形の幅（マス）。最後の 6 マスで、なだらかに高さ 0 へ下げる
+export const OUTSIDE_TERRAIN_DEPTH = 16;
+
 // 被弾リアクション（突進の命中時）の調整値
 //   ヒットストップ: 命中した瞬間にゲームの時間を一瞬止める（秒）。重い武器・会心・撃破で長くなる
 //   カメラの揺れ: 会心・撃破・重い武器の命中で、画面を短く揺らす（amp=揺れの大きさ、duration=秒）
@@ -307,7 +310,7 @@ export class GameEngine {
             cliffSand: RetroTextureGenerator.createCliffTexture(['#b8845a', '#a67448', '#c4936a', '#97653d', '#cfa07a'], '#4a2e1c', 31),
             cliffDark: RetroTextureGenerator.createCliffTexture(['#4a4344', '#3b3536', '#574f50', '#2f2a2b', '#625858'], '#120f10', 77),
             snowGround: RetroTextureGenerator.createSpeckleFloorTexture('#f4f8ff', ['#ffffff', '#e2eaf4', '#eaf0f8']),
-            forestGround: RetroTextureGenerator.createSpeckleFloorTexture('#2c3a22', ['#1f2b18', '#3a4a2a', '#4a3a22', '#55402a']),
+            forestGround: RetroTextureGenerator.createSpeckleFloorTexture('#667744', ['#566a38', '#788a50', '#876c46', '#6c5838']),   // 森の地面: 普通の、緑と茶の落ち葉の色（暗さは、環境の光と霧で出す。床自体を黒くしない）
             rockGround: RetroTextureGenerator.createSpeckleFloorTexture('#6e6a66', ['#59554f', '#85807a', '#4a4642']),
             whiteSand: RetroTextureGenerator.createSpeckleFloorTexture('#fff6d8', ['#fffbe8', '#f0e6c4', '#faf0d0']),
             dryGrassGround: RetroTextureGenerator.createSpeckleFloorTexture('#a89a52', ['#8f8240', '#bcae64', '#7d7338', '#c9bb70']),
@@ -835,6 +838,12 @@ export class GameEngine {
         const world = this.world;
         if (!world || !world.grid?.some(r => r.includes(mapId))) return;
         const W = cols * tileSize, D = rows * tileSize, FAR = 400;
+        // 4 方向の隣のマップを、同時に読み込む（順に待つと、読み込みが遅くなる）
+        await Promise.all(['north', 'south', 'west', 'east'].map(async (dir) => {
+            const nid = worldNeighbor(world, mapId, dir);
+            if (!nid || this.mapCache[nid]) return;
+            try { this.mapCache[nid] = await (await fetch(`/data/maps/${nid}.json`)).json(); } catch { /* 読めなければ、隣の地形は描かない */ }
+        }));
         const floorOf = async (dir) => {
             const nid = worldNeighbor(world, mapId, dir);
             if (!nid) return null;
@@ -863,6 +872,107 @@ export class GameEngine {
             mesh.rotation.x = -Math.PI / 2;
             mesh.position.set(cx, -0.01, cz);
             this.scene.add(mesh);
+        }
+        // 端の向こうの、隣のマップの地形（高さ・地面の種類・水）を、端から OUTSIDE_TERRAIN_DEPTH マスの幅で描く（端が高い所で、高い所から下へ落ちるように見えないため）
+        for (const dir of Object.keys(strips)) {
+            const nid = worldNeighbor(world, mapId, dir);
+            if (!nid) continue;
+            let nd = this.mapCache[nid];
+            if (!nd) { try { nd = await (await fetch(`/data/maps/${nid}.json`)).json(); this.mapCache[nid] = nd; } catch { continue; } }
+            if (nd?.heights) this.buildNeighborTerrain(dir, nd, cols, rows, tileSize);
+        }
+    }
+
+    // 隣のマップ nd の、境から OUTSIDE_TERRAIN_DEPTH マスぶんの地形を、このマップの外側に描く。
+    //   高さは、隣のマップの heights（最後の 6 マスで、なだらかに 0 へ下げる）。地面は floorLayer の種類。水（川・湖・海）は、水面。木・草は、描かない。
+    buildNeighborTerrain(dir, nd, cols, rows, ts) {
+        const DEPTH = OUTSIDE_TERRAIN_DEPTH, TAPER = 6;
+        const W = cols * ts, D = rows * ts;
+        const nrows = nd.layout.length, ncols = nd.layout[0].length;
+        const step = nd.heightStep ?? 1;
+        const horizontal = (dir === 'east' || dir === 'west');   // 境が縦（東西）なら、境に沿って行を並べる
+        const along = horizontal ? rows : cols;
+        this.outsideMats = this.outsideMats || new Map();
+        const matOf = (key, make) => { if (!this.outsideMats.has(key)) this.outsideMats.set(key, make()); return this.outsideMats.get(key); };
+        const floorMat = (ft) => matOf('f:' + ft, () => new THREE.MeshLambertMaterial({ map: this.floorTextureOf(ft) }));
+        const waterMat = (shallow) => matOf(shallow ? 'w:s' : 'w:d', () => new THREE.MeshLambertMaterial({ map: shallow ? this.textures.shallowWater : this.textures.water }));
+        // 隣のマップのマス（境から k 番目・境に沿って i 番目）
+        const tileAt = (k, i) => {
+            if (dir === 'east') return [i, k];
+            if (dir === 'west') return [i, ncols - 1 - k];
+            if (dir === 'south') return [k, i];
+            return [nrows - 1 - k, i];
+        };
+        const worldXZ = (k, i) => {
+            if (dir === 'east') return [W + k * ts + ts / 2, i * ts + ts / 2];
+            if (dir === 'west') return [-k * ts - ts / 2, i * ts + ts / 2];
+            if (dir === 'south') return [i * ts + ts / 2, D + k * ts + ts / 2];
+            return [i * ts + ts / 2, -k * ts - ts / 2];
+        };
+        const info = [];   // [k][i] = { h, water, shallow, ft }
+        for (let k = 0; k < DEPTH; k++) {
+            const row = [];
+            for (let i = 0; i < along; i++) {
+                const [tr, tc] = tileAt(k, i);
+                const ch = nd.layout[tr]?.[tc] ?? '0';
+                const def = ch === '0' ? null : this.objectDefinitions?.[nd.legend?.[ch]];
+                const isWater = !!def && (def.type === 'liquid_tile' || def.type === 'sea_tile' || !!def.waterBelow);
+                const f = Math.min(1, Math.max(0, (DEPTH - k) / TAPER));
+                const lv = parseInt(nd.heights[tr]?.[tc] ?? '0', 36) || 0;
+                const fch = nd.floorLayer?.[tr]?.[tc];
+                row.push({ h: lv * step * f, water: isWater, shallow: !!def && (def.texture === 'shallowWater' || !!def.waterBelow), ft: (fch !== undefined && nd.floorLegend?.[fch]) || nd.environment?.floorType });
+            }
+            info.push(row);
+        }
+        const geo = new THREE.PlaneGeometry(ts, ts);
+        const faceDirs = [[0, 1, 0], [0, -1, Math.PI], [1, 0, Math.PI / 2], [-1, 0, -Math.PI / 2]];   // [dx(x 方向), dz(z 方向), 板の向き]
+        // 境に沿う向き・境から離れる向きを、世界の x, z の向きへ
+        const outward = dir === 'east' ? [1, 0] : dir === 'west' ? [-1, 0] : dir === 'south' ? [0, 1] : [0, -1];
+        const alongV = horizontal ? [0, 1] : [1, 0];
+        let waterAny = false;
+        const faceGeos = new Map();
+        const addFace = (wx, wz, dx, dz, rotY, yLow, yHigh, mat) => {
+            if (yHigh - yLow < 0.02) return;
+            const hKey = Math.round((yHigh - yLow) * 50) / 50;   // 高さが近い板は、形を共有する（板が大量になるため）
+            if (!faceGeos.has(hKey)) faceGeos.set(hKey, new THREE.PlaneGeometry(ts, hKey));
+            const face = new THREE.Mesh(faceGeos.get(hKey), mat);
+            face.rotation.y = rotY;
+            face.position.set(wx + dx * ts / 2, (yLow + yHigh) / 2, wz + dz * ts / 2);
+            this.addStatic(face);
+        };
+        const rotOf = (dx, dz) => faceDirs.find(f => f[0] === dx && f[1] === dz)[2];
+        for (let k = 0; k < DEPTH; k++) {
+            for (let i = 0; i < along; i++) {
+                const t = info[k][i];
+                const [wx, wz] = worldXZ(k, i);
+                if (t.water) {
+                    const m = new THREE.Mesh(geo, waterMat(t.shallow));
+                    m.rotation.x = -Math.PI / 2; m.position.set(wx, 0.003, wz);
+                    this.addStatic(m); waterAny = true;
+                    continue;
+                }
+                const mat = floorMat(t.ft);
+                const top = new THREE.Mesh(geo, mat);
+                top.rotation.x = -Math.PI / 2; top.position.set(wx, t.h + 0.004, wz);
+                this.addStatic(top);
+                // 側面: 隣のマス（境に沿う 2 方向・境から離れる向き）より高ければ、その向きに板を立てる
+                const nbrs = [[alongV[0], alongV[1], k, i + 1], [-alongV[0], -alongV[1], k, i - 1], [outward[0], outward[1], k + 1, i]];
+                for (const [dx, dz, nk, ni] of nbrs) {
+                    const n = info[nk]?.[ni];
+                    const nh = n ? (n.water ? 0 : n.h) : 0;
+                    addFace(wx, wz, dx, dz, rotOf(dx, dz), nh, t.h, mat);
+                }
+                // 境（このマップの端のマスとの継ぎ目）: 隣の最初のマスが、このマップの端のマスより高ければ、境に板を立てる（端のマスの側から見える）
+                if (k === 0) {
+                    const cr = horizontal ? i : (dir === 'south' ? rows - 1 : 0), cc = horizontal ? (dir === 'east' ? cols - 1 : 0) : i;
+                    const hc = this.heightLevelAtTile(cr, cc) * this.heightStep;
+                    addFace(wx, wz, -outward[0], -outward[1], rotOf(-outward[0], -outward[1]), hc, t.h, mat);
+                }
+            }
+        }
+        if (waterAny) {   // 水の模様のアニメーションを動かすための、見えない目印
+            const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.01, 0.01), waterMat(false));
+            flag.visible = false; this.scene.add(flag); this.waterMeshes.push(flag);
         }
     }
 

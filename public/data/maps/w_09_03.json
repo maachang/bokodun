@@ -12,13 +12,13 @@
  "environment": {
   "floorType": "forest",
   "hasCeiling": false,
-  "ambientLight": 6981744,
-  "directionalLight": 11452578,
-  "fogColor": 1978406,
+  "ambientLight": 5665374,
+  "directionalLight": 9742474,
+  "fogColor": 1714720,
   "fogNear": 9,
   "fogFar": 44,
   "visibility": 0.65,
-  "skyColor": 1978406
+  "skyColor": 1714720
  },
  "legend": {
   "G": "grass_tree",
