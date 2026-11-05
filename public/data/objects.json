@@ -330,7 +330,7 @@
     "texture": "fConiferTreeA",
     "imageFile": "field/conifer_tree_a.png",
     "sdId": 262,
-    "aspect": 0.604,
+    "aspect": 0.528,
     "height": 6.0,
     "solid": true,
     "description": "ツンドラなどの、針葉樹 1 本（sdServer ID 262）。まだ、どのマップにも置いていない"
@@ -348,7 +348,7 @@
   "conifer_forest_a": {
     "type": "tree",
     "texture": "fConiferTreeA",
-    "aspect": 0.604,
+    "aspect": 0.528,
     "height": 12.0,
     "colliderHalf": 1.0,
     "solid": true,
@@ -366,7 +366,7 @@
   "great_conifer_a": {
     "type": "tree",
     "texture": "fConiferTreeA",
-    "aspect": 0.604,
+    "aspect": 0.528,
     "height": 18.0,
     "colliderHalf": 1.2,
     "solid": true,
