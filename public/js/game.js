@@ -977,12 +977,12 @@ export class GameEngine {
                     m.sprite.position.y = m.floorY;
                     this.monsters.push(m);
                     this.scene.add(m.sprite);
-                    if (!mapData.enemyFloor) continue;
-                    enemyTile = true;   // enemyFloor: 敵のマスにも、その床（ピラミッドの石の床など）を敷く
+                    if (!mapData.enemyFloor?.chars?.includes(char)) continue;
+                    enemyTile = true;   // enemyFloor: { floor, chars }。chars の敵のマスにも、その床（ピラミッドの石の床など）を敷く
                 }
 
                 // 2. Check if char represents an object
-                const objType = enemyTile ? mapData.enemyFloor : (mapData.legend ? mapData.legend[char] : null);
+                const objType = enemyTile ? mapData.enemyFloor.floor : (mapData.legend ? mapData.legend[char] : null);
                 const objDef = objType ? this.objectDefinitions[objType] : null;
 
                 if (!objDef) {

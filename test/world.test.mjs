@@ -140,9 +140,9 @@ for (const id of ['field_mountain', 'field_desert', 'field_snow', 'field_grass',
 
 test('なだらかな地域（崖のある 山道・高原・岩山の頂・乾燥地帯 以外）: 隣り合うマスの段差は 1 まで', () => {
     for (const id of ['field_desert', 'field_snow', 'field_grass', 'field_forest', 'field_lake', 'field_tropical', 'field_coast', 'field_tundra', 'field_volcano', 'field_riverside', 'field_swamp']) {
-        const h = readJson(`public/data/maps/${id}.json`).heights;
+        const md = readJson(`public/data/maps/${id}.json`), h = md.heights, gb = md.gimmickBoxes || [];
         for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) {
-            if (id === 'field_desert' && r >= 34 && r <= 60 && c >= 18 && c <= 44) continue;   // ピラミッドの段の壁（3 段分）は、わざと登れない
+            if (gb.some(b => r >= b.r0 && r <= b.r1 && c >= b.c0 && c <= b.c1)) continue;   // ピラミッドや塔の段の壁（3 段分）は、わざと登れない（gimmickBoxes）
             if (c < 63) assert.ok(Math.abs(levelOf(h[r][c]) - levelOf(h[r][c + 1])) <= 1, `${id}: ${r},${c}`);
             if (r < 63) assert.ok(Math.abs(levelOf(h[r][c]) - levelOf(h[r + 1][c])) <= 1, `${id}: ${r},${c}`);
         }
@@ -434,4 +434,48 @@ test('ピラミッド: 砂漠に、段のあるピラミッド（1 段ずつ高�
     const [ex, ez] = exit[0].split(',').map(Number);
     assert.ok(seen.has(`${ez},${ex}`), '出口に行ける');
     assert.ok([...enemyCh].length >= 2);
+});
+
+test('塔（field_peak・field_volcano・field_grass）: 段の壁（3 段分）は登れず、各段の階段だけで頂上の宝箱へ行ける。敵は段ごと。敵のマスにも床', () => {
+    for (const id of ['field_peak', 'field_volcano', 'field_grass']) {
+        const d = readJson(`public/data/maps/${id}.json`);
+        const lv = (r, c) => parseInt(d.heights[r][c], 36);
+        const fl = d.enemyFloor.floor;
+        assert.ok(objects[fl] && objects[fl].type === 'floor_tile', `${id}: 床の定義`);
+        const flCh = Object.entries(d.legend).find(([, v]) => v === fl)[0];
+        const chestCh = Object.entries(d.legend).find(([, v]) => v === 'treasure_chest')[0];
+        const cells = [], chests = [];
+        for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) {
+            const ch = d.layout[r][c];
+            if (ch === flCh || d.enemyFloor.chars.includes(ch) || ch === chestCh) cells.push([r, c]);
+            if (ch === chestCh) chests.push([r, c]);
+        }
+        assert.equal(chests.length, 2, `${id}: 頂上の宝箱`);
+        assert.ok(d.enemyFloor.chars.length >= 3 && d.enemyFloor.chars.every(ch => d.enemies[ch]), `${id}: 敵`);
+        const solidAt = (r, c) => { const o = objects[d.legend[d.layout[r][c]]]; return !!o && o.solid && o.type !== 'floor_tile' && o.type !== 'chest'; };
+        const start = cells.reduce((a, b) => lv(...a) <= lv(...b) ? a : b);
+        const reach = (stepMax) => {
+            const seen = new Set([start.join(',')]); const q = [start];
+            while (q.length) {
+                const [r, c] = q.shift();
+                for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+                    const nr = r + dr, nc = c + dc;
+                    if (nr < 0 || nc < 0 || nr >= 64 || nc >= 64 || seen.has(`${nr},${nc}`)) continue;
+                    if (solidAt(nr, nc) || lv(nr, nc) - lv(r, c) > stepMax) continue;
+                    seen.add(`${nr},${nc}`); q.push([nr, nc]);
+                }
+            }
+            return seen;
+        };
+        const top = Math.max(...cells.map(([r, c]) => lv(r, c)));
+        const base = Math.min(...cells.map(([r, c]) => lv(r, c)));
+        assert.ok(top - base >= 6, `${id}: 塔の高さ ${top - base}`);
+        const near = (set, r, c) => set.has(`${r},${c}`);
+        // 階段（段差 1）で、頂上の宝箱へ行ける。段差 0 だけでは行けない（登れない壁）
+        const up = reach(1), flat = reach(0);
+        assert.ok(chests.every(([r, c]) => near(up, r, c)), `${id}: 階段で、頂上の宝箱へ行ける`);
+        assert.ok(chests.every(([r, c]) => !near(flat, r, c)), `${id}: 壁は、登れない`);
+        const gb = d.gimmickBoxes[0];
+        assert.ok(cells.every(([r, c]) => r >= gb.r0 && r <= gb.r1 && c >= gb.c0 && c <= gb.c1), `${id}: gimmickBoxes の範囲`);
+    }
 });

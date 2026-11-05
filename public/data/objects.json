@@ -63,6 +63,18 @@
     "message": "外に出る",
     "description": "ピラミッドの内側の出口"
   },
+  "tower_stone_gray": {
+    "type": "floor_tile",
+    "texture": "cliffGray",
+    "solid": false,
+    "description": "塔の石の段（灰色の岩肌。歩いて上れる）"
+  },
+  "tower_stone_dark": {
+    "type": "floor_tile",
+    "texture": "cliffDark",
+    "solid": false,
+    "description": "塔の石の段（黒っぽい火山岩。歩いて上れる）"
+  },
   "mossy_stone_wall": {
     "type": "block",
     "texture": "mossyStone",

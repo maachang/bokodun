@@ -20,7 +20,8 @@
     "visibility": 1.0,
     "skyColor": 15258784
   },
-  "enemyFloor": "pyramid_stone",
+  "gimmickBoxes": [{ "name": "pyramid", "r0": 34, "c0": 18, "r1": 60, "c1": 44 }],
+  "enemyFloor": { "floor": "pyramid_stone", "chars": ["V", "N", "M", "O", "L", "B"] },
   "legend": {
     "R": "cliff_sandstone_wall",
     "C": "cactus",
