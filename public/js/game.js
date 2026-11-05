@@ -273,6 +273,8 @@ export class GameEngine {
             fConiferWall: RetroTextureGenerator.createFieldImageTexture('conifer_wall'),
             fOddTree: RetroTextureGenerator.createFieldImageTexture('desert_odd_tree'),
             fTundraConifers: RetroTextureGenerator.createFieldImageTexture('tundra_conifers'),
+            fConiferTreeA: RetroTextureGenerator.createFieldImageTexture('conifer_tree_a'),
+            fConiferTreeB: RetroTextureGenerator.createFieldImageTexture('conifer_tree_b'),
             fBroadleafWall: RetroTextureGenerator.createFieldImageTexture('broadleaf_wall'),
             fTundraWall: RetroTextureGenerator.createFieldImageTexture('tundra_wall'),
             fJungleTree: RetroTextureGenerator.createFieldImageTexture('jungle_tree'),
@@ -529,7 +531,6 @@ export class GameEngine {
         if (floorType === 'redEarth') return this.textures.redEarthGround;
         if (floorType === 'ash') return this.textures.ashGround;
         if (floorType === 'ice') return this.textures.ice;
-        if (floorType === 'darkRock') return this.textures.cliffDark;   // 暗い岩肌（大森林の迷路の壁の上）
         return this.textures.floorStone;
     }
 

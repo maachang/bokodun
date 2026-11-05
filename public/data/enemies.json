@@ -198,10 +198,9 @@
     ],
     "y": 1.2,
     "radius": 0.95,
-    "deathColor": "#9ca3af",
+    "deathColor": "#ef4444",
     "stealth": "normal",
     "alwaysAware": true,
-    "deathColor": "#ef4444",
     "family": "golem",
     "rank": 4,
     "boss": false,
@@ -873,7 +872,7 @@
     "sdId": 63,
     "imageFile": "reptile/cobra.png",
     "scale": [
-      2.07,
+      1.16,
       1.5,
       1.0
     ],
@@ -1075,7 +1074,7 @@
     "sdId": 115,
     "imageFile": "beast/mandrill.png",
     "scale": [
-      1.45,
+      1.59,
       2.2,
       1.0
     ],
@@ -1108,7 +1107,7 @@
     "sdId": 102,
     "imageFile": "beast/great_wolf.png",
     "scale": [
-      1.03,
+      0.82,
       2.0,
       1.0
     ],
@@ -3200,7 +3199,12 @@
       "mult": 0.5
     },
     "inflict": [
-      { "type": "burn", "chance": 0.15, "t": 3, "dps": 3 }
+      {
+        "type": "burn",
+        "chance": 0.15,
+        "t": 3,
+        "dps": 3
+      }
     ],
     "immune": [
       "elemental"
@@ -3793,7 +3797,7 @@
     "sdId": 195,
     "imageFile": "beast/giant_hawk.png",
     "scale": [
-      3.99,
+      6.25,
       3.0,
       1.0
     ],
@@ -4379,6 +4383,36 @@
         "expected": 18.7
       },
       "exp": 179
+    }
+  },
+  "fat_sparrow": {
+    "id": "fat_sparrow",
+    "name": "ファット・スパロウ",
+    "sdId": 216,
+    "imageFile": "beast/fat_sparrow.png",
+    "scale": [
+      1.54,
+      2.4,
+      1.0
+    ],
+    "radius": 0.9,
+    "family": "beast",
+    "rank": 2,
+    "boss": false,
+    "abilities": [],
+    "stats": {
+      "level": 5,
+      "hp": 38,
+      "attack": {
+        "weight": 49,
+        "dice": {
+          "n": 2,
+          "m": 6,
+          "k": 0
+        },
+        "expected": 14.0
+      },
+      "exp": 22
     }
   }
 }

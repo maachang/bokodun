@@ -94,9 +94,9 @@
   "0000000000000000001222222222222222222223333333333334444444445555",
   "0000000000000000001222222222222222222223333333333334444444445555",
   "0000000000000000001222222222222222222222333333333334444444555555",
-  "0000000000000000001222222222222222222222333333333334444455555559",
-  "0000000000000000001222222222222222222222333333333344444555555559",
-  "000000000000000000122222222222222222222223333333344444555555566a",
+  "0000000000000000001222222222222222222222333333333334444455555555",
+  "0000000000000000001222222222222222222222333333333344444555555555",
+  "0000000000000000001222222222222222222222233333333444445555555666",
   "0000000000000000001222222222222222222222233333333444445555666666",
   "0000000000000000001222222222222222222222233333334444455556666666",
   "0000000000000000001222222222222222222222223333333444455556666677"
@@ -104,7 +104,6 @@
  "floorLegend": {
   "f": "forest",
   "g": "grass",
-  "k": "darkRock",
   "w": "whiteSand"
  },
  "floorLayer": [
@@ -166,9 +165,9 @@
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
-  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggk",
-  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggk",
-  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggk",
+  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
+  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
+  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggg"
@@ -238,7 +237,5 @@
   "OOOOOOOOOOOOOOOOOq000m0000l00m0000000000000m0000000m0000m000000e",
   "OOOOOOOOOOOOOOOOOq0000m0m0000000w00000000000000000000m00000000m0",
   "OOOOOOOOOOOOOOOOOq00000w0mm00000Gm00m0m0p0000000mm0vmm000m000000"
- ],
- "mazeWalls": true,
- "cliffTexture": "cliffDark"
+ ]
 }

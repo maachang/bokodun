@@ -49,8 +49,7 @@ test('世界の境: 隣り合うマップの境で、高さの差が 1 以下（
             for (let i = 0; i < N; i++) {
                 const [ra, ca, rb, cb] = dc ? [i, N - 1, i, 0] : [N - 1, i, 0, i];
                 const ha = levelOf(a.heights[ra][ca]), hb = levelOf(b.heights[rb][cb]);
-                const maze = a.mazeWalls || b.mazeWalls;   // 大森林の迷路の壁は、地形の崖（岩肌）。段差 2 以上が、わざと、ある
-                assert.ok(Math.abs(ha - hb) <= (maze ? 6 : 1), `${a.id}→${b.id} の境 ${i}: 高さ ${ha} と ${hb}`);
+                assert.ok(Math.abs(ha - hb) <= 1, `${a.id}→${b.id} の境 ${i}: 高さ ${ha} と ${hb}`);
                 // 水の上の高さは 0（川・湖・海は、高さ 0 のマスだけ）
                 if (isWater(a, ra, ca)) assert.equal(ha, 0, `${a.id} の境 ${i}: 水のマスの高さ`);
                 if (isWater(b, rb, cb)) assert.equal(hb, 0, `${b.id} の境 ${i}: 水のマスの高さ`);
@@ -67,8 +66,6 @@ test('世界を歩ける: 出発点から、段差 1 までの道で、歩ける
     const solidTypes = new Set(['tree', 'tree_wall', 'boulder', 'liquid_tile_deep', 'sea_tile']);
     const blocked = new Uint8Array(W * H).fill(1);   // 1: 通れない（海・メッシュのない所を含む）
     const level = new Uint8Array(W * H);
-    const cliffOk = new Uint8Array(W * H);   // 迷路の壁の崖があるマップのマス
-    const wallTop = new Uint8Array(W * H);   // 迷路の壁の上
     let start = null;
     world.grid.forEach((rw, j) => rw.forEach((id, i) => {
         if (!id) return;
@@ -80,7 +77,6 @@ test('世界を歩ける: 出発点から、段差 1 までの道で、歩ける
             const k = (j * M + r) * W + i * M + c;
             blocked[k] = solid ? 1 : 0;
             level[k] = levelOf(m.heights[r][c]);
-            if (m.mazeWalls) { cliffOk[k] = 1; if (m.floorLegend[m.floorLayer[r][c]] === 'darkRock') wallTop[k] = 1; }   // 迷路の壁の上（岩肌の地面）は、登れない所（数えない）
         }
         if (id === world.start) start = [j * M + Math.floor(m.spawn.z), i * M + Math.floor(m.spawn.x)];
     }));
@@ -88,9 +84,8 @@ test('世界を歩ける: 出発点から、段差 1 までの道で、歩ける
     // 隣り合うマスの高さは、1 以下（山が、歩ける傾き）
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
         const k = y * W + x;
-        const lim = (a, b) => (cliffOk[a] || cliffOk[b]) ? 6 : 1;   // 大森林の迷路の壁は、崖（登れない）
-        if (x < W - 1) assert.ok(Math.abs(level[k] - level[k + 1]) <= lim(k, k + 1), `高さの差が大きい ${y},${x}`);
-        if (y < H - 1) assert.ok(Math.abs(level[k] - level[k + W]) <= lim(k, k + W), `高さの差が大きい ${y},${x}`);
+        if (x < W - 1) assert.ok(Math.abs(level[k] - level[k + 1]) <= 1, `高さの差が大きい ${y},${x}`);
+        if (y < H - 1) assert.ok(Math.abs(level[k] - level[k + W]) <= 1, `高さの差が大きい ${y},${x}`);
     }
     const seen = new Uint8Array(W * H);
     const q = [start[0] * W + start[1]]; seen[q[0]] = 1;
@@ -106,9 +101,7 @@ test('世界を歩ける: 出発点から、段差 1 までの道で、歩ける
             seen[nk] = 1; q.push(nk);
         }
     }
-    let free = 0; for (let k = 0; k < W * H; k++) if (!blocked[k] && !wallTop[k]) free++;
-    let wallReached = 0; for (let k = 0; k < W * H; k++) if (seen[k] && wallTop[k]) wallReached++;
-    assert.equal(wallReached, 0, `迷路の壁の上へ、登れてしまう: ${wallReached}`);
+    let free = 0; for (let k = 0; k < W * H; k++) if (!blocked[k]) free++;
     assert.ok(reached / free >= 0.97, `行ける割合: ${(reached / free * 100).toFixed(1)}%（${reached}/${free}）`);
 });
 
@@ -830,7 +823,7 @@ test('世界の川: 本流・支流・三角州に加えて、山（雪山の麓
 });
 
 test('世界の森: 林の壁（tree_wall）は使わない。森は ID 217・218 の木を 2 倍、大森林は 3 倍にして 1 本ずつ並べ、大森林は薄暗い（大湿原の環境）', () => {
-    let walls = 0, great = 0, forestTrees = 0, greatMeshes = 0;
+    let walls = 0, great = 0, forestTrees = 0, greatMeshes = 0, oldColdTrees = 0;
     for (const id of world.grid.flat().filter(Boolean)) {
         const m = readJson(`public/data/maps/${id}.json`);
         const lay = m.layout.join('');
@@ -838,7 +831,8 @@ test('世界の森: 林の壁（tree_wall）は使わない。森は ID 217・21
             const n = lay.split(ch).length - 1;
             if (objects[name]?.type === 'tree_wall') walls += n;
             if (name.startsWith('great_tree')) great += n;
-            if (name.startsWith('forest_tree')) forestTrees += n;
+            if (name.startsWith('forest_tree') || name.startsWith('conifer_forest')) forestTrees += n;
+            if (name === 'snow_pine' || name === 'tundra_wall') oldColdTrees += n;
         }
         if (m.name.startsWith('大森林')) {
             greatMeshes++;
@@ -846,6 +840,7 @@ test('世界の森: 林の壁（tree_wall）は使わない。森は ID 217・21
         }
     }
     assert.equal(walls, 0, `林の壁: ${walls}`);
+    assert.equal(oldColdTrees, 0, `寒冷地の木は、新しい針葉樹（ID 262・263）に置き換えた（昔の snow_pine・tundra_wall: ${oldColdTrees}）`);
     assert.ok(great > 5000 && forestTrees > 2000, `巨木 ${great}・森の木 ${forestTrees}`);
     assert.ok(greatMeshes >= 10, `大森林のマップ: ${greatMeshes}`);
     // 217・218 の木を、拡大して使う（高さ: 通常の木 5.2 の、2 倍・3 倍）
@@ -858,10 +853,12 @@ test('世界の森: 林の壁（tree_wall）は使わない。森は ID 217・21
     assert.ok(game.includes('objDef.colliderHalf ?? 0.6') && game.includes('this.treeMats'), '幹の太さ・材質の共有');
 });
 
-test('大森林は、天然の迷宮: 迷路の壁は地形の崖（岩肌。登れない）・通路は 3 マス幅・真っ暗・起伏が激しい・目印を置かない。敵は出さない', () => {
+test('大森林: 巨木（3 倍）・真っ暗・起伏が激しい・目印を置かない。岩山や崖にはしない（普通の、通れる起伏）。敵は出さない', () => {
     let forestMeshes = 0, trees = 0, tiles = 0, landmarks = 0, maxLevel = 0;
     for (const id of world.grid.flat().filter(Boolean)) {
         const m = readJson(`public/data/maps/${id}.json`);
+        assert.ok(!m.mazeWalls && !m.cliffTexture, `${id}: 迷路の壁（崖）は使わない`);
+        for (const ft of Object.values(m.floorLegend)) assert.notEqual(ft, 'darkRock', `${id}: 暗い岩肌の地面は使わない`);
         if (!m.name.startsWith('大森林')) continue;
         forestMeshes++;
         assert.ok(m.environment.fogNear <= 6 && m.environment.fogFar <= 30 && m.environment.visibility <= 0.5, `${id}: 真っ暗（霧 ${m.environment.fogNear}〜${m.environment.fogFar}・視界 ${m.environment.visibility}）`);
@@ -877,17 +874,15 @@ test('大森林は、天然の迷宮: 迷路の壁は地形の崖（岩肌。登
     }
     assert.ok(forestMeshes >= 10, `大森林のマップ: ${forestMeshes}`);
     const ratio = trees / tiles;
-    assert.ok(ratio > 0.05 && ratio < 0.2, `巨木の割合（飾り。まばら）: ${(ratio * 100).toFixed(1)}%`);
-    assert.ok(landmarks / tiles < 0.01, `目印（断崖・花）は、森の外との境にだけ少しある: ${landmarks}（${(landmarks / tiles * 100).toFixed(2)}%）`);
+    assert.ok(ratio > 0.05 && ratio < 0.25, `巨木の割合（まばら。木の間は通れる）: ${(ratio * 100).toFixed(1)}%`);
+    assert.ok(landmarks / tiles < 0.01, `目印（断崖・花）は、森の外との境にだけ少しある: ${landmarks}`);
     assert.ok(maxLevel >= 18, `起伏が激しい（最大 ${maxLevel} 段）`);
-    const src = fs.readFileSync(path.join(root, 'scripts/world/gen_world.py'), 'utf-8');
-    assert.ok(src.includes('def build_maze') && src.includes('DARK_FOREST_ENV'), '迷路の生成と、暗い環境');
 });
 
-test('林・森・大森林: 木の間は、必ず通れる（木が隣り合うマスに並ばない・幹の当たり判定は、すき間 1.6 以上）。通れない所は、地形の崖（岩肌）', () => {
-    const TREES = ['forest_tree_a', 'forest_tree_b', 'great_tree_a', 'great_tree_b'];
+test('林・森・大森林: 木の間は、必ず通れる（木が隣り合うマスに並ばない・幹の当たり判定は、すき間 1.6 以上）。通れない所は作らない（普通の、通れる起伏）', () => {
+    const TREES = ['forest_tree_a', 'forest_tree_b', 'great_tree_a', 'great_tree_b', 'conifer_forest_a', 'conifer_forest_b', 'great_conifer_a', 'great_conifer_b'];
     for (const n of TREES) assert.ok(4 - 2 * objects[n].colliderHalf >= 1.6, `${n}: 木と木のすき間 ${(4 - 2 * objects[n].colliderHalf).toFixed(1)}（プレイヤーの幅 1.2 より、広い）`);
-    let treeTiles = 0, cliffs = 0;
+    let treeTiles = 0;
     for (const id of world.grid.flat().filter(Boolean)) {
         const m = readJson(`public/data/maps/${id}.json`);
         const isTree = (r, c) => TREES.includes(m.legend[m.layout[r]?.[c]]);
@@ -896,14 +891,28 @@ test('林・森・大森林: 木の間は、必ず通れる（木が隣り合う
             treeTiles++;
             for (let dr = -1; dr <= 1; dr++) for (let dc = -1; dc <= 1; dc++) if ((dr || dc) && isTree(r + dr, c + dc)) assert.fail(`${id} ${r},${c}: 隣り合うマスに、木が並んでいる`);
         }
-        if (m.mazeWalls) {
-            for (let r = 0; r < 63; r++) for (let c = 0; c < 63; c++) {
-                const h = levelOf(m.heights[r][c]);
-                if (Math.abs(h - levelOf(m.heights[r][c + 1])) >= 2 || Math.abs(h - levelOf(m.heights[r + 1][c])) >= 2) cliffs++;
-            }
-            assert.equal(m.cliffTexture, 'cliffDark', `${id}: 崖の岩肌`);
-        }
     }
     assert.ok(treeTiles > 10000, `木: ${treeTiles}`);
-    assert.ok(cliffs > 3000, `大森林の崖（迷路の壁の岩肌）: ${cliffs}`);
+});
+
+test('寒冷地の木: 新しい針葉樹 2 枚（ID 262・263）が主役。森は 2 倍・大森林は 3 倍（高さ）。1 本ずつ・木の間は通れる', () => {
+    assert.equal(objects.conifer_tree_a.sdId, 262); assert.equal(objects.conifer_tree_b.sdId, 263);
+    for (const k of ['a', 'b']) {
+        const base = objects[`conifer_tree_${k}`];
+        assert.equal(objects[`conifer_forest_${k}`].texture, base.texture);
+        assert.ok(Math.abs(objects[`conifer_forest_${k}`].height - base.height * 2) < 1e-6, `森 ${k}: 2 倍`);
+        assert.ok(Math.abs(objects[`great_conifer_${k}`].height - base.height * 3) < 1e-6, `大森林 ${k}: 3 倍`);
+        assert.equal(objects[`conifer_forest_${k}`].aspect, base.aspect);
+    }
+    let cold = 0, single = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const lay = m.layout.join('');
+        for (const [ch, name] of Object.entries(m.legend)) {
+            const n = lay.split(ch).length - 1;
+            if (name.startsWith('conifer_forest')) cold += n;
+            if (name.startsWith('conifer_tree')) single += n;
+        }
+    }
+    assert.ok(cold > 3000 && single > 5000, `寒冷地の木: 森 ${cold}・単独 ${single}`);
 });

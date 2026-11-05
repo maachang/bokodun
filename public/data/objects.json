@@ -311,6 +311,76 @@
     "solid": true,
     "description": "大森林の巨木 B（ID 218 を 3 倍に拡大）"
   },
+  "zeus_statue": {
+    "type": "statue",
+    "imageFile": "zeus_statue.png",
+    "sdId": 211,
+    "aspect": 0.378,
+    "height": 4.0,
+    "pedestalHeight": 1.4,
+    "radius": 0.9,
+    "solid": true,
+    "blocksProjectiles": false,
+    "floorTexture": "marbleFloor",
+    "ceilingTexture": "marbleWall",
+    "description": "全能の神（ゼウスのような、力強い男性）の石像（画像。sdServer ID 211）。台座の上に立つ。女神像（goddess_statue）と同じ作り。まだ、どのマップにも置いていない"
+  },
+  "conifer_tree_a": {
+    "type": "tree",
+    "texture": "fConiferTreeA",
+    "imageFile": "field/conifer_tree_a.png",
+    "sdId": 262,
+    "aspect": 0.604,
+    "height": 6.0,
+    "solid": true,
+    "description": "ツンドラなどの、針葉樹 1 本（sdServer ID 262）。まだ、どのマップにも置いていない"
+  },
+  "conifer_tree_b": {
+    "type": "tree",
+    "texture": "fConiferTreeB",
+    "imageFile": "field/conifer_tree_b.png",
+    "sdId": 263,
+    "aspect": 0.756,
+    "height": 6.0,
+    "solid": true,
+    "description": "ツンドラなどの、針葉樹 1 本（sdServer ID 263）。まだ、どのマップにも置いていない"
+  },
+  "conifer_forest_a": {
+    "type": "tree",
+    "texture": "fConiferTreeA",
+    "aspect": 0.604,
+    "height": 12.0,
+    "colliderHalf": 1.0,
+    "solid": true,
+    "description": "寒冷地の森の針葉樹 A（sdServer ID 262 の針葉樹を 2 倍に拡大。ツンドラ・雪山の裾野の森。1 本ずつ並べる）"
+  },
+  "conifer_forest_b": {
+    "type": "tree",
+    "texture": "fConiferTreeB",
+    "aspect": 0.756,
+    "height": 12.0,
+    "colliderHalf": 1.0,
+    "solid": true,
+    "description": "寒冷地の森の針葉樹 B（sdServer ID 263 の針葉樹を 2 倍に拡大）"
+  },
+  "great_conifer_a": {
+    "type": "tree",
+    "texture": "fConiferTreeA",
+    "aspect": 0.604,
+    "height": 18.0,
+    "colliderHalf": 1.2,
+    "solid": true,
+    "description": "寒冷地の大森林の巨木 A（ID 262 の針葉樹を 3 倍に拡大）。まだ、どのマップにも置いていない（寒冷地に大森林を作るとき用）"
+  },
+  "great_conifer_b": {
+    "type": "tree",
+    "texture": "fConiferTreeB",
+    "aspect": 0.756,
+    "height": 18.0,
+    "colliderHalf": 1.2,
+    "solid": true,
+    "description": "寒冷地の大森林の巨木 B（ID 263 の針葉樹を 3 倍に拡大）。まだ、どのマップにも置いていない"
+  },
   "plank_bridge": {
     "type": "bridge_deck",
     "texture": "woodBridge",
