@@ -528,6 +528,7 @@ export class GameEngine {
         if (floorType === 'tundra') return this.textures.tundraGround;
         if (floorType === 'redEarth') return this.textures.redEarthGround;
         if (floorType === 'ash') return this.textures.ashGround;
+        if (floorType === 'ice') return this.textures.ice;
         return this.textures.floorStone;
     }
 

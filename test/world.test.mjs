@@ -755,3 +755,29 @@ test('マップ間の移動: 読み込み中は動かず、落下ダメージも
     assert.ok(body('movePlayer').includes('if (this.nav?.busy) return;'), '読み込み中は movePlayer が動かない');
     assert.ok(body('applyHeightFall').includes('if (this.nav?.busy) return;'), '読み込み中は落下ダメージなし');
 });
+
+test('世界の特徴: 北の雪山（断崖・氷）・西の大森林（獣道・空き地・小川）・東の炭鉱（入口・トロッコ・赤茶の地面）・南国（ヤシ・南国の木・白い砂浜）', () => {
+    let cliffs = 0, iceTiles = 0, mineEntrances = 0, carts = 0, palms = 0, tropical = 0, trail = 0, redEarth = 0, tropicalMeshes = 0, mineMeshes = 0, forestWater = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const lay = m.layout.join('');
+        const count = (name) => Object.entries(m.legend).filter(([, v]) => v === name).reduce((s, [ch]) => s + lay.split(ch).length - 1, 0);
+        cliffs += count('cliff_rock_wall'); mineEntrances += count('mine_entrance'); carts += count('mine_cart'); palms += count('palm'); tropical += count('tropical_tree');
+        const fl = m.floorLayer.join('');
+        for (const [ch, ft] of Object.entries(m.floorLegend)) {
+            const n = fl.split(ch).length - 1;
+            if (ft === 'ice') iceTiles += n; if (ft === 'tundra' && m.name.startsWith('大森林')) trail += n; if (ft === 'redEarth') redEarth += n;
+        }
+        if (m.name.startsWith('南国')) tropicalMeshes++;
+        if (m.name.startsWith('炭鉱')) mineMeshes++;
+        if (m.name.startsWith('大森林')) forestWater += count('water');
+    }
+    assert.ok(cliffs > 3000, `断崖の壁: ${cliffs}`);
+    assert.ok(iceTiles > 2000, `氷の地面: ${iceTiles}`);
+    assert.ok(trail > 500, `森の獣道・土の地面: ${trail}`);
+    assert.ok(forestWater > 100, `森を流れる小川: ${forestWater}`);
+    assert.ok(mineEntrances >= 2 && carts >= 2 && mineMeshes >= 2, `炭鉱: 入口 ${mineEntrances}・トロッコ ${carts}・マップ ${mineMeshes}`);
+    assert.ok(redEarth > 3000, `赤茶の地面: ${redEarth}`);
+    assert.ok(tropicalMeshes >= 3 && palms > 300 && tropical > 200, `南国: マップ ${tropicalMeshes}・ヤシ ${palms}・南国の木 ${tropical}`);
+    assert.equal(objects.mine_entrance.type, 'furniture'); assert.equal(objects.mine_cart.type, 'furniture');
+});

@@ -96,6 +96,7 @@
  ],
  "floorLegend": {
   "g": "grass",
+  "i": "ice",
   "s": "snow",
   "w": "whiteSand"
  },
@@ -160,7 +161,7 @@
   "gggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggwww",
   "ggggggggggggggggggggggggggggggggggggggggggggggggggggggggggwwwwww",
   "ggggggggggggggggggggggggggggggggggggggggggggggggggggggggwwwwwwss",
-  "ggggggggggggggggggggggggggggggggggggggggggggggggggggggwwwwwwwsss",
+  "ggggggggggggggggggggggggggggggggggggggggggggggggggggggwwwwwwwiii",
   "ggggggggggggggggggggggggggggggggggggggggggggggggggggwwwwwwssssss",
   "ggggggggggggggggggggggggggggggggggggggggggggggggggggwwwwssssssss",
   "ggggggggggggggggggggggggggggggggggggggggggggggggggwwwwssssssssss"

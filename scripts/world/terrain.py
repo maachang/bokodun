@@ -19,8 +19,14 @@ MESH = 64                  # 1 メッシュのマス数
 W, H = GW * MESH, GH * MESH  # 世界のマス数（1280×960）
 
 # 地形の種類（コード）
-SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK = range(7)
-NAMES = ['sea', 'snow', 'conifer', 'forest', 'grass', 'desert', 'rock']
+SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL = range(8)
+NAMES = ['sea', 'snow', 'conifer', 'forest', 'grass', 'desert', 'rock', 'tropical']
+
+# 南国（画像の南の一帯。川の枝分かれ（中洲）より南の草原。画像の座標）
+TROPICAL_POLY = [(335, 470), (430, 495), (520, 515), (600, 525), (610, 560), (520, 580), (440, 576), (400, 548), (360, 512)]
+# 炭鉱（画像の遺跡の位置。画像の座標）と、広がり（マス）
+MINES = [(612, 405), (505, 470)]
+MINE_R = 26
 
 # 北の雪山の輪郭（画像の座標 x, y。画像を見て指定）
 NORTH_POLY = [(190, 205), (215, 180), (235, 150), (262, 125), (287, 100), (320, 108), (340, 85), (375, 70), (406, 52), (430, 70), (461, 60), (480, 85), (501, 85), (520, 95), (541, 83), (556, 100), (574, 112), (604, 130), (624, 148), (654, 160), (672, 172), (676, 192), (668, 215), (650, 235), (630, 245), (560, 247), (480, 245), (400, 240), (330, 236), (260, 232), (200, 226), (160, 230), (150, 245)]
@@ -30,6 +36,8 @@ RIVERS = [
     [(528, 215), (524, 240), (505, 268), (478, 293), (455, 308), (430, 322), (405, 328), (380, 335), (358, 352), (352, 372), (372, 388), (374, 410), (362, 428), (350, 452), (335, 470), (322, 484)],
     # 支流: 本流から別れ、西の森の南へ
     [(352, 372), (322, 372), (298, 372), (278, 390), (266, 408), (272, 426), (268, 442), (280, 462), (296, 482)],
+    # 西の大森林の小川: 森の中から、西の海岸へ
+    [(262, 262), (232, 288), (204, 322), (176, 350), (148, 376), (112, 392), (78, 398)],
 ]
 # 山（x, y, 高さ（段）, 広がり（画像の px））
 PEAKS_SNOW = [(287, 100, 22, 30), (340, 92, 20, 28), (406, 58, 27, 30), (461, 66, 27, 30), (501, 88, 22, 26), (541, 88, 27, 28), (574, 115, 18, 24), (604, 135, 16, 22), (320, 125, 16, 24), (250, 140, 14, 24), (440, 120, 18, 30), (520, 140, 16, 26)]
@@ -175,6 +183,8 @@ def read_image():
     # 水・紙と判定された陸の点は、周りの多数派に
     unk = land & np.isin(cls, [0, 1]) & ~is_n & ~(((cls == 0)) & land)
     biome = _mode_filter(np.where(land, biome, GRASS).astype(np.uint8), 7, 15)
+    tp = Image.new('L', (iw, ih), 0); ImageDraw.Draw(tp).polygon(TROPICAL_POLY, fill=255)
+    biome[(np.asarray(tp) > 0) & (biome == GRASS)] = TROPICAL   # 南国
     biome[~land] = SEA
     # 湖: 陸の中の、大きな水のかたまり
     lake_px = water & land & (hue > 150) & (hue < 250) & (v > 0.55) & (s > 0.12)
@@ -296,18 +306,30 @@ def build():
     ix, iy = xs / sx, ys / sy
     def blur(m, r): return gauss(m, r)
     w_snow = blur(biome == SNOW, 22); w_con = blur(biome == CONIFER, 22); w_rock = blur(biome == ROCK, 22)
-    # 雪山: 北ほど高い土台と、山
-    e_snow = np.clip((250 - iy) / 200, 0, 1) * 9
+    # 雪山（連峰）: 山（ガウス）に、尾根の線（ridged noise）と谷を重ねて、尖った峰と尾根・谷・峠を作る
+    e_snow = np.clip((250 - iy) / 200, 0, 1) * 7
+    peaks = np.zeros((H, W), np.float32)
     for px, py, ph, ps in PEAKS_SNOW:
-        e_snow += ph * np.exp(-(((ix - px) ** 2 + (iy - py) ** 2) / (2 * ps ** 2)))
-    ridge = 0.65 + 0.7 * fbm(31, (40, 14, 5))
-    e_snow = e_snow * ridge
+        peaks += ph * np.exp(-(((ix - px) ** 2 + (iy - py) ** 2) / (2 * ps ** 2)))
+    ridge1 = 1 - np.abs(2 * fbm(31, (56, 20, 7)) - 1)      # 尾根（0〜1）: 1 に近いほど、尾根の筋
+    ridge2 = 1 - np.abs(2 * fbm(33, (30, 11, 4)) - 1)
+    valley = fbm(35, (72, 24, 8))
+    e_snow = e_snow + peaks * (0.35 + 0.95 * ridge1 ** 1.6) + 7 * ridge2 ** 2 * np.clip(peaks / 12, 0, 1) - 6 * (valley > 0.62) * np.clip(peaks / 10, 0, 1)
+    # 岩山（東・南東）: 段々の山。炭鉱のまわりは、掘削跡（くぼ地）
     e_rock = np.full((H, W), 3.0, np.float32)
     for px, py, ph, ps in PEAKS_ROCK:
         e_rock += ph * np.exp(-(((ix - px) ** 2 + (iy - py) ** 2) / (2 * ps ** 2)))
     e_rock = e_rock * (0.7 + 0.6 * fbm(37, (40, 14, 5)))
+    e_rock = np.round(e_rock / 3.0) * 3.0 + 1.2 * fbm(38, (12, 5, 3))      # 3 段ごとの段々
+    for mx, my in MINES:
+        d = np.hypot(ix * sx - mx * sx, iy * sy - my * sy)
+        pit = np.exp(-((d / (MINE_R * 0.55)) ** 2))
+        e_rock = e_rock - pit * 14                                        # 中央をくぼませる
+        e_rock = e_rock + 5 * np.exp(-(((d - MINE_R * 0.75) / 5) ** 2))   # ふちの盛り土
+    e_rock = np.maximum(e_rock, 1)
     e_con = 3 + 6 * fbm(41, (60, 20, 8))
     plains = 4.0 * fbm(43, (96, 32, 10))
+    plains = np.where(biome == TROPICAL, plains * 0.35, plains)   # 南国は、平ら
     wsum = w_snow + w_con + w_rock
     mount = (w_snow * e_snow + w_con * e_con + w_rock * e_rock)
     elev = mount + plains * np.clip(1 - wsum, 0, 1)

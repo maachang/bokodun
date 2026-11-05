@@ -2,9 +2,9 @@
 import sys, numpy as np
 from PIL import Image, ImageDraw
 sys.path.insert(0, __file__.rsplit('/', 1)[0])
-from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK
+from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL
 t = np.load(sys.argv[1])
-pal = np.array([[40, 90, 170], [235, 240, 250], [60, 110, 90], [40, 100, 40], [150, 200, 80], [225, 200, 120], [130, 100, 70]], np.float32)
+pal = np.array([[40, 90, 170], [235, 240, 250], [60, 110, 90], [40, 100, 40], [150, 200, 80], [225, 200, 120], [130, 100, 70], [60, 190, 120]], np.float32)
 img = pal[t['biome']]
 elev = t['elev'].astype(np.float32)
 shade = 0.65 + 0.35 * (elev / 35.0)[..., None]

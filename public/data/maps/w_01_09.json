@@ -23,6 +23,7 @@
  "legend": {
   "O": "sea",
   "P": "snow_pine",
+  "c": "cliff_rock_wall",
   "q": "water_shallow"
  },
  "enemies": {},
@@ -88,14 +89,16 @@
   "222344456677677777888999aa99999aaaaabccbbcdddcccddddefffghiihhhi",
   "333455567788788888999aaabbaaaaabbbbbcddccdeeedddeeeefggghijjiiij",
   "444566678899899999aaabbbccbbbbbcccccdeeddefffeeeffffghhhijkkjjjk",
-  "5556777899aa9aaaaabbbcccddcccccdddddeffeefgggfffgggghiiijkllkkkl",
-  "66678889aabbabbbbbcccdddeedddddeeeeefggffghhhggghhhhijjjklmmlllm",
-  "7778999abbccbcccccdddeeeffeeeeefffffghhgghiiihhhiiiijkkklmnnmmmn",
-  "8889aaabccddcdddddeeefffggfffffggggghiihhijjjiiijjjjklllmnoonnno",
-  "999abbbcddeedeeeeefffggghhggggghhhhhijjiijkkkjjjkkkklmmmnoppooop"
+  "5556777899aa9aaaaabbbcccddcccccdddddeefeefgggfffgggghiiijkllkkkl",
+  "66678889aabbabbbbbcccdddeedddddeeeeedeeffghhhggghhhhijjjklmmlllm",
+  "7778999abbccbcccccdddeeeffeeeeefeeddddefghiiihhhiiiijkkklmnnmmmn",
+  "8889aaabccddcdddddeeefffggfffffeedddddefghijjiiijjjjklllmnoonnno",
+  "999abbbcddeedeeeeefffggghhggffeeddddddefghijkjjjkkkklmmmnoppooop"
  ],
  "floorLegend": {
   "g": "grass",
+  "i": "ice",
+  "r": "rock",
   "s": "snow",
   "w": "whiteSand"
  },
@@ -159,11 +162,11 @@
   "wwwwssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
   "wwwsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
   "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
+  "ssssssssssssssssssssssssssssssssssssssssssssssssiiisssssssssssss",
   "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
   "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
-  "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
-  "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss",
-  "ssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssss"
+  "ssssssssssssssssssssssssiissssssssssssssssssssssssssssssssrrsssr",
+  "sssssssssssssssssssssiiiiiiisssssssssssssssssssssssssssssrrrrrrr"
  ],
  "layout": [
   "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
@@ -216,19 +219,19 @@
   "OOOOOOOOOOOOOOOOOOOOq0qq00qqqqq000000000000000000000000000P00000",
   "OOOOOOOOOOOOOOOOOOqqq00000000000000000000P000000P000P00000000000",
   "OOOOOOOOOOqqOqqqqq0000000000000000000000P0000000000000P000000000",
-  "OOOOOOOqqq00q00000000000000000000PP000000P000P000000000000000000",
+  "OOOOOOOqqq00q00000000000000000000PP000000P000P00000000000P000000",
   "OOOOOOq000000000000000000000000000000000P00000000000000000000000",
   "OOOOqqq000000000000P00P00000000P00000000000P0000000000000000000P",
-  "OOOq0000000000000000P000000000000000P00P0P00000P00000000000P0000",
-  "qqq000000000000P0000000P000000000P00P0000000000P0000000000000000",
-  "0000000000P000000000000000000000P000P000000000000000000000000000",
-  "000000P00PPP0000000P000000P00000000000000000000000P0000000000000",
-  "0000P0000P0P00000000P0000000000000000000000P000000000P0000000000",
-  "0000P00000P000P00000P0000000000000000000000000000000000000000000",
-  "0P000000000000000000000PPP00000000000000000000000000000000000000",
-  "0000P000P00000P00000000P0000000000000000000000000000000000000000",
-  "00000000000000000000P000000000000P00000000000000P000000000000000",
-  "0000000P0000000000000000000000000000000000000000000000P000000000",
-  "00000000000000000000P0000000000000P00000000000000000000000000000"
+  "OOOq0000000000000000P000000000000000P00P0P00000P0000P0000cc00000",
+  "qqq000000000000P0000000P000000000P00P00000P0000P0P0P0000c0c00000",
+  "0000000000P000000000000000000000P000P0000000000000000000cccc0000",
+  "000000P00PPP0000000P000000P00000000000000000000000P0000ccccc0000",
+  "0000P0000P0P00000000P0000000000000P0000000000000000ccP0cc0cc0000",
+  "0000P00000P000P00000PP00000000000000000000000000000cccccccc00000",
+  "0P0000000000000P0P00000P0P000000000000000000000000000ccccccc0000",
+  "0000P000P000P0P00000000P0000000000000000000000000000ccccc0P00000",
+  "000000000000P0000000P000000000000P00000000000000P0000cc000000000",
+  "0000P00P000000000000000000000000000000000000000000000ccc00000000",
+  "000000P000cc00000000P0000000000000P000000000000000000ccccc000000"
  ]
 }

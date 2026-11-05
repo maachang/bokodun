@@ -28,7 +28,7 @@ test('村: 村長の家の外壁・屋内の床・扉・家具の定義', () => 
     assert.ok(objects.wooden_door.floorTexture && objects.wooden_door.ceilingTexture);
     for (const [id, def] of Object.entries(objects)) {
         if (def.type !== 'furniture') continue;
-        if (!id.startsWith('flower_bed') && !id.startsWith('market_stall') && id !== 'crate_out' && id !== 'training_dummy_out' && id !== 'well' && id !== 'outhouse') assert.ok(def.floorTexture && def.ceilingTexture, `${id}: 屋内の家具の下にも床と天井`);   // 花壇・市場の露店・野外の木箱は屋外
+        if (!id.startsWith('flower_bed') && !id.startsWith('market_stall') && id !== 'crate_out' && id !== 'training_dummy_out' && id !== 'well' && id !== 'outhouse' && !id.startsWith('mine_')) assert.ok(def.floorTexture && def.ceilingTexture, `${id}: 屋内の家具の下にも床と天井`);   // 花壇・市場の露店・野外の木箱は屋外
         assert.ok(def.parts.length > 0, id);
         for (const p of def.parts) {
             assert.equal(p.size.length, 3, id);
