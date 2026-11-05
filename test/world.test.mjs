@@ -539,6 +539,9 @@ test('山道の吊橋（rope_bridge）: 同じ高さの床・両端は同じ高�
     const deck = lv(...cells[0]);
     assert.ok(cells.every(([r, c]) => lv(r, c) === deck), '床は、すべて同じ高さ');
     const isBridge = (r, c) => m.layout[r]?.[c] === ch;
+    const gameSrc = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    assert.ok(gameSrc.includes('bridgeLayerLevel(h, this.bridgeUnder, ref)'), '橋のマスは、橋の上・橋の下の 2 層（橋の下を通れる）');
+    assert.ok(gameSrc.includes('if (this.heightLevelAtTile(r + dr, c + dc) > deckLv - 2) continue;'), '手すりは、橋の脇（谷）だけ。橋の端は塞がない');
     assert.ok(Number.isInteger(m.bridgeUnder) && m.bridgeUnder <= deck - 3, `橋の下の谷の底（${m.bridgeUnder}）は、橋（${deck}）より 3 段以上低い（降りられない）`);
     for (const [r, c] of cells) {
         for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {

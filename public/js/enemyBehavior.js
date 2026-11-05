@@ -180,6 +180,14 @@ export function groundStepOk(levelAt, fromX, fromZ, toX, toZ) {
     return diff <= 1 && diff >= -2;
 }
 
+// 吊橋のマス（床 deck 段・橋の下の谷の底 under 段）の、動く者が使う層の高さの段。
+//   ref: 動く者の、今の高さの段。橋の床（deck）と谷の底（under）の、真ん中より上にいれば、橋の上（deck）、下にいれば、橋の下（under）の層を使う。
+//   ref が未指定のときは、橋の上。橋の上と下は、行き来できない（橋の脇は、崖）
+export function bridgeLayerLevel(deck, under, ref) {
+    if (ref === undefined || ref === null) return deck;
+    return ref >= (deck + under) / 2 ? deck : under;
+}
+
 // 飛ぶ敵が、急降下（攻撃）の途中の、目標の高さ。t: 0（上空）〜 1（プレイヤーの胴の高さ）
 export function diveHeight(hoverY, targetY, t) {
     const k = Math.min(1, Math.max(0, t));

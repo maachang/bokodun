@@ -4,7 +4,7 @@ import { Monster, Projectile } from '/js/entities.js';
 import { Npc } from '/js/npc.js';
 import { MapNavigator, stairsFacing, STAIRS_DIRS } from '/js/mapNavigator.js';
 import { worldNeighbor, edgeCrossing, clampToWorld } from '/js/world.js';
-import { groundStepOk } from '/js/enemyBehavior.js';
+import { groundStepOk, bridgeLayerLevel } from '/js/enemyBehavior.js';
 import { SoundFX } from '/js/audio.js';
 import { SDAssetManager } from '/js/sdAssetManager.js';
 import { ParticleSystem } from '/js/particles.js';
@@ -566,11 +566,20 @@ export class GameEngine {
         return this.bridgeCells?.has(`${r},${c}`) ? this.bridgeUnder : this.heightLevelAtTile(r, c);
     }
 
-    // ワールド座標 (x, z) の高さの段
-    heightLevelAt(x, z) {
+    // ワールド座標 (x, z) の高さの段。
+    //   ref: 動く者の、今の高さの段（省略可）。吊橋のマスは、層が 2 つ（橋の上＝heights の値・橋の下＝bridgeUnder）で、ref に近いほうの層を返す
+    heightLevelAt(x, z, ref) {
         if (!this.heightMap) return 0;
         const ts = this.mapData?.tileSize || 4;
-        return this.heightLevelAtTile(Math.floor(z / ts), Math.floor(x / ts));
+        const r = Math.floor(z / ts), c = Math.floor(x / ts);
+        const h = this.heightLevelAtTile(r, c);
+        if (this.bridgeCells?.has(`${r},${c}`)) return bridgeLayerLevel(h, this.bridgeUnder, ref);
+        return h;
+    }
+
+    // 床の高さ（ワールドの y）から、高さの段（吊橋の層を選ぶ ref に使う）
+    levelOfFloorY(floorY) {
+        return (floorY ?? 0) / (this.heightStep || 1);
     }
 
     // 起伏のある地面: 高くなっているマスの上面と、低い隣との境の側面を作る。
@@ -628,6 +637,19 @@ export class GameEngine {
         }
     }
 
+    // 弾が、地面（崖の面・斜面）・吊橋の床にぶつかっているか。吊橋のマスは、弾の高さに近い層を地面とし、
+    //   橋の下から上へ撃った弾は、橋の床（厚み）に当たって消える
+    projectileHitsGround(p) {
+        if (p.y < this.getFloorHeight(p.x, p.z, this.levelOfFloorY(p.y))) return true;
+        const ts = this.mapData?.tileSize || 4;
+        const r = Math.floor(p.z / ts), c = Math.floor(p.x / ts);
+        if (this.bridgeCells?.has(`${r},${c}`)) {
+            const deckY = this.heightLevelAtTile(r, c) * this.heightStep;
+            if (p.y >= deckY - 0.4 && p.y <= deckY) return true;
+        }
+        return false;
+    }
+
     // 敵に、ゲーム側の処理（地形・召喚・範囲攻撃）をつなぐ
     attachMonsterHooks(m) {
         m.terrainBlock = (mm, x, z) => this.monsterTerrainBlocked(mm, x, z);   // 地上の敵は、崖・毒沼へ進まない
@@ -675,7 +697,7 @@ export class GameEngine {
 
     // 地上の敵が、(x, z) へ進めないか: 崖（上り 2 段以上・下り 3 段以上）、毒沼・溶岩などのダメージ床
     monsterTerrainBlocked(m, x, z) {
-        if (this.heightMap && !groundStepOk((px, pz) => this.heightLevelAt(px, pz), m.x, m.z, x, z)) return true;
+        if (this.heightMap && !groundStepOk((px, pz) => this.heightLevelAt(px, pz, this.levelOfFloorY(m.floorY)), m.x, m.z, x, z)) return true;
         for (const t of this.terrainGrid) {
             if (t.damagePerSec > 0 && x >= t.minX && x <= t.maxX && z >= t.minZ && z <= t.maxZ) return true;
         }
@@ -1877,9 +1899,12 @@ export class GameEngine {
                         const isBridge = (rr, cc) => this.bridgeCells.has(`${rr},${cc}`);
                         const ropeMat = new THREE.MeshLambertMaterial({ color: 0x8a6a3b });
                         const postMat = new THREE.MeshLambertMaterial({ map: this.textures.woodWall });
-                        // 橋でない側の縁（北・南・西・東）に、手すり（ロープ 2 本）と支柱を立てる
+                        // 手すり（ロープ 2 本）と支柱は、橋の脇（隣が、橋の床より 2 段以上低い谷）の縁だけに立てる。
+                        //   橋の端（隣が、同じ高さの地面）は、出入り口なので、塞がない
+                        const deckLv = this.heightLevelAtTile(r, c);
                         for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
                             if (isBridge(r + dr, c + dc)) continue;
+                            if (this.heightLevelAtTile(r + dr, c + dc) > deckLv - 2) continue;
                             const ex = wx + dc * tileSize / 2, ez = wz + dr * tileSize / 2;
                             const alongX = dr !== 0;   // 北・南の縁は、x 方向に伸びる
                             for (const y of [1.05, 0.55]) {
@@ -2919,7 +2944,7 @@ export class GameEngine {
     // プレイヤーの弾の、発射の高さを決める。起伏のあるマップでは、目の前（正面の ±25 度）の最も近い敵へ、
     //   上下にも狙いをつける（高い所から、低い所の敵へ撃ち下ろす／低い所から、高い所の敵へ撃ち上げる）。敵がいなければ、水平に飛ぶ
     aimProjectileHeight(p, dirX, dirZ) {
-        const y0 = this.getFloorHeight(this.player.x, this.player.z) + 1.3;
+        const y0 = this.getFloorHeight(this.player.x, this.player.z, this.player.heightLevel) + 1.3;
         let vy = 0;
         if (this.heightMap || this.monsters.some(m => m.flying)) {
             let best = null, bestD = 40;
@@ -3802,7 +3827,7 @@ export class GameEngine {
 
         // Camera height with elevation difference (wading in water lowers player's eye height naturally, and falling plummets eye height into pit)
         // 高さのある床（高台の段）の上では目線も上がる。段ごとに急に跳ねないよう、なめらかに追従させる
-        const targetFloorY = this.getFloorHeight(this.player.x, this.player.z);
+        const targetFloorY = this.getFloorHeight(this.player.x, this.player.z, this.player.heightLevel);
         this.player.floorY = (this.player.floorY ?? targetFloorY) + (targetFloorY - (this.player.floorY ?? targetFloorY)) * Math.min(1, dt * 10);
         const eyeHeight = 1.8 + this.player.floorY - playerFloorDepth - (this.player.isFalling ? this.player.fallDepth : 0);
         // 木の描画: 近い木は従来どおり、遠い木は切り抜き（遠景で、壁の木と重なると四角く欠けるため）。境目で、ちらつかないよう、ヒステリシスをつける（距離は暫定）
@@ -3865,7 +3890,7 @@ export class GameEngine {
             p.update(dt, this.colliders, this.particles);
 
             // 起伏のあるマップ: 弾が、地面（崖の面・斜面）にぶつかったら消える
-            if (this.heightMap && p.active && p.y < this.getFloorHeight(p.x, p.z)) {
+            if (this.heightMap && p.active && this.projectileHitsGround(p)) {
                 p.active = false;
                 this.particles.spawnBurst(p.x, p.y, p.z, p.color ?? 0xb08d58, 8, 2.5);
             }
@@ -3979,8 +4004,9 @@ export class GameEngine {
 
     // 村人が、その位置に立てないか（壁・家具などの当たり判定、水、プレイヤー、ほかの村人）
     // その位置にある、高さのある床の高さ（なければ 0）
-    getFloorHeight(x, z) {
-        let h = this.heightMap ? this.heightLevelAt(x, z) * this.heightStep : 0;
+    //   refLevel: 動く者の今の高さの段（吊橋の層を選ぶ。省略は橋の上）
+    getFloorHeight(x, z, refLevel) {
+        let h = this.heightMap ? this.heightLevelAt(x, z, refLevel) * this.heightStep : 0;
         for (const t of this.raisedFloors ?? []) {
             if (x >= t.minX && x <= t.maxX && z >= t.minZ && z <= t.maxZ) h = Math.max(h, t.height);
         }
@@ -3989,7 +4015,7 @@ export class GameEngine {
 
     isNpcBlocked(self, x, z, radius) {
         // 起伏のあるマップ: 村人も、崖（上り 2 段以上・下り 3 段以上）へは、進まない
-        if (this.heightMap && self && !groundStepOk((px, pz) => this.heightLevelAt(px, pz), self.x, self.z, x, z)) return true;
+        if (this.heightMap && self && !groundStepOk((px, pz) => this.heightLevelAt(px, pz, this.levelOfFloorY(self.floorY)), self.x, self.z, x, z)) return true;
         for (const c of this.colliders) {
             if (c.disabled) continue;
             if (x >= c.minX - radius && x <= c.maxX + radius && z >= c.minZ - radius && z <= c.maxZ + radius) return true;
@@ -4006,7 +4032,7 @@ export class GameEngine {
 
     updateNpcs(dt) {
         for (const n of this.npcs ?? []) {
-            n.floorY = this.getFloorHeight(n.x, n.z);
+            n.floorY = this.getFloorHeight(n.x, n.z, this.levelOfFloorY(n.floorY));
             n.update(dt, (x, z, r) => this.isNpcBlocked(n, x, z, r));
         }
     }
@@ -4249,7 +4275,8 @@ export class GameEngine {
         //   降りるのは、1 段は普通に、2 段は飛び降りて（ダメージ）降りられる。3 段以上の高さからは、降りられない（崖の縁で止まる）
         const climbOk = (x, z, dirX, dirZ) => {
             if (!this.heightMap) return true;
-            const diff = this.heightLevelAt(x + dirX * r, z + dirZ * r) - this.heightLevelAt(this.player.x, this.player.z);
+            const cur = this.player.heightLevel ?? this.heightLevelAt(this.player.x, this.player.z);
+            const diff = this.heightLevelAt(x + dirX * r, z + dirZ * r, cur) - cur;   // 吊橋のマスは、今の高さに近い層（橋の上・橋の下）へ進む
             return diff <= 1 && diff >= -2;
         };
         if (canMoveX && !climbOk(nextX, this.player.z, Math.sign(dx), 0)) canMoveX = false;
@@ -4269,8 +4296,8 @@ export class GameEngine {
         if (canMoveZ) this.player.z = nextZ;
         // 起伏: 2 段以上低い所へ降りたら、落下（高さに応じたダメージ）
         if (this.heightMap) {
-            const lv = this.heightLevelAt(this.player.x, this.player.z);
-            const prev = this.player.heightLevel ?? lv;
+            const prev = this.player.heightLevel ?? this.heightLevelAt(this.player.x, this.player.z);
+            const lv = this.heightLevelAt(this.player.x, this.player.z, prev);
             if (prev - lv >= 2) this.applyHeightFall(prev - lv);
             this.player.heightLevel = lv;
         }
@@ -4318,7 +4345,7 @@ export class GameEngine {
         }
         for (let i = this.monsters.length - 1; i >= 0; i--) {
             const m = this.monsters[i];
-            m.floorY = this.getFloorHeight(m.x, m.z);
+            m.floorY = this.getFloorHeight(m.x, m.z, this.levelOfFloorY(m.floorY));
             m.update(dt, this.player, this.colliders, this.projectiles, this.sound, this.scene, this.visibility ?? 1.0);
             this.processBurn(m);
 

@@ -533,3 +533,21 @@ test('ガーゴイルの置き場所: 洞窟・段丘（縁と段丘）・ピラ
     assert.ok(where('field_desert').cells.length >= 1, '砂漠のピラミッドの段');
 });
 function readJsonE(f) { return JSON.parse(fs.readFileSync(path.join(root, f), 'utf-8')); }
+
+test('吊橋のマス: 動く者の高さに近い層（橋の上 deck・橋の下 under）を使う。橋の上と下は行き来できない', async () => {
+    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'bridge-'));
+    const f = path.join(dir, 'eb.mjs');
+    fs.copyFileSync(path.join(root, 'public/js/enemyBehavior.js'), f);
+    const { bridgeLayerLevel, groundStepOk } = await import(f);
+    const deck = 7, under = 3;
+    assert.equal(bridgeLayerLevel(deck, under), deck, '基準なしは、橋の上');
+    assert.equal(bridgeLayerLevel(deck, under, 7), deck, '橋の上にいる');
+    assert.equal(bridgeLayerLevel(deck, under, 6), deck, '橋の端の手前（段 6）は、橋の上');
+    assert.equal(bridgeLayerLevel(deck, under, 3), under, '谷の底にいれば、橋の下');
+    assert.equal(bridgeLayerLevel(deck, under, 4), under, '谷の南の口（段 4）から入れば、橋の下');
+    // 歩く判定（敵・村人）: 谷の底から橋のマスへは、橋の下の層で進める。橋の上の層へは、上れない
+    const levelAt = (ref) => (x, z) => (x >= 10 && x < 20) ? bridgeLayerLevel(deck, under, ref) : (ref >= 5 ? 7 : 3);
+    assert.ok(groundStepOk(levelAt(3), 5, 0, 15, 0), '谷の底の者は、橋の下をくぐれる（段 3→3）');
+    assert.ok(groundStepOk(levelAt(7), 5, 0, 15, 0), '高台の者は、橋の上を渡れる（段 7→7）');
+    assert.ok(!groundStepOk((x, z) => x >= 10 ? 7 : 3, 5, 0, 15, 0), '（参考）橋の下から橋の上の高さへは、上れない（4 段）');
+});
