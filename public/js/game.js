@@ -967,7 +967,7 @@ export class GameEngine {
                 const char = mapData.layout[r][c];
                 const objType = mapData.legend ? mapData.legend[char] : null;
                 const objDef = objType ? this.objectDefinitions[objType] : null;
-                if (objDef && (objDef.type === 'liquid_tile' || objDef.type === 'sea_tile')) {
+                if (objDef && (objDef.type === 'liquid_tile' || objDef.type === 'sea_tile' || objDef.waterBelow)) {   // waterBelow: 橋の下に水（床は敷かない）
                     waterMap[r][c] = true;
                 }
                 if (objDef && objDef.type === 'crumbling_floor') {
@@ -1962,9 +1962,18 @@ export class GameEngine {
                         // 手すり（ロープ 2 本）と支柱は、橋の脇（隣が、橋の床より 2 段以上低い谷）の縁だけに立てる。
                         //   橋の端（隣が、同じ高さの地面）は、出入り口なので、塞がない
                         const deckLv = this.heightLevelAtTile(r, c);
+                        // waterBelow: 橋の下に水の面（川）を置く。railOnWater: 手すりは、隣が水のマス（橋の脇）だけ
+                        if (objDef.waterBelow) {
+                            const under = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, tileSize), new THREE.MeshLambertMaterial({ map: this.textures.water }));
+                            under.rotation.x = -Math.PI / 2;
+                            under.position.set(wx, -0.2, wz);
+                            this.scene.add(under);
+                            this.waterMeshes.push(under);
+                        }
                         for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
                             if (isBridge(r + dr, c + dc)) continue;
-                            if (this.heightLevelAtTile(r + dr, c + dc) > deckLv - 2) continue;
+                            if (objDef.railOnWater) { if (!waterMap[r + dr]?.[c + dc]) continue; }
+                            else if (this.heightLevelAtTile(r + dr, c + dc) > deckLv - 2) continue;
                             const ex = wx + dc * tileSize / 2, ez = wz + dr * tileSize / 2;
                             const alongX = dr !== 0;   // 北・南の縁は、x 方向に伸びる
                             for (const y of [1.05, 0.55]) {

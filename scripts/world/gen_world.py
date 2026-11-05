@@ -25,7 +25,7 @@ LEGEND = {
     'R': 'mountain_rock_a', 'S': 'mountain_rock_b', 'B': 'mountain_rock_c', 'H': 'mountain_rock_d',
     'm': 'meadow_grass', 'e': 'fern', 'h': 'highland_grass', 'v': 'weed_flower', 'k': 'cattail_cluster', 'l': 'lavender_flower', 'i': 'arid_grass', 'o': 'highland_weed', 'w': 'roadside_flowers', 'p': 'path_flower', 'b': 'bush_flower',
     'c': 'cliff_rock_wall', 'Y': 'tropical_tree', 'E': 'mine_entrance', 't': 'mine_cart',
-    'Q': 'water', 'q': 'water_shallow', 'O': 'sea',
+    'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge',
 }
 SOLID_CH = set('FCNPDGAXUMRSBHcYEt')          # 通れない物体（端のマスには置かない）
 # 地面の種類（floorLayer の文字 → environment.floorType と同じ名前）
@@ -48,7 +48,7 @@ def build_tiles(t):
     obj = np.full((H, W), ord('0'), np.uint8)
     def put(mask, ch): obj[mask] = ord(ch)
     d_sea, d_water = t['dist_sea'], t['dist_water']
-    free = land & ~(t['deep'] | t['shallow'])
+    free = land & ~(t['deep'] | t['shallow'] | t['bridge'])
     ys_, xs_ = np.mgrid[0:H, 0:W].astype(np.float32)
     sx, sy = W / 768.0, H / 640.0
     # 傾き（隣との高さの差。急な斜面ほど大きい）
@@ -147,6 +147,7 @@ def build_tiles(t):
     put(t['deep'] & ~lake, 'Q')
     put(lake & t['deep'], 'Q'); put(lake & t['deep'] & (d_nonlake >= 3), 'O')
     put(t['shallow'], 'q')
+    put(t['bridge'], 'Z')                                                       # 川の橋
     sea = ~land
     trop_near = T.box_mean((biome == TROPICAL).astype(np.float32), 8) > 0.02
     put(sea, 'O'); put(sea & (d_land <= np.where(trop_near, 3, 1)), 'q')

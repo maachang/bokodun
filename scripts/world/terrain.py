@@ -30,21 +30,37 @@ MINE_R = 26
 
 # 北の雪山の輪郭（画像の座標 x, y。画像を見て指定）
 NORTH_POLY = [(190, 205), (215, 180), (235, 150), (262, 125), (287, 100), (320, 108), (340, 85), (375, 70), (406, 52), (430, 70), (461, 60), (480, 85), (501, 85), (520, 95), (541, 83), (556, 100), (574, 112), (604, 130), (624, 148), (654, 160), (672, 172), (676, 192), (668, 215), (650, 235), (630, 245), (560, 247), (480, 245), (400, 240), (330, 236), (260, 232), (200, 226), (160, 230), (150, 245)]
-# 川（画像の座標。上流 → 下流）
+# 川（画像の座標。上流 → 下流）。dict: pts（点）, width（幅。マス）, ford（浅瀬の間隔。マス）, sea（True なら、最後の向きのまま、海まで延ばす）
 RIVERS = [
     # 本流: 北の山から、砂地の脇を通り、南西の湾へ
-    [(528, 215), (524, 240), (505, 268), (478, 293), (455, 308), (430, 322), (405, 328), (380, 335), (358, 352), (352, 372), (372, 388), (374, 410), (362, 428), (350, 452), (335, 470), (322, 484)],
-    # 支流: 本流から別れ、西の森の南へ
-    [(352, 372), (322, 372), (298, 372), (278, 390), (266, 408), (272, 426), (268, 442), (280, 462), (296, 482)],
+    dict(pts=[(528, 215), (524, 240), (505, 268), (478, 293), (455, 308), (430, 322), (405, 328), (380, 335), (358, 352), (352, 372), (372, 388), (374, 410), (362, 428), (350, 452), (335, 470), (322, 484)], width=4, ford=120, sea=True),
+    # 支流（大きな枝分かれ）: 本流から別れ、西の森の南へ
+    dict(pts=[(352, 372), (322, 372), (298, 372), (278, 390), (266, 408), (272, 426), (268, 442), (280, 462), (296, 482)], width=4, ford=120, sea=True),
+    # 本流の河口の、もう 1 本の流れ（三角州）: 東の海岸へ
+    dict(pts=[(350, 452), (364, 470), (376, 490), (384, 506)], width=3, ford=70, sea=True),
     # 西の大森林の小川: 森の中から、西の海岸へ
-    [(262, 262), (232, 288), (204, 322), (176, 350), (148, 376), (112, 392), (78, 398)],
+    dict(pts=[(262, 262), (232, 288), (204, 322), (176, 350), (148, 376), (112, 392), (78, 398)], width=3, ford=90, sea=True),
+    # --- 北の雪山の連峰から流れ出る川（山の麓から）---
+    dict(pts=[(300, 205), (290, 235), (274, 256), (262, 262)], width=3, ford=70),                       # 西の麓 → 森の小川
+    dict(pts=[(398, 222), (392, 250), (382, 288), (366, 326), (358, 352)], width=3, ford=80),           # 中央西の麓 → 本流（砂地の西）
+    dict(pts=[(450, 232), (454, 258), (468, 282), (478, 293)], width=3, ford=70),                       # 中央の麓 → 本流
+    dict(pts=[(580, 232), (574, 248), (570, 258)], width=3, ford=60),                                    # 東の麓 → 湖
+    dict(pts=[(640, 214), (646, 240), (658, 266), (672, 290), (688, 316)], width=3, ford=80, sea=True),  # 北東の麓 → 東の海岸
+    # --- 湖・本流のまわりの川 ---
+    dict(pts=[(506, 304), (494, 300), (478, 293)], width=3, ford=50),                                    # 湖の出口 → 本流
+    # --- 東の山々（岩山・炭鉱）から流れ出る川 ---
+    dict(pts=[(562, 398), (524, 384), (484, 370), (440, 360), (398, 350), (372, 342)], width=3, ford=80),  # 南東の山 → 本流（草原を西へ）
+    dict(pts=[(506, 466), (492, 500), (474, 530), (458, 556)], width=3, ford=80, sea=True),             # 南の山 → 南の海岸（南国へ）
+    dict(pts=[(634, 336), (656, 350), (682, 358)], width=3, ford=60, sea=True),                          # 東の山 → 東の海岸
+    # --- 大森林の、そのほかの小川 ---
+    dict(pts=[(300, 330), (262, 346), (222, 372), (186, 420), (154, 456), (122, 474)], width=3, ford=90, sea=True),
+    dict(pts=[(232, 430), (218, 470), (206, 506), (192, 540)], width=3, ford=80, sea=True),
 ]
 # 山（x, y, 高さ（段）, 広がり（画像の px））
 PEAKS_SNOW = [(287, 100, 22, 30), (340, 92, 20, 28), (406, 58, 27, 30), (461, 66, 27, 30), (501, 88, 22, 26), (541, 88, 27, 28), (574, 115, 18, 24), (604, 135, 16, 22), (320, 125, 16, 24), (250, 140, 14, 24), (440, 120, 18, 30), (520, 140, 16, 26)]
 PEAKS_ROCK = [(628, 332, 17, 22), (572, 395, 12, 22), (505, 466, 14, 22), (440, 470, 12, 22), (612, 405, 12, 20), (660, 420, 8, 18), (470, 420, 8, 22)]
 MAX_LEVEL = 35
-FORD_EVERY = 120           # 川の浅瀬（歩いて渡れる所）の間隔（マス）
-FORD_LEN = 7
+BRIDGE_WIDTH = 2           # 橋の幅（マス）。橋は、川ごとの間隔（RIVERS の ford）で、川を横切る
 
 
 def noise(seed, scale, shape=(H, W)):
@@ -244,6 +260,81 @@ def _lipschitz(e):
     return e
 
 
+def _mesh_frac(mask):
+    """メッシュごとの、True の割合（GH×GW）"""
+    return mask.astype(np.float32).reshape(GH, MESH, GW, MESH).mean(axis=(1, 3))
+
+
+def _shrink_lake(lake, limit=0.55):
+    """湖が大きく、1 枚のマップの大半が水になるときは、湖の中心に向かって縮める（どのメッシュも、湖の割合が limit 以下）"""
+    if not lake.any(): return lake
+    ys, xs = np.nonzero(lake); cy, cx = ys.mean(), xs.mean()
+    Y, X = np.mgrid[0:H, 0:W].astype(np.float32)
+    s = 1.0
+    while s > 0.25:
+        iy = np.round(cy + (Y - cy) / s).astype(int); ix = np.round(cx + (X - cx) / s).astype(int)
+        ok = (iy >= 0) & (iy < H) & (ix >= 0) & (ix < W)
+        m = np.zeros_like(lake); m[ok] = lake[iy[ok], ix[ok]]
+        if _mesh_frac(m).max() <= limit: return m
+        s -= 0.03
+    return m
+
+
+def _reshape_coast(land, lake, biome, max_water=0.5):
+    """海や湖が大半のマップを、なくす。水（海・湖）が max_water を超えるメッシュは、陸に近い海から順に陸にして、水の割合を下げる
+    （海岸線が、外へ広がる）。広がる距離は、メッシュごとに決めて、メッシュの間でなめらかにつなぐ（双一次補間）。
+    陸のないメッシュには広げず、その手前で、なだらかに 0 にする（まっすぐな切れ目を作らない）。"""
+    land0 = land.copy()
+    frac0 = _mesh_frac(land0)
+    active = np.kron(frac0 > 0, np.ones((MESH, MESH), bool))                      # 陸のあるメッシュ（タイルの範囲）
+    ramp = np.clip((_distance(~active) - 3) / 22.0, 0, 1).astype(np.float32)     # 空のメッシュに近いほど 0
+    dland = _distance(land0).astype(np.float32)
+    noise_d = (fbm(55, (40, 14, 5)) - 0.5) * 12
+    thr_grid = np.zeros((GH, GW), np.float32)
+    land_new = land0
+    for _ in range(40):
+        thr_tile = np.asarray(Image.fromarray(thr_grid).resize((W, H), Image.BILINEAR))
+        land_new = land0 | ((dland + noise_d) <= thr_tile * ramp)
+        water = (~land_new) | lake
+        wf = _mesh_frac(water)
+        viol = (wf > max_water) & (frac0 > 0)
+        if not viol.any(): break
+        thr_grid[viol] += 3
+    land = land_new
+    # 角を丸める
+    land = box_mean(land.astype(np.float32), 5) > 0.5
+    # 広げても陸が少ししかないメッシュは、なくす
+    f = _mesh_frac(land)
+    for j in range(GH):
+        for i in range(GW):
+            if 0 < f[j, i] < 0.15:
+                land[j * MESH:(j + 1) * MESH, i * MESH:(i + 1) * MESH] = False
+    land = land & np.kron(_mesh_frac(land) > 0, np.ones((MESH, MESH), bool))
+    lake = lake & land
+    # 新しい陸の地形: いちばん近い陸の種類（4 近傍へ、1 マスずつ広げる。向きの偏りを避けるため、マスごとにランダムな順で見る）
+    b = biome.copy(); known = (biome != SEA) & land
+    b[~known] = 255
+    pick = (np.random.default_rng(5).integers(0, 4, size=(H, W))).astype(np.int8)
+    dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    for _ in range(120):
+        if known[land].all(): break
+        nbs = [(np.roll(np.roll(b, dy, 0), dx, 1), np.roll(np.roll(known, dy, 0), dx, 1)) for dy, dx in dirs]
+        newb = b.copy(); newk = known.copy()
+        for k in range(4):
+            for d in range(4):
+                nb, nk = nbs[d]
+                take = land & ~newk & nk & (((pick + k) % 4) == d)
+                newb[take] = nb[take]; newk |= take
+        b, known = newb, newk
+    b[~land] = SEA
+    b[land & (b == 255)] = GRASS
+    smooth = _mode_filter(np.where(land, b, GRASS).astype(np.uint8), 8, 25)   # 広げた所の、縞（1 方向に伸びた筋）を、なだらかに
+    new_land = land & ~land0
+    b = np.where(new_land, smooth, b)
+    b[~land] = SEA
+    return land, lake, b.astype(np.uint8)
+
+
 def build():
     land_i, biome_i, lake_i = read_image()
     sx, sy = W / land_i.shape[1], H / land_i.shape[0]
@@ -255,12 +346,25 @@ def build():
     biome = np.where(land, biome, SEA).astype(np.uint8)
     biome[(biome == SEA) & land] = GRASS
     lake = _scale(lake_i.astype(np.uint8), warp=(wx, wy)).astype(bool) & land
+    lake = _shrink_lake(lake)
+    land, lake, biome = _reshape_coast(land, lake, biome)
 
     # 川（世界のマス）: 線に、ゆらぎをつけて描く。浅瀬（歩いて渡れる）を、間隔をあけて作る
     river = np.zeros((H, W), np.uint8)   # 0 なし・1 深い・2 浅瀬
     rng = np.random.default_rng(7)
-    for ri, pts in enumerate(RIVERS):
+    for ri, rv in enumerate(RIVERS):
+        pts = rv['pts']; width = rv['width']; ford_every = rv['ford']
         P = [(x * sx, y * sy) for x, y in pts]
+        # 海まで延ばす: 最後の向きのまま、陸の外（海）に出るまで
+        if rv.get('sea'):
+            (xa, ya), (xb, yb) = P[-2], P[-1]; L = np.hypot(xb - xa, yb - ya) or 1
+            ux, uy = (xb - xa) / L, (yb - ya) / L
+            cx, cy = xb, yb
+            for _k in range(160):
+                cx += ux * 3; cy += uy * 3
+                ix_, iy_ = int(cx), int(cy)
+                if not (0 <= ix_ < W and 0 <= iy_ < H) or not land[iy_, ix_]: break
+            P.append((cx, cy))
         # 折れ線を細かく分けて、ゆらぎ（垂直方向）を足す
         seg = []
         for (x0, y0), (x1, y1) in zip(P[:-1], P[1:]):
@@ -268,7 +372,7 @@ def build():
             for i in range(n):
                 seg.append((x0 + (x1 - x0) * i / n, y0 + (y1 - y0) * i / n))
         seg.append(P[-1])
-        off = np.cumsum(rng.normal(0, 0.9, len(seg))); off = off - np.convolve(off, np.ones(25) / 25, mode='same')
+        off = np.cumsum(rng.normal(0, 0.9, len(seg))); kw = min(25, len(off)); off = off - np.convolve(off, np.ones(kw) / kw, mode='same')
         path = []
         for i, (x, y) in enumerate(seg):
             j = min(i + 1, len(seg) - 1); k = max(i - 1, 0)
@@ -276,17 +380,19 @@ def build():
             path.append((x - dy / L * off[i] * 3, y + dx / L * off[i] * 3))
         deep = Image.new('L', (W, H), 0); dd = ImageDraw.Draw(deep)
         ford = Image.new('L', (W, H), 0); fd = ImageDraw.Draw(ford)
-        width = 4
         dd.line(path, fill=255, width=width)
         for x, y in path: dd.ellipse([x - width / 2, y - width / 2, x + width / 2, y + width / 2], fill=255)
-        # 浅瀬: 川の長さに沿って、一定の間隔
-        acc = 0.0; nextf = FORD_EVERY * 0.6
-        for i in range(1, len(path)):
+        # 橋: 川の長さに沿って、一定の間隔。川の向きに垂直に、幅 2 マスで、川を横切る（川の水のマスだけが、橋になる）
+        acc = 0.0; nextf = ford_every * 0.6
+        for i in range(1, len(path) - 1):
             acc += np.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1])
             if acc >= nextf:
                 cx, cy = path[i]
-                fd.ellipse([cx - FORD_LEN / 2 - 1, cy - FORD_LEN / 2 - 1, cx + FORD_LEN / 2 + 1, cy + FORD_LEN / 2 + 1], fill=255)
-                nextf += FORD_EVERY
+                tx, ty = path[i + 1][0] - path[i - 1][0], path[i + 1][1] - path[i - 1][1]; tl = np.hypot(tx, ty) or 1
+                nx_, ny_ = -ty / tl, tx / tl
+                half = width / 2 + 2
+                fd.line([(cx - nx_ * half, cy - ny_ * half), (cx + nx_ * half, cy + ny_ * half)], fill=255, width=BRIDGE_WIDTH)
+                nextf += ford_every
         deep = np.asarray(deep) > 0; ford = (np.asarray(ford) > 0) & deep
         river[deep] = np.maximum(river[deep], 1)
         river[ford] = 2
@@ -297,9 +403,10 @@ def build():
     water_deep = lake | (river == 1)
     # 湖のふちと川の浅瀬: 浅瀬
     lake_edge = lake & ~_ero(lake, 3)
-    water_shallow = lake_edge | (river == 2)
-    water_deep &= ~water_shallow
-    any_water = water_deep | water_shallow
+    bridge = (river == 2) & ~lake
+    water_shallow = lake_edge
+    water_deep &= ~water_shallow & ~bridge
+    any_water = water_deep | water_shallow | bridge
 
     # 高さ
     ys, xs = np.mgrid[0:H, 0:W].astype(np.float32)
@@ -342,7 +449,7 @@ def build():
     elev = _lipschitz(elev)
     elev[any_water | ~land] = 0
     elev = _lipschitz(elev)
-    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lake=lake, river=river, elev=elev, dist_sea=_distance(~land), dist_water=_distance(any_water))
+    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, bridge=bridge, lake=lake, river=river, elev=elev, dist_sea=_distance(~land), dist_water=_distance(any_water))
 
 
 if __name__ == '__main__':

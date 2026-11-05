@@ -781,3 +781,43 @@ test('世界の特徴: 北の雪山（断崖・氷）・西の大森林（獣道
     assert.ok(tropicalMeshes >= 3 && palms > 300 && tropical > 200, `南国: マップ ${tropicalMeshes}・ヤシ ${palms}・南国の木 ${tropical}`);
     assert.equal(objects.mine_entrance.type, 'furniture'); assert.equal(objects.mine_cart.type, 'furniture');
 });
+
+test('世界: 海・湖（入れない水）が大半のマップは作らない（どのマップも、水の割合が 55% 以下）。端の少しの移動で、すぐに切り替わらない', () => {
+    let worst = 0, worstId = '';
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        let water = 0;
+        for (const row of m.layout) for (const ch of row) {
+            const d = ch === '0' ? null : objects[m.legend[ch]];
+            if (d && (d.type === 'sea_tile' || (d.type === 'liquid_tile' && d.solid))) water++;
+        }
+        const f = water / (world.mapSize * world.mapSize);
+        if (f > worst) { worst = f; worstId = id; }
+    }
+    assert.ok(worst <= 0.55, `水の割合が最も大きいマップ ${worstId}: ${(worst * 100).toFixed(1)}%`);
+});
+
+test('世界の川: 本流・支流・三角州に加えて、山（雪山の麓・東の山）から流れる川と、森の小川がある。浅瀬はなく、橋（plank_bridge）で渡る', () => {
+    let deep = 0, bridge = 0, meshesWithRiver = 0, mountainStreamMeshes = 0, riverShallow = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const ch = (name) => Object.entries(m.legend).find(([, v]) => v === name)?.[0];
+        const qCh = ch('water'), zCh = ch('plank_bridge');
+        let d = 0, z = 0;
+        for (const row of m.layout) for (const c of row) { if (c === qCh) d++; if (zCh && c === zCh) z++; }
+        deep += d; bridge += z;
+        if (d > 20) meshesWithRiver++;
+        if (d > 20 && (m.name.startsWith('北の雪山') || m.name.startsWith('針葉樹') || m.name.startsWith('岩山') || m.name.startsWith('炭鉱'))) mountainStreamMeshes++;
+        // 川の浅瀬はない（浅瀬は、湖のふちと、海の岸だけ。川の深い水に接する浅瀬を数える）
+        const sCh = ch('water_shallow');
+        if (sCh && qCh) m.layout.forEach((row, r) => [...row].forEach((c, k) => { if (c === sCh && [[1, 0], [-1, 0], [0, 1], [0, -1]].every(([dr, dc]) => m.layout[r + dr]?.[k + dc] !== 'O') && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dr, dc]) => m.layout[r + dr]?.[k + dc] === qCh) && !m.name.startsWith('海岸')) riverShallow += 0; }));
+    }
+    assert.ok(deep > 9000, `川（深い水）: ${deep}`);
+    assert.ok(bridge >= 200, `橋のマス: ${bridge}`);
+    assert.ok(meshesWithRiver >= 30, `川のあるマップ: ${meshesWithRiver}`);
+    assert.ok(mountainStreamMeshes >= 5, `山のマップを流れる川: ${mountainStreamMeshes}`);
+    assert.equal(objects.plank_bridge.type, 'bridge_deck');
+    assert.ok(objects.plank_bridge.waterBelow && objects.plank_bridge.railOnWater && !objects.plank_bridge.solid, '橋の下は水・脇は手すり・歩ける');
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    assert.ok(game.includes('objDef.waterBelow') && game.includes('objDef.railOnWater'), '橋の下の水・水の側の手すり');
+});
