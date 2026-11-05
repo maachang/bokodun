@@ -282,6 +282,7 @@
     "height": 10.4,
     "colliderHalf": 1.0,
     "solid": true,
+    "noShadow": true,
     "description": "森の木 A（sdServer 画像 ID 217「草原の広葉樹」を 2 倍に拡大。林の壁は使わず、1 本ずつ並べる）"
   },
   "forest_tree_b": {
@@ -291,6 +292,7 @@
     "height": 10.4,
     "colliderHalf": 1.0,
     "solid": true,
+    "noShadow": true,
     "description": "森の木 B（sdServer 画像 ID 218「湿地の木」を 2 倍に拡大）"
   },
   "great_tree_a": {
@@ -300,6 +302,7 @@
     "height": 15.6,
     "colliderHalf": 1.2,
     "solid": true,
+    "noShadow": true,
     "description": "大森林の巨木 A（ID 217 を 3 倍に拡大。幹は太いが、木の間は必ず通れる）"
   },
   "great_tree_b": {
@@ -309,6 +312,7 @@
     "height": 15.6,
     "colliderHalf": 1.2,
     "solid": true,
+    "noShadow": true,
     "description": "大森林の巨木 B（ID 218 を 3 倍に拡大）"
   },
   "zeus_statue": {
@@ -352,6 +356,7 @@
     "height": 12.0,
     "colliderHalf": 1.0,
     "solid": true,
+    "noShadow": true,
     "description": "寒冷地の森の針葉樹 A（sdServer ID 262 の針葉樹を 2 倍に拡大。ツンドラ・雪山の裾野の森。1 本ずつ並べる）"
   },
   "conifer_forest_b": {
@@ -361,6 +366,7 @@
     "height": 12.0,
     "colliderHalf": 1.0,
     "solid": true,
+    "noShadow": true,
     "description": "寒冷地の森の針葉樹 B（sdServer ID 263 の針葉樹を 2 倍に拡大）"
   },
   "great_conifer_a": {
@@ -370,6 +376,7 @@
     "height": 18.0,
     "colliderHalf": 1.2,
     "solid": true,
+    "noShadow": true,
     "description": "寒冷地の大森林の巨木 A（ID 262 の針葉樹を 3 倍に拡大）。まだ、どのマップにも置いていない（寒冷地に大森林を作るとき用）"
   },
   "great_conifer_b": {
@@ -379,6 +386,7 @@
     "height": 18.0,
     "colliderHalf": 1.2,
     "solid": true,
+    "noShadow": true,
     "description": "寒冷地の大森林の巨木 B（ID 263 の針葉樹を 3 倍に拡大）。まだ、どのマップにも置いていない"
   },
   "tropical_forest_a": {
@@ -388,6 +396,7 @@
     "height": 11.6,
     "colliderHalf": 1.0,
     "solid": true,
+    "noShadow": true,
     "description": "南国のジャングルの木 A（南国の木 tropical_tree を 2 倍に拡大。1 本ずつ並べる）"
   },
   "tropical_forest_b": {
@@ -397,6 +406,7 @@
     "height": 12.0,
     "colliderHalf": 1.0,
     "solid": true,
+    "noShadow": true,
     "description": "南国のジャングルの木 B（樹海の木 dark_tree を 2 倍に拡大）"
   },
   "tropical_palm_forest": {
@@ -406,6 +416,7 @@
     "height": 15.0,
     "colliderHalf": 0.8,
     "solid": true,
+    "noShadow": true,
     "description": "南国のヤシの林の木（ヤシ palm を 2 倍に拡大。海辺と、ジャングルに生える）"
   },
   "plank_bridge": {

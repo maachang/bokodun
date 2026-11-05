@@ -14,6 +14,9 @@ import { StrikeEffectSystem } from '/js/strikeEffect.js';
 // テスト用: 走る速さ（Shift）の倍率。広い世界を、すばやく見て回るため。通常の速さに戻すときは 1 にする（歩く速さは、そのまま）
 export const TEST_RUN_SPEED_SCALE = 5;
 
+// 木の足元の影（暗い緑の丸い板）を置くか。雪原などで目立つため、いったん、すべてなくした（true で、小さな木だけ、影が戻る。2 倍・3 倍の木は、noShadow で、いつも、影なし）
+export const TREE_SHADOWS = false;
+
 // 端の向こうに描く、隣のマップの地形の幅（マス）。最小 16・最大 32。境の高さに合わせて広げ、1 マスに 1 段までの傾きで、高さ 0 へ下げる（高い所の端で、急な崖にならない）
 export const OUTSIDE_TERRAIN_MIN_DEPTH = 16;
 export const OUTSIDE_TERRAIN_MAX_DEPTH = 32;
@@ -1504,28 +1507,32 @@ export class GameEngine {
                         this.scene.add(tree);
                         tree.updateMatrix(); tree.matrixAutoUpdate = false;   // 動かない: 毎フレームの行列の計算をしない
 
-                        // Ground contact shadow under the tree trunk（大きい木ほど、広い影。1 つの影の材質・形を共有）
-                        if (!this.treeShadowMat) {
-                            const shadowCanvas = document.createElement('canvas');
-                            shadowCanvas.width = 32;
-                            shadowCanvas.height = 32;
-                            const sCtx = shadowCanvas.getContext('2d');
-                            const grad = sCtx.createRadialGradient(16, 16, 2, 16, 16, 16);
-                            grad.addColorStop(0, 'rgba(10, 25, 10, 0.65)');
-                            grad.addColorStop(0.5, 'rgba(15, 30, 15, 0.35)');
-                            grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
-                            sCtx.fillStyle = grad;
-                            sCtx.fillRect(0, 0, 32, 32);
-                            this.treeShadowMat = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shadowCanvas), transparent: true, depthWrite: false });
-                            this.treeShadowGeo = new THREE.PlaneGeometry(2.4, 2.4);
+                        // Ground contact shadow under the tree trunk（1 つの影の材質・形を共有）。
+                        //   noShadow: true の木（2 倍・3 倍の大きな木）は、影を置かない（起伏のある地面で、大きな影の板が、隣の高いマスに埋まって、三角形などの欠けた形に見えるため。木の数が多い森が、軽くなる）
+                        let shadowMesh = null;
+                        if (TREE_SHADOWS && !objDef.noShadow) {
+                            if (!this.treeShadowMat) {
+                                const shadowCanvas = document.createElement('canvas');
+                                shadowCanvas.width = 32;
+                                shadowCanvas.height = 32;
+                                const sCtx = shadowCanvas.getContext('2d');
+                                const grad = sCtx.createRadialGradient(16, 16, 2, 16, 16, 16);
+                                grad.addColorStop(0, 'rgba(10, 25, 10, 0.65)');
+                                grad.addColorStop(0.5, 'rgba(15, 30, 15, 0.35)');
+                                grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                                sCtx.fillStyle = grad;
+                                sCtx.fillRect(0, 0, 32, 32);
+                                this.treeShadowMat = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shadowCanvas), transparent: true, depthWrite: false });
+                                this.treeShadowGeo = new THREE.PlaneGeometry(2.4, 2.4);
+                            }
+                            shadowMesh = new THREE.Mesh(this.treeShadowGeo, this.treeShadowMat);
+                            shadowMesh.rotation.x = -Math.PI / 2;
+                            const shadowK = Math.min(3, Math.max(1, baseH / 5.2));
+                            shadowMesh.scale.set(shadowK, shadowK, 1);
+                            shadowMesh.position.set(wx, 0.012, wz);
+                            this.scene.add(shadowMesh);
+                            shadowMesh.updateMatrix(); shadowMesh.matrixAutoUpdate = false;
                         }
-                        const shadowMesh = new THREE.Mesh(this.treeShadowGeo, this.treeShadowMat);
-                        shadowMesh.rotation.x = -Math.PI / 2;
-                        const shadowK = Math.min(3, Math.max(1, baseH / 5.2));
-                        shadowMesh.scale.set(shadowK, shadowK, 1);
-                        shadowMesh.position.set(wx, 0.012, wz);
-                        this.scene.add(shadowMesh);
-                        shadowMesh.updateMatrix(); shadowMesh.matrixAutoUpdate = false;
                         this.treeSprites.push({ sprite: tree, shadow: shadowMesh, far: treeMat, near: treeMatNear, vis: true });
                         if (objDef.solid) {
                             const half = objDef.colliderHalf ?? 0.6;   // 幹の当たり判定の半幅（大きな木ほど、太い）

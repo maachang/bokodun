@@ -1010,3 +1010,12 @@ test('大森林などの負荷: 前のマップの木が溜まらない（マッ
     assert.ok(game.includes('this.scene.fog.far * 1.1') && game.includes('this.cullSprites'), '霧より遠い木・影・草は隠す');
     assert.ok(game.includes('this.plantMats') && game.includes('this.minimapBase'), '草の材質の共有・ミニマップの壁の使い回し');
 });
+
+test('木の足元の影: いったん、すべてなくした（TREE_SHADOWS = false）。大きな木（2 倍・3 倍）は、スイッチを戻しても、影なし', () => {
+    const big = ['forest_tree_a', 'forest_tree_b', 'great_tree_a', 'great_tree_b', 'conifer_forest_a', 'conifer_forest_b', 'great_conifer_a', 'great_conifer_b', 'tropical_forest_a', 'tropical_forest_b', 'tropical_palm_forest'];
+    for (const n of big) assert.equal(objects[n].noShadow, true, `${n}: 影なし`);
+    for (const n of ['grass_tree', 'tropical_tree', 'palm', 'swamp_tree_a', 'conifer_tree_a', 'conifer_tree_b', 'dark_tree']) assert.ok(!objects[n].noShadow, `${n}: 小さな木は、スイッチで、影が戻る`);
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    assert.ok(game.includes('export const TREE_SHADOWS = false;'), '影のスイッチ: いまは、すべてなし');
+    assert.ok(game.includes('if (TREE_SHADOWS && !objDef.noShadow) {') && game.includes('shadow: shadowMesh'), '影の処理');
+});
