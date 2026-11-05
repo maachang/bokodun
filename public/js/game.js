@@ -11,6 +11,9 @@ import { ParticleSystem } from '/js/particles.js';
 import { SlashEffectSystem } from '/js/slashEffect.js';
 import { StrikeEffectSystem } from '/js/strikeEffect.js';
 
+// テスト用: 走る速さ（Shift）の倍率。広い世界を、すばやく見て回るため。通常の速さに戻すときは 1 にする（歩く速さは、そのまま）
+export const TEST_RUN_SPEED_SCALE = 5;
+
 // 被弾リアクション（突進の命中時）の調整値
 //   ヒットストップ: 命中した瞬間にゲームの時間を一瞬止める（秒）。重い武器・会心・撃破で長くなる
 //   カメラの揺れ: 会心・撃破・重い武器の命中で、画面を短く揺らす（amp=揺れの大きさ、duration=秒）
@@ -49,7 +52,7 @@ export class GameEngine {
             angle: 0,
             pitch: 0,
             speed: 8.5,
-            runSpeed: 13.0,
+            runSpeed: 13.0 * TEST_RUN_SPEED_SCALE,   // 走る速さ（Shift）。テスト用の倍率を掛けてある
             rotSpeed: 2.8,
             radius: 0.6,
             maxHp: 100,
@@ -108,6 +111,7 @@ export class GameEngine {
         this.projectiles = [];
         this.portals = [];   // ポータル（次のマップへの入口）。マップに複数置ける
         this.waterMeshes = [];
+        this.seaCells = [];   // 海のマス（type: sea_tile）。1 マスずつは描かず、マップ全体の水面 1 枚と、並びごとの当たり判定にする
         this.heatHazePlanes = [];
         this.torchGlows = [];   // 松明の光（光だまり・光の輪）。ゆらぎのアニメーション用
         this.fountains = [];
@@ -139,6 +143,11 @@ export class GameEngine {
 
     async init() {
         await this.loadDefinitions();
+        // 最初に入るマップ: 世界（world.json）の start。読めなければ、そのまま（currentMapId の既定）
+        try {
+            this.world = await (await fetch('/data/world.json')).json();
+            if (this.world.start) this.currentMapId = this.world.start;
+        } catch { this.world = null; }
         await this.loadMap(this.currentMapId);
     }
 
@@ -557,8 +566,12 @@ export class GameEngine {
     }
 
     // マス (行 r, 列 c) の高さの段（起伏のないマップは 0。マップの外は 0）
+    //   マップの外のマスは、いちばん近い端のマスの高さ（端を越えるとき、段差にならない。連続した高さの世界で、端の高さが 3 段以上でも、越えられる）
     heightLevelAtTile(r, c) {
-        return this.heightMap?.[r]?.[c] ?? 0;
+        const hm = this.heightMap;
+        if (!hm) return 0;
+        const rr = Math.min(Math.max(r, 0), hm.length - 1);
+        return hm[rr][Math.min(Math.max(c, 0), hm[rr].length - 1)] ?? 0;
     }
 
     // マス (行 r, 列 c) の、地形（地面・崖の面）の高さの段。吊橋のマスは、橋の下の谷の底（bridgeUnder）の高さ
@@ -584,12 +597,13 @@ export class GameEngine {
 
     // 起伏のある地面: 高くなっているマスの上面と、低い隣との境の側面を作る。
     //   段差 1 は、地面と同じ模様の側面（歩いて上れる）。段差 2 以上は、崖（岩肌。mapData.cliffTexture、省略は cliffGray）
-    buildHeightTerrain(mapData, rows, cols, tileSize, baseFloorMat) {
+    buildHeightTerrain(mapData, rows, cols, tileSize, floorMats, floorMatOf, floorTypeAt) {
         const step = this.heightStep;
         const cliffMat = new THREE.MeshLambertMaterial({ map: this.textures[mapData.cliffTexture] || this.textures.cliffGray });
         // 高さごとに、地面の明るさを変える（低い所は少し暗く、高い所は明るく）。起伏が、見て分かるようにする
         //   mapData.heightTint: [最も低い所, 最も高い所] の明るさ（省略は [0.82, 1.0]）。洞窟など、段の高さを強調したいマップは、幅を広げる。
         //   heightTint があるマップは、崖の面も、上の段の高さに応じた明るさにする（段ごとの崖が、見分けやすい）
+        //   mapData.sideShade: 段差 1 の側面の明るさ（省略は 0.78。1.0 で、上の面と同じ。なだらかな斜面を、線にしたくないマップ用）
         let maxLv = 1;
         for (const row of this.heightMap) for (const v of row) if (v > maxLv) maxLv = v;
         const [tintLo, tintHi] = mapData.heightTint ?? [0.82, 1.0];
@@ -601,15 +615,16 @@ export class GameEngine {
             return cliffMats.get(lv);
         };
         const topMats = new Map(), sideMats = new Map();
-        const matFor = (cache, lv, k) => {
-            if (!cache.has(lv)) {
-                const m = baseFloorMat.clone();
+        const matFor = (cache, lv, k, ft) => {   // ft: 地面の種類。高さ・種類ごとの材質（明るさを変えた複製）
+            const key = `${ft}|${lv}`;
+            if (!cache.has(key)) {
+                const m = floorMatOf(ft).clone();
                 m.color.setScalar(tintOf(lv) * k);
-                cache.set(lv, m);
+                cache.set(key, m);
             }
-            return cache.get(lv);
+            return cache.get(key);
         };
-        baseFloorMat.color.setScalar(tintOf(0));   // 高さ 0 の平らな地面も、同じ基準にそろえる
+        for (const m of floorMats.values()) m.color.setScalar(tintOf(0));   // 高さ 0 の平らな地面も、同じ基準にそろえる
         const topGeo = new THREE.PlaneGeometry(tileSize, tileSize);
         const dirs = [[0, 1, 0], [0, -1, Math.PI], [1, 0, Math.PI / 2], [-1, 0, -Math.PI / 2]];   // [dx(列), dz(行), 向き]
         for (let r = 0; r < rows; r++) {
@@ -618,7 +633,8 @@ export class GameEngine {
                 if (h <= 0) continue;
                 const wx = c * tileSize + tileSize / 2;
                 const wz = r * tileSize + tileSize / 2;
-                const top = new THREE.Mesh(topGeo, matFor(topMats, h, 1.0));
+                const ft = floorTypeAt(r, c);
+                const top = new THREE.Mesh(topGeo, matFor(topMats, h, 1.0, ft));
                 top.rotation.x = -Math.PI / 2;
                 top.position.set(wx, h * step, wz);
                 this.addStatic(top);
@@ -628,12 +644,38 @@ export class GameEngine {
                     if (!inMap || nh >= h) continue;
                     const drop = h - nh;
                     const faceH = drop * step;
-                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMatFor(h) : matFor(sideMats, h, 0.78));
+                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMatFor(h) : matFor(sideMats, h, mapData.sideShade ?? 0.78, ft));
                     face.rotation.y = rotY;
                     face.position.set(wx + dx * tileSize / 2, nh * step + faceH / 2, wz + dz * tileSize / 2);
                     this.addStatic(face);
                 }
             }
+        }
+    }
+
+    // 海: マップの外まで広がる水面 1 枚（深い水の模様。ゆれる）と、海のマスの当たり判定（同じ行の連続を 1 つにまとめる。入れない・弾は通る）
+    buildSea(rows, cols, tileSize) {
+        const FAR = 400;
+        const w = cols * tileSize + FAR * 2, d = rows * tileSize + FAR * 2;
+        const geo = new THREE.PlaneGeometry(w, d);
+        const uv = geo.attributes.uv;
+        for (let i = 0; i < uv.count; i++) uv.setXY(i, uv.getX(i) * w / tileSize, uv.getY(i) * d / tileSize);
+        const sea = new THREE.Mesh(geo, new THREE.MeshLambertMaterial({ map: this.textures.water }));
+        sea.rotation.x = -Math.PI / 2;
+        sea.position.set(cols * tileSize / 2, -0.2, rows * tileSize / 2);
+        this.scene.add(sea);
+        this.waterMeshes.push(sea);   // 水の模様のアニメーションを動かす
+        const byRow = new Map();
+        for (const [r, c] of this.seaCells) { if (!byRow.has(r)) byRow.set(r, []); byRow.get(r).push(c); }
+        for (const [r, cs] of byRow) {
+            cs.sort((a, b) => a - b);
+            let start = cs[0], prev = cs[0];
+            const push = (a, b) => this.colliders.push({ minX: a * tileSize, maxX: (b + 1) * tileSize, minZ: r * tileSize, maxZ: (r + 1) * tileSize, blocksProjectiles: false });
+            for (let i = 1; i < cs.length; i++) {
+                if (cs[i] !== prev + 1) { push(start, prev); start = cs[i]; }
+                prev = cs[i];
+            }
+            push(start, prev);
         }
     }
 
@@ -874,6 +916,7 @@ export class GameEngine {
         this.projectiles = [];
         this.portals = [];   // ポータル（次のマップへの入口）。マップに複数置ける
         this.waterMeshes = [];
+        this.seaCells = [];
         this.heatHazePlanes = [];
         this.torchGlows = [];   // 松明の光（光だまり・光の輪）。ゆらぎのアニメーション用
         this.fountains = [];
@@ -922,7 +965,7 @@ export class GameEngine {
                 const char = mapData.layout[r][c];
                 const objType = mapData.legend ? mapData.legend[char] : null;
                 const objDef = objType ? this.objectDefinitions[objType] : null;
-                if (objDef && objDef.type === 'liquid_tile') {
+                if (objDef && (objDef.type === 'liquid_tile' || objDef.type === 'sea_tile')) {
                     waterMap[r][c] = true;
                 }
                 if (objDef && objDef.type === 'crumbling_floor') {
@@ -951,9 +994,18 @@ export class GameEngine {
         }
 
         // 1. Grid-based Floor Generation (carving holes for sunken water tiles and crumbling pitfall cavities)
-        const baseFloorTex = this.floorTextureOf(env.floorType);
-
-        const baseFloorMat = new THREE.MeshLambertMaterial({ map: baseFloorTex });
+        // 地面の種類: 既定は environment.floorType。マップの floorLayer（行ごとの文字列）と floorLegend（文字 → 地面の種類）で、マスごとに変えられる
+        //   （広い世界で、草原・砂地・雪などが、同じマップの中に混ざる。物体（木・草）を置いても、地面は変わらない）
+        const floorMats = new Map();
+        const floorMatOf = (ft) => {
+            if (!floorMats.has(ft)) floorMats.set(ft, new THREE.MeshLambertMaterial({ map: this.floorTextureOf(ft) }));
+            return floorMats.get(ft);
+        };
+        const floorTypeAt = (r, c) => {
+            const ch = mapData.floorLayer?.[r]?.[c];
+            return (ch !== undefined && mapData.floorLegend?.[ch]) || env.floorType;
+        };
+        const baseFloorMat = floorMatOf(env.floorType);
         const cellGeo = new THREE.PlaneGeometry(tileSize, tileSize);
 
         for (let r = 0; r < rows; r++) {
@@ -964,14 +1016,14 @@ export class GameEngine {
                 const wx = c * tileSize + tileSize / 2;
                 const wz = r * tileSize + tileSize / 2;
 
-                const cellMesh = new THREE.Mesh(cellGeo, baseFloorMat);
+                const cellMesh = new THREE.Mesh(cellGeo, floorMatOf(floorTypeAt(r, c)));
                 cellMesh.rotation.x = -Math.PI / 2;
                 cellMesh.position.set(wx, 0, wz);
                 this.addStatic(cellMesh);
             }
         }
 
-        if (this.heightMap) this.buildHeightTerrain(mapData, rows, cols, tileSize, baseFloorMat);
+        if (this.heightMap) this.buildHeightTerrain(mapData, rows, cols, tileSize, floorMats, floorMatOf, floorTypeAt);
 
         // 外のマップ（world.json にあるマップ）: 隣のマップがある方向は、端の外へ、隣の地面が遠くまで続く（外に出ると、隣のマップへ切り替わる）
         await this.buildOutsideGround(mapId, cols, rows, tileSize);
@@ -1888,6 +1940,12 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'sea_tile': {
+                        // 海: 1 マスずつは描かない（大量になるため）。buildSea が、水面 1 枚と、当たり判定を作る
+                        this.seaCells.push([r, c]);
+                        break;
+                    }
+
                     case 'bridge_deck': {
                         // 吊橋: 薄い板の床（側面も、下の面もない。下に、谷の底が見える）と、橋の縁に沿った、ロープの手すり・支柱。
                         //   床の高さは、heights（objDef.lift で、このマスの高さまで持ち上がる）。歩く・段差の判定は、高さの仕組みのまま
@@ -2678,6 +2736,7 @@ export class GameEngine {
         }
 
         unlift();   // 持ち上げ用に差し替えた scene.add を元に戻す
+        if (this.seaCells.length) this.buildSea(rows, cols, tileSize);
 
         // 動かない部品（床・天井・壁・家具など）を、材質ごとに1つにまとめる（描画の回数を減らして、CPU の負荷を下げる）
         this.mergeStaticMeshes();
@@ -2708,6 +2767,7 @@ export class GameEngine {
         const spawn = opts.spawn || (fromMapId !== mapId && mapData.spawnFrom?.[fromMapId]) || mapData.spawn;
         this.player.x = spawn.x * tileSize + tileSize / 2;
         this.player.z = spawn.z * tileSize + tileSize / 2;
+        if (opts.edgeBlend) this.pushPlayerOutOfWalls();   // 端を越えて、隣のマップの木・岩の中に出たら、近くの空きへ出す
         this.player.lastSafePos = { x: this.player.x, z: this.player.z };
         this.player.angle = spawn.angle || 0;
         this.player.pitch = 0;
@@ -3702,7 +3762,9 @@ export class GameEngine {
 
             const stepFromX = this.player.x;
             const stepFromZ = this.player.z;
-            this.movePlayer(worldMoveX, worldMoveZ);
+            // 速い移動（走る・倍率つき）でも、壁・崖をすり抜けないよう、0.5 以下の長さに分けて動かす
+            const moveLen = Math.hypot(worldMoveX, worldMoveZ), steps = Math.max(1, Math.ceil(moveLen / 0.5));
+            for (let i = 0; i < steps; i++) this.movePlayer(worldMoveX / steps, worldMoveZ / steps);
             // 足音: 実際に進んだ距離が一定に達するたびに1回鳴らす（壁に押し付けて進めない間は鳴らさない）
             if (!this.player.isFalling) {
                 this.footstepDistance = (this.footstepDistance || 0) + Math.hypot(this.player.x - stepFromX, this.player.z - stepFromZ);
@@ -3968,6 +4030,21 @@ export class GameEngine {
 
         // Render Minimap
         this.renderMinimap();
+    }
+
+    // プレイヤーが、壁（木・岩・海などの当たり判定）に重なっていたら、近くの空いている所（中心から外へ 0.5 ずつ広げて探す）へ動かす
+    pushPlayerOutOfWalls() {
+        if (!this.isInsideWall(this.player.x, this.player.z)) return;
+        const ts = this.mapData?.tileSize || 4;
+        const maxX = (this.mapData?.layout?.[0]?.length ?? 0) * ts, maxZ = (this.mapData?.layout?.length ?? 0) * ts;
+        for (let d = 0.5; d <= 20; d += 0.5) {
+            for (let k = 0; k < 16; k++) {
+                const a = k * Math.PI / 8;
+                const x = this.player.x + Math.cos(a) * d, z = this.player.z + Math.sin(a) * d;
+                if (x < 0 || z < 0 || x > maxX || z > maxZ) continue;
+                if (!this.isInsideWall(x, z)) { this.player.x = x; this.player.z = z; return; }
+            }
+        }
     }
 
     // 壁（colliders）の判定範囲（プレイヤーの半径ぶん外側へ広げた矩形）の中に (x, z) があるか

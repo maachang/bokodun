@@ -642,6 +642,17 @@
                     <option value="dungeon">地下迷宮</option>
                     <option value="giant_test">巨大試験場</option>
                 </select>
+                <select class="sel-scene" title="世界（ボコスカ島）" onchange="if (this.value) window.game.loadMap(this.value); this.selectedIndex = 0; this.blur();">
+                    <option value="">世界（ボコスカ島）</option>
+                    <option value="w_09_11">最初の場所（草原）</option>
+                    <option value="w_03_10">北の雪山</option>
+                    <option value="w_06_07">西の大森林</option>
+                    <option value="w_07_11">砂地</option>
+                    <option value="w_07_14">東の湖</option>
+                    <option value="w_08_09">川</option>
+                    <option value="w_09_16">南東の岩山</option>
+                    <option value="w_09_18">東の海岸</option>
+                </select>
                 <select class="sel-scene" title="外マップ（64×64）" onchange="if (this.value) window.game.loadMap(this.value); this.selectedIndex = 0; this.blur();">
                     <option value="">外マップ（64×64）</option>
                     <option value="field_grass">草原の道</option>

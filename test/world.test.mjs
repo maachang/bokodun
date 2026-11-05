@@ -15,49 +15,94 @@ async function loadWorldMod() {
 const world = readJson('public/data/world.json');
 const objects = readJson('public/data/objects.json');
 
-test('世界の並び: 外のマップはすべて 64×64 で、同じマップが 2 か所にない。端が隣へ続く側は、端が通れる', () => {
+test('世界の並び: 外のマップはすべて 64×64 で、同じマップが 2 か所にない。敵はない。出発点は、歩ける陸のマス', () => {
     const ids = world.grid.flat().filter(Boolean);
     assert.equal(new Set(ids).size, ids.length, '同じマップが、配列に 2 回ある');
+    assert.ok(ids.includes(world.start), 'start（最初のマップ）が、配列にある');
+    assert.equal(world.grid.length, 15); assert.ok(world.grid.every(r => r.length === 20), '20×15 メッシュ');
+    const solidTypes = new Set(['tree', 'tree_wall', 'boulder', 'liquid_tile', 'sea_tile']);
     for (const id of ids) {
         const m = readJson(`public/data/maps/${id}.json`);
         assert.equal(m.layout.length, world.mapSize, `${id}: 行数`);
         for (const row of m.layout) assert.equal(row.length, world.mapSize, `${id}: 列数`);
         assert.ok(m.environment?.floorType, `${id}: 地面の種類（隣のマップが、端の外の地面に使う）`);
-        // 隣がある方向の端は、壁や木でふさがない
-        const solidAt = (r, c) => { const d = objects[m.legend[m.layout[r][c]]]; return !!d && d.solid; };
-        const N = world.mapSize;
-        let row = -1, col = -1;
-        world.grid.forEach((rw, r) => { if (rw.includes(id)) { row = r; col = rw.indexOf(id); } });
-        const has = (dr, dc) => !!world.grid[row + dr]?.[col + dc];
-        // 川（深い水）は、端を横切ってよい。ただし、隣のマップの反対側の端も、同じ位置が深い水（川がつながる）
-        const deepAt = (mm, r, c) => { const d = objects[mm.legend[mm.layout[r][c]]]; return d?.type === 'liquid_tile' && d.solid; };
-        const nb = (dr, dc) => readJson(`public/data/maps/${world.grid[row + dr][col + dc]}.json`);
-        const edgeOk = (r, c, dr, dc, nr, nc) => !solidAt(r, c) || (deepAt(m, r, c) && deepAt(nb(dr, dc), nr, nc));
-        for (let i = 1; i < N - 1; i++) {   // 四隅は、ほかの 2 辺の壁と重なるので除く
-            if (has(-1, 0)) assert.ok(edgeOk(0, i, -1, 0, N - 1, i), `${id}: 北の端 ${i}`);
-            if (has(1, 0)) assert.ok(edgeOk(N - 1, i, 1, 0, 0, i), `${id}: 南の端 ${i}`);
-            if (has(0, -1)) assert.ok(edgeOk(i, 0, 0, -1, i, N - 1), `${id}: 西の端 ${i}`);
-            if (has(0, 1)) assert.ok(edgeOk(i, N - 1, 0, 1, i, 0), `${id}: 東の端 ${i}`);
-        }
-        // スポーンから、反対の端（隣へ続く側）まで歩いて行ける
-        const pass = (r, c) => { const d = objects[m.legend[m.layout[r][c]]]; return m.layout[r][c] === '0' || !d || !d.solid; };
-        const enemyCh = new Set(Object.keys(m.enemies || {}));
-        const ok = (r, c) => r >= 0 && c >= 0 && r < N && c < N && (enemyCh.has(m.layout[r][c]) || pass(r, c));
-        const start = [Math.floor(m.spawn.z), Math.floor(m.spawn.x)];
-        const seen = new Set([start.join()]), q = [start];
-        while (q.length) {
-            const [r, c] = q.shift();
-            for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
-                const nr = r + dr, nc = c + dc;
-                if (!ok(nr, nc) || seen.has(`${nr},${nc}`)) continue;
-                seen.add(`${nr},${nc}`); q.push([nr, nc]);
+        assert.deepEqual(m.enemies ?? {}, {}, `${id}: 敵は置かない（地形だけ）`);
+        for (const ch of new Set(m.layout.join(''))) assert.ok(ch === '0' || objects[m.legend[ch]], `${id}: 凡例にない文字 ${ch}`);
+        // 出現位置は、歩ける陸のマス（木・岩・水でない）
+        const sp = m.layout[Math.floor(m.spawn.z)][Math.floor(m.spawn.x)];
+        const d = sp === '0' ? null : objects[m.legend[sp]];
+        assert.ok(!d || !solidTypes.has(d.type), `${id}: 出現位置が、通れないマス`);
+        assert.ok(m.floorLayer.length === 64 && m.floorLayer.every(r => r.length === 64), `${id}: floorLayer`);
+        for (const ch of new Set(m.floorLayer.join(''))) assert.ok(m.floorLegend[ch], `${id}: floorLegend にない文字 ${ch}`);
+    }
+});
+
+test('世界の境: 隣り合うマップの境で、高さの差が 1 以下（山が、境でも、なだらかにつながる）。水のマスは、高さ 0', () => {
+    const N = world.mapSize;
+    const get = (r, c) => world.grid[r]?.[c] ? readJson(`public/data/maps/${world.grid[r][c]}.json`) : null;
+    const isWater = (m, r, c) => { const d = objects[m.legend[m.layout[r][c]]]; return d?.type === 'liquid_tile' || d?.type === 'sea_tile'; };
+    let seams = 0;
+    for (let row = 0; row < world.grid.length; row++) for (let col = 0; col < world.grid[row].length; col++) {
+        const a = get(row, col); if (!a) continue;
+        for (const [dr, dc] of [[0, 1], [1, 0]]) {
+            const b = get(row + dr, col + dc); if (!b) continue;
+            for (let i = 0; i < N; i++) {
+                const [ra, ca, rb, cb] = dc ? [i, N - 1, i, 0] : [N - 1, i, 0, i];
+                const ha = levelOf(a.heights[ra][ca]), hb = levelOf(b.heights[rb][cb]);
+                assert.ok(Math.abs(ha - hb) <= 1, `${a.id}→${b.id} の境 ${i}: 高さ ${ha} と ${hb}`);
+                // 水の上の高さは 0（川・湖・海は、高さ 0 のマスだけ）
+                if (isWater(a, ra, ca)) assert.equal(ha, 0, `${a.id} の境 ${i}: 水のマスの高さ`);
+                if (isWater(b, rb, cb)) assert.equal(hb, 0, `${b.id} の境 ${i}: 水のマスの高さ`);
+                seams++;
             }
         }
-        for (let i = 1; i < N - 1; i++) {
-            if (has(0, 1)) assert.ok(seen.has(`${i},${N - 1}`) || !ok(i, N - 1), `${id}: 東の端へ行けない ${i}`);
-            if (has(0, -1)) assert.ok(seen.has(`${i},0`) || !ok(i, 0), `${id}: 西の端へ行けない ${i}`);
+    }
+    assert.ok(seams > 5000, `検査した境のマス: ${seams}`);
+});
+
+test('世界を歩ける: 出発点から、段差 1 までの道で、歩ける陸（木・岩・水を除く）の 97% 以上へ行ける（川は、浅瀬で渡れる）。山は、1 マスに 1 段までの傾き', () => {
+    const M = world.mapSize, GWn = world.grid[0].length, GHn = world.grid.length;
+    const W = GWn * M, H = GHn * M;
+    const solidTypes = new Set(['tree', 'tree_wall', 'boulder', 'liquid_tile_deep', 'sea_tile']);
+    const blocked = new Uint8Array(W * H).fill(1);   // 1: 通れない（海・メッシュのない所を含む）
+    const level = new Uint8Array(W * H);
+    let start = null;
+    world.grid.forEach((rw, j) => rw.forEach((id, i) => {
+        if (!id) return;
+        const m = readJson(`public/data/maps/${id}.json`);
+        for (let r = 0; r < M; r++) for (let c = 0; c < M; c++) {
+            const ch = m.layout[r][c];
+            const d = ch === '0' ? null : objects[m.legend[ch]];
+            const solid = d && (d.type === 'tree' || d.type === 'tree_wall' || d.type === 'boulder' || d.type === 'sea_tile' || (d.type === 'liquid_tile' && d.solid));
+            const k = (j * M + r) * W + i * M + c;
+            blocked[k] = solid ? 1 : 0;
+            level[k] = levelOf(m.heights[r][c]);
+        }
+        if (id === world.start) start = [j * M + Math.floor(m.spawn.z), i * M + Math.floor(m.spawn.x)];
+    }));
+    assert.ok(start, 'start');
+    // 隣り合うマスの高さは、1 以下（山が、歩ける傾き）
+    for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
+        const k = y * W + x;
+        if (x < W - 1) assert.ok(Math.abs(level[k] - level[k + 1]) <= 1, `高さの差が大きい ${y},${x}`);
+        if (y < H - 1) assert.ok(Math.abs(level[k] - level[k + W]) <= 1, `高さの差が大きい ${y},${x}`);
+    }
+    const seen = new Uint8Array(W * H);
+    const q = [start[0] * W + start[1]]; seen[q[0]] = 1;
+    let reached = 0;
+    for (let h = 0; h < q.length; h++) {
+        const k = q[h]; reached++;
+        const y = (k / W) | 0, x = k % W;
+        for (const [dy, dx] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const ny = y + dy, nx = x + dx;
+            if (ny < 0 || nx < 0 || ny >= H || nx >= W) continue;
+            const nk = ny * W + nx;
+            if (seen[nk] || blocked[nk] || Math.abs(level[nk] - level[k]) > 1) continue;
+            seen[nk] = 1; q.push(nk);
         }
     }
+    let free = 0; for (let k = 0; k < W * H; k++) if (!blocked[k]) free++;
+    assert.ok(reached / free >= 0.97, `行ける割合: ${(reached / free * 100).toFixed(1)}%（${reached}/${free}）`);
 });
 
 test('世界の並び: 隣のマップは配列の位置で決まり、端を越えると反対側の同じ位置に出る。配列の外側の端は、越えられない', async () => {
@@ -652,4 +697,54 @@ test('高低差のあるマップ: 高いマスに置く物体は、持ち上げ
         }));
     }
     assert.ok(checked > 50, `検査したマス: ${checked}`);
+});
+
+test('海（sea_tile）: マップを読み込むたびに、海のマスを空にする（前のマップの海が、当たり判定に残らない）。1 マスずつ描かない', () => {
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    assert.ok((game.match(/this\.seaCells = \[\]/g) || []).length >= 2, '初期化と、マップの読み込みごとのリセット');
+    assert.ok(game.includes("case 'sea_tile'") && game.includes('buildSea(rows, cols, tileSize)'), '海は、水面 1 枚＋当たり判定');
+    assert.ok(game.includes('floorTypeAt(r, c)'), 'マスごとの地面の種類（floorLayer）');
+    assert.equal(objects.sea.type, 'sea_tile');
+});
+
+test('街・町・村のマップに、岩（boulder）は置かない', () => {
+    let checked = 0;
+    for (const f of fs.readdirSync(path.join(root, 'public/data/maps'))) {
+        if (!/^(village|town|city)/.test(f)) continue;
+        const m = readJson(`public/data/maps/${f}`);
+        for (const ch of new Set(m.layout.join(''))) {
+            const d = m.legend?.[ch] && objects[m.legend[ch]];
+            assert.ok(!d || d.type !== 'boulder', `${m.id}: 岩（${m.legend[ch]}）がある`);
+        }
+        checked++;
+    }
+    assert.ok(checked >= 4, `検査した街・町・村のマップ: ${checked}`);
+});
+
+test('世界: 端の高さが何段でも越えられる（マップの外の高さは、近い端のマスと同じ）。岩は、急な斜面だけに少し。花は、新しい画像', () => {
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    assert.ok(game.includes('Math.min(Math.max(r, 0), hm.length - 1)'), 'マップの外の高さは、近い端のマス');
+    // 端のマスが 3 段以上の境が、実際にある（この修正が効く）
+    let high = 0, rocks = 0, oldFlower = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        for (let i = 0; i < 64; i++) if (levelOf(m.heights[63][i]) >= 3) high++;
+        for (const [ch, name] of Object.entries(m.legend)) {
+            const n = m.layout.join('').split(ch).length - 1;
+            if (objects[name]?.type === 'boulder') rocks += n;
+            if (name === 'wild_flowers') oldFlower += n;
+        }
+        assert.equal(m.sideShade, 1.0, `${id}: 斜面の側面を目立たせない`);
+    }
+    assert.ok(high > 1000, `端が 3 段以上の所: ${high}`);
+    assert.ok(rocks > 0 && rocks < 800, `岩の数: ${rocks}（以前は 4500 ほど）`);
+    assert.equal(oldFlower, 0, '昔の画像の花（wild_flowers）は使わない');
+    assert.ok(game.includes('mapData.sideShade ?? 0.78'), 'sideShade');
+});
+
+test('テスト用: 走る速さ（Shift）は 5 倍。速くても、壁・崖をすり抜けないよう、0.5 以下に分けて動かす', () => {
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    assert.ok(game.includes('export const TEST_RUN_SPEED_SCALE = 5;'), '倍率');
+    assert.ok(game.includes('runSpeed: 13.0 * TEST_RUN_SPEED_SCALE'), '走る速さに掛ける');
+    assert.ok(game.includes('Math.ceil(moveLen / 0.5)'), '移動を分ける');
 });
