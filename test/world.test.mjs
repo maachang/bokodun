@@ -479,3 +479,49 @@ test('塔（field_peak・field_volcano・field_grass）: 段の壁（3 段分）
         assert.ok(cells.every(([r, c]) => r >= gb.r0 && r <= gb.r1 && c >= gb.c0 && c <= gb.c1), `${id}: gimmickBoxes の範囲`);
     }
 });
+
+// 洞窟の高低差（試作）: 地底洞窟・段丘（cave_terrace）。天井を高くして（wallHeight 10）、湖を中心にした段丘
+test('洞窟・段丘（cave_terrace）: 天井に届かない高さ・歩いて湖から縁まで行ける・崖の飛び降りの近道・宝箱と敵', () => {
+    const d = readJson('public/data/maps/cave_terrace.json');
+    const R = d.layout.length, C = d.layout[0].length;
+    assert.equal(d.environment.hasCeiling, true);
+    assert.equal(d.heights.length, R);
+    assert.ok(d.heights.every(row => row.length === C && /^[0-9a-z]+$/.test(row)), '高さの表の大きさ');
+    const lv = (r, c) => parseInt(d.heights[r][c], 36);
+    const maxLv = Math.max(...d.heights.join('').split('').map(ch => parseInt(ch, 36)));
+    // 立ったときの目線（1.8）が、天井（wallHeight）に当たらない
+    assert.ok(maxLv * d.heightStep + 1.8 + 0.5 <= d.wallHeight, `最大の高さ ${maxLv * d.heightStep} は、天井 ${d.wallHeight} に届かない`);
+    assert.ok(maxLv >= 6, '段丘の高低差が十分ある');
+    const solidAt = (r, c) => { const o = objects[d.legend[d.layout[r][c]]]; return !!o && o.solid && o.type !== 'chest'; };
+    const start = [d.spawn.z, d.spawn.x];
+    assert.ok(!solidAt(...start), '出発点は歩ける');
+    const reach = (stepMax) => {
+        const seen = new Set([start.join(',')]); const q = [start];
+        while (q.length) {
+            const [r, c] = q.shift();
+            for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+                const nr = r + dr, nc = c + dc;
+                if (nr < 0 || nc < 0 || nr >= R || nc >= C || seen.has(`${nr},${nc}`) || solidAt(nr, nc)) continue;
+                if (Math.abs(lv(nr, nc) - lv(r, c)) > stepMax) continue;
+                seen.add(`${nr},${nc}`); q.push([nr, nc]);
+            }
+        }
+        return seen;
+    };
+    const walkable = [];
+    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) if (!solidAt(r, c)) walkable.push([r, c]);
+    const stairs = reach(1);
+    assert.equal(stairs.size, walkable.length, '段差 1 の道で、歩けるマスが、すべて 1 つにつながる');
+    // 段丘の崖（段差 2）がある。崖だけでは、全部は行けない（階段を探す）
+    const cliffs = walkable.filter(([r, c]) => [[1, 0], [0, 1]].some(([dr, dc]) => r + dr < R && c + dc < C && !solidAt(r + dr, c + dc) && Math.abs(lv(r + dr, c + dc) - lv(r, c)) === 2));
+    assert.ok(cliffs.length >= 20, '崖（段差 2）がある');
+    assert.ok(reach(0).size < walkable.length / 2, '平らな道だけでは、全部へ行けない');
+    // 宝箱 2、敵がいる
+    const chestCh = Object.keys(d.legend).find(k => d.legend[k] === 'treasure_chest');
+    const chests = [];
+    d.layout.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === chestCh) chests.push([r, c]); }));
+    assert.equal(chests.length, 2, '宝箱');
+    assert.ok(chests.every(([r, c]) => stairs.has(`${r},${c}`)), '宝箱へ歩いて行ける');
+    const enemyCount = d.layout.join('').split('').filter(ch => d.enemies[ch]).length;
+    assert.ok(enemyCount >= 5 && enemyCount <= 10, `敵は少なめ: ${enemyCount}`);
+});
