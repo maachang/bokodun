@@ -572,3 +572,59 @@ test('洞窟・段丘の明かり: 高さによる明るさの幅（heightTint�
     const levels = new Set(torches.map(([r, c]) => levelOf(d.heights[r][c])));
     assert.ok(levels.size >= 3, `松明は、いくつかの段に置く: ${[...levels]}`);
 });
+
+// 地下迷宮（dungeon）の高低差: 階段の通路・飛び降りられる段差・高台の宝箱・見張りのガーゴイル・松明
+test('地下迷宮（dungeon）: 天井に届かない高さ・上り 1 段/下り 2 段で、すべてのマスと出発点を行き来できる・飛び降りの近道・高台の宝箱・ガーゴイル', () => {
+    const d = readJson('public/data/maps/dungeon.json');
+    const R = d.layout.length, C = d.layout[0].length;
+    assert.equal(d.heights.length, R);
+    assert.ok(d.heights.every(row => row.length === C && /^[0-9a-z]+$/.test(row)));
+    const lv = (r, c) => levelOf(d.heights[r][c]);
+    const maxLv = Math.max(...d.heights.join('').split('').map(ch => parseInt(ch, 36)));
+    assert.ok(maxLv >= 3, '高低差がある');
+    assert.ok(maxLv * d.heightStep + 1.8 + 0.3 <= d.wallHeight, '目線が天井に当たらない');
+    assert.ok(d.wallHeight <= 5, '扉は壁の高さのまま（壁 5 以下）');
+    assert.ok(d.heights.every((row, r) => [...row].every((ch, c) => d.layout[r][c] !== '1' || ch === '0')), '壁のマスは、高さ 0');
+    const walk = (r, c) => d.layout[r][c] !== '1';
+    const cells = [];
+    for (let r = 0; r < R; r++) for (let c = 0; c < C; c++) if (walk(r, c)) cells.push([r, c]);
+    // 向きのある到達: 上りは 1 段まで、下りは 2 段まで（2 段は飛び降り）。出発点から全マスへ行け、全マスから出発点へ戻れる
+    const reach = (src, rev) => {
+        const seen = new Set([src.join(',')]); const q = [src];
+        while (q.length) {
+            const [r, c] = q.pop();
+            for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+                const nr = r + dr, nc = c + dc;
+                if (nr < 0 || nc < 0 || nr >= R || nc >= C || seen.has(`${nr},${nc}`) || !walk(nr, nc)) continue;
+                const diff = rev ? lv(r, c) - lv(nr, nc) : lv(nr, nc) - lv(r, c);
+                if (diff > 1 || diff < -2) continue;
+                seen.add(`${nr},${nc}`); q.push([nr, nc]);
+            }
+        }
+        return seen;
+    };
+    const sp = [d.spawn.z, d.spawn.x];
+    assert.equal(reach(sp, false).size, cells.length, '出発点から、すべてのマスへ行ける');
+    assert.equal(reach(sp, true).size, cells.length, 'すべてのマスから、出発点へ戻れる（落ちて詰まない）');
+    // 飛び降り（段差 2 の隣り合う歩けるマス）の近道が、2 か所以上ある
+    let drops = 0;
+    for (const [r, c] of cells) for (const [dr, dc] of [[1, 0], [0, 1]]) {
+        const nr = r + dr, nc = c + dc;
+        if (nr < R && nc < C && walk(nr, nc) && Math.abs(lv(r, c) - lv(nr, nc)) === 2) drops++;
+    }
+    assert.ok(drops >= 2, `飛び降りの段差（2 段）: ${drops}`);
+    // 高台の宝箱（段 3）・ガーゴイル（山の頂上）・松明
+    const chestCh = Object.entries(d.legend).find(([, v]) => v === 'treasure_chest')[0];
+    const chestLv = [];
+    d.layout.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === chestCh) chestLv.push(lv(r, c)); }));
+    assert.ok(chestLv.includes(3), `高台（段 3）の宝箱: ${chestLv}`);
+    const gar = Object.entries(d.enemies).filter(([, v]) => v === 'gargoyle').map(([k]) => k);
+    const garCells = [];
+    d.layout.forEach((row, r) => [...row].forEach((ch, c) => { if (gar.includes(ch)) garCells.push([r, c]); }));
+    assert.equal(garCells.length, 1);
+    assert.ok(lv(...garCells[0]) >= 2, 'ガーゴイルは、高い所');
+    const [gr, gc] = garCells[0];
+    assert.ok(walk(gr, gc - 1) && lv(gr, gc - 1) === lv(gr, gc) - 2, 'ガーゴイルの隣（西の通路）へ、2 段で飛び降りられる（登れない）');
+    const torchCh = Object.entries(d.legend).find(([, v]) => v === 'cave_torch')[0];
+    assert.ok(d.layout.join('').split('').filter(ch => ch === torchCh).length >= 4, '松明');
+});
