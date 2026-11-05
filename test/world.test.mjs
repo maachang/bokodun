@@ -916,3 +916,28 @@ test('寒冷地の木: 新しい針葉樹 2 枚（ID 262・263）が主役。森
     }
     assert.ok(cold > 3000 && single > 5000, `寒冷地の木: 森 ${cold}・単独 ${single}`);
 });
+
+test('南国の作り込み: ジャングルの木（2 倍）・ヤシの林・入り江と沖の小島・砂州・池・青緑の浅瀬・明るい空気・ゆるい丘。木の間は通れる', () => {
+    let jungle = 0, palmForest = 0, glow = 0, mangrove = 0, marshFlower = 0, tropicalMeshes = 0, maxLevel = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const lay = m.layout.join('');
+        const count = (name) => Object.entries(m.legend).filter(([, v]) => v === name).reduce((s, [ch]) => s + lay.split(ch).length - 1, 0);
+        const isTropical = m.name.startsWith('南国');
+        jungle += count('tropical_forest_a') + count('tropical_forest_b'); palmForest += count('tropical_palm_forest');
+        glow += count('water_shallow_glow'); mangrove += count('swamp_tree_a'); marshFlower += count('marsh_flower');
+        assert.ok(!(count('water_shallow_glow') > 0 && !isTropical && !m.name.startsWith('海岸') && !m.name.startsWith('草原') && !m.name.startsWith('岩山')), `${id}: 青緑の浅瀬は、南国の海岸のまわりだけ`);
+        if (isTropical) {
+            tropicalMeshes++;
+            assert.ok(m.environment.visibility === 1 && m.environment.fogFar >= 100, `${id}: 南国は明るい（霧 ${m.environment.fogFar}）`);
+            for (const row of m.heights) for (const ch of row) maxLevel = Math.max(maxLevel, levelOf(ch));
+        }
+    }
+    assert.ok(jungle > 500 && palmForest > 300, `ジャングルの木 ${jungle}・ヤシの林 ${palmForest}`);
+    assert.ok(glow > 1500, `青緑の浅瀬（入り江・砂州・池・海岸）: ${glow}`);
+    assert.ok(mangrove > 50 && marshFlower > 50, `マングローブ ${mangrove}・毒々しい花 ${marshFlower}`);
+    assert.ok(tropicalMeshes >= 4, `南国のマップ: ${tropicalMeshes}`);
+    assert.ok(maxLevel >= 8, `ゆるい丘（最大 ${maxLevel} 段）`);
+    for (const n of ['tropical_forest_a', 'tropical_forest_b', 'tropical_palm_forest']) assert.ok(4 - 2 * objects[n].colliderHalf >= 1.6, `${n}: 木の間は通れる`);
+    assert.ok(Math.abs(objects.tropical_forest_a.height - objects.tropical_tree.height * 2) < 1e-6 && Math.abs(objects.tropical_palm_forest.height - objects.palm.height * 2) < 1e-6, '2 倍');
+});

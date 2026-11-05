@@ -26,15 +26,17 @@ LEGEND = {
     'm': 'meadow_grass', 'e': 'fern', 'h': 'highland_grass', 'v': 'weed_flower', 'k': 'cattail_cluster', 'l': 'lavender_flower', 'i': 'arid_grass', 'o': 'highland_weed', 'w': 'roadside_flowers', 'p': 'path_flower', 'b': 'bush_flower',
     'T': 'forest_tree_a', 'V': 'forest_tree_b', 'W': 'great_tree_a', 'K': 'great_tree_b',      # 森: 217・218 の木（2 倍）・大森林: 3 倍。林の壁（F・C・N）は、使わない
     'J': 'conifer_forest_a', 'L': 'conifer_forest_b', 'j': 'great_conifer_a', 'n': 'great_conifer_b', 'x': 'conifer_tree_a', 'y': 'conifer_tree_b',   # 寒冷地の木（ID 262・263）: 森 2 倍・大森林 3 倍・単独 1 倍
+    'a': 'tropical_forest_a', 'd': 'tropical_forest_b', 'f': 'tropical_palm_forest', 'r': 'swamp_tree_a', 's': 'marsh_flower', 'g': 'water_shallow_glow',   # 南国: ジャングルの木・ヤシの林（2 倍）・マングローブ・毒々しい花・青緑に光る浅瀬
     'c': 'cliff_rock_wall', 'Y': 'tropical_tree', 'E': 'mine_entrance', 't': 'mine_cart',
     'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge',
 }
-SOLID_CH = set('FCNPDGAXUMRSBHcYEtTVWKJLjnxy')          # 通れない物体（端のマスには置かない）
+SOLID_CH = set('FCNPDGAXUMRSBHcYEtTVWKJLjnxyadfr')          # 通れない物体（端のマスには置かない）
 # 地面の種類（floorLayer の文字 → environment.floorType と同じ名前）
 FLOOR = {'g': 'grass', 's': 'snow', 'f': 'forest', 'd': 'desert', 'r': 'rock', 'w': 'whiteSand', 'u': 'tundra', 'i': 'ice', 'm': 'redEarth', 'a': 'ash'}
 BIOME_FLOOR = {SNOW: 's', CONIFER: 'u', FOREST: 'f', GRASS: 'g', DESERT: 'd', ROCK: 'r', TROPICAL: 'g', SEA: 'g'}
 BIOME_NAME = {SNOW: '北の雪山', CONIFER: '針葉樹の裾野', FOREST: '大森林', GRASS: '草原', DESERT: '砂地', ROCK: '岩山', TROPICAL: '南国', SEA: '海岸'}
 # 環境（空・霧・光）: 既存の外マップから、地形ごとに借りる
+TROPICAL_ENV = {'ambientLight': 0xffffff, 'directionalLight': 0xfff2c8, 'fogColor': 0xb8e8e0, 'fogNear': 30, 'fogFar': 105, 'visibility': 1.0, 'skyColor': 0x4fd0e8}   # 南国: 青緑がかった、明るい空と霧
 DARK_FOREST_ENV = {'ambientLight': 0x2c4234, 'directionalLight': 0x586e58, 'fogColor': 0x07100b, 'fogNear': 5, 'fogFar': 28, 'visibility': 0.4, 'skyColor': 0x07100b}
 ENV_FROM = {SNOW: 'field_snow', CONIFER: 'field_tundra', FOREST: 'field_swamp', GRASS: 'field_grass', DESERT: 'field_desert', ROCK: 'field_mountain', TROPICAL: 'field_tropical', SEA: 'field_coast'}
 
@@ -51,7 +53,7 @@ def build_tiles(t):
     obj = np.full((H, W), ord('0'), np.uint8)
     def put(mask, ch): obj[mask] = ord(ch)
     d_sea, d_water = t['dist_sea'], t['dist_water']
-    free = land & ~(t['deep'] | t['shallow'] | t['bridge'])
+    free = land & ~(t['deep'] | t['shallow'] | t['bridge'] | t['lagoon'])
     ys_, xs_ = np.mgrid[0:H, 0:W].astype(np.float32)
     sx, sy = W / 768.0, H / 640.0
     # 傾き（隣との高さの差。急な斜面ほど大きい）
@@ -101,13 +103,22 @@ def build_tiles(t):
     put(de & (u < 0.03), 'i')
     put(de & (u2 < 0.01), 'A'); put(de & (u2 > 0.992), 'X'); put(de & (u3 < 0.008), 'U')
 
-    # --- 南国 ---
+    # --- 南国（入り江・小島・砂州・池・ゆるい丘とジャングルの谷）---
     tr = free & (biome == TROPICAL)
     sandy = T.fbm(81, (22, 8, 3))
     fl(tr & (sandy > 0.62), 'w')
-    put(tr & (u3 < 0.14), 'e'); put(tr & (u < 0.05), 'b'); put(tr & (u2 < 0.02), 'w'); put(tr & (u2 >= 0.02) & (u2 < 0.03), 'p')
-    put(tr & (u2 > 0.965), 'Y'); put(tr & (u2 > 0.92) & (u2 <= 0.965), 'M')
-    forest_tree(tr & (patch2 > 0.6) & (u3 > 0.3), u)                            # ジャングルの茂み（2 倍の木）
+    clump = patch2                                                               # 花・茂みの群生（かたまり）
+    put(tr & (u3 < 0.14 + 0.14 * (elev < 4)), 'e')                               # シダ（谷の底ほど、濃い）
+    put(tr & (clump > 0.58) & (u < 0.30), 'b'); put(tr & (clump > 0.58) & (u >= 0.30) & (u < 0.42), 'w')
+    put(tr & (clump < 0.38) & (u < 0.12), 'p'); put(tr & (clump > 0.45) & (clump <= 0.58) & (u < 0.05), 's')
+    put(tr & (u2 > 0.965), 'Y'); put(tr & (u2 > 0.93) & (u2 <= 0.965), 'M')     # 単独の南国の木・ヤシ（1 倍）
+    # ジャングルの森（2 倍・格子・1 本ずつ）: 南国の木・樹海の木・ヤシ。海に近い所は、ヤシの林
+    jungle = tr & (patch2 > 0.52) & (d_sea > 8)
+    put(jungle & lat & (u2 < 0.6) & (u3 < 0.38), 'a'); put(jungle & lat & (u2 < 0.6) & (u3 >= 0.38) & (u3 < 0.7), 'd'); put(jungle & lat & (u2 < 0.6) & (u3 >= 0.7), 'f')
+    palm_grove = tr & (d_sea <= 14) & (d_sea > 5) & (patch > 0.5)
+    put(palm_grove & lat & (u2 < 0.5), 'f')
+    # マングローブ: 川・池のそば（湿地の木 1 倍）
+    put(tr & (d_water <= 3) & (u < 0.35), 'r')
 
     # --- 東の山々と炭鉱 ---
     ro = free & (biome == ROCK)
@@ -151,6 +162,8 @@ def build_tiles(t):
     sea = ~land
     trop_near = T.box_mean((biome == TROPICAL).astype(np.float32), 8) > 0.02
     put(sea, 'O'); put(sea & (d_land <= np.where(trop_near, 3, 1)), 'q')
+    put(sea & trop_near & (d_land <= 3), 'g')                                   # 南国の浅瀬: 青緑に光る
+    put(t['lagoon'], 'g')                                                       # 入り江・砂州・池のふち（歩ける浅瀬）
     # 炭鉱の入口とトロッコ: 掘削跡のふち（北・西・東側）に、地形ごとに少数
     for k, (mx, my) in enumerate(MINES):
         cx, cz = mx * sx, my * sy
@@ -200,6 +213,8 @@ def main():
             base_ch = max(floor_counts, key=floor_counts.get)
             env = dict(envs[SEA if sea_frac > 0.35 else dom])
             env['floorType'] = FLOOR[base_ch]
+            if dom == TROPICAL:
+                env.update(TROPICAL_ENV)
             if not sea_frac > 0.35 and dom == FOREST:
                 env.update(DARK_FOREST_ENV)   # 大森林: 真っ暗（数マス先は、巨木のシルエットだけ）
             layout = [''.join(chr(v) for v in row) for row in o]
@@ -214,7 +229,7 @@ def main():
             best = None
             for r in range(MESH):
                 for c in range(MESH):
-                    if not L[r, c] or chr(o[r, c]) in solid or chr(o[r, c]) in 'q': continue
+                    if not L[r, c] or chr(o[r, c]) in solid or chr(o[r, c]) in 'qgZ': continue
                     d = (r - cy) ** 2 + (c - cx) ** 2
                     if best is None or d < best[0]: best = (d, r, c)
             spawn = {'x': best[2], 'z': best[1], 'angle': 0} if best else {'x': 32, 'z': 32, 'angle': 0}

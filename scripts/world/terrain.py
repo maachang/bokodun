@@ -335,6 +335,68 @@ def _reshape_coast(land, lake, biome, max_water=0.5):
     return land, lake, b.astype(np.uint8)
 
 
+def _tropical_coast(land, biome):
+    """南国の海岸を作り込む。入り江（ラグーン）2 つ（陸を削って、浅い青緑の水に）・沖の小島 3 つ（陸を足す）・小島へ歩いて渡れる砂州（浅瀬）・内陸の池。
+    戻り値: land, biome, lagoon（入り江・砂州・池のふち＝歩ける浅瀬）, pond（池の深い所）"""
+    rng = np.random.default_rng(88)
+    trop = land & (biome == TROPICAL)
+    lagoon = np.zeros((H, W), bool); pond = np.zeros((H, W), bool)
+    if trop.sum() < 2000: return land, biome, lagoon, pond
+    dsea = _distance(~land)
+    ys, xs = np.nonzero(trop & (dsea <= 2))
+    cy_c, cx_c = np.nonzero(trop)[0].mean(), np.nonzero(trop)[1].mean()
+    south = ys > np.median(ys)                                   # 南側の海岸
+    ys, xs = ys[south], xs[south]
+    order = np.argsort(xs); ys, xs = ys[order], xs[order]
+    def anchor(q):
+        i = int(len(xs) * q); return int(xs[i]), int(ys[i])
+    Y, X = np.mgrid[0:H, 0:W].astype(np.float32)
+    noise_e = (fbm(97, (12, 5, 2)) - 0.5) * 0.35
+    def ellipse(cx, cy, rx, ry): return ((X - cx) / rx) ** 2 + ((Y - cy) / ry) ** 2 + noise_e < 1.0
+    # 入り江: 海岸から、内陸（南国の中心）へ向かって、くぼませる
+    for q in (0.28, 0.68):
+        ax, ay = anchor(q)
+        dx, dy = cx_c - ax, cy_c - ay; L = np.hypot(dx, dy) or 1
+        cx, cy = ax + dx / L * 12, ay + dy / L * 12
+        e = ellipse(cx, cy, 16, 11)
+        lagoon |= e & (land | ~land)
+    # 沖の小島と砂州（浅瀬）: 海岸から外へ
+    active_mesh = _mesh_frac(land) > 0
+    islets = []
+    for q in (0.12, 0.48, 0.86):
+        ax, ay = anchor(q)
+        dx, dy = ax - cx_c, ay - cy_c; L = np.hypot(dx, dy) or 1
+        # 小島は、陸のあるメッシュの中に置く（海だけのメッシュに、小さな島だけのマップを、作らない）。届かなければ、海岸に近づける
+        for dist in range(26, 7, -2):
+            cx, cy = ax + dx / L * dist, ay + dy / L * dist
+            pts = [(int(cx + a), int(cy + b)) for a in (-10, 0, 10) for b in (-8, 0, 8)]
+            if all(0 <= x_ < W and 0 <= y_ < H and active_mesh[y_ // MESH, x_ // MESH] for x_, y_ in pts): break
+        else:
+            continue
+        islets.append((cx, cy, ax, ay))
+    land = land & ~lagoon
+    for cx, cy, ax, ay in islets:
+        isle = ellipse(cx, cy, 8, 6)
+        land = land | isle
+        biome = np.where(isle & ~land | isle, TROPICAL, biome)
+        # 砂州: 海岸から小島へ、幅 3 マスの浅瀬
+        bar = Image.new('L', (W, H), 0); ImageDraw.Draw(bar).line([(ax, ay), (cx, cy)], fill=255, width=3)
+        bar = (np.asarray(bar) > 0) & ~land
+        lagoon |= bar
+    # 入り江は、浅瀬（歩ける）。入り江のまわりの陸も、南国
+    biome = np.where(land & (biome == SEA), TROPICAL, biome)
+    # 内陸の池: 南国の内陸（海から 22 マス以上）に、4 つ
+    inland = np.argwhere(land & (biome == TROPICAL) & (_distance(~land) >= 22))
+    if len(inland):
+        picks = inland[rng.choice(len(inland), size=min(4, len(inland)), replace=False)]
+        for py, px in picks:
+            rx, ry = rng.uniform(4.5, 7), rng.uniform(3.5, 5.5)
+            e = ellipse(px, py, rx, ry)
+            ring = ellipse(px, py, rx + 1.8, ry + 1.8) & ~e
+            pond |= e & land; lagoon |= ring & land
+    return land, biome, lagoon, pond
+
+
 def build():
     land_i, biome_i, lake_i = read_image()
     sx, sy = W / land_i.shape[1], H / land_i.shape[0]
@@ -348,6 +410,7 @@ def build():
     lake = _scale(lake_i.astype(np.uint8), warp=(wx, wy)).astype(bool) & land
     lake = _shrink_lake(lake)
     land, lake, biome = _reshape_coast(land, lake, biome)
+    land, biome, lagoon, pond = _tropical_coast(land, biome)   # 南国の入り江・小島・砂州・池
 
     # 川（世界のマス）: 線に、ゆらぎをつけて描く。浅瀬（歩いて渡れる）を、間隔をあけて作る
     river = np.zeros((H, W), np.uint8)   # 0 なし・1 深い・2 浅瀬
@@ -406,12 +469,14 @@ def build():
     bridge = (river == 2) & ~lake
     water_shallow = lake_edge
     water_deep &= ~water_shallow & ~bridge
-    any_water = water_deep | water_shallow | bridge
+    water_deep = water_deep | pond
+    any_water = water_deep | water_shallow | bridge | lagoon
 
     # 高さ
     ys, xs = np.mgrid[0:H, 0:W].astype(np.float32)
     ix, iy = xs / sx, ys / sy
     def blur(m, r): return gauss(m, r)
+    w_tr = blur(biome == TROPICAL, 18)
     w_snow = blur(biome == SNOW, 22); w_con = blur(biome == CONIFER, 22); w_rock = blur(biome == ROCK, 22); w_for = blur(biome == FOREST, 16)
     # 雪山（連峰）: 山（ガウス）に、尾根の線（ridged noise）と谷を重ねて、尖った峰と尾根・谷・峠を作る
     e_snow = np.clip((250 - iy) / 200, 0, 1) * 7
@@ -436,12 +501,12 @@ def build():
     e_rock = np.maximum(e_rock, 1)
     e_con = 3 + 6 * fbm(41, (60, 20, 8))
     plains = 4.0 * fbm(43, (96, 32, 10))
-    plains = np.where(biome == TROPICAL, plains * 0.35, plains)   # 南国は、平ら
     # 西の大森林: 起伏を激しく（短い周期の丘と、尾根・谷）。木が密なので、地形でも通りにくくなる
     ridgeF = (1 - np.abs(2 * fbm(46, (34, 12, 4)) - 1)) ** 2
     e_for = 3 + 13 * fbm(45, (28, 10, 4)) + 9 * ridgeF
-    wsum = w_snow + w_con + w_rock + w_for
-    mount = (w_snow * e_snow + w_con * e_con + w_rock * e_rock + w_for * e_for)
+    e_tr = 4 + 9 * fbm(47, (34, 12, 5)) + 3 * (1 - np.abs(2 * fbm(48, (40, 14, 5)) - 1)) ** 2   # 南国: ゆるい丘とジャングルの谷
+    wsum = w_snow + w_con + w_rock + w_for + w_tr
+    mount = (w_snow * e_snow + w_con * e_con + w_rock * e_rock + w_for * e_for + w_tr * e_tr)
     elev = mount + plains * np.clip(1 - wsum, 0, 1)
     elev = np.where(land, elev, 0)
     elev = np.clip(elev, 0, MAX_LEVEL).round().astype(np.int32)
@@ -452,7 +517,7 @@ def build():
     elev = _lipschitz(elev)
     elev[any_water | ~land] = 0
     elev = _lipschitz(elev)
-    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, bridge=bridge, lake=lake, river=river, elev=elev, dist_sea=_distance(~land), dist_water=_distance(any_water))
+    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, bridge=bridge, lake=lake, river=river, elev=elev, dist_sea=_distance(~land), dist_water=_distance(any_water))
 
 
 if __name__ == '__main__':

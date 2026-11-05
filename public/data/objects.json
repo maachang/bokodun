@@ -381,6 +381,33 @@
     "solid": true,
     "description": "寒冷地の大森林の巨木 B（ID 263 の針葉樹を 3 倍に拡大）。まだ、どのマップにも置いていない"
   },
+  "tropical_forest_a": {
+    "type": "tree",
+    "texture": "fTropicalTree",
+    "aspect": 0.809,
+    "height": 11.6,
+    "colliderHalf": 1.0,
+    "solid": true,
+    "description": "南国のジャングルの木 A（南国の木 tropical_tree を 2 倍に拡大。1 本ずつ並べる）"
+  },
+  "tropical_forest_b": {
+    "type": "tree",
+    "texture": "fJungleTree",
+    "aspect": 0.887,
+    "height": 12.0,
+    "colliderHalf": 1.0,
+    "solid": true,
+    "description": "南国のジャングルの木 B（樹海の木 dark_tree を 2 倍に拡大）"
+  },
+  "tropical_palm_forest": {
+    "type": "tree",
+    "texture": "fPalm",
+    "aspect": 0.523,
+    "height": 15.0,
+    "colliderHalf": 0.8,
+    "solid": true,
+    "description": "南国のヤシの林の木（ヤシ palm を 2 倍に拡大。海辺と、ジャングルに生える）"
+  },
   "plank_bridge": {
     "type": "bridge_deck",
     "texture": "woodBridge",
