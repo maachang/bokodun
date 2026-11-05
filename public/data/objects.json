@@ -15684,7 +15684,7 @@
     "count": 3,
     "scale": [1.3, 1.9],
     "spread": 3.0,
-    "description": "池のガマの穂（群生）（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+    "description": "池のガマの穂（群生）（見た目だけで、当たり判定なし。sdServer 画像。湿地帯（field_swamp・swamp）を中心に、水辺（湖畔・川辺）に置く）"
   },
   "cattail_single": {
     "type": "plant",
@@ -15692,7 +15692,7 @@
     "count": 3,
     "scale": [0.61, 2.0],
     "spread": 3.0,
-    "description": "池のガマの穂（1 株）（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
+    "description": "池のガマの穂（1 株）（見た目だけで、当たり判定なし。sdServer 画像。湿地帯（field_swamp・swamp）を中心に、水辺（湖畔・川辺）に置く）"
   },
   "path_flower": {
     "type": "plant",
