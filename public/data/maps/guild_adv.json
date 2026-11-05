@@ -24,6 +24,7 @@
   },
   "legend": {
     "W": "wooden_wall",
+    "M": "island_map",
     "F": "wood_floor",
     "E": "building_exit",
     "u": "rug",
@@ -40,7 +41,7 @@
   },
   "enemies": {},
   "layout": [
-    "WWaWWWaWWWW",
+    "WWaWWMaWWWW",
     "WQFFFFFFFQW",
     "WFFFFFFFFFW",
     "LCCCCCCCCCL",

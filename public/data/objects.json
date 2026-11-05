@@ -15903,5 +15903,17 @@
     ],
     "radius": 2.2,
     "description": "山の巨岩（山岳地帯のレンガ調の岩の代わりに大きく置く。sdServer 画像）"
+  },
+  "island_map": {
+    "type": "wall_image",
+    "imageFile": "island_map.png",
+    "sdId": 261,
+    "aspect": 1.2,
+    "height": 2.2,
+    "bottom": 1.0,
+    "wallTexture": "woodWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "ボコスカ島の地図（冒険者ギルドの壁に飾る、壁の面に付ける画像。sdServer 画像 261）"
   }
 }
