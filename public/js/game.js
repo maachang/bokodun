@@ -103,6 +103,7 @@ export class GameEngine {
         this.cameraShake = { time: 0, duration: 0.15, amp: 0 };
         this.weaponClasses = {}; // 武器クラス定義（weaponClasses.json: クラス名 → 攻撃の形・範囲・エフェクト）
         this.colliders = [];
+        this.treeSprites = [];   // 木のスプライト（距離で、描画の方式を切り替える）
         this.monsters = [];
         this.projectiles = [];
         this.portals = [];   // ポータル（次のマップへの入口）。マップに複数置ける
@@ -1073,7 +1074,7 @@ export class GameEngine {
                         this.treeWallMats = this.treeWallMats || new Map();
                         let panelMat = this.treeWallMats.get(wallTex);
                         if (!panelMat) {
-                            panelMat = new THREE.MeshLambertMaterial({ map: wallTex, transparent: true, alphaTest: 0.35, side: THREE.DoubleSide });
+                            panelMat = new THREE.MeshLambertMaterial({ map: wallTex, alphaTest: 0.35, side: THREE.DoubleSide });   // 切り抜きだけ（transparent を外す）: 半透明の距離順に頼らず、奥の木が隠れない
                             this.treeWallMats.set(wallTex, panelMat);
                         }
                         const panelH = (objDef.height ?? wallH * 1.4) * (0.9 + ((r * 7 + c * 13) % 5) * 0.05);
@@ -1258,7 +1259,9 @@ export class GameEngine {
                     }
 
                     case 'tree': {
-                        const treeMat = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.tree });
+                        const treeMat = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.tree, transparent: false, alphaTest: 0.4 });   // 遠い木: 切り抜き。透明な画素が奥行きを書いて、奥の壁の木を四角く隠すのを防ぐ
+                        const treeMatNear = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.tree });   // 近い木: 従来の（なめらかな）描画
+                        this.treeSprites = this.treeSprites || [];
                         const tree = new THREE.Sprite(treeMat);
                         tree.center.set(0.5, 0.0);
                         const baseH = objDef.height ?? 4.8;   // 木の高さ（省略時は標準の木）。ばらつきは、高さに比例
@@ -1267,6 +1270,7 @@ export class GameEngine {
                         // Sink tree base slightly into grass (-0.08) so trunk roots naturally penetrate the terrain
                         tree.position.set(wx, -0.08, wz);
                         this.scene.add(tree);
+                        this.treeSprites.push({ sprite: tree, far: treeMat, near: treeMatNear });
 
                         // Ground contact shadow under the tree trunk
                         const shadowCanvas = document.createElement('canvas');
@@ -3677,6 +3681,12 @@ export class GameEngine {
         const targetFloorY = this.getFloorHeight(this.player.x, this.player.z);
         this.player.floorY = (this.player.floorY ?? targetFloorY) + (targetFloorY - (this.player.floorY ?? targetFloorY)) * Math.min(1, dt * 10);
         const eyeHeight = 1.8 + this.player.floorY - playerFloorDepth - (this.player.isFalling ? this.player.fallDepth : 0);
+        // 木の描画: 近い木は従来どおり、遠い木は切り抜き（遠景で、壁の木と重なると四角く欠けるため）。境目で、ちらつかないよう、ヒステリシスをつける（距離は暫定）
+        for (const t of this.treeSprites || []) {
+            const dx = t.sprite.position.x - this.player.x, dz = t.sprite.position.z - this.player.z, d2 = dx * dx + dz * dz;
+            const wantNear = t.isNear ? d2 < 42 * 42 : d2 < 40 * 40;
+            if (wantNear !== t.isNear) { t.isNear = wantNear; t.sprite.material = wantNear ? t.near : t.far; }
+        }
         this.camera.position.set(this.player.x, eyeHeight, this.player.z);
         this.camera.rotation.set(0, 0, 0);
         this.camera.rotateY(this.player.angle);
