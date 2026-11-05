@@ -810,6 +810,7 @@ export class GameEngine {
 
     // 高い所から落ちたときのダメージ（levels: 落ちた段の数。1 段の段差は、落下にしない）
     applyHeightFall(levels) {
+        if (this.nav?.busy) return;   // マップ間の移動中は、ダメージなし
         const dmg = Math.round((levels - 1) * this.fallDamagePerLevel);
         if (dmg <= 0) return;
         this.player.hp = Math.max(0, this.player.hp - dmg);
@@ -4331,6 +4332,9 @@ export class GameEngine {
     }
 
     movePlayer(dx, dz) {
+        // マップの読み込み中は、動かない。読み込み中も、ゲームの時間は進み、新しい地形の高さが先に入るため、古い位置のまま動くと、
+        //   段差を落下と判定して、落下ダメージを受けていた（マップ間の移動）
+        if (this.nav?.busy) return;
         this.depenetrateFromWalls();
         const prevX = this.player.x;
         const prevZ = this.player.z;

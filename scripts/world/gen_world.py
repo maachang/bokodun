@@ -57,7 +57,7 @@ def build_tiles(t):
     clump = patch2 > 0.55
     rock_ok = (steep > 0.9) & (elev >= 6) & clump
     sn = free & (biome == SNOW); high = elev >= 22
-    put(sn & rock_ok & (u < 0.05), 'R'); put(sn & rock_ok & (u < 0.05) & (u2 < 0.4), 'S'); put(sn & rock_ok & (u < 0.05) & (u2 >= 0.4) & (u2 < 0.6), 'B')
+    # 岩は、世界に置かない（ユーザー指示）
     put(sn & ~high & (u < (0.04 + 0.06 * (elev < 10))), 'P')
     put(sn & ~high & (patch > 0.66) & (u2 < 0.5) & (elev < 14), 'N')
     co = free & (biome == CONIFER)
@@ -72,8 +72,6 @@ def build_tiles(t):
     put(de & (u < 0.03), 'i'); put(de & (u2 < 0.01), 'A'); put(de & (u2 > 0.992), 'X'); put(de & (u3 < 0.008), 'U')
     ro = free & (biome == ROCK)
     put(ro & (u2 < 0.05), 'h')
-    ro_ok = ro & (steep > 0.7) & clump
-    put(ro_ok & (u < 0.06), 'R'); put(ro_ok & (u < 0.06) & (u3 < 0.35), 'S'); put(ro_ok & (u < 0.06) & (u3 >= 0.35) & (u3 < 0.6), 'B'); put(ro_ok & (u < 0.06) & (u3 >= 0.6) & (u3 < 0.75), 'H')
     # 砂浜（海から 3 マス以内）: 南の浜には、ヤシ
     beach = free & (d_sea <= 3)
     obj[beach] = ord('0')

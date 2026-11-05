@@ -721,7 +721,7 @@ test('街・町・村のマップに、岩（boulder）は置かない', () => {
     assert.ok(checked >= 4, `検査した街・町・村のマップ: ${checked}`);
 });
 
-test('世界: 端の高さが何段でも越えられる（マップの外の高さは、近い端のマスと同じ）。岩は、急な斜面だけに少し。花は、新しい画像', () => {
+test('世界: 端の高さが何段でも越えられる（マップの外の高さは、近い端のマスと同じ）。岩は置かない。花は、新しい画像', () => {
     const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
     assert.ok(game.includes('Math.min(Math.max(r, 0), hm.length - 1)'), 'マップの外の高さは、近い端のマス');
     // 端のマスが 3 段以上の境が、実際にある（この修正が効く）
@@ -737,7 +737,7 @@ test('世界: 端の高さが何段でも越えられる（マップの外の高
         assert.equal(m.sideShade, 1.0, `${id}: 斜面の側面を目立たせない`);
     }
     assert.ok(high > 1000, `端が 3 段以上の所: ${high}`);
-    assert.ok(rocks > 0 && rocks < 800, `岩の数: ${rocks}（以前は 4500 ほど）`);
+    assert.equal(rocks, 0, `世界に岩は置かない（${rocks} 個ある）`);
     assert.equal(oldFlower, 0, '昔の画像の花（wild_flowers）は使わない');
     assert.ok(game.includes('mapData.sideShade ?? 0.78'), 'sideShade');
 });
@@ -747,4 +747,11 @@ test('テスト用: 走る速さ（Shift）は 5 倍。速くても、壁・崖�
     assert.ok(game.includes('export const TEST_RUN_SPEED_SCALE = 5;'), '倍率');
     assert.ok(game.includes('runSpeed: 13.0 * TEST_RUN_SPEED_SCALE'), '走る速さに掛ける');
     assert.ok(game.includes('Math.ceil(moveLen / 0.5)'), '移動を分ける');
+});
+
+test('マップ間の移動: 読み込み中は動かず、落下ダメージも受けない（古い位置のまま、新しい地形の段差を落下と判定していた）', () => {
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const body = (name) => game.slice(game.indexOf(`    ${name}(`), game.indexOf(`    ${name}(`) + 900);
+    assert.ok(body('movePlayer').includes('if (this.nav?.busy) return;'), '読み込み中は movePlayer が動かない');
+    assert.ok(body('applyHeightFall').includes('if (this.nav?.busy) return;'), '読み込み中は落下ダメージなし');
 });
