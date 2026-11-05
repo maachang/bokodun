@@ -553,3 +553,22 @@ test('山道の吊橋（rope_bridge）: 同じ高さの床・両端は同じ高�
     assert.ok(gb && cells.every(([r, c]) => r >= gb.r0 && r <= gb.r1 && c >= gb.c0 && c <= gb.c1), 'gimmickBoxes の範囲');
     // 谷へ降りる小道（北側）と南の口があり、全体は、つながっている（上の「すべて 1 つにつながる」のテストで確認）
 });
+
+test('洞窟・段丘の明かり: 高さによる明るさの幅（heightTint）・光る水・松明（通り抜けられ、歩く道を塞がない）', () => {
+    const d = readJson('public/data/maps/cave_terrace.json');
+    assert.ok(Array.isArray(d.heightTint) && d.heightTint[0] < 0.7 && d.heightTint[1] >= 0.9, '段の高さで明るさを変える（暗い底〜明るい縁）');
+    assert.equal(d.legend.P, 'water_glow');
+    assert.equal(d.legend['~'], 'water_shallow_glow');
+    assert.ok(objects.water_glow.glow && objects.water_shallow_glow.glow, '光る水');
+    assert.equal(objects.water_glow.solid, true, '深い水は進入不可');
+    assert.equal(objects.water_shallow_glow.solid, false, '浅瀬は歩ける');
+    const torchCh = Object.entries(d.legend).find(([, v]) => v === 'cave_torch')[0];
+    assert.equal(objects.cave_torch.type, 'torch_stand');
+    assert.equal(objects.cave_torch.solid, false);
+    assert.ok(objects.cave_torch.lift, '床の高さまで持ち上げる');
+    const torches = [];
+    d.layout.forEach((row, r) => [...row].forEach((ch, c) => { if (ch === torchCh) torches.push([r, c]); }));
+    assert.ok(torches.length >= 6 && torches.length <= 14, `松明の数: ${torches.length}`);
+    const levels = new Set(torches.map(([r, c]) => levelOf(d.heights[r][c])));
+    assert.ok(levels.size >= 3, `松明は、いくつかの段に置く: ${[...levels]}`);
+});

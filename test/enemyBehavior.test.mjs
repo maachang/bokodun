@@ -497,9 +497,9 @@ test('ガーゴイル: 固定砲台（動かない・火の弾を連射・ノッ
     const proj = [];
     const P = (x, z) => ({ x, z, floorY: 0, radius: 0.6 });
     const scene = { add() {} };
-    for (let t = 0; t < 5; t += 0.05) g.update(0.05, P(12, 0), [], proj, null, scene, 1.0);
+    for (let t = 0; t < 6; t += 0.05) g.update(0.05, P(12, 0), [], proj, null, scene, 1.0);   // 最初の待ち時間は、0〜2 秒の乱数なので、6 秒回す
     assert.ok(g.x === 0 && g.z === 0, '動かない');
-    assert.ok(proj.length >= 5, `5 秒で連射する（${proj.length} 発）`);
+    assert.ok(proj.length >= 5, `6 秒で連射する（${proj.length} 発）`);
     assert.ok(proj.every(q => q.type === 'fire_bolt' && !q.isPlayer && q.damage === p.shoot.damage));
     // ノックバックしない
     g.takeDamage(5, { x: 1, z: 0 });

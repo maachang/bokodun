@@ -208,6 +208,34 @@
     "solid": false,
     "description": "水路や谷に架かる木製の橋・板張り床"
   },
+  "water_glow": {
+    "type": "liquid_tile",
+    "texture": "water",
+    "solid": true,
+    "blocksProjectiles": false,
+    "depth": 0.8,
+    "glow": "#2a8fb0",
+    "description": "光る地底湖の深い水（水面が青緑に自ら光る。進入不可）"
+  },
+  "water_shallow_glow": {
+    "type": "liquid_tile",
+    "texture": "shallowWater",
+    "solid": false,
+    "depth": 0.35,
+    "slowdown": 0.65,
+    "glow": "#2fb89a",
+    "description": "光る地底湖の浅瀬（水面が青緑に自ら光る。歩行可能）"
+  },
+  "cave_torch": {
+    "type": "torch_stand",
+    "solid": false,
+    "lift": true,
+    "lightColor": "#ffa040",
+    "lightRadius": 3.2,
+    "poolOpacity": 0.9,
+    "haloOpacity": 0.8,
+    "description": "松明（木の柱と炎。床に光だまり、炎に光の輪。周囲を照らす光源は置かない見た目だけの明かり。通り抜けられる）"
+  },
   "rope_bridge": {
     "type": "bridge_deck",
     "texture": "woodBridge",

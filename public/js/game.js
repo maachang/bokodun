@@ -109,6 +109,7 @@ export class GameEngine {
         this.portals = [];   // ポータル（次のマップへの入口）。マップに複数置ける
         this.waterMeshes = [];
         this.heatHazePlanes = [];
+        this.torchGlows = [];   // 松明の光（光だまり・光の輪）。ゆらぎのアニメーション用
         this.fountains = [];
         this.chompers = [];
         this.popSpikes = [];
@@ -578,9 +579,18 @@ export class GameEngine {
         const step = this.heightStep;
         const cliffMat = new THREE.MeshLambertMaterial({ map: this.textures[mapData.cliffTexture] || this.textures.cliffGray });
         // 高さごとに、地面の明るさを変える（低い所は少し暗く、高い所は明るく）。起伏が、見て分かるようにする
+        //   mapData.heightTint: [最も低い所, 最も高い所] の明るさ（省略は [0.82, 1.0]）。洞窟など、段の高さを強調したいマップは、幅を広げる。
+        //   heightTint があるマップは、崖の面も、上の段の高さに応じた明るさにする（段ごとの崖が、見分けやすい）
         let maxLv = 1;
         for (const row of this.heightMap) for (const v of row) if (v > maxLv) maxLv = v;
-        const tintOf = (lv) => 0.82 + 0.18 * Math.min(1, lv / maxLv);
+        const [tintLo, tintHi] = mapData.heightTint ?? [0.82, 1.0];
+        const tintOf = (lv) => tintLo + (tintHi - tintLo) * Math.min(1, lv / maxLv);
+        const cliffMats = new Map();
+        const cliffMatFor = (lv) => {
+            if (!mapData.heightTint) return cliffMat;
+            if (!cliffMats.has(lv)) { const m = cliffMat.clone(); m.color.setScalar(Math.min(1.2, tintOf(lv) * 1.05)); cliffMats.set(lv, m); }
+            return cliffMats.get(lv);
+        };
         const topMats = new Map(), sideMats = new Map();
         const matFor = (cache, lv, k) => {
             if (!cache.has(lv)) {
@@ -609,7 +619,7 @@ export class GameEngine {
                     if (!inMap || nh >= h) continue;
                     const drop = h - nh;
                     const faceH = drop * step;
-                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMat : matFor(sideMats, h, 0.78));
+                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMatFor(h) : matFor(sideMats, h, 0.78));
                     face.rotation.y = rotY;
                     face.position.set(wx + dx * tileSize / 2, nh * step + faceH / 2, wz + dz * tileSize / 2);
                     this.addStatic(face);
@@ -843,6 +853,7 @@ export class GameEngine {
         this.portals = [];   // ポータル（次のマップへの入口）。マップに複数置ける
         this.waterMeshes = [];
         this.heatHazePlanes = [];
+        this.torchGlows = [];   // 松明の光（光だまり・光の輪）。ゆらぎのアニメーション用
         this.fountains = [];
         this.chompers = [];
         this.popSpikes = [];
@@ -1891,6 +1902,44 @@ export class GameEngine {
                         break;
                     }
 
+                    case 'torch_stand': {
+                        // 松明（燭台）: 木の柱と、炎（自ら光る箱）。周囲を照らす光源（PointLight）は置かず（GPU の上限のため）、
+                        //   床に光だまり（加算合成の丸い光）と、炎のまわりの光の輪を置く。ゆらぐ（update の torchGlows）。通り抜けられる。
+                        //   床の高さは、マップの heights（objDef.lift で持ち上がる）
+                        const group = new THREE.Group();
+                        const stake = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.5, 0.16), new THREE.MeshLambertMaterial({ color: 0x5a3b1e }));
+                        stake.position.set(0, 0.75, 0);
+                        group.add(stake);
+                        const bowl = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.18, 0.4), new THREE.MeshLambertMaterial({ color: 0x2b2b2b }));
+                        bowl.position.set(0, 1.55, 0);
+                        group.add(bowl);
+                        group.position.set(wx, 0, wz);
+                        this.addStatic(group);
+                        const glowTex = this.getGlowTexture();
+                        const lightColor = new THREE.Color(objDef.lightColor ?? '#ffa040');
+                        const poolR = (objDef.lightRadius ?? 3.2) * tileSize / 2;
+                        const poolOpacity = objDef.poolOpacity ?? 0.5, haloOpacity = objDef.haloOpacity ?? 0.8;
+                        const pool = new THREE.Mesh(new THREE.PlaneGeometry(poolR * 2, poolR * 2), new THREE.MeshBasicMaterial({ map: glowTex, color: lightColor, transparent: true, opacity: poolOpacity, blending: THREE.AdditiveBlending, depthWrite: false }));
+                        pool.rotation.x = -Math.PI / 2;
+                        pool.position.set(wx, 0.05, wz);
+                        this.scene.add(pool);
+                        const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: lightColor, transparent: true, opacity: haloOpacity, blending: THREE.AdditiveBlending, depthWrite: false }));
+                        halo.scale.set(2.6, 2.6, 1);
+                        halo.position.set(wx, 1.9, wz);
+                        this.scene.add(halo);
+                        // 炎: ゆらぐので、静的な部品（addStatic で結合される）ではなく、シーンに直接追加する
+                        const liveFlame = new THREE.Group();
+                        const lo = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.5, 0.3), new THREE.MeshBasicMaterial({ color: 0xff8a1f }));
+                        lo.position.set(0, 1.9, 0);
+                        const li = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.34, 0.16), new THREE.MeshBasicMaterial({ color: 0xffe58a }));
+                        li.position.set(0, 1.86, 0);
+                        liveFlame.add(lo, li);
+                        liveFlame.position.set(wx, 0, wz);
+                        this.scene.add(liveFlame);
+                        this.torchGlows.push({ pool, halo, flame: liveFlame, poolOpacity, haloOpacity, phase: (r * 7 + c * 13) % 10 });
+                        break;
+                    }
+
                     case 'fire_jet': {
                         // Periodic Flamethrower / Fire Jet Floor Grate Trap
                         const ventMat = new THREE.MeshLambertMaterial({ map: this.textures.fireVent });
@@ -2321,8 +2370,8 @@ export class GameEngine {
                             map: liquidTex,
                             transparent: true,
                             opacity: isShallow ? 0.72 : (isLava ? 1.0 : 0.92),
-                            emissive: isLava ? 0xff2200 : (isPoison ? 0x220533 : 0x000000),
-                            emissiveIntensity: isLava ? 0.85 : 0.3
+                            emissive: isLava ? 0xff2200 : (isPoison ? 0x220533 : (objDef.glow ? new THREE.Color(objDef.glow).getHex() : 0x000000)),
+                            emissiveIntensity: isLava ? 0.85 : (objDef.glow ? 0.9 : 0.3)   // glow: 水面が、自ら光る（洞窟の地底湖）
                         });
                         const waterGeo = new THREE.PlaneGeometry(tileSize, tileSize);
                         const waterMesh = new THREE.Mesh(waterGeo, waterMat);
@@ -3517,6 +3566,14 @@ export class GameEngine {
                 this.textures.fountainWater.offset.y = (time * 0.07) % 1;
             }
 
+            // 松明の光: 光だまり・光の輪が、ゆらゆらと、明るさを変える
+            for (const tg of this.torchGlows) {
+                const f = 0.85 + 0.15 * Math.sin(time * 9 + tg.phase) * Math.sin(time * 3.7 + tg.phase * 1.7);
+                tg.pool.material.opacity = tg.poolOpacity * f;
+                tg.halo.material.opacity = tg.haloOpacity * f;
+                tg.flame.scale.set(1, 0.9 + 0.2 * f, 1);
+            }
+
             // Animate shimmering rising heat haze & smoke wisps above lava
             if (this.heatHazePlanes && this.heatHazePlanes.length > 0) {
                 for (let i = 0; i < this.heatHazePlanes.length; i++) {
@@ -4073,6 +4130,23 @@ export class GameEngine {
     makeLitMaterial(textureKey, texture) {
         const glow = typeof textureKey === 'string' && textureKey.startsWith('marble');
         return new THREE.MeshLambertMaterial(glow ? { map: texture, emissive: 0x92928c } : { map: texture });
+    }
+
+    // 丸いぼかしの光（中心が明るく、外へ消える）のテクスチャ。松明の光だまり・光の輪に使う（1 回だけ作る）
+    getGlowTexture() {
+        if (!this.glowTexture) {
+            const cv = document.createElement('canvas');
+            cv.width = cv.height = 128;
+            const g = cv.getContext('2d');
+            const grad = g.createRadialGradient(64, 64, 0, 64, 64, 64);
+            grad.addColorStop(0, 'rgba(255,255,255,1)');
+            grad.addColorStop(0.35, 'rgba(255,255,255,0.45)');
+            grad.addColorStop(1, 'rgba(255,255,255,0)');
+            g.fillStyle = grad;
+            g.fillRect(0, 0, 128, 128);
+            this.glowTexture = new THREE.CanvasTexture(cv);
+        }
+        return this.glowTexture;
     }
 
     // オブジェクトの画像（objects.json の imageFile。/images/objects/ 以下）のテクスチャ。同じ画像は1回だけ読み込む
