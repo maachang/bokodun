@@ -298,16 +298,16 @@
     "texture": "fGrassTree",
     "aspect": 0.922,
     "height": 15.6,
-    "colliderHalf": 1.6,
+    "colliderHalf": 1.2,
     "solid": true,
-    "description": "大森林の巨木 A（ID 217 を 3 倍に拡大。幹が太く、並ぶと通れない）"
+    "description": "大森林の巨木 A（ID 217 を 3 倍に拡大。幹は太いが、木の間は必ず通れる）"
   },
   "great_tree_b": {
     "type": "tree",
     "texture": "fSwampTreeA",
     "aspect": 0.887,
     "height": 15.6,
-    "colliderHalf": 1.6,
+    "colliderHalf": 1.2,
     "solid": true,
     "description": "大森林の巨木 B（ID 218 を 3 倍に拡大）"
   },

@@ -22,9 +22,7 @@
  },
  "legend": {
   "G": "grass_tree",
-  "K": "great_tree_b",
   "O": "sea",
-  "W": "great_tree_a",
   "b": "bush_flower",
   "e": "fern",
   "l": "lavender_flower",
@@ -96,9 +94,9 @@
   "0000000000000000001222222222222222222223333333333334444444445555",
   "0000000000000000001222222222222222222223333333333334444444445555",
   "0000000000000000001222222222222222222222333333333334444444555555",
-  "0000000000000000001222222222222222222222333333333334444455555555",
-  "0000000000000000001222222222222222222222333333333344444555555555",
-  "0000000000000000001222222222222222222222233333333444445555555666",
+  "0000000000000000001222222222222222222222333333333334444455555559",
+  "0000000000000000001222222222222222222222333333333344444555555559",
+  "000000000000000000122222222222222222222223333333344444555555566a",
   "0000000000000000001222222222222222222222233333333444445555666666",
   "0000000000000000001222222222222222222222233333334444455556666666",
   "0000000000000000001222222222222222222222223333333444455556666677"
@@ -106,6 +104,7 @@
  "floorLegend": {
   "f": "forest",
   "g": "grass",
+  "k": "darkRock",
   "w": "whiteSand"
  },
  "floorLayer": [
@@ -167,9 +166,9 @@
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
-  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
-  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
-  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
+  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggk",
+  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggk",
+  "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggk",
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggf",
   "ggggggggggggggggggwwwggggggggggggggggggggggggggggggggggggggggggg"
@@ -234,10 +233,12 @@
   "OOOOOOOOOOOOOOOOOq00000000000v000000p00000v0m000w00000000m0000G0",
   "OOOOOOOOOOOOOOOOOq000m00000000000000000000m0000m000m0000000m000e",
   "OOOOOOOOOOOOOOOOOq0000G0000m0000000000mmp00b00000000p000000l0000",
-  "OOOOOOOOOOOOOOOOOq000pm00000000bb00w0000000000000w0p0G00000000wW",
-  "OOOOOOOOOOOOOOOOOq0000000000m00m0000000m00000000G0000000000000lK",
+  "OOOOOOOOOOOOOOOOOq000pm00000000bb00w0000000000000w0p0G00000000w0",
+  "OOOOOOOOOOOOOOOOOq0000000000m00m0000000m00000000G0000000000000l0",
   "OOOOOOOOOOOOOOOOOq000m0000l00m0000000000000m0000000m0000m000000e",
   "OOOOOOOOOOOOOOOOOq0000m0m0000000w00000000000000000000m00000000m0",
   "OOOOOOOOOOOOOOOOOq00000w0mm00000Gm00m0m0p0000000mm0vmm000m000000"
- ]
+ ],
+ "mazeWalls": true,
+ "cliffTexture": "cliffDark"
 }

@@ -16,6 +16,7 @@ from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESER
 ROOT = T.ROOT
 MAPS = os.path.join(ROOT, 'public', 'data', 'maps')
 HEIGHT_STEP = 0.5
+WALL_RISE = 4      # 大森林の迷路の壁の高さ（段）。隣の通路との差が 2 以上で、崖（岩肌が見える）になり、登れない
 CH36 = '0123456789abcdefghijklmnopqrstuvwxyz'
 
 # 物体（objects.json の ID）の文字
@@ -30,7 +31,7 @@ LEGEND = {
 }
 SOLID_CH = set('FCNPDGAXUMRSBHcYEtTVWK')          # 通れない物体（端のマスには置かない）
 # 地面の種類（floorLayer の文字 → environment.floorType と同じ名前）
-FLOOR = {'g': 'grass', 's': 'snow', 'f': 'forest', 'd': 'desert', 'r': 'rock', 'w': 'whiteSand', 'u': 'tundra', 'i': 'ice', 'm': 'redEarth', 'a': 'ash'}
+FLOOR = {'g': 'grass', 's': 'snow', 'f': 'forest', 'd': 'desert', 'r': 'rock', 'w': 'whiteSand', 'u': 'tundra', 'i': 'ice', 'm': 'redEarth', 'a': 'ash', 'k': 'darkRock'}
 BIOME_FLOOR = {SNOW: 's', CONIFER: 'u', FOREST: 'f', GRASS: 'g', DESERT: 'd', ROCK: 'r', TROPICAL: 'g', SEA: 'g'}
 BIOME_NAME = {SNOW: '北の雪山', CONIFER: '針葉樹の裾野', FOREST: '大森林', GRASS: '草原', DESERT: '砂地', ROCK: '岩山', TROPICAL: '南国', SEA: '海岸'}
 # 環境（空・霧・光）: 既存の外マップから、地形ごとに借りる
@@ -119,8 +120,10 @@ def build_tiles(t):
     sn = free & (biome == SNOW)
     cl = np.abs(T.fbm(61, (34, 12, 4)) - 0.5) < 0.034                       # 断崖の線（尾根・段）
     ice_hi = T.fbm(62, (30, 10, 4)); ice_lo = T.fbm(63, (22, 8, 3)); bare = T.fbm(64, (18, 6, 3))
-    forest_tree = lambda mask, k: (put(mask & (k < 0.5), 'T'), put(mask & (k >= 0.5), 'V'))
-    forest_tree(sn & (elev < 12) & (patch > 0.5) & (u2 < 0.32), u3)               # 裾野の木（2 倍の木を、1 本ずつ）
+    # 木は、2 マスおきの格子の点にだけ置く（隣り合うマスに、木が並ばない。木の間は、必ず 1 マス以上あいて、通れる）
+    lat = ((xs_.astype(int) % 2) == 0) & ((ys_.astype(int) % 2) == 0)
+    forest_tree = lambda mask, k: (put(mask & lat & (k < 0.5), 'T'), put(mask & lat & (k >= 0.5), 'V'))
+    forest_tree(sn & (elev < 12) & (patch > 0.5) & (u2 < 0.55), u3)               # 裾野の木（2 倍の木を、1 本ずつ）
     put(sn & (elev < 12) & (u < 0.10) & (obj == ord('0')), 'P')
     put(sn & (elev >= 12) & (elev < 24) & (u < 0.025), 'P')
     put(sn & (elev >= 14) & cl & (u3 < 0.88), 'c')                              # 断崖の壁（ところどころ切れて、峠になる）
@@ -128,7 +131,7 @@ def build_tiles(t):
     fl(sn & (elev < 14) & (ice_lo > 0.74), 'i')                                # 凍った湖
     fl(sn & (elev >= 24) & (bare > 0.25), 'r')                                  # 高い所は、岩肌
     co = free & (biome == CONIFER)
-    put(co & (u < 0.06), 'P'); forest_tree(co & (patch > 0.52) & (u2 < 0.34), u3)
+    put(co & (u < 0.06), 'P'); forest_tree(co & (patch > 0.52) & (u2 < 0.6), u3)
 
     # --- 西の大森林: 天然の迷宮（217・218 の木を 3 倍。真っ暗。起伏が激しい。目印を減らし、同じような木が続く）---
     fo = free & (biome == FOREST)
@@ -142,12 +145,13 @@ def build_tiles(t):
                  ((mk == 4) & ((lx == 1) | (hs < 0.55))) |                        # 縦の壁: 中心の列は、必ず木
                  ((mk == 5) & ((lx == 1) | (ly == 1) | (hs < 0.5))))              # 柱: 中心の十字は、必ず木
     in_maze = fo & (mk > 0)
+    wall_unit = in_maze & ((mk == 3) | (mk == 4) | (mk == 5))
+    elev = np.where(wall_unit, np.minimum(35, elev + WALL_RISE), elev)           # 迷路の壁は、木ではなく、地形（高い崖の壁）。岩肌が見える＝登れない
     put(fo & (u3 < 0.10), 'e')                                                    # 下草（シダ）。目印になる花・断崖・空き地は、置かない
-    put(in_maze & wall_tree & (u < 0.5), 'W'); put(in_maze & wall_tree & (u >= 0.5), 'K')   # 巨木（3 倍）
-    # 迷路の外の森（迷路にならない端・川のそば）: 木は少なめ（通れる）
-    out_maze = fo & (mk == 0)
-    put(out_maze & (u2 < 0.12) & (u < 0.5), 'W'); put(out_maze & (u2 < 0.12) & (u >= 0.5), 'K')
-    fl(fo, 'f')
+    # 木は、飾り。2 マスおきの格子の点にだけ（隣り合うマスに並ばない）。通路にも、壁の上にも、まばらに生える
+    tree_p = np.where(wall_unit, 0.55, 0.22)
+    put(fo & lat & (u2 < tree_p) & (u < 0.5), 'W'); put(fo & lat & (u2 < tree_p) & (u >= 0.5), 'K')   # 巨木（3 倍）
+    fl(fo, 'f'); fl(wall_unit, 'k')                                               # 壁の上は、暗い岩肌
 
     # --- 草原 ---
     gr = free & (biome == GRASS)
@@ -166,7 +170,7 @@ def build_tiles(t):
     fl(tr & (sandy > 0.62), 'w')
     put(tr & (u3 < 0.14), 'e'); put(tr & (u < 0.05), 'b'); put(tr & (u2 < 0.02), 'w'); put(tr & (u2 >= 0.02) & (u2 < 0.03), 'p')
     put(tr & (u2 > 0.965), 'Y'); put(tr & (u2 > 0.92) & (u2 <= 0.965), 'M')
-    forest_tree(tr & (patch2 > 0.6) & (u3 > 0.55), u)                            # ジャングルの茂み（2 倍の木）
+    forest_tree(tr & (patch2 > 0.6) & (u3 > 0.3), u)                            # ジャングルの茂み（2 倍の木）
 
     # --- 東の山々と炭鉱 ---
     ro = free & (biome == ROCK)
@@ -223,7 +227,7 @@ def build_tiles(t):
                         obj[yy, xx] = ord(ch); break
                 else: continue
                 break
-    return obj, floor
+    return obj, floor, elev
 
 
 def mesh_name(row, col, biome_counts, sea_frac, mine=False):
@@ -235,8 +239,8 @@ def mesh_name(row, col, biome_counts, sea_frac, mine=False):
 
 def main():
     t = T.build()
-    obj, floor = build_tiles(t)
-    land, biome, elev = t['land'], t['biome'], t['elev']
+    obj, floor, elev = build_tiles(t)
+    land, biome = t['land'], t['biome']
     envs = {}
     for b, f in ENV_FROM.items():
         envs[b] = json.load(open(os.path.join(MAPS, f + '.json'), encoding='utf-8'))['environment']
@@ -255,7 +259,7 @@ def main():
             dom = max(counts, key=counts.get)
             sea_frac = float((~L).mean())
             floor_counts = {}
-            for ch in 'gsfdrwuima': floor_counts[ch] = int(((fl == ord(ch)) & L).sum())
+            for ch in 'gsfdrwuimak': floor_counts[ch] = int(((fl == ord(ch)) & L).sum())
             base_ch = max(floor_counts, key=floor_counts.get)
             env = dict(envs[SEA if sea_frac > 0.35 else dom])
             env['floorType'] = FLOOR[base_ch]
@@ -263,6 +267,7 @@ def main():
                 env.update(DARK_FOREST_ENV)   # 大森林: 真っ暗（数マス先は、巨木のシルエットだけ）
             layout = [''.join(chr(v) for v in row) for row in o]
             heights = [''.join(CH36[min(35, int(v))] for v in row) for row in el]
+            maze_walls = bool((el != t['elev'][ys, xs]).any())   # 大森林の迷路の壁（地形の崖）がある
             floor_layer = [''.join(chr(v) for v in row) for row in fl]
             used = set(''.join(layout)) - {'0'}
             legend = {k: LEGEND[k] for k in sorted(used)}
@@ -284,6 +289,7 @@ def main():
                 'floorLegend': {k: FLOOR[k] for k in sorted(set(''.join(floor_layer)))}, 'floorLayer': floor_layer,
                 'layout': layout,
             }
+            if maze_walls: m['mazeWalls'] = True; m['cliffTexture'] = 'cliffDark'   # 迷路の壁は、地形の崖。岩肌（暗い岩）が見える
             json.dump(m, open(os.path.join(MAPS, mid + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
             grid[j][i] = mid
             info[mid] = dict(row=j, col=i, dom=dom, sea=sea_frac, grass=counts[GRASS] / max(1, int(L.sum())), land=int(L.sum()))

@@ -529,6 +529,7 @@ export class GameEngine {
         if (floorType === 'redEarth') return this.textures.redEarthGround;
         if (floorType === 'ash') return this.textures.ashGround;
         if (floorType === 'ice') return this.textures.ice;
+        if (floorType === 'darkRock') return this.textures.cliffDark;   // 暗い岩肌（大森林の迷路の壁の上）
         return this.textures.floorStone;
     }
 
