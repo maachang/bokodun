@@ -20,6 +20,7 @@
     "visibility": 1.0,
     "skyColor": 15258784
   },
+  "enemyFloor": "pyramid_stone",
   "legend": {
     "R": "cliff_sandstone_wall",
     "C": "cactus",

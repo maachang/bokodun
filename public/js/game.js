@@ -966,6 +966,7 @@ export class GameEngine {
                 const wx = c * tileSize + tileSize / 2;
                 const wz = r * tileSize + tileSize / 2;
 
+                let enemyTile = false;
                 // 1. Check if char represents an enemy
                 const enemyType = mapData.enemies ? mapData.enemies[char] : null;
                 if (enemyType && this.enemyDefinitions && this.enemyDefinitions[enemyType]) {
@@ -976,11 +977,12 @@ export class GameEngine {
                     m.sprite.position.y = m.floorY;
                     this.monsters.push(m);
                     this.scene.add(m.sprite);
-                    continue;
+                    if (!mapData.enemyFloor) continue;
+                    enemyTile = true;   // enemyFloor: 敵のマスにも、その床（ピラミッドの石の床など）を敷く
                 }
 
                 // 2. Check if char represents an object
-                const objType = mapData.legend ? mapData.legend[char] : null;
+                const objType = enemyTile ? mapData.enemyFloor : (mapData.legend ? mapData.legend[char] : null);
                 const objDef = objType ? this.objectDefinitions[objType] : null;
 
                 if (!objDef) {
