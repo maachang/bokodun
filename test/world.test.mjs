@@ -1050,3 +1050,60 @@ test('雪山の裾野: 標高の帯（草地→ツンドラ→針葉樹林→ま
     assert.ok(footEnvOk >= 5, `裾野のマップは、ツンドラの環境（冷たい光・やや濃い霧）: ${footEnvOk}`);
     assert.ok(hillyMaxLevel >= 20, `山の高さ: ${hillyMaxLevel}`);
 });
+
+
+test('マップの境界線: 継ぎ目の向かい合うマスの、歩ける・歩けないが、そろう（境界を越えて、壁・水の中に出て、押し出されない）。川は、渡らずに、境界のそばを流れない', () => {
+    const M = world.mapSize;
+    const maps = new Map();
+    world.grid.forEach((rw, j) => rw.forEach((id, i) => { if (id) maps.set(`${j},${i}`, readJson(`public/data/maps/${id}.json`)); }));
+    const code = (y, x) => {   // 'walk' | 'solid' | 'water'（深い水・海）| null（マップなし）
+        const m = maps.get(`${Math.floor(y / M)},${Math.floor(x / M)}`);
+        if (!m) return null;
+        const ch = m.layout[y % M][x % M];
+        const d = ch === '0' ? null : objects[m.legend[ch]];
+        if (!d) return 'walk';
+        if (d.type === 'sea_tile' || (d.type === 'liquid_tile' && d.solid)) return 'water';
+        if (['tree', 'tree_wall', 'boulder', 'block'].includes(d.type) || (d.type === 'furniture' && d.solid !== false)) return 'solid';
+        return 'walk';
+    };
+    const H = world.grid.length * M, W = world.grid[0].length * M;
+    let mismatch = [], seamPairs = 0;
+    for (let k = 1; k < world.grid[0].length; k++) for (let y = 0; y < H; y++) {   // 縦の継ぎ目
+        const a = code(y, k * M - 1), b = code(y, k * M);
+        if (a === null || b === null) continue;
+        seamPairs++;
+        if ((a === 'walk') !== (b === 'walk') && (a === 'walk' || b === 'walk')) mismatch.push(`縦 x=${k * M} y=${y}: ${a}|${b}`);
+    }
+    for (let k = 1; k < world.grid.length; k++) for (let x = 0; x < W; x++) {       // 横の継ぎ目
+        const a = code(k * M - 1, x), b = code(k * M, x);
+        if (a === null || b === null) continue;
+        seamPairs++;
+        if ((a === 'walk') !== (b === 'walk') && (a === 'walk' || b === 'walk')) mismatch.push(`横 y=${k * M} x=${x}: ${a}|${b}`);
+    }
+    assert.ok(seamPairs > 5000, `検査した継ぎ目: ${seamPairs}`);
+    assert.deepEqual(mismatch.slice(0, 5), [], `継ぎ目で、歩ける・歩けないが食い違うマス: ${mismatch.length}`);
+    // 川・池・湖の深い水が、境界線から 2 マス以内にあるなら、その近く（±14 マス。浅い角度で渡る川は、境界のそばを長く流れる）で、境界を渡っている（両側が水）
+    const waterKind = (y, x) => {
+        const m = maps.get(`${Math.floor(y / M)},${Math.floor(x / M)}`);
+        if (!m) return null;
+        const ch = m.layout[y % M][x % M];
+        return ch === '0' ? null : m.legend[ch] ?? null;
+    };
+    const isRiverWater = (y, x) => waterKind(y, x) === 'water';                          // 川・池・湖のふち
+    const isDeepWater = (y, x) => ['water', 'sea', 'plank_bridge', 'water_shallow', 'water_shallow_glow'].includes(waterKind(y, x));   // 湖・海の中・橋・浅瀬も含める（川・湖が境界を渡る所の判定用）
+    let along = [];
+    const hasMap = (y, x) => maps.has(`${Math.floor(y / M)},${Math.floor(x / M)}`);
+    for (let k = 1; k < world.grid[0].length; k++) for (let y = 0; y < H; y++) for (let x = k * M - 2; x < k * M + 2; x++) {
+        if (!isRiverWater(y, x) || !hasMap(y, k * M - 1) || !hasMap(y, k * M)) continue;   // 隣のマップがない継ぎ目は、越えられない
+        let crossing = false;
+        for (let yy = y - 14; yy <= y + 14 && !crossing; yy++) if (isDeepWater(yy, k * M - 1) && isDeepWater(yy, k * M)) crossing = true;
+        if (!crossing) along.push(`縦の境界 x=${k * M} y=${y}`);
+    }
+    for (let k = 1; k < world.grid.length; k++) for (let x = 0; x < W; x++) for (let y = k * M - 2; y < k * M + 2; y++) {
+        if (!isRiverWater(y, x) || !hasMap(k * M - 1, x) || !hasMap(k * M, x)) continue;
+        let crossing = false;
+        for (let xx = x - 14; xx <= x + 14 && !crossing; xx++) if (isDeepWater(k * M - 1, xx) && isDeepWater(k * M, xx)) crossing = true;
+        if (!crossing) along.push(`横の境界 y=${k * M} x=${x}`);
+    }
+    assert.deepEqual(along.slice(0, 40), [], `境界線のそばを、渡らずに流れる川（境界から 2 マス以内）: ${along.length} マス`);
+});

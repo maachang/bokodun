@@ -386,7 +386,8 @@ def _tropical_coast(land, biome):
     # 入り江は、浅瀬（歩ける）。入り江のまわりの陸も、南国
     biome = np.where(land & (biome == SEA), TROPICAL, biome)
     # 内陸の池: 南国の内陸（海から 22 マス以上）に、4 つ
-    inland = np.argwhere(land & (biome == TROPICAL) & (_distance(~land) >= 22))
+    Yg, Xg = np.mgrid[0:H, 0:W]
+    inland = np.argwhere(land & (biome == TROPICAL) & (_distance(~land) >= 22) & ~_near_seam(Yg, Xg, 10))
     if len(inland):
         picks = inland[rng.choice(len(inland), size=min(4, len(inland)), replace=False)]
         for py, px in picks:
@@ -397,12 +398,36 @@ def _tropical_coast(land, biome):
     return land, biome, lagoon, pond
 
 
+def _avoid_seams(path, margin):
+    """川の道筋（点の並び）を、マップの境界線（64 マスごと）から、margin マス以上離す。
+    境界を越えて、隣のマップへ続く（渡っている）所は、そのまま。境界のそばを、渡らずに流れる所だけ、境界から離す（境界のすぐ隣が川だと、
+    境界を越えた人が、川の中に出て、押し出されて、向こう岸へ渡ってしまうため）"""
+    pts = [list(p) for p in path]
+    n = len(pts)
+    for axis, size, count in ((0, W, GW), (1, H, GH)):
+        for k in range(1, count):
+            sline = k * MESH
+            for i in range(n):
+                v = pts[i][axis]
+                if abs(v - sline) >= margin: continue
+                lo, hi = max(0, i - 6), min(n - 1, i + 6)
+                prev = np.mean([pts[j][axis] for j in range(lo, i + 1)]); nxt = np.mean([pts[j][axis] for j in range(i, hi + 1)])
+                a, b = np.sign(prev - sline), np.sign(nxt - sline)
+                if a != 0 and a == b: pts[i][axis] = sline + a * margin   # 前後とも、同じ側: 渡っていない → 境界から離す
+    return [tuple(p) for p in pts]
+
+
+def _near_seam(mask_y, mask_x, dist):
+    """(y, x) が、マップの境界線（64 マスごと）から、dist マス以内か"""
+    return ((mask_x % MESH) < dist) | ((mask_x % MESH) >= MESH - dist) | ((mask_y % MESH) < dist) | ((mask_y % MESH) >= MESH - dist)
+
+
 def _foothill_ponds(land, biome):
     """雪山の裾野（雪・針葉樹の地形の、南側の帯）に、小さな池を置く。半分は凍った池（氷の地面。歩ける）、半分は雪解けの池（深い水＋浅いふち）。
     戻り値: pond（深い水）, ring（浅いふち）, frozen（凍った池＝氷の地面にする所）"""
     rng = np.random.default_rng(91)
     Y, X = np.mgrid[0:H, 0:W].astype(np.float32)
-    band = land & np.isin(biome, [SNOW, CONIFER]) & (Y > 250) & (Y < 390) & (_distance(~land) >= 12)
+    band = land & np.isin(biome, [SNOW, CONIFER]) & (Y > 250) & (Y < 390) & (_distance(~land) >= 12) & ~_near_seam(Y.astype(int), X.astype(int), 10)   # 池は、境界線から離す
     cand = np.argwhere(band)
     pond = np.zeros((H, W), bool); ring = np.zeros((H, W), bool); frozen = np.zeros((H, W), bool)
     if len(cand) == 0: return pond, ring, frozen
@@ -467,6 +492,7 @@ def build():
             j = min(i + 1, len(seg) - 1); k = max(i - 1, 0)
             dx, dy = seg[j][0] - seg[k][0], seg[j][1] - seg[k][1]; L = np.hypot(dx, dy) or 1
             path.append((x - dy / L * off[i] * 3, y + dx / L * off[i] * 3))
+        path = _avoid_seams(path, width / 2 + 3.5)   # 川は、境界線のそばを、渡らずに流れないよう、境界から離す
         deep = Image.new('L', (W, H), 0); dd = ImageDraw.Draw(deep)
         ford = Image.new('L', (W, H), 0); fd = ImageDraw.Draw(ford)
         dd.line(path, fill=255, width=width)

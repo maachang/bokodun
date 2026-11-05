@@ -214,6 +214,33 @@ def build_tiles(t):
                         obj[yy, xx] = ord(ch); break
                 else: continue
                 break
+    # --- 境界線（隣のマップとの継ぎ目）の整合 ---
+    #   境界を越えると、隣のマップの同じ位置に出る。そこが、木・崖・水の中だと、近くの空きへ押し出され、川の向こう岸へ渡ったり、
+    #   壁に囲まれた空間の中に入って、出られなくなったりする。継ぎ目の両側のマス（向かい合うマス）の、歩ける・歩けないを、そろえる:
+    #   片方が歩けて、もう片方が通れない物（木・崖・柱）なら、通れない物を取り除く。深い水・海なら、浅瀬（歩ける）にする。
+    solid_codes = np.array([ord(c) for c in SOLID_CH], np.uint8)
+    deep_codes = np.array([ord('Q'), ord('O')], np.uint8)
+    def walk(a): return ~(np.isin(a, solid_codes) | np.isin(a, deep_codes))
+    fixed = 0
+    for axis, size, count in ((1, W, GW), (0, H, GH)):
+        for k in range(1, count):
+            sl = k * MESH
+            if axis == 1: A = (slice(None), sl - 1); B = (slice(None), sl)
+            else: A = (sl - 1, slice(None)); B = (sl, slice(None))
+            a, b = obj[A].copy(), obj[B].copy()
+            both_land = np.ones(len(a), bool)                 # すべての継ぎ目のマス（海岸・浅い海の継ぎ目も、そろえる）
+            wa, wb = walk(a), walk(b)
+            bad_b = both_land & wa & ~wb                      # A は歩ける・B は歩けない
+            bad_a = both_land & wb & ~wa
+            for (X_, Y_, bad) in ((B, b, bad_b), (A, a, bad_a)):
+                cur = obj[X_]
+                is_solid = np.isin(cur, solid_codes)
+                cur = np.where(bad & is_solid, ord('0'), cur)
+                cur = np.where(bad & ~is_solid, ord('q'), cur)   # 深い水・海は、浅瀬に
+                obj[X_] = cur
+                fixed += int(bad.sum())
+    # 継ぎ目の整合のあと、浅瀬にした所は、水のマスなので、地面の種類は、そのまま（水の下の地面は、使われない）
+    print('境界線の整合: 直したマス', fixed)
     return obj, floor, elev
 
 
