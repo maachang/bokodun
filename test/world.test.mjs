@@ -525,3 +525,31 @@ test('洞窟・段丘（cave_terrace）: 天井に届かない高さ・歩いて
     const enemyCount = d.layout.join('').split('').filter(ch => d.enemies[ch]).length;
     assert.ok(enemyCount >= 5 && enemyCount <= 10, `敵は少なめ: ${enemyCount}`);
 });
+
+// 吊橋（rope_bridge）: 山道の北東の谷。床は薄い板（type bridge_deck）。谷の底は、橋から 3 段以上低く、橋の脇へは降りられない
+test('山道の吊橋（rope_bridge）: 同じ高さの床・両端は同じ高さの地面・脇の谷は降りられない深さ・橋の下の高さ（bridgeUnder）', () => {
+    const m = readJson('public/data/maps/field_mountain.json');
+    assert.equal(objects.rope_bridge.type, 'bridge_deck');
+    assert.ok(objects.rope_bridge.lift, '床の高さは、heights で持ち上げる');
+    const ch = Object.entries(m.legend).find(([, v]) => v === 'rope_bridge')[0];
+    const lv = (r, c) => levelOf(m.heights[r][c]);
+    const cells = [];
+    m.layout.forEach((row, r) => [...row].forEach((x, c) => { if (x === ch) cells.push([r, c]); }));
+    assert.ok(cells.length >= 16, `吊橋のマス: ${cells.length}（長さ 8 × 幅 2 以上）`);
+    const deck = lv(...cells[0]);
+    assert.ok(cells.every(([r, c]) => lv(r, c) === deck), '床は、すべて同じ高さ');
+    const isBridge = (r, c) => m.layout[r]?.[c] === ch;
+    assert.ok(Number.isInteger(m.bridgeUnder) && m.bridgeUnder <= deck - 3, `橋の下の谷の底（${m.bridgeUnder}）は、橋（${deck}）より 3 段以上低い（降りられない）`);
+    for (const [r, c] of cells) {
+        for (const [dr, dc] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const nr = r + dr, nc = c + dc;
+            if (isBridge(nr, nc)) continue;
+            const d = lv(nr, nc);
+            // 橋の端は、同じ高さの地面。橋の脇は、谷（3 段以上低い）
+            assert.ok(d === deck || deck - d >= 3, `${r},${c} の隣 ${nr},${nc}: 高さ ${d}`);
+        }
+    }
+    const gb = m.gimmickBoxes.find(b => b.name === 'rope_bridge');
+    assert.ok(gb && cells.every(([r, c]) => r >= gb.r0 && r <= gb.r1 && c >= gb.c0 && c <= gb.c1), 'gimmickBoxes の範囲');
+    // 谷へ降りる小道（北側）と南の口があり、全体は、つながっている（上の「すべて 1 つにつながる」のテストで確認）
+});

@@ -560,6 +560,11 @@ export class GameEngine {
         return this.heightMap?.[r]?.[c] ?? 0;
     }
 
+    // マス (行 r, 列 c) の、地形（地面・崖の面）の高さの段。吊橋のマスは、橋の下の谷の底（bridgeUnder）の高さ
+    terrainLevelAtTile(r, c) {
+        return this.bridgeCells?.has(`${r},${c}`) ? this.bridgeUnder : this.heightLevelAtTile(r, c);
+    }
+
     // ワールド座標 (x, z) の高さの段
     heightLevelAt(x, z) {
         if (!this.heightMap) return 0;
@@ -590,7 +595,7 @@ export class GameEngine {
         const dirs = [[0, 1, 0], [0, -1, Math.PI], [1, 0, Math.PI / 2], [-1, 0, -Math.PI / 2]];   // [dx(列), dz(行), 向き]
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
-                const h = this.heightLevelAtTile(r, c);
+                const h = this.terrainLevelAtTile(r, c);
                 if (h <= 0) continue;
                 const wx = c * tileSize + tileSize / 2;
                 const wz = r * tileSize + tileSize / 2;
@@ -599,7 +604,7 @@ export class GameEngine {
                 top.position.set(wx, h * step, wz);
                 this.addStatic(top);
                 for (const [dx, dz, rotY] of dirs) {
-                    const nh = this.heightLevelAtTile(r + dz, c + dx);
+                    const nh = this.terrainLevelAtTile(r + dz, c + dx);
                     const inMap = r + dz >= 0 && r + dz < rows && c + dx >= 0 && c + dx < cols;
                     if (!inMap || nh >= h) continue;
                     const drop = h - nh;
@@ -903,6 +908,14 @@ export class GameEngine {
         if (mapData.heights) {
             this.heightMap = mapData.heights.map(row => Array.from(row, ch => parseInt(ch, 36) || 0));
         }
+        // 吊橋（type: bridge_deck）のマス: 床（歩く高さ）は heights だが、地形（地面・崖の面）は、下の谷の底（bridgeUnder）の高さで作る
+        this.bridgeCells = new Set();
+        this.bridgeUnder = mapData.bridgeUnder ?? 0;
+        for (let r = 0; r < rows; r++) {
+            for (let c = 0; c < cols; c++) {
+                if (this.objectDefinitions[mapData.legend?.[mapData.layout[r][c]]]?.type === 'bridge_deck') this.bridgeCells.add(`${r},${c}`);
+            }
+        }
 
         // 1. Grid-based Floor Generation (carving holes for sunken water tiles and crumbling pitfall cavities)
         const baseFloorTex = this.floorTextureOf(env.floorType);
@@ -913,7 +926,7 @@ export class GameEngine {
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 if (waterMap[r][c] || holeFloorMap[r][c]) continue; // Water and crumbling pits do not have base floor at Y=0!
-                if (this.heightLevelAtTile(r, c) > 0) continue;   // 高くなっている所は、下の面を描かない（buildHeightTerrain が、上面と側面を作る）
+                if (this.terrainLevelAtTile(r, c) > 0) continue;   // 高くなっている所は、下の面を描かない（buildHeightTerrain が、上面と側面を作る）
 
                 const wx = c * tileSize + tileSize / 2;
                 const wz = r * tileSize + tileSize / 2;
@@ -1837,6 +1850,43 @@ export class GameEngine {
                             friction: objDef.friction,
                             mpRegenBonus: objDef.mpRegenBonus || 0,
                             isWater: false
+                        });
+                        break;
+                    }
+
+                    case 'bridge_deck': {
+                        // 吊橋: 薄い板の床（側面も、下の面もない。下に、谷の底が見える）と、橋の縁に沿った、ロープの手すり・支柱。
+                        //   床の高さは、heights（objDef.lift で、このマスの高さまで持ち上がる）。歩く・段差の判定は、高さの仕組みのまま
+                        const deckMat = this.makeLitMaterial(objDef.texture, this.textures[objDef.texture] || this.textures.sand);
+                        const thick = 0.16;
+                        const deck = new THREE.Mesh(new THREE.BoxGeometry(tileSize, thick, tileSize), deckMat);
+                        deck.position.set(wx, 0.02 - thick / 2, wz);
+                        this.addStatic(deck);
+                        const isBridge = (rr, cc) => this.bridgeCells.has(`${rr},${cc}`);
+                        const ropeMat = new THREE.MeshLambertMaterial({ color: 0x8a6a3b });
+                        const postMat = new THREE.MeshLambertMaterial({ map: this.textures.woodWall });
+                        // 橋でない側の縁（北・南・西・東）に、手すり（ロープ 2 本）と支柱を立てる
+                        for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+                            if (isBridge(r + dr, c + dc)) continue;
+                            const ex = wx + dc * tileSize / 2, ez = wz + dr * tileSize / 2;
+                            const alongX = dr !== 0;   // 北・南の縁は、x 方向に伸びる
+                            for (const y of [1.05, 0.55]) {
+                                const rope = new THREE.Mesh(new THREE.BoxGeometry(alongX ? tileSize : 0.07, 0.07, alongX ? 0.07 : tileSize), ropeMat);
+                                rope.position.set(ex, y, ez);
+                                this.addStatic(rope);
+                            }
+                            // 支柱: 縁の始まり（西・北）に必ず。終わり（東・南）は、縁が続かないときだけ（隣のマスの始まりと、重ねない）
+                            const nextCell = alongX ? isBridge(r, c + 1) && !isBridge(r + dr, c + 1) : isBridge(r + 1, c) && !isBridge(r + 1, c + dc);
+                            for (const end of nextCell ? [-1] : [-1, 1]) {
+                                const post = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.3, 0.16), postMat);
+                                post.position.set(alongX ? ex + end * tileSize / 2 : ex, 0.65, alongX ? ez : ez + end * tileSize / 2);
+                                this.addStatic(post);
+                            }
+                        }
+                        this.terrainGrid.push({
+                            minX: wx - tileSize / 2, maxX: wx + tileSize / 2,
+                            minZ: wz - tileSize / 2, maxZ: wz + tileSize / 2,
+                            depth: 0, slowdown: 1.0, speedBonus: 1.0, friction: objDef.friction, mpRegenBonus: 0, isWater: false
                         });
                         break;
                     }
@@ -2878,7 +2928,8 @@ export class GameEngine {
                 status: w.status,
                 pierce: w.pierce,
                 label: w.name,
-                soundKind: w.sound
+                soundKind: w.sound,
+                element: w.element
             });
             this.aimProjectileHeight(fireball, dirX, dirZ);
             this.projectiles.push(fireball);
@@ -2896,6 +2947,14 @@ export class GameEngine {
         const hitColor = isArrow ? 0xd4d4d8 : new THREE.Color(p.visual?.hit ?? '#ff5500').getHex();
         this.particles.spawnBurst(p.x, p.y, p.z, hitColor, isArrow ? 8 : 16, isArrow ? 2.5 : 5.0);
 
+        if (!isArrow && m.isImmuneTo(p.element)) {
+            // 魔法が効かない敵（ガーゴイルなど）: ダメージ 0・状態異常なし。弾は消える（貫通しない）
+            this.addPopup('魔法は効かない!', '#94a3b8', m.x, m.z);
+            this.notifyEnemyEngaged(m);
+            p.hitMonsters.add(m);
+            p.active = false;
+            return true;
+        }
         const isDead = m.takeDamage(p.damage, { x: p.dirX, z: p.dirZ, magic: !isArrow });
         this.addPopup(m.lastBlocked ? 'ガード!' : `${p.label || 'ファイア'}! -${p.damage}`, m.lastBlocked ? '#94a3b8' : '#f97316', m.x, m.z);
         if (!isDead && p.status && m.applyStatus(p.status)) {
@@ -2945,12 +3004,12 @@ export class GameEngine {
             warnTime: spell.warnTime,
             pillarTime: spell.pillarTime,
             smokeTime: spell.smokeTime ?? 0,
-            onImpact: () => this.blastAt(tx, tz, spell.blastRadius, damage)
+            onImpact: () => this.blastAt(tx, tz, spell.blastRadius, damage, spell.element)
         });
     }
 
     // 着弾の範囲ダメージ: 中心から半径 radius 内の敵すべてに damage（ノックバックは中心から外向き）
-    blastAt(x, z, radius, damage) {
+    blastAt(x, z, radius, damage, element = null) {
         this.sound.playBigExplosion();
         this.particles.spawnBurst(x, 0.8, z, 0xff5500, 40, 7.0);
         this.particles.spawnBurst(x, 1.5, z, 0xffdd33, 24, 4.5);
@@ -2963,6 +3022,11 @@ export class GameEngine {
             if (dist > radius + m.radius) continue;
             const nx = dist > 0.001 ? dx / dist : 0;
             const nz = dist > 0.001 ? dz / dist : 1;
+            if (m.isImmuneTo(element)) {   // 魔法が効かない敵: ダメージ 0
+                this.addPopup('魔法は効かない!', '#94a3b8', m.x, m.z);
+                this.notifyEnemyEngaged(m);
+                continue;
+            }
             const isDead = m.takeDamage(damage, { x: nx, z: nz });
             this.requestHitStop(HIT_FEEDBACK.hitStop.blast);
             this.addPopup(`爆発! -${damage}`, '#f97316', m.x, m.z);
@@ -3779,6 +3843,10 @@ export class GameEngine {
                         this.sound.playExplosion();
                         this.particles.spawnBurst(p.x, p.y, p.z, 0xff6a00, 20, 3.5);
                         this.addPopup(`炎のブレス被弾! -${p.damage}`, '#fb923c');
+                    } else if (p.type === 'fire_bolt') {
+                        this.sound.playExplosion();
+                        this.particles.spawnBurst(p.x, p.y, p.z, 0xff6a00, 12, 3.0);
+                        this.addPopup(`火球被弾! -${p.damage}`, '#fb923c');
                     } else if (p.type === 'poison_dust') {
                         this.sound.playExplosion();
                         this.particles.spawnBurst(p.x, p.y, p.z, 0xd946ef, 16, 3.0);

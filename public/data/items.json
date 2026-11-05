@@ -63,6 +63,7 @@
   },
   "fire": {
     "id": "fire",
+    "element": "fire",
     "name": "ファイア",
     "kind": "spell",
     "type": "fireball",
@@ -88,6 +89,7 @@
   },
   "explosion": {
     "id": "explosion",
+    "element": "fire",
     "name": "爆発火球",
     "kind": "spell",
     "type": "strike",
@@ -102,6 +104,7 @@
   },
   "spread": {
     "id": "spread",
+    "element": "ice",
     "name": "拡散弾",
     "kind": "spell",
     "type": "spread",
@@ -129,6 +132,7 @@
   },
   "magic_bolt": {
     "id": "magic_bolt",
+    "element": "none",
     "name": "マジックボルト",
     "kind": "spell",
     "type": "fireball",

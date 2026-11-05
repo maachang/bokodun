@@ -13,7 +13,9 @@
 //     cat           { range, height, rest, flurry, flurryScale, away, cool } 猫系: 隠密・低く長く跳ぶ・近くで連続攻撃・ヒットアンドアウェイ
 //     relentless    { speed, joinRadius } 一定の速さで追跡をやめない・仲間が合流する（狼）
 //     territory     { radius, mode, leash } 縄張り（guard=縄張りに入ると攻撃 / patrol=範囲を巡回、入ると攻撃 / roam=住民のようにうろつき、攻撃されたときだけ追う）
-//     shoot         { type, range, cooldown, speed, damage } 遠距離攻撃
+//     shoot         { type, range, cooldown, speed, damage, mult } 遠距離攻撃（mult: 攻撃力に対する威力の倍率。damage を省いたとき、attackPower × mult）
+//     turret        true で固定砲台（動かない・待ち伏せしない・ノックバックしない。向きだけプレイヤーへ回り、射程に入ると撃ち続ける）。能力 turret でも同じ
+//     immune        魔法（弾・爆発）の、効かない属性の配列（fire / ice / holy / ... と、全属性を表す 'elemental'）。無属性（none）の魔法と、物理攻撃（剣・矢など）は、効く
 
 // 能力から決まる、遠距離攻撃の種類
 const SHOOT_BY_ABILITY = [
@@ -48,11 +50,16 @@ export function deriveProfile(def = {}) {
         regen: ab.has('regen'),
         ambush: ab.has('ambush'),
         knockback: ab.has('knockback'),
+        turret: !!(def.turret || ab.has('turret')) && def.turret !== false,   // 固定砲台
+        immune: new Set(def.immune || []),                                    // 魔法の、効かない属性
     };
     if (p.flying && p.flightHeight == null) p.flightHeight = defaultFlightHeight(def);
 
     // 遠距離攻撃: 個別の指定 > canShoot（従来の定義） > 能力
-    if (def.shoot) p.shoot = { type: 'magic', range: 14, cooldown: 3, speed: 8, damage: null, ...def.shoot };
+    if (def.shoot) {
+        p.shoot = { type: 'magic', range: 14, cooldown: 3, speed: 8, damage: null, ...def.shoot };
+        if (p.shoot.damage == null && def.shoot.mult != null) p.shoot.damage = Math.max(2, Math.round((def.attackPower ?? 10) * def.shoot.mult));
+    }
     else if (def.canShoot) p.shoot = { type: def.shootType || 'magic', range: def.shootRange ?? 15, cooldown: def.shootCooldown ?? 3, speed: null, damage: null };
     else {
         for (const [a, type, range, cooldown, speed, mult] of SHOOT_BY_ABILITY) {
@@ -142,6 +149,12 @@ export function deriveProfile(def = {}) {
     //   高い所にいる間は、近接が届かない（魔法・弓で撃ち落とす）。high: 高さ、wait: 高い所で狙う時間、glide: 滑空の速さと時間、recover: よけられたあとの隙、vulnerable: 隙の間の被ダメージ倍率
     if (def.raptor || (p.flying && /hawk|eagle|falcon|griffon/.test(id) && def.raptor !== false)) {
         p.raptor = { high: 5.0, wait: 1.5, glideSpeed: 14, glideTime: 0.9, recover: 1.8, hitRecover: 0.6, vulnerable: 1.5, ...(def.raptor || {}) };
+    }
+
+    // 固定砲台（turret）: 動かない（突進・跳ねる・追う動きは、すべてやめる）。待ち伏せもしない。弾は、上の遠距離攻撃（shoot）で撃つ
+    if (p.turret) {
+        p.flying = false; p.flightHeight = null; p.charge = null; p.hop = null; p.cat = null; p.relentless = null; p.rush = null;
+        p.raptor = null; p.territory = null; p.burrow = null; p.blink = null; p.ambushHide = null; p.knockback = false; p.aiType = 'stationary';
     }
 
     // 動き方（aiType）を決める。個別の指定があれば、それを優先する（ただし、飛ぶ敵が walk_chase の指定のままなら、飛ぶ動きにする）

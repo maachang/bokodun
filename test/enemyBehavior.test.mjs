@@ -483,3 +483,53 @@ test('潜る: 地中を、姿を消し、攻撃も受けずに近づき、近く
     for (let i = 0; i < 6; i++) a.update(0.05, P(3, 0), [], [], null, null, 1.0);
     assert.ok(!a.ambushHidden && a.state === 'chase' && a.hitScale > 1, `近づくと、不意打ち（威力 ${a.hitScale}）`);
 });
+
+test('ガーゴイル: 固定砲台（動かない・火の弾を連射・ノックバックしない）、魔法（無属性以外）が効かず、物理と無属性は効く', async () => {
+    const { Monster, deriveProfile } = await load();
+    const d = { ...defs.gargoyle, id: 'gargoyle' };
+    const p = deriveProfile(d);
+    assert.ok(p.turret && p.aiType === 'stationary' && !p.flying && !p.ambushHide, '固定砲台');
+    assert.equal(p.shoot.type, 'fire_bolt');
+    assert.ok(p.shoot.cooldown <= 1.0 && p.shoot.range >= 20, '連射・長射程');
+    assert.equal(p.shoot.damage, Math.round(d.attackPower * 0.5), '威力は攻撃力の 0.5 倍');
+    assert.ok(p.inflict.some(f => f.type === 'burn'), '火傷');
+    const g = new Monster('gargoyle', 0, 0, tex, d);
+    const proj = [];
+    const P = (x, z) => ({ x, z, floorY: 0, radius: 0.6 });
+    const scene = { add() {} };
+    for (let t = 0; t < 5; t += 0.05) g.update(0.05, P(12, 0), [], proj, null, scene, 1.0);
+    assert.ok(g.x === 0 && g.z === 0, '動かない');
+    assert.ok(proj.length >= 5, `5 秒で連射する（${proj.length} 発）`);
+    assert.ok(proj.every(q => q.type === 'fire_bolt' && !q.isPlayer && q.damage === p.shoot.damage));
+    // ノックバックしない
+    g.takeDamage(5, { x: 1, z: 0 });
+    assert.equal(g.knockback.lengthSq(), 0, 'ノックバックしない');
+    // 魔法の属性
+    for (const el of ['fire', 'ice', 'holy']) assert.ok(g.isImmuneTo(el), `${el} は効かない`);
+    assert.ok(!g.isImmuneTo('none') && !g.isImmuneTo(null) && !g.isImmuneTo(undefined), '無属性は効く');
+    // ほかの敵は、どの属性も効く
+    const s = new Monster('slime', 0, 0, tex, { ...defs.slime, id: 'slime' });
+    assert.ok(!s.isImmuneTo('fire'));
+    // 個別の免疫（fire だけ）
+    const salamander = new Monster('x', 0, 0, tex, { ...defs.slime, id: 'x', immune: ['fire'] });
+    assert.ok(salamander.isImmuneTo('fire') && !salamander.isImmuneTo('ice'));
+});
+
+test('ガーゴイルの置き場所: 洞窟・段丘（縁と段丘）・ピラミッドの墓所の入口・砂漠のピラミッドの段', () => {
+    const where = (id) => {
+        const m = readJsonE(`public/data/maps/${id}.json`);
+        const ch = Object.entries(m.enemies).filter(([, v]) => v === 'gargoyle').map(([k]) => k);
+        const cells = [];
+        m.layout.forEach((row, r) => [...row].forEach((c, i) => { if (ch.includes(c)) cells.push([r, i]); }));
+        return { m, cells };
+    };
+    const ct = where('cave_terrace');
+    assert.equal(ct.cells.length, 3);
+    const lvs = ct.cells.map(([r, c]) => parseInt(ct.m.heights[r][c], 36)).sort();
+    assert.deepEqual(lvs, [5, 7, 7], '縁（7）に 2・段丘（5）に 1');
+    const py = where('pyramid');
+    assert.equal(py.cells.length, 2, 'ピラミッドの墓所の入口');
+    assert.ok(py.cells.every(([r]) => r === 12), '前室の入口の左右');
+    assert.ok(where('field_desert').cells.length >= 1, '砂漠のピラミッドの段');
+});
+function readJsonE(f) { return JSON.parse(fs.readFileSync(path.join(root, f), 'utf-8')); }

@@ -1265,6 +1265,14 @@ export class Monster {
         }
     }
 
+    // 魔法の属性 element（fire / ice / holy / none ...）が、この敵に効かないか。無属性（none・未指定）は、いつも効く。
+    //   immune に 'elemental' があれば、無属性以外のすべての属性が効かない（ガーゴイル）
+    isImmuneTo(element) {
+        const im = this.profile?.immune;
+        if (!im || im.size === 0 || !element || element === 'none') return false;
+        return im.has('elemental') || im.has(element);
+    }
+
     // 燃焼で溜まったダメージを受け取る（game.js が takeDamage して、倒したら経験値を与える）
     consumeBurnDamage() {
         const d = this.pendingBurn;
@@ -1294,7 +1302,7 @@ export class Monster {
         // 被弾したら状態にかかわらず即追跡
         this.state = 'chase';
         this.lostTimer = 0;
-        if (knockDir) {
+        if (knockDir && !this.profile?.turret) {   // 固定砲台（石像）は、ノックバックしない
             this.knockback.set(knockDir.x * 12 * knockScale, 0, knockDir.z * 12 * knockScale);
         }
         if (this.hp <= 0) {
@@ -1354,6 +1362,7 @@ export class Projectile {
         this.status = options.status || null;        // 命中した敵に与える状態異常（燃焼・鈍足）
         this.label = options.label || null;          // 命中時のポップアップに出す名前
         this.soundKind = options.soundKind || null;  // 命中時の効果音の種類（fire / ice / bolt）
+        this.element = options.element || null;      // 魔法の属性（fire / ice / none ...）。属性が効かない敵（ガーゴイル）の判定に使う
         this.hitsLeft = options.pierce || 1;         // 貫通できる残り体数（1=貫通しない）
         this.hitMonsters = new Set();                // 貫通中に、すでに当たった敵（二重ヒットしない）
         this.radius = (this.type === 'arrow') ? 0.25 : 0.45;
@@ -1415,6 +1424,17 @@ export class Projectile {
             this.aura = new THREE.Mesh(fireGeo, fireMat);
             this.mesh.add(this.aura);
             this.mesh.add(new THREE.Mesh(new THREE.SphereGeometry(0.28, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffe08a })));
+        } else if (this.type === 'fire_bolt') {
+            // 火の連射（ガーゴイルなど）: 小さめの火の玉。遠くまで飛ぶ
+            this.color = 0xff5a10;
+            this.trailColor = 0xffa940;
+            this.lifeTime = 3.2;
+            this.radius = 0.4;
+            const boltGeo = new THREE.DodecahedronGeometry(0.34, 1);
+            const boltMat = new THREE.MeshBasicMaterial({ color: 0xff6a1a, wireframe: true });
+            this.aura = new THREE.Mesh(boltGeo, boltMat);
+            this.mesh.add(this.aura);
+            this.mesh.add(new THREE.Mesh(new THREE.SphereGeometry(0.2, 8, 8), new THREE.MeshBasicMaterial({ color: 0xffe08a })));
         } else if (this.type === 'poison_dust') {
             // Poison Moth Spores / Toxic Dust Cluster
             this.color = 0xd946ef;

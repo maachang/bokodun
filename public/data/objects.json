@@ -208,6 +208,13 @@
     "solid": false,
     "description": "水路や谷に架かる木製の橋・板張り床"
   },
+  "rope_bridge": {
+    "type": "bridge_deck",
+    "texture": "woodBridge",
+    "solid": false,
+    "lift": true,
+    "description": "谷に架かる吊橋（薄い板の床と、両脇のロープの手すり・支柱。柱の側面はなく、下に谷の底が見える。床の高さは、マップの heights で決める。下の谷の底の高さは、マップの bridgeUnder）"
+  },
   "cobblestone_path": {
     "type": "floor_tile",
     "texture": "cobblestone",

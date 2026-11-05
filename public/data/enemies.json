@@ -198,6 +198,8 @@
     ],
     "y": 1.2,
     "radius": 0.95,
+    "deathColor": "#9ca3af",
+    "stealth": "normal",
     "alwaysAware": true,
     "deathColor": "#ef4444",
     "family": "golem",
@@ -3179,8 +3181,29 @@
     "rank": 5,
     "boss": false,
     "abilities": [
-      "fly",
-      "ambush"
+      "turret",
+      "ranged"
+    ],
+    "maxHp": 70,
+    "attackPower": 14,
+    "exp": 60,
+    "speed": 0,
+    "y": 1.3,
+    "deathColor": "#9ca3af",
+    "stealth": "normal",
+    "alwaysAware": true,
+    "shoot": {
+      "type": "fire_bolt",
+      "range": 24,
+      "cooldown": 0.9,
+      "speed": 8,
+      "mult": 0.5
+    },
+    "inflict": [
+      { "type": "burn", "chance": 0.15, "t": 3, "dps": 3 }
+    ],
+    "immune": [
+      "elemental"
     ],
     "stats": {
       "level": 30,

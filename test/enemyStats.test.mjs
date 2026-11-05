@@ -12,7 +12,7 @@ const ranks = readJson('enemyRanks.json');
 const ABILITIES = new Set([
     'fatigue', 'exhaust', 'regen', 'lifesteal', 'lastStand', 'revive', 'armorBreak', 'enrage',
     'poison', 'venom', 'paralysis', 'slow', 'burn', 'curse', 'silence', 'blind',
-    'fly', 'burrow', 'teleport', 'charge', 'summon', 'split', 'flee', 'ambush',
+    'fly', 'burrow', 'teleport', 'charge', 'summon', 'split', 'flee', 'ambush', 'turret',
     'ranged', 'breath', 'aoe', 'knockback', 'pull', 'reflect', 'barrier', 'evasion',
     'pack', 'rare', 'sticky', 'stealItem'
 ]);

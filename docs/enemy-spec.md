@@ -117,7 +117,7 @@
 - スタミナへの攻撃: `fatigue`（疲労: 攻撃にスタミナを削る効果を付ける）、`exhaust`（消耗: 攻撃にスタミナの消費増加や回復の遅延・停止を付ける。種類は下の表）。
 - 回復・耐久: `regen`（自動回復）、`lifesteal`（吸血: 与ダメージの一部をHPに回復。スタミナ攻撃の `drain` とは別）、`lastStand`（踏ん張り）、`revive`（復活）、`armorBreak`（硬質: 一定以下のダメージを通さない）、`enrage`（怒り）。
 - 状態異常の攻撃: `poison`（毒）、`venom`（猛毒）、`paralysis`（麻痺）、`slow`（鈍足）、`burn`（燃焼）、`curse`（呪い）、`silence`（沈黙）、`blind`（暗闇）。
-- 行動・移動: `fly`（飛行）、`burrow`（潜行）、`teleport`（瞬間移動）、`charge`（突進）、`summon`（召喚）、`split`（分裂）、`flee`（逃走）、`ambush`（待ち伏せ）。
+- 行動・移動: `turret`（固定砲台: 動かず撃ち続ける。ガーゴイル）、`fly`（飛行）、`burrow`（潜行）、`teleport`（瞬間移動）、`charge`（突進）、`summon`（召喚）、`split`（分裂）、`flee`（逃走）、`ambush`（待ち伏せ）。
 - 遠距離・範囲: `ranged`（射撃）、`breath`（ブレス）、`aoe`（範囲魔法）、`knockback`（ノックバック）、`pull`（引き寄せ）。
 - 防御・耐性: `reflect`（反射）、`barrier`（結界）、`evasion`（高回避）。武器耐性・魔法の有効率・攻撃属性は、2〜4章のとおり。
 - その他: `pack`（群れ）、`rare`（レア）、`sticky`（取りつき）、`stealItem`（盗み）。
