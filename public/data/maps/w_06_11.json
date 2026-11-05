@@ -23,6 +23,7 @@
  "legend": {
   "A": "cactus",
   "G": "grass_tree",
+  "J": "conifer_forest_a",
   "Q": "water",
   "U": "succulent",
   "X": "dead_tree",
@@ -175,7 +176,7 @@
   "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
  ],
  "layout": [
-  "0000000wG0pm000000m00000000000v0000l000m00mG0A00000QQQ0X00000i00",
+  "0000000wG0pm000000m00000J00000v0000l000mJ0mG0A00000QQQ0X00000i00",
   "0000m000000000v00pG00000000000000000000000000000000QQQ000000000i",
   "00000000vm000000l0m00000w00v0000m00000000000000i000QQQQ000000000",
   "000000Gm000w00000m00w00000m00m000000000000000000000QQQQ000000000",

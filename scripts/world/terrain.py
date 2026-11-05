@@ -397,6 +397,30 @@ def _tropical_coast(land, biome):
     return land, biome, lagoon, pond
 
 
+def _foothill_ponds(land, biome):
+    """雪山の裾野（雪・針葉樹の地形の、南側の帯）に、小さな池を置く。半分は凍った池（氷の地面。歩ける）、半分は雪解けの池（深い水＋浅いふち）。
+    戻り値: pond（深い水）, ring（浅いふち）, frozen（凍った池＝氷の地面にする所）"""
+    rng = np.random.default_rng(91)
+    Y, X = np.mgrid[0:H, 0:W].astype(np.float32)
+    band = land & np.isin(biome, [SNOW, CONIFER]) & (Y > 250) & (Y < 390) & (_distance(~land) >= 12)
+    cand = np.argwhere(band)
+    pond = np.zeros((H, W), bool); ring = np.zeros((H, W), bool); frozen = np.zeros((H, W), bool)
+    if len(cand) == 0: return pond, ring, frozen
+    noise_e = (fbm(98, (12, 5, 2)) - 0.5) * 0.4
+    picks = []
+    for _ in range(400):
+        y, x = cand[rng.integers(len(cand))]
+        if all((y - py) ** 2 + (x - px) ** 2 > 45 ** 2 for py, px in picks): picks.append((y, x))
+        if len(picks) >= 12: break
+    for n, (py, px) in enumerate(picks):
+        rx, ry = rng.uniform(4.5, 8), rng.uniform(3.5, 6)
+        e = ((X - px) / rx) ** 2 + ((Y - py) / ry) ** 2 + noise_e < 1.0
+        ring_e = ((X - px) / (rx + 1.8)) ** 2 + ((Y - py) / (ry + 1.8)) ** 2 + noise_e < 1.0
+        if n % 2 == 0: frozen |= ring_e & land                          # 凍った池: 氷の地面（歩ける）
+        else: pond |= e & land; ring |= (ring_e & ~e) & land            # 雪解けの池
+    return pond, ring, frozen
+
+
 def build():
     land_i, biome_i, lake_i = read_image()
     sx, sy = W / land_i.shape[1], H / land_i.shape[0]
@@ -411,6 +435,8 @@ def build():
     lake = _shrink_lake(lake)
     land, lake, biome = _reshape_coast(land, lake, biome)
     land, biome, lagoon, pond = _tropical_coast(land, biome)   # 南国の入り江・小島・砂州・池
+    fpond, fring, ffrozen = _foothill_ponds(land, biome)        # 雪山の裾野の池
+    pond = pond | fpond
 
     # 川（世界のマス）: 線に、ゆらぎをつけて描く。浅瀬（歩いて渡れる）を、間隔をあけて作る
     river = np.zeros((H, W), np.uint8)   # 0 なし・1 深い・2 浅瀬
@@ -478,7 +504,7 @@ def build():
     # 湖のふちと川の浅瀬: 浅瀬
     lake_edge = lake & ~_ero(lake, 3)
     bridge = (river == 2) & ~lake
-    water_shallow = lake_edge
+    water_shallow = lake_edge | fring
     water_deep &= ~water_shallow & ~bridge
     water_deep = water_deep | pond
     any_water = water_deep | water_shallow | bridge | lagoon
@@ -494,10 +520,13 @@ def build():
     peaks = np.zeros((H, W), np.float32)
     for px, py, ph, ps in PEAKS_SNOW:
         peaks += ph * np.exp(-(((ix - px) ** 2 + (iy - py) ** 2) / (2 * ps ** 2)))
+    # 裾野（雪山の南側の帯）: 氷河が運んだような、ゆるい丘（モレーン）と谷。山の高い所には、足さない
+    foot_w = np.clip((iy - 170) / 50, 0, 1) * (1 - np.clip((iy - 255) / 20, 0, 1))
+    moraine = (3 + 6 * fbm(51, (28, 10, 4)) + 3 * (1 - np.abs(2 * fbm(52, (36, 12, 4)) - 1)) ** 2) * foot_w
     ridge1 = 1 - np.abs(2 * fbm(31, (56, 20, 7)) - 1)      # 尾根（0〜1）: 1 に近いほど、尾根の筋
     ridge2 = 1 - np.abs(2 * fbm(33, (30, 11, 4)) - 1)
     valley = fbm(35, (72, 24, 8))
-    e_snow = e_snow + peaks * (0.35 + 0.95 * ridge1 ** 1.6) + 7 * ridge2 ** 2 * np.clip(peaks / 12, 0, 1) - 6 * (valley > 0.62) * np.clip(peaks / 10, 0, 1)
+    e_snow = e_snow + moraine * (1 - np.clip(peaks / 14, 0, 1)) + peaks * (0.35 + 0.95 * ridge1 ** 1.6) + 7 * ridge2 ** 2 * np.clip(peaks / 12, 0, 1) - 6 * (valley > 0.62) * np.clip(peaks / 10, 0, 1)
     # 岩山（東・南東）: 段々の山。炭鉱のまわりは、掘削跡（くぼ地）
     e_rock = np.full((H, W), 3.0, np.float32)
     for px, py, ph, ps in PEAKS_ROCK:
@@ -510,7 +539,7 @@ def build():
         e_rock = e_rock - pit * 14                                        # 中央をくぼませる
         e_rock = e_rock + 5 * np.exp(-(((d - MINE_R * 0.75) / 5) ** 2))   # ふちの盛り土
     e_rock = np.maximum(e_rock, 1)
-    e_con = 3 + 6 * fbm(41, (60, 20, 8))
+    e_con = 3 + 6 * fbm(41, (60, 20, 8)) + 3 * (1 - np.abs(2 * fbm(53, (30, 10, 4)) - 1)) ** 2
     plains = 4.0 * fbm(43, (96, 32, 10))
     # 西の大森林: 起伏を激しく（短い周期の丘と、尾根・谷）。木が密なので、地形でも通りにくくなる
     ridgeF = (1 - np.abs(2 * fbm(46, (34, 12, 4)) - 1)) ** 2
@@ -528,7 +557,7 @@ def build():
     elev = _lipschitz(elev)
     elev[any_water | ~land] = 0
     elev = _lipschitz(elev)
-    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, bridge=bridge, lake=lake, river=river, elev=elev, dist_sea=_distance(~land), dist_water=_distance(any_water))
+    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, dist_sea=_distance(~land), dist_water=_distance(any_water))
 
 
 if __name__ == '__main__':

@@ -75,15 +75,49 @@ def build_tiles(t):
     forest_tree = lambda mask, k: (put(mask & lat & (k < 0.5), 'T'), put(mask & lat & (k >= 0.5), 'V'))
     conifer_forest = lambda mask, k: (put(mask & lat & (k < 0.5), 'J'), put(mask & lat & (k >= 0.5), 'L'))   # 寒冷地の森: 針葉樹（ID 262・263）を 2 倍
     conifer_single = lambda mask, k: (put(mask & (k < 0.5), 'x'), put(mask & (k >= 0.5), 'y'))            # 寒冷地の、単独の針葉樹（1 倍）
-    conifer_forest(sn & (elev < 12) & (patch > 0.5) & (u2 < 0.55), u3)               # 裾野の木（2 倍の木を、1 本ずつ）
-    conifer_single(sn & (elev < 12) & (u < 0.10) & (obj == ord('0')), u3)
-    conifer_single(sn & (elev >= 12) & (elev < 24) & (u < 0.025), u3)
+    # --- 雪山の裾野: 標高による帯（草地 → ツンドラ → 針葉樹林（森林限界）→ まばらな木と雪原 → 雪と岩肌）。境は、ノイズでぼかす ---
+    foot = free & np.isin(biome, [SNOW, CONIFER])
+    nj = (T.fbm(120, (24, 9, 3)) - 0.5) * 4
+    ee = elev + nj
+    snowp = T.fbm(121, (16, 6, 3)); tundrap = T.fbm(122, (18, 7, 3))
+    meadow = foot & (ee < 3.5)
+    tundra = foot & (ee >= 3.5) & (ee < 6.5)
+    belt = foot & (ee >= 5.5) & (ee < 11.5)
+    sparse = foot & (ee >= 11.5) & (ee < 17)
+    # 地面: 草地は草、ツンドラは苔の土に雪の斑点、森林帯は雪の斑点が多い土、まばらな帯は雪に土の斑点
+    fl(meadow, 'g'); fl(tundra | belt, 'u')
+    fl(tundra & (snowp > 0.66), 's'); fl(belt & (snowp > 0.5), 's'); fl(sparse, 's'); fl(sparse & (tundrap > 0.72), 'u')
+    # 草・花: 草地（高原の草・ラベンダー・草の花）、ツンドラ（高地の雑草・草）
+    put(meadow & (u < 0.13), 'h'); put(meadow & (u3 > 0.95), 'l'); put(meadow & (u3 > 0.90) & (u3 <= 0.95), 'v'); put(meadow & (u2 < 0.05) & (u3 < 0.5), 'o')
+    put(tundra & (u < 0.10), 'o'); put(tundra & (u2 < 0.06), 'h'); put(tundra & (u3 > 0.97), 'l')
+    put(belt & (u3 < 0.05), 'o')
+    # 木: 針葉樹林（森林限界）は、2 倍の針葉樹を、まとまりのある群れで。草地・ツンドラにも、群れのはしが入る。まばらな帯は、一本立ち
+    conifer_forest(belt & (patch > 0.42) & (u2 < 0.75), u3)
+    conifer_forest((meadow | tundra) & (patch > 0.62) & (u2 < 0.45), u3)
+    conifer_single((belt | tundra) & (u < 0.06) & (obj == ord('0')), u3)
+    conifer_single(sparse & (u < 0.025), u3)
+    conifer_single(meadow & (u < 0.015), u3)
+    # 枯れ木（砂漠の珍しい木）: 森林限界の上の方に、まばらに
+    put((belt | sparse) & (ee >= 8.5) & (u3 < 0.025) & (obj == ord('0')), 'X')
+    # 水辺（裾野の池・川）: 毒々しい湿地の花・高地の草
+    put(foot & (d_water <= 3) & (u2 < 0.12) & (obj == ord('0')), 's')
+    put(foot & (d_water <= 3) & (u3 < 0.10) & (obj == ord('0')), 'h')
+    # 凍った池（氷の地面）
+    fl(t['frozen'] & land, 'i')
+    # 裾野と草原の境をぼかす: 草原（草の地形）のうち、裾野から 28 マス以内は、ツンドラの地面・針葉樹・高地の草が、距離とともに、まばらになる（境が、1 本の線にならない）
+    d_cold = T._distance(np.isin(biome, [SNOW, CONIFER]) & land)
+    trans = free & (biome == GRASS) & (d_cold > 0) & (d_cold <= 28)
+    tt = d_cold.astype(np.float32) / 28.0                                       # 境 0 → 28 マス先 1
+    mixn = T.fbm(123, (20, 8, 3)) * 0.6 + 0.2
+    mix = trans & (mixn > tt)                                                   # 境に近いほど、混ざる
+    fl(mix, 'u'); fl(mix & (snowp > 0.8), 's')
+    put(mix & (u < 0.10) & (obj == ord('0')), 'o'); put(mix & (u2 < 0.05) & (obj == ord('0')), 'h')
+    conifer_forest(trans & (patch > 0.55) & (u2 < (1 - tt) * 0.5), u3)
+    conifer_single(trans & (u < (1 - tt) * 0.05) & (obj == ord('0')), u3)
     put(sn & (elev >= 14) & cl & (u3 < 0.88), 'c')                              # 断崖の壁（ところどころ切れて、峠になる）
     fl(sn & (elev >= 16) & (ice_hi > 0.62), 'i')                               # 氷河
-    fl(sn & (elev < 14) & (ice_lo > 0.74), 'i')                                # 凍った湖
+    fl(sn & (elev >= 8) & (elev < 14) & (ice_lo > 0.82), 'i')                  # 山の谷の、凍った所
     fl(sn & (elev >= 24) & (bare > 0.25), 'r')                                  # 高い所は、岩肌
-    co = free & (biome == CONIFER)
-    conifer_single(co & (u < 0.06), u3); conifer_forest(co & (patch > 0.52) & (u2 < 0.6), u3)
 
     # --- 西の大森林: 巨木（217・218 の木を 3 倍）・真っ暗・起伏が激しい。岩山や崖にはしない（普通の、通れる起伏）。迷路的にするなら、木でなく起伏で ---
     fo = free & (biome == FOREST)
@@ -216,6 +250,9 @@ def main():
             base_ch = max(floor_counts, key=floor_counts.get)
             env = dict(envs[SEA if sea_frac > 0.35 else dom])
             env['floorType'] = FLOOR[base_ch]
+            foot_frac = float((np.isin(bm, [SNOW, CONIFER]) & L & (el < 12)).sum()) / max(1, int(L.sum()))
+            if dom in (SNOW, CONIFER) and foot_frac > 0.5:
+                env = dict(envs[CONIFER]); env['floorType'] = FLOOR[base_ch]   # 裾野: ツンドラの環境
             if dom == TROPICAL:
                 env.update(TROPICAL_ENV)
             if not sea_frac > 0.35 and dom == FOREST:

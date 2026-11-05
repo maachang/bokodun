@@ -21,9 +21,8 @@
   "skyColor": 14674418
  },
  "legend": {
-  "c": "cliff_rock_wall",
-  "x": "conifer_tree_a",
-  "y": "conifer_tree_b"
+  "X": "dead_tree",
+  "c": "cliff_rock_wall"
  },
  "enemies": {},
  "heightStep": 0.5,
@@ -97,7 +96,8 @@
  "floorLegend": {
   "i": "ice",
   "r": "rock",
-  "s": "snow"
+  "s": "snow",
+  "u": "tundra"
  },
  "floorLayer": [
   "rrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrssssrrrrrrrrrrrrrrrrrrrrrrrr",
@@ -161,9 +161,9 @@
   "rrrrsssrrssssssrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrsssssssrrssssssss",
   "rrrrssssrssssssrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrssssssssssssssssss",
   "rrrrsssrrsssssrrrrrrrrrrrrrrrrrrrrrrrrrrrrrsssssssssssssssssssss",
-  "ssssssssrrrrrrrrrrrrrrrrrrrrrrirrrrrrrrrrrrsssssssssssssssssssss",
-  "sssssssssrrrrrrrrrrrrrrrrrrrrriirrrrrrrrrrrsssssssssssssssssssss",
-  "ssssssssssrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrssssssssssssssssssssss"
+  "ssssssssrrrrrrrrrrrrrrrrrrrrrrirrrrrrrrrrrrssssssuuussssssssssss",
+  "sssssssssrrrrrrrrrrrrrrrrrrrrriirrrrrrrrrrrsssssuuuuusssssssssss",
+  "ssssssssssrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrsssssuuuuuuussssssusss"
  ],
  "layout": [
   "0000000000ccccccccccc0ccc00000000000000000cc00000000000000000000",
@@ -225,10 +225,10 @@
   "00000000cccccc00000000000000000000000000000000000000000000000000",
   "0000000000000000000000000000000000000000000000000000000000000000",
   "0000000000000000000000000000000000000000000000000000000000000000",
-  "00000000000000000000000000000000000000000000000x0000000000000000",
-  "000000x0000000000cc000000000000000000000000000000000000000000000",
-  "0000000000000000cccc000000000000000000000000x0000000000x00000000",
-  "00x0000000000000ccccc0000000000000000000000000000000000000000000",
-  "00000000000000000ccc0cccc0000000000000000000y0000000000000000000"
+  "0000000000000000000000000000000000000000000000000000000000000000",
+  "00000000000000000cc000000000000000000000000000000000000000000000",
+  "0000000000000000cccc00000000000000000000000000000000000000000000",
+  "0000000000000000ccccc0000000000000000000000000000000000000000000",
+  "00000000000000000ccc0cccc0000000000000000000000X0000000000000000"
  ]
 }

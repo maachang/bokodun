@@ -915,7 +915,7 @@ test('寒冷地の木: 新しい針葉樹 2 枚（ID 262・263）が主役。森
             if (name.startsWith('conifer_tree')) single += n;
         }
     }
-    assert.ok(cold > 3000 && single > 5000, `寒冷地の木: 森 ${cold}・単独 ${single}`);
+    assert.ok(cold > 3000 && single > 2000, `寒冷地の木: 森 ${cold}・単独 ${single}`);
 });
 
 test('南国の作り込み: ジャングルの木（2 倍）・ヤシの林・入り江と沖の小島・砂州・池・青緑の浅瀬・明るい空気・ゆるい丘。木の間は通れる', () => {
@@ -1019,4 +1019,34 @@ test('木の足元の影: いったん、すべてなくした（TREE_SHADOWS = 
     const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
     assert.ok(game.includes('export const TREE_SHADOWS = false;'), '影のスイッチ: いまは、すべてなし');
     assert.ok(game.includes('if (TREE_SHADOWS && !objDef.noShadow) {') && game.includes('shadow: shadowMesh'), '影の処理');
+});
+
+test('雪山の裾野: 標高の帯（草地→ツンドラ→針葉樹林→まばらな木と雪原）・枯れ木・花と高地の草・凍った池と雪解けの池・ゆるい丘・草原との境のぼかし・ツンドラの環境', () => {
+    let tundraTiles = 0, iceTiles = 0, dead = 0, lavender = 0, highlandGrass = 0, ponds = 0, footMeshes = 0, blendTiles = 0, hillyMaxLevel = 0, footEnvOk = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const lay = m.layout.join('');
+        const count = (name) => Object.entries(m.legend).filter(([, v]) => v === name).reduce((s, [ch]) => s + lay.split(ch).length - 1, 0);
+        const fl = m.floorLayer.join('');
+        const floorN = (ft) => Object.entries(m.floorLegend).filter(([, v]) => v === ft).reduce((s, [ch]) => s + fl.split(ch).length - 1, 0);
+        const cold = m.name.startsWith('北の雪山') || m.name.startsWith('針葉樹');
+        if (cold) {
+            tundraTiles += floorN('tundra'); iceTiles += floorN('ice'); dead += count('dead_tree'); lavender += count('lavender_flower'); highlandGrass += count('highland_grass');
+            ponds += count('water');
+            footMeshes++;
+            if (m.environment.floorType === 'tundra' && m.environment.fogFar <= 70) footEnvOk++;
+            for (const row of m.heights) for (const ch of row) hillyMaxLevel = Math.max(hillyMaxLevel, levelOf(ch));
+        } else if (m.name.startsWith('草原') || m.name.startsWith('砂地') || m.name.startsWith('大森林')) {
+            blendTiles += floorN('tundra');   // 草原のマップに、ツンドラの地面が、境のぼかしとして、入る
+        }
+    }
+    assert.ok(footMeshes >= 20, `雪山・裾野のマップ: ${footMeshes}`);
+    assert.ok(tundraTiles > 8000, `ツンドラの地面: ${tundraTiles}`);
+    assert.ok(iceTiles > 1500, `凍った池・氷河の地面: ${iceTiles}`);
+    assert.ok(dead > 100, `枯れ木: ${dead}`);
+    assert.ok(lavender > 100 && highlandGrass > 500, `ラベンダー ${lavender}・高地の草 ${highlandGrass}`);
+    assert.ok(ponds > 400, `川と雪解けの池の水: ${ponds}`);
+    assert.ok(blendTiles > 800, `草原との境のぼかし（ツンドラの地面が、草原のマップに入る）: ${blendTiles}`);
+    assert.ok(footEnvOk >= 5, `裾野のマップは、ツンドラの環境（冷たい光・やや濃い霧）: ${footEnvOk}`);
+    assert.ok(hillyMaxLevel >= 20, `山の高さ: ${hillyMaxLevel}`);
 });
