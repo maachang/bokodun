@@ -978,7 +978,7 @@ export class GameEngine {
 
         // Spawn objects based on map layout & legend
         // 起伏のあるマップ: 高くなっているマスに置く、木・草・壁などは、そのマスの高さだけ持ち上げて置く（scene.add を、その間だけ差し替える）
-        const LIFT_TYPES = new Set(['block', 'tree', 'boulder', 'plant', 'tree_wall', 'furniture', 'floor_tile', 'wooden_fence']);
+        const LIFT_TYPES = new Set(['block', 'tree', 'boulder', 'plant', 'tree_wall', 'furniture', 'floor_tile', 'wooden_fence', 'chest', 'portal']);   // 高低差のあるマスで、そのマスの高さまで持ち上げる種類。宝箱・ポータルも（高台で、床に埋まらない）
         const origSceneAdd = this.scene.add;
         const unlift = () => { if (this.scene.add !== origSceneAdd) this.scene.add = origSceneAdd; };
         for (let r = 0; r < rows; r++) {
@@ -1797,6 +1797,7 @@ export class GameEngine {
                         this.scene.add(chestGroup);
 
                         const chestObj = {
+                            floorY: this.heightLevelAtTile(r, c) * this.heightStep,   // 置かれている床の高さ（高台の宝箱を、下から開けないように）
                             group: chestGroup,
                             lidPivot: lidPivot,
                             baseMesh: baseMesh,
@@ -3419,7 +3420,7 @@ export class GameEngine {
 
                 // Check distance to prompt player interaction
                 const distToChest = Math.hypot(this.player.x - ch.x, this.player.z - ch.z);
-                if (distToChest < ch.radius + 0.8 && !ch.isOpen && ch.group.visible) {
+                if (distToChest < ch.radius + 0.8 && !ch.isOpen && ch.group.visible && this.sameFloorAs(ch.floorY)) {
                     nearChestInteractable = true;
                 }
             }
@@ -4567,13 +4568,18 @@ export class GameEngine {
             for (const ch of this.chests) {
                 if (ch.isOpen || !ch.group.visible) continue;
                 const dist = Math.hypot(this.player.x - ch.x, this.player.z - ch.z);
-                if (dist <= ch.radius + 1.2) {
+                if (dist <= ch.radius + 1.2 && this.sameFloorAs(ch.floorY)) {
                     this.openChest(ch);
                     return true;
                 }
             }
         }
         return false;
+    }
+
+    // プレイヤーが、高さ floorY の物と、同じ床にいるか（高台の宝箱を、崖の下から開けない）。段差 1 段までは、同じ床（隣のマスの階段の 1 段目から、など）。2 段以上は、別の床
+    sameFloorAs(floorY) {
+        return Math.abs((this.player.floorY ?? 0) - (floorY ?? 0)) <= (this.heightStep ?? 1) * 1.1;
     }
 
     // Open chest or trigger Mimic encounter

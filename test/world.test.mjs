@@ -628,3 +628,25 @@ test('地下迷宮（dungeon）: 天井に届かない高さ・上り 1 段/下�
     const torchCh = Object.entries(d.legend).find(([, v]) => v === 'cave_torch')[0];
     assert.ok(d.layout.join('').split('').filter(ch => ch === torchCh).length >= 4, '松明');
 });
+
+// 高低差のあるマスの物体: 床の高さまで持ち上がる種類だけを置く（宝箱が高台の床に埋まる・液体が地面の下に隠れて、ダメージだけ受ける、を防ぐ）
+test('高低差のあるマップ: 高いマスに置く物体は、持ち上げの対象（LIFT_TYPES・lift: true）。液体（溶岩・水・急流）は、高さ 0 のマスだけ', () => {
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const lift = new Set([...game.match(/const LIFT_TYPES = new Set\(\[([^\]]*)\]/)[1].matchAll(/'([^']+)'/g)].map(x => x[1]));
+    assert.ok(lift.has('chest') && lift.has('portal'), '宝箱・ポータルも持ち上げる');
+    assert.ok(game.includes('sameFloorAs(ch.floorY)'), '宝箱は、同じ床の高さからだけ開けられる');
+    let checked = 0;
+    for (const f of fs.readdirSync(path.join(root, 'public/data/maps'))) {
+        const m = readJson(`public/data/maps/${f}`);
+        if (!m.heights) continue;
+        m.layout.forEach((row, r) => [...row].forEach((ch, c) => {
+            const name = m.legend[ch];
+            const d = name && objects[name];
+            if (!d || m.enemies?.[ch] || levelOf(m.heights[r][c]) === 0) return;
+            checked++;
+            assert.notEqual(d.type, 'liquid_tile', `${m.id} ${r},${c}: 液体（${name}）は、高さ 0 のマスだけ`);
+            assert.ok(lift.has(d.type) || d.lift, `${m.id} ${r},${c}: ${name}（${d.type}）が、高いマスで持ち上がらない`);
+        }));
+    }
+    assert.ok(checked > 50, `検査したマス: ${checked}`);
+});
