@@ -1273,3 +1273,22 @@ test('スタミナ: やられて復活するとき、全回復する', () => {
     const g = fs.readFileSync('public/js/game.js', 'utf8');
     assert.equal(g.split('this.player.stamina = this.player.maxStamina; this.player.staminaExhausted = false;').length - 1, 4);
 });
+
+test('草原のブラッシュアップ: 丘陵・ため池・林がある', () => {
+    const dir = path.join(root, 'public/data/maps');
+    let maxH = 0, pondMaps = 0, groveMaps = 0;
+    for (const f of fs.readdirSync(dir)) {
+        if (!/^w_\d\d_\d\d\.json$/.test(f)) continue;
+        const d = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8'));
+        const fl = d.floorLayer; if (!fl) continue;
+        const grass = fl.join('').split('').filter(c => d.floorLegend[c] === 'grass').length / 4096;
+        if (grass < 0.9) continue;
+        maxH = Math.max(maxH, ...d.heights.join('').split('').map(c => parseInt(c, 36)));
+        const names = d.layout.join('').split('').map(c => d.legend?.[c]);
+        if (names.includes('water')) pondMaps++;
+        if (names.filter(n => n === 'grass_tree').length >= 100) groveMaps++;
+    }
+    assert.ok(maxH >= 9, `草原の最大の高さ ${maxH}`);
+    assert.ok(pondMaps >= 3, `ため池のある草原のマップ ${pondMaps}`);
+    assert.ok(groveMaps >= 5, `林のある草原のマップ ${groveMaps}`);
+});

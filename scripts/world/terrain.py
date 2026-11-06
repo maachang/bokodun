@@ -335,6 +335,50 @@ def _reshape_coast(land, lake, biome, max_water=0.5):
     return land, lake, b.astype(np.uint8)
 
 
+def _shape_coast(land, lake, biome, max_water=0.5):
+    """海岸線に、入り江（湾）と岬・半島を作る（43-55）。海岸線を、大きな周期のノイズで、内へ最大 8 マス・外へ最大 12 マス動かす。
+    陸のないメッシュには広げない（その手前でなだらかに 0）。水が max_water を超えるメッシュは、そのメッシュの動きを、外へ寄せて、直す。新しい陸の地形は、近い陸の地形。"""
+    frac0 = _mesh_frac(land)
+    active = np.kron(frac0 > 0, np.ones((MESH, MESH), bool))
+    ramp = np.clip((_distance(~active) - 3) / 14.0, 0, 1).astype(np.float32)
+    d_in = _distance(~land).astype(np.float32)              # 陸の内側へ、海岸からの距離
+    d_out = _distance(land).astype(np.float32)              # 海の側へ、海岸からの距離
+    signed = np.where(land, d_in, -d_out)                   # 陸: 正・海: 負
+    coast_n = fbm(56, (70, 26, 8)); coast_n2 = fbm(57, (30, 11, 4))
+    move = (coast_n - 0.5) * 2 * 16 + (coast_n2 - 0.5) * 2 * 4       # 負: 内へ（入り江）、正: 外へ（岬）
+    move = np.clip(move, -8, 12)
+    bias_grid = np.zeros((GH, GW), np.float32)
+    new_land = land
+    for _ in range(30):
+        bias = np.asarray(Image.fromarray(bias_grid).resize((W, H), Image.BILINEAR))
+        new_land = ((signed + (move + bias) * ramp) > 0) & active
+        new_land = box_mean(new_land.astype(np.float32), 5) > 0.5
+        wf = _mesh_frac((~new_land) | lake)
+        viol = (wf > max_water) & (frac0 > 0)
+        if not viol.any(): break
+        bias_grid[viol] += 2
+    new_land = _fill_holes(_largest(new_land | (land & (d_in >= 9))))   # 陸が、ちぎれない・内陸の穴を作らない
+    lake = lake & new_land
+    # 新しい陸の地形: いちばん近い陸の種類
+    known = land & new_land
+    b = np.where(known, biome, 255).astype(np.uint8)
+    pick = (np.random.default_rng(6).integers(0, 4, size=(H, W))).astype(np.int8)
+    dirs = [(1, 0), (-1, 0), (0, 1), (0, -1)]
+    for _ in range(40):
+        if known[new_land].all(): break
+        nbs = [(np.roll(np.roll(b, dy, 0), dx, 1), np.roll(np.roll(known, dy, 0), dx, 1)) for dy, dx in dirs]
+        newb = b.copy(); newk = known.copy()
+        for k in range(4):
+            for d in range(4):
+                nb, nk = nbs[d]
+                take = new_land & ~newk & nk & (((pick + k) % 4) == d)
+                newb[take] = nb[take]; newk |= take
+        b, known = newb, newk
+    b[new_land & (b == 255)] = GRASS
+    b[~new_land] = SEA
+    return new_land, lake, b.astype(np.uint8)
+
+
 def _tropical_coast(land, biome):
     """南国の海岸を作り込む。入り江（ラグーン）2 つ（陸を削って、浅い青緑の水に）・沖の小島 3 つ（陸を足す）・小島へ歩いて渡れる砂州（浅瀬）・内陸の池。
     戻り値: land, biome, lagoon（入り江・砂州・池のふち＝歩ける浅瀬）, pond（池の深い所）"""
@@ -420,6 +464,28 @@ def _avoid_seams(path, margin):
 def _near_seam(mask_y, mask_x, dist):
     """(y, x) が、マップの境界線（64 マスごと）から、dist マス以内か"""
     return ((mask_x % MESH) < dist) | ((mask_x % MESH) >= MESH - dist) | ((mask_y % MESH) < dist) | ((mask_y % MESH) >= MESH - dist)
+
+
+def _grass_ponds(land, biome):
+    """草原の、ため池。小さい池（深い水）と、浅いふち。川・海・山から離して、点々と置く（43-54）。戻り値: pond, ring"""
+    rng = np.random.default_rng(93)
+    Y, X = np.mgrid[0:H, 0:W].astype(np.float32)
+    band = land & (biome == GRASS) & (_distance(~land) >= 16) & ~_near_seam(Y.astype(int), X.astype(int), 12) & (Y > 330)
+    cand = np.argwhere(band)
+    pond = np.zeros((H, W), bool); ring = np.zeros((H, W), bool)
+    if len(cand) == 0: return pond, ring
+    noise_e = (fbm(94, (12, 5, 2)) - 0.5) * 0.5
+    picks = []
+    for _ in range(3000):
+        y, x = cand[rng.integers(len(cand))]
+        if all((y - py) ** 2 + (x - px) ** 2 > 70 ** 2 for py, px in picks): picks.append((y, x))
+        if len(picks) >= 14: break
+    for py, px in picks:
+        rx, ry = rng.uniform(3.5, 6.5), rng.uniform(3.0, 5.5)
+        e = ((X - px) / rx) ** 2 + ((Y - py) / ry) ** 2 + noise_e < 1.0
+        ring_e = ((X - px) / (rx + 1.6)) ** 2 + ((Y - py) / (ry + 1.6)) ** 2 + noise_e < 1.0
+        pond |= e & land; ring |= (ring_e & ~e) & land
+    return pond, ring
 
 
 def _foothill_ponds(land, biome):
@@ -768,13 +834,17 @@ def build():
     lake = _scale(lake_i.astype(np.uint8), warp=(wx, wy)).astype(bool) & land
     lake = _shrink_lake(lake)
     land, lake, biome = _reshape_coast(land, lake, biome)
+    land, lake, biome = _shape_coast(land, lake, biome)         # 入り江と岬
     land, biome, lagoon, pond = _tropical_coast(land, biome)   # 南国の入り江・小島・砂州・池
     biome = _expand_desert_north(land, biome)                  # 砂漠を、北へ広げる
     fpond, fring, ffrozen = _foothill_ponds(land, biome)        # 雪山の裾野の池
     pond = pond | fpond
+    gpond, gring = _grass_ponds(land, biome)                     # 草原のため池
+    pond = pond | gpond
     oasis = _desert_oases(land, biome, sx, sy)                           # 砂漠のオアシス
     pond = pond | oasis['pond']
     fring = fring | oasis['ring']
+    fring = fring | gring
 
     # 川（世界のマス）: 線に、ゆらぎをつけて描く。浅瀬（歩いて渡れる）を、間隔をあけて作る
     river = np.zeros((H, W), np.uint8)   # 0 なし・1 深い・2 浅瀬
@@ -838,6 +908,10 @@ def build():
     river[~land] = 0
     # 湖と重なる川は、湖に任せる（深い水）
     river[lake] = 0
+    # 海岸・湖で切れて、短くなった橋（橋のマスが 3 マス以下）は、橋にしない（両岸をつなげない橋を、作らない）
+    lab_b = _components(river == 2)
+    for k in range(1, int(lab_b.max()) + 1):
+        if (lab_b == k).sum() <= 3: river[lab_b == k] = 1
 
     water_deep = lake | (river == 1)
     # 湖のふちと川の浅瀬: 浅瀬
@@ -880,6 +954,15 @@ def build():
     e_rock = np.maximum(e_rock, 1)
     e_con = 3 + 6 * fbm(41, (60, 20, 8)) + 3 * (1 - np.abs(2 * fbm(53, (30, 10, 4)) - 1)) ** 2
     plains = 4.0 * fbm(43, (96, 32, 10))
+    # 草原: ゆるやかな丘陵（周期の長い起伏）。大きな丘（見晴らしの丘）が点々と。傾きは、ゆるい（道をつけやすい）。低い所は、池・川のくぼ地になる
+    w_gr = blur(biome == GRASS, 12)
+    hills = 1.0 + 6.0 * fbm(70, (84, 30, 9)) ** 1.3 + 2.0 * (1 - np.abs(2 * fbm(71, (44, 16, 5)) - 1)) ** 2
+    lookout = np.zeros((H, W), np.float32)
+    rng_h = np.random.default_rng(95)
+    for _ in range(9):
+        py_, px_ = rng_h.integers(300, 760), rng_h.integers(300, 1100)
+        lookout += rng_h.uniform(3.0, 5.0) * np.exp(-(((xs - px_) ** 2 + (ys - py_) ** 2) / (2 * rng_h.uniform(14, 22) ** 2)))
+    plains = plains * (1 - w_gr) + (hills + lookout) * w_gr
     # 西の大森林: 起伏を激しく（短い周期の丘と、尾根・谷）。木が密なので、地形でも通りにくくなる
     ridgeF = (1 - np.abs(2 * fbm(46, (34, 12, 4)) - 1)) ** 2
     e_for = 3 + 13 * fbm(45, (28, 10, 4)) + 9 * ridgeF

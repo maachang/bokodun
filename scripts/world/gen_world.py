@@ -133,7 +133,17 @@ def build_tiles(t):
     gr = free & (biome == GRASS)
     put(gr & (u < 0.12), 'm')
     put(gr & (u3 < 0.02), 'v'); put(gr & (u3 >= 0.02) & (u3 < 0.035), 'w'); put(gr & (u3 >= 0.035) & (u3 < 0.042), 'p'); put(gr & (u3 >= 0.042) & (u3 < 0.05), 'b')
-    put(gr & (u2 < 0.01), 'l'); put(gr & (u3 > 0.985), 'G')
+    put(gr & (u2 < 0.01), 'l'); put(gr & (u3 > 0.995), 'G')                      # 一本立ちの木は、まれに
+    # 草原の見どころ（43-54）: 林（木のかたまり。格子の点だけなので、木の間は通れる）・茂み（花の茂みのかたまり）・お花畑・丘の上の一本木・池のまわりの草
+    grove = gr & (patch2 > 0.60) & (d_water > 3)
+    put(grove & lat & (u < 0.55), 'G')
+    put(grove & ~lat & (u2 < 0.10), 'b')
+    thicket = gr & (patch > 0.68) & (patch2 <= 0.60)
+    put(thicket & (u3 < 0.22), 'b'); put(thicket & (u3 >= 0.22) & (u3 < 0.30), 'm')
+    meadow_f = gr & (patch < 0.26) & (patch2 < 0.5)                              # お花畑: 花が、まとまって咲く
+    put(meadow_f & (u < 0.30), 'v'); put(meadow_f & (u >= 0.30) & (u < 0.42), 'w'); put(meadow_f & (u >= 0.42) & (u < 0.48), 'p')
+    put(gr & (elev >= 9) & (u < 0.012) & lat, 'G')                               # 丘の上の一本木
+    put(gr & (d_water <= 2) & (d_water > 0) & (u2 < 0.35) & (obj == ord('0')), 'm')  # 水辺は、草が濃い
 
     # --- 砂地 ---
     de = free & (biome == DESERT)
