@@ -1115,7 +1115,9 @@ test('南国の植物は南国の近くだけ: 北・草原・森に毒々しい
         const m = readJson(`public/data/maps/${id}.json`);
         const names = new Set(m.layout.join('').split('').map((ch) => m.legend[ch]).filter(Boolean));
         const tropical = m.environment.skyColor === 0x4fd0e8;
-        if (!tropical && r <= 8 && (names.has('marsh_flower') || names.has('palm'))) bad.push(`${id}（北）`);
+        const dch = Object.keys(m.floorLegend).find((k) => m.floorLegend[k] === 'desert');
+        const desertFrac = dch ? (m.floorLayer.join('').split(dch).length - 1) / (m.floorLayer.join('').length) : 0;   // 砂漠のオアシスには、ヤシがある
+        if (!tropical && r <= 8 && (names.has('marsh_flower') || (names.has('palm') && desertFrac < 0.05))) bad.push(`${id}（北）`);
         if (!tropical && m.environment.floorType !== 'rock' && r <= 10 && names.has('tropical_palm_forest')) bad.push(`${id}（ヤシの林）`);
     }
     assert.deepEqual(bad, []);
@@ -1161,4 +1163,28 @@ test('砂漠は砂丘の起伏がある: 砂地の床が 60% 以上のマップ�
     }
     assert.ok(n > 0, '砂漠のマップがない');
     assert.deepEqual(flat, []);
+});
+
+test('砂漠にオアシスがある: 砂地の中に、池（水）・草の地面・ヤシがあり、街の予定地（広い平らな所）がある', () => {
+    let oases = 0, town = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const t = m.floorLayer.join('');
+        const ch = (name) => Object.keys(m.floorLegend).find((k) => m.floorLegend[k] === name);
+        const dch = ch('desert'), gch = ch('grass');
+        if (!dch || (t.split(dch).length - 1) / t.length < 0.3 || !gch) continue;
+        const names = new Set(m.layout.join('').split('').map((c) => m.legend[c]));
+        if (names.has('water') && names.has('palm')) oases++;
+        // 街の予定地: 高さ 0 で、物のない、9×9 のかたまり（池を囲む、幅 9 マスの輪の中）
+        const h = m.heights, L = m.layout;
+        for (let y = 0; y + 9 <= 64 && !town; y += 3) for (let x = 0; x + 9 <= 64; x += 3) {
+            let okb = true;
+            for (let yy = y; yy < y + 9 && okb; yy++) for (let xx = x; xx < x + 9; xx++) {
+                if (h[yy][xx] !== '0' || !['0', 'm'].includes(m.legend[L[yy][xx]] === 'meadow_grass' ? 'm' : (L[yy][xx] === '0' ? '0' : 'x'))) { okb = false; break; }
+            }
+            if (okb) { town++; break; }
+        }
+    }
+    assert.ok(oases >= 1, 'オアシスがない');
+    assert.ok(town >= 1, '街の予定地がない');
 });

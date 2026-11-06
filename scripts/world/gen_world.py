@@ -147,6 +147,17 @@ def build_tiles(t):
     thin_de = de & (d_out_de <= 14) & (d_out_de > 0) & (u5 < np.clip((14.0 - d_out_de.astype(np.float32)) / 8.0, 0, 1))   # 境から 6 マス以内は全部、14 マスで 0
     for ch in 'AXUi': obj[thin_de & (obj == ord(ch))] = ord('0')
     put(thin_de & (obj == ord('0')) & (u < 0.12), 'i')                         # 砂地には、乾いた草
+    # オアシス: 草の地面・池のそばの白い砂。草・花・ヤシ・南国の木・ガマ。街の予定地（大きなオアシスの、半径 20 マス）は、物を置かない（草を少しだけ）
+    oa = t['oasis']
+    fl(oa['grass'] & land, 'g'); fl(oa['sand'] & land, 'w')
+    for ch in 'AXUi': obj[oa['grass'] & (obj == ord(ch))] = ord('0')               # 砂漠の植物は、オアシスに置かない
+    oag = oa['grass'] & free & ~oa['clear'] & (obj == ord('0'))
+    put(oag & (u < 0.25), 'm'); put(oag & (u3 < 0.05), 'b'); put(oag & (u3 >= 0.05) & (u3 < 0.09), 'w'); put(oag & (u3 >= 0.09) & (u3 < 0.12), 'p')
+    put(oag & lat & (u2 < 0.18), 'M'); put(oag & (u2 > 0.96), 'Y')                     # ヤシ・南国の木
+    put(oag & (d_water <= 2) & (u < 0.3), 'k')                                         # 池のそば: ガマ
+    oc = oa['clear'] & free
+    for ch in 'MYadfrsbwpek' + 'AXUiGlvho': obj[oc & (obj == ord(ch))] = ord('0')      # 街の予定地: 物（木・花・草）を、置かない
+    put(oc & (u < 0.04), 'm')
     # 草原の植物（草・花・草原の木）は、寒い土地・砂地との境で、間引く（雪山・ツンドラ・砂漠の中に、草原の植物が混ざらない）。境から 6 マス以内は全部、14 マス先で 0
     d_dry = T._distance(land & (biome == DESERT))
     u6 = (u3 * 9.1 + u * 4.7) % 1.0

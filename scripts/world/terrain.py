@@ -446,6 +446,39 @@ def _foothill_ponds(land, biome):
     return pond, ring, frozen
 
 
+def _desert_oases(land, biome):
+    """砂漠のオアシス（砂漠の奥に 3 か所。1 か所は、街を作る大きな所）。
+    戻り値: dict(pond=深い水, ring=浅いふち, grass=草の地面, sand=白い砂のふち, flat=平らにする所（高さ 0）, clear=物を置かない所（街の予定地）, town=街の予定地の中心, centers=[(y, x, 種別)])"""
+    rng = np.random.default_rng(97)
+    Y, X = np.mgrid[0:H, 0:W].astype(np.float32)
+    out = dict(pond=np.zeros((H, W), bool), ring=np.zeros((H, W), bool), grass=np.zeros((H, W), bool), sand=np.zeros((H, W), bool),
+               flat=np.zeros((H, W), bool), clear=np.zeros((H, W), bool), town=None, centers=[])
+    dd = _distance(~(land & (biome == DESERT))).astype(np.float32)
+    ok = land & (biome == DESERT) & (dd >= 24) & ~_near_seam(Y.astype(int), X.astype(int), 22)    # 砂漠の奥。境界線から離す（街の平らな所が、境界線を越えない）
+    cand = np.argwhere(ok)
+    if len(cand) == 0: return out
+    # 1 か所目（街）: 砂漠の、いちばん奥に近い所。あとは、70 マス以上離す
+    best = cand[np.argmax(dd[cand[:, 0], cand[:, 1]])]
+    picks = [(int(best[0]), int(best[1]), 'town')]
+    for _ in range(600):
+        y, x = cand[rng.integers(len(cand))]
+        if all((y - py) ** 2 + (x - px) ** 2 > 70 ** 2 for py, px, _k in picks): picks.append((int(y), int(x), 'small'))
+        if len(picks) >= 3: break
+    noise = (fbm(99, (14, 5, 2)) - 0.5) * 0.5
+    for py, px, kind in picks:
+        r_pond, r_grass, r_flat = (9.0, 26.0, 20.0) if kind == 'town' else (5.5, 9.0, 10.0)
+        d = np.hypot(X - px, Y - py)
+        e = d / r_pond + noise < 1.0                                    # 池（深い水）
+        ring = (d / (r_pond + 2.0) + noise < 1.0) & ~e                  # 浅いふち
+        out['pond'] |= e & land; out['ring'] |= ring & land
+        out['sand'] |= (d / (r_pond + 4.0) + noise < 1.0) & ~e & ~ring & land      # 池のそばの白い砂
+        out['grass'] |= (d / r_grass + noise * 0.6 < 1.0) & land        # 草の地面
+        out['flat'] |= (d <= r_flat) & land
+        if kind == 'town': out['clear'] |= (d <= r_flat) & land; out['town'] = (py, px)
+        out['centers'].append((py, px, kind))
+    return out
+
+
 def build():
     land_i, biome_i, lake_i = read_image()
     sx, sy = W / land_i.shape[1], H / land_i.shape[0]
@@ -462,6 +495,9 @@ def build():
     land, biome, lagoon, pond = _tropical_coast(land, biome)   # 南国の入り江・小島・砂州・池
     fpond, fring, ffrozen = _foothill_ponds(land, biome)        # 雪山の裾野の池
     pond = pond | fpond
+    oasis = _desert_oases(land, biome)                           # 砂漠のオアシス
+    pond = pond | oasis['pond']
+    fring = fring | oasis['ring']
 
     # 川（世界のマス）: 線に、ゆらぎをつけて描く。浅瀬（歩いて渡れる）を、間隔をあけて作る
     river = np.zeros((H, W), np.uint8)   # 0 なし・1 深い・2 浅瀬
@@ -582,6 +618,8 @@ def build():
     gap = np.clip((fbm(63, (22, 8, 3)) - 0.62) * 8, 0, 1)                               # 峠（尾根の切れ目）
     ripple = 0.8 * (1 - np.abs(2 * fbm(64, (10, 4, 2)) - 1))                            # 砂紋（細かい波）
     e_des = 2 + amp * saw * (1 - 0.85 * gap) + ripple
+    d_oa = _distance(oasis['flat']).astype(np.float32)                                  # オアシス（平ら）までの距離: 近づくほど、砂丘が低くなる
+    e_des = e_des * np.clip(d_oa / 30.0, 0, 1)
     dm = _distance(biome != DESERT)
     for _ in range(3):                                                                  # 星型の砂丘（砂漠の奥に、高い山）
         py_, px_ = np.unravel_index(np.argmax(dm), dm.shape)
@@ -594,13 +632,13 @@ def build():
     elev = np.where(land, elev, 0)
     elev = np.clip(elev, 0, MAX_LEVEL).round().astype(np.int32)
     # 水辺・海岸に向かって、1 マスに 1 段までの傾きで下がる
-    seeds = any_water | ~land
+    seeds = any_water | ~land | oasis['flat']
     dist = _distance(seeds)
     elev = np.minimum(elev, dist.astype(np.int32))
     elev = _lipschitz(elev)
-    elev[any_water | ~land] = 0
+    elev[any_water | ~land | oasis['flat']] = 0
     elev = _lipschitz(elev)
-    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, dist_sea=_distance(~land), dist_water=_distance(any_water))
+    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, oasis=oasis, dist_sea=_distance(~land), dist_water=_distance(any_water))
 
 
 if __name__ == '__main__':
