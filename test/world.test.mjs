@@ -1028,7 +1028,7 @@ test('木の足元の影: いったん、すべてなくした（TREE_SHADOWS = 
     assert.ok(game.includes('if (TREE_SHADOWS && !objDef.noShadow) {') && game.includes('shadow: shadowMesh'), '影の処理');
 });
 
-test('雪山の裾野: 標高の帯（草地→ツンドラ→針葉樹林→まばらな木と雪原）・枯れ木・花と高地の草・凍った池と雪解けの池・ゆるい丘・草原との境のぼかし・ツンドラの環境', () => {
+test('雪山の裾野: 標高の帯（草地→ツンドラ→針葉樹林→まばらな木と雪原）・花と高地の草・凍った池と雪解けの池・ゆるい丘・草原との境のぼかし・ツンドラの環境', () => {
     let tundraTiles = 0, iceTiles = 0, dead = 0, lavender = 0, highlandGrass = 0, ponds = 0, footMeshes = 0, blendTiles = 0, hillyMaxLevel = 0, footEnvOk = 0;
     for (const id of world.grid.flat().filter(Boolean)) {
         const m = readJson(`public/data/maps/${id}.json`);
@@ -1050,7 +1050,7 @@ test('雪山の裾野: 標高の帯（草地→ツンドラ→針葉樹林→ま
     assert.ok(footMeshes >= 20, `雪山・裾野のマップ: ${footMeshes}`);
     assert.ok(tundraTiles > 8000, `ツンドラの地面: ${tundraTiles}`);
     assert.ok(iceTiles > 1500, `凍った池・氷河の地面: ${iceTiles}`);
-    assert.ok(dead > 100, `枯れ木: ${dead}`);
+    assert.ok(dead < 20, `砂漠の木（dead_tree）は、雪山の裾野に置かない（砂漠との境に残るだけ）: ${dead}`);
     assert.ok(lavender > 100 && highlandGrass > 500, `ラベンダー ${lavender}・高地の草 ${highlandGrass}`);
     assert.ok(ponds > 400, `川と雪解けの池の水: ${ponds}`);
     assert.ok(blendTiles > 800, `草原との境のぼかし（ツンドラの地面が、草原のマップに入る）: ${blendTiles}`);

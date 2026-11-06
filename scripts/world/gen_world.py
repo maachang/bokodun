@@ -97,8 +97,6 @@ def build_tiles(t):
     conifer_single((belt | tundra) & (u < 0.06) & (obj == ord('0')), u3)
     conifer_single(sparse & (u < 0.025), u3)
     conifer_single(meadow & (u < 0.015), u3)
-    # 枯れ木（砂漠の珍しい木）: 森林限界の上の方に、まばらに
-    put((belt | sparse) & (ee >= 8.5) & (u3 < 0.025) & (obj == ord('0')), 'X')
     # 水辺（裾野の池・川）: 高地の草（毒々しい花は湿地・南国の花なので、北の裾野には置かない）
     put(foot & (d_water <= 3) & (u3 < 0.10) & (obj == ord('0')), 'h')
     # 凍った池（氷の地面）
