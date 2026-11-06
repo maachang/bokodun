@@ -446,24 +446,56 @@ def _foothill_ponds(land, biome):
     return pond, ring, frozen
 
 
-def _desert_oases(land, biome):
-    """砂漠のオアシス（砂漠の奥に 3 か所。1 か所は、街を作る大きな所）。
+def _components(mask):
+    """True の所の、連結成分の番号（4 近傍。1 から）"""
+    lab = np.zeros((H, W), np.int32); n = 0
+    for y0, x0 in zip(*np.nonzero(mask)):
+        if lab[y0, x0]: continue
+        n += 1; st = [(y0, x0)]; lab[y0, x0] = n
+        while st:
+            y, x = st.pop()
+            for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                yy, xx = y + dy, x + dx
+                if 0 <= yy < H and 0 <= xx < W and mask[yy, xx] and not lab[yy, xx]: lab[yy, xx] = n; st.append((yy, xx))
+    return lab
+
+
+def _expand_desert_north(land, biome, reach=22):
+    """砂漠を、北（上）へ広げる。草原の地形のうち、砂漠のすぐ北（reach マス以内。ゆらぎあり）を、砂漠にする。雪・森・岩山・海には、広げない"""
+    n = (fbm(71, (30, 10, 4)) - 0.5) * 2.0                         # -1〜1
+    R = np.clip(reach * (0.65 + 0.55 * n), 0, reach * 1.2)          # 列ごと・場所ごとの、広げる量（ゆらぎ）
+    out = biome.copy()
+    d = np.full(W, 10 ** 6, np.int32)                                # 各列の、すぐ南にある砂漠までの距離
+    for y in range(H - 1, -1, -1):
+        d = np.where(biome[y] == DESERT, 0, np.minimum(d + 1, 10 ** 6))
+        grow = (biome[y] == GRASS) & land[y] & (d <= R[y])
+        out[y] = np.where(grow, DESERT, out[y])
+    return out
+
+
+def _desert_oases(land, biome, sx=1.0, sy=1.0):
+    """砂漠のオアシス（砂漠の真ん中あたりに、最大 2 か所。川から離す。いちばん大きな砂漠が、街を作る大きなオアシス、2 つ目は小さなオアシス）。
     戻り値: dict(pond=深い水, ring=浅いふち, grass=草の地面, sand=白い砂のふち, flat=平らにする所（高さ 0）, clear=物を置かない所（街の予定地）, town=街の予定地の中心, centers=[(y, x, 種別)])"""
-    rng = np.random.default_rng(97)
     Y, X = np.mgrid[0:H, 0:W].astype(np.float32)
     out = dict(pond=np.zeros((H, W), bool), ring=np.zeros((H, W), bool), grass=np.zeros((H, W), bool), sand=np.zeros((H, W), bool),
                flat=np.zeros((H, W), bool), clear=np.zeros((H, W), bool), town=None, centers=[])
-    dd = _distance(~(land & (biome == DESERT))).astype(np.float32)
-    ok = land & (biome == DESERT) & (dd >= 24) & ~_near_seam(Y.astype(int), X.astype(int), 22)    # 砂漠の奥。境界線から離す（街の平らな所が、境界線を越えない）
-    cand = np.argwhere(ok)
-    if len(cand) == 0: return out
-    # 1 か所目（街）: 砂漠の、いちばん奥に近い所。あとは、70 マス以上離す
-    best = cand[np.argmax(dd[cand[:, 0], cand[:, 1]])]
-    picks = [(int(best[0]), int(best[1]), 'town')]
-    for _ in range(600):
-        y, x = cand[rng.integers(len(cand))]
-        if all((y - py) ** 2 + (x - px) ** 2 > 70 ** 2 for py, px, _k in picks): picks.append((int(y), int(x), 'small'))
-        if len(picks) >= 3: break
+    des = land & (biome == DESERT)
+    dd = _distance(~des).astype(np.float32)
+    # 川（RIVERS の折れ線）までの距離: オアシスは、川から離す
+    rim = Image.new('L', (W, H), 0); rd = ImageDraw.Draw(rim)
+    for rv in RIVERS: rd.line([(x * sx, y * sy) for x, y in rv['pts']], fill=255, width=3)
+    d_river = _distance(np.asarray(rim) > 0).astype(np.float32)
+    ok = des & (dd >= 24) & (d_river >= 40) & ~_near_seam(Y.astype(int), X.astype(int), 22)    # 砂漠の奥・川から 40 マス以上・境界線から離す
+    # 砂漠のまとまり（連結成分）ごとに、いちばん奥（縁から遠い）の所を 1 か所。大きなまとまりから、最大 2 か所
+    comps = _components(des)
+    picks = []
+    for cid in sorted(range(1, comps.max() + 1), key=lambda c: -int((comps == c).sum())):
+        m = ok & (comps == cid)
+        if not m.any(): continue
+        sc = np.where(m, dd, -1)
+        py, px = np.unravel_index(np.argmax(sc), sc.shape)
+        if all((py - a) ** 2 + (px - b) ** 2 > 90 ** 2 for a, b, _k in picks): picks.append((int(py), int(px), 'town' if not picks else 'small'))
+        if len(picks) >= 2: break
     noise = (fbm(99, (14, 5, 2)) - 0.5) * 0.5
     for py, px, kind in picks:
         r_pond, r_grass, r_flat = (9.0, 26.0, 20.0) if kind == 'town' else (5.5, 9.0, 10.0)
@@ -493,9 +525,10 @@ def build():
     lake = _shrink_lake(lake)
     land, lake, biome = _reshape_coast(land, lake, biome)
     land, biome, lagoon, pond = _tropical_coast(land, biome)   # 南国の入り江・小島・砂州・池
+    biome = _expand_desert_north(land, biome)                  # 砂漠を、北へ広げる
     fpond, fring, ffrozen = _foothill_ponds(land, biome)        # 雪山の裾野の池
     pond = pond | fpond
-    oasis = _desert_oases(land, biome)                           # 砂漠のオアシス
+    oasis = _desert_oases(land, biome, sx, sy)                           # 砂漠のオアシス
     pond = pond | oasis['pond']
     fring = fring | oasis['ring']
 

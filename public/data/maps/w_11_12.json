@@ -45,7 +45,7 @@
  "sideShade": 1.0,
  "heights": [
   "bccccccccbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaabcdeeffggfedcba9876",
-  "bbbbbbcbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaabcdeeffgfedcba98765",
+  "bbbbbccbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbaaaaaaabcdeeffgfedcba98765",
   "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcddeeffgfedcba98765",
   "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcdeeeffgfedcba98765",
   "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbcdeefffedcba987654",
@@ -71,7 +71,7 @@
   "bbbbba999999999aaa999aaaaaaaaaa99abbccccccba9abcccba987654322100",
   "bbbbba999999999aaa9999aaaaaaaaa999abcccccccbabcbbba9876543211000",
   "bbbba9999999999aaa999999aaaaaaa9999abcccccccbcbaaa98765432100000",
-  "bbbba9999999999aa9999999999aaa99999abbbbbbbbbba99987654321000001",
+  "bbbba9999999999aaa999999999aaa99999abbbbbbbbbba99987654321000001",
   "bbbba99999999999999999999999a9999999aaaaaaaaaa999987654321000012",
   "bbba999999999999999999999999999999999999999999999987654321000012",
   "bbba999999999999999999999999999999999999999999999987654321000123",

@@ -1175,11 +1175,11 @@ test('砂漠にオアシスがある: 砂地の中に、池（水）・草の地
         if (!dch || (t.split(dch).length - 1) / t.length < 0.3 || !gch) continue;
         const names = new Set(m.layout.join('').split('').map((c) => m.legend[c]));
         if (names.has('water') && names.has('palm')) oases++;
-        // 街の予定地: 高さ 0 で、物のない、9×9 のかたまり（池を囲む、幅 9 マスの輪の中）
+        // 街の予定地: 高さ 0 で、物のない、7×7 のかたまり（池を囲む、幅 8 マスの輪の中）
         const h = m.heights, L = m.layout;
-        for (let y = 0; y + 9 <= 64 && !town; y += 3) for (let x = 0; x + 9 <= 64; x += 3) {
+        for (let y = 0; y + 7 <= 64 && !town; y += 3) for (let x = 0; x + 7 <= 64; x += 3) {
             let okb = true;
-            for (let yy = y; yy < y + 9 && okb; yy++) for (let xx = x; xx < x + 9; xx++) {
+            for (let yy = y; yy < y + 7 && okb; yy++) for (let xx = x; xx < x + 7; xx++) {
                 if (h[yy][xx] !== '0' || !['0', 'm'].includes(m.legend[L[yy][xx]] === 'meadow_grass' ? 'm' : (L[yy][xx] === '0' ? '0' : 'x'))) { okb = false; break; }
             }
             if (okb) { town++; break; }
