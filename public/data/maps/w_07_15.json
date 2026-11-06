@@ -25,6 +25,7 @@
   "b": "bush_flower",
   "c": "cliff_rock_wall",
   "h": "highland_grass",
+  "i": "arid_grass",
   "l": "lavender_flower",
   "m": "meadow_grass",
   "p": "path_flower",
@@ -172,7 +173,7 @@
   "ggggggggggggggggggggggggggggggggggggggggggggggggggggggggrrrrrrrr"
  ],
  "layout": [
-  "000bl0m0m000000000000m00bm000000m00000000000w00000m0000mmv000mm0",
+  "000bl0m0m000000000000m00bm000000m00000000000w00000m0000mm0i00mm0",
   "m0m0m000000000m000m0000000000v0G00000000000m0000m00m000m00000000",
   "00000000b0000000v0000m000000000m000pm000000Gm0m00m00000000000000",
   "0000wmm00w000m00m0mmv0m00w0000v00m00000mG0000l00m00000000m00G000",

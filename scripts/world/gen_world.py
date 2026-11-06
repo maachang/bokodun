@@ -141,6 +141,14 @@ def build_tiles(t):
     thin_de = de & (d_out_de <= 14) & (d_out_de > 0) & (u5 < np.clip((14.0 - d_out_de.astype(np.float32)) / 8.0, 0, 1))   # 境から 6 マス以内は全部、14 マスで 0
     for ch in 'AXUi': obj[thin_de & (obj == ord(ch))] = ord('0')
     put(thin_de & (obj == ord('0')) & (u < 0.12), 'm')
+    # 草原の植物（草・花・草原の木）は、寒い土地・砂地との境で、間引く（雪山・ツンドラ・砂漠の中に、草原の植物が混ざらない）。境から 6 マス以内は全部、14 マス先で 0
+    d_dry = T._distance(land & (biome == DESERT))
+    u6 = (u3 * 9.1 + u * 4.7) % 1.0
+    GRASS_PLANTS = 'mlvwpbG'
+    for dd_, repl in ((d_cold, 'o'), (d_dry, 'i')):
+        th = gr & (dd_ <= 14) & (dd_ > 0) & (u6 < np.clip((14.0 - dd_.astype(np.float32)) / 8.0, 0, 1))
+        for ch in GRASS_PLANTS: obj[th & (obj == ord(ch))] = ord('0')
+        put(th & (obj == ord('0')) & (u2 < 0.15), repl)                        # 寒い土地は高地の雑草・砂地は乾いた草に置き換える
 
     # --- 南国（入り江・小島・砂州・池・ゆるい丘とジャングルの谷）---
     tr = free & (biome == TROPICAL)
