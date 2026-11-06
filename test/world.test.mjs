@@ -1107,3 +1107,16 @@ test('マップの境界線: 継ぎ目の向かい合うマスの、歩ける・
     }
     assert.deepEqual(along.slice(0, 40), [], `境界線のそばを、渡らずに流れる川（境界から 2 マス以内）: ${along.length} マス`);
 });
+
+test('南国の植物は南国の近くだけ: 北・草原・森に毒々しい花がない。北半分の草原にヤシがない。境の近くで南国の木が急に現れない', () => {
+    const bad = [];
+    for (let r = 0; r < world.grid.length; r++) for (let c = 0; c < world.grid[r].length; c++) {
+        const id = world.grid[r][c]; if (!id) continue;
+        const m = readJson(`public/data/maps/${id}.json`);
+        const names = new Set(m.layout.join('').split('').map((ch) => m.legend[ch]).filter(Boolean));
+        const tropical = m.environment.skyColor === 0x4fd0e8;
+        if (!tropical && r <= 8 && (names.has('marsh_flower') || names.has('palm'))) bad.push(`${id}（北）`);
+        if (!tropical && m.environment.floorType !== 'rock' && r <= 10 && names.has('tropical_palm_forest')) bad.push(`${id}（ヤシの林）`);
+    }
+    assert.deepEqual(bad, []);
+});

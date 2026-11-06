@@ -99,8 +99,7 @@ def build_tiles(t):
     conifer_single(meadow & (u < 0.015), u3)
     # 枯れ木（砂漠の珍しい木）: 森林限界の上の方に、まばらに
     put((belt | sparse) & (ee >= 8.5) & (u3 < 0.025) & (obj == ord('0')), 'X')
-    # 水辺（裾野の池・川）: 毒々しい湿地の花・高地の草
-    put(foot & (d_water <= 3) & (u2 < 0.12) & (obj == ord('0')), 's')
+    # 水辺（裾野の池・川）: 高地の草（毒々しい花は湿地・南国の花なので、北の裾野には置かない）
     put(foot & (d_water <= 3) & (u3 < 0.10) & (obj == ord('0')), 'h')
     # 凍った池（氷の地面）
     fl(t['frozen'] & land, 'i')
@@ -153,6 +152,13 @@ def build_tiles(t):
     put(palm_grove & lat & (u2 < 0.5), 'f')
     # マングローブ: 川・池のそば（湿地の木 1 倍）
     put(tr & (d_water <= 3) & (u < 0.35), 'r')
+    # 南国と他の地形の境: 境に近いほど南国の木・ヤシ・花を間引き、草に置き換える（草原・岩山の中に、南国の植物が急に現れない）
+    d_out = T._distance(land & (biome != TROPICAL) & (biome != SEA))             # 南国でない陸までの距離
+    u4 = (u * 13.7 + u2 * 5.3) % 1.0
+    fade = tr & (d_out <= 14) & (d_out > 0)
+    thin = fade & (u4 < (1.0 - d_out.astype(np.float32) / 14.0) * 0.9)
+    for ch in 'MYadfrsbwpe': obj[thin & (obj == ord(ch))] = ord('0')
+    put(thin & (obj == ord('0')) & (u3 < 0.3), 'm')
 
     # --- 東の山々と炭鉱 ---
     ro = free & (biome == ROCK)
@@ -181,7 +187,9 @@ def build_tiles(t):
     obj[beach & ~np.isin(obj, [ord('Y'), ord('M')])] = ord('0')
     fl(land & (d_sea <= beach_w), 'w')
     put(beach & (biome == TROPICAL) & (u < 0.08), 'M')
-    put(beach & (ys_ > 620) & (biome != TROPICAL) & (u < 0.03), 'M')
+    d_trop = T._distance(biome == TROPICAL)
+    near_trop = np.clip(1.0 - d_trop.astype(np.float32) / 40.0, 0, 1)            # 南国に近いほど多い（40 マス先でゼロ）
+    put(beach & (biome != TROPICAL) & (biome != SEA) & (u < 0.05 * near_trop), 'M')   # 南国でない浜: 南国に近い所だけ、ヤシ
     # 水辺: ガマ
     bank = free & (d_water <= 2) & np.isin(biome, [GRASS, FOREST])
     put(bank & (u2 < 0.3) & np.isin(obj, [ord('0'), ord('m'), ord('e'), ord('v'), ord('w'), ord('p'), ord('b')]), 'k')
