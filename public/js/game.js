@@ -877,7 +877,7 @@ export class GameEngine {
             tex.needsUpdate = true;
             const mesh = new THREE.Mesh(new THREE.PlaneGeometry(w, d), new THREE.MeshLambertMaterial({ map: tex }));
             mesh.rotation.x = -Math.PI / 2;
-            mesh.position.set(cx, -0.01, cz);
+            mesh.position.set(cx, -0.3, cz);   // 隣のマップの水の面（-0.15）・海の面（-0.2）より下（上だと、水が、模様のある地面におおわれる）
             this.scene.add(mesh);
         }
         // 端の向こうの、隣のマップ（斜めの角を含む 8 方向）を、本物のマス（高さ・地面・崖・水・木・草・岩）で描く（見た目だけ。当たり判定は、今のマップだけ）
@@ -1080,10 +1080,13 @@ export class GameEngine {
     async loadMap(mapId, opts = {}) {
         if (this.nav.busy) return;   // 読み込み中は、次の移動を受け付けない
         this.nav.busy = true;
+        this.loadingMap = true;   // 読み込み中は、更新・描画を止める（作りかけの画面や、前のマップの位置のままの画面が、一瞬映らない。前の画面のまま止まる）
         try {
             await this.loadMapBody(mapId, opts);
         } finally {
             this.nav.busy = false;
+            this.loadingMap = false;
+            this.clock?.getDelta();   // 止めていた間の時間を、捨てる（切り替え直後に、大きな時間が、一度に進まない）
         }
     }
 
@@ -5310,6 +5313,7 @@ export class GameEngine {
             requestAnimationFrame(loop);
             if (now - last < MIN_FRAME_MS) return;
             last = now;
+            if (this.loadingMap) return;   // マップの読み込み中は、更新も描画もしない（前の画面のまま）
             const dt = Math.min(0.1, this.clock.getDelta());
             this.update(dt);
             this.render();

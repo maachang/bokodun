@@ -1000,6 +1000,8 @@ test('端の向こうの景色: 隣のマップ（斜めの角を含む 8 方向
     assert.ok(game.includes('nd.floorLayer') && game.includes("def.type === 'liquid_tile'") && game.includes('waterBelow'), '地面の種類と水');
     assert.ok(game.includes("def.type === 'tree'") && game.includes("def.type === 'plant'") && game.includes("def.type === 'boulder'"), '木・草・岩');
     assert.ok(game.includes('prefetchNearbyMaps(mapId)') && game.includes('prefetchToken'), '2 マス先までのマップのデータを、先に読んでおく');
+    assert.ok(game.includes('this.loadingMap = true') && game.includes('if (this.loadingMap) return;'), 'マップの読み込み中は、更新も描画も止める（作りかけの画面が、一瞬映らない）');
+    assert.ok(game.includes('mesh.position.set(cx, -0.3, cz)'), '端の外の平らな地面は、隣のマップの水の面（-0.15）より下（水が、模様のある地面におおわれない）');
     assert.ok(game.includes('reversed'), '境の段差は、崖の面で埋める（隙間から空が見えない）');
     assert.ok(!game.includes('buildNeighborTerrain'), 'なめらかな面（古い方式）は、使わない');
     assert.ok(game.includes('for (const [mat, g] of groups)'), '地形の板は、材質ごとに 1 つのメッシュにまとめる（1 マスごとにメッシュを作らない。切り替えが止まる）');
