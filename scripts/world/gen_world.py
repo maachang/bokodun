@@ -28,7 +28,7 @@ LEGEND = {
     'J': 'conifer_forest_a', 'L': 'conifer_forest_b', 'j': 'great_conifer_a', 'n': 'great_conifer_b', 'x': 'conifer_tree_a', 'y': 'conifer_tree_b',   # 寒冷地の木（ID 262・263）: 森 2 倍・大森林 3 倍・単独 1 倍
     'a': 'tropical_forest_a', 'd': 'tropical_forest_b', 'f': 'tropical_palm_forest', 'r': 'swamp_tree_a', 's': 'marsh_flower', 'g': 'water_shallow_glow',   # 南国: ジャングルの木・ヤシの林（2 倍）・マングローブ・毒々しい花・青緑に光る浅瀬
     'c': 'cliff_rock_wall', 'Y': 'tropical_tree', 'E': 'mine_entrance', 't': 'mine_cart',
-    'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge',
+    'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge', 'I': 'rope_bridge',
 }
 SOLID_CH = set('FCNPDGAXUMRSBHcYEtTVWKJLjnxyadfr')          # 通れない物体（端のマスには置かない）
 # 地面の種類（floorLayer の文字 → environment.floorType と同じ名前）
@@ -324,6 +324,11 @@ def build_tiles(t):
     tr1[1:, :] |= trail[:-1, :]; tr1[:-1, :] |= trail[1:, :]; tr1[:, 1:] |= trail[:, :-1]; tr1[:, :-1] |= trail[:, 1:]
     for ch in 'JLjnxyPDXhoulzmeblvwp': obj[tr1 & (obj == ord(ch))] = ord('0')
     fl(trail & land, 'm')
+    # 吊橋（山の峡谷）: 橋のまわり（峡谷の中）の物を除いて、橋の床を置く
+    mb = t['mtn_bridge']
+    gb = T.box_mean(mb.astype(np.float32), 2) > 0
+    obj[gb & land] = ord('0')
+    put(mb, 'I')
     return obj, floor, elev
 
 
@@ -383,6 +388,7 @@ def main():
                     d = (r - cy) ** 2 + (c - cx) ** 2
                     if best is None or d < best[0]: best = (d, r, c)
             spawn = {'x': best[2], 'z': best[1], 'angle': 0} if best else {'x': 32, 'z': 32, 'angle': 0}
+            m_under = t['bridge_under'].get((j, i))
             m = {
                 'id': mid, 'name': mesh_name(j, i, counts, sea_frac, any(ch in ('E', 't') for ch in set(''.join(layout)))), 'type': 'open', 'tileSize': 4, 'wallHeight': 4,
                 'spawn': spawn, 'environment': env, 'legend': legend, 'enemies': {},
@@ -390,6 +396,7 @@ def main():
                 'floorLegend': {k: FLOOR[k] for k in sorted(set(''.join(floor_layer)))}, 'floorLayer': floor_layer,
                 'layout': layout,
             }
+            if m_under is not None: m['bridgeUnder'] = int(m_under)
             json.dump(m, open(os.path.join(MAPS, mid + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
             grid[j][i] = mid
             info[mid] = dict(row=j, col=i, dom=dom, sea=sea_frac, grass=counts[GRASS] / max(1, int(L.sum())), land=int(L.sum()))

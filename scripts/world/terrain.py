@@ -576,7 +576,58 @@ def _mountains(elev, land, biome, blocked, sx, sy):
         m = (d <= 6) & land & ~blocked
         out = np.where(m, ah, out)
         trail |= m & (d <= 5)
-    return out, trail, arenas
+    # 吊橋の峡谷: 山道どうしを、まっすぐ（9〜18 マス）結ぶ近道。山道を歩くと遠回りの所だけ（山道の輪＝半分迷路）
+    out, bridges, bridge_under = _gorge_bridges(out, trail, t2, land, blocked, _near_seam(Y, X, 5))
+    return out, trail, arenas, bridges, bridge_under
+
+
+def _gorge_bridges(out, trail, t2, land, blocked, near_seam):
+    """山道の、まっすぐで同じ高さの所（5〜8 マス）に、峡谷（山道を横切る、幅 14 の溝。床はマップごとの bridgeUnder）と、吊橋（幅 2）をかける。
+    橋でないと、その山道は渡れない（溝の両脇は、崖）。戻り値: out（溝の床・橋の高さを反映）, bridges（橋の床のマス）, bridge_under（{(マップ行, マップ列): 谷の底の高さ}）"""
+    bridges = np.zeros((H, W), bool)
+    gorge = np.zeros((H, W), bool)
+    near_b = np.zeros((H, W), bool)
+    deck = {}
+    ok_cell = land & ~blocked & ~near_seam & ~t2
+    ys, xs = np.nonzero(trail)
+    rng = np.random.default_rng(31)
+    n_bridge = 0
+    LAT = list(range(-6, 0)) + list(range(2, 8))
+    for k in rng.permutation(len(ys)):
+        if n_bridge >= 60: break
+        y, x = int(ys[k]), int(xs[k])
+        if out[y, x] < 8 or near_b[y, x]: continue
+        done = False
+        for dy, dx in ((0, 1), (1, 0)):
+            py, px = dx, dy
+            for ln in (7, 6, 5, 8):
+                if not (0 <= y + dy * (ln + 1) + py * 7 < H and 0 <= x + dx * (ln + 1) + px * 7 < W and y + py * -6 >= 0 and x + px * -6 >= 0): continue
+                band = [(y + dy * i + py * o, x + dx * i + px * o) for i in range(0, ln + 2) for o in (0, 1)]
+                if not all(trail[a] or t2[a] for a in band): continue
+                hs = [int(out[a]) for a in band]
+                if max(hs) - min(hs) > 1: continue
+                D = min(hs)
+                if D < 8: continue
+                lat = [(y + dy * i + py * o, x + dx * i + px * o) for i in range(1, ln + 1) for o in LAT]
+                if not all(ok_cell[a] and not gorge[a] for a in lat): continue
+                for a in lat: gorge[a] = True
+                for i in range(1, ln + 1):
+                    for o in (0, 1):
+                        c = (y + dy * i + py * o, x + dx * i + px * o); bridges[c] = True; deck[c] = D; gorge[c] = True
+                y0, y1, x0, x1 = max(0, y - 14), min(H, y + 15), max(0, x - 14), min(W, x + 15)
+                near_b[y0:y1, x0:x1] = True
+                n_bridge += 1; done = True
+                break
+            if done: break
+    M = 64
+    under = {}
+    for (a, b), D in deck.items():
+        key = (a // M, b // M); under[key] = min(under.get(key, 99), max(0, D - 4))
+    gy, gx = np.nonzero(gorge)
+    for a, b in zip(gy, gx): out[a, b] = under[(a // M, b // M)]
+    for (a, b), D in deck.items(): out[a, b] = D
+    print('吊橋', n_bridge)
+    return out, bridges, under
 
 
 def _desert_oases(land, biome, sx=1.0, sy=1.0):
@@ -779,9 +830,9 @@ def build():
     elev = _lipschitz(elev)
     elev[any_water | ~land | oasis['flat']] = 0
     elev = _lipschitz(elev)
-    elev, trail, arenas = _mountains(elev, land, biome, (water_deep & ~bridge) | oasis['flat'] | ~land, sx, sy)   # 連峰・山脈: 段丘と山道
+    elev, trail, arenas, mtn_bridge, bridge_under = _mountains(elev, land, biome, (water_deep & ~bridge) | oasis['flat'] | ~land, sx, sy)   # 連峰・山脈: 段丘と山道
     elev[any_water | ~land | oasis['flat']] = 0
-    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, trail=trail, arenas=arenas, oasis=oasis, dist_sea=_distance(~land), dist_water=_distance(any_water))
+    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, trail=trail, arenas=arenas, mtn_bridge=mtn_bridge, bridge_under=bridge_under, oasis=oasis, dist_sea=_distance(~land), dist_water=_distance(any_water))
 
 
 if __name__ == '__main__':

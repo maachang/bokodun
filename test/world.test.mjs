@@ -1223,3 +1223,20 @@ test('ガマは水のそばだけ（湿地帯は、水が逃げにくい低地�
     }
     assert.deepEqual(bad.slice(0, 10), []);
 });
+
+// 山の吊橋（峡谷）: 橋のあるマップには bridgeUnder があり、谷の底は橋の床より 3 段以上低い
+test('山の吊橋: 世界に 5 か所以上・橋の下の谷の底（bridgeUnder）は、橋の床より 3 段以上低い', () => {
+    let bridges = 0;
+    for (const f of fs.readdirSync(path.join(root, 'public/data/maps'))) {
+        if (!f.startsWith('w_')) continue;
+        const m = readJson('public/data/maps/' + f);
+        const ch = Object.entries(m.legend).find(([, v]) => v === 'rope_bridge')?.[0];
+        if (!ch) continue;
+        assert.ok(Number.isInteger(m.bridgeUnder), `${f}: bridgeUnder`);
+        for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) if (m.layout[r][c] === ch) {
+            bridges++;
+            assert.ok(m.bridgeUnder <= parseInt(m.heights[r][c], 36) - 3, `${f} ${r},${c}: 谷の底が浅い`);
+        }
+    }
+    assert.ok(bridges >= 10 * 5, `吊橋のマス: ${bridges}`);
+});
