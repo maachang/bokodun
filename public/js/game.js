@@ -806,7 +806,7 @@ export class GameEngine {
                     if (this.player.hp <= 0) {
                         this.player.status = {};
                         this.addPopup(type === 'poison' ? 'GAME OVER! 毒で力尽きた…' : 'GAME OVER! 火傷で力尽きた…', '#ef4444');
-                        setTimeout(() => { this.player.hp = this.player.maxHp; this.loadMap(this.currentMapId); }, 1000);
+                        setTimeout(() => { this.player.hp = this.player.maxHp; this.player.stamina = this.player.maxStamina; this.player.staminaExhausted = false; this.loadMap(this.currentMapId); }, 1000);
                         return;
                     }
                 }
@@ -843,7 +843,7 @@ export class GameEngine {
         if (this.player.hp <= 0) {
             this.addPopup('GAME OVER! 崖から落ちて力尽きた…', '#ef4444');
             setTimeout(() => {
-                this.player.hp = this.player.maxHp;
+                this.player.hp = this.player.maxHp; this.player.stamina = this.player.maxStamina; this.player.staminaExhausted = false;
                 this.loadMap(this.currentMapId);
             }, 1500);
         }
@@ -4952,7 +4952,7 @@ export class GameEngine {
         if (this.player.hp <= 0) {
             this.addPopup('GAME OVER! リスポーンします', '#ef4444');
             setTimeout(() => {
-                this.player.hp = this.player.maxHp;
+                this.player.hp = this.player.maxHp; this.player.stamina = this.player.maxStamina; this.player.staminaExhausted = false;
                 this.loadMap(this.currentMapId);
             }, 1000);
         }
@@ -4992,7 +4992,7 @@ export class GameEngine {
         if (this.player.hp <= 0) {
             this.addPopup('GAME OVER! 奈落の底で力尽きた…', '#ef4444');
             setTimeout(() => {
-                this.player.hp = this.player.maxHp;
+                this.player.hp = this.player.maxHp; this.player.stamina = this.player.maxStamina; this.player.staminaExhausted = false;
                 this.player.fallDepth = 0;
                 this.player.fallVelocityY = 0;
                 this.player.pitch = 0;

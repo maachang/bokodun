@@ -1268,3 +1268,8 @@ test('スタミナ: ダッシュ・攻撃・登りで減り、0 で止まり、2
     for (const k of ['useStamina(this.staminaCost(\'dash\') * dt)', 'staminaExhausted', 'updateStamina(dt)', 'this.staminaCost(\'attack\'', 'useStamina(this.staminaDef?.climbCost']) assert.ok(g.includes(k), k);
     assert.ok(fs.readFileSync('public/index.html', 'utf8').includes('id="staminaBar"'));
 });
+
+test('スタミナ: やられて復活するとき、全回復する', () => {
+    const g = fs.readFileSync('public/js/game.js', 'utf8');
+    assert.equal(g.split('this.player.stamina = this.player.maxStamina; this.player.staminaExhausted = false;').length - 1, 4);
+});
