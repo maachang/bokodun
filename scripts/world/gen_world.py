@@ -250,10 +250,13 @@ def build_tiles(t):
     d_lake = T._distance(t['lake'])
     not_dry = ~np.isin(biome, [DESERT, ROCK])
     delta = land & not_dry & (d_sea <= 14) & (d_rv <= 10)
-    lakeside = land & not_dry & (d_lake <= 5) & low
-    wet = (((jungle | trans) & low) | delta | lakeside) & (patch2 > 0.32) & free
+    lakeside = land & not_dry & (d_lake <= 8) & low                                    # もと湖: 湖のまわりの低地
+    floodplain = land & not_dry & low & (d_rv <= 8) & (d_sea <= 40)                    # 沖積平野: 川の下流（海に近い）の、低地（洪水で、細かい泥・粘土がたまる）
+    basin = land & not_dry & (elev_f <= T.gauss(elev_f, 10) - 1.0) & (elev <= 6)       # 盆地・谷底: 周りより、はっきり低い所（水が集まる）
+    wet_w = (((jungle | trans) & low) | delta | lakeside | floodplain) & (patch2 > 0.32) & free     # 水のそば（ガマもある）
+    wet = wet_w | (basin & (patch2 > 0.32) & free)                                            # 盆地・谷底（湿地の草・雑草だけ）
     free_obj = np.isin(obj, [ord('0'), ord('m'), ord('e'), ord('v'), ord('w'), ord('p'), ord('b'), ord('h'), ord('o'), ord('l')])
-    put(wet & free_obj & (d_water <= 4) & (u2 < 0.5), 'k')
+    put(wet_w & free_obj & (d_water <= 4) & (u2 < 0.35), 'k')
     put(wet & free_obj & (d_water > 4) & (u3 < 0.15), 'z'); put(wet & free_obj & (u < 0.06), 'u')
     # 水: 川・湖（深い所 Q・浅瀬 q）、湖の中央と海（O）、海の岸の浅瀬（q）
     lake = t['lake']

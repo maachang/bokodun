@@ -35,6 +35,7 @@
   "m": "meadow_grass",
   "p": "path_flower",
   "q": "water_shallow",
+  "u": "marsh_weed",
   "v": "weed_flower",
   "w": "roadside_flowers"
  },
@@ -180,7 +181,7 @@
   "mmmmmmmmmmmmmmmddddddddddddddddddddddddddddddddddddddddddddddddd"
  ],
  "layout": [
-  "0000000m0000m00000m0000000m0b0000m000000000m000000QQQQQq0m0ZZ000",
+  "0000000m0000m00000m0000000m0b0000m000000000m000000QQQQQq0u0ZZ000",
   "0000bm0000v0000000000m000000000w0000mp0000mmG0m0000QQQQQQQQZZQ00",
   "m00000000000v000m00000000000000000000000000000mm0000QQQQQQZZZQ00",
   "000000m0m0m000m0m0G00l0m00i00000000vv0000000000000m0mm0000ZZQQQ0",
