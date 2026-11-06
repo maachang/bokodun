@@ -1002,6 +1002,9 @@ test('端の向こうの景色: 隣のマップ（斜めの角を含む 8 方向
     assert.ok(game.includes('prefetchNearbyMaps(mapId)') && game.includes('prefetchToken'), '2 マス先までのマップのデータを、先に読んでおく');
     assert.ok(game.includes('this.loadingMap = true') && game.includes('if (this.loadingMap) return;'), 'マップの読み込み中は、更新も描画も止める（作りかけの画面が、一瞬映らない）');
     assert.ok(game.includes('mesh.position.set(cx, -0.3, cz)'), '端の外の平らな地面は、隣のマップの水の面（-0.15）より下（水が、模様のある地面におおわれない）');
+    assert.ok(game.includes('waterAcrossEdge(nr, nc, rows, cols)'), '水が境をこえて続くとき、境に砂の土手を立てない（茶色の線が出ない）');
+    assert.ok(game.includes('opacity: 0.72') && game.includes('flat(waterMats.sand, wx, bedY, wz)'), '隣の水も、砂の底と半透明の水面（浅瀬が暗くならない）');
+    assert.ok(game.includes('glowMatOf(def)') && game.includes('emissiveIntensity: 0.9'), '光る浅瀬（glow）は、隣のマップでも、自ら光る（暗くならない）');
     assert.ok(game.includes('reversed'), '境の段差は、崖の面で埋める（隙間から空が見えない）');
     assert.ok(!game.includes('buildNeighborTerrain'), 'なめらかな面（古い方式）は、使わない');
     assert.ok(game.includes('for (const [mat, g] of groups)'), '地形の板は、材質ごとに 1 つのメッシュにまとめる（1 マスごとにメッシュを作らない。切り替えが止まる）');

@@ -885,6 +885,18 @@ export class GameEngine {
         this.prefetchNearbyMaps(mapId);   // 端を越えて切り替わるとき、読み込みを待たない（隣の隣までの、マップのデータを、先に読んでおく）
     }
 
+    // マップの外の隣のマス（行 nr・列 nc。どちらか一方だけが、範囲の外）が、隣のマップの水か。隣のマップが読み込めていない・世界の外は、水でない
+    waterAcrossEdge(nr, nc, rows, cols) {
+        if (!this.world || (nr < 0 || nr >= rows) === (nc < 0 || nc >= cols)) return false;
+        const dir = nr < 0 ? 'north' : nr >= rows ? 'south' : nc < 0 ? 'west' : 'east';
+        const nid = worldNeighbor(this.world, this.currentMapId, dir);
+        const nd = nid && this.mapCache[nid];
+        if (!nd?.layout) return false;
+        const ch = nd.layout[(nr + rows) % rows]?.[(nc + cols) % cols];
+        const def = ch && ch !== '0' ? this.objectDefinitions?.[nd.legend?.[ch]] : null;
+        return !!def && (def.type === 'liquid_tile' || def.type === 'sea_tile' || !!def.waterBelow);
+    }
+
     // 今のマップから、2 マス先までのマップ（5×5）のデータを、先に読んでおく（切り替え先の、隣のマップの読み込みを待たなくする）。
     //   マップが切り替わったら、古い予約は、やめる（番号で判定）。1 枚ずつ、少し間をあけて読む（今の描画を邪魔しない）
     prefetchNearbyMaps(mapId) {
@@ -932,7 +944,14 @@ export class GameEngine {
             if (!cache.has(key)) { const m = floorMatOf(ft).clone(); m.color.setScalar(tintOf(lv) * k); cache.set(key, m); }
             return cache.get(key);
         };
-        const waterMats = { deep: new THREE.MeshLambertMaterial({ color: 0x2a4fa0 }), shallow: new THREE.MeshLambertMaterial({ color: 0x6fbad8 }), deck: new THREE.MeshLambertMaterial({ color: 0x8a6a40 }) };
+        // 水は、今のマップの水と同じ模様の画像（動く: 水の模様のアニメーションは、画像の位置をずらして動かす）
+        const waterMats = { deep: new THREE.MeshLambertMaterial({ map: this.textures.water, transparent: true, opacity: 0.92 }), shallow: new THREE.MeshLambertMaterial({ map: this.textures.shallowWater, transparent: true, opacity: 0.72 }), sand: new THREE.MeshLambertMaterial({ map: this.textures.sand }), deck: new THREE.MeshLambertMaterial({ color: 0x8a6a40 }) };
+        // 光る水（glow を持つ浅瀬。南国の海岸の、青緑に光る浅瀬）: 今のマップと同じく、水面が自ら光る（emissive）
+        const glowMats = new Map();
+        const glowMatOf = (def) => {
+            if (!glowMats.has(def.glow)) glowMats.set(def.glow, new THREE.MeshLambertMaterial({ map: this.textures[def.texture] || this.textures.shallowWater, transparent: true, opacity: 0.72, emissive: new THREE.Color(def.glow).getHex(), emissiveIntensity: 0.9 }));
+            return glowMats.get(def.glow);
+        };
         // 地形の板は、1 マスごとにメッシュを作らず、材質ごとの頂点の配列にためて、最後に 1 つのメッシュにする（板が約 2 万枚になり、まとめる処理が数秒かかるため）
         const groups = new Map();
         const quad = (mat, TL, TR, BL, BR, n) => {
@@ -976,7 +995,17 @@ export class GameEngine {
                         const def = ch !== '0' ? this.objectDefinitions?.[nd.legend?.[ch]] : null;
                         if (isWaterDef(def)) {   // 水（川・湖・海）: 低い所の、色つきの面
                             const shallow = def.texture === 'shallowWater' || !!def.waterBelow;
-                            flat(shallow ? waterMats.shallow : waterMats.deep, wx, -0.15, wz);
+                            // 今のマップの水（liquid_tile）と同じ作り: 砂の底・陸との境の砂の土手・半透明の水面（浅瀬は底 -0.25・水面 -0.12、深い所は底 -0.55・水面 -0.2）
+                            const bedY = shallow ? -0.25 : -0.55;
+                            flat(waterMats.sand, wx, bedY, wz);
+                            for (const [dx, dz, rotY] of dirs) {
+                                const rr = r + dz, cc = c + dx;
+                                if (rr < 0 || rr >= nrows || cc < 0 || cc >= ncols) continue;   // マップの外の隣は、水として扱う（土手なし）
+                                const nch = nd.layout[rr][cc];
+                                if (isWaterDef(nch !== '0' ? this.objectDefinitions?.[nd.legend?.[nch]] : null)) continue;
+                                wall(waterMats.sand, wx + dx * ts / 2, bedY / 2, wz + dz * ts / 2, Math.abs(bedY), rotY + Math.PI);   // 陸の側の縁に、水のほうを向けて立てる
+                            }
+                            flat(def.glow ? glowMatOf(def) : (shallow ? waterMats.shallow : waterMats.deep), wx, shallow ? -0.12 : -0.2, wz);
                             continue;
                         }
                         const lv = lvOf(nd, r, c);
@@ -1066,6 +1095,7 @@ export class GameEngine {
             const mesh = new THREE.Mesh(geo, mat);
             mesh.matrixAutoUpdate = false;
             this.scene.add(mesh);
+            if (mat === waterMats.deep || mat === waterMats.shallow || [...glowMats.values()].includes(mat)) this.waterMeshes.push(mesh);   // 水の模様のアニメーションを動かす
         }
     }
 
@@ -2676,7 +2706,7 @@ export class GameEngine {
                         neighbors.forEach(n => {
                             const nr = r + n.dr;
                             const nc = c + n.dc;
-                            const isNeighborWater = (nr >= 0 && nr < rows && nc >= 0 && nc < cols && waterMap[nr][nc]);
+                            const isNeighborWater = (nr >= 0 && nr < rows && nc >= 0 && nc < cols) ? waterMap[nr][nc] : this.waterAcrossEdge(nr, nc, rows, cols);   // マップの外の隣は、隣のマップのマスで判定する（水が境をこえて続くとき、境に土手を立てない）
                             if (!isNeighborWater) {
                                 // Land edge bank
                                 const bankGeo = new THREE.PlaneGeometry(n.w, wallH);
