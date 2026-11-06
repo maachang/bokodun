@@ -146,11 +146,13 @@ def build_tiles(t):
     u5 = (u2 * 11.3 + u3 * 7.9) % 1.0
     thin_de = de & (d_out_de <= 14) & (d_out_de > 0) & (u5 < np.clip((14.0 - d_out_de.astype(np.float32)) / 8.0, 0, 1))   # 境から 6 マス以内は全部、14 マスで 0
     for ch in 'AXUi': obj[thin_de & (obj == ord(ch))] = ord('0')
-    put(thin_de & (obj == ord('0')) & (u < 0.12), 'm')
+    put(thin_de & (obj == ord('0')) & (u < 0.12), 'i')                         # 砂地には、乾いた草
     # 草原の植物（草・花・草原の木）は、寒い土地・砂地との境で、間引く（雪山・ツンドラ・砂漠の中に、草原の植物が混ざらない）。境から 6 マス以内は全部、14 マス先で 0
     d_dry = T._distance(land & (biome == DESERT))
     u6 = (u3 * 9.1 + u * 4.7) % 1.0
     GRASS_PLANTS = 'mlvwpbG'
+    snow_floor = np.isin(floor, [ord('s'), ord('i')])                           # 雪・氷の床の上には、草原の植物を置かない（草は雪の下）
+    for ch in GRASS_PLANTS: obj[gr & snow_floor & (obj == ord(ch))] = ord('0')
     for dd_, repl in ((d_cold, 'o'), (d_dry, 'i')):
         th = gr & (dd_ <= 14) & (dd_ > 0) & (u6 < np.clip((14.0 - dd_.astype(np.float32)) / 8.0, 0, 1))
         for ch in GRASS_PLANTS: obj[th & (obj == ord(ch))] = ord('0')
@@ -178,7 +180,7 @@ def build_tiles(t):
     fade = tr & (d_out <= 14) & (d_out > 0)
     thin = fade & (u4 < (1.0 - d_out.astype(np.float32) / 14.0) * 0.9)
     for ch in 'MYadfrsbwpe': obj[thin & (obj == ord(ch))] = ord('0')
-    put(thin & (obj == ord('0')) & (u3 < 0.3), 'm')
+    put(thin & (obj == ord('0')) & (u3 < 0.3) & (floor != ord('w')), 'm')       # 白い砂の上には、草を置かない
 
     # --- 東の山々と炭鉱 ---
     ro = free & (biome == ROCK)
