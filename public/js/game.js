@@ -71,6 +71,9 @@ export class GameEngine {
             hp: 100,
             maxMp: 60,
             mp: 60,
+            maxStamina: 43, stamina: 43,   // スタミナ（仮。能力値ができるまで、Lv1・人間・平均の値。式は character-spec 8.2e、定数は combat.json）
+            staminaPause: 0,       // 回復が止まる残り秒（ダッシュ・攻撃・登りのあと）
+            staminaExhausted: false,   // 0 になって、最大値の resumeRatio まで回復するまで、ダッシュ・攻撃・登りができない
             gold: 0,
             status: {},         // 状態異常（poison・burn: 継続ダメージ / slow / paralysis / silence / curse）。{ 種類: { t: 残り秒, dps / scale } }
             exp: 0,
@@ -173,6 +176,7 @@ export class GameEngine {
                 fetch('/data/player.json'),
                 fetch('/data/npcs.json')
             ]);
+            this.staminaDef = (await (await fetch('/data/combat.json')).json()).stamina;
             this.objectDefinitions = await objRes.json();
             this.enemyDefinitions = await enemyRes.json();
             this.items = await itemRes.json();
@@ -3458,6 +3462,8 @@ export class GameEngine {
             return;
         }
 
+        this.updateStamina(dt);
+
         // Player cooldown & invincibility
         if (this.player.attackCooldown > 0) this.player.attackCooldown -= dt;
         if (this.player.magicCooldown > 0) this.player.magicCooldown -= dt;
@@ -4035,7 +4041,7 @@ export class GameEngine {
             // Rotate move direction by player's view angle
             const sin = Math.sin(this.player.angle);
             const cos = Math.cos(this.player.angle);
-            const baseSpeed = this.keys.sprint ? this.player.runSpeed : this.player.speed;
+            const baseSpeed = (this.keys.sprint && this.useStamina(this.staminaCost('dash') * dt)) ? this.player.runSpeed : this.player.speed;
             const moveSpeed = baseSpeed * speedMod;
             worldMoveX = (moveDir.x * cos + moveDir.z * sin) * moveSpeed * dt;
             worldMoveZ = (-moveDir.x * sin + moveDir.z * cos) * moveSpeed * dt;
@@ -4342,12 +4348,36 @@ export class GameEngine {
     // 崖（ちょうど 2 段高い所）をよじ登る: 崖に向かって前を押し続けて CLIMB_HOLD_SEC 秒で始まり、CLIMB_SEC 秒かかる。
     //   ①ジャンプして崖の縁に手をかける ②手で体を引き上げる ③足をひっかけて、よっこいしょと上がる ④縁の上に立つ。
     //   登っている間は歩けない。敵の攻撃で、ダメージを受けると、中断して下に落ちる（落下のダメージは、なし）。3 段以上の崖は、登れない
+    // ---- スタミナ（character-spec 8.2e）。能力値・重量がまだないので、重量比 0.8・持久力 14・Lv1 の仮の値で計算する ----
+    staminaMul() { const r = 0.8, d = this.staminaDef; return r <= 1 ? d.loadMulUnder.base + d.loadMulUnder.slope * r : Math.min(d.loadMulOver.max, 1 + (r - 1) * d.loadMulOver.slope); }
+    staminaCost(kind, weaponWeight = 0) {
+        const d = this.staminaDef; if (!d) return 0;
+        const base = kind === 'dash' ? d.dashCost : weaponWeight * d.attackCoef;
+        return base * this.staminaMul() / (1 + 14 * d.enduranceDivisor);
+    }
+    // 消費する。足りないとき（切れている・0 になる）は、false（ダッシュなどを止める）
+    useStamina(amount) {
+        const p = this.player;
+        if (!this.staminaDef || p.staminaExhausted) return !this.staminaDef;
+        p.stamina = Math.max(0, p.stamina - amount);
+        p.staminaPause = this.staminaDef.regenPause;
+        if (p.stamina <= 0) p.staminaExhausted = true;
+        return true;
+    }
+    updateStamina(dt) {
+        const p = this.player, d = this.staminaDef; if (!d) return;
+        if (p.staminaPause > 0) { p.staminaPause -= dt; return; }
+        p.stamina = Math.min(p.maxStamina, p.stamina + (14 * d.regenEnd + 1 * d.regenLevel) * dt);
+        if (p.staminaExhausted && p.stamina >= p.maxStamina * d.resumeRatio) p.staminaExhausted = false;
+    }
+
     tryStartClimb(dirX, dirZ) {
         const now = performance.now();
         const h = this.climbHold;
         if (!h || now - h.last > 150 || h.dirX !== dirX || h.dirZ !== dirZ) this.climbHold = { since: now, last: now, dirX, dirZ };
         else h.last = now;
         if (now - this.climbHold.since < CLIMB_HOLD_SEC * 1000) return;
+        if (this.player.staminaExhausted) return;   // スタミナ切れは、登れない
         const cur = this.player.heightLevel ?? this.heightLevelAt(this.player.x, this.player.z);
         const r = this.player.radius;
         // 崖の縁（2 段高くなる所）を探し、その先の、上に立つ位置を決める
@@ -4360,6 +4390,7 @@ export class GameEngine {
         if (this.heightLevelAt(tx, tz, cur) - cur !== CLIMB_RISE || this.isInsideWall(tx, tz)) return;   // 上に立てない（壁・木・段が、続く）ときは、登らない
         this.player.climb = { t: 0, sx: this.player.x, sz: this.player.z, tx, tz, fromLv: cur, toLv: cur + CLIMB_RISE, fromY: cur * this.heightStep, toY: (cur + CLIMB_RISE) * this.heightStep };
         this.climbHold = null;
+        this.useStamina(this.staminaDef?.climbCost ?? 15);   // 登りの消費（仮）
     }
 
     updateClimb(dt) {
@@ -4850,7 +4881,7 @@ export class GameEngine {
         const cross = Math.abs(pFwdX * nz - pFwdZ * nx);
 
         // Player is actively pressing move key to attack/charge forward
-        const isPlayerMovingForward = (this.keys.forward && !this.player.isFalling);
+        const isPlayerMovingForward = (this.keys.forward && !this.player.isFalling && !this.player.staminaExhausted);   // スタミナ切れは、攻撃できない（歩行・防御は可）
 
         // Ys 1 "Half-offset" rule:
         // Attack only occurs if player is actively moving forward!
@@ -4866,6 +4897,8 @@ export class GameEngine {
         };
         const knockScale = cls ? cls.knockback : 1.0;
         const heavySound = cls ? cls.sound === 'heavy' : false;
+
+        if ((isHalfOffset || isCharging)) this.useStamina(this.staminaCost('attack', weapon?.weight ?? 10));   // 攻撃 1 回の消費（当たっても外れても）
 
         if (isHalfOffset) {
             // CRITICAL HALF-OFFSET HIT: Player takes 0 damage, monster takes full + bonus damage!
@@ -5212,6 +5245,7 @@ export class GameEngine {
         put('hpText', 'text', `${Math.ceil(this.player.hp)}/${this.player.maxHp}`);
         put('mpBar', 'width', `${(this.player.mp / this.player.maxMp) * 100}%`);
         put('mpText', 'text', `${Math.floor(this.player.mp)}/${this.player.maxMp}`);
+        put('staminaBar', 'width', `${(this.player.stamina / this.player.maxStamina) * 100}%`);
         put('levelText', 'text', `Lv.${this.player.level}`);
         put('expText', 'text', `EXP: ${this.player.exp}`);
         put('goldText', 'text', `${this.player.gold || 0} G`);

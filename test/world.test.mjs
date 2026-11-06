@@ -1260,3 +1260,11 @@ test('崖のよじ登り: ちょうど 2 段高い崖だけ・前を押し続け
     assert.ok(game.includes('if (this.player.climb) { this.player.climb = null;'), 'ダメージを受けたら、中断して落ちる');
     assert.ok(game.includes('return diff <= 1 && diff >= -2;'), '歩いて上れるのは 1 段まで・降りられるのは 2 段まで（今までどおり）');
 });
+
+test('スタミナ: ダッシュ・攻撃・登りで減り、0 で止まり、20% まで戻ると再開（仮の値）', () => {
+    const g = fs.readFileSync('public/js/game.js', 'utf8');
+    const c = JSON.parse(fs.readFileSync('public/data/combat.json', 'utf8'));
+    assert.ok(c.stamina.climbCost > 0);
+    for (const k of ['useStamina(this.staminaCost(\'dash\') * dt)', 'staminaExhausted', 'updateStamina(dt)', 'this.staminaCost(\'attack\'', 'useStamina(this.staminaDef?.climbCost']) assert.ok(g.includes(k), k);
+    assert.ok(fs.readFileSync('public/index.html', 'utf8').includes('id="staminaBar"'));
+});

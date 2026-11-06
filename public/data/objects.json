@@ -278,8 +278,8 @@
   "forest_tree_a": {
     "type": "tree",
     "texture": "fGrassTree",
-    "aspect": 0.922,
-    "height": 10.4,
+    "aspect": 0.971,
+    "height": 9.88,
     "colliderHalf": 1.0,
     "solid": true,
     "noShadow": true,
@@ -298,8 +298,8 @@
   "great_tree_a": {
     "type": "tree",
     "texture": "fGrassTree",
-    "aspect": 0.922,
-    "height": 15.6,
+    "aspect": 0.971,
+    "height": 14.82,
     "colliderHalf": 1.2,
     "solid": true,
     "noShadow": true,
@@ -16073,8 +16073,8 @@
     "imageFile": "field/grass_tree.png",
     "sdId": 217,
     "texture": "fGrassTree",
-    "aspect": 0.922,
-    "height": 5.2,
+    "aspect": 0.971,
+    "height": 4.94,
     "solid": true,
     "description": "草原の広葉樹（sdServer 画像）"
   },
