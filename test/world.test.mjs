@@ -1292,3 +1292,9 @@ test('草原のブラッシュアップ: 丘陵・ため池・林がある', () 
     assert.ok(pondMaps >= 3, `ため池のある草原のマップ ${pondMaps}`);
     assert.ok(groveMaps >= 5, `林のある草原のマップ ${groveMaps}`);
 });
+
+test('描画の負荷: 木・草・花の板は、区画ごとにまとめて隠す。距離の判定は、動いたときだけ。隣の草・花は近くだけ', () => {
+    const g = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    for (const k of ['export const CULL_CHUNK = 32', 'export const NEIGHBOR_PLANT_RANGE = 10', 'buildCullChunks() {', 'updateCullChunks() {', 'this.buildCullChunks();', 'this.updateCullChunks();', 'this.cullChunks = [];', "def.type === 'plant' && gr >= -NEIGHBOR_PLANT_RANGE"]) assert.ok(g.includes(k), k);
+    assert.ok(g.includes('if (!this._cullDirty && Math.abs(p.x - this._cullX) + Math.abs(p.z - this._cullZ) < 1'), '動いたときだけ判定する');
+});

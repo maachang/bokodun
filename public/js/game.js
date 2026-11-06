@@ -25,6 +25,8 @@ export const TREE_SHADOWS = false;
 // 隣のマップ（斜めの角を含む 8 方向）を、本物のマスで描く範囲（今のマップの端から何マスまでか）。地形は 48 マス・木や草や岩は 26 マス（霧の終わりは、約 21 マス）
 export const NEIGHBOR_TERRAIN_RANGE = 48;
 export const NEIGHBOR_OBJECT_RANGE = 26;
+export const NEIGHBOR_PLANT_RANGE = 10;   // 隣のマップの、草・花を描く範囲（端から。木・岩は NEIGHBOR_OBJECT_RANGE。遠くの小さな草は、見えにくいので、減らす）
+export const CULL_CHUNK = 32;            // 木・草・花の板を、まとめて隠す区画の大きさ（ワールドの長さ。8 マス）
 
 // 被弾リアクション（突進の命中時）の調整値
 //   ヒットストップ: 命中した瞬間にゲームの時間を一瞬止める（秒）。重い武器・会心・撃破で長くなる
@@ -1066,7 +1068,7 @@ export class GameEngine {
                             this.scene.add(tree);
                             tree.updateMatrix(); tree.matrixAutoUpdate = false;
                             this.treeSprites.push({ sprite: tree, shadow: null, far: treeMat, near: treeMatNear, vis: true });
-                        } else if (def.type === 'plant') {
+                        } else if (def.type === 'plant' && gr >= -NEIGHBOR_PLANT_RANGE && gr < rows + NEIGHBOR_PLANT_RANGE && gc >= -NEIGHBOR_PLANT_RANGE && gc < cols + NEIGHBOR_PLANT_RANGE) {
                             const plantTex = this.textures[def.texture] || this.textures.grassTuft;
                             this.plantMats = this.plantMats || new Map();
                             if (!this.plantMats.has(plantTex)) this.plantMats.set(plantTex, new THREE.SpriteMaterial({ map: plantTex }));
@@ -1173,6 +1175,7 @@ export class GameEngine {
         this.heatHazePlanes = [];
         this.treeSprites = [];   // 木のスプライト（前のマップの木が溜まって、毎フレームの処理が増えないよう、マップごとに空にする）
         this.cullSprites = [];   // 遠くで隠す飾りのスプライト（草・花）
+        this.cullChunks = [];   // 木・草・花の板の区画（マップを作り終えたあとに、buildCullChunks で作る）
         this.minimapBase = null; // ミニマップの、動かない部分（壁）の絵
         this.torchGlows = [];   // 松明の光（光だまり・光の輪）。ゆらぎのアニメーション用
         this.fountains = [];
@@ -3024,6 +3027,7 @@ export class GameEngine {
 
         // 動かない部品（床・天井・壁・家具など）を、材質ごとに1つにまとめる（描画の回数を減らして、CPU の負荷を下げる）
         this.mergeStaticMeshes();
+        this.buildCullChunks();   // 木・草・花の板を、区画ごとにまとめる（遠い区画は、まとめて隠す。毎フレームの走査・判定を減らして、CPU の負荷を下げる）
 
         // 村人（NPC）: マップの npcs（{ id: npcs.json の ID, x, z: マスの位置 }）。マスの上の床や家具とは独立に置く
         const shop = this.shops?.[this.mapParams.shopId];   // 汎用の店マップ: 入った店の種類（店名・店主）
@@ -4179,21 +4183,7 @@ export class GameEngine {
         const targetFloorY = this.getFloorHeight(this.player.x, this.player.z, this.player.heightLevel);
         if (!this.player.climb) this.player.floorY = (this.player.floorY ?? targetFloorY) + (targetFloorY - (this.player.floorY ?? targetFloorY)) * Math.min(1, dt * 10);
         const eyeHeight = 1.8 + this.player.floorY - playerFloorDepth - (this.player.isFalling ? this.player.fallDepth : 0);
-        // 木の描画: 近い木は従来どおり、遠い木は切り抜き（遠景で、壁の木と重なると四角く欠けるため）。境目で、ちらつかないよう、ヒステリシスをつける（距離は暫定）
-        // 霧で見えなくなる距離（霧の遠さ×1.1）より遠い木・影・草は、隠す（描画する数を減らす。大森林は、木が大量にある）
-        const cullD2 = this.scene.fog ? (this.scene.fog.far * 1.1) ** 2 : Infinity;
-        for (const t of this.treeSprites || []) {
-            const dx = t.sprite.position.x - this.player.x, dz = t.sprite.position.z - this.player.z, d2 = dx * dx + dz * dz;
-            const wantNear = t.isNear ? d2 < 42 * 42 : d2 < 40 * 40;
-            if (wantNear !== t.isNear) { t.isNear = wantNear; t.sprite.material = wantNear ? t.near : t.far; }
-            const vis = d2 < cullD2;
-            if (vis !== t.vis) { t.vis = vis; t.sprite.visible = vis; if (t.shadow) t.shadow.visible = vis; }
-        }
-        for (const sp of this.cullSprites || []) {
-            const dx = sp.position.x - this.player.x, dz = sp.position.z - this.player.z;
-            const vis = dx * dx + dz * dz < cullD2;
-            if (vis !== sp.visible) sp.visible = vis;
-        }
+        this.updateCullChunks();   // 木の描画（近い木は従来どおり・遠い木は切り抜き）と、霧で見えなくなる遠さの木・影・草の非表示（区画ごと。1 マス動いたときだけ）
         this.camera.position.set(this.player.x, eyeHeight, this.player.z);
         this.fitCameraFar();   // 高い所では、描画距離をのばす
         this.camera.rotation.set(0, 0, 0);
@@ -4653,6 +4643,79 @@ export class GameEngine {
     // addStatic で足した部品（グループの中の部品も）を、同じ材質ごとに、1つのメッシュにまとめる。
     //   1マスごとに別々のメッシュだと、描画の命令が1フレームに数百〜千回を超え、CPU が重くなる。見た目は変わらない。
     //   半透明な材質・配列の材質は、描画の順番が崩れるので、まとめずに、そのまま残す
+    // 木・草・花の板を、区画（CULL_CHUNK）ごとの Group にまとめる。マップを作り終えたあとに呼ぶ
+    buildCullChunks() {
+        const CH = CULL_CHUNK, chunks = new Map();
+        const chunkAt = (x, z) => {
+            const kx = Math.floor(x / CH), kz = Math.floor(z / CH), key = kx * 4096 + kz;
+            let c = chunks.get(key);
+            if (!c) {
+                c = { group: new THREE.Group(), mx: (kx + 0.5) * CH, mz: (kz + 0.5) * CH, sprites: [], trees: [], mode: -1, hasNear: false };
+                this.scene.add(c.group); chunks.set(key, c);
+            }
+            return c;
+        };
+        for (const t of this.treeSprites || []) {
+            const c = chunkAt(t.sprite.position.x, t.sprite.position.z);
+            c.group.add(t.sprite); if (t.shadow) c.group.add(t.shadow);
+            c.trees.push(t);
+        }
+        for (const sp of this.cullSprites || []) {
+            const c = chunkAt(sp.position.x, sp.position.z);
+            c.group.add(sp); c.sprites.push(sp);
+        }
+        this.cullChunks = [...chunks.values()];
+        this._cullDirty = true;
+    }
+
+    // 区画ごとに、遠い区画は隠し、近い区画は見せる。境の区画だけ、1 枚ずつ距離を測る。近い木は、材質を切り替える（ヒステリシスつき）。プレイヤーが 1 以上動いたとき・霧が変わったときだけ
+    updateCullChunks() {
+        const chunks = this.cullChunks; if (!chunks?.length) return;
+        const p = this.player;
+        const cullD2 = this.scene.fog ? (this.scene.fog.far * 1.1) ** 2 : Infinity;
+        if (!this._cullDirty && Math.abs(p.x - this._cullX) + Math.abs(p.z - this._cullZ) < 1 && cullD2 === this._cullD2) return;
+        this._cullX = p.x; this._cullZ = p.z; this._cullD2 = cullD2; this._cullDirty = false;
+        const RR = CULL_CHUNK * 0.7072;
+        for (const c of chunks) {
+            const d = Math.hypot(c.mx - p.x, c.mz - p.z), dmin = Math.max(0, d - RR), dmax = d + RR;
+            if (dmin * dmin >= cullD2) {   // 区画ぜんぶが、霧の向こう
+                if (c.group.visible) c.group.visible = false;
+                c.mode = 0;
+            } else {
+                if (!c.group.visible) c.group.visible = true;
+                if (dmax * dmax < cullD2) {   // 区画ぜんぶが、見える
+                    if (c.mode !== 2) {
+                        for (const t of c.trees) { t.vis = true; t.sprite.visible = true; if (t.shadow) t.shadow.visible = true; }
+                        for (const sp of c.sprites) sp.visible = true;
+                        c.mode = 2;
+                    }
+                } else {   // 霧の境にかかる区画: 1 枚ずつ
+                    for (const t of c.trees) {
+                        const dx = t.sprite.position.x - p.x, dz = t.sprite.position.z - p.z, vis = dx * dx + dz * dz < cullD2;
+                        if (vis !== t.vis) { t.vis = vis; t.sprite.visible = vis; if (t.shadow) t.shadow.visible = vis; }
+                    }
+                    for (const sp of c.sprites) {
+                        const dx = sp.position.x - p.x, dz = sp.position.z - p.z, vis = dx * dx + dz * dz < cullD2;
+                        if (vis !== sp.visible) sp.visible = vis;
+                    }
+                    c.mode = 1;
+                }
+            }
+            // 近い木は従来の（なめらかな）材質、遠い木は切り抜き（遠景で、壁の木と重なると四角く欠けるため）。境目で、ちらつかないよう、ヒステリシスをつける（距離は暫定）
+            if (dmin < 44) {
+                for (const t of c.trees) {
+                    const dx = t.sprite.position.x - p.x, dz = t.sprite.position.z - p.z, d2 = dx * dx + dz * dz;
+                    const wantNear = t.isNear ? d2 < 42 * 42 : d2 < 40 * 40;
+                    if (wantNear !== t.isNear) { t.isNear = wantNear; t.sprite.material = wantNear ? t.near : t.far; }
+                }
+                c.hasNear = true;
+            } else if (c.hasNear) {   // 遠くへ出た区画: 木を遠い材質に戻す
+                for (const t of c.trees) if (t.isNear) { t.isNear = false; t.sprite.material = t.far; }
+                c.hasNear = false;
+            }
+        }
+    }
+
     mergeStaticMeshes() {
         const meshes = [];
         const groups = [];
