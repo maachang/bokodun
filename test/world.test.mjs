@@ -735,14 +735,16 @@ test('世界: 端の高さが何段でも越えられる（マップの外の高
         const m = readJson(`public/data/maps/${id}.json`);
         for (let i = 0; i < 64; i++) if (levelOf(m.heights[63][i]) >= 3) high++;
         for (const [ch, name] of Object.entries(m.legend)) {
-            const n = m.layout.join('').split(ch).length - 1;
-            if (objects[name]?.type === 'boulder') rocks += n;
+            if (objects[name]?.type === 'boulder') {
+                // 岩は、山（高さ 6 以上）だけに置く
+                for (let r = 0; r < 64; r++) for (let c = 0; c < 64; c++) if (m.layout[r][c] === ch && levelOf(m.heights[r][c]) < 6) rocks++;
+            }
             if (name === 'wild_flowers') oldFlower += n;
         }
         assert.equal(m.sideShade, 1.0, `${id}: 斜面の側面を目立たせない`);
     }
     assert.ok(high > 1000, `端が 3 段以上の所: ${high}`);
-    assert.equal(rocks, 0, `世界に岩は置かない（${rocks} 個ある）`);
+    assert.equal(rocks, 0, `山以外（高さ 6 未満）に岩は置かない（${rocks} 個ある）`);
     assert.equal(oldFlower, 0, '昔の画像の花（wild_flowers）は使わない');
     assert.ok(game.includes('mapData.sideShade ?? 0.78'), 'sideShade');
 });

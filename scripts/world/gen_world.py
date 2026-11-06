@@ -28,9 +28,9 @@ LEGEND = {
     'J': 'conifer_forest_a', 'L': 'conifer_forest_b', 'j': 'great_conifer_a', 'n': 'great_conifer_b', 'x': 'conifer_tree_a', 'y': 'conifer_tree_b',   # 寒冷地の木（ID 262・263）: 森 2 倍・大森林 3 倍・単独 1 倍
     'a': 'tropical_forest_a', 'd': 'tropical_forest_b', 'f': 'tropical_palm_forest', 'r': 'swamp_tree_a', 's': 'marsh_flower', 'g': 'water_shallow_glow',   # 南国: ジャングルの木・ヤシの林（2 倍）・マングローブ・毒々しい花・青緑に光る浅瀬
     'c': 'cliff_rock_wall', 'Y': 'tropical_tree', 'E': 'mine_entrance', 't': 'mine_cart',
-    'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge', 'I': 'rope_bridge',
+    'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge', 'I': 'rope_bridge', '1': 'cave_torch', '2': 'riverside_tree',
 }
-SOLID_CH = set('FCNPDGAXUMRSBHcYEtTVWKJLjnxyadfr')          # 通れない物体（端のマスには置かない）
+SOLID_CH = set('FCNPDGAXUMRSBHcYEtTVWKJLjnxyadfr2')          # 通れない物体（端のマスには置かない）
 # 地面の種類（floorLayer の文字 → environment.floorType と同じ名前）
 FLOOR = {'g': 'grass', 's': 'snow', 'f': 'forest', 'd': 'desert', 'r': 'rock', 'w': 'whiteSand', 'u': 'tundra', 'i': 'ice', 'm': 'redEarth', 'a': 'ash'}
 BIOME_FLOOR = {SNOW: 's', CONIFER: 'u', FOREST: 'f', GRASS: 'g', DESERT: 'd', ROCK: 'r', TROPICAL: 'g', SEA: 'g'}
@@ -322,7 +322,25 @@ def build_tiles(t):
     trail = t['trail']
     tr1 = trail.copy()
     tr1[1:, :] |= trail[:-1, :]; tr1[:-1, :] |= trail[1:, :]; tr1[:, 1:] |= trail[:, :-1]; tr1[:, :-1] |= trail[:, 1:]
-    for ch in 'JLjnxyPDXhoulzmeblvwp': obj[tr1 & (obj == ord(ch))] = ord('0')
+    ns2 = T._near_seam(ys_.astype(int), xs_.astype(int), 2)                    # 隣のマップとの境の近くには、置かない（継ぎ目の整合）
+    # 山の高い所（森林限界より上の雪山・岩山）: 岩の代わりに、まばらな木（針葉樹・枯れ木）と、枯れかけた草
+    hi = free & ~ns2 & (obj == ord('0')) & (((biome == SNOW) & (elev >= 17)) | ((biome == ROCK) & (elev >= 9)))
+    lat2 = ((xs_.astype(int) % 2) == 1) & ((ys_.astype(int) % 2) == 1)
+    put(hi & lat2 & (u2 < 0.08), 'x'); put(hi & lat2 & (u2 >= 0.08) & (u2 < 0.12), 'y'); put(hi & lat2 & (u2 >= 0.12) & (u2 < 0.16), '2')
+    put(hi & (obj == ord('0')) & (u < 0.16), 'i')
+    for ch in 'JLjnxyPDX2ihoulzmeblvwp': obj[tr1 & (obj == ord(ch))] = ord('0')
+    # 休憩所: 山道（高さ 8 以上）の、24 マスおきに、松明を、道のわきに
+    margin = tr1 & ~trail & ~ns2 & land & (obj == ord('0'))
+    ty_, tx_ = np.nonzero(trail & (elev >= 8))
+    rr = np.random.default_rng(55); kept = []
+    for k in rr.permutation(len(ty_)):
+        y, x = int(ty_[k]), int(tx_[k])
+        if any((y - a) ** 2 + (x - b) ** 2 < 24 * 24 for a, b in kept): continue
+        nb = [(y + dy, x + dx) for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1)) if 0 <= y + dy < H and 0 <= x + dx < W and margin[y + dy, x + dx]]
+        if len(nb) < 2: continue
+        obj[nb[0]] = ord('1'); margin[nb[0]] = False
+        kept.append((y, x))
+    print('休憩所', len(kept))
     fl(trail & land, 'm')
     # 吊橋（山の峡谷）: 橋のまわり（峡谷の中）の物を除いて、橋の床を置く
     mb = t['mtn_bridge']
