@@ -17,9 +17,9 @@ export const TEST_RUN_SPEED_SCALE = 5;
 // 木の足元の影（暗い緑の丸い板）を置くか。雪原などで目立つため、いったん、すべてなくした（true で、小さな木だけ、影が戻る。2 倍・3 倍の木は、noShadow で、いつも、影なし）
 export const TREE_SHADOWS = false;
 
-// 端の向こうに描く、隣のマップの地形の幅（マス）。最小 16・最大 32。境の高さに合わせて広げ、1 マスに 1 段までの傾きで、高さ 0 へ下げる（高い所の端で、急な崖にならない）
-export const OUTSIDE_TERRAIN_MIN_DEPTH = 16;
-export const OUTSIDE_TERRAIN_MAX_DEPTH = 32;
+// 隣のマップ（斜めの角を含む 8 方向）を、本物のマスで描く範囲（今のマップの端から何マスまでか）。地形は 48 マス・木や草や岩は 26 マス（霧の終わりは、約 21 マス）
+export const NEIGHBOR_TERRAIN_RANGE = 48;
+export const NEIGHBOR_OBJECT_RANGE = 26;
 
 // 被弾リアクション（突進の命中時）の調整値
 //   ヒットストップ: 命中した瞬間にゲームの時間を一瞬止める（秒）。重い武器・会心・撃破で長くなる
@@ -841,7 +841,7 @@ export class GameEngine {
     }
 
     // 世界の並びの中のマップなら、隣のマップがある方向の外側に、隣の地面を遠くまで敷く。隣がない方向は、何も描かない（空だけ）
-    async buildOutsideGround(mapId, cols, rows, tileSize) {
+    async buildOutsideGround(mapId, cols, rows, tileSize, mapData, floorMatOf) {
         const world = this.world;
         if (!world || !world.grid?.some(r => r.includes(mapId))) return;
         const W = cols * tileSize, D = rows * tileSize, FAR = 400;
@@ -880,138 +880,167 @@ export class GameEngine {
             mesh.position.set(cx, -0.01, cz);
             this.scene.add(mesh);
         }
-        // 端の向こうの、隣のマップの地形（高さ・地面の種類・水）を、端から 16〜32 マスの幅で描く（端が高い所で、高い所から下へ落ちるように見えないため）
-        for (const dir of Object.keys(strips)) {
-            const nid = worldNeighbor(world, mapId, dir);
-            if (!nid) continue;
-            let nd = this.mapCache[nid];
-            if (!nd) { try { nd = await (await fetch(`/data/maps/${nid}.json`)).json(); this.mapCache[nid] = nd; } catch { continue; } }
-            if (nd?.heights) this.buildNeighborTerrain(dir, nd, cols, rows, tileSize);
-        }
+        // 端の向こうの、隣のマップ（斜めの角を含む 8 方向）を、本物のマス（高さ・地面・崖・水・木・草・岩）で描く（見た目だけ。当たり判定は、今のマップだけ）
+        await this.buildNeighborDecor(mapId, cols, rows, tileSize, mapData, floorMatOf);
     }
 
-    // 隣のマップ nd の、境から 16〜32 マス（境の高さに合わせる）の地形を、このマップの外側に描く。
-    //   高さは、隣のマップの heights（境の高さに合わせて広げ、1 マスに 1 段までの傾きで、なだらかに 0 へ下げる）。地面は floorLayer の種類。水（川・湖・海）は、水面。木・草は、描かない。
-    buildNeighborTerrain(dir, nd, cols, rows, ts) {
-        const W = cols * ts, D = rows * ts;
-        const nrows = nd.layout.length, ncols = nd.layout[0].length;
-        const step = nd.heightStep ?? 1;
-        const horizontal = (dir === 'east' || dir === 'west');   // 境が縦（東西）なら、境に沿って行を並べる
-        const along = horizontal ? rows : cols;
-        // 隣のマップのマス（境から k 番目・境に沿って i 番目）
-        const tileAt = (k, i) => {
-            if (dir === 'east') return [i, k];
-            if (dir === 'west') return [i, ncols - 1 - k];
-            if (dir === 'south') return [k, i];
-            return [nrows - 1 - k, i];
+    // 隣のマップ（8 方向）を、今のマップの外側に、本物のマスで描く。
+    //   地形: 端から NEIGHBOR_TERRAIN_RANGE マスまで（高さの段・崖の面・地面の種類・水）。物体: 端から NEIGHBOR_OBJECT_RANGE マスまでの、木・草・岩（距離で隠す仕組みは、今のマップと同じ）。
+    //   境（マップのつなぎ目）は、今のマップの端のマスの高さと、段差があれば、崖の面で埋める（隙間から空が見えない）
+    async buildNeighborDecor(mapId, cols, rows, ts, mapData, floorMatOf) {
+        const world = this.world;
+        let pj = -1, pi = -1;
+        world.grid.forEach((row, j) => { const i = row.indexOf(mapId); if (i >= 0) { pj = j; pi = i; } });
+        if (pj < 0) return;
+        const step = this.heightStep;
+        const R = NEIGHBOR_TERRAIN_RANGE, RO = NEIGHBOR_OBJECT_RANGE;
+        // 高さごとの地面の明るさ（今のマップと同じ。境で、色が変わらない）
+        let maxLv = 1;
+        for (const row of this.heightMap || []) for (const v of row) if (v > maxLv) maxLv = v;
+        const [tintLo, tintHi] = mapData.heightTint ?? [0.82, 1.0];
+        const tintOf = (lv) => tintLo + (tintHi - tintLo) * Math.min(1, lv / maxLv);
+        const cliffMat = new THREE.MeshLambertMaterial({ map: this.textures[mapData.cliffTexture] || this.textures.cliffGray });
+        const topMats = new Map(), sideMats = new Map();
+        const matFor = (cache, lv, k, ft) => {
+            const key = `${ft}|${lv}`;
+            if (!cache.has(key)) { const m = floorMatOf(ft).clone(); m.color.setScalar(tintOf(lv) * k); cache.set(key, m); }
+            return cache.get(key);
         };
-        // 幅: 境の高さ（最大の段）に合わせる。1 マスに 1 段までの傾きで 0 へ下げるので、高い端ほど、広く描く
-        let edgeMax = 0;
-        for (let i = 0; i < along; i++) {
-            const [tr, tc] = tileAt(0, i);
-            edgeMax = Math.max(edgeMax, parseInt(nd.heights[tr]?.[tc] ?? '0', 36) || 0);
-        }
-        const DEPTH = Math.min(OUTSIDE_TERRAIN_MAX_DEPTH, Math.max(OUTSIDE_TERRAIN_MIN_DEPTH, edgeMax + 2));
-        // 南北の隣は、東西の外（斜めの向こう側の角）まで、DEPTH マス広げる（広げた所は、端のマスの値を使い、距離ぶんだけ 1 マスに 1 段で下げる）。
-        //   高い所から、斜めの向こうを見ると、角が描かれず、空が見えるため。東西の隣は広げない（角が、南北の隣と重ならない）
-        const ext = horizontal ? 0 : DEPTH;
-        const A = along + 2 * ext;
-        const info = [];   // [k][i] = { h, water, shallow, ft }
-        for (let k = 0; k < DEPTH; k++) {
-            const row = [];
-            for (let i = 0; i < A; i++) {
-                const ii = i - ext;
-                const lat = ii < 0 ? -ii : (ii >= along ? ii - along + 1 : 0);
-                const [tr, tc] = tileAt(k, Math.min(along - 1, Math.max(0, ii)));
-                const ch = nd.layout[tr]?.[tc] ?? '0';
-                const def = ch === '0' ? null : this.objectDefinitions?.[nd.legend?.[ch]];
-                const isWater = !!def && (def.type === 'liquid_tile' || def.type === 'sea_tile' || !!def.waterBelow);
-                // 高さ（段）: 隣の高さと、「境からの距離ぶんだけ、1 マスに 1 段で下がる線」の、低いほう（なだらかに 0 へ）
-                const lv = Math.max(0, Math.min(parseInt(nd.heights[tr]?.[tc] ?? '0', 36) || 0, DEPTH - k - lat));
-                const fch = nd.floorLayer?.[tr]?.[tc];
-                row.push({ h: lv * step, water: isWater, shallow: !!def && (def.texture === 'shallowWater' || !!def.waterBelow), ft: (fch !== undefined && nd.floorLegend?.[fch]) || nd.environment?.floorType });
-            }
-            info.push(row);
-        }
-        // なめらかな 1 枚の面（頂点の高さ・色は、まわりのマスの平均）。1 マスずつの板にすると、雪と草の境や 1 段の段差が、四角い板になり、遠くで宙に浮いて見えた。
-        //   水（川・湖・海）のマスは、高さ 0・青い色。頂点は、境の線の上（k: 境から離れる向き・i: 境に沿う向き）に、(DEPTH+1)×(along+1) 個
-        const FLOOR_COLOR = { grass: 0x5b7f3a, snow: 0xe6edf5, forest: 0x55663a, desert: 0xd6be82, rock: 0x77706a, whiteSand: 0xece4c8, tundra: 0x8d8a70, dryGrass: 0xa89a52, redEarth: 0xc0703f, ash: 0x4a4440, ice: 0xaad7f0, swamp: 0x3a4a30, sand: 0xd8c690 };
-        const WATER_DEEP = 0x2a4fa0, WATER_SHALLOW = 0x6fbad8;
-        const cornerXZ = (k, i) => {
-            if (dir === 'east') return [W + k * ts, i * ts];
-            if (dir === 'west') return [-k * ts, i * ts];
-            if (dir === 'south') return [i * ts, D + k * ts];
-            return [i * ts, -k * ts];
+        const waterMats = { deep: new THREE.MeshLambertMaterial({ color: 0x2a4fa0 }), shallow: new THREE.MeshLambertMaterial({ color: 0x6fbad8 }), deck: new THREE.MeshLambertMaterial({ color: 0x8a6a40 }) };
+        // 地形の板は、1 マスごとにメッシュを作らず、材質ごとの頂点の配列にためて、最後に 1 つのメッシュにする（板が約 2 万枚になり、まとめる処理が数秒かかるため）
+        const groups = new Map();
+        const quad = (mat, TL, TR, BL, BR, n) => {
+            let g = groups.get(mat);
+            if (!g) { g = { pos: [], nor: [], uv: [], idx: [] }; groups.set(mat, g); }
+            const o = g.pos.length / 3;
+            for (const P of [TL, TR, BL, BR]) { g.pos.push(P[0], P[1], P[2]); g.nor.push(n[0], n[1], n[2]); }
+            g.uv.push(0, 1, 1, 1, 0, 0, 1, 0);
+            g.idx.push(o, o + 2, o + 1, o + 2, o + 3, o + 1);
         };
-        // 地面の色: 床のテクスチャの平均の色（実際の床と、同じ色合いにする）。取れなければ、上の表の色
-        this.outsideColors = this.outsideColors || new Map();
-        const floorColor = (ft) => {
-            if (!this.outsideColors.has(ft)) {
-                let col = new THREE.Color(FLOOR_COLOR[ft] ?? 0x5b7f3a);
-                try {
-                    const img = this.floorTextureOf(ft)?.image;
-                    if (img && (img.width || img.naturalWidth)) {
-                        const cv = document.createElement('canvas'); cv.width = cv.height = 1;
-                        const cx = cv.getContext('2d'); cx.drawImage(img, 0, 0, 1, 1);
-                        const [r, g, b] = cx.getImageData(0, 0, 1, 1).data;
-                        col = new THREE.Color(r / 255, g / 255, b / 255);
-                        col.convertSRGBToLinear();
+        const flat = (mat, wx, y, wz) => quad(mat, [wx - ts / 2, y, wz - ts / 2], [wx + ts / 2, y, wz - ts / 2], [wx - ts / 2, y, wz + ts / 2], [wx + ts / 2, y, wz + ts / 2], [0, 1, 0]);
+        const wall = (mat, cx, cy, cz, fh, rotY) => {
+            const ax = Math.cos(rotY), az = -Math.sin(rotY), nx = Math.sin(rotY), nz = Math.cos(rotY), hw = ts / 2, hh = fh / 2;
+            const at = (sx, sy) => [cx + sx * hw * ax, cy + sy * hh, cz + sx * hw * az];
+            quad(mat, at(-1, 1), at(1, 1), at(-1, -1), at(1, -1), [nx, 0, nz]);
+        };
+        const dirs = [[0, 1, 0], [0, -1, Math.PI], [1, 0, Math.PI / 2], [-1, 0, -Math.PI / 2]];   // [dx(列), dz(行), 向き]
+        const lvOf = (nd, r, c) => {
+            const ch = nd.layout[r]?.[c];
+            const def = ch && ch !== '0' ? this.objectDefinitions?.[nd.legend?.[ch]] : null;
+            if (def?.type === 'bridge_deck') return nd.bridgeUnder ?? 0;
+            return parseInt(nd.heights?.[r]?.[c] ?? '0', 36) || 0;
+        };
+        const isWaterDef = (def) => !!def && (def.type === 'liquid_tile' || def.type === 'sea_tile' || !!def.waterBelow);
+        for (let dj = -1; dj <= 1; dj++) {
+            for (let di = -1; di <= 1; di++) {
+                if (!dj && !di) continue;
+                const nid = world.grid[pj + dj]?.[pi + di];
+                if (!nid) continue;
+                let nd = this.mapCache[nid];
+                if (!nd) { try { nd = await (await fetch(`/data/maps/${nid}.json`)).json(); this.mapCache[nid] = nd; } catch { continue; } }
+                if (!nd?.heights || !nd.layout) continue;
+                const nrows = nd.layout.length, ncols = nd.layout[0].length;
+                const rowOff = dj * rows, colOff = di * cols;
+                for (let r = 0; r < nrows; r++) {
+                    for (let c = 0; c < ncols; c++) {
+                        const gr = rowOff + r, gc = colOff + c;
+                        if (gr < -R || gr >= rows + R || gc < -R || gc >= cols + R) continue;
+                        const wx = gc * ts + ts / 2, wz = gr * ts + ts / 2;
+                        const ch = nd.layout[r][c];
+                        const def = ch !== '0' ? this.objectDefinitions?.[nd.legend?.[ch]] : null;
+                        if (isWaterDef(def)) {   // 水（川・湖・海）: 低い所の、色つきの面
+                            const shallow = def.texture === 'shallowWater' || !!def.waterBelow;
+                            flat(shallow ? waterMats.shallow : waterMats.deep, wx, -0.15, wz);
+                            continue;
+                        }
+                        const lv = lvOf(nd, r, c);
+                        const fch = nd.floorLayer?.[r]?.[c];
+                        const ft = (fch !== undefined && nd.floorLegend?.[fch]) || nd.environment?.floorType;
+                        flat(matFor(topMats, lv, 1.0, ft), wx, lv * step, wz);
+                        if (def?.type === 'bridge_deck') {   // 吊橋: 床の板（高さは heights）
+                            flat(waterMats.deck, wx, (parseInt(nd.heights[r][c], 36) || 0) * step + 0.02, wz);
+                        }
+                        // 崖・段の側面: 低い隣へ（隣が、このマップの中の、今のマップの端のマスなら、高いほうから、低いほうへ）
+                        for (const [dx, dz, rotY] of dirs) {
+                            const rr = r + dz, cc = c + dx;
+                            let nh = null, reversed = false;
+                            if (rr >= 0 && rr < nrows && cc >= 0 && cc < ncols) nh = lvOf(nd, rr, cc);
+                            else {
+                                const ogr = gr + dz, ogc = gc + dx;   // 今のマップの、隣のマス
+                                if (ogr >= 0 && ogr < rows && ogc >= 0 && ogc < cols) { nh = this.terrainLevelAtTile(ogr, ogc); reversed = true; }
+                            }
+                            if (nh === null) continue;
+                            if (!reversed && nh >= lv) continue;
+                            if (reversed && nh === lv) continue;
+                            const hi = Math.max(lv, nh), lo = Math.min(lv, nh), drop = hi - lo;
+                            const faceH = drop * step;
+                            // 面の向きは、低いほうへ。reversed で、今のマップのほうが高いとき（nh > lv）は、このマス（低い側）へ向ける
+                            const toward = (!reversed || nh < lv) ? rotY : rotY + Math.PI;
+                            wall(drop >= 2 ? cliffMat : matFor(sideMats, hi, mapData.sideShade ?? 0.78, ft), wx + dx * ts / 2, lo * step + faceH / 2, wz + dz * ts / 2, faceH, toward);
+                        }
+                        // 物体（木・草・岩）: 端から NEIGHBOR_OBJECT_RANGE マスまで
+                        if (!def || gr < -RO || gr >= rows + RO || gc < -RO || gc >= cols + RO) continue;
+                        const y0 = lv * step;
+                        if (def.type === 'tree') {
+                            this.treeMats = this.treeMats || new Map();
+                            const texKey = def.texture;
+                            if (!this.treeMats.has(texKey)) {
+                                const tx = this.textures[texKey] || this.textures.tree;
+                                this.treeMats.set(texKey, { far: new THREE.SpriteMaterial({ map: tx, transparent: false, alphaTest: 0.4 }), near: new THREE.SpriteMaterial({ map: tx }) });
+                            }
+                            const { far: treeMat, near: treeMatNear } = this.treeMats.get(texKey);
+                            const tree = new THREE.Sprite(treeMat);
+                            tree.center.set(0.5, 0.0);
+                            const baseH = def.height ?? 4.8;
+                            const sv = baseH + ((gr * 5 + gc * 3) % 4 + 4) % 4 * 0.5 * (baseH / 4.8);
+                            tree.scale.set(sv * (def.aspect ?? (899 / 893)), sv, 1);
+                            tree.position.set(wx, y0 - 0.08, wz);
+                            this.scene.add(tree);
+                            tree.updateMatrix(); tree.matrixAutoUpdate = false;
+                            this.treeSprites.push({ sprite: tree, shadow: null, far: treeMat, near: treeMatNear, vis: true });
+                        } else if (def.type === 'plant') {
+                            const plantTex = this.textures[def.texture] || this.textures.grassTuft;
+                            this.plantMats = this.plantMats || new Map();
+                            if (!this.plantMats.has(plantTex)) this.plantMats.set(plantTex, new THREE.SpriteMaterial({ map: plantTex }));
+                            const [pw, ph] = def.scale || [1.2, 1.0];
+                            const count = Math.min(def.count || 4, 2);   // 遠くは、枚数を減らす
+                            for (let i = 0; i < count; i++) {
+                                const h1 = Math.sin((gr * 12.9898 + gc * 78.233 + i * 37.719) * 43758.5453) * 43758.5453;
+                                const h2 = Math.sin((gr * 39.346 + gc * 11.135 + i * 83.155) * 24634.6345) * 24634.6345;
+                                const fx = h1 - Math.floor(h1), fz = h2 - Math.floor(h2);
+                                const sprite = new THREE.Sprite(this.plantMats.get(plantTex));
+                                sprite.center.set(0.5, 0.0);
+                                const k = 0.8 + fx * 0.5;
+                                sprite.scale.set(pw * k, ph * k, 1);
+                                sprite.position.set(wx + (fx - 0.5) * (def.spread || ts * 0.8), y0 - 0.02, wz + (fz - 0.5) * (def.spread || ts * 0.8));
+                                this.scene.add(sprite);
+                                sprite.updateMatrix(); sprite.matrixAutoUpdate = false;
+                                this.cullSprites.push(sprite);
+                            }
+                        } else if (def.type === 'boulder') {
+                            const b = new THREE.Sprite(new THREE.SpriteMaterial({ map: this.textures[def.texture] || this.textures.boulder }));
+                            b.center.set(0.5, 0.0);
+                            const bs = def.scale || [2.6, 2.0, 1.0];
+                            b.scale.set(bs[0], bs[1], bs[2]);
+                            b.position.set(wx, y0 - 0.05, wz);
+                            this.scene.add(b);
+                            b.updateMatrix(); b.matrixAutoUpdate = false;
+                            this.cullSprites.push(b);
+                        }
                     }
-                } catch { /* テクスチャが取れなければ、表の色 */ }
-                this.outsideColors.set(ft, col);
-            }
-            return this.outsideColors.get(ft);
-        };
-        const colOf = (t) => t.water ? new THREE.Color(t.shallow ? WATER_SHALLOW : WATER_DEEP) : floorColor(t.ft).clone();
-        // このマップの端のマス（境に沿って i 番目）の高さ。境の頂点（i）は、両側のマス（i-1・i）の高いほう
-        const ownLevel = (i) => {
-            if (i < 0 || i >= along) return 0;
-            const [r, c] = dir === 'east' ? [i, cols - 1] : dir === 'west' ? [i, 0] : dir === 'south' ? [rows - 1, i] : [0, i];
-            return this.heightLevelAtTile(r, c) || 0;
-        };
-        const ownStep = this.heightStep ?? step;
-        const edgeTop = (i) => Math.max(ownLevel(i - 1), ownLevel(i)) * ownStep;
-        const nV = (DEPTH + 1) * (A + 1);
-        const pos = new Float32Array(nV * 3), colr = new Float32Array(nV * 3);
-        for (let k = 0; k <= DEPTH; k++) {
-            for (let i = 0; i <= A; i++) {
-                let hs = 0, n = 0; const c = new THREE.Color(0, 0, 0);
-                for (const [tk, ti] of [[k - 1, i - 1], [k - 1, i], [k, i - 1], [k, i]]) {
-                    const t = info[tk]?.[ti];
-                    if (!t) continue;   // 範囲の外のマスは、数えない
-                    hs += t.water ? 0 : t.h; n++; c.add(colOf(t));
                 }
-                const idx = k * (A + 1) + i;
-                const [wx, wz] = cornerXZ(k, i - ext);
-                let vy = (n ? hs / n : 0) + 0.01;
-                if (k === 0) vy = Math.max(vy, edgeTop(i - ext) + 0.01);   // 境の線は、このマップの端のマスの高さより、低くしない（端のマスの外側の面は描かれないので、1 段ぶんの隙間から、空が見える）
-                pos[idx * 3] = wx; pos[idx * 3 + 1] = vy; pos[idx * 3 + 2] = wz;
-                if (n) c.multiplyScalar(1 / n);
-                colr[idx * 3] = c.r; colr[idx * 3 + 1] = c.g; colr[idx * 3 + 2] = c.b;
             }
         }
-        // 面の向き: 4 方向で、頂点の並びの向きが違う。上から見て表になる並びに、そろえる（法線を後から反転すると、裏表の判定とずれて、暗くなる）
-        const buildIndices = (flip) => {
-            const idx = [];
-            for (let k = 0; k < DEPTH; k++) {
-                for (let i = 0; i < A; i++) {
-                    const a = k * (A + 1) + i, b = a + 1, c2 = a + (A + 1), d = c2 + 1;
-                    if (flip) idx.push(a, b, c2, b, d, c2); else idx.push(a, c2, b, b, c2, d);
-                }
-            }
-            return idx;
-        };
-        const geo = new THREE.BufferGeometry();
-        geo.setAttribute('position', new THREE.BufferAttribute(pos, 3));
-        geo.setAttribute('color', new THREE.BufferAttribute(colr, 3));
-        geo.setIndex(buildIndices(false));
-        geo.computeVertexNormals();
-        if (geo.attributes.normal.getY(Math.floor(nV / 2)) < 0) { geo.setIndex(buildIndices(true)); geo.computeVertexNormals(); }
-        this.outsideMats = this.outsideMats || new Map();
-        if (!this.outsideMats.has('smooth')) this.outsideMats.set('smooth', new THREE.MeshLambertMaterial({ vertexColors: true }));
-        const mesh = new THREE.Mesh(geo, this.outsideMats.get('smooth'));
-        mesh.matrixAutoUpdate = false;
-        this.scene.add(mesh);
+        for (const [mat, g] of groups) {
+            const geo = new THREE.BufferGeometry();
+            geo.setAttribute('position', new THREE.Float32BufferAttribute(g.pos, 3));
+            geo.setAttribute('normal', new THREE.Float32BufferAttribute(g.nor, 3));
+            geo.setAttribute('uv', new THREE.Float32BufferAttribute(g.uv, 2));
+            geo.setIndex(g.idx);
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.matrixAutoUpdate = false;
+            this.scene.add(mesh);
+        }
     }
 
     // 建物などへの出入り: 行き先 nextMap へ移動する。扉・門のマスごとの指定は、マップの links（"列,行": { nextMap, message, params, back }）
@@ -1181,7 +1210,7 @@ export class GameEngine {
         if (this.heightMap) this.buildHeightTerrain(mapData, rows, cols, tileSize, floorMats, floorMatOf, floorTypeAt);
 
         // 外のマップ（world.json にあるマップ）: 隣のマップがある方向は、端の外へ、隣の地面が遠くまで続く（外に出ると、隣のマップへ切り替わる）
-        await this.buildOutsideGround(mapId, cols, rows, tileSize);
+        await this.buildOutsideGround(mapId, cols, rows, tileSize, mapData, floorMatOf);
 
         // Ceiling mesh if specified
         this.strikeEffects.setCeilingHeight(env.hasCeiling ? wallH : null);

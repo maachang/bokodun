@@ -992,15 +992,16 @@ test('川の橋: すべての橋が、両岸をつなぐ（橋のマスが 4 近
     assert.ok(comps >= 30, `橋の数: ${comps}`);
 });
 
-test('端の向こうの景色: 隣のマップの地形（高さ・地面の種類・水）を、端から 16〜32 マスの幅で描く。端が高くても、高い所から下へ落ちるように見えない', () => {
+test('端の向こうの景色: 隣のマップ（斜めの角を含む 8 方向）を、本物のマス（高さ・崖・地面の種類・水・木・草・岩）で描く', () => {
     const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
-    assert.ok(game.includes('buildNeighborTerrain(dir, nd, cols, rows, tileSize)'), '隣の地形を描く');
-    assert.ok(game.includes('OUTSIDE_TERRAIN_MIN_DEPTH = 16') && game.includes('OUTSIDE_TERRAIN_MAX_DEPTH = 32'), '幅（16〜32）');
-    assert.ok(game.includes('Math.min(parseInt(nd.heights[tr]?.[tc]') && game.includes('DEPTH - k - lat)'), '1 マスに 1 段までの傾きで、0 へ下げる（高い端で、急な崖にならない）');
-    assert.ok(game.includes('edgeMax + 2'), '境の高さに合わせて、幅を決める');
+    assert.ok(game.includes('await this.buildNeighborDecor(mapId, cols, rows, tileSize, mapData, floorMatOf)'), '隣のマップを描く');
+    assert.ok(game.includes('NEIGHBOR_TERRAIN_RANGE = 48') && game.includes('NEIGHBOR_OBJECT_RANGE = 26'), '範囲（地形 48・物体 26）');
+    assert.ok(game.includes('for (let dj = -1; dj <= 1; dj++)') && game.includes('for (let di = -1; di <= 1; di++)'), '8 方向（斜めの角を含む）');
     assert.ok(game.includes('nd.floorLayer') && game.includes("def.type === 'liquid_tile'") && game.includes('waterBelow'), '地面の種類と水');
-    assert.ok(game.includes('vertexColors: true') && game.includes('buildIndices') && game.includes('floorColor(t.ft)'), 'なめらかな 1 枚の面（頂点の高さ・色は、まわりのマスの平均。1 マスずつの板にしない）');
-    assert.ok(game.includes("await Promise.all(['north', 'south', 'west', 'east']"), '隣のマップを、同時に読み込む');
+    assert.ok(game.includes("def.type === 'tree'") && game.includes("def.type === 'plant'") && game.includes("def.type === 'boulder'"), '木・草・岩');
+    assert.ok(game.includes('reversed'), '境の段差は、崖の面で埋める（隙間から空が見えない）');
+    assert.ok(!game.includes('buildNeighborTerrain'), 'なめらかな面（古い方式）は、使わない');
+    assert.ok(game.includes('for (const [mat, g] of groups)'), '地形の板は、材質ごとに 1 つのメッシュにまとめる（1 マスごとにメッシュを作らない。切り替えが止まる）');
     // 端の高さが 3 段以上の境は、たくさんある（この描画が効く）
     let high = 0;
     for (const id of world.grid.flat().filter(Boolean)) {
