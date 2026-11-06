@@ -1250,3 +1250,12 @@ test('山の吊橋: 世界に 5 か所以上・橋の下の谷の底（bridgeUnd
     }
     assert.ok(bridges >= 10 * 5, `吊橋のマス: ${bridges}`);
 });
+
+test('崖のよじ登り: ちょうど 2 段高い崖だけ・前を押し続けて始まり・2 秒かかる・攻撃を受けると中断して落ちる', () => {
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    assert.ok(game.includes('export const CLIMB_RISE = 2;') && game.includes('export const CLIMB_SEC = 2.0;') && game.includes('export const CLIMB_HOLD_SEC = 0.3;'), '登れる高さ 2 段・2 秒・0.3 秒押し続ける');
+    assert.ok(game.includes('if (diff === CLIMB_RISE) this._climbBump'), 'ちょうど 2 段高い崖だけ（3 段以上は、登れない）');
+    assert.ok(game.includes('if (this.player.climb) return;'), '登っている間は、歩けない');
+    assert.ok(game.includes('if (this.player.climb) { this.player.climb = null;'), 'ダメージを受けたら、中断して落ちる');
+    assert.ok(game.includes('return diff <= 1 && diff >= -2;'), '歩いて上れるのは 1 段まで・降りられるのは 2 段まで（今までどおり）');
+});

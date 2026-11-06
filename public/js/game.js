@@ -14,6 +14,11 @@ import { StrikeEffectSystem } from '/js/strikeEffect.js';
 // テスト用: 走る速さ（Shift）の倍率。広い世界を、すばやく見て回るため。通常の速さに戻すときは 1 にする（歩く速さは、そのまま）
 export const TEST_RUN_SPEED_SCALE = 5;
 
+// 崖のよじ登り: 登れる高さ（段）・登るのにかかる時間（秒）・前を押し続けて始まるまでの時間（秒）
+export const CLIMB_RISE = 2;
+export const CLIMB_SEC = 2.0;
+export const CLIMB_HOLD_SEC = 0.3;
+
 // 木の足元の影（暗い緑の丸い板）を置くか。雪原などで目立つため、いったん、すべてなくした（true で、小さな木だけ、影が戻る。2 倍・3 倍の木は、noShadow で、いつも、影なし）
 export const TREE_SHADOWS = false;
 
@@ -4164,8 +4169,9 @@ export class GameEngine {
 
         // Camera height with elevation difference (wading in water lowers player's eye height naturally, and falling plummets eye height into pit)
         // 高さのある床（高台の段）の上では目線も上がる。段ごとに急に跳ねないよう、なめらかに追従させる
+        if (this.player.climb) this.updateClimb(dt);   // よじ登り中: 目線の高さは、登りの動きで決める
         const targetFloorY = this.getFloorHeight(this.player.x, this.player.z, this.player.heightLevel);
-        this.player.floorY = (this.player.floorY ?? targetFloorY) + (targetFloorY - (this.player.floorY ?? targetFloorY)) * Math.min(1, dt * 10);
+        if (!this.player.climb) this.player.floorY = (this.player.floorY ?? targetFloorY) + (targetFloorY - (this.player.floorY ?? targetFloorY)) * Math.min(1, dt * 10);
         const eyeHeight = 1.8 + this.player.floorY - playerFloorDepth - (this.player.isFalling ? this.player.fallDepth : 0);
         // 木の描画: 近い木は従来どおり、遠い木は切り抜き（遠景で、壁の木と重なると四角く欠けるため）。境目で、ちらつかないよう、ヒステリシスをつける（距離は暫定）
         // 霧で見えなくなる距離（霧の遠さ×1.1）より遠い木・影・草は、隠す（描画する数を減らす。大森林は、木が大量にある）
@@ -4333,6 +4339,55 @@ export class GameEngine {
     }
 
     // 壁（colliders）の判定範囲（プレイヤーの半径ぶん外側へ広げた矩形）の中に (x, z) があるか
+    // 崖（ちょうど 2 段高い所）をよじ登る: 崖に向かって前を押し続けて CLIMB_HOLD_SEC 秒で始まり、CLIMB_SEC 秒かかる。
+    //   ①ジャンプして崖の縁に手をかける ②手で体を引き上げる ③足をひっかけて、よっこいしょと上がる ④縁の上に立つ。
+    //   登っている間は歩けない。敵の攻撃で、ダメージを受けると、中断して下に落ちる（落下のダメージは、なし）。3 段以上の崖は、登れない
+    tryStartClimb(dirX, dirZ) {
+        const now = performance.now();
+        const h = this.climbHold;
+        if (!h || now - h.last > 150 || h.dirX !== dirX || h.dirZ !== dirZ) this.climbHold = { since: now, last: now, dirX, dirZ };
+        else h.last = now;
+        if (now - this.climbHold.since < CLIMB_HOLD_SEC * 1000) return;
+        const cur = this.player.heightLevel ?? this.heightLevelAt(this.player.x, this.player.z);
+        const r = this.player.radius;
+        // 崖の縁（2 段高くなる所）を探し、その先の、上に立つ位置を決める
+        let d = 0, found = false;
+        for (; d <= 3; d += 0.1) {
+            if (this.heightLevelAt(this.player.x + dirX * (r + d), this.player.z + dirZ * (r + d), cur) - cur === CLIMB_RISE) { found = true; break; }
+        }
+        if (!found) return;
+        const tx = this.player.x + dirX * (r + d + r + 0.5), tz = this.player.z + dirZ * (r + d + r + 0.5);
+        if (this.heightLevelAt(tx, tz, cur) - cur !== CLIMB_RISE || this.isInsideWall(tx, tz)) return;   // 上に立てない（壁・木・段が、続く）ときは、登らない
+        this.player.climb = { t: 0, sx: this.player.x, sz: this.player.z, tx, tz, fromLv: cur, toLv: cur + CLIMB_RISE, fromY: cur * this.heightStep, toY: (cur + CLIMB_RISE) * this.heightStep };
+        this.climbHold = null;
+    }
+
+    updateClimb(dt) {
+        const c = this.player.climb;
+        c.t += dt;
+        const T = c.t, rise = c.toY - c.fromY;
+        // 高さの進み方（0〜1）: ①0〜0.35 秒: ジャンプして縁に手をかける（0 → 0.55）②0.35〜1.0 秒: 腕で引き上げる（0.55 → 0.75。ゆっくり）③1.0〜1.6 秒: 足をひっかけて、体を縁の上へ（0.75 → 1.0）④1.6〜2.0 秒: 縁の上に立つ（前へ進む）
+        const ease = (x) => x * x * (3 - 2 * x);
+        let p;
+        if (T < 0.35) p = 0.55 * (1 - (1 - T / 0.35) ** 2);
+        else if (T < 1.0) p = 0.55 + 0.2 * ease((T - 0.35) / 0.65);
+        else if (T < 1.6) p = 0.75 + 0.25 * ease((T - 1.0) / 0.6);
+        else p = 1;
+        const sway = (T > 0.35 && T < 1.6) ? Math.sin(T * 14) * 0.03 : 0;   // 腕で引き上げる間の、わずかな揺れ
+        this.player.floorY = c.fromY + rise * p + sway;
+        if (T >= 1.6) {   // 縁の上に立つ位置へ、なめらかに進む
+            const k = Math.min(1, (T - 1.6) / (CLIMB_SEC - 1.6));
+            this.player.x = c.sx + (c.tx - c.sx) * ease(k);
+            this.player.z = c.sz + (c.tz - c.sz) * ease(k);
+        }
+        if (T >= CLIMB_SEC) {
+            this.player.x = c.tx; this.player.z = c.tz;
+            this.player.heightLevel = c.toLv;
+            this.player.floorY = c.toY;
+            this.player.climb = null;
+        }
+    }
+
     isInsideWall(x, z) {
         const r = this.player.radius;
         for (const c of this.colliders) {
@@ -4619,6 +4674,8 @@ export class GameEngine {
         // マップの読み込み中は、動かない。読み込み中も、ゲームの時間は進み、新しい地形の高さが先に入るため、古い位置のまま動くと、
         //   段差を落下と判定して、落下ダメージを受けていた（マップ間の移動）
         if (this.nav?.busy) return;
+        if (this.player.climb) return;   // 崖をよじ登っている間は、歩けない
+        this._climbBump = null;
         this.depenetrateFromWalls();
         const prevX = this.player.x;
         const prevZ = this.player.z;
@@ -4642,6 +4699,7 @@ export class GameEngine {
             if (!this.heightMap) return true;
             const cur = this.player.heightLevel ?? this.heightLevelAt(this.player.x, this.player.z);
             const diff = this.heightLevelAt(x + dirX * r, z + dirZ * r, cur) - cur;   // 吊橋のマスは、今の高さに近い層（橋の上・橋の下）へ進む
+            if (diff === CLIMB_RISE) this._climbBump = { dirX, dirZ };   // ちょうど 2 段高い崖: 前へ押し続けると、よじ登れる
             return diff <= 1 && diff >= -2;
         };
         if (canMoveX && !climbOk(nextX, this.player.z, Math.sign(dx), 0)) canMoveX = false;
@@ -4666,6 +4724,9 @@ export class GameEngine {
             if (prev - lv >= 2) this.applyHeightFall(prev - lv);
             this.player.heightLevel = lv;
         }
+
+        if (this._climbBump && !this.player.climb) this.tryStartClimb(this._climbBump.dirX, this._climbBump.dirZ);
+        else if (!this._climbBump) this.climbHold = null;
 
         // 生きている敵は障害物（突き抜けられない）。敵に近づく方向の移動だけ、敵の円の縁まで押し戻して横へ滑らせる。
         // 突進の攻撃判定（距離 player.radius + m.radius 未満）が成立するよう、縁は攻撃判定の距離より内側（80%）にする。
@@ -4845,6 +4906,7 @@ export class GameEngine {
     playerTakeDamage(amount, knockDir, knockScale = 1.0, source = null) {
         if (this.player.isInvincible) return;
         if (source) this.onPlayerHitBy(source, amount);   // 状態異常・生命力吸収
+        if (this.player.climb) { this.player.climb = null; this.addPopup('手が離れた！', '#fbbf24'); }   // 登っている間に攻撃を受けたら、中断して、下に落ちる（目線の高さは、なめらかに下がる。落下のダメージはなし）
 
         this.player.hp = Math.max(0, this.player.hp - amount);
         this.player.isInvincible = true;
