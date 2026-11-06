@@ -1005,6 +1005,7 @@ test('端の向こうの景色: 隣のマップ（斜めの角を含む 8 方向
     assert.ok(game.includes('waterAcrossEdge(nr, nc, rows, cols)'), '水が境をこえて続くとき、境に砂の土手を立てない（茶色の線が出ない）');
     assert.ok(game.includes('opacity: 0.72') && game.includes('flat(waterMats.sand, wx, bedY, wz)'), '隣の水も、砂の底と半透明の水面（浅瀬が暗くならない）');
     assert.ok(game.includes('glowMatOf(def)') && game.includes('emissiveIntensity: 0.9'), '光る浅瀬（glow）は、隣のマップでも、自ら光る（暗くならない）');
+    assert.ok(game.includes("if (def.type === 'bridge_deck') {") && game.includes('waterMats.plank'), '隣のマップの川の木の橋は、水の上に、板を描く（浅瀬に見えない）');
     assert.ok(game.includes('reversed'), '境の段差は、崖の面で埋める（隙間から空が見えない）');
     assert.ok(!game.includes('buildNeighborTerrain'), 'なめらかな面（古い方式）は、使わない');
     assert.ok(game.includes('for (const [mat, g] of groups)'), '地形の板は、材質ごとに 1 つのメッシュにまとめる（1 マスごとにメッシュを作らない。切り替えが止まる）');

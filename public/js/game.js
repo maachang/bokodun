@@ -1006,6 +1006,10 @@ export class GameEngine {
                                 wall(waterMats.sand, wx + dx * ts / 2, bedY / 2, wz + dz * ts / 2, Math.abs(bedY), rotY + Math.PI);   // 陸の側の縁に、水のほうを向けて立てる
                             }
                             flat(def.glow ? glowMatOf(def) : (shallow ? waterMats.shallow : waterMats.deep), wx, shallow ? -0.12 : -0.2, wz);
+                            if (def.type === 'bridge_deck') {   // 川の木の橋（下に水がある）: 水の上に、橋の板（高さは heights。手すりは描かない）
+                                if (!waterMats.plank) waterMats.plank = new THREE.MeshLambertMaterial({ map: this.textures[def.texture] || this.textures.woodBridge });
+                                flat(waterMats.plank, wx, (parseInt(nd.heights[r][c], 36) || 0) * step + 0.06, wz);
+                            }
                             continue;
                         }
                         const lv = lvOf(nd, r, c);
