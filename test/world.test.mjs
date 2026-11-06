@@ -1201,3 +1201,20 @@ test('ガマは湿地帯前提: 砂漠の床の上にガマがない', () => {
     }
     assert.deepEqual(bad.slice(0, 10), []);
 });
+
+test('ガマは水のそばだけ（湿地帯は、水が逃げにくい低地・河口・湖のまわり・雪解けの裾野）: ガマから 4 マス以内に、水がある', () => {
+    const bad = [];
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const water = new Set(['water', 'water_shallow', 'water_shallow_glow', 'sea', 'plank_bridge']);
+        for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) {
+            if (m.legend[m.layout[y][x]] !== 'cattail_cluster') continue;
+            // 画面の端のマスは、隣のマップの水が見えないので、数えない
+            if (x < 5 || x > 58 || y < 5 || y > 58) continue;
+            let near = false;
+            for (let yy = y - 4; yy <= y + 4 && !near; yy++) for (let xx = x - 4; xx <= x + 4; xx++) if (water.has(m.legend[m.layout[yy][xx]])) { near = true; break; }
+            if (!near) bad.push(`${id} (${x},${y})`);
+        }
+    }
+    assert.deepEqual(bad.slice(0, 10), []);
+});

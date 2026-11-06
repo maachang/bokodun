@@ -23,7 +23,7 @@ LEGEND = {
     'F': 'broadleaf_wall', 'C': 'conifer_wall', 'N': 'tundra_wall', 'P': 'snow_pine', 'D': 'dark_tree', 'G': 'grass_tree',
     'A': 'cactus', 'X': 'dead_tree', 'U': 'succulent', 'M': 'palm',
     'R': 'mountain_rock_a', 'S': 'mountain_rock_b', 'B': 'mountain_rock_c', 'H': 'mountain_rock_d',
-    'm': 'meadow_grass', 'e': 'fern', 'h': 'highland_grass', 'v': 'weed_flower', 'k': 'cattail_cluster', 'l': 'lavender_flower', 'i': 'arid_grass', 'o': 'highland_weed', 'w': 'roadside_flowers', 'p': 'path_flower', 'b': 'bush_flower',
+    'm': 'meadow_grass', 'e': 'fern', 'h': 'highland_grass', 'v': 'weed_flower', 'k': 'cattail_cluster', 'z': 'marsh_grass', 'u': 'marsh_weed', 'l': 'lavender_flower', 'i': 'arid_grass', 'o': 'highland_weed', 'w': 'roadside_flowers', 'p': 'path_flower', 'b': 'bush_flower',
     'T': 'forest_tree_a', 'V': 'forest_tree_b', 'W': 'great_tree_a', 'K': 'great_tree_b',      # 森: 217・218 の木（2 倍）・大森林: 3 倍。林の壁（F・C・N）は、使わない
     'J': 'conifer_forest_a', 'L': 'conifer_forest_b', 'j': 'great_conifer_a', 'n': 'great_conifer_b', 'x': 'conifer_tree_a', 'y': 'conifer_tree_b',   # 寒冷地の木（ID 262・263）: 森 2 倍・大森林 3 倍・単独 1 倍
     'a': 'tropical_forest_a', 'd': 'tropical_forest_b', 'f': 'tropical_palm_forest', 'r': 'swamp_tree_a', 's': 'marsh_flower', 'g': 'water_shallow_glow',   # 南国: ジャングルの木・ヤシの林（2 倍）・マングローブ・毒々しい花・青緑に光る浅瀬
@@ -240,8 +240,21 @@ def build_tiles(t):
     near_trop = np.clip(1.0 - d_trop.astype(np.float32) / 40.0, 0, 1)            # 南国に近いほど多い（40 マス先でゼロ）
     put(beach & (biome != TROPICAL) & (biome != SEA) & (u < 0.05 * near_trop), 'M')   # 南国でない浜: 南国に近い所だけ、ヤシ
     # 水辺: ガマ
-    bank = free & (d_water <= 2) & np.isin(biome, [GRASS, FOREST])
-    put(bank & (u2 < 0.3) & np.isin(obj, [ord('0'), ord('m'), ord('e'), ord('v'), ord('w'), ord('p'), ord('b')]), 'k')
+    # 湿地帯（できる原理: ①水が逃げにくい地形＝低地・盆地・川の河口（デルタ）・もと湖の場所、水を通しにくい地層。②寒冷・多湿で、枯れた草が分解されず積もる（泥炭）＝雪解け水で湿る、雪山の裾野）
+    #   ・低地: 周りより低い所（盆地）。南国のジャングルの低地・雪解け水で湿る裾野（雪山から 28 マス以内の草原）の低地
+    #   ・河口（デルタ）: 海から 14 マス以内で、川から 10 マス以内（砂漠・岩山は除く）
+    #   ・湖のまわりの低地（湖から 5 マス以内。砂漠・岩山は除く）
+    #  まだら（かたまり）に。ガマ（水のそば）・湿地の草・湿地の雑草。ほかの所（高台・草原・森・砂漠）には、ガマを置かない
+    elev_f = elev.astype(np.float32)
+    low = (elev_f <= T.gauss(elev_f, 10) + 0.0) | (elev <= 2)                          # 周りより低い所
+    d_lake = T._distance(t['lake'])
+    not_dry = ~np.isin(biome, [DESERT, ROCK])
+    delta = land & not_dry & (d_sea <= 14) & (d_rv <= 10)
+    lakeside = land & not_dry & (d_lake <= 5) & low
+    wet = (((jungle | trans) & low) | delta | lakeside) & (patch2 > 0.32) & free
+    free_obj = np.isin(obj, [ord('0'), ord('m'), ord('e'), ord('v'), ord('w'), ord('p'), ord('b'), ord('h'), ord('o'), ord('l')])
+    put(wet & free_obj & (d_water <= 4) & (u2 < 0.5), 'k')
+    put(wet & free_obj & (d_water > 4) & (u3 < 0.15), 'z'); put(wet & free_obj & (u < 0.06), 'u')
     # 水: 川・湖（深い所 Q・浅瀬 q）、湖の中央と海（O）、海の岸の浅瀬（q）
     lake = t['lake']
     d_nonlake = T._distance(~lake)

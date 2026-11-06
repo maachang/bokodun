@@ -35,6 +35,7 @@
   "i": "arid_grass",
   "m": "meadow_grass",
   "q": "water_shallow",
+  "u": "marsh_weed",
   "w": "roadside_flowers"
  },
  "enemies": {},
@@ -178,7 +179,7 @@
   "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd"
  ],
  "layout": [
-  "0i000000000i0000000i0000000000000000000000i000000eeQQqem00000i00",
+  "0i000000000i000000ui0000000000000000000000i000000eeQQqem00000i00",
   "000000000000000000000000000000000000000000000000eemQQQee0000000i",
   "000000000i00000000i00000000i0000i00000000000000imeeQQQQeee000000",
   "0000000i000i00000i00000000000i0000000000000000000eeQQQQeem000000",
