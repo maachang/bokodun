@@ -98,12 +98,14 @@ def main():
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         im.save(dst, optimize=True)
         ratio = im.width / im.height
-        if kind in ('npc', 'object'):
+        d0 = json.load(open(path, encoding='utf-8'))[key]
+        if kind in ('npc', 'object') and 'aspect' in d0:
             set_field(path, key, 'aspect', lambda _: str(round(ratio, 3)))
-        else:
-            d = json.load(open(path, encoding='utf-8'))[key]
-            if 'scale' in d:
-                set_field(path, key, 'scale', lambda _: str(round(d['scale'][1] * ratio, 2)))
+        elif kind == 'object' and 'scale' in d0:
+            # 植物・岩（aspect を持たず scale [幅, 高さ] を持つ）: 高さを保ち、幅を新しい縦横比で更新
+            set_field(path, key, 'scale', lambda _: str(round(d0['scale'][1] * ratio, 2)))
+        elif 'scale' in d0:
+            set_field(path, key, 'scale', lambda _: str(round(d0['scale'][1] * ratio, 2)))
         man[str(sid)] = {'imageUpdatedAt': api[sid]['image_updated_at'], 'fileUpdatedAt': iso(os.path.getmtime(dst))}
     json.dump(dict(sorted(man.items(), key=lambda x: int(x[0]))), open(MANIFEST, 'w'), indent=2)
     open(MANIFEST, 'a').write('\n')

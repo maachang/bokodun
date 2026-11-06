@@ -15805,6 +15805,8 @@
   },
   "cactus": {
     "type": "tree",
+    "imageFile": "field/cactus.png",
+    "sdId": 224,
     "texture": "fCactus",
     "aspect": 0.512,
     "height": 3.4,
@@ -15813,6 +15815,8 @@
   },
   "dead_tree": {
     "type": "tree",
+    "imageFile": "field/desert_odd_tree.png",
+    "sdId": 227,
     "texture": "fOddTree",
     "aspect": 0.93,
     "height": 3.4,
@@ -15821,6 +15825,8 @@
   },
   "snow_pine": {
     "type": "tree",
+    "imageFile": "field/tundra_conifers.png",
+    "sdId": 228,
     "texture": "fTundraConifers",
     "aspect": 0.809,
     "height": 5.5,
@@ -15829,6 +15835,8 @@
   },
   "dark_tree": {
     "type": "tree",
+    "imageFile": "field/jungle_tree.png",
+    "sdId": 231,
     "texture": "fJungleTree",
     "aspect": 0.887,
     "height": 6.0,
@@ -15837,6 +15845,8 @@
   },
   "palm": {
     "type": "tree",
+    "imageFile": "field/palm.png",
+    "sdId": 221,
     "texture": "fPalm",
     "aspect": 0.703,
     "height": 7.5,
@@ -15845,6 +15855,8 @@
   },
   "fern": {
     "type": "plant",
+    "imageFile": "field/fern.png",
+    "sdId": 232,
     "texture": "fFern",
     "count": 3,
     "scale": [
@@ -15856,6 +15868,8 @@
   },
   "road_weed": {
     "type": "plant",
+    "imageFile": "field/road_weed.png",
+    "sdId": 238,
     "texture": "fRoadWeed",
     "count": 3,
     "scale": [1.11, 1.3],
@@ -15864,6 +15878,8 @@
   },
   "highland_weed": {
     "type": "plant",
+    "imageFile": "field/highland_weed.png",
+    "sdId": 239,
     "texture": "fHighlandWeed",
     "count": 3,
     "scale": [1.53, 1.7],
@@ -15872,6 +15888,8 @@
   },
   "marsh_weed": {
     "type": "plant",
+    "imageFile": "field/marsh_weed.png",
+    "sdId": 240,
     "texture": "fMarshWeed",
     "count": 3,
     "scale": [1.12, 1.7],
@@ -15880,6 +15898,8 @@
   },
   "meadow_grass": {
     "type": "plant",
+    "imageFile": "field/meadow_grass.png",
+    "sdId": 241,
     "texture": "fMeadowGrass",
     "count": 4,
     "scale": [1.42, 1.1],
@@ -15888,6 +15908,8 @@
   },
   "marsh_grass": {
     "type": "plant",
+    "imageFile": "field/marsh_grass.png",
+    "sdId": 242,
     "texture": "fMarshGrass",
     "count": 3,
     "scale": [1.18, 1.2],
@@ -15896,6 +15918,8 @@
   },
   "highland_grass": {
     "type": "plant",
+    "imageFile": "field/highland_grass.png",
+    "sdId": 243,
     "texture": "fHighlandGrass",
     "count": 3,
     "scale": [1.11, 1.2],
@@ -15904,6 +15928,8 @@
   },
   "arid_grass": {
     "type": "plant",
+    "imageFile": "field/arid_grass.png",
+    "sdId": 244,
     "texture": "fAridGrass",
     "count": 3,
     "scale": [1.3, 1.7],
@@ -15912,6 +15938,8 @@
   },
   "arid_grass_thick": {
     "type": "plant",
+    "imageFile": "field/arid_grass_thick.png",
+    "sdId": 245,
     "texture": "fAridGrassThick",
     "count": 3,
     "scale": [1.33, 1.2],
@@ -15920,6 +15948,8 @@
   },
   "cattail_cluster": {
     "type": "plant",
+    "imageFile": "field/cattail_cluster.png",
+    "sdId": 246,
     "texture": "fCattailCluster",
     "count": 3,
     "scale": [1.3, 1.9],
@@ -15928,6 +15958,8 @@
   },
   "cattail_single": {
     "type": "plant",
+    "imageFile": "field/cattail_single.png",
+    "sdId": 247,
     "texture": "fCattailSingle",
     "count": 3,
     "scale": [0.61, 2.0],
@@ -15936,6 +15968,8 @@
   },
   "path_flower": {
     "type": "plant",
+    "imageFile": "field/path_flower.png",
+    "sdId": 248,
     "texture": "fPathFlower",
     "count": 3,
     "scale": [0.96, 1.3],
@@ -15944,6 +15978,8 @@
   },
   "bush_flower": {
     "type": "plant",
+    "imageFile": "field/bush_flower.png",
+    "sdId": 249,
     "texture": "fBushFlower",
     "count": 3,
     "scale": [1.28, 1.4],
@@ -15952,6 +15988,8 @@
   },
   "lavender_flower": {
     "type": "plant",
+    "imageFile": "field/lavender_flower.png",
+    "sdId": 250,
     "texture": "fLavenderFlower",
     "count": 3,
     "scale": [1.24, 1.5],
@@ -15960,6 +15998,8 @@
   },
   "roadside_flowers": {
     "type": "plant",
+    "imageFile": "field/roadside_flowers.png",
+    "sdId": 251,
     "texture": "fRoadsideFlowers",
     "count": 3,
     "scale": [1.28, 1.0],
@@ -15968,6 +16008,8 @@
   },
   "weed_flower": {
     "type": "plant",
+    "imageFile": "field/weed_flower.png",
+    "sdId": 252,
     "texture": "fWeedFlower",
     "count": 3,
     "scale": [0.98, 1.3],
@@ -15976,6 +16018,8 @@
   },
   "marsh_flower": {
     "type": "plant",
+    "imageFile": "field/marsh_flower.png",
+    "sdId": 253,
     "texture": "fMarshFlower",
     "count": 3,
     "scale": [1.17, 1.5],
@@ -15984,6 +16028,8 @@
   },
   "flowerbed_flower": {
     "type": "plant",
+    "imageFile": "field/flowerbed_flower.png",
+    "sdId": 254,
     "texture": "fFlowerbedFlower",
     "count": 3,
     "scale": [1.74, 1.0],
@@ -16014,6 +16060,8 @@
   },
   "succulent": {
     "type": "tree",
+    "imageFile": "field/succulent.png",
+    "sdId": 225,
     "texture": "fSucculent",
     "aspect": 0.992,
     "height": 1.8,
@@ -16022,6 +16070,8 @@
   },
   "grass_tree": {
     "type": "tree",
+    "imageFile": "field/grass_tree.png",
+    "sdId": 217,
     "texture": "fGrassTree",
     "aspect": 0.922,
     "height": 5.2,
@@ -16030,6 +16080,8 @@
   },
   "tropical_tree": {
     "type": "tree",
+    "imageFile": "field/tropical_tree.png",
+    "sdId": 220,
     "texture": "fTropicalTree",
     "aspect": 0.809,
     "height": 5.8,
@@ -16038,6 +16090,8 @@
   },
   "riverside_tree": {
     "type": "tree",
+    "imageFile": "field/riverside_tree.png",
+    "sdId": 222,
     "texture": "fRiversideTree",
     "aspect": 0.84,
     "height": 5.5,
@@ -16046,6 +16100,8 @@
   },
   "swamp_tree_a": {
     "type": "tree",
+    "imageFile": "field/swamp_tree_a.png",
+    "sdId": 218,
     "texture": "fSwampTreeA",
     "aspect": 0.887,
     "height": 5.2,
@@ -16054,6 +16110,8 @@
   },
   "swamp_tree_dead": {
     "type": "tree",
+    "imageFile": "field/swamp_tree_dead.png",
+    "sdId": 219,
     "texture": "fSwampTreeDead",
     "aspect": 0.875,
     "height": 5.2,
@@ -16062,6 +16120,8 @@
   },
   "forest_hedge_wall": {
     "type": "tree_wall",
+    "imageFile": "field/forest_hedge_wall.png",
+    "sdId": 223,
     "texture": "fHedgeWall",
     "aspect": 1.43,
     "height": 4.4,
@@ -16094,6 +16154,8 @@
   },
   "mountain_rock_a": {
     "type": "boulder",
+    "imageFile": "field/rock_a.png",
+    "sdId": 233,
     "texture": "fRockA",
     "solid": true,
     "blocksProjectiles": true,
@@ -16107,6 +16169,8 @@
   },
   "mountain_rock_b": {
     "type": "boulder",
+    "imageFile": "field/rock_b.png",
+    "sdId": 235,
     "texture": "fRockB",
     "solid": true,
     "blocksProjectiles": true,
@@ -16120,6 +16184,8 @@
   },
   "mountain_rock_c": {
     "type": "boulder",
+    "imageFile": "field/rock_c.png",
+    "sdId": 236,
     "texture": "fRockC",
     "solid": true,
     "blocksProjectiles": true,
@@ -16133,6 +16199,8 @@
   },
   "mountain_rock_d": {
     "type": "boulder",
+    "imageFile": "field/rock_d.png",
+    "sdId": 237,
     "texture": "fRockD",
     "solid": true,
     "blocksProjectiles": true,

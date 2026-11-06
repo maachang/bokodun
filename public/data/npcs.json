@@ -1214,6 +1214,7 @@
   },
   "cat_walk": {
     "name": "猫",
+    "sdId": 255,
     "texture": "/images/npcs/cat_walk.png",
     "height": 1.15,
     "aspect": 0.51,
@@ -1228,6 +1229,7 @@
   },
   "cat_walk_tail": {
     "name": "猫",
+    "sdId": 257,
     "texture": "/images/npcs/cat_walk_tail.png",
     "height": 1.3,
     "aspect": 0.324,
@@ -1242,6 +1244,7 @@
   },
   "cat_sleep": {
     "name": "寝ている猫",
+    "sdId": 256,
     "texture": "/images/npcs/cat_sleep.png",
     "height": 0.7,
     "aspect": 1.407,
@@ -1255,6 +1258,7 @@
   },
   "black_cat_walk": {
     "name": "黒猫",
+    "sdId": 259,
     "texture": "/images/npcs/black_cat_walk.png",
     "height": 1.1,
     "aspect": 0.394,
@@ -1269,6 +1273,7 @@
   },
   "black_cat_walk_tail": {
     "name": "黒猫",
+    "sdId": 260,
     "texture": "/images/npcs/black_cat_walk_tail.png",
     "height": 1.3,
     "aspect": 0.292,
@@ -1283,6 +1288,7 @@
   },
   "black_cat_sleep": {
     "name": "寝ている黒猫",
+    "sdId": 258,
     "texture": "/images/npcs/black_cat_sleep.png",
     "height": 0.65,
     "aspect": 1.85,
