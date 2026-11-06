@@ -13,7 +13,7 @@ from collections import deque
 from PIL import Image, ImageFilter, ImageDraw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
-IMAGE = os.path.join(ROOT, 'public', 'images', 'objects', 'island_map.png')
+IMAGE = os.path.join(ROOT, 'scripts', 'world', 'island_map_src.png')   # 地形を読み取る元の画像（768×640。巻物と海の余白つき）。ギルドの壁の地図は、余白を切った public/images/objects/island_map.png
 GW, GH = 20, 15            # メッシュの数
 MESH = 64                  # 1 メッシュのマス数
 W, H = GW * MESH, GH * MESH  # 世界のマス数（1280×960）

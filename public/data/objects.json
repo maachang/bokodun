@@ -15972,7 +15972,7 @@
     "sdId": 248,
     "texture": "fPathFlower",
     "count": 3,
-    "scale": [0.96, 1.3],
+    "scale": [1.11, 1.3],
     "spread": 3.0,
     "description": "道に咲く白い花（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
   },
@@ -16093,7 +16093,7 @@
     "imageFile": "field/riverside_tree.png",
     "sdId": 222,
     "texture": "fRiversideTree",
-    "aspect": 0.68,
+    "aspect": 0.675,
     "height": 4.92,
     "solid": true,
     "description": "水辺の木（根が張る。sdServer 画像）"
@@ -16216,8 +16216,8 @@
     "type": "wall_image",
     "imageFile": "island_map.png",
     "sdId": 261,
-    "aspect": 1.2,
-    "height": 2.2,
+    "aspect": 1.241,
+    "height": 3.2,
     "bottom": 1.0,
     "wallTexture": "woodWall",
     "solid": true,
