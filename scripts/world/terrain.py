@@ -473,6 +473,112 @@ def _expand_desert_north(land, biome, reach=22):
     return out
 
 
+MOUNTAIN_STEP = 6            # 山の段丘の、1 段の高さ（段）。段と段の間は崖（隣のマスの差が 2 以上＝上れない）
+TRAIL_PEAKS = []             # build() が、山道の行き先（山頂の広場）を入れる
+
+
+def _astar4(cost, start, goal, win):
+    """4 近傍の A*。cost[y, x] は、そのマスに入る費用（inf は通れない）。win=(y0, y1, x0, x1) の範囲だけ探す"""
+    import heapq
+    y0, y1, x0, x1 = win
+    gy, gx = goal
+    INF = 1e18
+    dist = {}
+    came = {}
+    sy_, sx_ = start
+    heap = [(0.0, 0.0, sy_, sx_)]
+    dist[(sy_, sx_)] = 0.0
+    while heap:
+        f, g, y, x = heapq.heappop(heap)
+        if (y, x) == (gy, gx): break
+        if g > dist.get((y, x), INF): continue
+        for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+            ny, nx = y + dy, x + dx
+            if ny < y0 or ny >= y1 or nx < x0 or nx >= x1: continue
+            c = cost[ny, nx]
+            if c >= INF: continue
+            ng = g + c
+            if ng < dist.get((ny, nx), INF):
+                dist[(ny, nx)] = ng; came[(ny, nx)] = (y, x)
+                h = 0.6 * (abs(ny - gy) + abs(nx - gx))
+                heapq.heappush(heap, (ng + h, ng, ny, nx))
+    if (gy, gx) not in came and (sy_, sx_) != (gy, gx): return None
+    path = [(gy, gx)]
+    while path[-1] != (sy_, sx_): path.append(came[path[-1]])
+    return path[::-1]
+
+
+def _mountains(elev, land, biome, blocked, sx, sy):
+    """連峰・山脈: 高い所を、段丘（崖で区切られた、広い段）にして、上れない所を作る。段丘のところどころに、ゆるやかな斜面（自然の坂）。
+    人が作った山道（4 近傍の A*。等高線に沿って、ジグザグに上る）を、段丘に切り込む（道は、元のなだらかな高さ）。山頂に、広場。
+    戻り値: elev, trail（山道のマス）, arenas（山頂の広場 [(y, x, 高さ)]）"""
+    Y, X = np.mgrid[0:H, 0:W]
+    T0 = np.where(biome == SNOW, 8, 6)
+    zone = land & np.isin(biome, [SNOW, ROCK]) & (elev >= T0)
+    s_ = elev + (fbm(111, (30, 10, 4)) - 0.5) * 5.0
+    q = (T0 + MOUNTAIN_STEP * np.round((s_ - T0) / MOUNTAIN_STEP)).astype(np.int32)
+    ramp = fbm(112, (20, 7, 3)) > 0.64                                   # 自然の坂（段丘の、ゆるやかな所）
+    near_seam = _near_seam(Y, X, 3)                                        # 隣のマップとの境は、なだらか
+    near_seam10 = _near_seam(Y, X, 10)
+    d_blk = _distance(blocked)
+    use_q = zone & ~ramp & ~near_seam & (d_blk > 3)
+    out = np.where(use_q, np.minimum(q, MAX_LEVEL), elev).astype(np.int32)
+    # 山頂の広場（山頂ごと）。山頂は、なだらかな高さの、最も高い所
+    arenas = []
+    for px, py, ph, ps in PEAKS_SNOW + PEAKS_ROCK:
+        cy, cx = int(py * sy), int(px * sx)
+        if not (0 <= cy < H and 0 <= cx < W): continue
+        y0, y1, x0, x1 = max(0, cy - 14), min(H, cy + 15), max(0, cx - 14), min(W, cx + 15)
+        sub = np.where(land[y0:y1, x0:x1] & ~near_seam10[y0:y1, x0:x1], elev[y0:y1, x0:x1], -1)   # 広場は、境界線から 10 マス離す
+        if sub.max() < 6: continue
+        iy, ix = np.unravel_index(np.argmax(sub), sub.shape); ay, ax = y0 + iy, x0 + ix
+        arenas.append((int(ay), int(ax), int(elev[ay, ax])))
+    # 山道: 麓（草原の低い所）から、山頂の広場へ。先にできた道は、使いやすい（費用が安い）ので、幹と枝になる
+    trail = np.zeros((H, W), bool)
+    arena_h = {}
+    base = np.where(blocked | ~land, 1e18, 1.0)
+    ef = elev.astype(np.float32)
+    low = land & ~blocked & (elev <= 6)
+    lab = _components(low)                                                # 低い所の、つながり。いちばん大きいもの（本土）から、山道を始める
+    big = int(np.argmax(np.bincount(lab.ravel())[1:])) + 1
+    starts_ok = (lab == big) & (elev <= 3) & ~near_seam
+    sy_idx, sx_idx = np.nonzero(starts_ok)
+    for ay, ax, ah in sorted(arenas, key=lambda a: -a[0]):                 # 南の山頂から
+        d2 = (sy_idx - ay) ** 2 + (sx_idx - ax) ** 2
+        k = int(np.argmin(d2)); st = (int(sy_idx[k]), int(sx_idx[k]))
+        y0, y1 = max(0, min(st[0], ay) - 60), min(H, max(st[0], ay) + 60)
+        x0, x1 = max(0, min(st[1], ax) - 60), min(W, max(st[1], ax) + 60)
+        # 費用: 1 マス 1 + 傾き（高さの差）×5。先にできた道は 0.2（使い回す）
+        cost = np.full((H, W), 1e18)
+        sub_b = base[y0:y1, x0:x1]
+        up = np.zeros_like(ef[y0:y1, x0:x1])
+        e_sub = ef[y0:y1, x0:x1]
+        gy_ = np.abs(np.diff(e_sub, axis=0, prepend=e_sub[:1])); gx_ = np.abs(np.diff(e_sub, axis=1, prepend=e_sub[:, :1]))
+        slope = np.maximum(gy_, gx_)
+        cs = sub_b * (1.0 + 5.0 * slope)
+        cs = np.where(trail[y0:y1, x0:x1], 0.2, cs)
+        cost[y0:y1, x0:x1] = cs
+        path = _astar4(cost, st, (ay, ax), (y0, y1, x0, x1))
+        if path is None: continue
+        for y, x in path: trail[y, x] = True
+        for y, x in path:                                                # 広場の高さ: 道が広場（半径 6）に入る最初のマスの、なだらかな高さ（広場と道が、段差 1 以内でつながる）
+            if (y - ay) ** 2 + (x - ax) ** 2 <= 36:
+                arena_h[(ay, ax)] = int(elev[y, x]); break
+    # 山道の幅 2 マス（右・下を足す）。高さは、なだらかな高さのまま（切り込む）
+    t2 = trail.copy()
+    t2[:-1, :] |= trail[1:, :]; t2[:, :-1] |= trail[:, 1:]
+    t2 &= land & ~blocked
+    out = np.where(t2, elev, out)
+    # 山頂の広場: 半径 6 を、平らに（なだらかな高さの、頂上の高さ）
+    arenas = [(ay, ax, arena_h.get((ay, ax), ah)) for ay, ax, ah in arenas]
+    for ay, ax, ah in arenas:
+        d = np.hypot(X - ax, Y - ay)
+        m = (d <= 6) & land & ~blocked
+        out = np.where(m, ah, out)
+        trail |= m & (d <= 5)
+    return out, trail, arenas
+
+
 def _desert_oases(land, biome, sx=1.0, sy=1.0):
     """砂漠のオアシス（砂漠の真ん中あたりに、最大 2 か所。川から離す。いちばん大きな砂漠が、街を作る大きなオアシス、2 つ目は小さなオアシス）。
     戻り値: dict(pond=深い水, ring=浅いふち, grass=草の地面, sand=白い砂のふち, flat=平らにする所（高さ 0）, clear=物を置かない所（街の予定地）, town=街の予定地の中心, centers=[(y, x, 種別)])"""
@@ -673,7 +779,9 @@ def build():
     elev = _lipschitz(elev)
     elev[any_water | ~land | oasis['flat']] = 0
     elev = _lipschitz(elev)
-    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, oasis=oasis, dist_sea=_distance(~land), dist_water=_distance(any_water))
+    elev, trail, arenas = _mountains(elev, land, biome, (water_deep & ~bridge) | oasis['flat'] | ~land, sx, sy)   # 連峰・山脈: 段丘と山道
+    elev[any_water | ~land | oasis['flat']] = 0
+    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, trail=trail, arenas=arenas, oasis=oasis, dist_sea=_distance(~land), dist_water=_distance(any_water))
 
 
 if __name__ == '__main__':

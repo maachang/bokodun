@@ -84,8 +84,9 @@ test('世界を歩ける: 出発点から、段差 1 までの道で、歩ける
     // 隣り合うマスの高さは、1 以下（山が、歩ける傾き）
     for (let y = 0; y < H; y++) for (let x = 0; x < W; x++) {
         const k = y * W + x;
-        if (x < W - 1) assert.ok(Math.abs(level[k] - level[k + 1]) <= 1, `高さの差が大きい ${y},${x}`);
-        if (y < H - 1) assert.ok(Math.abs(level[k] - level[k + W]) <= 1, `高さの差が大きい ${y},${x}`);
+        // 山の段丘（高さ 8 以上）には、崖（段差 2 以上）がある。それ以外は、1 以下
+        if (x < W - 1) assert.ok(Math.abs(level[k] - level[k + 1]) <= 1 || Math.max(level[k], level[k + 1]) >= 8, `高さの差が大きい ${y},${x}`);
+        if (y < H - 1) assert.ok(Math.abs(level[k] - level[k + W]) <= 1 || Math.max(level[k], level[k + W]) >= 8, `高さの差が大きい ${y},${x}`);
     }
     const seen = new Uint8Array(W * H);
     const q = [start[0] * W + start[1]]; seen[q[0]] = 1;
@@ -103,6 +104,10 @@ test('世界を歩ける: 出発点から、段差 1 までの道で、歩ける
     }
     let free = 0; for (let k = 0; k < W * H; k++) if (!blocked[k]) free++;
     assert.ok(reached / free >= 0.97, `行ける割合: ${(reached / free * 100).toFixed(1)}%（${reached}/${free}）`);
+    // 山頂の広場（山道の行き先）には、山道で行ける
+    assert.ok(world.arenas.length >= 10, `山頂の広場: ${world.arenas.length}`);
+    const lost = world.arenas.filter(([y, x]) => !seen[y * W + x]);
+    assert.deepEqual(lost, [], '山頂の広場へ行けない');
 });
 
 test('世界の並び: 隣のマップは配列の位置で決まり、端を越えると反対側の同じ位置に出る。配列の外側の端は、越えられない', async () => {
@@ -756,7 +761,7 @@ test('マップ間の移動: 読み込み中は動かず、落下ダメージも
     assert.ok(body('applyHeightFall').includes('if (this.nav?.busy) return;'), '読み込み中は落下ダメージなし');
 });
 
-test('世界の特徴: 北の雪山（断崖・氷）・西の大森林（獣道・空き地・小川）・東の炭鉱（入口・トロッコ・赤茶の地面）・南国（ヤシ・南国の木・白い砂浜）', () => {
+test('世界の特徴: 北の雪山（氷）・西の大森林（獣道・空き地・小川）・東の炭鉱（入口・トロッコ・赤茶の地面）・南国（ヤシ・南国の木・白い砂浜）', () => {
     let cliffs = 0, iceTiles = 0, mineEntrances = 0, carts = 0, palms = 0, tropical = 0, trail = 0, redEarth = 0, tropicalMeshes = 0, mineMeshes = 0, forestWater = 0;
     for (const id of world.grid.flat().filter(Boolean)) {
         const m = readJson(`public/data/maps/${id}.json`);
@@ -772,7 +777,7 @@ test('世界の特徴: 北の雪山（断崖・氷）・西の大森林（獣道
         if (m.name.startsWith('炭鉱')) mineMeshes++;
         if (m.name.startsWith('大森林')) forestWater += count('water');
     }
-    assert.ok(cliffs > 3000, `断崖の壁: ${cliffs}`);
+    assert.ok(cliffs < 400, `断崖の壁（石垣）は、炭鉱のふち以外に置かない: ${cliffs}`);
     assert.ok(iceTiles > 2000, `氷の地面: ${iceTiles}`);
     assert.ok(trail > 500, `森の獣道・土の地面: ${trail}`);
     assert.ok(forestWater > 100, `森を流れる小川: ${forestWater}`);

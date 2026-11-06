@@ -113,7 +113,7 @@ def build_tiles(t):
     put(mix & (u < 0.10) & (obj == ord('0')), 'o'); put(mix & (u2 < 0.05) & (obj == ord('0')), 'h')
     conifer_forest(trans & (patch > 0.55) & (u2 < (1 - tt) * 0.5), u3)
     conifer_single(trans & (u < (1 - tt) * 0.05) & (obj == ord('0')), u3)
-    put(sn & (elev >= 14) & cl & (u3 < 0.88), 'c')                              # 断崖の壁（ところどころ切れて、峠になる）
+    # （断崖の壁 'c' は置かない。山の崖は、高さの段差（段丘）で作る。石垣のように見えるため）
     fl(sn & (elev >= 16) & (ice_hi > 0.62), 'i')                               # 氷河
     fl(sn & (elev >= 8) & (elev < 14) & (ice_lo > 0.82), 'i')                  # 山の谷の、凍った所
     fl(sn & (elev >= 24) & (bare > 0.25), 'r')                                  # 高い所は、岩肌
@@ -215,7 +215,6 @@ def build_tiles(t):
     fl(ro, 'r'); fl(ro & strata, 'm')                                          # 岩肌と、赤茶の地層の縞
     put(ro & (u2 < 0.05), 'h')
     cl2 = np.abs(T.fbm(81 + 5, (28, 10, 4)) - 0.5) < 0.02
-    put(ro & (elev >= 6) & cl2 & (u3 < 0.75), 'c')                              # 山の断崖
     # 炭鉱: 掘削跡（くぼ地）のまわり。赤茶と黒い地面、ふちの断崖、入口とトロッコ
     dmine = np.full((H, W), 1e9, np.float32)
     for mx, my in MINES:
@@ -319,6 +318,12 @@ def build_tiles(t):
                 fixed += int(bad.sum())
     # 継ぎ目の整合のあと、浅瀬にした所は、水のマスなので、地面の種類は、そのまま（水の下の地面は、使われない）
     print('境界線の整合: 直したマス', fixed)
+    # 山道（人が切り開いた道）: 床は赤茶の土。道と、その両側 1 マスは、木・草・岩を置かない（山頂の広場も）
+    trail = t['trail']
+    tr1 = trail.copy()
+    tr1[1:, :] |= trail[:-1, :]; tr1[:-1, :] |= trail[1:, :]; tr1[:, 1:] |= trail[:, :-1]; tr1[:, :-1] |= trail[:, 1:]
+    for ch in 'JLjnxyPDXhoulzmeblvwp': obj[tr1 & (obj == ord(ch))] = ord('0')
+    fl(trail & land, 'm')
     return obj, floor, elev
 
 
@@ -391,7 +396,7 @@ def main():
     # 最初のマップ: 島の中心に近く、ほとんどが陸で、草原が多いメッシュ
     cands = [(abs(v['row'] - 8) + abs(v['col'] - 11), k) for k, v in info.items() if v['sea'] < 0.05 and v['grass'] > 0.6]
     start = min(cands)[1]
-    json.dump({'mapSize': MESH, 'start': start, 'grid': grid}, open(os.path.join(ROOT, 'public', 'data', 'world.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
+    json.dump({'mapSize': MESH, 'start': start, 'arenas': [[a, b, c] for a, b, c in t['arenas']], 'grid': grid}, open(os.path.join(ROOT, 'public', 'data', 'world.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
     print('マップ数', len(info), 'start', start)
 
 
