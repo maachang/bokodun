@@ -564,6 +564,42 @@ def _mountains(elev, land, biome, blocked, sx, sy):
         for y, x in path:                                                # 広場の高さ: 道が広場（半径 6）に入る最初のマスの、なだらかな高さ（広場と道が、段差 1 以内でつながる）
             if (y - ay) ** 2 + (x - ax) ** 2 <= 36:
                 arena_h[(ay, ax)] = int(elev[y, x]); break
+    # 近道の山道（輪）: 山道を歩くと遠回りの 2 点（直線で 14〜40 マス・山道の距離が 3 倍以上）を、新しい道で結ぶ。分かれ道・回り道ができる（半分迷路）
+    from collections import deque
+    def tdist_(src, limit=260):
+        d = {src: 0}; q = deque([src])
+        while q:
+            y, x = q.popleft()
+            if d[(y, x)] >= limit: continue
+            for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                n = (y + dy, x + dx)
+                if n in d or not (0 <= n[0] < H and 0 <= n[1] < W) or not trail[n]: continue
+                d[n] = d[(y, x)] + 1; q.append(n)
+        return d
+    rng2 = np.random.default_rng(77)
+    ty, tx = np.nonzero(trail & (elev >= 3))
+    n_loop = 0; dbg = {'c': 0, 'p': 0}
+    for k in rng2.permutation(len(ty))[:1500]:
+        if n_loop >= 30: break
+        a = (int(ty[k]), int(tx[k]))
+        dd = tdist_(a)
+        cand = [i for i in range(len(ty)) if 10 <= np.hypot(ty[i] - a[0], tx[i] - a[1]) <= 50 and dd.get((int(ty[i]), int(tx[i])), 999) >= 1.6 * np.hypot(ty[i] - a[0], tx[i] - a[1]) + 10]
+        dbg['c'] += bool(cand)
+        if not cand: continue
+        j = cand[int(rng2.integers(len(cand)))]; b = (int(ty[j]), int(tx[j]))
+        y0, y1 = max(0, min(a[0], b[0]) - 12), min(H, max(a[0], b[0]) + 12)
+        x0, x1 = max(0, min(a[1], b[1]) - 12), min(W, max(a[1], b[1]) + 12)
+        e_sub = ef[y0:y1, x0:x1]
+        slope = np.maximum(np.abs(np.diff(e_sub, axis=0, prepend=e_sub[:1])), np.abs(np.diff(e_sub, axis=1, prepend=e_sub[:, :1])))
+        cs = base[y0:y1, x0:x1] * (1.0 + 5.0 * slope)
+        cs = np.where(trail[y0:y1, x0:x1], 6.0, cs)                          # 今の道は高い費用（新しい道を作らせる）
+        cost = np.full((H, W), 1e18); cost[y0:y1, x0:x1] = cs
+        path = _astar4(cost, a, b, (y0, y1, x0, x1))
+        dbg['p'] += path is not None
+        if path is None or len(path) > 4 * np.hypot(a[0] - b[0], a[1] - b[1]) + 20: continue
+        for y, x in path: trail[y, x] = True
+        n_loop += 1
+    print('山道の輪', n_loop, dbg, len(ty))
     # 山道の幅 2 マス（右・下を足す）。高さは、なだらかな高さのまま（切り込む）
     t2 = trail.copy()
     t2[:-1, :] |= trail[1:, :]; t2[:, :-1] |= trail[:, 1:]

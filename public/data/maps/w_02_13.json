@@ -22,7 +22,6 @@
  },
  "legend": {
   "I": "rope_bridge",
-  "h": "highland_grass",
   "o": "highland_weed"
  },
  "enemies": {},
@@ -102,14 +101,14 @@
   "u": "tundra"
  },
  "floorLayer": [
-  "rrsssrrrrrrrrrrrrrrrrrrrrrmrrrrrrrrrrrrrrrrrrrrrruusssssuruuuuuu",
-  "rrrrrrrrrrrrrrrrrrrrmmmmmmmrrrrrrrrrrrrrrrrrrrrrrrsssssurrruuuuu",
-  "srrrrrrrrrrrrrrrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrsssrrrrrrruuu",
-  "srrrrrrrrrrrrrrrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
-  "ssrrrrrrrrrrrrrrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrruurrrr",
-  "srrrrrrrrrmrrrrrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
-  "rrrrrrrmmmmmmmrrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrruuurrrrrr",
-  "rrrrrrmmmmmmmmmrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
+  "rrsssrrrrrmrrrrrrrrrrrrrrrmrrrrrrrrrrrrrrrrrrrrrruusssssuruuuuuu",
+  "rrrrrrrrrrmrrrrrrrrrmmmmmmmrrrrrrrrrrrrrrrrrrrrrrrsssssurrruuuuu",
+  "srrrrrrrrrmrrrrrrrrrmrrrrmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmrrrrruuu",
+  "srrrrrrrrrmrrrrrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmrrrrrrr",
+  "ssrrrrrrrrmrrrrrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmuurrrr",
+  "srrrrrrrrrmrrrrrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmrrrrr",
+  "rrrrrrrmmmmmmmrrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrruuummrrrr",
+  "rrrrrrmmmmmmmmmrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrmmmmm",
   "rrrrrrmmmmmmmmmrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrurrrrrrrrrr",
   "rrrrrrmmmmmmmmmrrrrrmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrruurrrrrrrrrrr",
   "rrrrrmmmmmmmmmmmmmmmmrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrr",
@@ -169,8 +168,8 @@
  ],
  "layout": [
   "0000000000000000000000000000000000000000000000000000000000000000",
-  "00000000000000000000000000000000000000000000000000000h0o000000o0",
-  "00000000000000000000000000000000000000000000000000000o0000000ooo",
+  "00000000000000000000000000000000000000000000000000000000000000o0",
+  "0000000000000000000000000000000000000000000000000000000000000ooo",
   "0000000000000000000000000000000000000000000000000000000000000000",
   "0000000000000000000000000000000000000000000000000000000000000000",
   "0000000000000000000000000000000000000000000000000000000000000000",
