@@ -508,33 +508,51 @@ def _astar4(cost, start, goal, win):
     return path[::-1]
 
 
-def _switchback(path, e, ok, amp=5, pitch=4, min_run=10, min_rise=6):
-    """つづら折り: 急な斜面をまっすぐ上る所（同じ向きに 10 マス以上・高さが 6 以上上がる）を、左右に折り返す道（振れ幅 amp・折り返しの間隔 pitch）に置き換える。
-    置き換えた先のマスが、すべて通れる（ok）ときだけ。始点と終点は変わらない（つながりは保つ）"""
-    n = len(path); out = [path[0]]; i = 0
-    while i < n - 1:
-        dy, dx = path[i + 1][0] - path[i][0], path[i + 1][1] - path[i][1]
-        j = i + 1
-        while j + 1 < n and (path[j + 1][0] - path[j][0], path[j + 1][1] - path[j][1]) == (dy, dx): j += 1
-        run = j - i
-        seg = path[i + 1:j + 1]
-        if run >= min_run and abs(int(e[path[j]]) - int(e[path[i]])) >= min_rise:
-            qy, qx = dx, dy                                           # 直角の向き
-            new = []; side = 0; k = 0
-            legs = (run - amp) // pitch
-            for leg in range(max(legs, 0)):
-                tgt = amp if leg % 2 == 0 else -amp
-                while side != tgt:
-                    side += 1 if tgt > side else -1; new.append((path[i][0] + dy * k + qy * side, path[i][1] + dx * k + qx * side))
-                for _ in range(pitch):
-                    k += 1; new.append((path[i][0] + dy * k + qy * side, path[i][1] + dx * k + qx * side))
-            while side != 0:
-                side += -1 if side > 0 else 1; new.append((path[i][0] + dy * k + qy * side, path[i][1] + dx * k + qx * side))
-            while k < run:
-                k += 1; new.append((path[i][0] + dy * k, path[i][1] + dx * k))
-            if new and new[-1] == path[j] and all(0 <= a < H and 0 <= b < W and ok[a, b] for a, b in new):
-                seg = new
-        out.extend(seg); i = j
+def _zigzag(P, Q, amp, pitch):
+    """P から Q へ、主な向き（距離の長いほう）に、pitch マスずつ進みながら、直線から左右に ±amp 折り返す、4 近傍でつながった道"""
+    dy, dx = Q[0] - P[0], Q[1] - P[1]
+    main = 0 if abs(dy) >= abs(dx) else 1
+    pm, pl = (P[0], P[1]) if main == 0 else (P[1], P[0])
+    qm, ql = (Q[0], Q[1]) if main == 0 else (Q[1], Q[0])
+    sm = 1 if qm >= pm else -1
+    span = abs(qm - pm)
+    line = lambda m: pl + (ql - pl) * (m - pm) / (qm - pm) if qm != pm else pl
+    way = [(pm, pl)]
+    n = span // pitch
+    for k in range(n):
+        m0 = pm + sm * k * pitch
+        tgt = int(round(line(m0))) + (amp if k % 2 == 0 else -amp)
+        way.append((m0, tgt)); way.append((m0 + sm * pitch, tgt))
+    way.append((pm + sm * n * pitch, int(round(line(pm + sm * n * pitch)))))
+    way.append((qm, ql))
+    cells = [(pm, pl)]
+    for (m1, l1), (m2, l2) in zip(way, way[1:]):
+        m, l = cells[-1]
+        while l != l2: l += 1 if l2 > l else -1; cells.append((m, l))
+        while m != m2: m += 1 if m2 > m else -1; cells.append((m, l))
+    out = [(m, l) if main == 0 else (l, m) for m, l in cells]
+    dedup = [out[0]]
+    for c in out[1:]:
+        if c != dedup[-1]: dedup.append(c)
+    return dedup
+
+
+def _switchback(path, e, ok, amp=5, pitch=4, min_len=12, max_len=60, min_grade=0.4):
+    """つづら折り: 山道の、急な所（直線距離あたりの高さの上がりが min_grade 以上・直線距離 12〜60 マス）を、左右に折り返す道（振れ幅 amp・折り返しの間隔 pitch）に置き換える。
+    置き換え先のマスが、すべて通れる（ok）ときだけ。始点・終点は変わらない（つながりは保つ）。登る道の傾きは、約 1/3.5 に下がる"""
+    n = len(path); out = []; i = 0
+    while i < n:
+        done = False
+        for j in range(min(n - 1, i + max_len), i + min_len - 1, -1):
+            P, Q = path[i], path[j]
+            L = abs(P[0] - Q[0]) + abs(P[1] - Q[1])
+            if L < min_len or abs(int(e[Q]) - int(e[P])) < min_grade * L: continue
+            zz = _zigzag(P, Q, amp, pitch)
+            if zz[-1] == Q and all(0 <= a < H and 0 <= b < W and ok[a, b] for a, b in zz):
+                out.extend(zz[:-1]); i = j; done = True
+                break
+        if not done:
+            out.append(path[i]); i += 1
     return out
 
 

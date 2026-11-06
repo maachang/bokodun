@@ -571,7 +571,7 @@ export class GameEngine {
     fitCameraFar() {
         // 高い所（山の上）では、低い地面（下に見える海・低地）が、霧の終わりより遠くにあり、描画距離で切れて、空が見える（地面に穴が空いたように見える）。
         //   そこで、目の高さ（地面からの高さ）ぶんだけ、描画距離をのばす（霧は同じなので、遠くは霧の色に溶ける）
-        const boost = Math.min(160, Math.max(0, (this.camera.position.y - 6) * 8));
+        const boost = Math.min(450, Math.max(0, (this.camera.position.y - 6) * 50));
         const far = Math.min(100, (this.scene.fog?.far ?? 96) + 4) + boost;
         if (Math.abs(this.camera.far - far) < 3) return;
         this.camera.far = far;
@@ -912,16 +912,22 @@ export class GameEngine {
             edgeMax = Math.max(edgeMax, parseInt(nd.heights[tr]?.[tc] ?? '0', 36) || 0);
         }
         const DEPTH = Math.min(OUTSIDE_TERRAIN_MAX_DEPTH, Math.max(OUTSIDE_TERRAIN_MIN_DEPTH, edgeMax + 2));
+        // 南北の隣は、東西の外（斜めの向こう側の角）まで、DEPTH マス広げる（広げた所は、端のマスの値を使い、距離ぶんだけ 1 マスに 1 段で下げる）。
+        //   高い所から、斜めの向こうを見ると、角が描かれず、空が見えるため。東西の隣は広げない（角が、南北の隣と重ならない）
+        const ext = horizontal ? 0 : DEPTH;
+        const A = along + 2 * ext;
         const info = [];   // [k][i] = { h, water, shallow, ft }
         for (let k = 0; k < DEPTH; k++) {
             const row = [];
-            for (let i = 0; i < along; i++) {
-                const [tr, tc] = tileAt(k, i);
+            for (let i = 0; i < A; i++) {
+                const ii = i - ext;
+                const lat = ii < 0 ? -ii : (ii >= along ? ii - along + 1 : 0);
+                const [tr, tc] = tileAt(k, Math.min(along - 1, Math.max(0, ii)));
                 const ch = nd.layout[tr]?.[tc] ?? '0';
                 const def = ch === '0' ? null : this.objectDefinitions?.[nd.legend?.[ch]];
                 const isWater = !!def && (def.type === 'liquid_tile' || def.type === 'sea_tile' || !!def.waterBelow);
                 // 高さ（段）: 隣の高さと、「境からの距離ぶんだけ、1 マスに 1 段で下がる線」の、低いほう（なだらかに 0 へ）
-                const lv = Math.min(parseInt(nd.heights[tr]?.[tc] ?? '0', 36) || 0, DEPTH - k);
+                const lv = Math.max(0, Math.min(parseInt(nd.heights[tr]?.[tc] ?? '0', 36) || 0, DEPTH - k - lat));
                 const fch = nd.floorLayer?.[tr]?.[tc];
                 row.push({ h: lv * step, water: isWater, shallow: !!def && (def.texture === 'shallowWater' || !!def.waterBelow), ft: (fch !== undefined && nd.floorLegend?.[fch]) || nd.environment?.floorType });
             }
@@ -957,19 +963,29 @@ export class GameEngine {
             return this.outsideColors.get(ft);
         };
         const colOf = (t) => t.water ? new THREE.Color(t.shallow ? WATER_SHALLOW : WATER_DEEP) : floorColor(t.ft).clone();
-        const nV = (DEPTH + 1) * (along + 1);
+        // このマップの端のマス（境に沿って i 番目）の高さ。境の頂点（i）は、両側のマス（i-1・i）の高いほう
+        const ownLevel = (i) => {
+            if (i < 0 || i >= along) return 0;
+            const [r, c] = dir === 'east' ? [i, cols - 1] : dir === 'west' ? [i, 0] : dir === 'south' ? [rows - 1, i] : [0, i];
+            return this.heightLevelAtTile(r, c) || 0;
+        };
+        const ownStep = this.heightStep ?? step;
+        const edgeTop = (i) => Math.max(ownLevel(i - 1), ownLevel(i)) * ownStep;
+        const nV = (DEPTH + 1) * (A + 1);
         const pos = new Float32Array(nV * 3), colr = new Float32Array(nV * 3);
         for (let k = 0; k <= DEPTH; k++) {
-            for (let i = 0; i <= along; i++) {
+            for (let i = 0; i <= A; i++) {
                 let hs = 0, n = 0; const c = new THREE.Color(0, 0, 0);
                 for (const [tk, ti] of [[k - 1, i - 1], [k - 1, i], [k, i - 1], [k, i]]) {
                     const t = info[tk]?.[ti];
                     if (!t) continue;   // 範囲の外のマスは、数えない
                     hs += t.water ? 0 : t.h; n++; c.add(colOf(t));
                 }
-                const idx = k * (along + 1) + i;
-                const [wx, wz] = cornerXZ(k, i);
-                pos[idx * 3] = wx; pos[idx * 3 + 1] = (n ? hs / n : 0) + 0.01; pos[idx * 3 + 2] = wz;
+                const idx = k * (A + 1) + i;
+                const [wx, wz] = cornerXZ(k, i - ext);
+                let vy = (n ? hs / n : 0) + 0.01;
+                if (k === 0) vy = Math.max(vy, edgeTop(i - ext) + 0.01);   // 境の線は、このマップの端のマスの高さより、低くしない（端のマスの外側の面は描かれないので、1 段ぶんの隙間から、空が見える）
+                pos[idx * 3] = wx; pos[idx * 3 + 1] = vy; pos[idx * 3 + 2] = wz;
                 if (n) c.multiplyScalar(1 / n);
                 colr[idx * 3] = c.r; colr[idx * 3 + 1] = c.g; colr[idx * 3 + 2] = c.b;
             }
@@ -978,8 +994,8 @@ export class GameEngine {
         const buildIndices = (flip) => {
             const idx = [];
             for (let k = 0; k < DEPTH; k++) {
-                for (let i = 0; i < along; i++) {
-                    const a = k * (along + 1) + i, b = a + 1, c2 = a + (along + 1), d = c2 + 1;
+                for (let i = 0; i < A; i++) {
+                    const a = k * (A + 1) + i, b = a + 1, c2 = a + (A + 1), d = c2 + 1;
                     if (flip) idx.push(a, b, c2, b, d, c2); else idx.push(a, c2, b, b, c2, d);
                 }
             }
