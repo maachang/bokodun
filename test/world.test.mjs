@@ -1001,6 +1001,7 @@ test('端の向こうの景色: 隣のマップ（斜めの角を含む 8 方向
     assert.ok(game.includes("def.type === 'tree'") && game.includes("def.type === 'plant'") && game.includes("def.type === 'boulder'"), '木・草・岩');
     assert.ok(game.includes('prefetchNearbyMaps(mapId)') && game.includes('prefetchToken'), '2 マス先までのマップのデータを、先に読んでおく');
     assert.ok(game.includes('this.loadingMap = true') && game.includes('if (this.loadingMap) return;'), 'マップの読み込み中は、更新も描画も止める（作りかけの画面が、一瞬映らない）');
+    assert.ok(game.includes('if (!this.loadingMap) this.render();'), '更新で読み込みが始まったフレームも、作りかけの画面を描かない');
     assert.ok(game.includes('mesh.position.set(cx, -0.3, cz)'), '端の外の平らな地面は、隣のマップの水の面（-0.15）より下（水が、模様のある地面におおわれない）');
     assert.ok(game.includes('waterAcrossEdge(nr, nc, rows, cols)'), '水が境をこえて続くとき、境に砂の土手を立てない（茶色の線が出ない）');
     assert.ok(game.includes('opacity: 0.72') && game.includes('flat(waterMats.sand, wx, bedY, wz)'), '隣の水も、砂の底と半透明の水面（浅瀬が暗くならない）');

@@ -5412,7 +5412,7 @@ export class GameEngine {
             if (this.loadingMap) return;   // マップの読み込み中は、更新も描画もしない（前の画面のまま）
             const dt = Math.min(0.1, this.clock.getDelta());
             this.update(dt);
-            this.render();
+            if (!this.loadingMap) this.render();   // この更新で、マップの読み込みが始まったとき（端を越えたとき）は、作りかけの画面を描かない（読み込みの最初の部分は、同じフレームの中で、すぐ実行され、床の一部だけ作られる）
         };
         requestAnimationFrame(loop);
     }
