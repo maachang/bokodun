@@ -848,6 +848,8 @@ def build():
 
     # 川（世界のマス）: 線に、ゆらぎをつけて描く。浅瀬（歩いて渡れる）を、間隔をあけて作る
     river = np.zeros((H, W), np.uint8)   # 0 なし・1 深い・2 浅瀬
+    d_sea0 = _distance(~land)
+    mt_w = gauss(np.isin(biome, [SNOW, CONIFER, ROCK]).astype(np.float32), 10)   # 山（段丘の高さをもつ地形）の重み: 川は、山の中では蛇行させない（段丘の高さの規則を、乱さない）
     rng = np.random.default_rng(7)
     for ri, rv in enumerate(RIVERS):
         pts = rv['pts']; width = rv['width']; ford_every = rv['ford']
@@ -875,20 +877,43 @@ def build():
             j = min(i + 1, len(seg) - 1); k = max(i - 1, 0)
             dx, dy = seg[j][0] - seg[k][0], seg[j][1] - seg[k][1]; L = np.hypot(dx, dy) or 1
             path.append((x - dy / L * off[i] * 3, y + dx / L * off[i] * 3))
+        # 蛇行（43-57）: 川の長さに沿った、ゆるやかな波（振れ幅 幅+2 マス、波長 約 70 マス。水源と河口に近いほど小さい）
+        slen = np.concatenate([[0.0], np.cumsum([np.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1]) for i in range(1, len(path))])])
+        tot = float(slen[-1]) or 1.0
+        ph = rng.uniform(0, 6.28)
+        mean_ = [(path[i][0], path[i][1]) for i in range(len(path))]
+        path2 = []
+        for i, (x, y) in enumerate(mean_):
+            j = min(i + 1, len(path) - 1); k = max(i - 1, 0)
+            dx, dy = path[j][0] - path[k][0], path[j][1] - path[k][1]; L = np.hypot(dx, dy) or 1
+            taper = min(1.0, slen[i] / 40.0, (tot - slen[i]) / 40.0)
+            mw = 1.0 - min(1.0, float(mt_w[min(H - 1, max(0, int(y))), min(W - 1, max(0, int(x)))]) * 3.0)
+            m = (width + 2) * 0.6 * np.sin(slen[i] / 70.0 * 6.283 + ph) * max(0.0, taper) * max(0.0, mw)
+            path2.append((x - dy / L * m, y + dx / L * m))
+        path = path2
         path = _avoid_seams(path, width / 2 + 3.5)   # 川は、境界線のそばを、渡らずに流れないよう、境界から離す
         deep = Image.new('L', (W, H), 0); dd = ImageDraw.Draw(deep)
         ford = Image.new('L', (W, H), 0); fd = ImageDraw.Draw(ford)
-        dd.line(path, fill=255, width=width)
-        for x, y in path: dd.ellipse([x - width / 2, y - width / 2, x + width / 2, y + width / 2], fill=255)
+        # 川幅の変化（43-57）: 水源に近いほど細く（幅の 6 割）、河口ほど太く（幅の 1.1 倍）。ところどころに、広い淀み（+1 マス）。最小 2 マス
+        wn = fbm(140 + ri, (60, 20, 6)); wmax = width
+        for i in range(1, len(path)):
+            f = slen[i] / tot
+            w_i = max(2, int(round(width * (0.6 + 0.5 * f) + (1 if wn[min(H - 1, int(path[i][1])), min(W - 1, int(path[i][0]))] > 0.68 else 0))))
+            if mt_w[min(H - 1, max(0, int(path[i][1]))), min(W - 1, max(0, int(path[i][0])))] > 0.02: w_i = width     # 山（段丘）のそばは、幅を変えない
+            wmax = max(wmax, w_i)
+            dd.line([path[i - 1], path[i]], fill=255, width=w_i)
+            x, y = path[i]; dd.ellipse([x - w_i / 2, y - w_i / 2, x + w_i / 2, y + w_i / 2], fill=255)
         # 橋: 川の長さに沿って、一定の間隔。川の向きに垂直に、幅 2 マスで、川を横切る（川の水のマスだけが、橋になる）
         acc = 0.0; nextf = ford_every * 0.6
         for i in range(1, len(path) - 1):
             acc += np.hypot(path[i][0] - path[i - 1][0], path[i][1] - path[i - 1][1])
-            if acc >= nextf:
+            if acc >= nextf and d_sea0[min(H - 1, max(0, int(path[i][1]))), min(W - 1, max(0, int(path[i][0])))] < 14:
+                nextf += ford_every * 0.3          # 河口（海から 14 マス以内）は、川が広く、岸がはっきりしない: 橋を、かけない（少し先でかける）
+            elif acc >= nextf:
                 cx, cy = path[i]
                 tx, ty = path[i + 1][0] - path[i - 1][0], path[i + 1][1] - path[i - 1][1]; tl = np.hypot(tx, ty) or 1
                 nx_, ny_ = -ty / tl, tx / tl
-                half = width / 2 + 2
+                half = wmax / 2 + 3
                 fd.line([(cx - nx_ * half, cy - ny_ * half), (cx + nx_ * half, cy + ny_ * half)], fill=255, width=BRIDGE_WIDTH)
                 nextf += ford_every
         deep = np.asarray(deep) > 0; ford = (np.asarray(ford) > 0) & deep
@@ -911,7 +936,12 @@ def build():
     # 海岸・湖で切れて、短くなった橋（橋のマスが 3 マス以下）は、橋にしない（両岸をつなげない橋を、作らない）
     lab_b = _components(river == 2)
     for k in range(1, int(lab_b.max()) + 1):
-        if (lab_b == k).sum() <= 3: river[lab_b == k] = 1
+        comp = lab_b == k
+        if comp.sum() <= 3: river[comp] = 1; continue
+        # 両岸（通れる陸）に届かない橋（川幅が広い所・海岸）は、橋にしない
+        nb = _dil(comp, 3) & ~comp & land & (river == 0) & ~lake
+        pts_ = np.argwhere(nb)
+        if len(pts_) < 2 or (np.abs(pts_[:, None, :] - pts_[None, :, :]).sum(axis=2).max() < 3): river[comp] = 1
 
     water_deep = lake | (river == 1)
     # 湖のふちと川の浅瀬: 浅瀬

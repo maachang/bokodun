@@ -21,6 +21,7 @@
   "skyColor": 14674418
  },
  "legend": {
+  "1": "cave_torch",
   "2": "riverside_tree",
   "J": "conifer_forest_a",
   "L": "conifer_forest_b",
@@ -114,7 +115,7 @@
   "w": "whiteSand"
  },
  "floorLayer": [
-  "iiiiiiiiiiissssssssssssssssssssssssssussmmmmmmmmmuuuwwwggggggggg",
+  "iiiiiiiiiiissssssssssssssssssssssssssussmuusmmmmmuuuwwwggggggggg",
   "iiiiiiiiiiiisssssssssssssssssssssssssssumuusuuuuuuuugwwwgggggggg",
   "iiiiiiiiiiiissssssssssssssssssssssssssssmsssssuuuuuuuuwwwggggggg",
   "ssiiiiiiiiiisssssssssssssssrrrrrrrrrssssmsssssssuuuuuuuwwwwggggg",
@@ -186,7 +187,7 @@
   "000x00000y0000000000000000i0i0000000ix00000000000z0o00u0000qOOOO",
   "000000ii0000i000000000i0i000000000000i000000x0000x00Luhu0z00qOOO",
   "00000202i00000i000020i0000ii000002000000000000000000o00000z00qqO",
-  "0000000000000000000000000i000ii000i0000000i00000000000L0o0z0000q",
+  "0000000000000000000000000i000ii010i0000000i00000000000L0o0z0000q",
   "00000y0000i00x0000000y0i00i0i0000000000000i0i0000000x0000z00z000",
   "000000i0000ii0000i000000i00i00000000000000000000000000J0J0L0z000",
   "00000200000x00000y00i00x000000000000000x0i0000000000y0000000o0uu",

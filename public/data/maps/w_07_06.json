@@ -23,19 +23,18 @@
  "legend": {
   "K": "great_tree_b",
   "W": "great_tree_a",
-  "e": "fern",
-  "z": "marsh_grass"
+  "e": "fern"
  },
  "enemies": {},
  "heightStep": 0.5,
  "sideShade": 1.0,
  "heights": [
-  "abcdefghgfeeedddddddeeeddddeffggfffeeeeeeeeeeeeefffffeefffffeeee",
-  "bcdefgggfeddeeedddddeeeddcddefggggffeeeeefffeefffffffeeffffffeee",
-  "cdefghgfeddddeedddddeeeedddefghhhhggffeeeeeefffffffffeeefffffeee",
-  "defghhgfedccddddcccddeeeeeefghhiiihhgffeeddeeeffffffffeeeeeeeeee",
-  "efghhggfedccccccccccddeeeffghihhhhhhhgfedccddeeffffffffeeddeeefe",
-  "fghhggfeedcbbbbbbccccddefgghhhhggggghgfedcccdeeeeefffffeddddeffe",
+  "hggghgghgfeeedddddddeeeddddeffggfffeeeeeeeeeeeeefffffeefffffeeee",
+  "hgghhgggfeddeeedddddeeeddcddefggggffeeeeefffeefffffffeeffffffeee",
+  "hgghhhgfeddddeedddddeeeedddefghhhhggffeeeeeefffffffffeeefffffeee",
+  "ggghhhgfedccddddcccddeeeeeefghhiiihhgffeeddeeeffffffffeeeeeeeeee",
+  "ghhhhggfedccccccccccddeeeffghihhhhhhhgfedccddeeffffffffeeddeeefe",
+  "ghhhggfeedcbbbbbbccccddefgghhhhggggghgfedcccdeeeeefffffeddddeffe",
   "fggggfeedccbbaaabbbcccdefghhhgggggggggfedcccdeffffffgggfedddeffe",
   "efffffedccbbaaaaabbbccdefghhggffgggggggfedddeffffffgghhgfeeefffe",
   "eeeeeeedcbaaaaaaaabbbccdefghgfffgggggghgfeeeffggffgghiihgffffffe",
@@ -82,18 +81,18 @@
   "cddccccbbbbbbbbbccdeeffgfffghhhgfeeefgfedccdefggffffgggfeeeefggf",
   "cddcccbbbbbbbbbbccdeefgffffghihgfeeefffedccdefggffffgggfeeeefggf",
   "ddddccbbbcbbbbbbccddefggggghhihgfeeefffedccdefggfffgggggfeeffggf",
-  "deedccbbcccbbbbbccdddefghgghhiihgffffffedccddefffggghhgfeddeffff",
-  "deedccccccccbbbbcccdddefghhhhihhggffffeeddddddeefghhggfedccdeeee",
-  "deedcccccccccbbbccccddefghihhhhhhggffeeedddddddefghgffedcbbcdddd",
-  "cddddccccccccccccccccddefghihhhhhhgfeedddeeddddefggfeedcbaabcccc",
-  "bcccddddddddddddccccccdefghihhhhhhgfeddddeeeddeefgfeddcba99abbbb",
-  "bbccdddddddddedddcccccdefghihhhhihgfedcddeeeeeefffedccba9889aaaa",
-  "abbcdeeeddddeeeddcccccdefghihhghhgfedcccdeeeeeeeeedcbba987789999",
-  "abbcdefeeddeeeeeddddddefghiihhghihgfedccddddddddddcbaa9876678888",
-  "aabcdeffeddeefeeddddeefghijjihghiihgfeddccccddccccba998765567777",
-  "aabcdeffeedeeffeedeeffghijkjihghhihgfeddccccccbbbba9887654456666",
-  "aabcdeffeeeefffffeffgghijkkjihghhihgfedccbbbcbaaaa98776543345555",
-  "aabcdefeeddefggggfgghhijkkkjihhhhhgfeddcccbcba999987665432234444"
+  "deedccbbcccbbbbbccdddefghgghhiihgffffffedccddefffggghhgggfffggff",
+  "deedccccccccbbbbcccdddefghhhhihhggffffeeddddddeefghhhhhhggggggff",
+  "deedcccccccccbbbccccddefghihhhhhhggffeeedddddddefghhhhhhhgggggff",
+  "cddddccccccccccccccccddefghihhhhhhgfeedddeeddddefghhhhhhhggggfff",
+  "bcccddddddddddddccccccdefghihhhhhhgfeddddeeeddeefghhhhhggggggffe",
+  "bbccdddddddddedddcccccdefghihhhhihgfedcddeeeeeefgghhhhhgggggfeed",
+  "abbcdeeeddddeeeddcccccdefghihhghhgfedcccdeeeeeeffgghhhhhhggfeddc",
+  "abbcdefeeddeeeeeddddddefghiihhghihgfedccddddddeefffgghhhggfedccb",
+  "aabcdeffeddeefeeddddeefghiihihghiihgfeddccccdddeeeffgghhgfedcbba",
+  "aabcdeffeedeeffeedeeffghhhhghhghhihgfeddcccccddddeefghhgfedcbaa9",
+  "aabcdeffeeeefffffeffgghhgggfggghhhhgfedccbbbccddeeffghgfedcba998",
+  "aabcdefeeddefggggfggggggfffefffggggfeddcccbcccddefggggfedcba9887"
  ],
  "floorLegend": {
   "f": "forest"
@@ -228,6 +227,6 @@
   "0eW00e0eK000Ke0eWeW0W000K0K00000K00000W0W0W0W000W0W0K0000000W0K0",
   "00000000e000000000ee0000000000000000000e000000000000000000000000",
   "00K00eW00eK0W000e00000K0K0W0W0K0W0K0W0W0W0K0W0K0K0W0K0K0W0K000W0",
-  "0000000e00000e000000e0000000000e0ee000ee000000000000z0z00e000000"
+  "0000000e00000e000000e0000000000e0ee000ee000000000000e0e00e000000"
  ]
 }
