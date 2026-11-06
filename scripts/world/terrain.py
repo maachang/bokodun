@@ -508,6 +508,36 @@ def _astar4(cost, start, goal, win):
     return path[::-1]
 
 
+def _switchback(path, e, ok, amp=5, pitch=4, min_run=10, min_rise=6):
+    """つづら折り: 急な斜面をまっすぐ上る所（同じ向きに 10 マス以上・高さが 6 以上上がる）を、左右に折り返す道（振れ幅 amp・折り返しの間隔 pitch）に置き換える。
+    置き換えた先のマスが、すべて通れる（ok）ときだけ。始点と終点は変わらない（つながりは保つ）"""
+    n = len(path); out = [path[0]]; i = 0
+    while i < n - 1:
+        dy, dx = path[i + 1][0] - path[i][0], path[i + 1][1] - path[i][1]
+        j = i + 1
+        while j + 1 < n and (path[j + 1][0] - path[j][0], path[j + 1][1] - path[j][1]) == (dy, dx): j += 1
+        run = j - i
+        seg = path[i + 1:j + 1]
+        if run >= min_run and abs(int(e[path[j]]) - int(e[path[i]])) >= min_rise:
+            qy, qx = dx, dy                                           # 直角の向き
+            new = []; side = 0; k = 0
+            legs = (run - amp) // pitch
+            for leg in range(max(legs, 0)):
+                tgt = amp if leg % 2 == 0 else -amp
+                while side != tgt:
+                    side += 1 if tgt > side else -1; new.append((path[i][0] + dy * k + qy * side, path[i][1] + dx * k + qx * side))
+                for _ in range(pitch):
+                    k += 1; new.append((path[i][0] + dy * k + qy * side, path[i][1] + dx * k + qx * side))
+            while side != 0:
+                side += -1 if side > 0 else 1; new.append((path[i][0] + dy * k + qy * side, path[i][1] + dx * k + qx * side))
+            while k < run:
+                k += 1; new.append((path[i][0] + dy * k, path[i][1] + dx * k))
+            if new and new[-1] == path[j] and all(0 <= a < H and 0 <= b < W and ok[a, b] for a, b in new):
+                seg = new
+        out.extend(seg); i = j
+    return out
+
+
 def _mountains(elev, land, biome, blocked, sx, sy):
     """連峰・山脈: 高い所を、段丘（崖で区切られた、広い段）にして、上れない所を作る。段丘のところどころに、ゆるやかな斜面（自然の坂）。
     人が作った山道（4 近傍の A*。等高線に沿って、ジグザグに上る）を、段丘に切り込む（道は、元のなだらかな高さ）。山頂に、広場。
@@ -560,6 +590,7 @@ def _mountains(elev, land, biome, blocked, sx, sy):
         cost[y0:y1, x0:x1] = cs
         path = _astar4(cost, st, (ay, ax), (y0, y1, x0, x1))
         if path is None: continue
+        path = _switchback(path, elev, land & ~blocked)
         for y, x in path: trail[y, x] = True
         for y, x in path:                                                # 広場の高さ: 道が広場（半径 6）に入る最初のマスの、なだらかな高さ（広場と道が、段差 1 以内でつながる）
             if (y - ay) ** 2 + (x - ax) ** 2 <= 36:

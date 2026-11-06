@@ -21,7 +21,6 @@
   "skyColor": 8308976
  },
  "legend": {
-  "1": "cave_torch",
   "2": "riverside_tree",
   "G": "grass_tree",
   "J": "conifer_forest_a",
@@ -106,7 +105,7 @@
   "gggeeeeeeeeeeeeeeeeeeeeefeeeeehhhhhgfedcba9876543210000000000000",
   "gggeeeeeeeeeeeeeeeeeeeeeegghekkkiihgfedcba9876543210000000000000",
   "hhheeeeeeeeeeeeeeeeeeeeeeeekkjkjjihgfedcba9876543210000000000000",
-  "iiikeeeeeeeeeeeeeeeeeeeeekkkkkkkkjkkefedcba987654321000000000000",
+  "iiikeeeeeeeeeeeeeeeeeeeeekkjjkkkkjkkgfedcba987654321000000000000",
   "iijjiiiihggfeeeffggggghhijjkkllkkjihgfedcba987654321000000000000",
   "ijjjjjjjihhgfeeefggghhhijkkllmmllkjihgfedcba98765432100000000000",
   "jjkkkkkkjihgfeeefgghhiijkllmmmmmmlkjihgfedcba9876543210000000000"
@@ -174,16 +173,16 @@
   "ssssssssssssssssssuuuuuuuuuuuuuuuuuuugguuuuuuuwwwggggggggggggggg",
   "ssssssssssssuussssssssuuuuuuuuuuuuuuuuuuuuuuuuwwwggggggggggggggg",
   "sssuusssssssssusuussssssuuuuuuuuuuuuuuuuuuuuuuuwwwgggggggggggggg",
-  "uuuuussssssssssuusuusssssuuuuuuuuuuuuuuuuuuuuuuwwwgggggggggggggg",
-  "uuuusssssssssssssssusssssssuuuuuuuuuuuuuuuuuuuuwwwgggggggggggggg",
-  "uuuussssssssssssssssssssssssuuuuuuuuuuuuuuuuuuuwwwgggggggggggggg",
-  "iiiuusssssssssssssssssssusssssuuuuuuuuuuuuuuuuuuwwwggggggggggggg",
-  "iiiuuusssssssssssssssssssuuussssuuuuuuuuuuuuuuuuwwwggggggggggggg",
+  "uuuuussssssssssuusuusssssuuuuuuuuuuuuuuuuuuummmmmwgggggggggggggg",
+  "uuuusssssssssssssssusssssssuuuuuuuuuuuuuuuuumuuwmwgggggggggggggg",
+  "uuuussssssssssssssssssssssssuuuuuuuuuuuuuuuumuuwmwgggggggggggggg",
+  "iiiuusssssssssssssssssssusssssuuuuuuuuuuuuuumuuumwwggggggggggggg",
+  "iiiuuusssssssssssssssssssuuussssuuuuuuuuuuuumuuumwwggggggggggggg",
   "iiiuuusssssssssssssssssssssssussmmmmmmmmmmmmmmmmmwwggggggggggggg",
-  "iiiiussssssssssssssssssssssssssumusssuuuuuuuuuuuuwwwgggggggggggg",
-  "iiiiiiiiisssssssssssssssssssssssmsssssssssuuuuuuuwwwgggggggggggg",
-  "iiiiiiiiiissssssssssssssssssssssmssuussssssuuuuuuuwwwggggggggggg",
-  "iiiiiiiiiiisssssssssssssssssssssmsssssssssssuuuuuuuwwwgggggggggg"
+  "iiiiussssssssssssssssssssssssssumusssmuumuuumuuuuwwwgggggggggggg",
+  "iiiiiiiiissssssssssssssssssmmmmmmssssmssmsuumuuuuwwwgggggggggggg",
+  "iiiiiiiiiisssssssssssssssssmsssssssuumssmssumuuuuuwwwggggggggggg",
+  "iiiiiiiiiiissssssssssssssssmmmmmmmmmmmssmsssmuuuuuuwwwgggggggggg"
  ],
  "layout": [
   "OOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOOO",
@@ -239,16 +238,16 @@
   "00000000z000JoJ0000000o0L00hJ0v0000000L0JbL000000qOOOOOOOOOOOOOO",
   "0000000y00000000o00000000000o0000000000hmmh000zu0qOOOOOOOOOOOOOO",
   "000000000000J00000Jy00o0000o00000o000000J0000h00zqOOOOOOOOOOOOOO",
-  "00000000000000z0000000000000oo00o0000000000000u00uqOOOOOOOOOOOOO",
-  "0000000000000000z00o000000000000000000wo00LzJ00000qOOOOOOOOOOOOO",
+  "00000000000000z0000000000000oo00o0000000000000000uqOOOOOOOOOOOOO",
+  "0000000000000000z00o000000000000000000wo00L0000000qOOOOOOOOOOOOO",
   "000000000x00000y0000000000000000o000000000o0000000qOOOOOOOOOOOOO",
-  "0000000000000000000000000000o000000000L0J000L000z0qOOOOOOOOOOOOO",
-  "00000000000000000000000000000000000h00o00ozzu0o00z0qOOOOOOOOOOOO",
+  "0000000000000000000000000000o000000000L0J000000000qOOOOOOOOOOOOO",
+  "00000000000000000000000000000000000h00o00oz000o0000qOOOOOOOOOOOO",
   "00000000000000000000000000o000i00000000000000000000qOOOOOOOOOOOO",
   "00i000000000000000000y00000000i0000000000000000000zqOOOOOOOOOOOO",
-  "0000x0x0000000000000000000000000000000000001000000uzqOOOOOOOOOOO",
-  "00000002i00000000000000x000i000000000000000000000z00qOOOOOOOOOOO",
+  "0000x0x0000000000000000000000000000000000000000000uzqOOOOOOOOOOO",
+  "00000002i00000000000000x0000000000000000000000000z00qOOOOOOOOOOO",
   "0000000000000000000000x00000000000000000000000uh0z00uqOOOOOOOOOO",
-  "00000000000000000000000000000000000000000000o000000zu0qqOOOOOOOO"
+  "000000000000000000000000000000000000000000000000000zu0qqOOOOOOOO"
  ]
 }

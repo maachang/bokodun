@@ -569,8 +569,11 @@ export class GameEngine {
 
     // 霧で見えなくなる距離より先は描画しない（カメラの描画距離を霧の終わりに合わせる。CPU 負荷の軽減）
     fitCameraFar() {
-        const far = Math.min(100, (this.scene.fog?.far ?? 96) + 4);
-        if (Math.abs(this.camera.far - far) < 0.5) return;
+        // 高い所（山の上）では、低い地面（下に見える海・低地）が、霧の終わりより遠くにあり、描画距離で切れて、空が見える（地面に穴が空いたように見える）。
+        //   そこで、目の高さ（地面からの高さ）ぶんだけ、描画距離をのばす（霧は同じなので、遠くは霧の色に溶ける）
+        const boost = Math.min(160, Math.max(0, (this.camera.position.y - 6) * 8));
+        const far = Math.min(100, (this.scene.fog?.far ?? 96) + 4) + boost;
+        if (Math.abs(this.camera.far - far) < 3) return;
         this.camera.far = far;
         this.camera.updateProjectionMatrix();
     }
@@ -4072,6 +4075,7 @@ export class GameEngine {
             if (vis !== sp.visible) sp.visible = vis;
         }
         this.camera.position.set(this.player.x, eyeHeight, this.player.z);
+        this.fitCameraFar();   // 高い所では、描画距離をのばす
         this.camera.rotation.set(0, 0, 0);
         this.camera.rotateY(this.player.angle);
         this.camera.rotateX(this.player.pitch);
