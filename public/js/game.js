@@ -882,6 +882,32 @@ export class GameEngine {
         }
         // 端の向こうの、隣のマップ（斜めの角を含む 8 方向）を、本物のマス（高さ・地面・崖・水・木・草・岩）で描く（見た目だけ。当たり判定は、今のマップだけ）
         await this.buildNeighborDecor(mapId, cols, rows, tileSize, mapData, floorMatOf);
+        this.prefetchNearbyMaps(mapId);   // 端を越えて切り替わるとき、読み込みを待たない（隣の隣までの、マップのデータを、先に読んでおく）
+    }
+
+    // 今のマップから、2 マス先までのマップ（5×5）のデータを、先に読んでおく（切り替え先の、隣のマップの読み込みを待たなくする）。
+    //   マップが切り替わったら、古い予約は、やめる（番号で判定）。1 枚ずつ、少し間をあけて読む（今の描画を邪魔しない）
+    prefetchNearbyMaps(mapId) {
+        const world = this.world;
+        if (!world?.grid) return;
+        let pj = -1, pi = -1;
+        world.grid.forEach((row, j) => { const i = row.indexOf(mapId); if (i >= 0) { pj = j; pi = i; } });
+        if (pj < 0) return;
+        const token = this.prefetchToken = (this.prefetchToken || 0) + 1;
+        const ids = [];
+        for (let d = 1; d <= 2; d++) for (let dj = -d; dj <= d; dj++) for (let di = -d; di <= d; di++) {
+            if (Math.max(Math.abs(dj), Math.abs(di)) !== d) continue;
+            const nid = world.grid[pj + dj]?.[pi + di];
+            if (nid && !this.mapCache[nid]) ids.push(nid);
+        }
+        (async () => {
+            for (const nid of ids) {
+                await new Promise(r => setTimeout(r, 150));
+                if (token !== this.prefetchToken) return;
+                if (this.mapCache[nid]) continue;
+                try { this.mapCache[nid] = await (await fetch(`/data/maps/${nid}.json`)).json(); } catch { /* 読めなければ、あとで、必要なときに読む */ }
+            }
+        })();
     }
 
     // 隣のマップ（8 方向）を、今のマップの外側に、本物のマスで描く。
