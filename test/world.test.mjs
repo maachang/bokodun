@@ -1133,3 +1133,16 @@ test('砂漠の植物（サボテン・多肉植物）は砂地の中だけ: 砂
     }
     assert.deepEqual(bad, []);
 });
+
+test('大森林の巨木は森の中だけ: 森の床が 5% 未満のマップに、巨木がない', () => {
+    const bad = [];
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const t = m.floorLayer.join('');
+        const fch = Object.keys(m.floorLegend).find((k) => m.floorLegend[k] === 'forest');
+        const frac = fch ? t.split(fch).length - 1 : 0;
+        const has = m.layout.join('').split('').some((ch) => ['great_tree_a', 'great_tree_b'].includes(m.legend[ch]));
+        if (has && frac / t.length < 0.05) bad.push(id);
+    }
+    assert.deepEqual(bad, []);
+});

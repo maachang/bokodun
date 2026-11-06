@@ -124,6 +124,12 @@ def build_tiles(t):
     # 木は、2 マスおきの格子の点にだけ（隣り合うマスに並ばない。木の間は、必ず通れる）
     put(fo & lat & (u2 < 0.65) & (u < 0.5), 'W'); put(fo & lat & (u2 < 0.65) & (u >= 0.5), 'K')   # 巨木（3 倍）
     fl(fo, 'f')
+    # 大森林と他の地形の境: 境に近いほど、巨木とシダを間引き、草に置き換える（草原の中に、巨木・シダが急に現れない）。境から 6 マス以内は全部、14 マス先で 0
+    d_out_fo = T._distance(land & (biome != FOREST) & (biome != SEA))
+    u7 = (u2 * 8.3 + u3 * 6.1) % 1.0
+    thin_fo = fo & (d_out_fo <= 14) & (d_out_fo > 0) & (u7 < np.clip((14.0 - d_out_fo.astype(np.float32)) / 8.0, 0, 1))
+    for ch in 'WKe': obj[thin_fo & (obj == ord(ch))] = ord('0')
+    put(thin_fo & (obj == ord('0')) & (u < 0.15), 'm')
 
     # --- 草原 ---
     gr = free & (biome == GRASS)
