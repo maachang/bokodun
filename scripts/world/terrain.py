@@ -505,6 +505,8 @@ def _desert_oases(land, biome, sx=1.0, sy=1.0):
         out['pond'] |= e & land; out['ring'] |= ring & land
         out['sand'] |= (d / (r_pond + 4.0) + noise < 1.0) & ~e & ~ring & land      # 池のそばの白い砂
         out['grass'] |= (d / r_grass + noise * 0.6 < 1.0) & land        # 草の地面
+        fr = fbm(98, (10, 4, 2))                                         # 緑のふち: 外側へ、まだらに薄くなる（10 マス）
+        out['grass'] |= (d > r_grass) & (d <= r_grass + 10) & (fr > (d - r_grass) / 10.0) & land
         out['flat'] |= (d <= r_flat) & land
         if kind == 'town': out['clear'] |= (d <= r_flat) & land; out['town'] = (py, px)
         out['centers'].append((py, px, kind))

@@ -1117,7 +1117,7 @@ test('南国の植物は南国の近くだけ: 北・草原・森に毒々しい
         const tropical = m.environment.skyColor === 0x4fd0e8;
         const dch = Object.keys(m.floorLegend).find((k) => m.floorLegend[k] === 'desert');
         const desertFrac = dch ? (m.floorLayer.join('').split(dch).length - 1) / (m.floorLayer.join('').length) : 0;   // 砂漠のオアシスには、ヤシがある
-        if (!tropical && r <= 8 && (names.has('marsh_flower') || (names.has('palm') && desertFrac < 0.05))) bad.push(`${id}（北）`);
+        if (!tropical && r <= 8 && (names.has('marsh_flower') || (names.has('palm') && desertFrac === 0))) bad.push(`${id}（北）`);
         if (!tropical && m.environment.floorType !== 'rock' && r <= 10 && names.has('tropical_palm_forest')) bad.push(`${id}（ヤシの林）`);
     }
     assert.deepEqual(bad, []);
@@ -1172,7 +1172,7 @@ test('砂漠にオアシスがある: 砂地の中に、池（水）・草の地
         const t = m.floorLayer.join('');
         const ch = (name) => Object.keys(m.floorLegend).find((k) => m.floorLegend[k] === name);
         const dch = ch('desert'), gch = ch('grass');
-        if (!dch || (t.split(dch).length - 1) / t.length < 0.3 || !gch) continue;
+        if (!dch || (t.split(dch).length - 1) / t.length < 0.1 || !gch) continue;
         const names = new Set(m.layout.join('').split('').map((c) => m.legend[c]));
         if (names.has('water') && names.has('palm')) oases++;
         // 街の予定地: 高さ 0 で、物のない、7×7 のかたまり（池を囲む、幅 8 マスの輪の中）

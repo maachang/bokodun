@@ -152,9 +152,22 @@ def build_tiles(t):
     fl(oa['grass'] & land, 'g'); fl(oa['sand'] & land, 'w')
     for ch in 'AXUi': obj[oa['grass'] & (obj == ord(ch))] = ord('0')               # 砂漠の植物は、オアシスに置かない
     oag = oa['grass'] & free & ~oa['clear'] & (obj == ord('0'))
-    put(oag & (u < 0.25), 'm'); put(oag & (u3 < 0.05), 'b'); put(oag & (u3 >= 0.05) & (u3 < 0.09), 'w'); put(oag & (u3 >= 0.09) & (u3 < 0.12), 'p')
-    put(oag & lat & (u2 < 0.18), 'M'); put(oag & (u2 > 0.96), 'Y')                     # ヤシ・南国の木
+    put(oag & (u < 0.45), 'm'); put(oag & (u3 < 0.06), 'b'); put(oag & (u3 >= 0.06) & (u3 < 0.11), 'w'); put(oag & (u3 >= 0.11) & (u3 < 0.14), 'p')
+    put(oag & (u2 > 0.93), 'Y'); put(oag & lat & (u2 < 0.38), 'M')                     # 緑が生い茂る: ヤシ・南国の木（2 マスおきの格子に、ヤシ）
+    oa_in = oag & (d_water > 4)
+    put(oa_in & lat & (u2 >= 0.38) & (u2 < 0.62), 'a'); put(oa_in & lat & (u2 >= 0.62) & (u2 < 0.78), 'd')   # 少し離れた所は、ジャングルの木（2 倍）
     put(oag & (d_water <= 2) & (u < 0.3), 'k')                                         # 池のそば: ガマ
+    # 砂漠を通る川の周り: 川から 4〜10 マス（ゆらぎあり）は、オアシスと同じ、草の地面・草・花・ヤシ・南国の木・ガマ
+    d_rv = T._distance(t['river'] > 0)
+    rw = 4 + 6 * T.fbm(77, (16, 6, 3))
+    rb = land & (biome == DESERT) & (d_rv <= rw) & (d_rv > 0)
+    fl(rb & ~oa['clear'], 'g')
+    rbo = rb & free & ~oa['clear']
+    for ch in 'AXUi': obj[rbo & (obj == ord(ch))] = ord('0')
+    rbg = rbo & (obj == ord('0'))
+    put(rbg & (u < 0.40), 'm'); put(rbg & (u3 < 0.05), 'b'); put(rbg & (u3 >= 0.05) & (u3 < 0.09), 'w'); put(rbg & (u3 >= 0.09) & (u3 < 0.11), 'p')
+    put(rbg & (u2 > 0.95), 'Y'); put(rbg & lat & (u2 < 0.22), 'M')
+    put(rbg & (d_rv <= 2) & (u < 0.3), 'k')
     oc = oa['clear'] & free
     for ch in 'MYadfrsbwpek' + 'AXUiGlvho': obj[oc & (obj == ord(ch))] = ord('0')      # 街の予定地: 物（木・花・草）を、置かない
     put(oc & (u < 0.04), 'm')
