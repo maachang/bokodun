@@ -27,7 +27,6 @@
   "L": "conifer_forest_b",
   "M": "palm",
   "Q": "water",
-  "U": "succulent",
   "W": "great_tree_a",
   "X": "dead_tree",
   "Z": "plank_bridge",
@@ -116,7 +115,8 @@
  "floorLegend": {
   "d": "desert",
   "f": "forest",
-  "g": "grass"
+  "g": "grass",
+  "m": "redEarth"
  },
  "floorLayer": [
   "ffffffffffffffffffffffffffffffgggggggggggggggggggggggggggggggggd",
@@ -168,12 +168,12 @@
   "ggggggggggggggggggggggggggddddddddddddddddddddddddddddddddddgggg",
   "ggggggggggggggggggggggggggdddddddddddddddddddddddddddddddddddggg",
   "ggggggggggggggggggggggggggdddddddddddddddddddddddddddddddddddggg",
-  "gggggggggggggggggggggggggdddddddddddddddddddddddddddddddddddgggg",
-  "gggggggggggggggggggggggggdddddddddddddddddddddddddddddddddgggggg",
-  "ggggggggggggggggggggdddddddddddddddddddddddddddddddddddddggggggd",
-  "ggggggggggggggggggggdddddddddddddddddddddddddddddddddddddgggggdd",
-  "ggggggggggggggggggggddddddddddddddddddddddddddddddddddddggggdddd",
-  "ggggggggggggggggggggdddddddddddddddddddddddddddddddddddggggddddd",
+  "gggggggggggggggggggggggggdddddddddddddddddddddddddddddddddmdgggg",
+  "gggggggggggggggggggggggggddddddddddddddddddddddddddddddddmgggggg",
+  "ggggggggggggggggggggddddddddddddddddddddddddddddddddddddmggggggd",
+  "ggggggggggggggggggggdddddddddddddddddddddddddddddddddddmmgggggdd",
+  "ggggggggggggggggggggdddddddddddddddddddddddddddddddddddmggggdddd",
+  "ggggggggggggggggggggddddddddddddddddddddddddddddddddddmggggddddd",
   "ggggggggggggggggggggddddddddddddddddddddddddddddddddddggggdddddg",
   "ggggggggggggggggggggdddddddddddddddddddddddddddddddddggggdddddgg",
   "ggggggggggggggggggggddddddddddddddddddddddddddddddddggggdddddggg",
@@ -181,8 +181,8 @@
   "ggggggggggggggggggggddddddddddddddddddddddddddddddggggdddddgggdd",
   "ggggggggggggggggggggdddddddddddddddddddddddddddddggggdddddgggddd",
   "ggggggggggggggggggggdddddddddddddddddddddddddddddgggdddddgggdddd",
-  "ggggggggggggggggggggddddddddddddddddddddddddddddgggdddddggggdddd",
-  "ggggggggggggggggggggdddddddddddddddddddddddddddgggdddddggggddddd"
+  "ggggggggggggggggggggdddddddddddddddddddddmmdddddgggdddddggggdddd",
+  "ggggggggggggggggggggddddddddddddddddddddmmmmdddgggdddddggggddddd"
  ],
  "layout": [
   "0e00000000000000000e00000000000b00000z000000000z0000u00000z00i00",
@@ -232,22 +232,22 @@
   "00G0l00000GmG0000000000i0i0000000000000000000000i0000000000emeeQ",
   "0G0000w0b0000bmi0000000i000000000000000000000i000000000iii00mmee",
   "0000000mG0Gm00000000i000000i000000i00000000i000000000i00ii00Meem",
-  "0000000000mm0000i0i0ii0000i0000000i000000000000000000i0000000mbe",
+  "0000000000mm0000i0i0ii0000i0000000i000000000000000000i0000i00mbe",
   "0m00000000000000i0000000i00000ii00i0000000000000ii00i00000000mMe",
   "m0000m0000000i0000000000i0000000000000000000000iii0000i00000emem",
-  "mv0000000000000000000000i00000i0000000000000i000i000000000bmmmee",
+  "mv0000000000000000000000i00000i0000000000000i000i0000i0000bmmmee",
   "000m00000mm0000000i00000000i0000000000000000000i000i0000000eeeeQ",
-  "l00p0000m000000000i0000i0000000000000000X0000000i0000iU00mMmeeQQ",
-  "00m00000v00i00000000000000i000000000000000000000000000000meeQQQQ",
+  "l00p0000m000000000i0000i0000000000000000X0000000i0000ii00mMmeeQQ",
+  "00m00000v00i00000000000000i00000000000000000000000000i000meeQQQQ",
   "0w0000000000000000000000i00000000000000000i000000000000meemQQQQQ",
   "0000w000000l000i0000i000000000000i00000000000000000000mmmeQQQQQe",
   "000000000000i000000i0000000ii000000000000000000000000ebemQQQQQem",
   "m00000000i00i000000i00000000i000000000000000000i0000emeeQQQQQeeb",
   "0l0000pvv000000000000i0000000000000000000000000i000mMeeQQQQQ0ee0",
   "00v0v0vivi00i0000000i0000i00000000000000000i000000emmeQQQQQeem00",
-  "00vvw0wwv0pm000000i0i0000000000000000000000000000mMweQQQQQm00000",
-  "w000vvv000m000000000000000000000000000000A0000000weeQQQQQee00000",
-  "000000v0000i00000000000i0000i000i000000000000000meeQQQQQeee00000",
-  "00pw0vv0v00000i000ii00000i0i000000000000A000i00mm0ZZqqqeebm00000"
+  "00vvw0wwv0pm000000i0i00000000000000000ii0000X0000mMweQQQQQm00000",
+  "w000vvv000m00000000000000000000000000000ii0000000weeQQQQQee00000",
+  "000000v0000i00000000000i0000i000i000000000000i00meeQQQQQeee00000",
+  "00pw0vv0v00000i000ii00000i0i000000000000A000i00mm0ZZqqqeebmii000"
  ]
 }

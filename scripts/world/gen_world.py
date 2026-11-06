@@ -149,6 +149,19 @@ def build_tiles(t):
     de = free & (biome == DESERT)
     put(de & (u < 0.03), 'i')
     put(de & (u2 < 0.01), 'A'); put(de & (u2 > 0.992), 'X'); put(de & (u3 < 0.008), 'U')
+    # 砂地の作り込み（43-56）: 地面のまだら（赤土・白い砂）・乾いた川跡の筋・サボテンの群生・枯れ木の群れ・乾いた草の筋。一様な砂を、変化させる
+    de_in = de & (T._distance(biome != DESERT) >= 10)                          # 砂地の奥（縁から 10 マス以上）だけ、地面を変える（縁は、砂のまま）
+    dune_low = de_in & (elev <= 4)                                                  # 砂丘の谷（低い所）
+    bed = de_in & (np.abs(T.fbm(130, (52, 18, 5)) - 0.5) < 0.026) & (d_water > 4)  # 乾いた川跡: 細く曲がった筋（赤土）。水はない
+    red = de & dune_low & (T.fbm(131, (30, 10, 3)) > 0.68)                      # 谷の赤土のまだら
+    white = de_in & (T.fbm(132, (40, 14, 4)) > 0.74) & ~red                         # 白い砂のまだら
+    fl(white, 'w'); fl(red, 'm'); fl(bed, 'm')
+    cactus_c = de & dune_low & (patch > 0.62) & ~bed & ~T._near_seam(ys_.astype(int), xs_.astype(int), 8)   # マップの境のそばは、置かない（隣が砂地でも、このマップに砂地の床が少ないことがある）
+    put(cactus_c & (u < 0.10), 'A'); put(cactus_c & (u >= 0.10) & (u < 0.14), 'U')           # サボテンの群生（谷）
+    near_bed = de & (T.box_mean(bed.astype(np.float32), 3) > 0.05) & ~bed
+    put(near_bed & (u2 < 0.22), 'i'); put(near_bed & (u2 >= 0.22) & (u2 < 0.26) & lat, 'X')  # 川跡のふち: 乾いた草と枯れ木
+    put(de & (patch2 > 0.72) & lat & (u3 < 0.06), 'X')                                       # 枯れ木の群れ（まばら）
+    put(de & red & (u3 < 0.05), 'i')
     # 砂地と他の地形の境: 境に近いほど、サボテン・多肉植物・枯れ木・乾いた草を間引き、草に置き換える（草原・岩山の中に、砂漠の植物が急に現れない）
     d_out_de = T._distance(land & (biome != DESERT) & (biome != SEA))            # 砂地でない陸までの距離
     u5 = (u2 * 11.3 + u3 * 7.9) % 1.0

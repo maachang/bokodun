@@ -116,6 +116,7 @@
   "d": "desert",
   "g": "grass",
   "i": "ice",
+  "m": "redEarth",
   "s": "snow",
   "u": "tundra"
  },
@@ -173,17 +174,17 @@
   "ddddddddddddddddddddddddddddddddddddddddgggggggggggggggggggggggg",
   "dddddddddddddddddddddddddddddddddddddddddggggggggggggggggggggggg",
   "ddddddddddddddddddddddddddddddddddddddddddgggggggggggggggggggggg",
-  "ddddddddddddddddddddddddddddddddddddddddddgggggggggggggggggggggg",
-  "dddddddddddddddddddddddddddddddddddddddddddggggggggggggggggggggg",
-  "dddddddddddddddddddddddddddddddddddddddddddggggggggggggggggggggg",
-  "ddddddddddddddddddddddddddddddddddddddddddddgggggggggggggggggggg",
-  "ddddddddddddddddddddddddddddddddddddddddddddddgggggggggggggggggg",
+  "dddddddddddddddddddddddddddmddddddddddddddgggggggggggggggggggggg",
+  "dddddddddddddddddddddddddddmmdmddddddddddddggggggggggggggggggggg",
+  "dddddddddddddddddddddddddddmmmmddddddddddddggggggggggggggggggggg",
+  "dddddddddddddddddddddddddddmmmmdddddddddddddgggggggggggggggggggg",
+  "ddddddddddddddddddddddddddddmdddddddddddddddddgggggggggggggggggg",
   "ddddddddddddddddddddddddddddddddddddddddddddddgdgdgggggggggggggg",
   "ddddddddddddddddddddddddddddddddddddddddddddddddddgggggggggggggg",
-  "ddddddddddddddddddddddddddddddddddddddddddddddddddgggggggggggggg",
-  "ddddddddddddddddddddddddddddddddddddddddddddddddddgggggggggggggg",
-  "ddddddddddddddddddddddddddddddddddddddddddddddddddgggggggggggggg",
-  "ddddddddddddddddddddddddddddddddddddddddddddddddddgggggggggggggg"
+  "ddddddddddddddmmmmmdddddddddddddddddddddddddddddddgggggggggggggg",
+  "dddddddddddddmmmmmmmmdddddddddddddddddddddddddddddgggggggggggggg",
+  "dddddddddddddmmmmmmmmmddddddddddddddddddddddddddddgggggggggggggg",
+  "dddddddddddddmmmmmmmmdddddddddddddddddddddddddddddgggggggggggggg"
  ],
  "layout": [
   "000000000000000000000o00000000000000o0000o000o00000o000000000000",
@@ -239,16 +240,16 @@
   "00000000000000000000000000000000000i000000i0iii0000i0u0b00b00b00",
   "i00000000000000000000000000000000000000000000000000ui0000u00m0bm",
   "0i0000000A000000000000000i00000000i00i00000000000000zz0z00b0b000",
-  "000000000000000000X000000000000000i000000000000000i0000mbb00b000",
+  "000000000000000000X00000i000000000i000000000000000i0000mbb00b000",
   "0000000000U00000000000i00000000i0i0000i000000000000u00b00b0b000b",
-  "0000000000000U0000X000000000000000000000000000000i0i0000bbbi0000",
+  "0000000000000U0000X000000i00000i00000000000000000i0i0000bbbi0000",
   "000i0000000000000A0000000000000000000000000i000i0000000000000bb0",
-  "0000000000000000000000000000000000000000i00000i00ii00000000b00m0",
-  "00000i00000000X00000000000000000000000i00000000000i00000000mi0m0",
-  "000000000000i0000000000i00000000000000000000i00i000000i0000m0000",
+  "0000000000000000i0000000000i000i00000000i00000i00ii00000000b00m0",
+  "00000i00000000X0000000000000i000000000i00000000000i00000000mi0m0",
+  "000000000000i0000000000i0ii0i000000000000000i00i000000i0000m0000",
   "0000A000000000X000000000000000000000000U0i0i00000i0000000000000m",
-  "0000000000i00U00000U000000000000000000i0000i000000i00000b0000mbb",
+  "0000000000i00U00000U00i000000000000000i0000i000000i00000b0000mbb",
   "000000000000000000000000000X00000000000000000i000000000i000b00mm",
-  "00000000000000000000i000000000000000000000000000000000i00000m000"
+  "0000000000ii00000000i00i000000000000000000000000000000i00000m000"
  ]
 }

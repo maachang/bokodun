@@ -118,6 +118,7 @@
  "floorLegend": {
   "d": "desert",
   "g": "grass",
+  "m": "redEarth",
   "s": "snow",
   "u": "tundra"
  },
@@ -184,8 +185,8 @@
   "ggggggggggggggggggggggdggggggggdddddddddddddddgggdddgggddddddddd",
   "ggggggggggggggggggggggddddddgddddddddddddddddgggddddgggddddddddd",
   "ggggggggggggggggggggggdddddddddddddddddddddddgggddddgggddddddddd",
-  "ggggggggggggdgggggggggddddddddddddddddddddddddgggdddgggddddddddd",
-  "gggggggggdddddddggggggddddddddddddddddddddddddgggdddgggddddddddd"
+  "ggggggggggggdgggggggggddddddddddddddddddddddmdgggdddgggddddddddd",
+  "gggggggggdddddddggggggdddddddddddddddddddddmmdgggdddgggddddddddd"
  ],
  "layout": [
   "0000000000000000000000000000000000000000000000000000000000000000",
@@ -249,8 +250,8 @@
   "00G00m000iu00000000000000i0i00000000000000i0aeeeQQQee0000U000000",
   "000000000000ziz00000i00i00i00ii00ii0i000000000eeeQQQeem000000000",
   "0i0i0000000i00i0000i000000000000000000i00000ieeeQQQQeeM000000000",
-  "000i000000i00i000000000i00000000i000000000000eeeQQQQmee000000000",
+  "000i000000i00i000000000i00000000i0000000000i0eeeQQQQmee000000000",
   "00000i0000000i00i00000000000000000i00000000000MeeQQQm0M000000000",
-  "00000000000000000000z00i0000000000000i00000000e0mqQQbm0i00000000"
+  "00000000000000000000z00i0000000000000i000i000ie0mqQQbm0i00000000"
  ]
 }
