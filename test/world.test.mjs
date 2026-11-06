@@ -1146,3 +1146,19 @@ test('大森林の巨木は森の中だけ: 森の床が 5% 未満のマップ�
     }
     assert.deepEqual(bad, []);
 });
+
+test('砂漠は砂丘の起伏がある: 砂地の床が 60% 以上のマップは、高さの幅が 5 段以上', () => {
+    const flat = [];
+    let n = 0;
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const t = m.floorLayer.join('');
+        const dch = Object.keys(m.floorLegend).find((k) => m.floorLegend[k] === 'desert');
+        if (!dch || (t.split(dch).length - 1) / t.length < 0.6) continue;
+        n++;
+        const hs = m.heights.join('').split('').map((c) => parseInt(c, 36));
+        if (Math.max(...hs) - Math.min(...hs) < 5) flat.push(id);
+    }
+    assert.ok(n > 0, '砂漠のマップがない');
+    assert.deepEqual(flat, []);
+});

@@ -571,8 +571,25 @@ def build():
     ridgeF = (1 - np.abs(2 * fbm(46, (34, 12, 4)) - 1)) ** 2
     e_for = 3 + 13 * fbm(45, (28, 10, 4)) + 9 * ridgeF
     e_tr = 4 + 9 * fbm(47, (34, 12, 5)) + 3 * (1 - np.abs(2 * fbm(48, (40, 14, 5)) - 1)) ** 2   # 南国: ゆるい丘とジャングルの谷
-    wsum = w_snow + w_con + w_rock + w_for + w_tr
-    mount = (w_snow * e_snow + w_con * e_con + w_rock * e_rock + w_for * e_for + w_tr * e_tr)
+    # 砂漠: 砂丘。風は北西から南東へ。尾根は風と直交（北東〜南西）に、平行に並ぶ。風上はゆるやか（約 3 マスで 1 段）・風下は急（1 マスで 1 段）の、のこぎり型。尾根は、ゆらぎで曲がり、ところどころ切れて、峠になる。砂漠の中心ほど高く、数か所に、星型の高い砂丘
+    w_des = blur(biome == DESERT, 14)
+    inner = np.clip(_distance(biome != DESERT).astype(np.float32) / 40.0, 0, 1)         # 砂漠の縁 0 → 中心 1
+    sw = (xs + ys) / np.sqrt(2.0)                                                       # 風の向きの座標
+    lam = 20.0                                                                          # 尾根の間隔（マス）
+    phase = ((sw + 9 * (fbm(61, (40, 14, 5)) - 0.5) * 6) / lam) % 1.0                  # 尾根の曲がり（ゆらぎ）
+    saw = np.where(phase < 0.72, phase / 0.72, (1 - phase) / 0.28)                      # 風上ゆるやか・風下急
+    amp = (3.5 + 5.5 * fbm(62, (50, 18, 6))) * (0.45 + 0.55 * inner)                    # 尾根の高さ 4〜9 段（縁は低い）
+    gap = np.clip((fbm(63, (22, 8, 3)) - 0.62) * 8, 0, 1)                               # 峠（尾根の切れ目）
+    ripple = 0.8 * (1 - np.abs(2 * fbm(64, (10, 4, 2)) - 1))                            # 砂紋（細かい波）
+    e_des = 2 + amp * saw * (1 - 0.85 * gap) + ripple
+    dm = _distance(biome != DESERT)
+    for _ in range(3):                                                                  # 星型の砂丘（砂漠の奥に、高い山）
+        py_, px_ = np.unravel_index(np.argmax(dm), dm.shape)
+        if dm[py_, px_] < 18: break
+        e_des = e_des + 10 * np.exp(-(((xs - px_) ** 2 + (ys - py_) ** 2) / (2 * 14.0 ** 2)))
+        dm[np.hypot(xs - px_, ys - py_) < 70] = 0
+    wsum = w_snow + w_con + w_rock + w_for + w_tr + w_des
+    mount = (w_snow * e_snow + w_con * e_con + w_rock * e_rock + w_for * e_for + w_tr * e_tr + w_des * e_des)
     elev = mount + plains * np.clip(1 - wsum, 0, 1)
     elev = np.where(land, elev, 0)
     elev = np.clip(elev, 0, MAX_LEVEL).round().astype(np.int32)
