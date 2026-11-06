@@ -1120,3 +1120,16 @@ test('南国の植物は南国の近くだけ: 北・草原・森に毒々しい
     }
     assert.deepEqual(bad, []);
 });
+
+test('砂漠の植物（サボテン・多肉植物）は砂地の中だけ: 砂地の床が 5% 未満のマップにない', () => {
+    const bad = [];
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const t = m.floorLayer.join('');
+        const dch = Object.keys(m.floorLegend).find((k) => m.floorLegend[k] === 'desert');
+        const frac = dch ? t.split(dch).length - 1 : 0;
+        const has = m.layout.join('').split('').some((ch) => ['cactus', 'succulent'].includes(m.legend[ch]));
+        if (has && frac / t.length < 0.05) bad.push(id);
+    }
+    assert.deepEqual(bad, []);
+});

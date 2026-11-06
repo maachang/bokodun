@@ -135,6 +135,12 @@ def build_tiles(t):
     de = free & (biome == DESERT)
     put(de & (u < 0.03), 'i')
     put(de & (u2 < 0.01), 'A'); put(de & (u2 > 0.992), 'X'); put(de & (u3 < 0.008), 'U')
+    # 砂地と他の地形の境: 境に近いほど、サボテン・多肉植物・枯れ木・乾いた草を間引き、草に置き換える（草原・岩山の中に、砂漠の植物が急に現れない）
+    d_out_de = T._distance(land & (biome != DESERT) & (biome != SEA))            # 砂地でない陸までの距離
+    u5 = (u2 * 11.3 + u3 * 7.9) % 1.0
+    thin_de = de & (d_out_de <= 14) & (d_out_de > 0) & (u5 < np.clip((14.0 - d_out_de.astype(np.float32)) / 8.0, 0, 1))   # 境から 6 マス以内は全部、14 マスで 0
+    for ch in 'AXUi': obj[thin_de & (obj == ord(ch))] = ord('0')
+    put(thin_de & (obj == ord('0')) & (u < 0.12), 'm')
 
     # --- 南国（入り江・小島・砂州・池・ゆるい丘とジャングルの谷）---
     tr = free & (biome == TROPICAL)
@@ -208,6 +214,11 @@ def build_tiles(t):
     trop_near = T.box_mean((biome == TROPICAL).astype(np.float32), 8) > 0.02
     put(sea, 'O'); put(sea & (d_land <= np.where(trop_near, 3, 1)), 'q')
     put(sea & trop_near & (d_land <= 3), 'g')                                   # 南国の浅瀬: 青緑に光る
+    # 河口: 川の水から 3 マス以内の海は、岸の浅瀬にせず、深い水（川が途切れず海へ続く。河口を歩いて渡れない）
+    d_riv = T._distance(t['river'] > 0)
+    put(sea & (d_riv <= 3) & (d_land <= 3), 'Q')
+    mouth_q = np.isin(obj, [ord('q'), ord('g')]) & (d_riv <= 5) & (t['dist_sea'] <= 5)   # 河口のそばの、岸・入り江の浅瀬も、深い水に
+    put(mouth_q, 'Q')
     put(t['lagoon'], 'g')                                                       # 入り江・砂州・池のふち（歩ける浅瀬）
     # 炭鉱の入口とトロッコ: 掘削跡のふち（北・西・東側）に、地形ごとに少数
     for k, (mx, my) in enumerate(MINES):
