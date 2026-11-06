@@ -1188,3 +1188,16 @@ test('砂漠にオアシスがある: 砂地の中に、池（水）・草の地
     assert.ok(oases >= 1, 'オアシスがない');
     assert.ok(town >= 1, '街の予定地がない');
 });
+
+test('ガマは湿地帯前提: 砂漠の床の上にガマがない', () => {
+    const bad = [];
+    for (const id of world.grid.flat().filter(Boolean)) {
+        const m = readJson(`public/data/maps/${id}.json`);
+        const dch = Object.keys(m.floorLegend).find((k) => m.floorLegend[k] === 'desert');
+        if (!dch) continue;
+        for (let y = 0; y < 64; y++) for (let x = 0; x < 64; x++) {
+            if (m.legend[m.layout[y][x]] === 'cattail_cluster' && m.floorLayer[y][x] === dch) { bad.push(`${id} (${x},${y})`); break; }
+        }
+    }
+    assert.deepEqual(bad.slice(0, 10), []);
+});

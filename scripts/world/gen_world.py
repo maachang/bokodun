@@ -151,24 +151,27 @@ def build_tiles(t):
     oa = t['oasis']
     fl(oa['grass'] & land, 'g'); fl(oa['sand'] & land, 'w')
     for ch in 'AXUi': obj[oa['grass'] & (obj == ord(ch))] = ord('0')               # 砂漠の植物は、オアシスに置かない
-    oag = oa['grass'] & free & ~oa['clear'] & (obj == ord('0'))
-    put(oag & (u < 0.45), 'm'); put(oag & (u3 < 0.06), 'b'); put(oag & (u3 >= 0.06) & (u3 < 0.11), 'w'); put(oag & (u3 >= 0.11) & (u3 < 0.14), 'p')
-    put(oag & (u2 > 0.93), 'Y'); put(oag & lat & (u2 < 0.38), 'M')                     # 緑が生い茂る: ヤシ・南国の木（2 マスおきの格子に、ヤシ）
-    oa_in = oag & (d_water > 4)
-    put(oa_in & lat & (u2 >= 0.38) & (u2 < 0.62), 'a'); put(oa_in & lat & (u2 >= 0.62) & (u2 < 0.78), 'd')   # 少し離れた所は、ジャングルの木（2 倍）
-    put(oag & (d_water <= 2) & (u < 0.3), 'k')                                         # 池のそば: ガマ
-    # 砂漠を通る川の周り: 川から 4〜10 マス（ゆらぎあり）は、オアシスと同じ、草の地面・草・花・ヤシ・南国の木・ガマ
+    # 緑の帯（オアシスのまわり・砂漠の川の岸）: 参考画像（砂漠の川）のように、水のそばに、密な緑（低木・草・ヤシ・木・ガマ）。帯の外は、すぐ砂。木は 2 マスおきの格子にだけ置く（木の間は、必ず通れる）
+    def lush(mask, d_w):
+        m0 = mask & free & (obj == ord('0'))
+        put(m0 & (u < 0.62), 'm'); put(m0 & (u3 < 0.22), 'e'); put(m0 & (u3 >= 0.22) & (u3 < 0.30), 'b'); put(m0 & (u3 >= 0.30) & (u3 < 0.34), 'w')
+        g = m0 & lat
+        put(g & (u2 < 0.34), 'M'); put(g & (u2 >= 0.34) & (u2 < 0.50), 'Y')              # ヤシ・南国の木（格子）
+        put(g & (d_w > 3) & (u2 >= 0.50) & (u2 < 0.68), 'a'); put(g & (d_w > 3) & (u2 >= 0.68) & (u2 < 0.80), 'd')   # 少し離れた所は、ジャングルの木（2 倍）
+        put(m0 & (d_w <= 2) & (u2 < 0.7), 'e')                                          # 水のすぐそば: シダ（密）。ガマは湿地帯のものなので、砂漠の水辺には置かない
+    oag = oa['grass'] & free & (d_water <= 5) & (obj == ord('0'))                    # オアシスの緑は、池のふちから 5 マスまで（砂漠の川の岸と、同じくらいの狭さ）
+    lush(oag, d_water)
+    oag2 = oa['grass'] & free & (d_water > 5) & ~oa['clear'] & (obj == ord('0'))
+    put(oag2 & (u < 0.12), 'm')                                                       # その外の草の地面は、草を少しだけ
+    # 砂漠を通る川の岸: 川から 3〜9 マス（ゆらぎあり）は、緑の帯（草の地面）
     d_rv = T._distance(t['river'] > 0)
-    rw = 4 + 6 * T.fbm(77, (16, 6, 3))
+    rw = 2 + 4 * T.fbm(77, (16, 6, 3))
     rb = land & (biome == DESERT) & (d_rv <= rw) & (d_rv > 0)
     fl(rb & ~oa['clear'], 'g')
     rbo = rb & free & ~oa['clear']
     for ch in 'AXUi': obj[rbo & (obj == ord(ch))] = ord('0')
-    rbg = rbo & (obj == ord('0'))
-    put(rbg & (u < 0.40), 'm'); put(rbg & (u3 < 0.05), 'b'); put(rbg & (u3 >= 0.05) & (u3 < 0.09), 'w'); put(rbg & (u3 >= 0.09) & (u3 < 0.11), 'p')
-    put(rbg & (u2 > 0.95), 'Y'); put(rbg & lat & (u2 < 0.22), 'M')
-    put(rbg & (d_rv <= 2) & (u < 0.3), 'k')
-    oc = oa['clear'] & free
+    lush(rbo & (obj == ord('0')), d_rv)
+    oc = oa['clear'] & free & (d_water > 5)                                          # 街の予定地（池のふち 5 マスの緑は残す）
     for ch in 'MYadfrsbwpek' + 'AXUiGlvho': obj[oc & (obj == ord(ch))] = ord('0')      # 街の予定地: 物（木・花・草）を、置かない
     put(oc & (u < 0.04), 'm')
     # 草原の植物（草・花・草原の木）は、寒い土地・砂地との境で、間引く（雪山・ツンドラ・砂漠の中に、草原の植物が混ざらない）。境から 6 マス以内は全部、14 マス先で 0

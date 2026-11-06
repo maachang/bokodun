@@ -498,7 +498,7 @@ def _desert_oases(land, biome, sx=1.0, sy=1.0):
         if len(picks) >= 2: break
     noise = (fbm(99, (14, 5, 2)) - 0.5) * 0.5
     for py, px, kind in picks:
-        r_pond, r_grass, r_flat = (9.0, 26.0, 20.0) if kind == 'town' else (5.5, 9.0, 10.0)
+        r_pond, r_grass, r_flat = (9.0, 17.0, 26.0) if kind == 'town' else (5.5, 12.0, 10.0)
         d = np.hypot(X - px, Y - py)
         e = d / r_pond + noise < 1.0                                    # 池（深い水）
         ring = (d / (r_pond + 2.0) + noise < 1.0) & ~e                  # 浅いふち
@@ -506,7 +506,7 @@ def _desert_oases(land, biome, sx=1.0, sy=1.0):
         out['sand'] |= (d / (r_pond + 4.0) + noise < 1.0) & ~e & ~ring & land      # 池のそばの白い砂
         out['grass'] |= (d / r_grass + noise * 0.6 < 1.0) & land        # 草の地面
         fr = fbm(98, (10, 4, 2))                                         # 緑のふち: 外側へ、まだらに薄くなる（10 マス）
-        out['grass'] |= (d > r_grass) & (d <= r_grass + 10) & (fr > (d - r_grass) / 10.0) & land
+        out['grass'] |= (d > r_grass) & (d <= r_grass + 5) & (fr > (d - r_grass) / 5.0) & land
         out['flat'] |= (d <= r_flat) & land
         if kind == 'town': out['clear'] |= (d <= r_flat) & land; out['town'] = (py, px)
         out['centers'].append((py, px, kind))
