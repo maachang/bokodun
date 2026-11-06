@@ -1054,7 +1054,7 @@ export class GameEngine {
                             const texKey = def.texture;
                             if (!this.treeMats.has(texKey)) {
                                 const tx = this.textures[texKey] || this.textures.tree;
-                                this.treeMats.set(texKey, { far: new THREE.SpriteMaterial({ map: tx, transparent: false, alphaTest: 0.4 }), near: new THREE.SpriteMaterial({ map: tx }) });
+                                this.treeMats.set(texKey, { far: new THREE.SpriteMaterial({ map: tx, transparent: false, alphaTest: 0.4 }), near: new THREE.SpriteMaterial({ map: tx, alphaTest: 0.05 }) });
                             }
                             const { far: treeMat, near: treeMatNear } = this.treeMats.get(texKey);
                             const tree = new THREE.Sprite(treeMat);
@@ -1622,7 +1622,7 @@ export class GameEngine {
                             const tx = this.textures[texKey] || this.textures.tree;
                             this.treeMats.set(texKey, {
                                 far: new THREE.SpriteMaterial({ map: tx, transparent: false, alphaTest: 0.4 }),   // 遠い木: 切り抜き。透明な画素が奥行きを書いて、奥の壁の木を四角く隠すのを防ぐ
-                                near: new THREE.SpriteMaterial({ map: tx })                                      // 近い木: 従来の（なめらかな）描画
+                                near: new THREE.SpriteMaterial({ map: tx, alphaTest: 0.05 })                                   // 近い木: 従来の（なめらかな）描画
                             });
                         }
                         const { far: treeMat, near: treeMatNear } = this.treeMats.get(texKey);
