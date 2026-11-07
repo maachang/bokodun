@@ -1394,3 +1394,14 @@ test('マップの形式: 世界のマップ（w_*）は、物体 ID の数値�
     assert.equal(normalizeMap({ layout: ['ab'], legend: { a: 'x' } }).layout[0], 'ab', '手書きマップ（形式なし）は、そのまま');
     assert.throws(() => normalizeMap({ layoutFormat: 'ids', layout: [[0xD800]] }), /範囲外/);
 });
+
+test('地面の影: 立て札・像・噴水（groundShadow）と、建物・壁（baseShadow）に影がある。それぞれ 1 つの InstancedMesh にまとめる', () => {
+    const must = (names, key) => { for (const n of names) assert.equal(objects[n][key], true, `${n}: ${key}`); };
+    must(Object.entries(objects).filter(([, v]) => v.type === 'signpost' || v.type === 'statue').map(([k]) => k).concat(['plaza_fountain']), 'groundShadow');
+    must(['city_wall', 'brick_house', 'wooden_house', 'shop_building', 'inn_building', 'temple_building'], 'baseShadow');
+    for (const [k, v] of Object.entries(objects)) if (v.baseShadow) assert.equal(v.type, 'block', `${k}: baseShadow は壁・建物（block）だけ`);
+    for (const n of ['cliff_rock_wall', 'rock_wall', 'brick_wall']) assert.ok(!objects[n].baseShadow, `${n}: 崖・岩壁・ダンジョンの壁は、影なし`);
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    assert.ok(game.includes('buildGroundShadows(tileSize)') && game.includes('groundShadowItems'), '地面の影の処理');
+    assert.equal((game.match(/new THREE\.InstancedMesh\(geo, mat, items\.length\)/g) || []).length, 1, 'InstancedMesh を作る処理は 1 か所（丸い影・壁の帯で共有）');
+});

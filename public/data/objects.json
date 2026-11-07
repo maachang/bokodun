@@ -127,6 +127,7 @@
     "description": "苔むした平原の自然岩（弓矢や魔法を防ぐ遮蔽物）"
   },
   "wooden_signpost": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -376,6 +377,7 @@
     "description": "大森林の巨木 B（ID 218 を 3 倍に拡大）"
   },
   "zeus_statue": {
+    "groundShadow": true,
     "type": "statue",
     "imageFile": "zeus_statue.png",
     "sdId": 211,
@@ -551,6 +553,7 @@
     "description": "村を取り囲む木製の柵（矢や魔法は通すがモンスターやプレイヤーは通過不可）"
   },
   "wooden_house": {
+    "baseShadow": true,
     "type": "block",
     "texture": "woodWall",
     "hasRoof": true,
@@ -674,6 +677,7 @@
     "description": "村の土の街道・わだち道（移動速度15%アップ）"
   },
   "city_wall": {
+    "baseShadow": true,
     "type": "block",
     "texture": "cityWall",
     "solid": true,
@@ -681,6 +685,7 @@
     "description": "街を囲むヨーロッパ風の堅固な石造りの城壁・市壁"
   },
   "brick_house": {
+    "baseShadow": true,
     "type": "block",
     "texture": "brick",
     "roofTexture": "cityRoof",
@@ -798,6 +803,7 @@
     "faceEvery": 2
   },
   "shop_building": {
+    "baseShadow": true,
     "type": "block",
     "texture": "shopWall",
     "roofTexture": "cityRoof",
@@ -915,6 +921,7 @@
     "faceEvery": 2
   },
   "inn_building": {
+    "baseShadow": true,
     "type": "block",
     "texture": "innWall",
     "roofTexture": "cityRoof",
@@ -1039,6 +1046,8 @@
     "description": "ヨーロッパ風の舗装された石畳の広場・大通り（移動速度30%アップ）"
   },
   "plaza_fountain": {
+    "shadowSize": 4.6,
+    "groundShadow": true,
     "type": "fountain",
     "texture": "fountainWater",
     "solid": true,
@@ -1046,6 +1055,7 @@
     "description": "中央広場の石造りの噴水（清らかな水が湧き出る）"
   },
   "city_signpost": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -1146,6 +1156,7 @@
     "description": "回転ノコギリレール（通路のレール上を高速往復する巨大丸ノコ！待避ポケットを使いながら進め）"
   },
   "swamp_signpost": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -1154,6 +1165,7 @@
     "description": "湿地帯の入口に立つ古びた警告看板"
   },
   "wooden_wall": {
+    "baseShadow": true,
     "type": "block",
     "texture": "woodWall",
     "solid": true,
@@ -2287,6 +2299,7 @@
     "description": "建物（店）の出口の扉。近づくと開き、中へ入ると、入ってきた場所へ戻る"
   },
   "weapon_shop_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "weaponShopSign",
     "solid": true,
@@ -2301,6 +2314,7 @@
     "description": "武器屋の立て札（扉の横）"
   },
   "item_shop_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "itemShopSign",
     "solid": true,
@@ -2315,6 +2329,7 @@
     "description": "道具屋の立て札（扉の横）"
   },
   "adventurer_guild_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -2329,6 +2344,7 @@
     "description": "冒険者ギルドの案内標識（街のマップ用。建物の前に立てる）"
   },
   "mage_guild_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -2343,6 +2359,7 @@
     "description": "魔法ギルドの案内標識（街のマップ用。建物の前に立てる）"
   },
   "merchant_guild_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -2357,6 +2374,7 @@
     "description": "商人ギルドの案内標識（街のマップ用。建物の前に立てる）"
   },
   "training_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -2371,6 +2389,7 @@
     "description": "職業訓練所の案内標識（街のマップ用。建物の前に立てる）"
   },
   "church_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -2385,6 +2404,7 @@
     "description": "神殿の案内標識（街のマップ用。建物の前に立てる）"
   },
   "smith_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -2399,6 +2419,7 @@
     "description": "鍛冶屋の案内標識（街のマップ用。建物の前に立てる）"
   },
   "noble_district_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -2448,6 +2469,7 @@
     "description": "木の下り階段（屋内の天井つき）。作りは石と同じで、段が板張りの色"
   },
   "goddess_statue": {
+    "groundShadow": true,
     "type": "statue",
     "imageFile": "goddess_statue.png",
     "sdId": 205,
@@ -2511,6 +2533,7 @@
     "description": "ステンドグラス（髭の教祖が動物達と対話する）"
   },
   "temple_wall": {
+    "baseShadow": true,
     "type": "block",
     "texture": "marbleWall",
     "solid": true,
@@ -2644,6 +2667,7 @@
     "description": "神殿の出口の扉。近づくと開き、中へ入ると、入ってきた場所へ戻る"
   },
   "temple_building": {
+    "baseShadow": true,
     "type": "block",
     "texture": "marbleWall",
     "roofTexture": "cityRoof",
@@ -2743,6 +2767,7 @@
     "description": "街の神殿の扉（近づくと開き、中へ入ると神殿へ移動。行き先は map の links）"
   },
   "goddess_statue_large": {
+    "groundShadow": true,
     "type": "statue",
     "imageFile": "goddess_statue.png",
     "sdId": 205,
@@ -2759,6 +2784,7 @@
     "pedestalWidth": 3.2
   },
   "goddess_statue_small": {
+    "groundShadow": true,
     "type": "statue",
     "imageFile": "goddess_statue.png",
     "sdId": 205,
@@ -2895,6 +2921,7 @@
     "ceilingTexture": "marbleWall"
   },
   "temple_brick_wall": {
+    "baseShadow": true,
     "type": "block",
     "texture": "brick",
     "solid": true,
@@ -2927,6 +2954,7 @@
     "description": "街・町の広場の敷石（道路ではないので、移動速度ボーナスなし。道路は paved_road）"
   },
   "temple_brick_window": {
+    "baseShadow": true,
     "type": "block",
     "texture": "brickWindow",
     "solid": true,
@@ -8527,6 +8555,7 @@
     "description": "木箱（野外用。床・天井は付けない）"
   },
   "bar_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "barSign",
     "solid": true,
@@ -12880,6 +12909,7 @@
     "description": "木の窓（壁の面に付く。ガラスの窓に木の鎧戸。壁の高さ4用。村の家の屋内）"
   },
   "wooden_house_window": {
+    "baseShadow": true,
     "type": "block",
     "texture": "woodWall",
     "hasRoof": true,
@@ -15506,6 +15536,7 @@
     "description": "宿屋・酒場の扉（近づくと開き、中へ入ると宿屋へ移動。行き先は map の links）"
   },
   "inn_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "innSign",
     "solid": true,
@@ -15836,6 +15867,7 @@
     "description": "藁のねどこ（相部屋の寝床。安い客用）（木の床・天井用）"
   },
   "pub_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "barSign",
     "solid": true,
@@ -15850,6 +15882,7 @@
     "description": "町のパブの立て札（板にジョッキのマーク。扉の横）"
   },
   "inn_guide_sign": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "innSign",
     "solid": true,
@@ -16285,6 +16318,7 @@
     "description": "ボコスカ島の地図（冒険者ギルドの壁に飾る、壁の面に付ける画像。sdServer 画像 261）"
   },
   "town_sign_a": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -16299,6 +16333,7 @@
     "description": "街の入口の近くの立て札（キュラビッド帝国。外のマップ用）"
   },
   "town_sign_b": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -16313,6 +16348,7 @@
     "description": "街の入口の近くの立て札（フランケル聖国。外のマップ用）"
   },
   "town_sign_c": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -16327,6 +16363,7 @@
     "description": "街の入口の近くの立て札（ミレニアム自由都市。外のマップ用）"
   },
   "town_sign_d": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -16341,6 +16378,7 @@
     "description": "街の入口の近くの立て札（グリーン王国。外のマップ用）"
   },
   "town_sign_e": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -16355,6 +16393,7 @@
     "description": "街の入口の近くの立て札（ガリレオ連盟。外のマップ用）"
   },
   "town_sign_f": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -16369,6 +16408,7 @@
     "description": "街の入口の近くの立て札（ライアン獣王国。外のマップ用）"
   },
   "town_sign_g": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,
@@ -16383,6 +16423,7 @@
     "description": "街の入口の近くの立て札（デイラミ精霊国。外のマップ用）"
   },
   "town_sign_h": {
+    "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
     "solid": true,

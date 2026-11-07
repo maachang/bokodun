@@ -1316,6 +1316,8 @@ export class GameEngine {
         const LIFT_TYPES = new Set(['block', 'tree', 'boulder', 'plant', 'tree_wall', 'furniture', 'floor_tile', 'wooden_fence', 'chest', 'portal']);   // 高低差のあるマスで、そのマスの高さまで持ち上げる種類。宝箱・ポータルも（高台で、床に埋まらない）
         const origSceneAdd = this.scene.add;
         const unlift = () => { if (this.scene.add !== origSceneAdd) this.scene.add = origSceneAdd; };
+        // 地面の影の元（マップを作り終えたあと、buildGroundShadows が、InstancedMesh にまとめる）: 丸い影（単体の物）と、壁の足元の帯
+        this.groundShadowItems = { round: [], edges: [] };
         for (let r = 0; r < rows; r++) {
             for (let c = 0; c < cols; c++) {
                 unlift();
@@ -1349,6 +1351,24 @@ export class GameEngine {
                 }
 
                 const liftH = this.heightLevelAtTile(r, c) * this.heightStep;
+                // 地面の影: groundShadow（立て札・像・噴水など単体の物）は丸い影、baseShadow（建物・壁）は、開けた側の足元に帯の影
+                if (objDef.groundShadow || objDef.baseShadow) {
+                    const lifted = (LIFT_TYPES.has(objDef.type) || objDef.lift) ? liftH : 0;   // 物体が持ち上がる高さ（持ち上げない種類は 0）
+                    if (objDef.groundShadow) {
+                        const d = objDef.shadowSize ?? (objDef.type === 'signpost' ? (objDef.scale?.[0] ?? 1.9) * 0.9 : (objDef.radius ?? 0.5) * 2.6);   // 影の直径: 物の幅から決める
+                        this.groundShadowItems.round.push({ x: wx, z: wz, y: lifted, d });
+                    }
+                    if (objDef.baseShadow) {
+                        const lvl = this.heightLevelAtTile(r, c);
+                        for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
+                            const rr = r + dr, cc = c + dc;
+                            if (rr < 0 || cc < 0 || rr >= rows || cc >= cols) continue;
+                            if (this.objectDefinitions[mapData.legend?.[mapData.layout[rr][cc]]]?.type === 'block') continue;   // 隣が壁・建物なら、足元ではない
+                            if (this.heightLevelAtTile(rr, cc) !== lvl) continue;   // 段差のある側は、帯が浮く・埋まるので、置かない
+                            this.groundShadowItems.edges.push({ x: wx + dc * tileSize / 2, z: wz + dr * tileSize / 2, ox: dc, oz: dr, y: lifted });
+                        }
+                    }
+                }
                 if (liftH > 0 && (LIFT_TYPES.has(objDef.type) || objDef.lift) && !(objDef.type === 'floor_tile' && objDef.elevation > 0)) {   // lift: true の定義（頂上の入口の扉など）は、種類に関係なく、高さだけ持ち上げる
                     this.scene.add = function (o) { o.position.y += liftH; return origSceneAdd.call(this, o); };
                 }
@@ -3031,6 +3051,7 @@ export class GameEngine {
 
         // 動かない部品（床・天井・壁・家具など）を、材質ごとに1つにまとめる（描画の回数を減らして、CPU の負荷を下げる）
         this.mergeStaticMeshes();
+        this.buildGroundShadows(tileSize);   // 立て札・像・噴水などの丸い影と、建物・壁の足元の影（それぞれ 1 つの InstancedMesh）
         this.buildCullChunks();   // 木・草・花の板を、区画ごとにまとめる（遠い区画は、まとめて隠す。毎フレームの走査・判定を減らして、CPU の負荷を下げる）
 
         // 村人（NPC）: マップの npcs（{ id: npcs.json の ID, x, z: マスの位置 }）。マスの上の床や家具とは独立に置く
@@ -4647,6 +4668,54 @@ export class GameEngine {
     // addStatic で足した部品（グループの中の部品も）を、同じ材質ごとに、1つのメッシュにまとめる。
     //   1マスごとに別々のメッシュだと、描画の命令が1フレームに数百〜千回を超え、CPU が重くなる。見た目は変わらない。
     //   半透明な材質・配列の材質は、描画の順番が崩れるので、まとめずに、そのまま残す
+    // 地面の影（groundShadowItems）を、InstancedMesh にまとめる（描画の命令は、丸い影 1 回・壁の足元の帯 1 回）。
+    //   濃さは、木の影と同じく、地面の種類（TREE_SHADOW_OPACITY）で変える。マップを作り終えたあとに呼ぶ
+    buildGroundShadows(tileSize) {
+        const { round, edges } = this.groundShadowItems || { round: [], edges: [] };
+        if (!round.length && !edges.length) return;
+        const opacity = TREE_SHADOW_OPACITY[this.mapData?.environment?.floorType] ?? 1;
+        const dummy = new THREE.Object3D();
+        dummy.rotation.order = 'YXZ';
+        const make = (geo, tex, items, place) => {
+            const mat = new THREE.MeshBasicMaterial({ map: tex, transparent: true, depthWrite: false, opacity });
+            const inst = new THREE.InstancedMesh(geo, mat, items.length);
+            items.forEach((it, i) => { place(it); dummy.updateMatrix(); inst.setMatrixAt(i, dummy.matrix); });
+            inst.instanceMatrix.needsUpdate = true;
+            inst.matrixAutoUpdate = false;
+            inst.frustumCulled = false;   // マップ全体で 1 つ（範囲が広い）。数が少ないので、常に描く
+            this.scene.add(inst);
+        };
+        const gradTex = (draw) => {
+            const cv = document.createElement('canvas'); cv.width = 32; cv.height = 32;
+            draw(cv.getContext('2d'));
+            return new THREE.CanvasTexture(cv);
+        };
+        if (round.length) {
+            const tex = gradTex(ctx => {
+                const g = ctx.createRadialGradient(16, 16, 2, 16, 16, 16);
+                g.addColorStop(0, 'rgba(0, 4, 0, 0.9)'); g.addColorStop(0.55, 'rgba(0, 6, 0, 0.6)'); g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = g; ctx.fillRect(0, 0, 32, 32);
+            });
+            make(new THREE.PlaneGeometry(1, 1), tex, round, (it) => {
+                dummy.position.set(it.x, it.y + 0.012, it.z); dummy.rotation.set(-Math.PI / 2, 0, 0); dummy.scale.set(it.d, it.d, 1);
+            });
+        }
+        if (edges.length) {
+            // 壁に接する側（画像の上）が濃く、外へ向かって薄くなる帯
+            const tex = gradTex(ctx => {
+                const g = ctx.createLinearGradient(0, 0, 0, 32);
+                g.addColorStop(0, 'rgba(0, 4, 0, 0.65)'); g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                ctx.fillStyle = g; ctx.fillRect(0, 0, 32, 32);
+            });
+            const depth = tileSize * 0.7;
+            make(new THREE.PlaneGeometry(1, 1), tex, edges, (it) => {
+                dummy.position.set(it.x + it.ox * depth / 2, it.y + 0.02, it.z + it.oz * depth / 2);
+                dummy.rotation.set(-Math.PI / 2, Math.atan2(it.ox, it.oz), 0);   // 画像の上（濃い側）を、壁へ向ける
+                dummy.scale.set(tileSize, depth, 1);
+            });
+        }
+    }
+
     // 木・草・花の板を、区画（CULL_CHUNK）ごとの Group にまとめる。マップを作り終えたあとに呼ぶ
     buildCullChunks() {
         const CH = CULL_CHUNK, chunks = new Map();
