@@ -1006,6 +1006,12 @@ test('川の橋: すべての橋が、両岸をつなぐ（橋のマスが 4 近
 test('端の向こうの景色: 隣のマップ（斜めの角を含む 8 方向）を、本物のマス（高さ・崖・地面の種類・水・木・草・岩）で描く', () => {
     const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
     assert.ok(game.includes('await this.buildNeighborDecor(mapId, cols, rows, tileSize, mapData, floorMatOf)'), '隣のマップを描く');
+    assert.ok(/def\?\.type === 'floor_tile' && !\(def\.elevation > 0\)[\s\S]{0,400}flat\(waterMats\.floors/.test(game), '隣のマップの床（石畳の街道・門前の石畳）も描く（切り替えの前から、道が見える）');
+    // 見た目の共通部品: 今のマップ（visEnv）と、隣のマップの先読み（nEnv）が、同じ関数で壁・家・立て札・松明・扉・家具の見た目を作る
+    for (const t of ['Block', 'Signpost', 'Torch', 'Door', 'Furniture']) {
+        assert.match(game, new RegExp(`visual${t}\\(objDef, wx, wz`), `${t}: 今のマップが、共通部品を呼ぶ`);
+        assert.match(game, new RegExp(`this\\.visual${t}\\(def, wx, wz`), `${t}: 隣のマップの先読みが、同じ共通部品を呼ぶ`);
+    }
     assert.ok(game.includes('NEIGHBOR_TERRAIN_RANGE = 48') && game.includes('NEIGHBOR_OBJECT_RANGE = 26'), '範囲（地形 48・物体 26）');
     assert.ok(game.includes('for (let dj = -1; dj <= 1; dj++)') && game.includes('for (let di = -1; di <= 1; di++)'), '8 方向（斜めの角を含む）');
     assert.ok(game.includes('nd.floorLayer') && game.includes("def.type === 'liquid_tile'") && game.includes('waterBelow'), '地面の種類と水');

@@ -374,7 +374,7 @@ test('厨房らしさ: 全部の台所に、調理台・台所の暖炉・鍋つ
 
 test('扉: 壁が高い建物（大神殿など）でも、扉は標準の高さで頭打ちにして、上をまぐさでふさぐ。壁が5以下は、壁の高さのまま', () => {
     const game = fs.readFileSync('public/js/game.js', 'utf8');
-    assert.ok(game.includes('const doorH = Math.min(wallH, objDef.doorHeight ?? (wallH <= 5 ? wallH : 4.5))'), '扉の高さの頭打ち');
+    assert.ok(game.includes('const doorH = Math.min(env.wallH, objDef.doorHeight ?? (env.wallH <= 5 ? env.wallH : 4.5))'), '扉の高さの頭打ち');
     assert.ok(game.includes('まぐさ'), 'まぐさ');
     assert.ok(game.includes('openY: doorH * 1.45'), '開く量は扉の高さが基準');
     const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));

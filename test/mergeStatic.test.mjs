@@ -50,7 +50,9 @@ test('描画の負荷: 動かない部品は、同じ材質ごとに1つのメ�
 test('描画の負荷: 床・天井・壁・家具などの追加は addStatic を通す（まとめる対象）。扉・罠・水・宝箱は通さない', () => {
     const src = fs.readFileSync(path.join(projectRoot, 'public/js/game.js'), 'utf-8');
     assert.match(src, /this\.mergeStaticMeshes\(\);/);
-    for (const name of ['cellMesh', 'tileMesh', 'wall', 'house', 'roofMesh', 'stepMesh', 'postMesh']) assert.match(src, new RegExp(`this\\.addStatic\\(${name}\\)`), name);
-    const doorBlock = src.slice(src.indexOf("case 'door': {"), src.indexOf("case 'door': {") + 3500);
-    assert.ok(!doorBlock.includes('addStatic(doorMesh)') && !/this\.doors\.push\([\s\S]*addStatic/.test(doorBlock), '扉は、動くので、まとめない');
+    for (const name of ['cellMesh', 'tileMesh', 'stepMesh', 'postMesh']) assert.match(src, new RegExp(`this\\.addStatic\\(${name}\\)`), name);
+    // 壁・家は、見た目の共通部品（visualBlock）の中で、env.add(..., true)（= addStatic と同じ）を通す
+    for (const name of ['wall', 'house', 'roofMesh']) assert.match(src, new RegExp(`env\\.add\\(${name}, true\\)`), name);
+    const doorBlock = src.slice(src.indexOf("visualDoor(objDef, wx, wz, r, c, env) {"), src.indexOf("visualDoor(objDef, wx, wz, r, c, env) {") + 4500);
+    assert.ok(!doorBlock.includes('env.add(doorMesh') && !doorBlock.includes('addStatic(doorMesh)') && !doorBlock.includes('env.add(doorGroup, true)'), '扉は、動くので、まとめない');
 });

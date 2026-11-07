@@ -936,6 +936,262 @@ export class GameEngine {
         })();
     }
 
+    // ---- 見た目の共通部品 ----
+    //   今のマップの描画（タイルのループ）と、隣のマップの先読み描画（buildNeighborDecor）が、同じ関数で見た目を作る。
+    //   新しい種類は、ここに見た目を書けば、両方に出る。当たり判定・対話の登録は、今のマップの側だけ。
+    //   env: { rows, cols, wallH, tileSize, brickMat, standardWallGeo, charAt(列, 行)（範囲外は undefined）, defOf(文字)（物体の定義）, add(obj, isStatic) }
+
+    // 壁・家（block）
+    visualBlock(objDef, wx, wz, r, c, env) {
+        let blockTex = this.textures.rock;
+        if (objDef.texture === 'brick') blockTex = this.textures.brick;
+        else if (objDef.texture && this.textures[objDef.texture]) blockTex = this.textures[objDef.texture];
+
+        const mat = this.makeLitMaterial(objDef.texture, blockTex);
+        if (objDef.jagged || objDef.texture === 'mossyStone') {
+            // Natural craggy rock height variation & slight scale offsets for natural cave look
+            const rockH = env.wallH * (0.9 + ((r * 7 + c * 13) % 10) * 0.06);
+            const rockGeo = new THREE.BoxGeometry(env.tileSize * 1.02, rockH, env.tileSize * 1.02);
+            const rock = new THREE.Mesh(rockGeo, mat);
+            rock.position.set(wx, rockH / 2, wz);
+            env.add(rock, true);
+        } else if (objDef.hasRoof) {
+            // Buildings with European pitched roofs (Village wood or City brick/stone houses)
+            const houseH = env.wallH * 0.92;
+            const houseGeo = new THREE.BoxGeometry(env.tileSize, houseH, env.tileSize);
+            const house = new THREE.Mesh(houseGeo, mat);
+            house.position.set(wx, houseH / 2, wz);
+            env.add(house, true);
+
+            // Triangular pitched roof capping the building (Slate blue for city or terracotta for village)
+            const roofH = env.tileSize * 0.48;
+            const roofGeo = new THREE.ConeGeometry(env.tileSize * 0.78, roofH, 4);
+            const roofTex = (objDef.roofTexture && this.textures[objDef.roofTexture])
+                ? this.textures[objDef.roofTexture]
+                : (this.textures.villageRoof || this.textures.brick);
+            const roofMat = new THREE.MeshLambertMaterial({ map: roofTex });
+            const roofMesh = new THREE.Mesh(roofGeo, roofMat);
+            roofMesh.rotation.y = Math.PI / 4;
+            roofMesh.position.set(wx, houseH + roofH / 2, wz);
+            env.add(roofMesh, true);
+
+            // 外に向いた壁の面に付く部品（窓・鎧戸など。objects.json の faceParts。座標は wall_deco と同じ）
+            //   faceEvery（n）があれば、(列+行) が n で割り切れるマスだけに付ける（外壁に、1マスおきに窓が並ぶ）。
+            //   隣に、位置を決めて置いた窓（faceEvery のない faceParts）があるマスには、自動では付けない
+            const faceDefAt = (cc, rr) => env.defOf(env.charAt(cc, rr));
+            const nearFixedWindow = objDef.faceEvery && [[0, -1], [1, 0], [0, 1], [-1, 0]].some(([ex, ez]) => { const nd = faceDefAt(c + ex, r + ez); return nd && nd.faceParts && !nd.faceEvery; });
+            if (objDef.faceParts && (!objDef.faceEvery || (c + r) % objDef.faceEvery === 0) && !nearFixedWindow) {
+                for (const [dx, dz] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
+                    const cc = c + dx, rr = r + dz;
+                    if (env.charAt(cc, rr) === undefined) continue;
+                    const nt = env.defOf(env.charAt(cc, rr));
+                    if (nt && ['block', 'door', 'wall_image', 'wall_deco'].includes(nt.type)) continue;
+                    const face = new THREE.Group();
+                    for (const p of objDef.faceParts) {
+                        const pm = p.basic ? new THREE.MeshBasicMaterial({ color: p.color }) : new THREE.MeshLambertMaterial({ color: p.color });
+                        const pmesh = new THREE.Mesh(new THREE.BoxGeometry(p.size[0], p.size[1], p.size[2]), pm);
+                        pmesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
+                        face.add(pmesh);
+                    }
+                    face.position.set(wx + dx * env.tileSize / 2, 0, wz + dz * env.tileSize / 2);
+                    face.rotation.y = Math.atan2(dx, dz);
+                    env.add(face, true);
+                }
+            }
+        } else {
+            const wall = new THREE.Mesh(env.standardWallGeo, mat);
+            wall.position.set(wx, env.wallH / 2, wz);
+            env.add(wall, true);
+        }
+    }
+
+    // 立て札（signpost）
+    visualSignpost(objDef, wx, wz, env) {
+        // Rustic wooden signpost sprite
+        const signMat = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.signpost });
+        const sign = new THREE.Sprite(signMat);
+        sign.center.set(0.5, 0.0);
+        const sScale = objDef.scale || [1.9, 2.0, 1.0];
+        sign.scale.set(sScale[0], sScale[1], sScale[2]);
+        sign.position.set(wx, 0.0, wz);
+        env.add(sign);
+
+    }
+
+    // 松明（torch_stand）
+    visualTorch(objDef, wx, wz, r, c, env) {
+        // 松明（燭台）: 木の柱と、炎（自ら光る箱）。周囲を照らす光源（PointLight）は置かず（GPU の上限のため）、
+        //   床に光だまり（加算合成の丸い光）と、炎のまわりの光の輪を置く。ゆらぐ（update の torchGlows）。通り抜けられる。
+        //   床の高さは、マップの heights（objDef.lift で持ち上がる）
+        const group = new THREE.Group();
+        const stake = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.5, 0.16), new THREE.MeshLambertMaterial({ color: 0x5a3b1e }));
+        stake.position.set(0, 0.75, 0);
+        group.add(stake);
+        const bowl = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.18, 0.4), new THREE.MeshLambertMaterial({ color: 0x2b2b2b }));
+        bowl.position.set(0, 1.55, 0);
+        group.add(bowl);
+        group.position.set(wx, 0, wz);
+        env.add(group, true);
+        const glowTex = this.getGlowTexture();
+        const lightColor = new THREE.Color(objDef.lightColor ?? '#ffa040');
+        const poolR = (objDef.lightRadius ?? 3.2) * env.tileSize / 2;
+        const poolOpacity = objDef.poolOpacity ?? 0.5, haloOpacity = objDef.haloOpacity ?? 0.8;
+        const pool = new THREE.Mesh(new THREE.PlaneGeometry(poolR * 2, poolR * 2), new THREE.MeshBasicMaterial({ map: glowTex, color: lightColor, transparent: true, opacity: poolOpacity, blending: THREE.AdditiveBlending, depthWrite: false }));
+        pool.rotation.x = -Math.PI / 2;
+        pool.position.set(wx, 0.05, wz);
+        env.add(pool);
+        const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: lightColor, transparent: true, opacity: haloOpacity, blending: THREE.AdditiveBlending, depthWrite: false }));
+        halo.scale.set(2.6, 2.6, 1);
+        halo.position.set(wx, 1.9, wz);
+        env.add(halo);
+        // 炎: ゆらぐので、静的な部品（addStatic で結合される）ではなく、シーンに直接追加する
+        const liveFlame = new THREE.Group();
+        const lo = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.5, 0.3), new THREE.MeshBasicMaterial({ color: 0xff8a1f }));
+        lo.position.set(0, 1.9, 0);
+        const li = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.34, 0.16), new THREE.MeshBasicMaterial({ color: 0xffe58a }));
+        li.position.set(0, 1.86, 0);
+        liveFlame.add(lo, li);
+        liveFlame.position.set(wx, 0, wz);
+        env.add(liveFlame);
+        this.torchGlows.push({ pool, halo, flame: liveFlame, poolOpacity, haloOpacity, phase: (r * 7 + c * 13) % 10 });
+    }
+
+    // 扉・門（door）の見た目。戻り値は、動かす扉の板と寸法（今のマップは、これで当たり判定と開閉を作る）
+    visualDoor(objDef, wx, wz, r, c, env) {
+        // Wall-mounted interactive door
+        // Detect wall orientation: check if walls are on Left/Right (horizontal door) or Top/Bottom (vertical door)
+        // 壁は '1'、または凡例が壁ブロック（type: block）の文字
+        const isWallChar = (ch) => ch === '1' || ['block', 'door', 'wall_deco', 'wall_image'].includes(env.defOf(ch)?.type);   // 並んだ扉は、隣の扉も壁として数える
+        const isWallLeft = isWallChar(env.charAt(c - 1, r));
+        const isWallRight = isWallChar(env.charAt(c + 1, r));
+        const isWallTop = isWallChar(env.charAt(c, r - 1));
+        const isWallBottom = isWallChar(env.charAt(c, r + 1));
+
+        const isVertical = (isWallTop || isWallBottom) && !(isWallLeft && isWallRight);
+
+        const doorMat = new THREE.MeshLambertMaterial({ map: this.textures[objDef.texture] || this.textures.door });
+        const frameMat = objDef.frameTexture && this.textures[objDef.frameTexture]
+            ? this.makeLitMaterial(objDef.frameTexture, this.textures[objDef.frameTexture])
+            : env.brickMat;
+        const doorThickness = 0.45;
+        const doorW = env.tileSize * 0.75;
+        // 扉の高さ: 壁が高い建物（大神殿など）で、扉が細長くならないよう、標準の高さで頭打ちにする。
+        //   objects.json の doorHeight で個別に指定もできる。扉の上から天井までは、枠と同じ材質のまぐさでふさぐ
+        const doorH = Math.min(env.wallH, objDef.doorHeight ?? (env.wallH <= 5 ? env.wallH : 4.5));
+        const doorGeo = new THREE.BoxGeometry(doorW, doorH, doorThickness);
+        const doorMesh = new THREE.Mesh(doorGeo, doorMat);
+
+        // Door Frame Pillars on both sides
+        const pillarW = (env.tileSize - doorW) / 2;
+        const pillarGeo = new THREE.BoxGeometry(pillarW, env.wallH, env.tileSize);
+
+        const doorGroup = new THREE.Group();
+
+        if (isVertical) {
+            // North-South passage door (oriented along Z)
+            doorMesh.rotation.y = Math.PI / 2;
+            doorMesh.position.set(0, doorH / 2, 0);
+
+            const pillar1 = new THREE.Mesh(pillarGeo, frameMat);
+            pillar1.rotation.y = Math.PI / 2;
+            pillar1.position.set(0, env.wallH / 2, -(doorW / 2 + pillarW / 2));
+
+            const pillar2 = new THREE.Mesh(pillarGeo, frameMat);
+            pillar2.rotation.y = Math.PI / 2;
+            pillar2.position.set(0, env.wallH / 2, (doorW / 2 + pillarW / 2));
+
+            doorGroup.add(doorMesh);
+            doorGroup.add(pillar1);
+            doorGroup.add(pillar2);
+        } else {
+            // East-West passage door (oriented along X)
+            doorMesh.position.set(0, doorH / 2, 0);
+
+            const pillar1 = new THREE.Mesh(pillarGeo, frameMat);
+            pillar1.position.set(-(doorW / 2 + pillarW / 2), env.wallH / 2, 0);
+
+            const pillar2 = new THREE.Mesh(pillarGeo, frameMat);
+            pillar2.position.set((doorW / 2 + pillarW / 2), env.wallH / 2, 0);
+
+            doorGroup.add(doorMesh);
+            doorGroup.add(pillar1);
+            doorGroup.add(pillar2);
+        }
+
+        // まぐさ（扉の上から天井まで）
+        if (env.wallH > doorH + 1e-6) {
+            const lintelH = env.wallH - doorH;
+            const lintel = new THREE.Mesh(new THREE.BoxGeometry(doorW, lintelH, doorThickness), frameMat);
+            if (isVertical) lintel.rotation.y = Math.PI / 2;
+            lintel.position.set(0, doorH + lintelH / 2, 0);
+            doorGroup.add(lintel);
+        }
+
+        doorGroup.position.set(wx, 0, wz);
+        env.add(doorGroup);
+
+        return { doorMesh, doorH, isVertical, doorThickness };
+    }
+
+    // 家具（furniture）の見た目。戻り値は、当たり判定の位置と大きさ
+    visualFurniture(objDef, wx, wz, r, c, env) {
+        // 家具: 箱形のパーツを組み合わせた置物（objects.json の parts。座標はマス中心からの相対）。
+        // 当たり判定は collider（幅, 奥行き）と colliderOffset（x, z）。壁に寄せた家具は offset でずらす
+        const group = new THREE.Group();
+        for (const p of objDef.parts || []) {
+            const geo = new THREE.BoxGeometry(p.size[0], p.size[1], p.size[2]);
+            const mat = p.basic
+                ? new THREE.MeshBasicMaterial({ color: p.color })
+                : new THREE.MeshLambertMaterial({ color: p.color });
+            const mesh = new THREE.Mesh(geo, mat);
+            mesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
+            group.add(mesh);
+        }
+        // 壁に寄せた家具（colliderOffset の奥行き方向が 0.5 より大きい物）は、背中が、隣の壁に付く向きに回す。
+        //   定義の向き（offset の符号の側が背中）の側に壁があれば、そのまま。なければ、北・南・西・東の順で、壁のある側へ回す
+        let fOffX = (objDef.colliderOffset || [0, 0])[0], fOffZ = (objDef.colliderOffset || [0, 0])[1];
+        let fCw = objDef.collider ? objDef.collider[0] : 0, fCd = objDef.collider ? objDef.collider[1] : 0;
+        if (Math.abs(fOffZ) > 0.5 && fOffX === 0 && objDef.autoTurn !== false) {
+            const isWallAt = (cc, rr) => {
+                if (env.charAt(cc, rr) === undefined) return false;
+                const wt = env.defOf(env.charAt(cc, rr));
+                return !!wt && ['block', 'wall_deco', 'wall_image'].includes(wt.type);
+            };
+            const own = fOffZ < 0 ? [0, -1] : [0, 1];
+            const wallDir = isWallAt(c + own[0], r + own[1]) ? own
+                : [[0, -1], [0, 1], [-1, 0], [1, 0]].find(([dx, dz]) => isWallAt(c + dx, r + dz));
+            if (wallDir) {
+                const sgn = fOffZ < 0 ? -1 : 1, depthOff = Math.abs(fOffZ);
+                group.rotation.y = Math.atan2(sgn * wallDir[0], sgn * wallDir[1]);
+                fOffX = depthOff * wallDir[0]; fOffZ = depthOff * wallDir[1];
+                if (wallDir[0] !== 0) { const t = fCw; fCw = fCd; fCd = t; }   // 東西の壁なら、当たり判定の幅と奥行きを入れ替える
+            }
+        }
+        group.position.set(wx, 0, wz);
+        env.add(group, true);
+        // 家具の上に、花などの画像（plants: 花壇の花）を植える。マスの位置から決まる配置（毎回同じ）
+        if (objDef.plants) {
+            const pl = objDef.plants;
+            const tex = this.textures[pl.texture] || this.textures.grassTuft;
+            const n = pl.count || 4;
+            for (let i = 0; i < n; i++) {
+                const h1 = Math.sin((r * 12.9898 + c * 78.233 + i * 37.719) * 43758.5453) * 43758.5453;
+                const h2 = Math.sin((r * 39.346 + c * 11.135 + i * 83.155) * 24634.6345) * 24634.6345;
+                const fx = h1 - Math.floor(h1), fz = h2 - Math.floor(h2);
+                // 2×2 のマス目の中で、少しずらす（重ならずに、花壇いっぱいに並ぶ）
+                const gx = (i % 2 ? 1 : -1) * (pl.spread / 4) + (fx - 0.5) * 0.25;
+                const gz = (i < 2 ? -1 : 1) * (pl.spread / 4) + (fz - 0.5) * 0.25;
+                const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex }));
+                sp.center.set(0.5, 0.0);
+                const k = 0.9 + fx * 0.25;
+                sp.scale.set(pl.scale[0] * k, pl.scale[1] * k, 1);
+                sp.position.set(wx + gx, (pl.y ?? 0.3), wz + gz);
+                env.add(sp);
+            }
+        }
+        return { fOffX, fOffZ, fCw, fCd };
+    }
+
     // 隣のマップ（8 方向）を、今のマップの外側に、本物のマスで描く。
     //   地形: 端から NEIGHBOR_TERRAIN_RANGE マスまで（高さの段・崖の面・地面の種類・水）。物体: 端から NEIGHBOR_OBJECT_RANGE マスまでの、木・草・岩（距離で隠す仕組みは、今のマップと同じ）。
     //   境（マップのつなぎ目）は、今のマップの端のマスの高さと、段差があれば、崖の面で埋める（隙間から空が見えない）
@@ -967,6 +1223,7 @@ export class GameEngine {
             return glowMats.get(def.glow);
         };
         // 地形の板は、1 マスごとにメッシュを作らず、材質ごとの頂点の配列にためて、最後に 1 つのメッシュにする（板が約 2 万枚になり、まとめる処理が数秒かかるため）
+        const visBrickMat = new THREE.MeshLambertMaterial({ map: this.textures.brick }), visWallGeos = new Map();   // 見た目の共通部品の、共有の材質・形
         const groups = new Map();
         const quad = (mat, TL, TR, BL, BR, n) => {
             let g = groups.get(mat);
@@ -1000,6 +1257,15 @@ export class GameEngine {
                 if (!nd?.heights || !nd.layout) continue;
                 const nrows = nd.layout.length, ncols = nd.layout[0].length;
                 const rowOff = dj * rows, colOff = di * cols;
+                // 見た目の共通部品（visualBlock など。今のマップと同じ関数）が使う環境。y は、描くマスの高さ（add が、その分だけ持ち上げる）
+                const nWallH = nd.wallHeight || mapData.wallHeight || 4;
+                const nEnv = {
+                    rows: nrows, cols: ncols, wallH: nWallH, tileSize: ts, y: 0,
+                    brickMat: visBrickMat, standardWallGeo: visWallGeos.get(nWallH) || visWallGeos.set(nWallH, new THREE.BoxGeometry(ts, nWallH, ts)).get(nWallH),
+                    charAt: (cc, rr) => nd.layout[rr]?.[cc],
+                    defOf: (ch) => this.objectDefinitions?.[nd.legend?.[ch]],
+                    add: (o, isStatic) => { o.position.y += nEnv.y; if (isStatic) o.userData.static = true; this.scene.add(o); }
+                };
                 for (let r = 0; r < nrows; r++) {
                     for (let c = 0; c < ncols; c++) {
                         const gr = rowOff + r, gc = colOff + c;
@@ -1032,6 +1298,11 @@ export class GameEngine {
                         flat(matFor(topMats, lv, 1.0, ft), wx, lv * step, wz);
                         if (def?.type === 'bridge_deck') {   // 吊橋: 床の板（高さは heights）
                             flat(waterMats.deck, wx, (parseInt(nd.heights[r][c], 36) || 0) * step + 0.02, wz);
+                        }
+                        if (def?.type === 'floor_tile' && !(def.elevation > 0)) {   // 床（石畳の街道・街の門前の石畳）: その物体の画像で、地面の上に平らに敷く（切り替えの前から、道が見える）
+                            if (!waterMats.floors) waterMats.floors = new Map();
+                            if (!waterMats.floors.has(def.texture)) waterMats.floors.set(def.texture, new THREE.MeshLambertMaterial({ map: this.textures[def.texture] || this.textures.sand }));
+                            flat(waterMats.floors.get(def.texture), wx, lv * step + 0.01, wz);
                         }
                         // 崖・段の側面: 低い隣へ（隣が、このマップの中の、今のマップの端のマスなら、高いほうから、低いほうへ）
                         for (const [dx, dz, rotY] of dirs) {
@@ -1090,6 +1361,11 @@ export class GameEngine {
                                 sprite.updateMatrix(); sprite.matrixAutoUpdate = false;
                                 this.cullSprites.push(sprite);
                             }
+                        } else if (def.type === 'block') { nEnv.y = y0; this.visualBlock(def, wx, wz, r, c, nEnv);   // 壁・家（街の外観など）: 今のマップと同じ見た目
+                        } else if (def.type === 'signpost') { nEnv.y = y0; this.visualSignpost(def, wx, wz, nEnv);
+                        } else if (def.type === 'torch_stand') { nEnv.y = y0; this.visualTorch(def, wx, wz, r, c, nEnv);
+                        } else if (def.type === 'door') { nEnv.y = y0; this.visualDoor(def, wx, wz, r, c, nEnv);   // 扉・門: 閉じたまま（開閉・当たり判定は今のマップだけ）
+                        } else if (def.type === 'furniture') { nEnv.y = y0; this.visualFurniture(def, wx, wz, r, c, nEnv);
                         } else if (def.type === 'boulder') {
                             const b = new THREE.Sprite(new THREE.SpriteMaterial({ map: this.textures[def.texture] || this.textures.boulder }));
                             b.center.set(0.5, 0.0);
@@ -1314,6 +1590,13 @@ export class GameEngine {
         // Spawn objects based on map layout & legend
         // 起伏のあるマップ: 高くなっているマスに置く、木・草・壁などは、そのマスの高さだけ持ち上げて置く（scene.add を、その間だけ差し替える）
         const LIFT_TYPES = new Set(['block', 'tree', 'boulder', 'plant', 'tree_wall', 'furniture', 'floor_tile', 'wooden_fence', 'chest', 'portal']);   // 高低差のあるマスで、そのマスの高さまで持ち上げる種類。宝箱・ポータルも（高台で、床に埋まらない）
+        // 見た目の共通部品（visualBlock など。隣のマップの先読み描画 buildNeighborDecor と共通）が使う、今のマップの環境
+        const visEnv = {
+            rows, cols, wallH, tileSize, brickMat, standardWallGeo,
+            charAt: (cc, rr) => mapData.layout[rr]?.[cc],
+            defOf: (ch) => this.objectDefinitions[mapData.legend?.[ch]],
+            add: (o, isStatic) => { if (isStatic) o.userData.static = true; this.scene.add(o); }
+        };
         const origSceneAdd = this.scene.add;
         const unlift = () => { if (this.scene.add !== origSceneAdd) this.scene.add = origSceneAdd; };
         // 地面の影の元（マップを作り終えたあと、buildGroundShadows が、InstancedMesh にまとめる）: 丸い影（単体の物）と、壁の足元の帯
@@ -1375,66 +1658,7 @@ export class GameEngine {
 
                 switch (objDef.type) {
                     case 'block': {
-                        let blockTex = this.textures.rock;
-                        if (objDef.texture === 'brick') blockTex = this.textures.brick;
-                        else if (objDef.texture && this.textures[objDef.texture]) blockTex = this.textures[objDef.texture];
-
-                        const mat = this.makeLitMaterial(objDef.texture, blockTex);
-                        if (objDef.jagged || objDef.texture === 'mossyStone') {
-                            // Natural craggy rock height variation & slight scale offsets for natural cave look
-                            const rockH = wallH * (0.9 + ((r * 7 + c * 13) % 10) * 0.06);
-                            const rockGeo = new THREE.BoxGeometry(tileSize * 1.02, rockH, tileSize * 1.02);
-                            const rock = new THREE.Mesh(rockGeo, mat);
-                            rock.position.set(wx, rockH / 2, wz);
-                            this.addStatic(rock);
-                        } else if (objDef.hasRoof) {
-                            // Buildings with European pitched roofs (Village wood or City brick/stone houses)
-                            const houseH = wallH * 0.92;
-                            const houseGeo = new THREE.BoxGeometry(tileSize, houseH, tileSize);
-                            const house = new THREE.Mesh(houseGeo, mat);
-                            house.position.set(wx, houseH / 2, wz);
-                            this.addStatic(house);
-
-                            // Triangular pitched roof capping the building (Slate blue for city or terracotta for village)
-                            const roofH = tileSize * 0.48;
-                            const roofGeo = new THREE.ConeGeometry(tileSize * 0.78, roofH, 4);
-                            const roofTex = (objDef.roofTexture && this.textures[objDef.roofTexture])
-                                ? this.textures[objDef.roofTexture]
-                                : (this.textures.villageRoof || this.textures.brick);
-                            const roofMat = new THREE.MeshLambertMaterial({ map: roofTex });
-                            const roofMesh = new THREE.Mesh(roofGeo, roofMat);
-                            roofMesh.rotation.y = Math.PI / 4;
-                            roofMesh.position.set(wx, houseH + roofH / 2, wz);
-                            this.addStatic(roofMesh);
-
-                            // 外に向いた壁の面に付く部品（窓・鎧戸など。objects.json の faceParts。座標は wall_deco と同じ）
-                            //   faceEvery（n）があれば、(列+行) が n で割り切れるマスだけに付ける（外壁に、1マスおきに窓が並ぶ）。
-                            //   隣に、位置を決めて置いた窓（faceEvery のない faceParts）があるマスには、自動では付けない
-                            const faceDefAt = (cc, rr) => this.objectDefinitions[mapData.legend?.[mapData.layout[rr]?.[cc]]];
-                            const nearFixedWindow = objDef.faceEvery && [[0, -1], [1, 0], [0, 1], [-1, 0]].some(([ex, ez]) => { const nd = faceDefAt(c + ex, r + ez); return nd && nd.faceParts && !nd.faceEvery; });
-                            if (objDef.faceParts && (!objDef.faceEvery || (c + r) % objDef.faceEvery === 0) && !nearFixedWindow) {
-                                for (const [dx, dz] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
-                                    const cc = c + dx, rr = r + dz;
-                                    if (cc < 0 || rr < 0 || cc >= cols || rr >= rows) continue;
-                                    const nt = this.objectDefinitions[mapData.legend?.[mapData.layout[rr][cc]]];
-                                    if (nt && ['block', 'door', 'wall_image', 'wall_deco'].includes(nt.type)) continue;
-                                    const face = new THREE.Group();
-                                    for (const p of objDef.faceParts) {
-                                        const pm = p.basic ? new THREE.MeshBasicMaterial({ color: p.color }) : new THREE.MeshLambertMaterial({ color: p.color });
-                                        const pmesh = new THREE.Mesh(new THREE.BoxGeometry(p.size[0], p.size[1], p.size[2]), pm);
-                                        pmesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
-                                        face.add(pmesh);
-                                    }
-                                    face.position.set(wx + dx * tileSize / 2, 0, wz + dz * tileSize / 2);
-                                    face.rotation.y = Math.atan2(dx, dz);
-                                    this.addStatic(face);
-                                }
-                            }
-                        } else {
-                            const wall = new THREE.Mesh(standardWallGeo, mat);
-                            wall.position.set(wx, wallH / 2, wz);
-                            this.addStatic(wall);
-                        }
+                        this.visualBlock(objDef, wx, wz, r, c, visEnv);
                         if (objDef.solid) {
                             this.colliders.push({
                                 minX: wx - tileSize / 2,
@@ -1740,14 +1964,7 @@ export class GameEngine {
                     }
 
                     case 'signpost': {
-                        // Rustic wooden signpost sprite
-                        const signMat = new THREE.SpriteMaterial({ map: this.textures[objDef.texture] || this.textures.signpost });
-                        const sign = new THREE.Sprite(signMat);
-                        sign.center.set(0.5, 0.0);
-                        const sScale = objDef.scale || [1.9, 2.0, 1.0];
-                        sign.scale.set(sScale[0], sScale[1], sScale[2]);
-                        sign.position.set(wx, 0.0, wz);
-                        this.scene.add(sign);
+                        this.visualSignpost(objDef, wx, wz, visEnv);
 
                         if (objDef.solid) {
                             const rad = objDef.radius || 0.5;
@@ -2299,40 +2516,7 @@ export class GameEngine {
                     }
 
                     case 'torch_stand': {
-                        // 松明（燭台）: 木の柱と、炎（自ら光る箱）。周囲を照らす光源（PointLight）は置かず（GPU の上限のため）、
-                        //   床に光だまり（加算合成の丸い光）と、炎のまわりの光の輪を置く。ゆらぐ（update の torchGlows）。通り抜けられる。
-                        //   床の高さは、マップの heights（objDef.lift で持ち上がる）
-                        const group = new THREE.Group();
-                        const stake = new THREE.Mesh(new THREE.BoxGeometry(0.16, 1.5, 0.16), new THREE.MeshLambertMaterial({ color: 0x5a3b1e }));
-                        stake.position.set(0, 0.75, 0);
-                        group.add(stake);
-                        const bowl = new THREE.Mesh(new THREE.BoxGeometry(0.4, 0.18, 0.4), new THREE.MeshLambertMaterial({ color: 0x2b2b2b }));
-                        bowl.position.set(0, 1.55, 0);
-                        group.add(bowl);
-                        group.position.set(wx, 0, wz);
-                        this.addStatic(group);
-                        const glowTex = this.getGlowTexture();
-                        const lightColor = new THREE.Color(objDef.lightColor ?? '#ffa040');
-                        const poolR = (objDef.lightRadius ?? 3.2) * tileSize / 2;
-                        const poolOpacity = objDef.poolOpacity ?? 0.5, haloOpacity = objDef.haloOpacity ?? 0.8;
-                        const pool = new THREE.Mesh(new THREE.PlaneGeometry(poolR * 2, poolR * 2), new THREE.MeshBasicMaterial({ map: glowTex, color: lightColor, transparent: true, opacity: poolOpacity, blending: THREE.AdditiveBlending, depthWrite: false }));
-                        pool.rotation.x = -Math.PI / 2;
-                        pool.position.set(wx, 0.05, wz);
-                        this.scene.add(pool);
-                        const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTex, color: lightColor, transparent: true, opacity: haloOpacity, blending: THREE.AdditiveBlending, depthWrite: false }));
-                        halo.scale.set(2.6, 2.6, 1);
-                        halo.position.set(wx, 1.9, wz);
-                        this.scene.add(halo);
-                        // 炎: ゆらぐので、静的な部品（addStatic で結合される）ではなく、シーンに直接追加する
-                        const liveFlame = new THREE.Group();
-                        const lo = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.5, 0.3), new THREE.MeshBasicMaterial({ color: 0xff8a1f }));
-                        lo.position.set(0, 1.9, 0);
-                        const li = new THREE.Mesh(new THREE.BoxGeometry(0.16, 0.34, 0.16), new THREE.MeshBasicMaterial({ color: 0xffe58a }));
-                        li.position.set(0, 1.86, 0);
-                        liveFlame.add(lo, li);
-                        liveFlame.position.set(wx, 0, wz);
-                        this.scene.add(liveFlame);
-                        this.torchGlows.push({ pool, halo, flame: liveFlame, poolOpacity, haloOpacity, phase: (r * 7 + c * 13) % 10 });
+                        this.visualTorch(objDef, wx, wz, r, c, visEnv);
                         break;
                     }
 
@@ -2512,80 +2696,10 @@ export class GameEngine {
                     }
 
                     case 'door': {
-                        // Wall-mounted interactive door
-                        // Detect wall orientation: check if walls are on Left/Right (horizontal door) or Top/Bottom (vertical door)
-                        // 壁は '1'、または凡例が壁ブロック（type: block）の文字
-                        const isWallChar = (ch) => ch === '1' || ['block', 'door', 'wall_deco', 'wall_image'].includes(this.objectDefinitions[mapData.legend?.[ch]]?.type);   // 並んだ扉は、隣の扉も壁として数える
-                        const isWallLeft = (c > 0 && isWallChar(mapData.layout[r][c - 1]));
-                        const isWallRight = (c < cols - 1 && isWallChar(mapData.layout[r][c + 1]));
-                        const isWallTop = (r > 0 && isWallChar(mapData.layout[r - 1][c]));
-                        const isWallBottom = (r < rows - 1 && isWallChar(mapData.layout[r + 1][c]));
-
-                        const isVertical = (isWallTop || isWallBottom) && !(isWallLeft && isWallRight);
-
-                        const doorMat = new THREE.MeshLambertMaterial({ map: this.textures[objDef.texture] || this.textures.door });
-                        const frameMat = objDef.frameTexture && this.textures[objDef.frameTexture]
-                            ? this.makeLitMaterial(objDef.frameTexture, this.textures[objDef.frameTexture])
-                            : brickMat;
+                        const { doorMesh, doorH, isVertical, doorThickness } = this.visualDoor(objDef, wx, wz, r, c, visEnv);
                         // 屋内の戸口は、床と天井もつける
                         if (objDef.floorTexture) this.addFloorTile(wx, wz, tileSize, objDef.floorTexture);
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
-                        const doorThickness = 0.45;
-                        const doorW = tileSize * 0.75;
-                        // 扉の高さ: 壁が高い建物（大神殿など）で、扉が細長くならないよう、標準の高さで頭打ちにする。
-                        //   objects.json の doorHeight で個別に指定もできる。扉の上から天井までは、枠と同じ材質のまぐさでふさぐ
-                        const doorH = Math.min(wallH, objDef.doorHeight ?? (wallH <= 5 ? wallH : 4.5));
-                        const doorGeo = new THREE.BoxGeometry(doorW, doorH, doorThickness);
-                        const doorMesh = new THREE.Mesh(doorGeo, doorMat);
-
-                        // Door Frame Pillars on both sides
-                        const pillarW = (tileSize - doorW) / 2;
-                        const pillarGeo = new THREE.BoxGeometry(pillarW, wallH, tileSize);
-
-                        const doorGroup = new THREE.Group();
-
-                        if (isVertical) {
-                            // North-South passage door (oriented along Z)
-                            doorMesh.rotation.y = Math.PI / 2;
-                            doorMesh.position.set(0, doorH / 2, 0);
-
-                            const pillar1 = new THREE.Mesh(pillarGeo, frameMat);
-                            pillar1.rotation.y = Math.PI / 2;
-                            pillar1.position.set(0, wallH / 2, -(doorW / 2 + pillarW / 2));
-
-                            const pillar2 = new THREE.Mesh(pillarGeo, frameMat);
-                            pillar2.rotation.y = Math.PI / 2;
-                            pillar2.position.set(0, wallH / 2, (doorW / 2 + pillarW / 2));
-
-                            doorGroup.add(doorMesh);
-                            doorGroup.add(pillar1);
-                            doorGroup.add(pillar2);
-                        } else {
-                            // East-West passage door (oriented along X)
-                            doorMesh.position.set(0, doorH / 2, 0);
-
-                            const pillar1 = new THREE.Mesh(pillarGeo, frameMat);
-                            pillar1.position.set(-(doorW / 2 + pillarW / 2), wallH / 2, 0);
-
-                            const pillar2 = new THREE.Mesh(pillarGeo, frameMat);
-                            pillar2.position.set((doorW / 2 + pillarW / 2), wallH / 2, 0);
-
-                            doorGroup.add(doorMesh);
-                            doorGroup.add(pillar1);
-                            doorGroup.add(pillar2);
-                        }
-
-                        // まぐさ（扉の上から天井まで）
-                        if (wallH > doorH + 1e-6) {
-                            const lintelH = wallH - doorH;
-                            const lintel = new THREE.Mesh(new THREE.BoxGeometry(doorW, lintelH, doorThickness), frameMat);
-                            if (isVertical) lintel.rotation.y = Math.PI / 2;
-                            lintel.position.set(0, doorH + lintelH / 2, 0);
-                            doorGroup.add(lintel);
-                        }
-
-                        doorGroup.position.set(wx, 0, wz);
-                        this.scene.add(doorGroup);
 
                         // Collider entry that can be opened/removed
                         const collider = {
@@ -2624,60 +2738,7 @@ export class GameEngine {
                     }
 
                     case 'furniture': {
-                        // 家具: 箱形のパーツを組み合わせた置物（objects.json の parts。座標はマス中心からの相対）。
-                        // 当たり判定は collider（幅, 奥行き）と colliderOffset（x, z）。壁に寄せた家具は offset でずらす
-                        const group = new THREE.Group();
-                        for (const p of objDef.parts || []) {
-                            const geo = new THREE.BoxGeometry(p.size[0], p.size[1], p.size[2]);
-                            const mat = p.basic
-                                ? new THREE.MeshBasicMaterial({ color: p.color })
-                                : new THREE.MeshLambertMaterial({ color: p.color });
-                            const mesh = new THREE.Mesh(geo, mat);
-                            mesh.position.set(p.pos[0], p.pos[1], p.pos[2]);
-                            group.add(mesh);
-                        }
-                        // 壁に寄せた家具（colliderOffset の奥行き方向が 0.5 より大きい物）は、背中が、隣の壁に付く向きに回す。
-                        //   定義の向き（offset の符号の側が背中）の側に壁があれば、そのまま。なければ、北・南・西・東の順で、壁のある側へ回す
-                        let fOffX = (objDef.colliderOffset || [0, 0])[0], fOffZ = (objDef.colliderOffset || [0, 0])[1];
-                        let fCw = objDef.collider ? objDef.collider[0] : 0, fCd = objDef.collider ? objDef.collider[1] : 0;
-                        if (Math.abs(fOffZ) > 0.5 && fOffX === 0 && objDef.autoTurn !== false) {
-                            const isWallAt = (cc, rr) => {
-                                if (cc < 0 || rr < 0 || cc >= cols || rr >= rows) return false;
-                                const wt = this.objectDefinitions[mapData.legend?.[mapData.layout[rr][cc]]];
-                                return !!wt && ['block', 'wall_deco', 'wall_image'].includes(wt.type);
-                            };
-                            const own = fOffZ < 0 ? [0, -1] : [0, 1];
-                            const wallDir = isWallAt(c + own[0], r + own[1]) ? own
-                                : [[0, -1], [0, 1], [-1, 0], [1, 0]].find(([dx, dz]) => isWallAt(c + dx, r + dz));
-                            if (wallDir) {
-                                const sgn = fOffZ < 0 ? -1 : 1, depthOff = Math.abs(fOffZ);
-                                group.rotation.y = Math.atan2(sgn * wallDir[0], sgn * wallDir[1]);
-                                fOffX = depthOff * wallDir[0]; fOffZ = depthOff * wallDir[1];
-                                if (wallDir[0] !== 0) { const t = fCw; fCw = fCd; fCd = t; }   // 東西の壁なら、当たり判定の幅と奥行きを入れ替える
-                            }
-                        }
-                        group.position.set(wx, 0, wz);
-                        this.addStatic(group);
-                        // 家具の上に、花などの画像（plants: 花壇の花）を植える。マスの位置から決まる配置（毎回同じ）
-                        if (objDef.plants) {
-                            const pl = objDef.plants;
-                            const tex = this.textures[pl.texture] || this.textures.grassTuft;
-                            const n = pl.count || 4;
-                            for (let i = 0; i < n; i++) {
-                                const h1 = Math.sin((r * 12.9898 + c * 78.233 + i * 37.719) * 43758.5453) * 43758.5453;
-                                const h2 = Math.sin((r * 39.346 + c * 11.135 + i * 83.155) * 24634.6345) * 24634.6345;
-                                const fx = h1 - Math.floor(h1), fz = h2 - Math.floor(h2);
-                                // 2×2 のマス目の中で、少しずらす（重ならずに、花壇いっぱいに並ぶ）
-                                const gx = (i % 2 ? 1 : -1) * (pl.spread / 4) + (fx - 0.5) * 0.25;
-                                const gz = (i < 2 ? -1 : 1) * (pl.spread / 4) + (fz - 0.5) * 0.25;
-                                const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: tex }));
-                                sp.center.set(0.5, 0.0);
-                                const k = 0.9 + fx * 0.25;
-                                sp.scale.set(pl.scale[0] * k, pl.scale[1] * k, 1);
-                                sp.position.set(wx + gx, (pl.y ?? 0.3), wz + gz);
-                                this.scene.add(sp);
-                            }
-                        }
+                        const { fOffX, fOffZ, fCw, fCd } = this.visualFurniture(objDef, wx, wz, r, c, visEnv);
                         const furnitureFloor = objDef.floorTexture ?? mapData.decorFloor;   // 屋外の街では、飾りの下も石畳（map の decorFloor）
                         if (furnitureFloor) this.addFloorTile(wx, wz, tileSize, furnitureFloor);
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
