@@ -139,9 +139,23 @@ def fork_sign(t, obj, network, junction, towns):
         name = COMPASS[((1 if vy > 0 else -1), 0)] if abs(vy) > abs(vx) else COMPASS[(0, (1 if vx > 0 else -1))]
         if found: arms[name] = '・'.join(sorted(set(arms.get(name, '').split('・') + found) - {''}))
     msg = ' / '.join(f'{d}: {arms[d]}' for d in COMPASS_ORDER if d in arms)
-    for dy, dx in ((3, 3), (3, -3), (-3, 3), (-3, -3)):   # 道の外（中心線から 3 マス）の、斜めの空きマス
-        y, x = jy + dy, jx + dx
-        if t['land'][y, x] and not (t['deep'][y, x] or t['shallow'][y, x] or t['bridge'][y, x]) and chr(obj[y, x]) not in (ROAD_CH, BRIDGE_CH):
+    # 置く場所: 分かれ道のそばの、90 度の曲がり角（＿｜の形）の、外側のすぐわき（道の縁に接する空きマス）
+    def free(y, x):
+        return t['land'][y, x] and not (t['deep'][y, x] or t['shallow'][y, x] or t['bridge'][y, x]) and chr(obj[y, x]) not in (ROAD_CH, BRIDGE_CH)
+    corners = []
+    for (y, x) in network:
+        if abs(y - jy) + abs(x - jx) > 24: continue
+        nb = {d for d in COMPASS if (y + d[0], x + d[1]) in network}
+        if len(nb) == 2 and any(d[0] for d in nb) and any(d[1] for d in nb):   # 縦と横の隣が 1 つずつ（直角）
+            vy = next(d[0] for d in nb if d[0]); vx = next(d[1] for d in nb if d[1])
+            corners.append((abs(y - jy) + abs(x - jx), y, x, -vy, -vx))   # 外側は、腕の反対（-vy, -vx）
+    cands = []
+    for _, cy, cx, oy, ox in sorted(corners):
+        # 道は幅 3（中心線の両側 1 マス）。縁に接するのは、外側へ 2 マスのところ
+        cands += [(cy + oy, cx + 2 * ox), (cy + 2 * oy, cx + ox), (cy + 2 * oy, cx + 2 * ox)]
+    cands += [(jy + 2 * dy, jx + 2 * dx) for dy, dx in ((1, 1), (1, -1), (-1, 1), (-1, -1))]   # 曲がり角がなければ、分かれ道の斜め
+    for y, x in cands:
+        if free(y, x):
             obj[y, x] = ord(SIGN_CH)
             return (y, x), msg
     raise AssertionError(f'道しるべを置く空きマスがない {junction}')

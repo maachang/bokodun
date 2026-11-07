@@ -1535,7 +1535,7 @@ test('街道: D と H の門前の石畳を、石畳の道（paved_road・幅 3�
         for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
             const nb = tiles.get(`${x + dx},${y + dy}`);
             const d = nb && objects[nb.name];
-            if (d && d.solid && d.type !== 'liquid_tile' && d.type !== 'sea_tile' && !nb.name.startsWith('town_sign') && !['city_wall', 'district_gate', 'brick_house'].includes(nb.name)) assert.fail(`${k}: 道のわきに ${nb.name}`);
+            if (d && d.solid && d.type !== 'liquid_tile' && d.type !== 'sea_tile' && !nb.name.startsWith('town_sign') && nb.name !== 'road_sign' && !['city_wall', 'district_gate', 'brick_house'].includes(nb.name)) assert.fail(`${k}: 道のわきに ${nb.name}`);
         }
     }
 });
@@ -1599,6 +1599,7 @@ test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つ�
     for (const name of ['グリーン王国', 'ダマスカス自治領', 'ガリレオ連盟']) assert.ok(msg.includes(name), `${name} が書いてある`);
     assert.match(msg, /北: .*西: .*東: /, '方角（北・西・東）と行き先');
     assert.ok(!road.has(`${x},${y}`), '道の上ではない');
-    assert.ok([...road].some(k => { const [rx, ry] = k.split(',').map(Number); return Math.abs(rx - x) <= 4 && Math.abs(ry - y) <= 4; }), '分かれ道のそば');
+    assert.ok([...road].some(k => { const [rx, ry] = k.split(',').map(Number); return Math.abs(rx - x) + Math.abs(ry - y) === 1; }), '道の縁のすぐわき（道に接する）');
+    assert.ok([...road].filter(k => { const [rx, ry] = k.split(',').map(Number); return Math.abs(rx - x) <= 2 && Math.abs(ry - y) <= 2; }).length >= 6, '90 度の曲がり角のそば（道が、縦にも横にも、まわりにある）');
 });
 
