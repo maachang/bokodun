@@ -12,6 +12,7 @@ import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import terrain as T
 import town_d as TD
+import town_h as TH
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
 
 ROOT = T.ROOT
@@ -404,8 +405,8 @@ def mesh_name(row, col, biome_counts, sea_frac, mine=False):
     return f'{base} ({row + 1}-{col + 1})'
 
 
-# 街の中（枠だけ）の大きさ（マス）: 候補地ごと。B は大国の都、H は辺境の小さな街
-TOWN_SIZE = {'a': (32, 26), 'b': (48, 36), 'c': (40, 30), 'd': (40, 30), 'e': (32, 26), 'f': (40, 30), 'g': (32, 26), 'h': (28, 22)}
+# 街の中の大きさ（マス）: 候補地ごと。B は大国の都、H は辺境の小さな街（枠だけの街は town_layout・D と H は専用の build）
+TOWN_SIZE = {'a': (32, 26), 'b': (48, 36), 'c': (40, 30), 'd': (40, 30), 'e': (32, 26), 'f': (40, 30), 'g': (32, 26), 'h': (36, 26)}
 START_TOWN = 'd'   # ゲーム開始の街（グリーン王国・平野の最初の街）。開始位置はその門の前（ユーザー指定）
 TOWN_NAME = {'a': 'キュラビッド帝国', 'b': 'フランケル聖国', 'c': 'ミレニアム自由都市', 'd': 'グリーン王国', 'e': 'ガリレオ連盟', 'f': 'ライアン獣王国', 'g': 'デイラミ精霊国', 'h': 'ダマスカス自治領'}   # 国の名前（ユーザー指定）
 TOWN_SIGN_CH = 'À'   # 街の名前の立て札の文字（外のマップごとに、凡例で town_sign_<街ID> に割り当てる）
@@ -489,8 +490,8 @@ def gen_towns(t, city_legend, env):
              'spawn': {'x': w // 2, 'z': h - 3, 'angle': 0}, 'environment': env, 'decorFloor': 'cobblestone', 'enemies': {},
              'legend': {k: city_legend[k] for k in TOWN_LEGEND_KEYS}, 'layout': layout, 'npcs': [], 'links': links,
              'heights': ['0' * w for _ in range(h)], 'heightStep': 0.5}
-        if site['id'] == START_TOWN:   # 最初の街（D）は、施設・街の人を置く（scripts/world/town_d.py）
-            m['layout'], m['heights'] = TD.build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
+        if site['id'] in ('d', 'h'):   # D（最初の街）と H は、施設・街の人・高低・川を置く（scripts/world/town_d.py・town_h.py）
+            m['layout'], m['heights'] = (TD if site['id'] == 'd' else TH).build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
 

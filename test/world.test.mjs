@@ -1451,3 +1451,28 @@ test('D（グリーン王国）: 川と橋・高台・神殿（幅 2 倍）・�
         if (c + dc < 40 && r + dr < 30 && walk(c, r) && walk(c + dc, r + dr)) assert.ok(Math.abs(lv(c, r) - lv(c + dc, r + dr)) <= 1, `(${c},${r}) 段差が 2 以上`);
     }
 });
+
+test('H（ダマスカス自治領・辺境の街）: 施設 6 つ＋自治領主の館（城はない）。川と橋・高台。段差は 1 ずつ。街の人 5〜8 人', () => {
+    const t = readJson('public/data/maps/town_h.json');
+    const npcDefs = readJson('public/data/npcs.json');
+    const at = (c, r) => objects[t.legend[t.layout[r][c]]];
+    const lv = (c, r) => parseInt(t.heights[r][c], 36);
+    const doors = Object.entries(t.links).filter(([k]) => at(...k.split(',').map(Number))?.type === 'door' && t.legend[t.layout[+k.split(',')[1]][+k.split(',')[0]]] !== 'district_gate');
+    assert.deepEqual(doors.map(([, l]) => l.nextMap).sort(), ['city_inn', 'guild_adv', 'guild_training', 'mansion_margrave', 'shop', 'shop', 'temple']);
+    assert.ok(!doors.some(([, l]) => l.nextMap === 'castle'), '城はない');
+    for (const [key, l] of doors) {
+        const [c, r] = key.split(',').map(Number);
+        assert.ok(fs.existsSync(path.join(root, `public/data/maps/${l.nextMap}.json`)), `${l.nextMap}: 中のマップがある`);
+        assert.deepEqual([l.back.x, l.back.z], [c, r + 1]);
+        assert.ok(!at(c, r + 1)?.solid, `(${c},${r}): 扉の前が歩ける`);
+    }
+    assert.ok(t.layout.some(row => row.includes('w')) && t.layout.some(row => row.includes('b')), '川と橋');
+    assert.equal(t.layout.length, 26); assert.equal(t.layout[0].length, 36);
+    assert.equal(lv(29, 6), 3); assert.equal(lv(22, 12), 3);   // 館・神殿は高台
+    assert.ok(t.npcs.length >= 5 && t.npcs.length <= 8);
+    for (const n of t.npcs) { assert.ok(npcDefs[n.id], n.id); assert.ok(!at(n.x, n.z)?.solid, `${n.id}: 歩ける所`); }
+    const walk = (c, r) => { const d = at(c, r); return !d?.solid && d?.type !== 'liquid_tile' && d?.type !== 'door'; };
+    for (let r = 0; r < 26; r++) for (let c = 0; c < 36; c++) for (const [dc, dr] of [[1, 0], [0, 1]]) {
+        if (c + dc < 36 && r + dr < 26 && walk(c, r) && walk(c + dc, r + dr)) assert.ok(Math.abs(lv(c, r) - lv(c + dc, r + dr)) <= 1, `(${c},${r}) 段差が 2 以上`);
+    }
+});

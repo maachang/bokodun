@@ -6352,6 +6352,7 @@
     "description": "カーテンつきの窓（壁の面に付く。窓の両側に赤いカーテン。壁の高さ5用）"
   },
   "mansion_door": {
+    "lift": true,
     "type": "door",
     "texture": "woodDoor",
     "frameTexture": "cityWall",

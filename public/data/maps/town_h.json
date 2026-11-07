@@ -5,8 +5,8 @@
  "tileSize": 4,
  "wallHeight": 4,
  "spawn": {
-  "x": 14,
-  "z": 19,
+  "x": 18,
+  "z": 23,
   "angle": 0
  },
  "environment": {
@@ -31,35 +31,90 @@
   "f": "flower_bed",
   "v": "flower_bed_blue",
   "F": "plaza_fountain",
-  "G": "district_gate"
+  "G": "district_gate",
+  "Y": "mansion_door",
+  "S": "shop_building",
+  "I": "inn_building",
+  "J": "temple_building",
+  "d": "shop_door",
+  "N": "inn_door",
+  "D": "temple_door",
+  "M": "inn_sign",
+  "Q": "weapon_shop_sign",
+  "q": "item_shop_sign",
+  "a": "adventurer_guild_sign",
+  "r": "training_sign",
+  "c": "church_sign",
+  "w": "water",
+  "b": "wood_bridge"
  },
  "layout": [
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "Wppppppppppp====pppppppppppW",
-  "WpHHHHpHHHHp====pHHHHpHHHHpW",
-  "WpHHHHpHHHHp====pHHHHpHHHHpW",
-  "WpHHHHpHHHHp====pHHHHpHHHHpW",
-  "Wppppppppppp====pppppppppppW",
-  "WpHHHHpppppp====ppppppHHHHpW",
-  "WpHHHHppppppppppppppppHHHHpW",
-  "WpHHHHpppfppppppppfpppHHHHpW",
-  "WppppppppppppppppppppppppppW",
-  "W=======pppppFFppppp=======W",
-  "W=======pppppFFppppp=======W",
-  "W=======pppppppppppp=======W",
-  "WppppppppfppppppppfppppppppW",
-  "WpHHHHppppTppppppTppppHHHHpW",
-  "WpHHHHpppppp====ppppppHHHHpW",
-  "WpHHHHpppppp====ppppppHHHHpW",
-  "Wppppppppppp====pppppppppppW",
-  "Wppppppppppp====pppppppppppW",
-  "WpTppppppppp====pppppppppTpW",
-  "Wppppppppppp====pppppppppppW",
-  "WWWWWWWWWWWWWGGWWWWWWWWWWWWW"
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WpTppppppppppTpw====pppppppppppppppW",
+  "Wppppppppppppppw====pppppppppppppppW",
+  "WpSSSSpSSSSppppw====pSSSSpHHHHHHHHpW",
+  "WpSSSSpSSSSppppw====pSSSSpHHHHHHHHpW",
+  "WpSdSSpSdSSppppw====pSdSSpHHHYHHHHpW",
+  "W===Q====q=====b=======a===========W",
+  "W==============b===================W",
+  "Wppppppppppppppw====pppppppppppppppW",
+  "Wppppppppppppppw====pppppppppppppppW",
+  "WpIIIIpSSSSppppw=FF=vJJJJpppHHHHpppW",
+  "WpIIIIpSSSSpfvpw=FF=fJJJJpppHHHHpppW",
+  "WpINIIpSdSSppppw====pJDJJpppHHHHpppW",
+  "W===M====r=====b=======c===========W",
+  "W==============b===================W",
+  "Wppppppppppppppw====pppppppppppppppW",
+  "Wppppppppppppppw====pppppppppppppppW",
+  "WpHHHHpHHHHppppw====pHHHHpHHHHpHHHHW",
+  "WpHHHHpHHHHppppw====pHHHHpHHHHpHHHHW",
+  "WpHHHHpHHHHppppw====pHHHHpHHHHpHHHHW",
+  "Wppppppppppppppw====pppppppppppppppW",
+  "Wppppppppppppppb====pppppppppppppppW",
+  "Wppppppppppppppb====pppppppppppppppW",
+  "WpTppppppppppTpw====pppppppppppppTpW",
+  "Wppppppppppppppw====pppppppppppppppW",
+  "WWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWW"
  ],
- "npcs": [],
+ "npcs": [
+  {
+   "id": "town_man",
+   "x": 5,
+   "z": 8
+  },
+  {
+   "id": "junior_merchant_man",
+   "x": 13,
+   "z": 14
+  },
+  {
+   "id": "elder_man",
+   "x": 23,
+   "z": 8
+  },
+  {
+   "id": "child_boy",
+   "x": 12,
+   "z": 16
+  },
+  {
+   "id": "town_middle_man",
+   "x": 28,
+   "z": 14
+  },
+  {
+   "id": "guard_spear",
+   "x": 16,
+   "z": 24
+  },
+  {
+   "id": "guard_light",
+   "x": 19,
+   "z": 24
+  }
+ ],
  "links": {
-  "13,21": {
+  "17,25": {
    "nextMap": "w_11_06",
    "message": "ダマスカス自治領の外へ",
    "spawn": {
@@ -68,7 +123,7 @@
     "angle": 3.14159
    }
   },
-  "14,21": {
+  "18,25": {
    "nextMap": "w_11_06",
    "message": "ダマスカス自治領の外へ",
    "spawn": {
@@ -76,31 +131,110 @@
     "z": 30,
     "angle": 3.14159
    }
+  },
+  "3,5": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 3,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "8,5": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop"
+   },
+   "message": "道具屋に入る",
+   "icon": "itemShopIcon",
+   "back": {
+    "x": 8,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "22,5": {
+   "nextMap": "guild_adv",
+   "message": "冒険者ギルドに入る",
+   "icon": "advGuildIcon",
+   "back": {
+    "x": 22,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "29,5": {
+   "nextMap": "mansion_margrave",
+   "message": "自治領主の館に入る",
+   "back": {
+    "x": 29,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "3,12": {
+   "nextMap": "city_inn",
+   "message": "宿屋・酒場に入る",
+   "icon": "innIcon",
+   "back": {
+    "x": 3,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "8,12": {
+   "nextMap": "guild_training",
+   "message": "職業訓練所に入る",
+   "icon": "trainingIcon",
+   "back": {
+    "x": 8,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "22,12": {
+   "nextMap": "temple",
+   "message": "神殿に入る",
+   "icon": "templeIcon",
+   "back": {
+    "x": 22,
+    "z": 13,
+    "angle": 3.14159
+   }
   }
  },
  "heights": [
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000",
-  "0000000000000000000000000000"
+  "000000000000000000000000000000000000",
+  "011111111111111011112222233333333330",
+  "011111111111111011112222233333333330",
+  "011111111111111011112222233333333330",
+  "011111111111111011112222233333333330",
+  "011111111111111011112222233333333330",
+  "011111111111111011112222233333333330",
+  "011111111111111011112222233333333330",
+  "011111111111111011112222222222222220",
+  "011111111111111011112333333222222220",
+  "011111111111111011112333333222222220",
+  "011111111111111011112333333222222220",
+  "011111111111111011112333333222222220",
+  "011111111111111011112333333222222220",
+  "011111111111111011112222222222222220",
+  "011111111111111011112222222222222220",
+  "011111111111111011111111111111111110",
+  "011111111111111011111111111111111110",
+  "011111111111111011111111111111111110",
+  "011111111111111011111111111111111110",
+  "011111111111111011111111111111111110",
+  "011111111111111011111111111111111110",
+  "011111111111111011111111111111111110",
+  "011111111111111011111111111111111110",
+  "011111111111111011111111111111111110",
+  "000000000000000000000000000000000000"
  ],
  "heightStep": 0.5
 }
