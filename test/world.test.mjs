@@ -1476,3 +1476,53 @@ test('H（ダマスカス自治領・辺境の街）: 施設 6 つ＋自治領�
         if (c + dc < 36 && r + dr < 26 && walk(c, r) && walk(c + dc, r + dr)) assert.ok(Math.abs(lv(c, r) - lv(c + dc, r + dr)) <= 1, `(${c},${r}) 段差が 2 以上`);
     }
 });
+
+test('街道: D と H の門前の石畳を、石畳の道（paved_road・幅 3）と石の橋（stone_bridge）でつなぐ。1 本につながり、段差は 1 以下。道のわきに木・岩がない', () => {
+    const MESH = 64;
+    const tiles = new Map();   // "x,y"（世界のマス）→ { name, lv }
+    for (const f of fs.readdirSync(path.join(root, 'public/data/maps')).filter(n => /^w_\d\d_\d\d\.json$/.test(n))) {
+        const m = readJson(`public/data/maps/${f}`);
+        const [, j, i] = f.match(/^w_(\d\d)_(\d\d)/).map(Number);
+        m.layout.forEach((row, r) => [...row].forEach((ch, c) => {
+            const name = m.legend[ch];
+            if (name) tiles.set(`${i * MESH + c},${j * MESH + r}`, { name, lv: parseInt(m.heights[r][c], 36) });
+        }));
+    }
+    const isRoad = (n) => n === 'paved_road' || n === 'stone_bridge';
+    const road = [...tiles].filter(([, v]) => isRoad(v.name)).map(([k]) => k);
+    assert.ok(road.length > 300, '街道がある');
+    // 1 本につながる（4 方向）
+    const seen = new Set([road[0]]); const q = [road[0]];
+    while (q.length) {
+        const [x, y] = q.pop().split(',').map(Number);
+        for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) {
+            const k = `${x + dx},${y + dy}`;
+            if (!seen.has(k) && tiles.get(k) && isRoad(tiles.get(k).name)) { seen.add(k); q.push(k); }
+        }
+    }
+    assert.equal(seen.size, road.length, '街道は 1 本につながる');
+    // 両端: D（545,660）と H（416,727）の門前の石畳（plaza_stone）に接する
+    const touches = (cx, cy) => road.some(k => { const [x, y] = k.split(',').map(Number); return Math.abs(x - cx) <= 4 && y >= cy + 6 && y <= cy + 11 && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => tiles.get(`${x + dx},${y + dy}`)?.name === 'plaza_stone'); });
+    assert.ok(touches(545, 660), 'D の門前につながる'); assert.ok(touches(416, 727), 'H の門前につながる');
+    // 石の橋: 水に囲まれた所だけ。数がある
+    const bridges = road.filter(k => tiles.get(k).name === 'stone_bridge');
+    assert.ok(bridges.length >= 3, '石の橋がある');
+    // 段差: 隣り合う道のマスは 1 以下
+    for (const k of road) {
+        const [x, y] = k.split(',').map(Number);
+        for (const [dx, dy] of [[1, 0], [0, 1]]) {
+            const nb = tiles.get(`${x + dx},${y + dy}`);
+            if (nb && isRoad(nb.name)) assert.ok(Math.abs(tiles.get(k).lv - nb.lv) <= 1, `${k}: 道の段差が 2 以上`);
+        }
+    }
+    // 道のわき（8 方向の隣）に、通れない物（木・岩・壁など）がない
+    for (const k of road) {
+        const [x, y] = k.split(',').map(Number);
+        for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+            const nb = tiles.get(`${x + dx},${y + dy}`);
+            const d = nb && objects[nb.name];
+            if (d && d.solid && d.type !== 'liquid_tile' && d.type !== 'sea_tile' && !nb.name.startsWith('town_sign') && !['city_wall', 'district_gate', 'brick_house'].includes(nb.name)) assert.fail(`${k}: 道のわきに ${nb.name}`);
+        }
+    }
+});
+

@@ -2271,6 +2271,12 @@ export class GameEngine {
                             else if (this.heightLevelAtTile(r + dr, c + dc) > deckLv - 2) continue;
                             const ex = wx + dc * tileSize / 2, ez = wz + dr * tileSize / 2;
                             const alongX = dr !== 0;   // 北・南の縁は、x 方向に伸びる
+                            if (objDef.railStyle === 'stone') {   // 石の橋: ロープと支柱の代わりに、石の欄干（低い壁）を縁に沿って置く
+                                const parapet = new THREE.Mesh(new THREE.BoxGeometry(alongX ? tileSize : 0.34, 0.8, alongX ? 0.34 : tileSize), this.makeLitMaterial('cityWall', this.textures.cityWall));
+                                parapet.position.set(ex, 0.4, ez);
+                                this.addStatic(parapet);
+                                continue;
+                            }
                             for (const y of [1.05, 0.55]) {
                                 const rope = new THREE.Mesh(new THREE.BoxGeometry(alongX ? tileSize : 0.07, 0.07, alongX ? 0.07 : tileSize), ropeMat);
                                 rope.position.set(ex, y, ez);
