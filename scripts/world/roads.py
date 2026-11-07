@@ -91,6 +91,6 @@ def paint(t, obj, elev, path, keep_chars):
             for dx in range(-2, 3):
                 c = (y + dy, x + dx)
                 if c in road_cells or not (0 <= c[0] < H and 0 <= c[1] < W): continue
-                if water[c] or not t['land'][c] or chr(obj[c]) in keep_chars: continue
+                if water[c] or not t['land'][c] or chr(obj[c]) in keep_chars or chr(obj[c]) in (ROAD_CH, BRIDGE_CH): continue   # 先に作った街道は、消さない
                 obj[c] = ord('0')    # 道のわきは、何も置かない
     return n_road, n_bridge
