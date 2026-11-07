@@ -2002,6 +2002,8 @@
     "description": "かまど（北の壁に寄せて置く。鍋が乗り、前の焚き口に火がともる。上に煙出し）"
   },
   "flower_bed": {
+    "groundShadow": true,
+    "shadowSize": 4.4,
     "type": "furniture",
     "parts": [
       {
@@ -2088,6 +2090,8 @@
     "description": "花壇（レンガの縁に、紫の花の画像。歩いて通れない）"
   },
   "flower_bed_blue": {
+    "groundShadow": true,
+    "shadowSize": 4.4,
     "type": "furniture",
     "parts": [
       {

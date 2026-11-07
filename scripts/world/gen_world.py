@@ -11,6 +11,7 @@ import os, sys, json, glob
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import terrain as T
+import town_d as TD
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
 
 ROOT = T.ROOT
@@ -488,6 +489,8 @@ def gen_towns(t, city_legend, env):
              'spawn': {'x': w // 2, 'z': h - 3, 'angle': 0}, 'environment': env, 'decorFloor': 'cobblestone', 'enemies': {},
              'legend': {k: city_legend[k] for k in TOWN_LEGEND_KEYS}, 'layout': layout, 'npcs': [], 'links': links,
              'heights': ['0' * w for _ in range(h)], 'heightStep': 0.5}
+        if site['id'] == START_TOWN:   # 最初の街（D）は、施設・街の人を置く（scripts/world/town_d.py）
+            m['layout'] = TD.apply(m['layout'], m['legend'], city_legend, m['links'], m['npcs'])
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
 

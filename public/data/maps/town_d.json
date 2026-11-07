@@ -31,23 +31,36 @@
   "f": "flower_bed",
   "v": "flower_bed_blue",
   "F": "plaza_fountain",
-  "G": "district_gate"
+  "G": "district_gate",
+  "S": "shop_building",
+  "I": "inn_building",
+  "J": "temple_building",
+  "d": "shop_door",
+  "N": "inn_door",
+  "D": "temple_door",
+  "M": "inn_sign",
+  "Q": "weapon_shop_sign",
+  "q": "item_shop_sign",
+  "a": "adventurer_guild_sign",
+  "m": "mage_guild_sign",
+  "r": "training_sign",
+  "c": "church_sign"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "Wppppppppppppppppp====pppppppppppppppppW",
+  "WpHHHHpHHHHpIIIIpp====pppppSSSSpSSSSpppW",
+  "WpHHHHpHHHHpIIIIpp====pppppSSSSpSSSSpppW",
+  "WpHHHHpHHHHpINIIpp====pppppSdSSpSdSSpppW",
+  "WpppppppppppppMppp====pppppppmpppprppppW",
   "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
   "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
   "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
   "Wppppppppppppppppp====pppppppppppppppppW",
-  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppppppppppppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppfppppppppfppHHHHpHHHHpppW",
-  "WppppppppppppppppppppppppppppppppppppppW",
+  "WpSSSSpSSSSppppppp====pppppJJJJpSSSSpppW",
+  "WpSSSSpSSSSppppppppppppppppJJJJpSSSSpppW",
+  "WpSdSSpSdSSppppfppppppppfppJDJJpSdSSpppW",
+  "WpppqppppQpppppppppppppppppppcppppappppW",
   "W=============pppppFFppppp=============W",
   "W=============pppppFFppppp=============W",
   "W=============pppppppppppp=============W",
@@ -65,7 +78,48 @@
   "Wppppppppppppppppp====pppppppppppppppppW",
   "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
  ],
- "npcs": [],
+ "npcs": [
+  {
+   "id": "town_man",
+   "x": 6,
+   "z": 17
+  },
+  {
+   "id": "town_boy",
+   "x": 12,
+   "z": 17
+  },
+  {
+   "id": "town_middle_man",
+   "x": 28,
+   "z": 13
+  },
+  {
+   "id": "junior_merchant_man",
+   "x": 24,
+   "z": 9
+  },
+  {
+   "id": "elder_man",
+   "x": 6,
+   "z": 25
+  },
+  {
+   "id": "child_boy",
+   "x": 15,
+   "z": 21
+  },
+  {
+   "id": "guard_spear",
+   "x": 17,
+   "z": 27
+  },
+  {
+   "id": "guard_light",
+   "x": 22,
+   "z": 27
+  }
+ ],
  "links": {
   "19,29": {
    "nextMap": "w_10_08",
@@ -82,6 +136,82 @@
    "spawn": {
     "x": 33,
     "z": 27,
+    "angle": 3.14159
+   }
+  },
+  "3,12": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop"
+   },
+   "message": "道具屋に入る",
+   "icon": "itemShopIcon",
+   "back": {
+    "x": 3,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "8,12": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 8,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "13,4": {
+   "nextMap": "city_inn",
+   "message": "宿屋・酒場に入る",
+   "icon": "innIcon",
+   "back": {
+    "x": 13,
+    "z": 5,
+    "angle": 3.14159
+   }
+  },
+  "28,12": {
+   "nextMap": "temple",
+   "message": "神殿に入る",
+   "icon": "templeIcon",
+   "back": {
+    "x": 28,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "33,12": {
+   "nextMap": "guild_adv",
+   "message": "冒険者ギルドに入る",
+   "icon": "advGuildIcon",
+   "back": {
+    "x": 33,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "28,4": {
+   "nextMap": "guild_mage",
+   "message": "魔法ギルドに入る",
+   "icon": "mageGuildIcon",
+   "back": {
+    "x": 28,
+    "z": 5,
+    "angle": 3.14159
+   }
+  },
+  "33,4": {
+   "nextMap": "guild_training",
+   "message": "職業訓練所に入る",
+   "icon": "trainingIcon",
+   "back": {
+    "x": 33,
+    "z": 5,
     "angle": 3.14159
    }
   }

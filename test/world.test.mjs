@@ -1324,7 +1324,7 @@ test('街（候補地 A〜H）: 外のマップに壁と門（扉＋衛兵）・
         const t = readJson(`public/data/maps/town_${id}.json`);
         assert.equal(t.type, 'open');
         // 中: 外へ出る門 2 マス（南の壁）・出た先（外のマップ）が歩ける所の石畳
-        const gates = Object.entries(t.links);
+        const gates = Object.entries(t.links).filter(([k]) => { const [c, r] = k.split(',').map(Number); return t.legend[t.layout[r][c]] === 'district_gate'; });   // 施設の扉（D のみ）は、門ではない
         assert.equal(gates.length, 2, `town_${id}: 門は 2 マス`);
         for (const [key, l] of gates) {
             const [c, r] = key.split(',').map(Number);
@@ -1397,11 +1397,33 @@ test('マップの形式: 世界のマップ（w_*）は、物体 ID の数値�
 
 test('地面の影: 立て札・像・噴水（groundShadow）と、建物・壁（baseShadow）に影がある。それぞれ 1 つの InstancedMesh にまとめる', () => {
     const must = (names, key) => { for (const n of names) assert.equal(objects[n][key], true, `${n}: ${key}`); };
-    must(Object.entries(objects).filter(([, v]) => v.type === 'signpost' || v.type === 'statue').map(([k]) => k).concat(['plaza_fountain']), 'groundShadow');
+    must(Object.entries(objects).filter(([, v]) => v.type === 'signpost' || v.type === 'statue').map(([k]) => k).concat(['plaza_fountain', 'flower_bed', 'flower_bed_blue']), 'groundShadow');
     must(['city_wall', 'brick_house', 'wooden_house', 'shop_building', 'inn_building', 'temple_building'], 'baseShadow');
     for (const [k, v] of Object.entries(objects)) if (v.baseShadow) assert.equal(v.type, 'block', `${k}: baseShadow は壁・建物（block）だけ`);
     for (const n of ['cliff_rock_wall', 'rock_wall', 'brick_wall']) assert.ok(!objects[n].baseShadow, `${n}: 崖・岩壁・ダンジョンの壁は、影なし`);
     const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
     assert.ok(game.includes('buildGroundShadows(tileSize)') && game.includes('groundShadowItems'), '地面の影の処理');
     assert.equal((game.match(/new THREE\.InstancedMesh\(geo, mat, items\.length\)/g) || []).length, 1, 'InstancedMesh を作る処理は 1 か所（丸い影・壁の帯で共有）');
+});
+
+test('D（グリーン王国・最初の街）: 施設 7 つ（武器屋・道具屋・宿屋・冒険者ギルド・神殿・魔法ギルド・職業訓練所）の扉と、街の人。中は一般街と共有', () => {
+    const t = readJson('public/data/maps/town_d.json');
+    const npcDefs = readJson('public/data/npcs.json');
+    const doors = Object.entries(t.links).filter(([k]) => { const [c, r] = k.split(',').map(Number); return objects[t.legend[t.layout[r][c]]]?.type === 'door' && t.legend[t.layout[r][c]] !== 'district_gate'; });   // 門は除く
+    assert.deepEqual(doors.map(([, l]) => l.nextMap).sort(), ['city_inn', 'guild_adv', 'guild_mage', 'guild_training', 'shop', 'shop', 'temple']);
+    assert.deepEqual(doors.filter(([, l]) => l.nextMap === 'shop').map(([, l]) => l.params.shopId).sort(), ['item_shop', 'weapon_shop']);
+    for (const [key, l] of doors) {
+        const [c, r] = key.split(',').map(Number);
+        assert.ok(fs.existsSync(path.join(root, `public/data/maps/${l.nextMap}.json`)), `${l.nextMap}: 中のマップがある`);
+        assert.equal(l.back.x, c); assert.equal(l.back.z, r + 1);
+        const front = objects[t.legend[t.layout[r + 1][c]]];
+        assert.ok(!front?.solid, `(${c},${r}): 扉の前が歩ける`);
+    }
+    assert.ok(t.npcs.length >= 5 && t.npcs.length <= 8, '街の人は 5〜8 人');
+    for (const n of t.npcs) {
+        assert.ok(npcDefs[n.id], `${n.id}: NPC の定義がある`);
+        const o = objects[t.legend[t.layout[n.z][n.x]]];
+        assert.ok(!o?.solid, `${n.id}: 歩ける所に立つ`);
+    }
+    assert.equal(t.layout.length, 30); assert.equal(t.layout[0].length, 40);
 });
