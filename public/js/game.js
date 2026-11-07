@@ -21,7 +21,9 @@ export const CLIMB_SEC = 2.0;
 export const CLIMB_HOLD_SEC = 0.3;
 
 // 木の足元の影（暗い緑の丸い板）を置くか。雪原などで目立つため、いったん、すべてなくした（true で、小さな木だけ、影が戻る。2 倍・3 倍の木は、noShadow で、いつも、影なし）
-export const TREE_SHADOWS = false;
+export const TREE_SHADOWS = true;
+// 木の影の濃さ（地面の種類ごと。environment.floorType。明るい地面は薄く、目立ちすぎないように。ない種類は 1）
+export const TREE_SHADOW_OPACITY = { snow: 0.5, tundra: 0.7, desert: 0.7, redEarth: 0.8 };
 
 // 隣のマップ（斜めの角を含む 8 方向）を、本物のマスで描く範囲（今のマップの端から何マスまでか）。地形は 48 マス・木や草や岩は 26 マス（霧の終わりは、約 21 マス）
 export const NEIGHBOR_TERRAIN_RANGE = 48;
@@ -1649,21 +1651,23 @@ export class GameEngine {
                                 shadowCanvas.height = 32;
                                 const sCtx = shadowCanvas.getContext('2d');
                                 const grad = sCtx.createRadialGradient(16, 16, 2, 16, 16, 16);
-                                grad.addColorStop(0, 'rgba(10, 25, 10, 0.65)');
-                                grad.addColorStop(0.5, 'rgba(15, 30, 15, 0.35)');
+                                grad.addColorStop(0, 'rgba(0, 4, 0, 0.9)');
+                                grad.addColorStop(0.55, 'rgba(0, 6, 0, 0.6)');
                                 grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
                                 sCtx.fillStyle = grad;
                                 sCtx.fillRect(0, 0, 32, 32);
                                 this.treeShadowMat = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shadowCanvas), transparent: true, depthWrite: false });
-                                this.treeShadowGeo = new THREE.PlaneGeometry(2.4, 2.4);
+                                this.treeShadowGeo = new THREE.PlaneGeometry(3.2, 3.2);
                             }
+                            this.treeShadowMat.opacity = TREE_SHADOW_OPACITY[mapData.environment?.floorType] ?? 1;   // 全部の木で共有する材質: 開いたマップの地面に合わせる
                             shadowMesh = new THREE.Mesh(this.treeShadowGeo, this.treeShadowMat);
                             shadowMesh.rotation.x = -Math.PI / 2;
                             const shadowK = Math.min(3, Math.max(1, baseH / 5.2));
                             shadowMesh.scale.set(shadowK, shadowK, 1);
                             shadowMesh.position.set(wx, 0.012, wz);
-                            this.scene.add(shadowMesh);
-                            shadowMesh.updateMatrix(); shadowMesh.matrixAutoUpdate = false;
+                            shadowMesh.updateMatrix();   // シーンには置かない（buildCullChunks が、区画ごとの InstancedMesh にまとめる）。マップの高さの持ち上げ（scene.add の差し替え）は、ここで自分で反映する
+                            shadowMesh.position.y += liftH;   // 木（tree）は、LIFT_TYPES なので、高低差のあるマスで持ち上げる
+                            shadowMesh.updateMatrix();
                         }
                         this.treeSprites.push({ sprite: tree, shadow: shadowMesh, far: treeMat, near: treeMatNear, vis: true });
                         if (objDef.solid) {
@@ -4657,8 +4661,19 @@ export class GameEngine {
         };
         for (const t of this.treeSprites || []) {
             const c = chunkAt(t.sprite.position.x, t.sprite.position.z);
-            c.group.add(t.sprite); if (t.shadow) c.group.add(t.shadow);
+            c.group.add(t.sprite);
             c.trees.push(t);
+        }
+        // 木の影: 区画ごとに、1 つの InstancedMesh にまとめる（1 枚ずつ別メッシュだと、影の枚数だけ描画の命令が増える）。
+        //   影の板（t.shadow）は、位置・大きさを持つだけの部品として使い、シーンには置かない。霧の境の 1 枚ずつの表示切替はしない（区画ごと）
+        for (const c of chunks.values()) {
+            const withShadow = c.trees.filter(t => t.shadow);
+            if (!withShadow.length) continue;
+            const inst = new THREE.InstancedMesh(this.treeShadowGeo, this.treeShadowMat, withShadow.length);
+            withShadow.forEach((t, i) => inst.setMatrixAt(i, t.shadow.matrix));
+            inst.instanceMatrix.needsUpdate = true;
+            inst.matrixAutoUpdate = false;
+            c.group.add(inst);
         }
         for (const sp of this.cullSprites || []) {
             const c = chunkAt(sp.position.x, sp.position.z);

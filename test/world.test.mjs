@@ -1039,13 +1039,17 @@ test('大森林などの負荷: 前のマップの木が溜まらない（マッ
     assert.ok(game.includes('this.plantMats') && game.includes('this.minimapBase'), '草の材質の共有・ミニマップの壁の使い回し');
 });
 
-test('木の足元の影: いったん、すべてなくした（TREE_SHADOWS = false）。大きな木（2 倍・3 倍）は、スイッチを戻しても、影なし', () => {
+test('木の足元の影: 小さな木にだけ影がある（TREE_SHADOWS = true）。大きな木（2 倍・3 倍）は影なし。影は区画ごとの InstancedMesh にまとめ、明るい地面では薄い', () => {
     const big = ['forest_tree_a', 'forest_tree_b', 'great_tree_a', 'great_tree_b', 'conifer_forest_a', 'conifer_forest_b', 'great_conifer_a', 'great_conifer_b', 'tropical_forest_a', 'tropical_forest_b', 'tropical_palm_forest'];
     for (const n of big) assert.equal(objects[n].noShadow, true, `${n}: 影なし`);
     for (const n of ['grass_tree', 'tropical_tree', 'palm', 'swamp_tree_a', 'conifer_tree_a', 'conifer_tree_b', 'dark_tree']) assert.ok(!objects[n].noShadow, `${n}: 小さな木は、スイッチで、影が戻る`);
     const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
-    assert.ok(game.includes('export const TREE_SHADOWS = false;'), '影のスイッチ: いまは、すべてなし');
+    assert.ok(game.includes('export const TREE_SHADOWS = true;'), '影のスイッチ: 小さな木だけ、影あり');
     assert.ok(game.includes('if (TREE_SHADOWS && !objDef.noShadow) {') && game.includes('shadow: shadowMesh'), '影の処理');
+    assert.ok(game.includes('new THREE.InstancedMesh(this.treeShadowGeo, this.treeShadowMat'), '影は、区画ごとの InstancedMesh にまとめる（描画の命令を増やさない）');
+    const treeBlock = game.slice(game.indexOf('let shadowMesh = null;'), game.indexOf('this.treeSprites.push({ sprite: tree, shadow: shadowMesh'));
+    assert.ok(treeBlock.length > 100 && !treeBlock.includes('this.scene.add(shadowMesh)'), '木の影の板は、1 枚ずつシーンに置かない');
+    assert.ok(/TREE_SHADOW_OPACITY = \{[^}]*snow: 0\.\d+/.test(game), '雪など明るい地面は、影を薄くする');
 });
 
 test('雪山の裾野: 標高の帯（草地→ツンドラ→針葉樹林→まばらな木と雪原）・花と高地の草・凍った池と雪解けの池・ゆるい丘・草原との境のぼかし・ツンドラの環境', () => {
