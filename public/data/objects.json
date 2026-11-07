@@ -500,6 +500,18 @@
     "railOnWater": true,
     "description": "川に架かる石の橋（石畳の床。両脇の水の側に、石の欄干。下に水が流れる。橋の端は、地面とつながる。石畳の街道用）"
   },
+  "road_sign": {
+    "lift": true,
+    "groundShadow": true,
+    "type": "signpost",
+    "texture": "roadSign",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [1.9, 2.0, 1.0],
+    "radius": 0.5,
+    "message": "街道",
+    "description": "街道の分かれ道の道しるべ（立て札）。方角と行き先の文章は、マップの signs（\"列,行\": 文章）で、マスごとに指定する"
+  },
   "ship_large": {
     "type": "furniture",
     "solid": true,

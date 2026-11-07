@@ -34,7 +34,7 @@ LEGEND = {
     'c': 'cliff_rock_wall', 'Y': 'tropical_tree', 'E': 'mine_entrance', '3': 'mine_entrance_e', '4': 'mine_entrance_w', '5': 'mine_entrance_n', 't': 'mine_cart',   # 炭鉱の入口: E=南向き・3=東向き・4=西向き・5=北向き
     
     '6': 'city_wall', '7': 'district_gate', '8': 'brick_house', '9': 'plaza_stone',   # 街（候補地 A〜H）の外観: 壁・門・家・門の前の石畳
-    'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge', roads.ROAD_CH: 'paved_road', roads.BRIDGE_CH: 'stone_bridge', 'I': 'rope_bridge', '1': 'cave_torch', '2': 'riverside_tree',
+    'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge', roads.ROAD_CH: 'paved_road', roads.BRIDGE_CH: 'stone_bridge', roads.SIGN_CH: 'road_sign', 'I': 'rope_bridge', '1': 'cave_torch', '2': 'riverside_tree',
 }
 SOLID_CH = set('FCNPDGAXUMRSBHcYE345tTVWKJLjnxyadfr2678')          # 通れない物体（端のマスには置かない）
 # 地面の種類（floorLayer の文字 → environment.floorType と同じ名前）
@@ -354,6 +354,10 @@ def build_tiles(t):
         n_road, n_bridge = roads.paint(t, obj, elev, path, set('6789') | {TOWN_SIGN_CH})
         new_tiles = [c for c in path if c not in set(centers)]
         centers.extend(new_tiles)
+        if k >= 2:   # 2 つ目以降は、既存の街道から分かれる: 分かれ道に、道しるべ（方角と行き先）
+            pos, msg = roads.fork_sign(t, obj, set(centers), path[0], {gate_pt(s_): TOWN_NAME[s_] for s_ in ROAD_TOWNS[:k + 1]})
+            ROAD_SIGNS[pos] = msg
+            print('道しるべ', pos, msg)
         print(f'街道 {ROAD_TOWNS[0] if k == 1 else "網"}→{goal}: 中心線 {len(path)} マス（新しく {len(new_tiles)}）・石畳 {n_road}・石の橋 {n_bridge}')
     # --- 境界線（隣のマップとの継ぎ目）の整合 ---
     #   境界を越えると、隣のマップの同じ位置に出る。そこが、木・崖・水の中だと、近くの空きへ押し出され、川の向こう岸へ渡ったり、
@@ -423,6 +427,7 @@ def mesh_name(row, col, biome_counts, sea_frac, mine=False):
 
 # 街の中の大きさ（マス）: 候補地ごと。B は大国の都、H は辺境の小さな街（枠だけの街は town_layout・D と H は専用の build）
 TOWN_SIZE = {'a': (32, 26), 'b': (48, 36), 'c': (40, 30), 'd': (40, 30), 'e': (40, 30), 'f': (40, 30), 'g': (32, 26), 'h': (36, 26)}
+ROAD_SIGNS = {}   # 道しるべ: {(世界の行, 世界の列): 文章}（外のマップの signs に書く）
 ROAD_TOWNS = ('d', 'h', 'e')   # 石畳の街道でつなぐ街（グリーン王国・ダマスカス自治領・ガリレオ連盟。ユーザー指定）。1 本の道路網: 最初の 2 つを結び、以降は、すでにある街道のどこからでも分かれる
 START_TOWN = 'd'   # ゲーム開始の街（グリーン王国・平野の最初の街）。開始位置はその門の前（ユーザー指定）
 TOWN_NAME = {'a': 'キュラビッド帝国', 'b': 'フランケル聖国', 'c': 'ミレニアム自由都市', 'd': 'グリーン王国', 'e': 'ガリレオ連盟', 'f': 'ライアン獣王国', 'g': 'デイラミ精霊国', 'h': 'ダマスカス自治領'}   # 国の名前（ユーザー指定）
@@ -576,6 +581,8 @@ def main():
                 'layout': layout,
             }
             if m_under is not None: m['bridgeUnder'] = int(m_under)
+            signs = {f'{x - i * MESH},{y - j * MESH}': msg for (y, x), msg in ROAD_SIGNS.items() if y // MESH == j and x // MESH == i}
+            if signs: m['signs'] = signs   # 街道の道しるべ（マスごとの立て札の文章）
             tl, tn = town_outer_extras(t, j, i)
             if tl: m['links'] = tl; m['npcs'] = tn
             write_ids_map(m, os.path.join(MAPS, mid + '.json'))

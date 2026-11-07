@@ -26,6 +26,14 @@ export const TREE_SHADOWS = true;
 export const TREE_SHADOW_OPACITY = { snow: 0.5, tundra: 0.7, desert: 0.7, redEarth: 0.8 };
 
 // 隣のマップ（斜めの角を含む 8 方向）を、本物のマスで描く範囲（今のマップの端から何マスまでか）。地形は 48 マス・木や草や岩は 26 マス（霧の終わりは、約 21 マス）
+// 方角（8 方向）: 向いている向き（player.angle。0 = 北（-z）・-π/2 = 東・π = 南・π/2 = 西）から、大体の方向の名前
+export const COMPASS_NAMES = ['北', '北東', '東', '南東', '南', '南西', '西', '北西'];
+export function compassDirection(angle) {
+    const bearing = -angle;   // 北から時計回り
+    const idx = Math.round(bearing / (Math.PI / 4));
+    return COMPASS_NAMES[((idx % 8) + 8) % 8];
+}
+
 export const NEIGHBOR_TERRAIN_RANGE = 48;
 export const NEIGHBOR_OBJECT_RANGE = 26;
 export const NEIGHBOR_PLANT_RANGE = 10;   // 隣のマップの、草・花を描く範囲（端から。木・岩は NEIGHBOR_OBJECT_RANGE。遠くの小さな草は、見えにくいので、減らす）
@@ -337,6 +345,7 @@ export class GameEngine {
             ashGround: RetroTextureGenerator.createSpeckleFloorTexture('#3a3430', ['#2a2522', '#4a423c', '#554a42', '#1f1b19']),
             boulder: RetroTextureGenerator.createBoulderTexture(),
             signpost: RetroTextureGenerator.createSignpostTexture(),
+            roadSign: RetroTextureGenerator.createRoadSignTexture(),   // 道しるべ（文字は、創作の文字）
             weaponShopSign: RetroTextureGenerator.createShopSignTexture('weapon'),
             itemShopSign: RetroTextureGenerator.createShopSignTexture('item'),
             innSign: RetroTextureGenerator.createShopSignTexture('inn'),
@@ -1985,10 +1994,11 @@ export class GameEngine {
                         }
 
                         // Store signpost interaction
-                        if (objDef.message) {
+                        const signMsg = mapData.signs?.[`${c},${r}`] ?? objDef.message;   // マスごとの文章（マップの signs。街道の道しるべ）があれば、そちら
+                        if (signMsg) {
                             this.signposts = this.signposts || [];
                             this.signposts.push({
-                                x: wx, z: wz, message: objDef.message, radius: 2.2, triggered: false
+                                x: wx, z: wz, message: signMsg, radius: 2.2, triggered: false
                             });
                         }
                         break;
@@ -4026,6 +4036,7 @@ export class GameEngine {
             }
         }
         this.updateSignpostBanner(activeSignMessage, activeSignIcon);
+        this.updateCompass();
 
         // Animate liquid surfaces (water, shallow water, lava, swamp)
         if (this.waterMeshes && this.waterMeshes.length > 0) {
@@ -5407,6 +5418,15 @@ export class GameEngine {
 
     updatePopups(dt) {
         // Simple DOM based popups auto-remove
+    }
+
+    // 方角の表示（ゲーム画面の右上）: 向きが変わって、大体の方向が変わったときだけ、書き換える
+    updateCompass() {
+        const name = compassDirection(this.player.angle);
+        if (name === this.compassName) return;
+        this.compassName = name;
+        const el = document.getElementById('compassText');
+        if (el) el.innerText = name;
     }
 
     updateSignpostBanner(message, icon = '📜') {

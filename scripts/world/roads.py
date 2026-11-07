@@ -8,7 +8,7 @@ import heapq
 import numpy as np
 import terrain as T
 
-ROAD_CH, BRIDGE_CH = 'Á', 'Â'      # paved_road（石畳）・stone_bridge（石の橋）
+ROAD_CH, BRIDGE_CH, SIGN_CH = 'Á', 'Â', 'Ã'      # paved_road（石畳）・stone_bridge（石の橋）・road_sign（道しるべの立て札）
 AVOID = (T.SNOW, T.CONIFER, T.FOREST, T.ROCK, T.SEA)
 WATER_COST = 6.0      # 川を渡る 1 マスの費用（橋が長くなりすぎないように）
 TURN_COST = 3.0       # 曲がる費用（まっすぐな道にする。細かい階段状の斜めを避ける）
@@ -113,3 +113,35 @@ def paint(t, obj, elev, path, keep_chars):
                 if water[c] or not t['land'][c] or chr(obj[c]) in keep_chars or chr(obj[c]) in (ROAD_CH, BRIDGE_CH): continue   # 先に作った街道は、消さない
                 obj[c] = ord('0')    # 道のわきは、何も置かない
     return n_road, n_bridge
+
+
+COMPASS = {(-1, 0): '北', (1, 0): '南', (0, 1): '東', (0, -1): '西'}   # (行の増減, 列の増減) → 方角
+COMPASS_ORDER = ('北', '西', '東', '南')
+
+
+def fork_sign(t, obj, network, junction, towns):
+    """分かれ道（junction。街道の中心線 network の上）の道しるべ。方角（地図の北・西・東・南）と、その先の街の名前の文章を作り、
+    分かれ道の斜め前（道の外）の空きマスに、立て札（SIGN_CH）を置く。towns: {街の門前のマス: 街の名前}。戻り値: ((行, 列), 文章)"""
+    jy, jx = junction
+    arms = {}
+    LOOK = 10   # 方角は、分かれ道から 10 マス先の道の位置で決める（すぐ先で曲がる道でも、行き先の方向になる）
+    for (dy, dx) in COMPASS:
+        n = (jy + dy, jx + dx)
+        if n not in network: continue
+        dist = {junction: 0, n: 1}; queue = [n]; found = []; far = n
+        for u in queue:
+            if u in towns: found.append(towns[u])
+            if dist[u] <= LOOK and dist[u] >= dist[far]: far = u
+            for ddy, ddx in COMPASS:
+                v = (u[0] + ddy, u[1] + ddx)
+                if v in network and v not in dist: dist[v] = dist[u] + 1; queue.append(v)
+        vy, vx = far[0] - jy, far[1] - jx
+        name = COMPASS[((1 if vy > 0 else -1), 0)] if abs(vy) > abs(vx) else COMPASS[(0, (1 if vx > 0 else -1))]
+        if found: arms[name] = '・'.join(sorted(set(arms.get(name, '').split('・') + found) - {''}))
+    msg = ' / '.join(f'{d}: {arms[d]}' for d in COMPASS_ORDER if d in arms)
+    for dy, dx in ((3, 3), (3, -3), (-3, 3), (-3, -3)):   # 道の外（中心線から 3 マス）の、斜めの空きマス
+        y, x = jy + dy, jx + dx
+        if t['land'][y, x] and not (t['deep'][y, x] or t['shallow'][y, x] or t['bridge'][y, x]) and chr(obj[y, x]) not in (ROAD_CH, BRIDGE_CH):
+            obj[y, x] = ord(SIGN_CH)
+            return (y, x), msg
+    raise AssertionError(f'道しるべを置く空きマスがない {junction}')

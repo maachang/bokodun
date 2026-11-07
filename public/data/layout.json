@@ -14,6 +14,7 @@
         "enemies": "right",
         "areaName": "overlay-top",
         "areaNav": "top",
+        "compass": "overlay-top",
         "hints": "bottom",
         "effectTest": "right"
       }
@@ -31,6 +32,7 @@
         "minimap": "overlay-top-right",
         "areaName": "overlay-top",
         "areaNav": "overlay-top",
+        "compass": "overlay-top",
         "hints": "overlay-bottom-right",
         "effectTest": "hidden"
       }
@@ -48,6 +50,7 @@
         "minimap": "overlay-top-right",
         "areaName": "overlay-top",
         "areaNav": "top",
+        "compass": "overlay-top",
         "hints": "hidden",
         "effectTest": "hidden"
       }

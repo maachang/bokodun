@@ -1573,3 +1573,32 @@ test('屋外のマップ（外のマップ w_*・街の中 town_a〜h）に、�
     }
 });
 
+test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つの街）の文章。道のわきの空きマスに立つ', () => {
+    const MESH = 64;
+    const signs = [];   // { x, y（世界のマス）, msg }
+    const road = new Set();
+    for (const f of fs.readdirSync(path.join(root, 'public/data/maps')).filter(n => /^w_\d\d_\d\d\.json$/.test(n))) {
+        const m = readJson(`public/data/maps/${f}`);
+        const [, j, i] = f.match(/^w_(\d\d)_(\d\d)/).map(Number);
+        m.layout.forEach((row, r) => [...row].forEach((ch, c) => {
+            const n = m.legend[ch];
+            if (n === 'paved_road' || n === 'stone_bridge') road.add(`${i * MESH + c},${j * MESH + r}`);
+            if (n === 'road_sign') {
+                const msg = m.signs?.[`${c},${r}`];
+                assert.ok(msg, `${f} (${c},${r}): 道しるべの文章（signs）がある`);
+                signs.push({ x: i * MESH + c, y: j * MESH + r, msg });
+            }
+        }));
+    }
+    // 道しるべの絵: 英語の地名の入った立て札（signpost）ではなく、創作の文字の専用の絵（roadSign）
+    assert.equal(objects.road_sign.texture, 'roadSign');
+    assert.ok(fs.existsSync(path.join(root, 'public/images/objects/road_sign.png')), '専用の絵がある');
+    assert.match(fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf8'), /roadSign: RetroTextureGenerator\.createRoadSignTexture\(\)/);
+    assert.equal(signs.length, 1, '分かれ道は 1 か所');
+    const { x, y, msg } = signs[0];
+    for (const name of ['グリーン王国', 'ダマスカス自治領', 'ガリレオ連盟']) assert.ok(msg.includes(name), `${name} が書いてある`);
+    assert.match(msg, /北: .*西: .*東: /, '方角（北・西・東）と行き先');
+    assert.ok(!road.has(`${x},${y}`), '道の上ではない');
+    assert.ok([...road].some(k => { const [rx, ry] = k.split(',').map(Number); return Math.abs(rx - x) <= 4 && Math.abs(ry - y) <= 4; }), '分かれ道のそば');
+});
+

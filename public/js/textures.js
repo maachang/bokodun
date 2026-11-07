@@ -2096,6 +2096,15 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // 道しるべ（road_sign）: 立て札の板の文字を、世の中に存在しない文字（創作の文字）に替えた絵（scripts/images/make_road_sign.py で作る）
+    static createRoadSignTexture() {
+        const loader = new THREE.TextureLoader();
+        const texture = loader.load('/images/objects/road_sign.png?v=' + Date.now());
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        return texture;
+    }
+
     // 店のマーク（32×32 の枠の中に描く）: weapon = 剣、item = 薬びん。立て札の板と、扉の上のアイコンで共通に使う
     static drawShopMark(ctx, kind, x, y, size) {
         ctx.save();
