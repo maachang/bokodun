@@ -343,12 +343,18 @@ def build_tiles(t):
         obj[y1 + 2, px + 3] = ord(TOWN_SIGN_CH)                   # 門の前の石畳の東隣に、街の名前の立て札
     # --- 街道: 街どうしを結ぶ、石畳の道（幅 3）と、川の石の橋。門前の石畳（南の端の中央）から、門前の石畳へ ---
     sites = {s_['id']: s_ for s_ in t['towns']}
-    for a, b in ROADS:
-        sa, sb = sites[a], sites[b]
-        path = roads.find_path(t, (sa['y'] + TOWN_HH + 3, sa['x']), (sb['y'] + TOWN_HH + 3, sb['x']))
-        assert path, f'街道 {a}-{b}: 経路がない'
+    centers = []   # 街道の中心線（道路網）
+    gate_pt = lambda k: (sites[k]['y'] + TOWN_HH + 3, sites[k]['x'])
+    for k in range(1, len(ROAD_TOWNS)):
+        goal = ROAD_TOWNS[k]
+        start = gate_pt(ROAD_TOWNS[0]) if not centers else centers
+        path = roads.find_path(t, start, gate_pt(goal), reuse=set(centers))
+        if k == 1: centers = []   # 最初の 2 つは、1 本目（始点は、最初の街の門前）
+        assert path, f'街道 {goal}: 経路がない'
         n_road, n_bridge = roads.paint(t, obj, elev, path, set('6789') | {TOWN_SIGN_CH})
-        print(f'街道 {a}-{b}: 中心線 {len(path)} マス・石畳 {n_road}・石の橋 {n_bridge}')
+        new_tiles = [c for c in path if c not in set(centers)]
+        centers.extend(new_tiles)
+        print(f'街道 {ROAD_TOWNS[0] if k == 1 else "網"}→{goal}: 中心線 {len(path)} マス（新しく {len(new_tiles)}）・石畳 {n_road}・石の橋 {n_bridge}')
     # --- 境界線（隣のマップとの継ぎ目）の整合 ---
     #   境界を越えると、隣のマップの同じ位置に出る。そこが、木・崖・水の中だと、近くの空きへ押し出され、川の向こう岸へ渡ったり、
     #   壁に囲まれた空間の中に入って、出られなくなったりする。継ぎ目の両側のマス（向かい合うマス）の、歩ける・歩けないを、そろえる:
@@ -417,7 +423,7 @@ def mesh_name(row, col, biome_counts, sea_frac, mine=False):
 
 # 街の中の大きさ（マス）: 候補地ごと。B は大国の都、H は辺境の小さな街（枠だけの街は town_layout・D と H は専用の build）
 TOWN_SIZE = {'a': (32, 26), 'b': (48, 36), 'c': (40, 30), 'd': (40, 30), 'e': (40, 30), 'f': (40, 30), 'g': (32, 26), 'h': (36, 26)}
-ROADS = (('d', 'h'), ('h', 'e'))   # 石畳の街道でつなぐ街の組（グリーン王国―ダマスカス自治領。ユーザー指定）
+ROAD_TOWNS = ('d', 'h', 'e')   # 石畳の街道でつなぐ街（グリーン王国・ダマスカス自治領・ガリレオ連盟。ユーザー指定）。1 本の道路網: 最初の 2 つを結び、以降は、すでにある街道のどこからでも分かれる
 START_TOWN = 'd'   # ゲーム開始の街（グリーン王国・平野の最初の街）。開始位置はその門の前（ユーザー指定）
 TOWN_NAME = {'a': 'キュラビッド帝国', 'b': 'フランケル聖国', 'c': 'ミレニアム自由都市', 'd': 'グリーン王国', 'e': 'ガリレオ連盟', 'f': 'ライアン獣王国', 'g': 'デイラミ精霊国', 'h': 'ダマスカス自治領'}   # 国の名前（ユーザー指定）
 TOWN_SIGN_CH = 'À'   # 街の名前の立て札の文字（外のマップごとに、凡例で town_sign_<街ID> に割り当てる）

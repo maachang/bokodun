@@ -1510,7 +1510,14 @@ test('街道: D と H の門前の石畳を、石畳の道（paved_road・幅 3�
     assert.equal(seen.size, road.length, '街道は 1 本につながる');
     // 両端: D（545,660）と H（416,727）の門前の石畳（plaza_stone）に接する
     const touches = (cx, cy) => road.some(k => { const [x, y] = k.split(',').map(Number); return Math.abs(x - cx) <= 4 && y >= cy + 6 && y <= cy + 11 && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dx, dy]) => tiles.get(`${x + dx},${y + dy}`)?.name === 'plaza_stone'); });
-    assert.ok(touches(545, 660), 'D の門前につながる'); assert.ok(touches(416, 727), 'H の門前につながる');
+    assert.ok(touches(545, 660), 'D の門前につながる'); assert.ok(touches(416, 727), 'H の門前につながる'); assert.ok(touches(727, 792), 'E の門前につながる');
+    // 道路網（木の形）: 並走する太い帯（2 本の街道が平行に隣り合う所）がない。道の列の幅（東西・南北）が、3 を超える行・列が、全体の 15% 以下
+    {
+        const set = new Set(road);
+        let thick = 0;
+        for (const k of road) { const [x, y] = k.split(',').map(Number); let w = 0; while (set.has(`${x + w},${y}`)) w++; let h = 0; while (set.has(`${x},${y + h}`)) h++; if (w > 5 && h > 5) thick++; }
+        assert.ok(thick / road.length < 0.01, `並走する太い帯が多い（${thick}）`);
+    }
     // 石の橋: 水に囲まれた所だけ。数がある
     const bridges = road.filter(k => tiles.get(k).name === 'stone_bridge');
     assert.ok(bridges.length >= 3, '石の橋がある');
