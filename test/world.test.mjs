@@ -1409,7 +1409,7 @@ test('地面の影: 立て札・像・噴水（groundShadow）と、建物・壁
 test('D（グリーン王国・最初の街）: 施設 7 つ（武器屋・道具屋・宿屋・冒険者ギルド・神殿・魔法ギルド・職業訓練所）の扉と、街の人。中は一般街と共有', () => {
     const t = readJson('public/data/maps/town_d.json');
     const npcDefs = readJson('public/data/npcs.json');
-    const doors = Object.entries(t.links).filter(([k]) => { const [c, r] = k.split(',').map(Number); return objects[t.legend[t.layout[r][c]]]?.type === 'door' && t.legend[t.layout[r][c]] !== 'district_gate'; });   // 門は除く
+    const doors = Object.entries(t.links).filter(([k]) => { const [c, r] = k.split(',').map(Number); return objects[t.legend[t.layout[r][c]]]?.type === 'door' && !['district_gate', 'castle_gate'].includes(t.legend[t.layout[r][c]]); });   // 門・城門は除く
     assert.deepEqual(doors.map(([, l]) => l.nextMap).sort(), ['city_inn', 'guild_adv', 'guild_mage', 'guild_training', 'shop', 'shop', 'temple']);
     assert.deepEqual(doors.filter(([, l]) => l.nextMap === 'shop').map(([, l]) => l.params.shopId).sort(), ['item_shop', 'weapon_shop']);
     for (const [key, l] of doors) {
@@ -1419,11 +1419,35 @@ test('D（グリーン王国・最初の街）: 施設 7 つ（武器屋・道�
         const front = objects[t.legend[t.layout[r + 1][c]]];
         assert.ok(!front?.solid, `(${c},${r}): 扉の前が歩ける`);
     }
-    assert.ok(t.npcs.length >= 5 && t.npcs.length <= 8, '街の人は 5〜8 人');
+    assert.ok(t.npcs.length >= 5 && t.npcs.length <= 10, '街の人は 5〜10 人（城門の衛兵 2 人を含む）');
     for (const n of t.npcs) {
         assert.ok(npcDefs[n.id], `${n.id}: NPC の定義がある`);
         const o = objects[t.legend[t.layout[n.z][n.x]]];
         assert.ok(!o?.solid, `${n.id}: 歩ける所に立つ`);
     }
     assert.equal(t.layout.length, 30); assert.equal(t.layout[0].length, 40);
+});
+
+test('D（グリーン王国）: 川と橋・高台・神殿（幅 2 倍）・城門（王城）。入口の前の通りは 2 マス以上。段差は 1 ずつ', () => {
+    const t = readJson('public/data/maps/town_d.json');
+    const at = (c, r) => objects[t.legend[t.layout[r][c]]];
+    const lv = (c, r) => parseInt(t.heights[r][c], 36);
+    // 川（水は高さ 0）と橋（大通りの 4 マス）
+    assert.ok(t.layout[22].includes('w') && t.layout[22].includes('b'));
+    for (let c = 18; c <= 21; c++) assert.equal(t.legend[t.layout[22][c]], 'wood_bridge');
+    // 城門（北の外壁・2 マス）は、王城へ。出口は、入った場所（城門の前）
+    for (const c of [19, 20]) {
+        const l = t.links[`${c},0`];
+        assert.equal(l.nextMap, 'castle'); assert.deepEqual(l.back, { x: c, z: 1, angle: 3.14159 });
+    }
+    // 神殿は高台（3）で、幅 8（ほかの建物の 2 倍）
+    assert.equal(t.layout[10].split('').filter(ch => t.legend[ch] === 'temple_building').length, 8);
+    assert.equal(lv(30, 12), 3);
+    // 入口の前の通り: 宿・魔法ギルド・職業訓練所の前（行 5〜8）に家を置かない
+    for (let r = 6; r <= 8; r++) for (let c = 1; c < 39; c++) assert.notEqual(t.legend[t.layout[r][c]], 'brick_house', `(${c},${r}): 入口の前に家`);
+    // 段差: 歩ける隣どうしで 1 以下
+    const walk = (c, r) => { const d = at(c, r); return !d?.solid && d?.type !== 'liquid_tile' && d?.type !== 'door'; };
+    for (let r = 0; r < 30; r++) for (let c = 0; c < 40; c++) for (const [dc, dr] of [[1, 0], [0, 1]]) {
+        if (c + dc < 40 && r + dr < 30 && walk(c, r) && walk(c + dc, r + dr)) assert.ok(Math.abs(lv(c, r) - lv(c + dc, r + dr)) <= 1, `(${c},${r}) 段差が 2 以上`);
+    }
 });

@@ -490,7 +490,7 @@ def gen_towns(t, city_legend, env):
              'legend': {k: city_legend[k] for k in TOWN_LEGEND_KEYS}, 'layout': layout, 'npcs': [], 'links': links,
              'heights': ['0' * w for _ in range(h)], 'heightStep': 0.5}
         if site['id'] == START_TOWN:   # 最初の街（D）は、施設・街の人を置く（scripts/world/town_d.py）
-            m['layout'] = TD.apply(m['layout'], m['legend'], city_legend, m['links'], m['npcs'])
+            m['layout'], m['heights'] = TD.build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
 

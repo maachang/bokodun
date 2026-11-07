@@ -32,6 +32,7 @@
   "v": "flower_bed_blue",
   "F": "plaza_fountain",
   "G": "district_gate",
+  "C": "castle_gate",
   "S": "shop_building",
   "I": "inn_building",
   "J": "temple_building",
@@ -44,38 +45,40 @@
   "a": "adventurer_guild_sign",
   "m": "mage_guild_sign",
   "r": "training_sign",
-  "c": "church_sign"
+  "c": "church_sign",
+  "w": "water",
+  "b": "wood_bridge"
  },
  "layout": [
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WWWWWWWWWWWWWWWWWWWCCWWWWWWWWWWWWWWWWWWW",
+  "WpTppppppppppppppp====pppppppppppppppTpW",
   "WpHHHHpHHHHpIIIIpp====pppppSSSSpSSSSpppW",
   "WpHHHHpHHHHpIIIIpp====pppppSSSSpSSSSpppW",
   "WpHHHHpHHHHpINIIpp====pppppSdSSpSdSSpppW",
   "WpppppppppppppMppp====pppppppmpppprppppW",
-  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "Wpppppppppppppppfp====pvpppppppppppppppW",
   "Wppppppppppppppppp====pppppppppppppppppW",
-  "WpSSSSpSSSSppppppp====pppppJJJJpSSSSpppW",
-  "WpSSSSpSSSSppppppppppppppppJJJJpSSSSpppW",
-  "WpSdSSpSdSSppppfppppppppfppJDJJpSdSSpppW",
-  "WpppqppppQpppppppppppppppppppcppppappppW",
-  "W=============pppppFFppppp=============W",
-  "W=============pppppFFppppp=============W",
-  "W=============pppppppppppp=============W",
-  "WppppppppppppppfppppppppfppppppppppppppW",
-  "WpHHHHpHHHHpppppTppppppTpppHHHHpHHHHpTpW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "Wppppppppppppppppp====ppppppJJJJJJJJpppW",
+  "WpSSSSpSSSSpSSSSpp====ppppppJJJJJJJJpppW",
+  "WpSSSSpSSSSpSSSSpp====ppppppJJJDJJJJpppW",
+  "WpSdSSpSdSSpSdSSpp====ppppfpppppcppppvpW",
+  "WpppqppppQppppappp====pppppppppppppppppW",
+  "W==================FF==================W",
+  "W==================FF==================W",
+  "W======================================W",
+  "Wppppppppppppppfpp====ppvppppppppppppppW",
+  "WpHHHHpHHHHpppppTp====pTpppHHHHpHHHHpppW",
   "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
   "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
   "Wppppppppppppppppp====pppppppppppppppppW",
-  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
+  "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
   "Wppppppppppppppppp====pppppppppppppppppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
   "WpTppppppppppppppp====pppppppppppppppTpW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
   "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
  ],
  "npcs": [
@@ -101,8 +104,8 @@
   },
   {
    "id": "elder_man",
-   "x": 6,
-   "z": 25
+   "x": 14,
+   "z": 26
   },
   {
    "id": "child_boy",
@@ -118,6 +121,16 @@
    "id": "guard_light",
    "x": 22,
    "z": 27
+  },
+  {
+   "id": "gate_guard",
+   "x": 17,
+   "z": 1
+  },
+  {
+   "id": "gate_guard",
+   "x": 22,
+   "z": 1
   }
  ],
  "links": {
@@ -136,6 +149,24 @@
    "spawn": {
     "x": 33,
     "z": 27,
+    "angle": 3.14159
+   }
+  },
+  "19,0": {
+   "nextMap": "castle",
+   "message": "王城に入る",
+   "back": {
+    "x": 19,
+    "z": 1,
+    "angle": 3.14159
+   }
+  },
+  "20,0": {
+   "nextMap": "castle",
+   "message": "王城に入る",
+   "back": {
+    "x": 20,
+    "z": 1,
     "angle": 3.14159
    }
   },
@@ -165,6 +196,16 @@
     "angle": 3.14159
    }
   },
+  "13,12": {
+   "nextMap": "guild_adv",
+   "message": "冒険者ギルドに入る",
+   "icon": "advGuildIcon",
+   "back": {
+    "x": 13,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
   "13,4": {
    "nextMap": "city_inn",
    "message": "宿屋・酒場に入る",
@@ -172,26 +213,6 @@
    "back": {
     "x": 13,
     "z": 5,
-    "angle": 3.14159
-   }
-  },
-  "28,12": {
-   "nextMap": "temple",
-   "message": "神殿に入る",
-   "icon": "templeIcon",
-   "back": {
-    "x": 28,
-    "z": 13,
-    "angle": 3.14159
-   }
-  },
-  "33,12": {
-   "nextMap": "guild_adv",
-   "message": "冒険者ギルドに入る",
-   "icon": "advGuildIcon",
-   "back": {
-    "x": 33,
-    "z": 13,
     "angle": 3.14159
    }
   },
@@ -214,38 +235,48 @@
     "z": 5,
     "angle": 3.14159
    }
+  },
+  "31,11": {
+   "nextMap": "temple",
+   "message": "神殿に入る",
+   "icon": "templeIcon",
+   "back": {
+    "x": 31,
+    "z": 12,
+    "angle": 3.14159
+   }
   }
  },
  "heights": [
   "0000000000000000000000000000000000000000",
+  "0111111111111111111111111111111111111110",
+  "0222222222222222222222222222222222222220",
+  "0333333333333333333333333333333333333330",
+  "0333333333333333333333333333333333333330",
+  "0333333333333333333333333333333333333330",
+  "0333333333333333333333333333333333333330",
+  "0333333333333333333333333333333333333330",
+  "0222222222222222222222222222222222222220",
+  "0111111111111111111111111233333333333330",
+  "0111111111111111111111111233333333333330",
+  "0111111111111111111111111233333333333330",
+  "0111111111111111111111111233333333333330",
+  "0111111111111111111111111222222222222220",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
   "0000000000000000000000000000000000000000",
   "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
+  "0111111111111111111111111111111111111110",
   "0000000000000000000000000000000000000000"
  ],
  "heightStep": 0.5

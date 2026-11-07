@@ -1046,6 +1046,7 @@
     "description": "ヨーロッパ風の舗装された石畳の広場・大通り（移動速度30%アップ）"
   },
   "plaza_fountain": {
+    "lift": true,
     "shadowSize": 4.6,
     "groundShadow": true,
     "type": "fountain",
@@ -2003,7 +2004,7 @@
   },
   "flower_bed": {
     "groundShadow": true,
-    "shadowSize": 4.4,
+    "shadowSize": 6.0,
     "type": "furniture",
     "parts": [
       {
@@ -2091,7 +2092,7 @@
   },
   "flower_bed_blue": {
     "groundShadow": true,
-    "shadowSize": 4.4,
+    "shadowSize": 6.0,
     "type": "furniture",
     "parts": [
       {
@@ -2284,6 +2285,7 @@
     "description": "店の中の板張りの床（天井は店の天井を使う）"
   },
   "shop_door": {
+    "lift": true,
     "type": "door",
     "texture": "woodDoor",
     "frameTexture": "shopWall",
@@ -2303,6 +2305,7 @@
     "description": "建物（店）の出口の扉。近づくと開き、中へ入ると、入ってきた場所へ戻る"
   },
   "weapon_shop_sign": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "weaponShopSign",
@@ -2318,6 +2321,7 @@
     "description": "武器屋の立て札（扉の横）"
   },
   "item_shop_sign": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "itemShopSign",
@@ -2333,6 +2337,7 @@
     "description": "道具屋の立て札（扉の横）"
   },
   "adventurer_guild_sign": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -2348,6 +2353,7 @@
     "description": "冒険者ギルドの案内標識（街のマップ用。建物の前に立てる）"
   },
   "mage_guild_sign": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -2378,6 +2384,7 @@
     "description": "商人ギルドの案内標識（街のマップ用。建物の前に立てる）"
   },
   "training_sign": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -2393,6 +2400,7 @@
     "description": "職業訓練所の案内標識（街のマップ用。建物の前に立てる）"
   },
   "church_sign": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -2763,6 +2771,7 @@
     "faceEvery": 2
   },
   "temple_door": {
+    "lift": true,
     "type": "door",
     "texture": "woodDoor",
     "frameTexture": "marbleWall",
@@ -15532,6 +15541,7 @@
     "description": "石の窓（レンガの壁の面に付く。ガラスの窓に鉄の鎧戸。壁の高さ4〜5用）"
   },
   "inn_door": {
+    "lift": true,
     "type": "door",
     "texture": "woodDoor",
     "frameTexture": "innWall",
@@ -15540,6 +15550,7 @@
     "description": "宿屋・酒場の扉（近づくと開き、中へ入ると宿屋へ移動。行き先は map の links）"
   },
   "inn_sign": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "innSign",
