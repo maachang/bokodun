@@ -1561,3 +1561,15 @@ test('街・町・村の起伏: 作り込んだ街（街の人がいる town_*�
     }
 });
 
+test('屋外のマップ（外のマップ w_*・街の中 town_a〜h）に、屋内用の物（床・天井つき）を置かない。天井の板が、頭の上に浮く', () => {
+    const files = fs.readdirSync(path.join(root, 'public/data/maps')).filter(f => /^(w_\d\d_\d\d|town_[a-h])\.json$/.test(f));
+    assert.ok(files.length > 100);
+    for (const f of files) {
+        const m = readJson(`public/data/maps/${f}`);
+        for (const name of Object.values(m.legend)) {
+            const d = objects[name];
+            assert.ok(!d?.ceilingTexture, `${f}: ${name} は屋内用（ceilingTexture）。屋外用（crate_out など）を使う`);
+        }
+    }
+});
+

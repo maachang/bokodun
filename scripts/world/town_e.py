@@ -1,7 +1,7 @@
 """E（ガリレオ連盟・南国の大きな港）の中身。手本は、サンプルの街（city）と D・H の作り。街の中は、この build が丸ごと作る。
   - 施設 6 つ: 道具屋・武器屋・宿屋・冒険者ギルド・商人ギルド（港の取引）・神殿（サンプル city の施設から、港に合うもの。変更はユーザーに確認）
   - 中のマップは、既存を共有する（shop・city_inn・temple・guild_*）。街の人は、既存の NPC を流用
-  - 大きな港（ユーザー指定）: 街の東に、水の港（水路）と岸壁（石畳）。岸壁から、桟橋（木の橋）が水の中へ。水の上に、帆船（見た目だけ。船での移動は未実装）。岸壁に、木箱・樽
+  - 大きな港（ユーザー指定）: 街の東に、水の港（水路）と岸壁（石畳）。岸壁から、桟橋（木の橋）が水の中へ。水の上に、帆船（見た目だけ。船での移動は未実装）。岸壁に、木箱・樽（野外用 crate_out・barrel_out。屋内用は、天井の板が頭の上に浮く）
   - 高低: サンプル（city）の高さを土台にし（town_heights.sample_field）、神殿の高台（2〜3）と、港の水（0）・桟橋（0）を重ねる。段差は 1 以下
 """
 import town_heights as TH
@@ -81,7 +81,7 @@ def build(w, h, legend, city_legend, links, npcs):
     for x, y, c in ((2, 1, 'T'), (15, 1, 'T'), (2, 28, 'T'), (15, 28, 'T'), (27, 28, 'T'), (22, 9, 'v'), (22, 12, 'f'), (16, 9, 'f'), (16, 12, 'v')):
         assert g[y][x] == 'p', f'E の飾り ({x},{y}): 空きマスではない'
         g[y][x] = c
-    legend.update({'X': 'crate', 'B': 'barrel', 'L': 'ship_large', 'l': 'ship_small'})
+    legend.update({'X': 'crate_out', 'B': 'barrel_out', 'L': 'ship_large', 'l': 'ship_small'})
     for k in LEGEND_KEYS: legend[k] = city_legend[k]
     for nid, x, z in NPCS:
         assert g[z][x] in 'p=', f'E の NPC {nid} ({x},{z}): 歩ける空きマスではない'

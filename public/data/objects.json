@@ -8669,6 +8669,65 @@
     ],
     "description": "木箱（野外用。床・天井は付けない）"
   },
+  "barrel_out": {
+    "type": "furniture",
+    "parts": [
+        {
+            "size": [
+                1.0,
+                1.2,
+                1.0
+            ],
+            "pos": [
+                0,
+                0.6,
+                0
+            ],
+            "color": "#7a4e28"
+        },
+        {
+            "size": [
+                1.06,
+                0.08,
+                1.06
+            ],
+            "pos": [
+                0,
+                0.3,
+                0
+            ],
+            "color": "#3a2a1a"
+        },
+        {
+            "size": [
+                1.06,
+                0.08,
+                1.06
+            ],
+            "pos": [
+                0,
+                0.9,
+                0
+            ],
+            "color": "#3a2a1a"
+        },
+        {
+            "size": [
+                0.8,
+                0.06,
+                0.8
+            ],
+            "pos": [
+                0,
+                1.23,
+                0
+            ],
+            "color": "#5a3a1e"
+        }
+    ],
+    "collider": [1.2, 1.2],
+    "description": "樽（野外用。床・天井は付けない）"
+  },
   "bar_sign": {
     "groundShadow": true,
     "type": "signpost",
