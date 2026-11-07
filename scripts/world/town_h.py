@@ -2,9 +2,10 @@
   - 施設 7 つ: 道具屋・武器屋・宿屋・神殿・冒険者ギルド・職業訓練所（ユーザー指定）＋ 自治領主の館（城はなく、最高権力者が住む館）
   - 中のマップは、既存を共有する（shop・city_inn・temple・guild_*。館は mansion_margrave＝辺境伯の屋敷）
   - 街の人（NPC）は、一般街・町の NPC を流用して、少数を置く
-  - 高低: 東の街区（2）・館の高台（3）・神殿の高台（3）。川（南北・幅 1、水は 0）に橋（東西の通りと、南の脇道）。段差は 1 ずつ
+  - 高低: サンプル（city）の高さを土台にし（town_heights.sample_field）、館・神殿の高台（2〜3）と、川（南北・幅 1、水は 0。橋は東西の通りと南の脇道）を重ねる。段差は 1 ずつ
   - 入口の前の通りは 2 マス（一般街と同じ。扉の前の立て札の段が、東西の通り）
 """
+import town_heights as TH
 
 def _shop(shop_id, msg, icon): return {'nextMap': 'shop', 'params': {'shopId': shop_id}, 'message': msg, 'icon': icon}
 def _to(next_map, msg, icon=None): return dict({'nextMap': next_map, 'message': msg}, **({'icon': icon} if icon else {}))
@@ -33,14 +34,7 @@ def build(w, h, legend, city_legend, links, npcs):
     """H の街の中（layout・heights）を作り、legend・links・npcs に足す。(layout, heights) を返す"""
     assert (w, h) == (36, 26)
     g = [['p'] * w for _ in range(h)]
-    lv = [[1] * w for _ in range(h)]
-    # 段差: 東の街区（2）・館の高台（3）・神殿の高台（3）
-    for y in range(1, 16):
-        for x in range(20, w - 1): lv[y][x] = 2
-    for y in range(1, 8):
-        for x in range(25, w - 1): lv[y][x] = 3
-    for y in range(9, 14):
-        for x in range(21, 27): lv[y][x] = 3
+    lv = None   # 高さは、街を作り終えてから（サンプルの高さを土台にして、川・高台を重ねる）
     # 大通り（南北）・東西の通り（幅 2）・噴水
     for y in range(1, h - 1):
         for x in range(16, 20): g[y][x] = '='
@@ -52,10 +46,9 @@ def build(w, h, legend, city_legend, links, npcs):
     # 川（南北・幅 1。水は 0）と橋（東西の通り・南の脇道）
     for y in range(1, h - 1):
         g[y][15] = 'b' if y in (6, 7, 13, 14, 21, 22) else 'w'
-        lv[y][15] = 0
     # 外壁と南の門
-    for x in range(w): g[0][x] = g[h - 1][x] = 'W'; lv[0][x] = lv[h - 1][x] = 0
-    for y in range(h): g[y][0] = g[y][w - 1] = 'W'; lv[y][0] = lv[y][w - 1] = 0
+    for x in range(w): g[0][x] = g[h - 1][x] = 'W'
+    for y in range(h): g[y][0] = g[y][w - 1] = 'W'
     g[h - 1][17] = g[h - 1][18] = 'G'
     # 家（施設以外）
     for x0, y0 in ((28, 10), (2, 17), (7, 17), (21, 17), (26, 17), (31, 17)):
@@ -82,7 +75,17 @@ def build(w, h, legend, city_legend, links, npcs):
     for nid, x, z in NPCS:
         assert g[z][x] in 'p=', f'H の NPC {nid} ({x},{z}): 歩ける空きマスではない'
         npcs.append({'id': nid, 'x': x, 'z': z})
-    # 段差は、歩ける隣どうしで 1 以下
+    # 高さ: サンプル（city）の高さを土台にして、川（0）と高台（館・神殿）を重ねる。段差は、歩ける隣どうしで 1 以下
+    lv = TH.sample_field(w, h, 2, 2)
+    fixed = set()
+    for y in range(1, h - 1): lv[y][15] = 0; fixed.add((15, y))
+    for (x0, x1, y0, y1) in ((25, w - 2, 1, 7), (21, 26, 9, 13)):   # 館の高台（北東）・神殿の高台: 2〜3 の起伏のある高台
+        for y in range(y0, y1 + 1):
+            for x in range(x0, x1 + 1): lv[y][x] = 3 if lv[y][x] >= 2 else 2; fixed.add((x, y))
+    walk = [[g[y][x] not in SOLID and g[y][x] != 'w' for x in range(w)] for y in range(h)]
+    TH.relax(lv, walk, fixed)
+    for ch, x0, y0, wid, doff, door, sign, link in FACILITIES:   # 扉のマスの高さは、扉の前のマスと同じ（段差なく入れる）
+        lv[y0 + 2][x0 + doff] = lv[y0 + 3][x0 + doff]
     for y in range(h):
         for x in range(w):
             if g[y][x] in SOLID or g[y][x] == 'w': continue
@@ -90,4 +93,4 @@ def build(w, h, legend, city_legend, links, npcs):
                 xx, yy = x + dx, y + dz
                 if xx < w and yy < h and g[yy][xx] not in SOLID and g[yy][xx] != 'w':
                     assert abs(lv[y][x] - lv[yy][xx]) <= 1, f'H の段差 ({x},{y})-({xx},{yy}) が 2 以上'
-    return [''.join(r) for r in g], [''.join(str(v) for v in r) for r in lv]
+    return [''.join(r) for r in g], [''.join(TH.CH36[v] for v in r) for r in lv]

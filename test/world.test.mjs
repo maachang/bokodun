@@ -1449,7 +1449,7 @@ test('D（グリーン王国）: 川と橋・高台・神殿（幅 2 倍）・�
     }
     // 神殿は高台（3）で、幅 8（ほかの建物の 2 倍）
     assert.equal(t.layout[10].split('').filter(ch => t.legend[ch] === 'temple_building').length, 8);
-    assert.equal(lv(30, 12), 3);
+    assert.ok(lv(30, 12) >= 2, '神殿の高台');
     // 入口の前の通り: 宿・魔法ギルド・職業訓練所の前（行 5〜8）に家を置かない
     for (let r = 6; r <= 8; r++) for (let c = 1; c < 39; c++) assert.notEqual(t.legend[t.layout[r][c]], 'brick_house', `(${c},${r}): 入口の前に家`);
     // 段差: 歩ける隣どうしで 1 以下
@@ -1475,7 +1475,7 @@ test('H（ダマスカス自治領・辺境の街）: 施設 6 つ＋自治領�
     }
     assert.ok(t.layout.some(row => row.includes('w')) && t.layout.some(row => row.includes('b')), '川と橋');
     assert.equal(t.layout.length, 26); assert.equal(t.layout[0].length, 36);
-    assert.equal(lv(29, 6), 3); assert.equal(lv(22, 12), 3);   // 館・神殿は高台
+    assert.ok(lv(29, 6) >= 2 && lv(22, 12) >= 2, '館・神殿は高台');
     assert.ok(t.npcs.length >= 5 && t.npcs.length <= 8);
     for (const n of t.npcs) { assert.ok(npcDefs[n.id], n.id); assert.ok(!at(n.x, n.z)?.solid, `${n.id}: 歩ける所`); }
     const walk = (c, r) => { const d = at(c, r); return !d?.solid && d?.type !== 'liquid_tile' && d?.type !== 'door'; };
@@ -1530,6 +1530,27 @@ test('街道: D と H の門前の石畳を、石畳の道（paved_road・幅 3�
             const d = nb && objects[nb.name];
             if (d && d.solid && d.type !== 'liquid_tile' && d.type !== 'sea_tile' && !nb.name.startsWith('town_sign') && !['city_wall', 'district_gate', 'brick_house'].includes(nb.name)) assert.fail(`${k}: 道のわきに ${nb.name}`);
         }
+    }
+});
+
+test('街・町・村の起伏: 作り込んだ街（街の人がいる town_*）は、サンプル（city・city_noble・town・village）と同じ程度の起伏がある（厳命: サンプルを手本にする）', () => {
+    const ratio = (hs) => {
+        let tot = 0, ch = 0;
+        for (let y = 0; y < hs.length; y++) for (let x = 0; x < hs[0].length; x++) for (const [dx, dy] of [[1, 0], [0, 1]]) {
+            if (x + dx < hs[0].length && y + dy < hs.length) { tot++; if (hs[y][x] !== hs[y + dy][x + dx]) ch++; }
+        }
+        return ch / tot;
+    };
+    const share = (hs, lv) => [...hs.join('')].filter(c => parseInt(c, 36) === lv).length / hs.join('').length;
+    const samples = ['city', 'city_noble', 'town', 'village'].map(n => readJson(`public/data/maps/${n}.json`).heights);
+    const lo = Math.min(...samples.map(ratio)), hi = Math.max(...samples.map(ratio));
+    assert.ok(lo > 0.2 && hi < 0.35, `サンプルの、高さが変わる辺の割合: ${lo.toFixed(2)}〜${hi.toFixed(2)}`);
+    const built = fs.readdirSync(path.join(root, 'public/data/maps')).filter(f => /^town_[a-h]\.json$/.test(f)).map(f => readJson(`public/data/maps/${f}`)).filter(m => (m.npcs || []).length > 0);
+    assert.ok(built.length >= 2, '作り込んだ街（D・H）がある');
+    for (const m of built) {
+        const r = ratio(m.heights);
+        assert.ok(r >= lo - 0.03 && r <= hi + 0.05, `${m.id}: 高さが変わる辺の割合 ${r.toFixed(2)}（サンプルは ${lo.toFixed(2)}〜${hi.toFixed(2)}）`);
+        assert.ok(share(m.heights, 1) >= 0.15 && share(m.heights, 2) >= 0.15 && share(m.heights, 3) >= 0.03, `${m.id}: 高さ 1・2・3 の分布が、サンプルと同じく、散らばる`);
     }
 });
 
