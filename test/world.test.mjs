@@ -1368,7 +1368,8 @@ test('街（候補地 A〜H）: 敷地は、水・川・マップの境から離
         const wallCh = Object.entries(outer.legend).find(([, v]) => v === 'city_wall')[0];
         const rs = rows.map(([, i]) => i), cs = [];
         rows.forEach(([r]) => [...r].forEach((ch, c) => { if (ch === wallCh) cs.push(c); }));
-        assert.ok(Math.min(...rs) >= 8 && Math.max(...rs) <= 55 && Math.min(...cs) >= 8 && Math.max(...cs) <= 55, `${outer.id}: 街は、マップの境から離れている`);
+        const margin = id === 'a' ? 2 : 8;   // 山の上の街（A）は、山頂の平らな台地の広さに合わせる（台地は、マップの境のすぐ内側まで）
+        assert.ok(Math.min(...rs) >= margin && Math.max(...rs) <= 63 - margin && Math.min(...cs) >= margin && Math.max(...cs) <= 63 - margin, `${outer.id}: 街は、マップの境から離れている`);
         for (let r = Math.min(...rs) - 3; r <= Math.max(...rs) + 5; r++) for (let c = Math.min(...cs) - 3; c <= Math.max(...cs) + 3; c++) {
             const nm = outer.legend[outer.layout[r][c]];
             assert.ok(!['water', 'sea', 'water_shallow', 'water_shallow_glow'].includes(nm), `${outer.id}: 街のまわりに水がない (${c},${r})`);

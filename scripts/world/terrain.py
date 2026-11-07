@@ -824,6 +824,9 @@ def _desert_oases(land, biome, sx=1.0, sy=1.0):
 # 街の候補地（地図に重ねた図の A〜H）。画像のマス（1 マス = 世界の 1 マス）。実際の位置は、近くの「街に向く所」へ動かす
 TOWN_CANDIDATES = [('a', 375, 700), ('b', 515, 880), ('c', 470, 700), ('d', 640, 545), ('e', 790, 730), ('f', 590, 1060), ('g', 545, 165), ('h', 720, 360)]   # (名前, y, x)
 TOWN_R_FLAT = 17   # 街の敷地（平らにして、物を置かない）の半径
+# 山の上に置く街（位置を決め打ち。雪の連峰の山頂の、平らな台地。標高は、そのまま。山道でしか行けない）: A キュラビッド帝国（ユーザー指定: ロシア風・山道でしか行けない北の帝国）
+FIXED_TOWNS = {'a': (162, 842)}   # 街 → (y, x)。台地（高さ 35・約 28×30 マス）の中。山道が、台地の東の縁を通る
+TOWN_GATE_FRONT = 9               # 街の中心から、門前の石畳の南の端までの行数（gen_world の TOWN_HH = 6 から: 壁の南端 +5・石畳 +4）
 
 
 def _town_sites(land, biome, pond, oasis, sx=1.0, sy=1.0):
@@ -836,8 +839,13 @@ def _town_sites(land, biome, pond, oasis, sx=1.0, sy=1.0):
     d_sea = _distance(~land).astype(np.float32)
     d_pond = _distance(pond).astype(np.float32)
     base = land & (d_sea >= 20) & (d_river >= 28) & (d_pond >= 20) & ~_near_seam(Y.astype(int), X.astype(int), 20)
-    sites = []; mask = np.zeros((H, W), bool)
+    sites = []; mask = np.zeros((H, W), bool); mask_mtn = np.zeros((H, W), bool)
     for tid, cy, cx in TOWN_CANDIDATES:
+        if tid in FIXED_TOWNS:   # 山の上の街: 決め打ち。標高は変えない（mask_mtn は、物を置かない範囲だけ）
+            py, px = FIXED_TOWNS[tid]
+            sites.append(dict(id=tid, y=py, x=px))
+            mask_mtn |= (np.hypot(X - px, Y - py) <= TOWN_R_FLAT) & land
+            continue
         b0 = biome[cy, cx] if biome[cy, cx] in (GRASS, TROPICAL, DESERT) else GRASS     # C は砂漠（オアシスの池から 20 マス以上離す）
         ok = base & (_distance(biome != b0).astype(np.float32) >= 12)
         for o in sites: ok &= np.hypot(X - o['x'], Y - o['y']) > 70
@@ -847,7 +855,7 @@ def _town_sites(land, biome, pond, oasis, sx=1.0, sy=1.0):
         py, px = int(py), int(px)
         sites.append(dict(id=tid, y=py, x=px))
         mask |= (np.hypot(X - px, Y - py) <= TOWN_R_FLAT) & land
-    return sites, mask
+    return sites, mask, mask_mtn
 
 
 def build():
@@ -873,8 +881,9 @@ def build():
     oasis = _desert_oases(land, biome, sx, sy)                           # 砂漠のオアシス
     pond = pond | oasis['pond']
     fring = fring | oasis['ring']
-    towns, town_mask = _town_sites(land, biome, pond, oasis, sx, sy)   # 街の敷地（候補地 A〜H）
-    oasis['flat'] = oasis['flat'] | town_mask
+    towns, town_mask, town_mask_mtn = _town_sites(land, biome, pond, oasis, sx, sy)   # 街の敷地（候補地 A〜H）
+    oasis['flat'] = oasis['flat'] | town_mask          # 平地の街は、標高 0 に平らにする（山の上の街は、標高をそのまま）
+    town_mask = town_mask | town_mask_mtn
     fring = fring | gring
 
     # 川（世界のマス）: 線に、ゆらぎをつけて描く。浅瀬（歩いて渡れる）を、間隔をあけて作る
@@ -1061,6 +1070,23 @@ def build():
     elev = _lipschitz(elev)
     elev, trail, arenas, mtn_bridge, bridge_under = _mountains(elev, land, biome, (water_deep & ~bridge) | oasis['flat'] | ~land, sx, sy)   # 連峰・山脈: 段丘と山道
     elev[any_water | ~land | oasis['flat']] = 0
+    Y_, X_ = np.mgrid[0:H, 0:W]
+    # 山の上の街（A）: 門前の石畳から、近くの山道へ、山道をつなぐ（山道でしか行けない）。台地の上（街と同じ高さ）を通る
+    for s_ in towns:
+        if s_['id'] not in FIXED_TOWNS: continue
+        gy, gx = s_['y'] + TOWN_GATE_FRONT, s_['x']
+        ty_, tx_ = np.nonzero(trail & (np.hypot(Y_ - gy, X_ - gx) > 5))
+        k = int(np.argmin(np.hypot(ty_ - gy, tx_ - gx))); goal = (int(ty_[k]), int(tx_[k]))
+        y0_, y1_, x0_, x1_ = max(0, min(gy, goal[0]) - 20), min(H, max(gy, goal[0]) + 21), max(0, min(gx, goal[1]) - 20), min(W, max(gx, goal[1]) + 21)
+        cost = np.full((H, W), 1e18)
+        okc = land & (elev >= elev[s_['y'], s_['x']] - 1)
+        cost[y0_:y1_, x0_:x1_] = np.where(okc[y0_:y1_, x0_:x1_], 1.0, 1e18)
+        path = _astar4(cost, (gy, gx), goal, (y0_, y1_, x0_, x1_))
+        assert path, f'山の上の街 {s_["id"]}: 山道へのつなぎがない'
+        for y, x in path: trail[y, x] = True
+        for y, x in path: trail[min(H - 1, y + 1), x] = trail[y, min(W - 1, x + 1)] = True   # 山道の幅 2 マス
+        trail &= land
+        print('山の上の街', s_['id'], 'の山道のつなぎ', len(path), 'マス')
     return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, trail=trail, arenas=arenas, mtn_bridge=mtn_bridge, bridge_under=bridge_under, oasis=oasis, towns=towns, town_mask=town_mask, dist_sea=_distance(~land), dist_water=_distance(any_water))
 
 

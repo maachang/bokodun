@@ -7888,6 +7888,7 @@
     "description": "盗賊ギルドの隠し扉（建物の壁と同じ見た目で、看板もない。近づくと開く）"
   },
   "district_gate": {
+    "lift": true,
     "type": "door",
     "texture": "woodDoor",
     "frameTexture": "cityWall",
@@ -16506,6 +16507,7 @@
     "description": "ボコスカ島の地図（冒険者ギルドの壁に飾る、壁の面に付ける画像。sdServer 画像 261）"
   },
   "town_sign_a": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -16521,6 +16523,7 @@
     "description": "街の入口の近くの立て札（キュラビッド帝国。外のマップ用）"
   },
   "town_sign_b": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -16536,6 +16539,7 @@
     "description": "街の入口の近くの立て札（フランケル聖国。外のマップ用）"
   },
   "town_sign_c": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -16551,6 +16555,7 @@
     "description": "街の入口の近くの立て札（ミレニアム自由都市。外のマップ用）"
   },
   "town_sign_d": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -16566,6 +16571,7 @@
     "description": "街の入口の近くの立て札（グリーン王国。外のマップ用）"
   },
   "town_sign_e": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -16581,6 +16587,7 @@
     "description": "街の入口の近くの立て札（ガリレオ連盟。外のマップ用）"
   },
   "town_sign_f": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -16596,6 +16603,7 @@
     "description": "街の入口の近くの立て札（ライアン獣王国。外のマップ用）"
   },
   "town_sign_g": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
@@ -16611,6 +16619,7 @@
     "description": "街の入口の近くの立て札（デイラミ精霊国。外のマップ用）"
   },
   "town_sign_h": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",
