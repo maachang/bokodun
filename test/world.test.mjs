@@ -5,7 +5,11 @@ import os from 'node:os';
 import path from 'node:path';
 
 const root = process.cwd();
-const readJson = (f) => JSON.parse(fs.readFileSync(path.join(root, f), 'utf-8'));
+// マップ JSON は、物体 ID の数値の形式（layoutFormat 'ids'）なら、ゲームが使う 1 マス 1 文字の形にそろえる（public/js/mapFormat.js）
+const mapFormatTmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'mapformat-')), 'mapFormat.mjs');
+fs.copyFileSync(path.join(root, 'public/js/mapFormat.js'), mapFormatTmp);
+const { normalizeMap } = await import(mapFormatTmp);
+const readJson = (f) => normalizeMap(JSON.parse(fs.readFileSync(path.join(root, f), 'utf-8')));
 async function loadWorldMod() {
     // ブラウザ用の ES モジュール（.js）を、.mjs にコピーして読み込む
     const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'world-')), 'world.mjs');
@@ -1286,7 +1290,7 @@ test('草原のブラッシュアップ: 丘陵・ため池・林がある', () 
     let maxH = 0, pondMaps = 0, groveMaps = 0;
     for (const f of fs.readdirSync(dir)) {
         if (!/^w_\d\d_\d\d\.json$/.test(f)) continue;
-        const d = JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8'));
+        const d = normalizeMap(JSON.parse(fs.readFileSync(path.join(dir, f), 'utf-8')));
         const fl = d.floorLayer; if (!fl) continue;
         const grass = fl.join('').split('').filter(c => d.floorLegend[c] === 'grass').length / 4096;
         if (grass < 0.9) continue;
@@ -1371,4 +1375,18 @@ test('街（候補地 A〜H）: 門の前の石畳の東隣に、街の名前の
         assert.ok(outer.layout.some(r => r.includes(ch)), `${outer.id}: 立て札が置かれている`);
         assert.equal(objects[`town_sign_${id}`].message, t.name, `town_${id}: 立て札の文字は街の名前`);
     }
+});
+
+test('マップの形式: 世界のマップ（w_*）は、物体 ID の数値の配列（layoutFormat ids）。読み込むと 1 マス 1 文字になる。ID の範囲は 0〜0xD7FF', () => {
+    const raw = JSON.parse(fs.readFileSync(path.join(root, 'public/data/maps/w_10_08.json'), 'utf-8'));
+    assert.equal(raw.layoutFormat, 'ids');
+    assert.ok(Array.isArray(raw.layout[0]) && raw.layout.every(r => r.every(v => Number.isInteger(v) && v >= 0 && v <= 0xD7FF)), 'layout は整数の配列の配列');
+    assert.ok(Object.keys(raw.legend).every(k => /^\d+$/.test(k)), 'legend のキーは ID の 10 進文字列');
+    const m = normalizeMap(structuredClone(raw));
+    assert.equal(m.layout.length, 64);
+    assert.ok(m.layout.every((r, y) => typeof r === 'string' && r.length === 64 && [...r].every((ch, x) => ch.charCodeAt(0) === raw.layout[y][x])), '文字コードが ID と一致');
+    assert.ok(Object.keys(m.legend).every(k => k.length === 1), '変換後の legend のキーは 1 文字');
+    assert.equal(m.layoutFormat, undefined);
+    assert.equal(normalizeMap({ layout: ['ab'], legend: { a: 'x' } }).layout[0], 'ab', '手書きマップ（形式なし）は、そのまま');
+    assert.throws(() => normalizeMap({ layoutFormat: 'ids', layout: [[0xD800]] }), /範囲外/);
 });

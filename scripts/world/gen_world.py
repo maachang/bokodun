@@ -411,6 +411,18 @@ TOWN_SIGN_CH = 'À'   # 街の名前の立て札の文字（外のマップご�
 TOWN_LEGEND_KEYS = ('W', 'p', '=', 'H', 'T', 'f', 'v', 'F', 'G')
 
 
+def write_ids_map(m, path):
+    """世界のマップを書く。layout は物体 ID（文字コード）の数値の行の配列・legend のキーは ID の 10 進文字列（layoutFormat 'ids'。public/js/mapFormat.js が読む）"""
+    rows = [','.join(str(ord(ch)) for ch in row) for row in m['layout']]
+    m = dict(m)
+    m['layoutFormat'] = 'ids'
+    m['legend'] = {str(ord(k)): v for k, v in m['legend'].items()}
+    m['layout'] = [f'@@ROW{i}@@' for i in range(len(rows))]
+    text = json.dumps(m, ensure_ascii=False, indent=1)
+    for i, r in enumerate(rows): text = text.replace(f'"@@ROW{i}@@"', f'[{r}]', 1)
+    open(path, 'w', encoding='utf-8').write(text)
+
+
 def town_outer_id(site):
     """街の外観がある、外のマップの ID"""
     return f"w_{site['y'] // MESH:02d}_{site['x'] // MESH:02d}"
@@ -512,7 +524,7 @@ def main():
                 env.update(TROPICAL_ENV)
             if not sea_frac > 0.35 and dom == FOREST:
                 env.update(DARK_FOREST_ENV)   # 大森林: だいぶ薄暗い（大湿原より、少し暗い。近くは見え、遠くは霧に沈む）
-            layout = [''.join(chr(v) for v in row) for row in o]
+            layout = [''.join(chr(v) for v in row) for row in o]   # 以降は 1 文字で扱い、書き出すときに物体 ID（文字コード）の数値の配列にする
             heights = [''.join(CH36[min(35, int(v))] for v in row) for row in el]
             floor_layer = [''.join(chr(v) for v in row) for row in fl]
             used = set(''.join(layout)) - {'0'}
@@ -545,7 +557,7 @@ def main():
             if m_under is not None: m['bridgeUnder'] = int(m_under)
             tl, tn = town_outer_extras(t, j, i)
             if tl: m['links'] = tl; m['npcs'] = tn
-            json.dump(m, open(os.path.join(MAPS, mid + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+            write_ids_map(m, os.path.join(MAPS, mid + '.json'))
             grid[j][i] = mid
             info[mid] = dict(row=j, col=i, dom=dom, sea=sea_frac, grass=counts[GRASS] / max(1, int(L.sum())), land=int(L.sum()))
     city = json.load(open(os.path.join(MAPS, 'city.json'), encoding='utf-8'))

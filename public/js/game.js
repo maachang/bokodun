@@ -3,6 +3,7 @@ import { RetroTextureGenerator } from '/js/textures.js';
 import { Monster, Projectile } from '/js/entities.js';
 import { Npc } from '/js/npc.js';
 import { MapNavigator, stairsFacing, STAIRS_DIRS } from '/js/mapNavigator.js';
+import { fetchMap } from '/js/mapFormat.js';
 import { worldNeighbor, edgeCrossing, clampToWorld } from '/js/world.js';
 import { groundStepOk, bridgeLayerLevel } from '/js/enemyBehavior.js';
 import { SoundFX } from '/js/audio.js';
@@ -860,14 +861,14 @@ export class GameEngine {
         await Promise.all(['north', 'south', 'west', 'east'].map(async (dir) => {
             const nid = worldNeighbor(world, mapId, dir);
             if (!nid || this.mapCache[nid]) return;
-            try { this.mapCache[nid] = await (await fetch(`/data/maps/${nid}.json`)).json(); } catch { /* 読めなければ、隣の地形は描かない */ }
+            try { this.mapCache[nid] = await fetchMap(nid); } catch { /* 読めなければ、隣の地形は描かない */ }
         }));
         const floorOf = async (dir) => {
             const nid = worldNeighbor(world, mapId, dir);
             if (!nid) return null;
             let nd = this.mapCache[nid];
             if (!nd) {
-                try { nd = await (await fetch(`/data/maps/${nid}.json`)).json(); this.mapCache[nid] = nd; } catch { return null; }
+                try { nd = await fetchMap(nid); this.mapCache[nid] = nd; } catch { return null; }
             }
             return nd.environment?.floorType;
         };
@@ -928,7 +929,7 @@ export class GameEngine {
                 await new Promise(r => setTimeout(r, 150));
                 if (token !== this.prefetchToken) return;
                 if (this.mapCache[nid]) continue;
-                try { this.mapCache[nid] = await (await fetch(`/data/maps/${nid}.json`)).json(); } catch { /* 読めなければ、あとで、必要なときに読む */ }
+                try { this.mapCache[nid] = await fetchMap(nid); } catch { /* 読めなければ、あとで、必要なときに読む */ }
             }
         })();
     }
@@ -993,7 +994,7 @@ export class GameEngine {
                 const nid = world.grid[pj + dj]?.[pi + di];
                 if (!nid) continue;
                 let nd = this.mapCache[nid];
-                if (!nd) { try { nd = await (await fetch(`/data/maps/${nid}.json`)).json(); this.mapCache[nid] = nd; } catch { continue; } }
+                if (!nd) { try { nd = await fetchMap(nid); this.mapCache[nid] = nd; } catch { continue; } }
                 if (!nd?.heights || !nd.layout) continue;
                 const nrows = nd.layout.length, ncols = nd.layout[0].length;
                 const rowOff = dj * rows, colOff = di * cols;
@@ -1154,8 +1155,7 @@ export class GameEngine {
         let mapData = this.mapCache[mapId];
         if (!mapData) {
             try {
-                const res = await fetch(`/data/maps/${mapId}.json`);
-                mapData = await res.json();
+                mapData = await fetchMap(mapId);
                 this.mapCache[mapId] = mapData;
             } catch (err) {
                 console.error(`Failed to load map data for ${mapId}:`, err);

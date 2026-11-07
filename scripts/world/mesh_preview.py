@@ -18,6 +18,7 @@ for n, mid in enumerate(ids):
             k = 0.7 + 0.3 * min(1, h / 20)
             col = tuple(int(v * k) for v in f)
             ch = m['layout'][r][c]
+            if isinstance(ch, int): ch = chr(ch)   # 物体 ID（数値）の形式（layoutFormat 'ids'）は、文字コードとして 1 文字にする
             if ch in OBJ: col = OBJ[ch]
             d.rectangle([c * S, r * S, c * S + S - 1, r * S + S - 1], fill=col)
     out.paste(im, (n * (64 * S + 4), 0))
