@@ -43,7 +43,7 @@ DARK_FOREST_ENV = {'ambientLight': 0x56725e, 'directionalLight': 0x94a88a, 'fogC
 ENV_FROM = {SNOW: 'field_snow', CONIFER: 'field_tundra', FOREST: 'field_swamp', GRASS: 'field_grass', DESERT: 'field_desert', ROCK: 'field_mountain', TROPICAL: 'field_tropical', SEA: 'field_coast'}
 
 
-TOWN_HW, TOWN_HH = 12, 9    # 街の外観（壁）の半幅・半高さ（24×18 マス）。南の壁の真ん中に、門 2 マス
+TOWN_HW, TOWN_HH = 8, 6    # 街の外観（壁）の半幅・半高さ（16×12 マス。「街」と分かる最小限の大きさ）。南の壁の真ん中に、門 2 マス
 
 
 def town_gate_tiles(site):
@@ -404,6 +404,7 @@ def mesh_name(row, col, biome_counts, sea_frac, mine=False):
 
 # 街の中（枠だけ）の大きさ（マス）: 候補地ごと。B は大国の都、H は辺境の小さな街
 TOWN_SIZE = {'a': (32, 26), 'b': (48, 36), 'c': (40, 30), 'd': (40, 30), 'e': (32, 26), 'f': (40, 30), 'g': (32, 26), 'h': (28, 22)}
+START_TOWN = 'd'   # ゲーム開始の街（グリーン王国・平野の最初の街）。開始位置はその門の前（ユーザー指定）
 TOWN_NAME = {'a': 'キュラビッド帝国', 'b': 'フランケル聖国', 'c': 'ミレニアム自由都市', 'd': 'グリーン王国', 'e': 'ガリレオ連盟', 'f': 'ライアン獣王国', 'g': 'デイラミ精霊国', 'h': 'ダマスカス自治領'}   # 国の名前（ユーザー指定）
 TOWN_LEGEND_KEYS = ('W', 'p', '=', 'H', 'T', 'f', 'v', 'F', 'G')
 
@@ -421,8 +422,8 @@ def town_outer_extras(t, j, i):
         w, h = TOWN_SIZE[site['id']]
         for gx, gy in town_gate_tiles(site):
             links[f"{gx - i * MESH},{gy - j * MESH}"] = {'nextMap': f"town_{site['id']}", 'message': f"{TOWN_NAME[site['id']]}に入る", 'spawn': {'x': w // 2 - 1 + (gx - (site['x'] - 1)), 'z': h - 3, 'angle': 0}}
-        gy = site['y'] + TOWN_HH + 1
-        for k, (nid, dx) in enumerate((('guard_spear', -3), ('guard_light', 2))):
+        gy = site['y'] + TOWN_HH   # 壁のすぐ外（門と同じ並び）
+        for k, (nid, dx) in enumerate((('guard_spear', -2), ('guard_light', 1))):   # 門 2 マス（x-1, x）のすぐ両隣
             npcs.append({'id': nid, 'x': site['x'] + dx - i * MESH, 'z': gy - j * MESH})
     return links, npcs
 
@@ -525,6 +526,10 @@ def main():
                     d = (r - cy) ** 2 + (c - cx) ** 2
                     if best is None or d < best[0]: best = (d, r, c)
             spawn = {'x': best[2], 'z': best[1], 'angle': 0} if best else {'x': 32, 'z': 32, 'angle': 0}
+            # 最初の街（D・グリーン王国）がある外のマップは、出現位置を門の前（南へ 4 マス・北向き）にする
+            for site in t['towns']:
+                if site['id'] == START_TOWN and town_outer_id(site) == f'w_{j:02d}_{i:02d}':
+                    spawn = {'x': site['x'] - 1 - i * MESH, 'z': site['y'] + TOWN_HH - 1 + 4 - j * MESH, 'angle': 0}
             m_under = t['bridge_under'].get((j, i))
             m = {
                 'id': mid, 'name': mesh_name(j, i, counts, sea_frac, any(ch in ('E', '3', '4', '5', 't') for ch in set(''.join(layout)))), 'type': 'open', 'tileSize': 4, 'wallHeight': 4,
@@ -542,8 +547,8 @@ def main():
     city = json.load(open(os.path.join(MAPS, 'city.json'), encoding='utf-8'))
     gen_towns(t, city['legend'], city['environment'])
     # 最初のマップ: 島の中心に近く、ほとんどが陸で、草原が多いメッシュ
-    cands = [(abs(v['row'] - 8) + abs(v['col'] - 11), k) for k, v in info.items() if v['sea'] < 0.05 and v['grass'] > 0.6]
-    start = min(cands)[1]
+    # ゲーム開始は、最初の街（START_TOWN）の門の前。その街の外のマップを start にする
+    start = town_outer_id(next(site for site in t['towns'] if site['id'] == START_TOWN))
     json.dump({'mapSize': MESH, 'start': start, 'arenas': [[a, b, c] for a, b, c in t['arenas']], 'grid': grid}, open(os.path.join(ROOT, 'public', 'data', 'world.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
     print('マップ数', len(info), 'start', start)
 

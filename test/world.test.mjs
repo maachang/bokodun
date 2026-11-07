@@ -1344,12 +1344,12 @@ test('街（候補地 A〜H）: 外のマップに壁と門（扉＋衛兵）・
     }
 });
 
-test('街（候補地 A〜H）: 敷地は、水・川・マップの境から離れている（外壁 24×18 の中・まわりに水がない）', () => {
+test('街（候補地 A〜H）: 敷地は、水・川・マップの境から離れている（外壁 16×12 の中・まわりに水がない）', () => {
     for (const id of 'abcdefgh'.split('')) {
         const t = readJson(`public/data/maps/town_${id}.json`);
         const outer = readJson(`public/data/maps/${Object.values(t.links)[0].nextMap}.json`);
         const rows = outer.layout.map((r, i) => [r, i]).filter(([r]) => r.includes(Object.entries(outer.legend).find(([, v]) => v === 'city_wall')?.[0] ?? '#'));
-        assert.ok(rows.length >= 18, `${outer.id}: 街の外壁がある`);
+        assert.ok(rows.length >= 12, `${outer.id}: 街の外壁がある`);
         const wallCh = Object.entries(outer.legend).find(([, v]) => v === 'city_wall')[0];
         const rs = rows.map(([, i]) => i), cs = [];
         rows.forEach(([r]) => [...r].forEach((ch, c) => { if (ch === wallCh) cs.push(c); }));
