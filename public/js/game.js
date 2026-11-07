@@ -1671,8 +1671,8 @@ export class GameEngine {
                                 shadowCanvas.height = 32;
                                 const sCtx = shadowCanvas.getContext('2d');
                                 const grad = sCtx.createRadialGradient(16, 16, 2, 16, 16, 16);
-                                grad.addColorStop(0, 'rgba(0, 4, 0, 0.9)');
-                                grad.addColorStop(0.55, 'rgba(0, 6, 0, 0.6)');
+                                grad.addColorStop(0, 'rgba(0, 0, 0, 0.9)');
+                                grad.addColorStop(0.55, 'rgba(0, 0, 0, 0.6)');
                                 grad.addColorStop(1, 'rgba(0, 0, 0, 0)');
                                 sCtx.fillStyle = grad;
                                 sCtx.fillRect(0, 0, 32, 32);
@@ -4693,7 +4693,7 @@ export class GameEngine {
         if (round.length) {
             const tex = gradTex(ctx => {
                 const g = ctx.createRadialGradient(16, 16, 2, 16, 16, 16);
-                g.addColorStop(0, 'rgba(0, 4, 0, 0.9)'); g.addColorStop(0.55, 'rgba(0, 6, 0, 0.6)'); g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                g.addColorStop(0, 'rgba(0, 0, 0, 0.9)'); g.addColorStop(0.55, 'rgba(0, 0, 0, 0.6)'); g.addColorStop(1, 'rgba(0, 0, 0, 0)');
                 ctx.fillStyle = g; ctx.fillRect(0, 0, 32, 32);
             });
             make(new THREE.PlaneGeometry(1, 1), tex, round, (it) => {
@@ -4704,7 +4704,7 @@ export class GameEngine {
             // 壁に接する側（画像の上）が濃く、外へ向かって薄くなる帯
             const tex = gradTex(ctx => {
                 const g = ctx.createLinearGradient(0, 0, 0, 32);
-                g.addColorStop(0, 'rgba(0, 4, 0, 0.65)'); g.addColorStop(1, 'rgba(0, 0, 0, 0)');
+                g.addColorStop(0, 'rgba(0, 0, 0, 0.65)'); g.addColorStop(1, 'rgba(0, 0, 0, 0)');
                 ctx.fillStyle = g; ctx.fillRect(0, 0, 32, 32);
             });
             const depth = tileSize * 0.7;
