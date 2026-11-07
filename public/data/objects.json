@@ -16283,5 +16283,117 @@
     "solid": true,
     "blocksProjectiles": true,
     "description": "ボコスカ島の地図（冒険者ギルドの壁に飾る、壁の面に付ける画像。sdServer 画像 261）"
+  },
+  "town_sign_a": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "キュラビッド帝国",
+    "description": "街の入口の近くの立て札（キュラビッド帝国。外のマップ用）"
+  },
+  "town_sign_b": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "フランケル聖国",
+    "description": "街の入口の近くの立て札（フランケル聖国。外のマップ用）"
+  },
+  "town_sign_c": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "ミレニアム自由都市",
+    "description": "街の入口の近くの立て札（ミレニアム自由都市。外のマップ用）"
+  },
+  "town_sign_d": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "グリーン王国",
+    "description": "街の入口の近くの立て札（グリーン王国。外のマップ用）"
+  },
+  "town_sign_e": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "ガリレオ連盟",
+    "description": "街の入口の近くの立て札（ガリレオ連盟。外のマップ用）"
+  },
+  "town_sign_f": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "ライアン獣王国",
+    "description": "街の入口の近くの立て札（ライアン獣王国。外のマップ用）"
+  },
+  "town_sign_g": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "デイラミ精霊国",
+    "description": "街の入口の近くの立て札（デイラミ精霊国。外のマップ用）"
+  },
+  "town_sign_h": {
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "ダマスカス自治領",
+    "description": "街の入口の近くの立て札（ダマスカス自治領。外のマップ用）"
   }
 }

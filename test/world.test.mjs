@@ -1360,3 +1360,15 @@ test('街（候補地 A〜H）: 敷地は、水・川・マップの境から離
         }
     }
 });
+
+test('街（候補地 A〜H）: 門の前の石畳の東隣に、街の名前の立て札がある', () => {
+    const objects = readJson('public/data/objects.json');
+    for (const id of 'abcdefgh'.split('')) {
+        const t = readJson(`public/data/maps/town_${id}.json`);
+        const outer = readJson(`public/data/maps/${Object.values(t.links)[0].nextMap}.json`);
+        const ch = Object.entries(outer.legend).find(([, v]) => v === `town_sign_${id}`)?.[0];
+        assert.ok(ch, `${outer.id}: 立て札の凡例がある`);
+        assert.ok(outer.layout.some(r => r.includes(ch)), `${outer.id}: 立て札が置かれている`);
+        assert.equal(objects[`town_sign_${id}`].message, t.name, `town_${id}: 立て札の文字は街の名前`);
+    }
+});

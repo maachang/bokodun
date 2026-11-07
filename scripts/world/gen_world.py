@@ -336,6 +336,7 @@ def build_tiles(t):
         obj[y0, x0:x1 + 1] = ord('6'); obj[y1, x0:x1 + 1] = ord('6'); obj[y0:y1 + 1, x0] = ord('6'); obj[y0:y1 + 1, x1] = ord('6')
         for gx, gy in town_gate_tiles(site): obj[gy, gx] = ord('7')
         obj[y1 + 1:y1 + 5, px - 3:px + 3] = ord('9')              # 門の前の石畳
+        obj[y1 + 2, px + 3] = ord(TOWN_SIGN_CH)                   # 門の前の石畳の東隣に、街の名前の立て札
     # --- 境界線（隣のマップとの継ぎ目）の整合 ---
     #   境界を越えると、隣のマップの同じ位置に出る。そこが、木・崖・水の中だと、近くの空きへ押し出され、川の向こう岸へ渡ったり、
     #   壁に囲まれた空間の中に入って、出られなくなったりする。継ぎ目の両側のマス（向かい合うマス）の、歩ける・歩けないを、そろえる:
@@ -406,6 +407,7 @@ def mesh_name(row, col, biome_counts, sea_frac, mine=False):
 TOWN_SIZE = {'a': (32, 26), 'b': (48, 36), 'c': (40, 30), 'd': (40, 30), 'e': (32, 26), 'f': (40, 30), 'g': (32, 26), 'h': (28, 22)}
 START_TOWN = 'd'   # ゲーム開始の街（グリーン王国・平野の最初の街）。開始位置はその門の前（ユーザー指定）
 TOWN_NAME = {'a': 'キュラビッド帝国', 'b': 'フランケル聖国', 'c': 'ミレニアム自由都市', 'd': 'グリーン王国', 'e': 'ガリレオ連盟', 'f': 'ライアン獣王国', 'g': 'デイラミ精霊国', 'h': 'ダマスカス自治領'}   # 国の名前（ユーザー指定）
+TOWN_SIGN_CH = 'À'   # 街の名前の立て札の文字（外のマップごとに、凡例で town_sign_<街ID> に割り当てる）
 TOWN_LEGEND_KEYS = ('W', 'p', '=', 'H', 'T', 'f', 'v', 'F', 'G')
 
 
@@ -514,7 +516,9 @@ def main():
             heights = [''.join(CH36[min(35, int(v))] for v in row) for row in el]
             floor_layer = [''.join(chr(v) for v in row) for row in fl]
             used = set(''.join(layout)) - {'0'}
-            legend = {k: LEGEND[k] for k in sorted(used)}
+            legend = {k: LEGEND[k] for k in sorted(used) if k != TOWN_SIGN_CH}
+            for site in t['towns']:
+                if TOWN_SIGN_CH in used and town_outer_id(site) == f'w_{j:02d}_{i:02d}': legend[TOWN_SIGN_CH] = f"town_sign_{site['id']}"
             mid = f'w_{j:02d}_{i:02d}'
             # 出現位置: 中央に近い、歩ける陸のマス
             solid = set(SOLID_CH) | set('QO')
