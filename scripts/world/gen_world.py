@@ -29,9 +29,10 @@ LEGEND = {
     'a': 'tropical_forest_a', 'd': 'tropical_forest_b', 'f': 'tropical_palm_forest', 'r': 'swamp_tree_a', 's': 'marsh_flower', 'g': 'water_shallow_glow',   # 南国: ジャングルの木・ヤシの林（2 倍）・マングローブ・毒々しい花・青緑に光る浅瀬
     'c': 'cliff_rock_wall', 'Y': 'tropical_tree', 'E': 'mine_entrance', '3': 'mine_entrance_e', '4': 'mine_entrance_w', '5': 'mine_entrance_n', 't': 'mine_cart',   # 炭鉱の入口: E=南向き・3=東向き・4=西向き・5=北向き
     
+    '6': 'city_wall', '7': 'district_gate', '8': 'brick_house', '9': 'plaza_stone',   # 街（候補地 A〜H）の外観: 壁・門・家・門の前の石畳
     'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge', 'I': 'rope_bridge', '1': 'cave_torch', '2': 'riverside_tree',
 }
-SOLID_CH = set('FCNPDGAXUMRSBHcYE345tTVWKJLjnxyadfr2')          # 通れない物体（端のマスには置かない）
+SOLID_CH = set('FCNPDGAXUMRSBHcYE345tTVWKJLjnxyadfr2678')          # 通れない物体（端のマスには置かない）
 # 地面の種類（floorLayer の文字 → environment.floorType と同じ名前）
 FLOOR = {'g': 'grass', 's': 'snow', 'f': 'forest', 'd': 'desert', 'r': 'rock', 'w': 'whiteSand', 'u': 'tundra', 'i': 'ice', 'm': 'redEarth', 'a': 'ash'}
 BIOME_FLOOR = {SNOW: 's', CONIFER: 'u', FOREST: 'f', GRASS: 'g', DESERT: 'd', ROCK: 'r', TROPICAL: 'g', SEA: 'g'}
@@ -40,6 +41,14 @@ BIOME_NAME = {SNOW: '北の雪山', CONIFER: '針葉樹の裾野', FOREST: '大�
 TROPICAL_ENV = {'ambientLight': 0xffffff, 'directionalLight': 0xfff2c8, 'fogColor': 0xb8e8e0, 'fogNear': 30, 'fogFar': 105, 'visibility': 1.0, 'skyColor': 0x4fd0e8}   # 南国: 青緑がかった、明るい空と霧
 DARK_FOREST_ENV = {'ambientLight': 0x56725e, 'directionalLight': 0x94a88a, 'fogColor': 0x1a2a20, 'fogNear': 9, 'fogFar': 44, 'visibility': 0.65, 'skyColor': 0x1a2a20}
 ENV_FROM = {SNOW: 'field_snow', CONIFER: 'field_tundra', FOREST: 'field_swamp', GRASS: 'field_grass', DESERT: 'field_desert', ROCK: 'field_mountain', TROPICAL: 'field_tropical', SEA: 'field_coast'}
+
+
+TOWN_HW, TOWN_HH = 12, 9    # 街の外観（壁）の半幅・半高さ（24×18 マス）。南の壁の真ん中に、門 2 マス
+
+
+def town_gate_tiles(site):
+    """街の門の 2 マス（世界のマス: (x, y)）。南の壁の真ん中"""
+    return [(site['x'] - 1, site['y'] + TOWN_HH - 1), (site['x'], site['y'] + TOWN_HH - 1)]
 
 
 def build_tiles(t):
@@ -317,6 +326,16 @@ def build_tiles(t):
                         obj[yy, xx] = ord(pch); break
                 else: continue
                 break
+    # --- 街（候補地 A〜H）の外観: 平らな敷地に、壁で囲んだ街。南に門（扉＋衛兵）と石畳。中は別のマップ（town_*.json） ---
+    for site in t['towns']:
+        px, py = site['x'], site['y']
+        zone = t['town_mask'] & (np.hypot(xs_ - px, ys_ - py) <= T.TOWN_R_FLAT)
+        obj[zone] = ord('0')                                      # 敷地の物（木・草・花）を、すべて取り除く
+        x0, x1, y0, y1 = px - TOWN_HW, px + TOWN_HW - 1, py - TOWN_HH, py + TOWN_HH - 1
+        obj[y0:y1 + 1, x0:x1 + 1] = ord('8')                      # 壁の中は、家々の屋根（入れない）
+        obj[y0, x0:x1 + 1] = ord('6'); obj[y1, x0:x1 + 1] = ord('6'); obj[y0:y1 + 1, x0] = ord('6'); obj[y0:y1 + 1, x1] = ord('6')
+        for gx, gy in town_gate_tiles(site): obj[gy, gx] = ord('7')
+        obj[y1 + 1:y1 + 5, px - 3:px + 3] = ord('9')              # 門の前の石畳
     # --- 境界線（隣のマップとの継ぎ目）の整合 ---
     #   境界を越えると、隣のマップの同じ位置に出る。そこが、木・崖・水の中だと、近くの空きへ押し出され、川の向こう岸へ渡ったり、
     #   壁に囲まれた空間の中に入って、出られなくなったりする。継ぎ目の両側のマス（向かい合うマス）の、歩ける・歩けないを、そろえる:
@@ -383,6 +402,80 @@ def mesh_name(row, col, biome_counts, sea_frac, mine=False):
     return f'{base} ({row + 1}-{col + 1})'
 
 
+# 街の中（枠だけ）の大きさ（マス）: 候補地ごと。B は大国の都、H は辺境の小さな街
+TOWN_SIZE = {'a': (32, 26), 'b': (48, 36), 'c': (40, 30), 'd': (40, 30), 'e': (32, 26), 'f': (40, 30), 'g': (32, 26), 'h': (28, 22)}
+TOWN_NAME = {'a': 'キュラビッド帝国', 'b': 'フランケル聖国', 'c': 'ミレニアム自由都市', 'd': 'グリーン王国', 'e': 'ガリレオ連盟', 'f': 'ライアン獣王国', 'g': 'デイラミ精霊国', 'h': 'ダマスカス自治領'}   # 国の名前（ユーザー指定）
+TOWN_LEGEND_KEYS = ('W', 'p', '=', 'H', 'T', 'f', 'v', 'F', 'G')
+
+
+def town_outer_id(site):
+    """街の外観がある、外のマップの ID"""
+    return f"w_{site['y'] // MESH:02d}_{site['x'] // MESH:02d}"
+
+
+def town_outer_extras(t, j, i):
+    """外のマップ (j, i) にある街の、門の links・衛兵の npcs"""
+    links, npcs = {}, []
+    for site in t['towns']:
+        if site['y'] // MESH != j or site['x'] // MESH != i: continue
+        w, h = TOWN_SIZE[site['id']]
+        for gx, gy in town_gate_tiles(site):
+            links[f"{gx - i * MESH},{gy - j * MESH}"] = {'nextMap': f"town_{site['id']}", 'message': f"{TOWN_NAME[site['id']]}に入る", 'spawn': {'x': w // 2 - 1 + (gx - (site['x'] - 1)), 'z': h - 3, 'angle': 0}}
+        gy = site['y'] + TOWN_HH + 1
+        for k, (nid, dx) in enumerate((('guard_spear', -3), ('guard_light', 2))):
+            npcs.append({'id': nid, 'x': site['x'] + dx - i * MESH, 'z': gy - j * MESH})
+    return links, npcs
+
+
+def town_layout(w, h):
+    """街の中（枠だけ）。外壁・南の門・大通り・広場と噴水・家の並び（入口なし）。歩ける所は、すべてつながる"""
+    g = [['p'] * w for _ in range(h)]
+    cx, cy = w // 2, h // 2
+    block = np.zeros((h, w), bool)                                  # 家を置かない所（道・広場）
+    for y in range(1, h - 1):
+        for x in range(cx - 2, cx + 2): g[y][x] = '='; block[y][x] = True       # 大通り（南北）
+    for y in range(cy - 1, cy + 2):
+        for x in range(1, w - 1): g[y][x] = '='; block[y][x] = True             # 大通り（東西）
+    for y in range(cy - 4, cy + 4):
+        for x in range(cx - 6, cx + 6): g[y][x] = 'p'; block[y][x] = True       # 広場
+    g[cy - 1][cx - 1] = g[cy - 1][cx] = g[cy][cx - 1] = g[cy][cx] = 'F'         # 噴水（2×2）
+    for x in range(w): g[0][x] = 'W'; g[h - 1][x] = 'W'
+    for y in range(h): g[y][0] = 'W'; g[y][w - 1] = 'W'
+    g[h - 1][cx - 1] = g[h - 1][cx] = 'G'
+    bx = 2
+    while bx + 4 <= w - 2:
+        by = 2
+        while by + 3 <= h - 2:
+            if not block[max(0, by - 1):by + 4, max(0, bx - 1):bx + 5].any():
+                for y in range(by, by + 3):
+                    for x in range(bx, bx + 4): g[y][x] = 'H'
+            by += 4
+        bx += 5
+    for x, y in ((2, h - 3), (w - 3, h - 3), (2, cy + 3), (w - 3, cy + 3), (cx - 4, cy + 3), (cx + 3, cy + 3)):
+        if g[y][x] == 'p': g[y][x] = 'T'
+    for x in (cx - 5, cx + 4):
+        for y in (cy - 3, cy + 2):
+            if g[y][x] == 'p': g[y][x] = 'f'
+    return [''.join(r) for r in g]
+
+
+def gen_towns(t, city_legend, env):
+    """街の中のマップ（town_a〜town_h）を書く"""
+    for site in t['towns']:
+        w, h = TOWN_SIZE[site['id']]
+        layout = town_layout(w, h)
+        oid = town_outer_id(site)
+        links = {}
+        for gx, gy in town_gate_tiles(site):
+            links[f"{w // 2 - 1 + (gx - (site['x'] - 1))},{h - 1}"] = {'nextMap': oid, 'message': f"{TOWN_NAME[site['id']]}の外へ",
+                'spawn': {'x': gx - (site['x'] // MESH) * MESH, 'z': gy + 2 - (site['y'] // MESH) * MESH, 'angle': 3.14159}}
+        m = {'id': f"town_{site['id']}", 'name': TOWN_NAME[site['id']], 'type': 'open', 'tileSize': 4, 'wallHeight': 4,
+             'spawn': {'x': w // 2, 'z': h - 3, 'angle': 0}, 'environment': env, 'decorFloor': 'cobblestone', 'enemies': {},
+             'legend': {k: city_legend[k] for k in TOWN_LEGEND_KEYS}, 'layout': layout, 'npcs': [], 'links': links,
+             'heights': ['0' * w for _ in range(h)], 'heightStep': 0.5}
+        json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+
+
 def main():
     t = T.build()
     obj, floor, elev = build_tiles(t)
@@ -441,9 +534,13 @@ def main():
                 'layout': layout,
             }
             if m_under is not None: m['bridgeUnder'] = int(m_under)
+            tl, tn = town_outer_extras(t, j, i)
+            if tl: m['links'] = tl; m['npcs'] = tn
             json.dump(m, open(os.path.join(MAPS, mid + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
             grid[j][i] = mid
             info[mid] = dict(row=j, col=i, dom=dom, sea=sea_frac, grass=counts[GRASS] / max(1, int(L.sum())), land=int(L.sum()))
+    city = json.load(open(os.path.join(MAPS, 'city.json'), encoding='utf-8'))
+    gen_towns(t, city['legend'], city['environment'])
     # 最初のマップ: 島の中心に近く、ほとんどが陸で、草原が多いメッシュ
     cands = [(abs(v['row'] - 8) + abs(v['col'] - 11), k) for k, v in info.items() if v['sea'] < 0.05 and v['grass'] > 0.6]
     start = min(cands)[1]

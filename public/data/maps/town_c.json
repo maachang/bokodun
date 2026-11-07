@@ -1,0 +1,122 @@
+{
+ "id": "town_c",
+ "name": "ミレニアム自由都市",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "spawn": {
+  "x": 20,
+  "z": 27,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 11713215,
+  "fogNear": 22,
+  "fogFar": 75,
+  "visibility": 0.9,
+  "skyColor": 9018045
+ },
+ "decorFloor": "cobblestone",
+ "enemies": {},
+ "legend": {
+  "W": "city_wall",
+  "p": "plaza_stone",
+  "=": "paved_road",
+  "H": "brick_house",
+  "T": "tree",
+  "f": "flower_bed",
+  "v": "flower_bed_blue",
+  "F": "plaza_fountain",
+  "G": "district_gate"
+ },
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHppppppppppppppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHppppfppppppppfppHHHHpHHHHpppW",
+  "WppppppppppppppppppppppppppppppppppppppW",
+  "W=============pppppFFppppp=============W",
+  "W=============pppppFFppppp=============W",
+  "W=============pppppppppppp=============W",
+  "WppppppppppppppfppppppppfppppppppppppppW",
+  "WpHHHHpHHHHpppppTppppppTpppHHHHpHHHHpTpW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHpHHHHpp====pppppHHHHpHHHHpppW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WpTppppppppppppppp====pppppppppppppppTpW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
+ ],
+ "npcs": [],
+ "links": {
+  "19,29": {
+   "nextMap": "w_06_10",
+   "message": "ミレニアム自由都市の外へ",
+   "spawn": {
+    "x": 42,
+    "z": 53,
+    "angle": 3.14159
+   }
+  },
+  "20,29": {
+   "nextMap": "w_06_10",
+   "message": "ミレニアム自由都市の外へ",
+   "spawn": {
+    "x": 43,
+    "z": 53,
+    "angle": 3.14159
+   }
+  }
+ },
+ "heights": [
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000"
+ ],
+ "heightStep": 0.5
+}

@@ -821,6 +821,35 @@ def _desert_oases(land, biome, sx=1.0, sy=1.0):
     return out
 
 
+# 街の候補地（地図に重ねた図の A〜H）。画像のマス（1 マス = 世界の 1 マス）。実際の位置は、近くの「街に向く所」へ動かす
+TOWN_CANDIDATES = [('a', 375, 700), ('b', 515, 880), ('c', 470, 700), ('d', 640, 545), ('e', 790, 730), ('f', 590, 1060), ('g', 545, 165), ('h', 720, 360)]   # (名前, y, x)
+TOWN_R_FLAT = 17   # 街の敷地（平らにして、物を置かない）の半径
+
+
+def _town_sites(land, biome, pond, oasis, sx=1.0, sy=1.0):
+    """街の敷地（候補地ごとに 1 か所）。海・川・池・地形の境・マップの境から離れた、草原（C は砂漠のオアシス、E は南国）の平らにできる所のうち、候補にいちばん近い所。
+    戻り値: list of dict(id, y, x)・mask（平らにして、物を置かない所）"""
+    Y, X = np.mgrid[0:H, 0:W].astype(np.float32)
+    rim = Image.new('L', (W, H), 0); rd = ImageDraw.Draw(rim)
+    for rv in RIVERS: rd.line([(x * sx, y * sy) for x, y in rv['pts']], fill=255, width=3)
+    d_river = _distance(np.asarray(rim) > 0).astype(np.float32)
+    d_sea = _distance(~land).astype(np.float32)
+    d_pond = _distance(pond).astype(np.float32)
+    base = land & (d_sea >= 20) & (d_river >= 28) & (d_pond >= 20) & ~_near_seam(Y.astype(int), X.astype(int), 20)
+    sites = []; mask = np.zeros((H, W), bool)
+    for tid, cy, cx in TOWN_CANDIDATES:
+        b0 = biome[cy, cx] if biome[cy, cx] in (GRASS, TROPICAL, DESERT) else GRASS     # C は砂漠（オアシスの池から 20 マス以上離す）
+        ok = base & (_distance(biome != b0).astype(np.float32) >= 12)
+        for o in sites: ok &= np.hypot(X - o['x'], Y - o['y']) > 70
+        if not ok.any(): continue
+        dd = np.where(ok, np.hypot(X - cx, Y - cy), 1e9)
+        py, px = np.unravel_index(np.argmin(dd), dd.shape)
+        py, px = int(py), int(px)
+        sites.append(dict(id=tid, y=py, x=px))
+        mask |= (np.hypot(X - px, Y - py) <= TOWN_R_FLAT) & land
+    return sites, mask
+
+
 def build():
     land_i, biome_i, lake_i = read_image()
     sx, sy = W / land_i.shape[1], H / land_i.shape[0]
@@ -844,6 +873,8 @@ def build():
     oasis = _desert_oases(land, biome, sx, sy)                           # 砂漠のオアシス
     pond = pond | oasis['pond']
     fring = fring | oasis['ring']
+    towns, town_mask = _town_sites(land, biome, pond, oasis, sx, sy)   # 街の敷地（候補地 A〜H）
+    oasis['flat'] = oasis['flat'] | town_mask
     fring = fring | gring
 
     # 川（世界のマス）: 線に、ゆらぎをつけて描く。浅瀬（歩いて渡れる）を、間隔をあけて作る
@@ -1030,7 +1061,7 @@ def build():
     elev = _lipschitz(elev)
     elev, trail, arenas, mtn_bridge, bridge_under = _mountains(elev, land, biome, (water_deep & ~bridge) | oasis['flat'] | ~land, sx, sy)   # 連峰・山脈: 段丘と山道
     elev[any_water | ~land | oasis['flat']] = 0
-    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, trail=trail, arenas=arenas, mtn_bridge=mtn_bridge, bridge_under=bridge_under, oasis=oasis, dist_sea=_distance(~land), dist_water=_distance(any_water))
+    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, trail=trail, arenas=arenas, mtn_bridge=mtn_bridge, bridge_under=bridge_under, oasis=oasis, towns=towns, town_mask=town_mask, dist_sea=_distance(~land), dist_water=_distance(any_water))
 
 
 if __name__ == '__main__':

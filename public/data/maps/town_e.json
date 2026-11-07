@@ -1,0 +1,114 @@
+{
+ "id": "town_e",
+ "name": "ガリレオ連盟",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "spawn": {
+  "x": 16,
+  "z": 23,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 11713215,
+  "fogNear": 22,
+  "fogFar": 75,
+  "visibility": 0.9,
+  "skyColor": 9018045
+ },
+ "decorFloor": "cobblestone",
+ "enemies": {},
+ "legend": {
+  "W": "city_wall",
+  "p": "plaza_stone",
+  "=": "paved_road",
+  "H": "brick_house",
+  "T": "tree",
+  "f": "flower_bed",
+  "v": "flower_bed_blue",
+  "F": "plaza_fountain",
+  "G": "district_gate"
+ },
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "Wppppppppppppp====pppppppppppppW",
+  "WpHHHHpHHHHppp====ppppHHHHpppppW",
+  "WpHHHHpHHHHppp====ppppHHHHpppppW",
+  "WpHHHHpHHHHppp====ppppHHHHpppppW",
+  "Wppppppppppppp====pppppppppppppW",
+  "WpHHHHpppppppp====pppppppppppppW",
+  "WpHHHHpppppppp====pppppppppppppW",
+  "WpHHHHpppppppp====pppppppppppppW",
+  "WppppppppppppppppppppppppppppppW",
+  "WppppppppppfppppppppfppppppppppW",
+  "WppppppppppppppppppppppppppppppW",
+  "W=========pppppFFppppp=========W",
+  "W=========pppppFFppppp=========W",
+  "W=========pppppppppppp=========W",
+  "WppppppppppfppppppppfppppppppppW",
+  "WpTpppppppppTppppppTpppppppppTpW",
+  "Wppppppppppppp====pppppppppppppW",
+  "WpHHHHpHHHHppp====ppppHHHHpppppW",
+  "WpHHHHpHHHHppp====ppppHHHHpppppW",
+  "WpHHHHpHHHHppp====ppppHHHHpppppW",
+  "Wppppppppppppp====pppppppppppppW",
+  "Wppppppppppppp====pppppppppppppW",
+  "WpTppppppppppp====pppppppppppTpW",
+  "Wppppppppppppp====pppppppppppppW",
+  "WWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWW"
+ ],
+ "npcs": [],
+ "links": {
+  "15,25": {
+   "nextMap": "w_12_11",
+   "message": "ガリレオ連盟の外へ",
+   "spawn": {
+    "x": 22,
+    "z": 34,
+    "angle": 3.14159
+   }
+  },
+  "16,25": {
+   "nextMap": "w_12_11",
+   "message": "ガリレオ連盟の外へ",
+   "spawn": {
+    "x": 23,
+    "z": 34,
+    "angle": 3.14159
+   }
+  }
+ },
+ "heights": [
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000",
+  "00000000000000000000000000000000"
+ ],
+ "heightStep": 0.5
+}

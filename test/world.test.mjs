@@ -1305,3 +1305,58 @@ test('描画の負荷: 木・草・花の板は、区画ごとにまとめて隠
     for (const k of ['export const CULL_CHUNK = 32', 'export const NEIGHBOR_PLANT_RANGE = 10', 'buildCullChunks() {', 'updateCullChunks() {', 'this.buildCullChunks();', 'this.updateCullChunks();', 'this.cullChunks = [];', "def.type === 'plant' && gr >= -NEIGHBOR_PLANT_RANGE"]) assert.ok(g.includes(k), k);
     assert.ok(g.includes('if (!this._cullDirty && Math.abs(p.x - this._cullX) + Math.abs(p.z - this._cullZ) < 1'), '動いたときだけ判定する');
 });
+
+test('街（候補地 A〜H）: 外のマップに壁と門（扉＋衛兵）・石畳、中は別マップ（town_a〜h）。出入りの位置が歩ける所・中の歩ける所はすべてつながる', () => {
+    const ids = 'abcdefgh'.split('');
+    const outerWalk = (m, c, r) => {
+        const o = objects[m.legend[m.layout[r][c]]];
+        return !o || (!o.solid && o.type !== 'sea_tile' && !['water'].includes(m.legend[m.layout[r][c]]));
+    };
+    for (const id of ids) {
+        const t = readJson(`public/data/maps/town_${id}.json`);
+        assert.equal(t.type, 'open');
+        // 中: 外へ出る門 2 マス（南の壁）・出た先（外のマップ）が歩ける所の石畳
+        const gates = Object.entries(t.links);
+        assert.equal(gates.length, 2, `town_${id}: 門は 2 マス`);
+        for (const [key, l] of gates) {
+            const [c, r] = key.split(',').map(Number);
+            assert.equal(t.legend[t.layout[r][c]], 'district_gate');
+            const outer = readJson(`public/data/maps/${l.nextMap}.json`);
+            const oc = Math.floor(l.spawn.x), orow = Math.floor(l.spawn.z);
+            assert.ok(outerWalk(outer, oc, orow), `town_${id}: 出た先が歩ける所`);
+            assert.equal(outer.legend[outer.layout[orow][oc]], 'plaza_stone');
+            // 外の門のマスから、この街へ入る links があり、出現位置が、街の中の歩ける所
+            const back = Object.values(outer.links).filter((x) => x.nextMap === `town_${id}`);
+            assert.equal(back.length, 2, `${l.nextMap}: 街 ${id} へ入る門が 2 マス`);
+            for (const b of back) assert.equal(objects[t.legend[t.layout[Math.floor(b.spawn.z)][Math.floor(b.spawn.x)]]]?.solid ?? false, false);
+            assert.ok(outer.npcs.length >= 2, '門の衛兵');
+            for (const [k2] of Object.entries(outer.links)) { const [c2, r2] = k2.split(',').map(Number); assert.equal(outer.legend[outer.layout[r2][c2]], 'district_gate'); }
+        }
+        // 中の歩ける所は、出現位置からすべてつながる（門のマスは通れない物として数える）
+        const H = t.layout.length, W = t.layout[0].length;
+        const walk = (c, r) => c >= 0 && r >= 0 && c < W && r < H && !(objects[t.legend[t.layout[r][c]]]?.solid ?? false);
+        const seen = new Set(); const q = [[Math.floor(t.spawn.x), Math.floor(t.spawn.z)]];
+        assert.ok(walk(...q[0]), `town_${id}: 出現位置が歩ける所`);
+        seen.add(q[0].join());
+        while (q.length) { const [c, r] = q.pop(); for (const [dc, dr] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const n = [c + dc, r + dr]; if (walk(...n) && !seen.has(n.join())) { seen.add(n.join()); q.push(n); } } }
+        let total = 0; for (let r = 0; r < H; r++) for (let c = 0; c < W; c++) if (walk(c, r)) total++;
+        assert.equal(seen.size, total, `town_${id}: 歩ける所は、すべてつながる`);
+    }
+});
+
+test('街（候補地 A〜H）: 敷地は、水・川・マップの境から離れている（外壁 24×18 の中・まわりに水がない）', () => {
+    for (const id of 'abcdefgh'.split('')) {
+        const t = readJson(`public/data/maps/town_${id}.json`);
+        const outer = readJson(`public/data/maps/${Object.values(t.links)[0].nextMap}.json`);
+        const rows = outer.layout.map((r, i) => [r, i]).filter(([r]) => r.includes(Object.entries(outer.legend).find(([, v]) => v === 'city_wall')?.[0] ?? '#'));
+        assert.ok(rows.length >= 18, `${outer.id}: 街の外壁がある`);
+        const wallCh = Object.entries(outer.legend).find(([, v]) => v === 'city_wall')[0];
+        const rs = rows.map(([, i]) => i), cs = [];
+        rows.forEach(([r]) => [...r].forEach((ch, c) => { if (ch === wallCh) cs.push(c); }));
+        assert.ok(Math.min(...rs) >= 8 && Math.max(...rs) <= 55 && Math.min(...cs) >= 8 && Math.max(...cs) <= 55, `${outer.id}: 街は、マップの境から離れている`);
+        for (let r = Math.min(...rs) - 3; r <= Math.max(...rs) + 5; r++) for (let c = Math.min(...cs) - 3; c <= Math.max(...cs) + 3; c++) {
+            const nm = outer.legend[outer.layout[r][c]];
+            assert.ok(!['water', 'sea', 'water_shallow', 'water_shallow_glow'].includes(nm), `${outer.id}: 街のまわりに水がない (${c},${r})`);
+        }
+    }
+});
