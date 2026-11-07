@@ -1287,8 +1287,9 @@ export class GameEngine {
                             }
                             flat(def.glow ? glowMatOf(def) : (shallow ? waterMats.shallow : waterMats.deep), wx, shallow ? -0.12 : -0.2, wz);
                             if (def.type === 'bridge_deck') {   // 川の木の橋（下に水がある）: 水の上に、橋の板（高さは heights。手すりは描かない）
-                                if (!waterMats.plank) waterMats.plank = new THREE.MeshLambertMaterial({ map: this.textures[def.texture] || this.textures.woodBridge });
-                                flat(waterMats.plank, wx, (parseInt(nd.heights[r][c], 36) || 0) * step + 0.06, wz);
+                                if (!waterMats.planks) waterMats.planks = new Map();   // 橋の床の材質は、画像ごと（木の橋・石の橋で、材質を使い回さない）
+                                if (!waterMats.planks.has(def.texture)) waterMats.planks.set(def.texture, new THREE.MeshLambertMaterial({ map: this.textures[def.texture] || this.textures.woodBridge }));
+                                flat(waterMats.planks.get(def.texture), wx, (parseInt(nd.heights[r][c], 36) || 0) * step + 0.06, wz);
                             }
                             continue;
                         }

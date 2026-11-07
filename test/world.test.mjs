@@ -1007,6 +1007,7 @@ test('端の向こうの景色: 隣のマップ（斜めの角を含む 8 方向
     const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
     assert.ok(game.includes('await this.buildNeighborDecor(mapId, cols, rows, tileSize, mapData, floorMatOf)'), '隣のマップを描く');
     assert.ok(/def\?\.type === 'floor_tile' && !\(def\.elevation > 0\)[\s\S]{0,400}flat\(waterMats\.floors/.test(game), '隣のマップの床（石畳の街道・門前の石畳）も描く（切り替えの前から、道が見える）');
+    assert.ok(/waterMats\.planks\.has\(def\.texture\)[\s\S]{0,300}flat\(waterMats\.planks\.get\(def\.texture\)/.test(game) && !game.includes('waterMats.plank '), '隣のマップの橋の床は、画像ごとの材質（石の橋が、木の板で描かれない）');
     // 見た目の共通部品: 今のマップ（visEnv）と、隣のマップの先読み（nEnv）が、同じ関数で壁・家・立て札・松明・扉・家具の見た目を作る
     for (const t of ['Block', 'Signpost', 'Torch', 'Door', 'Furniture']) {
         assert.match(game, new RegExp(`visual${t}\\(objDef, wx, wz`), `${t}: 今のマップが、共通部品を呼ぶ`);
