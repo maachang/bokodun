@@ -500,6 +500,465 @@
     "railOnWater": true,
     "description": "川に架かる石の橋（石畳の床。両脇の水の側に、石の欄干。下に水が流れる。橋の端は、地面とつながる。石畳の街道用）"
   },
+  "brick_house_snow": {
+      "baseShadow": true,
+      "type": "block",
+      "texture": "brick",
+      "roofTexture": "snowRoof",
+      "hasRoof": true,
+      "solid": true,
+      "blocksProjectiles": true,
+      "description": "レンガ造りの住宅（スレート屋根付き）（雪国用。雪が積もっている）",
+      "faceParts": [
+          {
+              "size": [
+                  1.0,
+                  1.1,
+                  0.04
+              ],
+              "pos": [
+                  0,
+                  2.0,
+                  0.03
+              ],
+              "color": "#bcdcf0",
+              "basic": true
+          },
+          {
+              "size": [
+                  1.2,
+                  0.1,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  2.6,
+                  0.05
+              ],
+              "color": "#d8d0c0"
+          },
+          {
+              "size": [
+                  1.2,
+                  0.1,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  1.4,
+                  0.05
+              ],
+              "color": "#d8d0c0"
+          },
+          {
+              "size": [
+                  0.1,
+                  1.3,
+                  0.07
+              ],
+              "pos": [
+                  -0.55,
+                  2.0,
+                  0.05
+              ],
+              "color": "#d8d0c0"
+          },
+          {
+              "size": [
+                  0.1,
+                  1.3,
+                  0.07
+              ],
+              "pos": [
+                  0.55,
+                  2.0,
+                  0.05
+              ],
+              "color": "#d8d0c0"
+          },
+          {
+              "size": [
+                  0.06,
+                  1.1,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  2.0,
+                  0.06
+              ],
+              "color": "#d8d0c0"
+          },
+          {
+              "size": [
+                  1.5,
+                  0.12,
+                  0.25
+              ],
+              "pos": [
+                  0,
+                  1.32,
+                  0.12
+              ],
+              "color": "#b8b0a0"
+          },
+          {
+              "size": [
+                  1.4,
+                  0.12,
+                  0.12
+              ],
+              "pos": [
+                  0,
+                  2.75,
+                  0.07
+              ],
+              "color": "#a8a090"
+          }
+      ],
+      "faceEvery": 2
+  },
+  "shop_building_snow": {
+      "baseShadow": true,
+      "type": "block",
+      "texture": "shopWall",
+      "roofTexture": "snowRoof",
+      "hasRoof": true,
+      "solid": true,
+      "blocksProjectiles": true,
+      "description": "レンガ造りの商店・道具屋（日よけ・ショーウィンドウ付き）（雪国用。雪が積もっている）",
+      "faceParts": [
+          {
+              "size": [
+                  1.8,
+                  1.2,
+                  0.04
+              ],
+              "pos": [
+                  0,
+                  1.7,
+                  0.03
+              ],
+              "color": "#d0e8f0",
+              "basic": true
+          },
+          {
+              "size": [
+                  2.0,
+                  0.1,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  2.35,
+                  0.05
+              ],
+              "color": "#5a3a1e"
+          },
+          {
+              "size": [
+                  2.0,
+                  0.1,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  1.1,
+                  0.05
+              ],
+              "color": "#5a3a1e"
+          },
+          {
+              "size": [
+                  0.1,
+                  1.3,
+                  0.07
+              ],
+              "pos": [
+                  -0.95,
+                  1.7,
+                  0.05
+              ],
+              "color": "#5a3a1e"
+          },
+          {
+              "size": [
+                  0.1,
+                  1.3,
+                  0.07
+              ],
+              "pos": [
+                  0.95,
+                  1.7,
+                  0.05
+              ],
+              "color": "#5a3a1e"
+          },
+          {
+              "size": [
+                  0.06,
+                  1.2,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  1.7,
+                  0.06
+              ],
+              "color": "#5a3a1e"
+          },
+          {
+              "size": [
+                  2.4,
+                  0.1,
+                  0.7
+              ],
+              "pos": [
+                  0,
+                  2.6,
+                  0.35
+              ],
+              "color": "#a03030"
+          },
+          {
+              "size": [
+                  2.4,
+                  0.08,
+                  0.1
+              ],
+              "pos": [
+                  0,
+                  2.5,
+                  0.7
+              ],
+              "color": "#e8e0d0"
+          }
+      ],
+      "faceEvery": 2
+  },
+  "inn_building_snow": {
+      "baseShadow": true,
+      "type": "block",
+      "texture": "innWall",
+      "roofTexture": "snowRoof",
+      "hasRoof": true,
+      "solid": true,
+      "blocksProjectiles": true,
+      "description": "レンガ造りの宿屋・酒場（看板・あたたかいランプ窓付き）（雪国用。雪が積もっている）",
+      "faceParts": [
+          {
+              "size": [
+                  1.1,
+                  1.1,
+                  0.04
+              ],
+              "pos": [
+                  0,
+                  2.0,
+                  0.03
+              ],
+              "color": "#f4d58a",
+              "basic": true
+          },
+          {
+              "size": [
+                  1.3,
+                  0.1,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  2.6,
+                  0.05
+              ],
+              "color": "#3a2a1a"
+          },
+          {
+              "size": [
+                  1.3,
+                  0.1,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  1.4,
+                  0.05
+              ],
+              "color": "#3a2a1a"
+          },
+          {
+              "size": [
+                  0.1,
+                  1.3,
+                  0.07
+              ],
+              "pos": [
+                  -0.6,
+                  2.0,
+                  0.05
+              ],
+              "color": "#3a2a1a"
+          },
+          {
+              "size": [
+                  0.1,
+                  1.3,
+                  0.07
+              ],
+              "pos": [
+                  0.6,
+                  2.0,
+                  0.05
+              ],
+              "color": "#3a2a1a"
+          },
+          {
+              "size": [
+                  0.06,
+                  1.1,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  2.0,
+                  0.06
+              ],
+              "color": "#3a2a1a"
+          },
+          {
+              "size": [
+                  0.45,
+                  1.3,
+                  0.08
+              ],
+              "pos": [
+                  -1.0,
+                  2.0,
+                  0.07
+              ],
+              "color": "#7a4e28"
+          },
+          {
+              "size": [
+                  0.45,
+                  1.3,
+                  0.08
+              ],
+              "pos": [
+                  1.0,
+                  2.0,
+                  0.07
+              ],
+              "color": "#7a4e28"
+          }
+      ],
+      "faceEvery": 2
+  },
+  "temple_building_snow": {
+      "baseShadow": true,
+      "type": "block",
+      "texture": "marbleWall",
+      "roofTexture": "snowRoof",
+      "hasRoof": true,
+      "solid": true,
+      "blocksProjectiles": true,
+      "description": "白い大理石の神殿の建物（街のマップ用）（雪国用。雪が積もっている）",
+      "faceParts": [
+          {
+              "size": [
+                  0.7,
+                  1.9,
+                  0.04
+              ],
+              "pos": [
+                  0,
+                  2.1,
+                  0.03
+              ],
+              "color": "#6a8adf",
+              "basic": true
+          },
+          {
+              "size": [
+                  0.9,
+                  0.1,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  3.1,
+                  0.05
+              ],
+              "color": "#e8e4dc"
+          },
+          {
+              "size": [
+                  0.9,
+                  0.1,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  1.15,
+                  0.05
+              ],
+              "color": "#e8e4dc"
+          },
+          {
+              "size": [
+                  0.1,
+                  2.0,
+                  0.07
+              ],
+              "pos": [
+                  -0.4,
+                  2.1,
+                  0.05
+              ],
+              "color": "#e8e4dc"
+          },
+          {
+              "size": [
+                  0.1,
+                  2.0,
+                  0.07
+              ],
+              "pos": [
+                  0.4,
+                  2.1,
+                  0.05
+              ],
+              "color": "#e8e4dc"
+          },
+          {
+              "size": [
+                  0.06,
+                  1.9,
+                  0.07
+              ],
+              "pos": [
+                  0,
+                  2.1,
+                  0.06
+              ],
+              "color": "#e8e4dc"
+          }
+      ],
+      "faceEvery": 2
+  },
+  "plaza_stone_snow": {
+      "type": "floor_tile",
+      "texture": "snowCobble",
+      "solid": false,
+      "description": "街・町の広場の敷石（道路ではないので、移動速度ボーナスなし。道路は paved_road）（雪国用。雪が積もっている）"
+  },
+  "paved_road_snow": {
+      "type": "floor_tile",
+      "texture": "snowPaved",
+      "solid": false,
+      "speedBonus": 1.3,
+      "description": "ヨーロッパ風の舗装された石畳の広場・大通り（移動速度30%アップ）（雪国用。雪が積もっている）"
+  },
   "road_sign": {
     "lift": true,
     "groundShadow": true,
@@ -2529,6 +2988,7 @@
     "description": "神殿の案内標識（街のマップ用。建物の前に立てる）"
   },
   "smith_sign": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",

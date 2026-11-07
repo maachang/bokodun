@@ -1268,6 +1268,91 @@ export class RetroTextureGenerator {
         return texture;
     }
 
+    // ---- 雪国（A キュラビッド帝国）の、雪をかぶったテクスチャ（毎回同じ絵になるよう、乱数は固定） ----
+    static snowRng(seed) { let a = seed >>> 0; return () => { a = (a * 1664525 + 1013904223) >>> 0; return a / 4294967296; }; }
+
+    // 雪をかぶった屋根（スレートの屋根に、軽く雪が積もっている。瓦の下の縁と、濃い所が見える）
+    static createSnowRoofTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const rnd = RetroTextureGenerator.snowRng(20261108);
+        ctx.fillStyle = '#1e2430'; ctx.fillRect(0, 0, 64, 64);
+        const rowH = 8, slate = ['#334155', '#3f4f66', '#2b384a', '#475569'];
+        for (let y = 0; y < 64; y += rowH) {
+            const shift = ((y / rowH) % 2 === 0) ? 0 : 8;
+            for (let x = -8; x < 64; x += 16) {
+                ctx.fillStyle = slate[Math.floor(rnd() * slate.length)];
+                ctx.fillRect(x + shift + 1, y + 1, 14, rowH - 2);
+                ctx.fillStyle = 'rgba(0, 0, 0, 0.4)'; ctx.fillRect(x + shift + 1, y + rowH - 2, 14, 1);
+            }
+        }
+        // 雪: 瓦の上の段ごとに、白い雪が、ふくらんで積もる（下の縁は、少し青い影）。全体の 6 割ほど
+        for (let y = 0; y < 64; y += rowH) {
+            for (let x = 0; x < 64; x += 2) {
+                const h = Math.floor(2 + rnd() * 5 + 1.5 * Math.sin((x + y) / 6));
+                ctx.fillStyle = '#f3f7fb'; ctx.fillRect(x, y, 2, Math.min(rowH - 1, h));
+                ctx.fillStyle = '#c9d8e8'; ctx.fillRect(x, y + Math.min(rowH - 1, h), 2, 1);
+            }
+        }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter; texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping; texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 雪が積もった石畳（広場）: 石の上や目地に、雪が積もっている。石の頭が、ところどころ見える
+    static createSnowCobbleTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const rnd = RetroTextureGenerator.snowRng(7777);
+        ctx.fillStyle = '#cdd8e3'; ctx.fillRect(0, 0, 64, 64);   // 目地は、雪
+        const tones = ['#9aa3ad', '#aab3bd', '#8a939d', '#b4bcc6', '#7f8892'];
+        for (let r = 0; r < 4; r++) {
+            const shift = (r % 2 === 0) ? 0 : 8;
+            for (let c = -1; c < 5; c++) {
+                const sx = c * 16 + shift, sy = r * 16;
+                ctx.fillStyle = tones[Math.floor(rnd() * tones.length)];
+                ctx.fillRect(sx + 2, sy + 2, 12, 12);
+                // 雪: 石の上に、まだらに（約 6 割。白い）
+                for (let k = 0; k < 7; k++) {
+                    ctx.fillStyle = rnd() < 0.7 ? '#f4f8fc' : '#e3ebf3';
+                    ctx.fillRect(sx + 2 + Math.floor(rnd() * 10), sy + 2 + Math.floor(rnd() * 10), 2 + Math.floor(rnd() * 4), 2 + Math.floor(rnd() * 3));
+                }
+                ctx.fillStyle = 'rgba(70, 90, 120, 0.25)'; ctx.fillRect(sx + 3, sy + 11, 10, 2);   // 石の下の影（青）
+            }
+        }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter; texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping; texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    // 雪の積もった大通り（舗装路）: 人が通るので、石が多く見え、雪は、目地と端に残る
+    static createSnowPavedTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const rnd = RetroTextureGenerator.snowRng(4242);
+        ctx.fillStyle = '#dbe5ef'; ctx.fillRect(0, 0, 64, 64);
+        const colors = ['#88929e', '#9ba5b2', '#76808c', '#a6b0bd', '#6d7782'];
+        for (let r = 0; r < 8; r++) {
+            const shift = (r % 2 === 0) ? 0 : 8;
+            for (let c = -1; c < 5; c++) {
+                const sx = c * 16 + shift, sy = r * 8;
+                ctx.fillStyle = colors[Math.floor(rnd() * colors.length)];
+                ctx.fillRect(sx + 1, sy + 1, 14, 6);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.25)'; ctx.fillRect(sx + 1, sy + 1, 14, 1);
+                if (rnd() < 0.5) { ctx.fillStyle = '#f2f6fa'; ctx.fillRect(sx + 1 + Math.floor(rnd() * 8), sy + 1, 3 + Math.floor(rnd() * 5), 2 + Math.floor(rnd() * 2)); }   // 雪のまだら
+            }
+        }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter; texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping; texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
     // 19. European Paver Road (Paved stone plaza / street)
     static createPavedRoadTexture() {
         const canvas = document.createElement('canvas');

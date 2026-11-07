@@ -33,8 +33,11 @@ LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'm', 'r', 'c', 
 SOLID = set('WHSIJdNDC')   # 通れない（段差の確認の対象外）
 
 
-def build(w, h, legend, city_legend, links, npcs):
-    """D の街の中（layout・heights）を作り、legend・links・npcs に足す。(layout, heights) を返す"""
+def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None, skin=None):
+    """D の街の中（layout・heights）を作り、legend・links・npcs に足す。(layout, heights) を返す。
+    A（雪国）も、同じ作り（サンプルの高さを土台に、川・橋・高台・城門）で、施設・街の人・見た目（skin: 凡例の文字 → 物体の名前を上書き）だけを変える"""
+    facilities = facilities or FACILITIES
+    npc_list = npc_list or NPCS
     assert (w, h) == (40, 30)
     g = [['p'] * w for _ in range(h)]
     lv = None   # 高さは、街を作り終えてから（サンプルの高さを土台にして、川・高台を重ねる）
@@ -61,7 +64,7 @@ def build(w, h, legend, city_legend, links, npcs):
         for y in range(y0, y0 + 3):
             for x in range(x0, x0 + 4): g[y][x] = 'H'
     # 施設
-    for ch, x0, y0, wid, doff, door, sign, link in FACILITIES:
+    for ch, x0, y0, wid, doff, door, sign, link in facilities:
         for y in range(y0, y0 + 3):
             for x in range(x0, x0 + wid):
                 assert g[y][x] == 'p', f'D の施設 ({x},{y}): 空きマスではない'
@@ -77,8 +80,9 @@ def build(w, h, legend, city_legend, links, npcs):
         assert g[y][x] == 'p', f'D の飾り ({x},{y}): 空きマスではない'
         g[y][x] = c
     legend.update({'C': 'castle_gate'})
-    for k in LEGEND_KEYS: legend[k] = city_legend[k]
-    for nid, x, z in NPCS:
+    for k in set(LEGEND_KEYS) | {c for f in facilities for c in (f[0], f[5], f[6])}: legend[k] = city_legend[k]   # 施設の建物・扉・立て札の文字も
+    if skin: legend.update(skin)   # 見た目の差し替え（雪国: 雪をかぶった屋根・石畳など）
+    for nid, x, z in npc_list:
         assert g[z][x] in 'p=', f'D の NPC {nid} ({x},{z}): 歩ける空きマスではない'
         npcs.append({'id': nid, 'x': x, 'z': z})
     # 高さ: サンプル（city）の高さを土台にして、川（0）と高台（王城区・神殿）を重ねる。段差は、歩ける隣どうしで 1 以下
@@ -91,7 +95,7 @@ def build(w, h, legend, city_legend, links, npcs):
             for x in range(x0, x1 + 1): lv[y][x] = 3 if lv[y][x] >= 2 else 2; fixed.add((x, y))
     walk = [[g[y][x] not in SOLID and g[y][x] != 'w' for x in range(w)] for y in range(h)]
     TH.relax(lv, walk, fixed)
-    for ch, x0, y0, wid, doff, door, sign, link in FACILITIES:   # 扉のマスの高さは、扉の前のマスと同じ（段差なく入れる）
+    for ch, x0, y0, wid, doff, door, sign, link in facilities:   # 扉のマスの高さは、扉の前のマスと同じ（段差なく入れる）
         lv[y0 + 2][x0 + doff] = lv[y0 + 3][x0 + doff]
     for y in range(h):
         for x in range(w):
@@ -101,3 +105,23 @@ def build(w, h, legend, city_legend, links, npcs):
                 if xx < w and yy < h and g[yy][xx] not in SOLID and g[yy][xx] != 'w':
                     assert abs(lv[y][x] - lv[yy][xx]) <= 1, f'D の段差 ({x},{y})-({xx},{yy}) が 2 以上'
     return [''.join(r) for r in g], [''.join(TH.CH36[v] for v in r) for r in lv]
+
+
+# ---- A（キュラビッド帝国。雪国）: D と同じ作りで、施設・街の人・見た目を変える ----
+FACILITIES_A = [f for f in FACILITIES if f[6] != 'm'] + [
+    ('S', 27, 2, 4, 1, 'd', 'k', _to('guild_smith', '鍛冶屋に入る', 'smithIcon')),   # 魔法ギルドの代わりに、鍛冶屋（寒い国の、鉄と火）
+]
+NPCS_A = [
+    ('town_man', 6, 17), ('town_old_woman', 12, 17), ('town_middle_woman', 28, 13), ('junior_merchant_woman', 24, 9),
+    ('elder_woman', 6, 25), ('child_boy', 15, 21), ('guard_spear', 17, 27), ('guard_light', 22, 27),
+    ('gate_guard', 17, 1), ('gate_guard', 22, 1),
+]
+SKIN_SNOW = {   # 雪国の見た目: 雪をかぶった屋根（軽く）・雪の積もった石畳と大通り
+    'H': 'brick_house_snow', 'S': 'shop_building_snow', 'I': 'inn_building_snow', 'J': 'temple_building_snow',
+    'p': 'plaza_stone_snow', '=': 'paved_road_snow',
+    'T': 'conifer_tree_a', 'f': 'conifer_tree_b', 'v': 'conifer_tree_a',   # 木は針葉樹（花壇の代わりも、針葉樹）
+}
+
+
+def build_a(w, h, legend, city_legend, links, npcs):
+    return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_A, npc_list=NPCS_A, skin=SKIN_SNOW)

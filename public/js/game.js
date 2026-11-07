@@ -380,6 +380,9 @@ export class GameEngine {
             innWall: RetroTextureGenerator.createInnWallTexture(),
             cityRoof: RetroTextureGenerator.createCityRoofTexture(),
             pavedRoad: RetroTextureGenerator.createPavedRoadTexture(),
+            snowRoof: RetroTextureGenerator.createSnowRoofTexture(),       // 雪国（A）: 雪をかぶった屋根・雪の積もった石畳・大通り
+            snowCobble: RetroTextureGenerator.createSnowCobbleTexture(),
+            snowPaved: RetroTextureGenerator.createSnowPavedTexture(),
             fountainWater: RetroTextureGenerator.createFountainWaterTexture(),
             chomperBlade: RetroTextureGenerator.createChomperBladeTexture(),
             popSpikePlate: RetroTextureGenerator.createPoPSpikePlateTexture(),

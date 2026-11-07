@@ -25,8 +25,8 @@
   "50": "riverside_tree",
   "54": "city_wall",
   "55": "district_gate",
-  "56": "brick_house",
-  "57": "plaza_stone",
+  "56": "brick_house_snow",
+  "57": "plaza_stone_snow",
   "104": "highland_grass",
   "105": "arid_grass",
   "111": "highland_weed",
@@ -247,8 +247,8 @@
    "nextMap": "town_a",
    "message": "キュラビッド帝国に入る",
    "spawn": {
-    "x": 15,
-    "z": 23,
+    "x": 19,
+    "z": 27,
     "angle": 0
    }
   },
@@ -256,8 +256,8 @@
    "nextMap": "town_a",
    "message": "キュラビッド帝国に入る",
    "spawn": {
-    "x": 16,
-    "z": 23,
+    "x": 20,
+    "z": 27,
     "angle": 0
    }
   }

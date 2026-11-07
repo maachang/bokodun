@@ -1339,7 +1339,7 @@ test('街（候補地 A〜H）: 外のマップに壁と門（扉＋衛兵）・
             const outer = readJson(`public/data/maps/${l.nextMap}.json`);
             const oc = Math.floor(l.spawn.x), orow = Math.floor(l.spawn.z);
             assert.ok(outerWalk(outer, oc, orow), `town_${id}: 出た先が歩ける所`);
-            assert.equal(outer.legend[outer.layout[orow][oc]], 'plaza_stone');
+            assert.match(outer.legend[outer.layout[orow][oc]], /^plaza_stone(_snow)?$/);   // A（雪国）は、雪の積もった石畳
             // 外の門のマスから、この街へ入る links があり、出現位置が、街の中の歩ける所
             const back = Object.values(outer.links).filter((x) => x.nextMap === `town_${id}`);
             assert.equal(back.length, 2, `${l.nextMap}: 街 ${id} へ入る門が 2 マス`);
