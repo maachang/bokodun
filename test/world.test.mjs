@@ -769,7 +769,7 @@ test('世界の特徴: 北の雪山（氷）・西の大森林（獣道・空き
         const m = readJson(`public/data/maps/${id}.json`);
         const lay = m.layout.join('');
         const count = (name) => Object.entries(m.legend).filter(([, v]) => v === name).reduce((s, [ch]) => s + lay.split(ch).length - 1, 0);
-        cliffs += count('cliff_rock_wall'); mineEntrances += count('mine_entrance'); carts += count('mine_cart'); palms += count('palm'); tropical += count('tropical_tree');
+        cliffs += count('cliff_rock_wall'); mineEntrances += ['mine_entrance', 'mine_entrance_e', 'mine_entrance_w', 'mine_entrance_n'].reduce((a, n) => a + count(n), 0); carts += count('mine_cart'); palms += count('palm'); tropical += count('tropical_tree');
         const fl = m.floorLayer.join('');
         for (const [ch, ft] of Object.entries(m.floorLegend)) {
             const n = fl.split(ch).length - 1;
@@ -787,6 +787,13 @@ test('世界の特徴: 北の雪山（氷）・西の大森林（獣道・空き
     assert.ok(redEarth > 3000, `赤茶の地面: ${redEarth}`);
     assert.ok(tropicalMeshes >= 3 && palms > 300 && tropical > 200, `南国: マップ ${tropicalMeshes}・ヤシ ${palms}・南国の木 ${tropical}`);
     assert.equal(objects.mine_entrance.type, 'furniture'); assert.equal(objects.mine_cart.type, 'furniture');
+    // 炭鉱の入口は、4 方向（奥行きのある木枠のトンネル）。横から見ても、板に見えない（どの向きも、奥行き 1.5 以上の壁がある）
+    for (const n of ['mine_entrance', 'mine_entrance_e', 'mine_entrance_w', 'mine_entrance_n']) {
+        const o = objects[n];
+        assert.equal(o.type, 'furniture'); assert.equal(o.autoTurn, false);
+        const front = n.endsWith('_e') || n.endsWith('_w') ? 0 : 2;   // 奥行きの軸（南北向きは z・東西向きは x）
+        assert.ok(o.parts.some((p) => p.size[front] >= 1.5), `${n}: 奥行きのある側壁`);
+    }
 });
 
 test('世界: 海・湖（入れない水）が大半のマップは作らない（どのマップも、水の割合が 55% 以下）。端の少しの移動で、すぐに切り替わらない', () => {

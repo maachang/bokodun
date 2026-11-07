@@ -27,10 +27,11 @@ LEGEND = {
     'T': 'forest_tree_a', 'V': 'forest_tree_b', 'W': 'great_tree_a', 'K': 'great_tree_b',      # 森: 217・218 の木（2 倍）・大森林: 3 倍。林の壁（F・C・N）は、使わない
     'J': 'conifer_forest_a', 'L': 'conifer_forest_b', 'j': 'great_conifer_a', 'n': 'great_conifer_b', 'x': 'conifer_tree_a', 'y': 'conifer_tree_b',   # 寒冷地の木（ID 262・263）: 森 2 倍・大森林 3 倍・単独 1 倍
     'a': 'tropical_forest_a', 'd': 'tropical_forest_b', 'f': 'tropical_palm_forest', 'r': 'swamp_tree_a', 's': 'marsh_flower', 'g': 'water_shallow_glow',   # 南国: ジャングルの木・ヤシの林（2 倍）・マングローブ・毒々しい花・青緑に光る浅瀬
-    'c': 'cliff_rock_wall', 'Y': 'tropical_tree', 'E': 'mine_entrance', 't': 'mine_cart',
+    'c': 'cliff_rock_wall', 'Y': 'tropical_tree', 'E': 'mine_entrance', '3': 'mine_entrance_e', '4': 'mine_entrance_w', '5': 'mine_entrance_n', 't': 'mine_cart',   # 炭鉱の入口: E=南向き・3=東向き・4=西向き・5=北向き
+    
     'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge', 'I': 'rope_bridge', '1': 'cave_torch', '2': 'riverside_tree',
 }
-SOLID_CH = set('FCNPDGAXUMRSBHcYEtTVWKJLjnxyadfr2')          # 通れない物体（端のマスには置かない）
+SOLID_CH = set('FCNPDGAXUMRSBHcYE345tTVWKJLjnxyadfr2')          # 通れない物体（端のマスには置かない）
 # 地面の種類（floorLayer の文字 → environment.floorType と同じ名前）
 FLOOR = {'g': 'grass', 's': 'snow', 'f': 'forest', 'd': 'desert', 'r': 'rock', 'w': 'whiteSand', 'u': 'tundra', 'i': 'ice', 'm': 'redEarth', 'a': 'ash'}
 BIOME_FLOOR = {SNOW: 's', CONIFER: 'u', FOREST: 'f', GRASS: 'g', DESERT: 'd', ROCK: 'r', TROPICAL: 'g', SEA: 'g'}
@@ -309,7 +310,11 @@ def build_tiles(t):
                 for dx in range(-3, 4):
                     yy, xx = y0 + dy, x0 + dx
                     if 0 <= yy < H and 0 <= xx < W and free[yy, xx] and obj[yy, xx] in (ord('0'),):
-                        obj[yy, xx] = ord(ch); break
+                        pch = ch
+                        if ch == 'E':   # 入口は、掘削跡の崖を背にして、外の開いた地面のほうへ向ける（向きが固定で、横から見ると板に見えたため）
+                            fx, fz = x0 - cx, y0 - cz
+                            pch = ('4' if fx < 0 else '3') if abs(fx) >= abs(fz) else ('5' if fz < 0 else 'E')
+                        obj[yy, xx] = ord(pch); break
                 else: continue
                 break
     # --- 境界線（隣のマップとの継ぎ目）の整合 ---
@@ -429,7 +434,7 @@ def main():
             spawn = {'x': best[2], 'z': best[1], 'angle': 0} if best else {'x': 32, 'z': 32, 'angle': 0}
             m_under = t['bridge_under'].get((j, i))
             m = {
-                'id': mid, 'name': mesh_name(j, i, counts, sea_frac, any(ch in ('E', 't') for ch in set(''.join(layout)))), 'type': 'open', 'tileSize': 4, 'wallHeight': 4,
+                'id': mid, 'name': mesh_name(j, i, counts, sea_frac, any(ch in ('E', '3', '4', '5', 't') for ch in set(''.join(layout)))), 'type': 'open', 'tileSize': 4, 'wallHeight': 4,
                 'spawn': spawn, 'environment': env, 'legend': legend, 'enemies': {},
                 'heightStep': HEIGHT_STEP, 'sideShade': 1.0, 'heights': heights,
                 'floorLegend': {k: FLOOR[k] for k in sorted(set(''.join(floor_layer)))}, 'floorLayer': floor_layer,
