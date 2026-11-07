@@ -500,6 +500,96 @@
     "railOnWater": true,
     "description": "川に架かる石の橋（石畳の床。両脇の水の側に、石の欄干。下に水が流れる。橋の端は、地面とつながる。石畳の街道用）"
   },
+  "ship_large": {
+    "type": "furniture",
+    "solid": true,
+    "waterBelow": true,
+    "parts": [
+      {
+        "size": [3.4, 0.8, 1.4],
+        "pos": [0, 0.2, 0],
+        "color": "#6b4426"
+      },
+      {
+        "size": [0.7, 0.7, 0.9],
+        "pos": [1.6, 0.35, 0],
+        "color": "#6b4426"
+      },
+      {
+        "size": [0.6, 0.6, 1],
+        "pos": [-1.6, 0.4, 0],
+        "color": "#6b4426"
+      },
+      {
+        "size": [3.2, 0.1, 1.2],
+        "pos": [0, 0.65, 0],
+        "color": "#a07a4a"
+      },
+      {
+        "size": [1, 0.8, 1],
+        "pos": [-0.9, 1.1, 0],
+        "color": "#8b5a2b"
+      },
+      {
+        "size": [0.14, 2.8, 0.14],
+        "pos": [0.3, 2, 0],
+        "color": "#4a3020"
+      },
+      {
+        "size": [0.06, 1.9, 1.5],
+        "pos": [0.4, 2.3, 0],
+        "color": "#ece4d0"
+      }
+    ],
+    "collider": [3.4, 1.6],
+    "blocksProjectiles": false,
+    "description": "港の大きな帆船（水の上の置物。歩いて通れない。見た目だけ）"
+  },
+  "ship_small": {
+    "type": "furniture",
+    "solid": true,
+    "waterBelow": true,
+    "parts": [
+      {
+        "size": [2.38, 0.56, 0.98],
+        "pos": [0, 0.14, 0],
+        "color": "#6b4426"
+      },
+      {
+        "size": [0.49, 0.49, 0.63],
+        "pos": [1.12, 0.245, 0],
+        "color": "#6b4426"
+      },
+      {
+        "size": [0.42, 0.42, 0.7],
+        "pos": [-1.12, 0.28, 0],
+        "color": "#6b4426"
+      },
+      {
+        "size": [2.24, 0.07, 0.84],
+        "pos": [0, 0.455, 0],
+        "color": "#a07a4a"
+      },
+      {
+        "size": [0.7, 0.56, 0.7],
+        "pos": [-0.63, 0.77, 0],
+        "color": "#8b5a2b"
+      },
+      {
+        "size": [0.098, 1.96, 0.098],
+        "pos": [0.21, 1.4, 0],
+        "color": "#4a3020"
+      },
+      {
+        "size": [0.042, 1.33, 1.05],
+        "pos": [0.28, 1.61, 0],
+        "color": "#ece4d0"
+      }
+    ],
+    "collider": [2.38, 1.12],
+    "blocksProjectiles": false,
+    "description": "港の小さな帆船（水の上の置物。歩いて通れない。見た目だけ）"
+  },
   "rope_bridge": {
     "type": "bridge_deck",
     "texture": "woodBridge",
@@ -2379,6 +2469,7 @@
     "description": "魔法ギルドの案内標識（街のマップ用。建物の前に立てる）"
   },
   "merchant_guild_sign": {
+    "lift": true,
     "groundShadow": true,
     "type": "signpost",
     "texture": "signpost",

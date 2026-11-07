@@ -1169,6 +1169,14 @@ export class GameEngine {
         }
         group.position.set(wx, 0, wz);
         env.add(group, true);
+        // waterBelow（水の上の置物: 港の船）: 下に水の面を置く（床は敷かない）
+        if (objDef.waterBelow) {
+            const under = new THREE.Mesh(new THREE.PlaneGeometry(env.tileSize, env.tileSize), new THREE.MeshLambertMaterial({ map: this.textures.water }));
+            under.rotation.x = -Math.PI / 2;
+            under.position.set(wx, -0.2, wz);
+            env.add(under);
+            this.waterMeshes.push(under);
+        }
         // 家具の上に、花などの画像（plants: 花壇の花）を植える。マスの位置から決まる配置（毎回同じ）
         if (objDef.plants) {
             const pl = objDef.plants;
@@ -2741,7 +2749,7 @@ export class GameEngine {
                     case 'furniture': {
                         const { fOffX, fOffZ, fCw, fCd } = this.visualFurniture(objDef, wx, wz, r, c, visEnv);
                         const furnitureFloor = objDef.floorTexture ?? mapData.decorFloor;   // 屋外の街では、飾りの下も石畳（map の decorFloor）
-                        if (furnitureFloor) this.addFloorTile(wx, wz, tileSize, furnitureFloor);
+                        if (furnitureFloor && !objDef.waterBelow) this.addFloorTile(wx, wz, tileSize, furnitureFloor);
                         if (objDef.ceilingTexture) this.addCeilingTile(wx, wz, tileSize, wallH, objDef.ceilingTexture);
                         if (objDef.collider) {
                             const cw = fCw, cd = fCd;

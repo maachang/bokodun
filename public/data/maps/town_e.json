@@ -5,8 +5,8 @@
  "tileSize": 4,
  "wallHeight": 4,
  "spawn": {
-  "x": 16,
-  "z": 23,
+  "x": 20,
+  "z": 27,
   "angle": 0
  },
  "environment": {
@@ -31,39 +31,102 @@
   "f": "flower_bed",
   "v": "flower_bed_blue",
   "F": "plaza_fountain",
-  "G": "district_gate"
+  "G": "district_gate",
+  "X": "crate",
+  "B": "barrel",
+  "L": "ship_large",
+  "l": "ship_small",
+  "S": "shop_building",
+  "I": "inn_building",
+  "J": "temple_building",
+  "d": "shop_door",
+  "N": "inn_door",
+  "D": "temple_door",
+  "M": "inn_sign",
+  "Q": "weapon_shop_sign",
+  "q": "item_shop_sign",
+  "a": "adventurer_guild_sign",
+  "g": "merchant_guild_sign",
+  "c": "church_sign",
+  "w": "water",
+  "b": "wood_bridge"
  },
  "layout": [
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "Wppppppppppppp====pppppppppppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "Wppppppppppppp====pppppppppppppW",
-  "WpHHHHpppppppp====pppppppppppppW",
-  "WpHHHHpppppppp====pppppppppppppW",
-  "WpHHHHpppppppp====pppppppppppppW",
-  "WppppppppppppppppppppppppppppppW",
-  "WppppppppppfppppppppfppppppppppW",
-  "WppppppppppppppppppppppppppppppW",
-  "W=========pppppFFppppp=========W",
-  "W=========pppppFFppppp=========W",
-  "W=========pppppppppppp=========W",
-  "WppppppppppfppppppppfppppppppppW",
-  "WpTpppppppppTppppppTpppppppppTpW",
-  "Wppppppppppppp====pppppppppppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "Wppppppppppppp====pppppppppppppW",
-  "Wppppppppppppp====pppppppppppppW",
-  "WpTppppppppppp====pppppppppppTpW",
-  "Wppppppppppppp====pppppppppppppW",
-  "WWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWW"
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WpTppppppppppppTpp====pppppppppppppppppW",
+  "Wppppppppppppppppp====ppppppppwwwwwwwwwW",
+  "WpSSSSpSSSSpIIIIpp====pSSSSppXwwwwwwwwwW",
+  "WpSSSSpSSSSpIIIIpp====pSSSSpppbbbbbbbbwW",
+  "WpSdSSpSdSSpINIIpp====pSdSSpppwwwwwwlwwW",
+  "W===q====Q====M==========a====wwwwwwwwwW",
+  "W=============================wwwwLwwwwW",
+  "Wppppppppppppppppp====ppppppppwwlwwwwwwW",
+  "Wpppppppppppppppfp====vppppppBwwwwwwwwwW",
+  "WpSSSSpppppppppppp=FF=pJJJJpppbbbbbbbbwW",
+  "WpSSSSpppppppppppp=FF=pJJJJppXwwwwwwwwwW",
+  "WpSdSSppppppppppvp====fJDJJpppwwwwwwwwwW",
+  "Wpppgppppppppppppp====pppcppppwwwwLwwwwW",
+  "W=============================wlwwwwwwwW",
+  "W=============================wwwwwwwwwW",
+  "Wppppppppppppppppp====ppppppppwwwwwwwwwW",
+  "Wppppppppppppppppp====ppppppppbbbbbbbbwW",
+  "WpHHHHpHHHHpHHHHpp====pHHHHpppwwwwwwwwwW",
+  "WpHHHHpHHHHpHHHHpp====pHHHHppBwwwwwwwwwW",
+  "WpHHHHpHHHHpHHHHpp====pHHHHpppwwlwLwwwwW",
+  "Wppppppppppppppppp====pppppppXwwwwwwwwwW",
+  "Wppppppppppppppppp====ppppppppwwwwwwwwwW",
+  "Wppppppppppppppppp====ppppppppbbbbbbbbwW",
+  "WpHHHHpHHHHpHHHHpp====pHHHHpppwwwlwwwwwW",
+  "WpHHHHpHHHHpHHHHpp====pHHHHppBwwwwwwwwwW",
+  "WpHHHHpHHHHpHHHHpp====pHHHHpppwwwwwLwwwW",
+  "Wppppppppppppppppp====ppppppppwwwwwwwwwW",
+  "WpTppppppppppppTpp====pppppTpppppppppppW",
+  "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
  ],
- "npcs": [],
+ "npcs": [
+  {
+   "id": "town_man",
+   "x": 5,
+   "z": 8
+  },
+  {
+   "id": "town_middle_man",
+   "x": 26,
+   "z": 8
+  },
+  {
+   "id": "elder_man",
+   "x": 12,
+   "z": 9
+  },
+  {
+   "id": "child_boy",
+   "x": 15,
+   "z": 17
+  },
+  {
+   "id": "traveler_merchant",
+   "x": 26,
+   "z": 15
+  },
+  {
+   "id": "merchant_man",
+   "x": 27,
+   "z": 12
+  },
+  {
+   "id": "guard_spear",
+   "x": 17,
+   "z": 27
+  },
+  {
+   "id": "guard_light",
+   "x": 22,
+   "z": 27
+  }
+ ],
  "links": {
-  "15,25": {
+  "19,29": {
    "nextMap": "w_12_11",
    "message": "ガリレオ連盟の外へ",
    "spawn": {
@@ -72,7 +135,7 @@
     "angle": 3.14159
    }
   },
-  "16,25": {
+  "20,29": {
    "nextMap": "w_12_11",
    "message": "ガリレオ連盟の外へ",
    "spawn": {
@@ -80,35 +143,105 @@
     "z": 31,
     "angle": 3.14159
    }
+  },
+  "3,5": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop"
+   },
+   "message": "道具屋に入る",
+   "icon": "itemShopIcon",
+   "back": {
+    "x": 3,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "8,5": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 8,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "13,5": {
+   "nextMap": "city_inn",
+   "message": "宿屋・酒場に入る",
+   "icon": "innIcon",
+   "back": {
+    "x": 13,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "24,5": {
+   "nextMap": "guild_adv",
+   "message": "冒険者ギルドに入る",
+   "icon": "advGuildIcon",
+   "back": {
+    "x": 24,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "3,12": {
+   "nextMap": "guild_merchant",
+   "message": "商人ギルドに入る",
+   "icon": "merchantGuildIcon",
+   "back": {
+    "x": 3,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "24,12": {
+   "nextMap": "temple",
+   "message": "神殿に入る",
+   "icon": "templeIcon",
+   "back": {
+    "x": 24,
+    "z": 13,
+    "angle": 3.14159
+   }
   }
  },
  "heights": [
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000"
+  "0000000000000000000000000000000000000000",
+  "0111111111111111111111111111111111111110",
+  "0122222222222222111222222222210000000000",
+  "0121111211112111111233211112110000000000",
+  "0121111211112111111233211112110000000000",
+  "0122111221112211111233211112110000000000",
+  "0122111221112211111233321111210000000000",
+  "0122212222123321111233332212210000000000",
+  "0122222222223332111223333323210000000000",
+  "0112222222222322111112333333210000000000",
+  "0122222222222332111112333332210000000000",
+  "0122222222223222111112333332210000000000",
+  "0121111222222111111112322222110000000000",
+  "0111111222222111111222322222110000000000",
+  "0111111222222111111222211112110000000000",
+  "0111111222222222111222221112210000000000",
+  "0111111222222222111222222122210000000000",
+  "0111111112222222111222222222210000000000",
+  "0111111111112111111222222222210000000000",
+  "0111111111112111111222222222210000000000",
+  "0111111111112111111222222222210000000000",
+  "0111111112222222111222222222210000000000",
+  "0111111122222222111222222222210000000000",
+  "0111111122222222111222222222210000000000",
+  "0111111122222222111222222222210000000000",
+  "0111111122222222111222222222210000000000",
+  "0111111112222222111222222222210000000000",
+  "0111111111222222111222222222210000000000",
+  "0111111111111111111111111111111111111110",
+  "0000000000000000000000000000000000000000"
  ],
  "heightStep": 0.5
 }

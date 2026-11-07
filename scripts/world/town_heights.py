@@ -36,12 +36,12 @@ def relax(lv, walk, fixed, passes=300):
 
 
 def edge_change_ratio(heights):
-    """サンプルと比べる指標: 隣のマスと高さが変わる辺の割合（heights: 文字列の行の配列）"""
+    """サンプルと比べる指標: 陸（高さ 0 でない）どうしの辺で、高さが変わる割合（heights: 文字列の行の配列）。川・港の水は除く"""
     h, w = len(heights), len(heights[0])
     tot = ch = 0
     for y in range(h):
         for x in range(w):
             for dx, dy in ((1, 0), (0, 1)):
-                if x + dx < w and y + dy < h:
+                if x + dx < w and y + dy < h and heights[y][x] != '0' and heights[y + dy][x + dx] != '0':
                     tot += 1; ch += heights[y][x] != heights[y + dy][x + dx]
     return ch / tot

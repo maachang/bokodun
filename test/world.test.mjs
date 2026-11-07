@@ -1537,16 +1537,16 @@ test('街・町・村の起伏: 作り込んだ街（街の人がいる town_*�
     const ratio = (hs) => {
         let tot = 0, ch = 0;
         for (let y = 0; y < hs.length; y++) for (let x = 0; x < hs[0].length; x++) for (const [dx, dy] of [[1, 0], [0, 1]]) {
-            if (x + dx < hs[0].length && y + dy < hs.length) { tot++; if (hs[y][x] !== hs[y + dy][x + dx]) ch++; }
+            if (x + dx < hs[0].length && y + dy < hs.length && hs[y][x] !== '0' && hs[y + dy][x + dx] !== '0') { tot++; if (hs[y][x] !== hs[y + dy][x + dx]) ch++; }   // 陸（高さ 0 でない）どうしの辺だけ（川・港の水は、除く）
         }
         return ch / tot;
     };
     const share = (hs, lv) => [...hs.join('')].filter(c => parseInt(c, 36) === lv).length / hs.join('').length;
     const samples = ['city', 'city_noble', 'town', 'village'].map(n => readJson(`public/data/maps/${n}.json`).heights);
     const lo = Math.min(...samples.map(ratio)), hi = Math.max(...samples.map(ratio));
-    assert.ok(lo > 0.2 && hi < 0.35, `サンプルの、高さが変わる辺の割合: ${lo.toFixed(2)}〜${hi.toFixed(2)}`);
+    assert.ok(lo > 0.15 && hi < 0.3, `サンプルの、陸の辺で高さが変わる割合: ${lo.toFixed(2)}〜${hi.toFixed(2)}`);
     const built = fs.readdirSync(path.join(root, 'public/data/maps')).filter(f => /^town_[a-h]\.json$/.test(f)).map(f => readJson(`public/data/maps/${f}`)).filter(m => (m.npcs || []).length > 0);
-    assert.ok(built.length >= 2, '作り込んだ街（D・H）がある');
+    assert.ok(built.length >= 3, '作り込んだ街（D・E・H）がある');
     for (const m of built) {
         const r = ratio(m.heights);
         assert.ok(r >= lo - 0.03 && r <= hi + 0.05, `${m.id}: 高さが変わる辺の割合 ${r.toFixed(2)}（サンプルは ${lo.toFixed(2)}〜${hi.toFixed(2)}）`);
