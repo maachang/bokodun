@@ -381,6 +381,12 @@ export class GameEngine {
             pavedRoad: RetroTextureGenerator.createPavedRoadTexture(),
             snowRoof: RetroTextureGenerator.createSnowRoofTexture(),       // 雪国（A）: 雪をかぶった屋根・雪の積もった石畳・大通り
             snowCobble: RetroTextureGenerator.createSnowCobbleTexture(),
+            adobeWall: RetroTextureGenerator.createAdobeWallTexture('#d9bd8c', '#b8683a', 5150),   // 中東風（C）: 砂色の漆喰の壁・赤土色の壁（商店）・平らな屋根・青緑のドーム
+            adobeWallOchre: RetroTextureGenerator.createAdobeWallTexture('#cf9f62', '#2a6f8a', 6262),
+            adobeRoof: RetroTextureGenerator.createAdobeRoofTexture(),
+            domeTile: RetroTextureGenerator.createDomeTileTexture(),
+            packedEarth: RetroTextureGenerator.createPackedEarthTexture(false),   // 砂漠の街（C）の地面: 踏み固めた土（広場）・わだちのある土の大通り
+            packedEarthRoad: RetroTextureGenerator.createPackedEarthTexture(true),
             snowPaved: RetroTextureGenerator.createSnowPavedTexture(),
             fountainWater: RetroTextureGenerator.createFountainWaterTexture(),
             chomperBlade: RetroTextureGenerator.createChomperBladeTexture(),
@@ -974,6 +980,37 @@ export class GameEngine {
             house.position.set(wx, houseH / 2, wz);
             env.add(house, true);
 
+            if (objDef.roofStyle === 'flat') {
+                // 中東風: 平らな屋根と、低い縁（パラペット）。ドーム（dome）・尖塔（spire）は、あれば載せる
+                const ts = env.tileSize;
+                const flatTex = (objDef.roofTexture && this.textures[objDef.roofTexture]) || this.textures.adobeRoof;
+                const flatMat = new THREE.MeshLambertMaterial({ map: flatTex });
+                const slab = new THREE.Mesh(new THREE.BoxGeometry(ts * 1.0, 0.12, ts * 1.0), flatMat);
+                slab.position.set(wx, houseH + 0.06, wz);
+                env.add(slab, true);
+                const rimH = 0.38, rimT = 0.2;
+                for (const [sx, sz, ax, az] of [[0, -1, ts, rimT], [0, 1, ts, rimT], [-1, 0, rimT, ts], [1, 0, rimT, ts]]) {
+                    const rim = new THREE.Mesh(new THREE.BoxGeometry(ax, rimH, az), flatMat);
+                    rim.position.set(wx + sx * (ts - rimT) / 2, houseH + 0.12 + rimH / 2, wz + sz * (ts - rimT) / 2);
+                    env.add(rim, true);
+                }
+                if (objDef.dome) {
+                    const rad = ts * 0.4;
+                    const domeMat = new THREE.MeshLambertMaterial({ map: this.textures[objDef.domeTexture] || this.textures.domeTile });
+                    const dome = new THREE.Mesh(new THREE.SphereGeometry(rad, 12, 8, 0, Math.PI * 2, 0, Math.PI / 2), domeMat);
+                    dome.position.set(wx, houseH + 0.12, wz);
+                    env.add(dome, true);
+                    if (objDef.spire) {
+                        const gold = new THREE.MeshLambertMaterial({ color: 0xd9a92e });
+                        const spire = new THREE.Mesh(new THREE.CylinderGeometry(0.03, 0.07, rad * 0.9, 6), gold);
+                        spire.position.set(wx, houseH + 0.12 + rad + rad * 0.4, wz);
+                        env.add(spire, true);
+                        const ball = new THREE.Mesh(new THREE.SphereGeometry(0.13, 8, 6), gold);
+                        ball.position.set(wx, houseH + 0.12 + rad + rad * 0.35, wz);
+                        env.add(ball, true);
+                    }
+                }
+            } else {
             // Triangular pitched roof capping the building (Slate blue for city or terracotta for village)
             const roofH = env.tileSize * 0.48;
             const roofGeo = new THREE.ConeGeometry(env.tileSize * 0.78, roofH, 4);
@@ -985,6 +1022,7 @@ export class GameEngine {
             roofMesh.rotation.y = Math.PI / 4;
             roofMesh.position.set(wx, houseH + roofH / 2, wz);
             env.add(roofMesh, true);
+            }
 
             // 外に向いた壁の面に付く部品（窓・鎧戸など。objects.json の faceParts。座標は wall_deco と同じ）
             //   faceEvery（n）があれば、(列+行) が n で割り切れるマスだけに付ける（外壁に、1マスおきに窓が並ぶ）。

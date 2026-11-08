@@ -1272,6 +1272,82 @@ export class RetroTextureGenerator {
     static snowRng(seed) { let a = seed >>> 0; return () => { a = (a * 1664525 + 1013904223) >>> 0; return a / 4294967296; }; }
 
     // 雪をかぶった屋根（スレートの屋根に、軽く雪が積もっている。瓦の下の縁と、濃い所が見える）
+    // 中東風（C: ミレニアム自由都市）: 日干しレンガ・漆喰の砂色の壁、平らな屋根、青緑のタイルのドーム
+    static createAdobeWallTexture(base = '#d9bd8c', band = '#b8683a', seed = 5150) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const rnd = RetroTextureGenerator.snowRng(seed);
+        ctx.fillStyle = base; ctx.fillRect(0, 0, 64, 64);
+        for (let i = 0; i < 160; i++) {   // 漆喰のむら（砂色の濃淡）
+            ctx.fillStyle = rnd() < 0.5 ? 'rgba(150, 110, 60, 0.18)' : 'rgba(255, 240, 200, 0.2)';
+            ctx.fillRect(Math.floor(rnd() * 62), Math.floor(rnd() * 62), 2 + Math.floor(rnd() * 4), 1 + Math.floor(rnd() * 3));
+        }
+        for (let k = 0; k < 4; k++) {   // 日干しレンガの目地（うっすら）
+            ctx.fillStyle = 'rgba(120, 85, 45, 0.16)'; ctx.fillRect(0, 12 + k * 16, 64, 1);
+        }
+        ctx.fillStyle = band; ctx.fillRect(0, 0, 64, 4);   // 上の縁の帯（赤土色）
+        ctx.fillStyle = 'rgba(255, 240, 210, 0.85)';        // 帯の幾何学模様（小さな菱形）
+        for (let x = 2; x < 64; x += 8) { ctx.fillRect(x + 2, 1, 2, 2); }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter; texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping; texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    static createAdobeRoofTexture() {   // 平らな屋根（踏み固めた土・漆喰）
+        const canvas = document.createElement('canvas');
+        canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const rnd = RetroTextureGenerator.snowRng(8821);
+        ctx.fillStyle = '#c9a56e'; ctx.fillRect(0, 0, 64, 64);
+        for (let i = 0; i < 220; i++) {
+            ctx.fillStyle = rnd() < 0.5 ? 'rgba(130, 95, 50, 0.25)' : 'rgba(245, 225, 175, 0.3)';
+            ctx.fillRect(Math.floor(rnd() * 62), Math.floor(rnd() * 62), 1 + Math.floor(rnd() * 3), 1 + Math.floor(rnd() * 3));
+        }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter; texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping; texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    static createDomeTileTexture() {   // ドームの、青緑（ターコイズ）のタイル。白と紺の幾何学模様
+        const canvas = document.createElement('canvas');
+        canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const rnd = RetroTextureGenerator.snowRng(3131);
+        ctx.fillStyle = '#1f9aa0'; ctx.fillRect(0, 0, 64, 64);
+        for (let y = 0; y < 64; y += 8) for (let x = 0; x < 64; x += 8) {
+            ctx.fillStyle = rnd() < 0.5 ? '#2bb0b4' : '#178288'; ctx.fillRect(x + 1, y + 1, 6, 6);   // タイルの濃淡
+        }
+        ctx.fillStyle = '#f4efe0';   // 白い菱形の列
+        for (let x = 0; x < 64; x += 16) { ctx.fillRect(x + 7, 16, 2, 2); ctx.fillRect(x + 6, 17, 4, 0); ctx.fillRect(x + 7, 40, 2, 2); }
+        ctx.fillStyle = '#14335f';   // 紺の帯
+        ctx.fillRect(0, 30, 64, 2); ctx.fillRect(0, 54, 64, 2);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter; texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping; texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
+    static createPackedEarthTexture(road = false) {   // 砂漠の街の、踏み固めた土の地面（広場）／往来の多い道（少し濃く、わだち）
+        const canvas = document.createElement('canvas');
+        canvas.width = 64; canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const rnd = RetroTextureGenerator.snowRng(road ? 9091 : 9090);
+        ctx.fillStyle = road ? '#b58f5a' : '#c4a06a'; ctx.fillRect(0, 0, 64, 64);
+        for (let i = 0; i < 260; i++) {   // 土のむら・小石
+            const d = rnd();
+            ctx.fillStyle = d < 0.4 ? 'rgba(120, 85, 45, 0.28)' : d < 0.8 ? 'rgba(235, 210, 160, 0.3)' : 'rgba(90, 65, 40, 0.5)';
+            ctx.fillRect(Math.floor(rnd() * 63), Math.floor(rnd() * 63), 1 + Math.floor(rnd() * 3), 1 + Math.floor(rnd() * 2));
+        }
+        if (road) { ctx.fillStyle = 'rgba(100, 70, 40, 0.3)'; ctx.fillRect(0, 18, 64, 3); ctx.fillRect(0, 42, 64, 3); }   // 荷車のわだち
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter; texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping; texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    }
+
     static createSnowRoofTexture() {
         const canvas = document.createElement('canvas');
         canvas.width = 64; canvas.height = 64;

@@ -1339,7 +1339,7 @@ test('街（候補地 A〜H）: 外のマップに壁と門（扉＋衛兵）・
             const outer = readJson(`public/data/maps/${l.nextMap}.json`);
             const oc = Math.floor(l.spawn.x), orow = Math.floor(l.spawn.z);
             assert.ok(outerWalk(outer, oc, orow), `town_${id}: 出た先が歩ける所`);
-            assert.match(outer.legend[outer.layout[orow][oc]], /^plaza_stone(_snow)?$/);   // A（雪国）は、雪の積もった石畳
+            assert.match(outer.legend[outer.layout[orow][oc]], /^plaza_(stone(_snow)?|earth)$/);   // A（雪国）は雪の積もった石畳・C（砂漠）は土
             // 外の門のマスから、この街へ入る links があり、出現位置が、街の中の歩ける所
             const back = Object.values(outer.links).filter((x) => x.nextMap === `town_${id}`);
             assert.equal(back.length, 2, `${l.nextMap}: 街 ${id} へ入る門が 2 マス`);
@@ -1620,4 +1620,23 @@ test('B（フランケル聖国）: 大教会が街の中心の北の最上位�
     assert.ok(clergy / ids.length >= 0.45, `聖職者（助祭・修道女）が多い: ${clergy}/${ids.length}`);
     for (const bad of ['priest_senior', 'cardinal', 'king', 'prince']) assert.ok(!ids.includes(bad), `${bad} は街に出ない`);
     assert.ok(!Object.values(m.links).some(l => ['guild_mage', 'guild_training'].includes(l.nextMap)), '魔法ギルド・職業訓練所は置かない');
+});
+
+test('C（ミレニアム自由都市）: 商人ギルドが街の中心・王城も神殿もない・オアシスの池・砂漠の見た目（砂の地面・ヤシ）・市場の屋台', () => {
+    const m = readJson('public/data/maps/town_c.json');
+    assert.deepEqual([m.layout[0].length, m.layout.length], [40, 30]);
+    assert.equal(m.links['29,11']?.nextMap, 'guild_merchant', '商人ギルドの扉');
+    const all = Object.values(m.links).map(l => l.nextMap);
+    for (const bad of ['castle', 'temple', 'guild_mage', 'guild_training']) assert.ok(!all.includes(bad), `${bad} は置かない`);
+    assert.ok(m.layout.join('').split('w').length - 1 >= 40, 'オアシスの池（水 40 マス以上）');
+    assert.equal(m.decorFloor, 'packedEarth');
+    assert.deepEqual([m.legend.p, m.legend['=']], ['plaza_earth', 'earth_road'], '地面は石畳ではなく土');
+    assert.equal(m.environment.floorType, 'desert');
+    assert.equal(m.legend.T, 'palm');
+    assert.deepEqual([m.legend.H, m.legend.S, m.legend.I, m.legend.K], ['mideast_house', 'mideast_shop', 'mideast_inn', 'mideast_guild'], '中東風の建物');
+    for (const id of ['mideast_house', 'mideast_shop', 'mideast_inn', 'mideast_guild']) assert.equal(objects[id].roofStyle, 'flat', `${id}: 平らな屋根`);
+    assert.ok(objects.mideast_guild.dome && objects.mideast_guild.spire, '商人ギルドは、ドームと尖塔');
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf8');
+    for (const t of ['adobeWall', 'adobeWallOchre', 'adobeRoof', 'domeTile', 'packedEarth', 'packedEarthRoad']) assert.ok(game.includes(`${t}:`), `テクスチャ ${t}`);
+    assert.ok(['1', '2', '3', '4'].some(c => m.layout.join('').includes(c)), '市場の屋台');
 });

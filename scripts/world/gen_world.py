@@ -15,6 +15,7 @@ import town_d as TD
 import town_h as TH
 import town_e as TE
 import town_b as TB
+import town_c as TC
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
 
@@ -499,7 +500,7 @@ def town_layout(w, h):
     return [''.join(r) for r in g]
 
 
-def gen_towns(t, city_legend, env, snow_env):
+def gen_towns(t, city_legend, env, snow_env, desert_env):
     """街の中のマップ（town_a〜town_h）を書く"""
     for site in t['towns']:
         w, h = TOWN_SIZE[site['id']]
@@ -516,8 +517,10 @@ def gen_towns(t, city_legend, env, snow_env):
         if site['id'] == 'a':   # A（雪国）: D と同じ作り（town_d.build_a）で、雪の見た目・雪の環境
             m['layout'], m['heights'] = TD.build_a(w, h, m['legend'], city_legend, m['links'], m['npcs'])
             m['environment'] = dict(snow_env, floorType='snow', fogNear=24, fogFar=72); m['decorFloor'] = 'snowCobble'   # 雪の環境（霧は、街が見えるよう薄め）
-        elif site['id'] in ('d', 'h', 'e', 'b'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
-            m['layout'], m['heights'] = {'d': TD, 'h': TH, 'e': TE, 'b': TB}[site['id']].build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
+        elif site['id'] in ('d', 'h', 'e', 'b', 'c'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
+            m['layout'], m['heights'] = {'d': TD, 'h': TH, 'e': TE, 'b': TB, 'c': TC}[site['id']].build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
+        if site['id'] == 'c':   # C（砂漠の自由都市）: 砂漠の環境（霧は、街が見えるよう薄め）・砂の地面
+            m['environment'] = dict(desert_env, floorType='desert', fogNear=24, fogFar=72); m['decorFloor'] = 'packedEarth'
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
 
@@ -564,6 +567,9 @@ def main():
                 if site['id'] == 'a' and town_outer_id(site) == f'w_{j:02d}_{i:02d}':   # A（雪国）の外観: 雪をかぶった屋根・雪の積もった門前の石畳
                     if '8' in legend: legend['8'] = 'brick_house_snow'
                     if '9' in legend: legend['9'] = 'plaza_stone_snow'
+                if site['id'] == 'c' and town_outer_id(site) == f'w_{j:02d}_{i:02d}':   # C（砂漠の自由都市）の外観: 中東風の家
+                    if '8' in legend: legend['8'] = 'mideast_house'
+                    if '9' in legend: legend['9'] = 'plaza_earth'   # 門前も土
             mid = f'w_{j:02d}_{i:02d}'
             # 出現位置: 中央に近い、歩ける陸のマス
             solid = set(SOLID_CH) | set('QO')
@@ -596,7 +602,7 @@ def main():
             grid[j][i] = mid
             info[mid] = dict(row=j, col=i, dom=dom, sea=sea_frac, grass=counts[GRASS] / max(1, int(L.sum())), land=int(L.sum()))
     city = json.load(open(os.path.join(MAPS, 'city.json'), encoding='utf-8'))
-    gen_towns(t, city['legend'], city['environment'], envs[SNOW])
+    gen_towns(t, city['legend'], city['environment'], envs[SNOW], envs[DESERT])
     # 最初のマップ: 島の中心に近く、ほとんどが陸で、草原が多いメッシュ
     # ゲーム開始は、最初の街（START_TOWN）の門の前。その街の外のマップを start にする
     start = town_outer_id(next(site for site in t['towns'] if site['id'] == START_TOWN))
