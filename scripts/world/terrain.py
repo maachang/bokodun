@@ -58,10 +58,9 @@ def _build_coast(g):
     g.towns = towns
 
 
-def _build_rivers(g):
-    """川（ゆらぎ・浅瀬・橋）と、湖との重なり。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
-    biome, lake, land, sx, sy = g.biome, g.lake, g.land, g.sx, g.sy
-    # 川（世界のマス）: 線に、ゆらぎをつけて描く。浅瀬（歩いて渡れる）を、間隔をあけて作る
+def _build_rivers_draw(g):
+    """川の線（ゆらぎ・浅瀬・橋）を、世界のマスへ描く。浅瀬（歩いて渡れる）を、間隔をあけて作る（元は _build_rivers の一部）"""
+    biome, land, sx, sy = g.biome, g.land, g.sx, g.sy
     river = np.zeros((H, W), np.uint8)   # 0 なし・1 深い・2 浅瀬
     d_sea0 = _distance(~land)
     mt_w = gauss(np.isin(biome, [SNOW, CONIFER, ROCK]).astype(np.float32), 10)   # 山（段丘の高さをもつ地形）の重み: 川は、山の中では蛇行させない（段丘の高さの規則を、乱さない）
@@ -145,6 +144,13 @@ def _build_rivers(g):
             for py, px in add: ford[py, px] = True
         river[deep] = np.maximum(river[deep], 1)
         river[ford] = 2
+    return river
+
+
+def _build_rivers(g):
+    """川（ゆらぎ・浅瀬・橋）と、湖との重なり。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
+    river = _build_rivers_draw(g)
+    lake, land = g.lake, g.land
     river[~land] = 0
     # 湖と重なる川は、湖に任せる（深い水）
     river[lake] = 0
