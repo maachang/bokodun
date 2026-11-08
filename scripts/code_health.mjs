@@ -107,6 +107,17 @@ if (process.argv[1] === new URL(import.meta.url).pathname) {
     console.log(`\n■ 目標を超えている関数（${fnRows.length}）  超過行の合計: ${fnRows.reduce((s, r) => s + r.over, 0)}`);
     for (const r of fnRows.slice(0, 15)) console.log(`  ${String(r.lines).padStart(5)} 行  超過 ${String(r.over).padStart(4)}  ${r.k}${ledger.funcs[r.k] ? '' : '  ← 台帳にない'}`);
     if (fnRows.length > 15) console.log(`  …ほか ${fnRows.length - 15} 件`);
+    // 注意リスト: 目標の 80% 以上（まだ超えていないが、近い）。大きくなる前に、分けるものを見つける（超えると、テストが失敗する）
+    const WARN = 0.8, warnFiles = [], warnFuncs = [];
+    for (const f of targets()) {
+        const m = measure(f);
+        if (!v.files[f] && (m.lines > TARGET.fileLines * WARN || m.bytes > TARGET.fileBytes * WARN)) warnFiles.push({ k: f, lines: m.lines, bytes: m.bytes });
+        for (const fn of m.funcs) if (!v.funcs[`${f}::${fn.name}`] && fn.lines > TARGET.funcLines * WARN) warnFuncs.push({ k: `${f}::${fn.name}`, lines: fn.lines });
+    }
+    warnFiles.sort((a, b) => b.lines - a.lines); warnFuncs.sort((a, b) => b.lines - a.lines);
+    console.log(`\n■ 注意（目標の ${WARN * 100}% 以上。ファイル ${warnFiles.length}・関数 ${warnFuncs.length}）`);
+    for (const r of warnFiles.slice(0, 8)) console.log(`  ファイル ${String(r.lines).padStart(5)} 行 ${String(Math.round(r.bytes / 1000)).padStart(4)}KB  ${r.k}`);
+    for (const r of warnFuncs.slice(0, 12)) console.log(`  関数     ${String(r.lines).padStart(5)} 行            ${r.k}`);
     const noPlan = [...Object.entries(ledger.files), ...Object.entries(ledger.funcs)].filter(([, x]) => !x.plan || x.plan === TODO_PLAN).map(([k]) => k);
     if (noPlan.length) console.log(`\n■ 計画（plan）が未記入の負債: ${noPlan.length} 件`);
     const stale = [...Object.keys(ledger.files).filter(k => !v.files[k]), ...Object.keys(ledger.funcs).filter(k => !v.funcs[k])];
