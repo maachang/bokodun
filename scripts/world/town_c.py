@@ -14,6 +14,7 @@ FACILITIES = [   # (建物の文字, 左上 x, y, 幅, 扉の x（建物の左�
     ('S', 7, 10, 4, 1, 'd', 'Q', _shop('weapon_shop', '武器屋に入る', 'weaponShopIcon')),
     ('S', 12, 10, 4, 1, 'd', 'a', _to('guild_adv', '冒険者ギルドに入る', 'advGuildIcon')),
     ('I', 12, 2, 4, 1, 'N', 'M', _to('city_inn', '宿屋・酒場に入る', 'innIcon')),
+    ('U', 2, 2, 8, 3, 'Y', 'x', {'nextMap': 'mansion_chairman_c', 'message': '議長の館に入る'}),   # 議長の館（扉の上の絵は、なし。H の自治領主の館と同じ。店・ギルドの絵を流用しない）（国のトップの館。ほかの 2 倍の幅）
     ('J', 28, 2, 8, 3, 'D', 'c', _to('temple', '神殿に入る', 'templeIcon')),   # 宗教は神殿（ユーザー指定）。ドームの大きな神殿
     ('K', 25, 9, 9, 4, 'd', 'g', _to('guild_merchant_c', '商人ギルドに入る', 'merchantGuildIcon')),   # 商人ギルドは、ほかの 2 倍の幅（街の中心）
 ]
@@ -30,10 +31,11 @@ NPCS = [   # 砂漠の住民（sdServer の画像）。議長は、商人ギル�
 ]
 
 LEGEND_KEYS = ('S', 'I', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'c', 'g', 'w', '1', '2', '3', '4')
-SOLID = set('WHSIJKdND1234')
-SKIN = {'T': 'palm', 'f': 'cactus', 'v': 'cactus',   # 木はヤシ、花壇の代わりはサボテン
+SOLID = set('WHSIJKUYdND1234')
+SKIN = {'W': 'adobe_wall',   # 街の壁は、石ではなく土壁（砂色の漆喰・日干しレンガ）
+        'T': 'palm', 'f': 'cactus', 'v': 'cactus',   # 木はヤシ、花壇の代わりはサボテン
         'p': 'plaza_earth', '=': 'earth_road',   # 地面は石畳ではなく土（ユーザー指示）
-        'H': 'mideast_house', 'S': 'mideast_shop', 'I': 'mideast_inn', 'K': 'mideast_guild', 'J': 'mideast_temple'}   # 中東風の建物（砂色の漆喰・平らな屋根・アーチの窓・木の格子・青緑のドーム）
+        'H': 'mideast_house', 'S': 'mideast_shop', 'I': 'mideast_inn', 'K': 'mideast_guild', 'J': 'mideast_temple', 'U': 'mideast_mansion', 'Y': 'mansion_door', 'x': 'chairman_sign'}   # 中東風の建物（砂色の漆喰・平らな屋根・アーチの窓・木の格子・青緑のドーム）
 
 
 def build(w, h, legend, city_legend, links, npcs):
@@ -52,7 +54,7 @@ def build(w, h, legend, city_legend, links, npcs):
     for x in range(w): g[0][x] = g[h - 1][x] = 'W'
     for y in range(h): g[y][0] = g[y][w - 1] = 'W'
     g[h - 1][19] = g[h - 1][20] = 'G'
-    for hx, hy in ((2, 2), (7, 2), (2, 18), (7, 18), (2, 24), (7, 24), (12, 24), (27, 28 - 1)):
+    for hx, hy in ((2, 18), (7, 18), (2, 24), (7, 24), (12, 24), (27, 28 - 1)):
         if hy + 3 >= h - 1: continue
         for y in range(hy, hy + 3):
             for x in range(hx, hx + 4): g[y][x] = 'H'
@@ -75,7 +77,7 @@ def build(w, h, legend, city_legend, links, npcs):
     for (x, y) in CACTI:
         assert g[y][x] == 'p', f'C のサボテン ({x},{y}): 空きマスではない'
         g[y][x] = 'f'
-    for k in (set(LEGEND_KEYS) - {'K'}) | {'T', 'f', 'v', 'F', 'G', 'W', 'p', '=', 'H'}: legend[k] = city_legend[k]
+    for k in (set(LEGEND_KEYS) - {'K', 'U', 'Y', 'x'}) | {'T', 'f', 'v', 'F', 'G', 'W', 'p', '=', 'H'}: legend[k] = city_legend[k]
     legend.update(SKIN)
     for nid, x, z in NPCS:
         assert g[z][x] in 'p=', f'C の NPC {nid} ({x},{z}): 歩ける空きマスではない'

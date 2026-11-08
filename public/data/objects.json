@@ -17667,5 +17667,127 @@
     "radius": 0.5,
     "message": "長老の家",
     "description": "長老の家の案内標識（G デイラミ精霊国。世界樹のそば）"
+  },
+  "mideast_mansion": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "adobeWallOchre",
+    "roofTexture": "adobeRoof",
+    "roofStyle": "flat",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "中東風の館（議長の館。ドームと金の尖塔。C 用）",
+    "faceParts": [
+      {
+        "size": [
+          0.9,
+          1.4,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.0,
+          0.03
+        ],
+        "color": "#2a2018",
+        "basic": true
+      },
+      {
+        "size": [
+          0.648,
+          0.18,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.79,
+          0.03
+        ],
+        "color": "#2a2018",
+        "basic": true
+      },
+      {
+        "size": [
+          0.378,
+          0.18,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.97,
+          0.03
+        ],
+        "color": "#2a2018",
+        "basic": true
+      },
+      {
+        "size": [
+          0.08,
+          1.5,
+          0.07
+        ],
+        "pos": [
+          -0.55,
+          2.1,
+          0.05
+        ],
+        "color": "#f2e8d0"
+      },
+      {
+        "size": [
+          0.08,
+          1.5,
+          0.07
+        ],
+        "pos": [
+          0.55,
+          2.1,
+          0.05
+        ],
+        "color": "#f2e8d0"
+      },
+      {
+        "size": [
+          1.2000000000000002,
+          0.1,
+          0.1
+        ],
+        "pos": [
+          0,
+          1.4,
+          0.07
+        ],
+        "color": "#f2e8d0"
+      }
+    ],
+    "faceEvery": 2,
+    "dome": true,
+    "spire": true,
+    "domeTexture": "domeTile"
+  },
+  "chairman_sign": {
+    "lift": true,
+    "groundShadow": true,
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "議長の館",
+    "description": "議長の館の案内標識（C ミレニアム自由都市）"
+  },
+  "adobe_wall": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "adobeWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "砂漠の街（C）を囲む土壁（砂色の漆喰・日干しレンガ。上の縁に赤土色の帯）"
   }
 }

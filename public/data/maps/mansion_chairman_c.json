@@ -1,0 +1,130 @@
+{
+ "id": "mansion_chairman_c",
+ "name": "議長の館（ミレニアム自由都市）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": "town_c",
+ "spawn": {
+  "x": 6,
+  "z": 13,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 4864552,
+  "fogNear": 22,
+  "fogFar": 70,
+  "visibility": 0.9,
+  "skyColor": 4864552
+ },
+ "legend": {
+  "W": "wooden_wall",
+  "F": "wood_floor",
+  "u": "rug",
+  "d": "wooden_door",
+  "E": "building_exit",
+  "U": "stairs_wood_up",
+  "t": "table",
+  "h": "chair",
+  "e": "bed",
+  "k": "bookshelf",
+  "g": "cupboard",
+  "s": "hearth",
+  "o": "stove",
+  "X": "crate",
+  "C": "wall_window_curtain",
+  "L": "wall_sconce_wood",
+  "K": "chandelier_mansion_rug",
+  "a": "sink",
+  "b": "water_barrel",
+  "c": "wash_stand",
+  "f": "oven",
+  "i": "kitchen_hearth",
+  "j": "prep_table",
+  "l": "sack_pile",
+  "m": "pot_rack",
+  "n": "wall_utensils",
+  "q": "kitchen_shelf"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWCWLWLWCWWWWWWnWWWW",
+  "WFkkFFsFFkkFFWfoaiogW",
+  "WFFFFuuuFFFFFWbFmFFqW",
+  "dFFFFuuuFFFFFWFFjjFFd",
+  "WFFFFuKuFFFFFdFhFFhFW",
+  "CFFFFuuuFFFFFWFFFFFlL",
+  "WFFFFuuuFFFFFWFFFFFFW",
+  "WFhthuuuhthFFWWWLWWWW",
+  "dFFFFuuuFFFFFWcFFFFFW",
+  "WFFFFuKuFFFFFWFeFFeFW",
+  "CFFFFuuuFFFFFWFFFFFFC",
+  "WFhthuuuhthFFdFFtFFFW",
+  "WFFFFuuuFFFFFWFeFFeFL",
+  "LFFFFuuuFFFFFWFFFhFFW",
+  "WFFFFuuuFFFFFWFFFFFgW",
+  "WWWCWLELWCWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "desert_chairman",
+   "x": 9,
+   "z": 4
+  },
+  {
+   "id": "butler",
+   "x": 4,
+   "z": 13
+  },
+  {
+   "id": "maid",
+   "x": 10,
+   "z": 12
+  },
+  {
+   "id": "maid",
+   "x": 15,
+   "z": 3
+  },
+  {
+   "id": "servant_man",
+   "x": 17,
+   "z": 11,
+   "wanderRadius": 0.8
+  }
+ ],
+ "links": {
+  "0,3": {
+   "nextMap": "mansion_chapel",
+   "message": "礼拝堂に入る",
+   "back": {
+    "x": 1,
+    "z": 3,
+    "angle": -1.570795
+   }
+  },
+  "0,8": {
+   "nextMap": "mansion_steward",
+   "message": "家令の執務室に入る",
+   "back": {
+    "x": 1,
+    "z": 8,
+    "angle": -1.570795
+   }
+  },
+  "20,3": {
+   "nextMap": "mansion_pantry",
+   "message": "食料庫・酒蔵に入る",
+   "back": {
+    "x": 19,
+    "z": 3,
+    "angle": 1.570795
+   }
+  }
+ }
+}

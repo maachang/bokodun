@@ -193,7 +193,7 @@ def build_f(w, h, legend, city_legend, links, npcs):
 # ---- G（デイラミ精霊国。大森林の中心の、エルフと精霊の街）: D と同じ作りで、街の中心に世界樹 ----
 FACILITIES_G = [(_remap(f, shopId='item_shop_g') if f[6] == 'q' else _remap(f, shopId='weapon_shop_g') if f[6] == 'Q' else _remap(f, nextMap='city_inn_g') if f[6] == 'M' else _remap(f, nextMap='guild_adv_g') if f[6] == 'a' else _remap(f, nextMap='guild_mage_g') if f[6] == 'm' else f)
                 for f in FACILITIES if f[6] not in ('r', 'c')] + [
-    ('S', 23, 10, 3, 1, 'd', 'x', _to('elder_house_g', '長老の家に入る', 'templeIcon')),   # 世界樹のそばの、小さな長老の家（長老たちは、この中にいる）
+    ('S', 23, 10, 3, 1, 'd', 'x', {'nextMap': 'elder_house_g', 'message': '長老の家に入る'}),   # 世界樹のそばの、小さな長老の家（長老たちは、この中にいる）
 ]   # 職業訓練所・神殿は置かない（神殿の品は道具屋 item_shop_g が売る。冒険者ギルド・魔法ギルドは、長老一族の複製のマップ）
 NPCS_G = [   # エルフの住民と、世界樹を管理する長老（世界樹のそば）
     ('elf_woman_a', 6, 17), ('elf_man_a', 12, 17), ('elf_woman_b', 28, 13), ('elf_man_b', 24, 9),

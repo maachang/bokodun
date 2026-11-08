@@ -79,3 +79,18 @@ def build_others():
         hall('castle_g', '女王の城（デイラミ精霊国）', 25, 15, 12, [('elf_queen', 12, 1), ('elf_chancellor', 9, 2)],
              [('elf_soldier_golem', 9, 6), ('elf_soldier_golem', 15, 6), ('elf_man_c', 18, 10), ('elf_woman_b', 6, 10)]),
     ]
+
+
+def build_mansion_c():
+    """C（ミレニアム自由都市）の議長の館（1 階）。H の自治領主の館（辺境伯の屋敷 mansion_margrave）を複製し、主を議長（desert_chairman）に替える。
+    辺境伯の 2 階への階段は、なくす（共通の 2 階は、辺境伯の屋敷に戻る作りのため）。礼拝堂・家令の部屋・食料庫は、共通のまま"""
+    m = json.load(open(os.path.join(os.path.dirname(CASTLE), 'mansion_margrave.json'), encoding='utf-8'))
+    m['id'] = 'mansion_chairman_c'; m['name'] = '議長の館（ミレニアム自由都市）'; m['nextMap'] = 'town_c'
+    rows = [list(r) for r in m['layout']]
+    assert rows[1][12] == 'U'
+    rows[1][12] = 'F'
+    m['layout'] = [''.join(r) for r in rows]
+    m['links'].pop('12,1', None)
+    for n in m['npcs']:
+        if n['id'] == 'margrave_man': n['id'] = 'desert_chairman'
+    return m

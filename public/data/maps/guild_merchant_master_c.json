@@ -1,6 +1,6 @@
 {
  "id": "guild_merchant_master_c",
- "name": "議長の部屋（ミレニアム自由都市）",
+ "name": "商人ギルド長の部屋（ミレニアム自由都市）",
  "type": "indoor",
  "tileSize": 4,
  "wallHeight": 4,
@@ -45,14 +45,14 @@
  ],
  "npcs": [
   {
-   "id": "desert_chairman",
+   "id": "desert_middle_man",
    "x": 5,
    "z": 3,
    "speed": 0,
    "wanderRadius": 0
   },
   {
-   "id": "desert_middle_woman",
+   "id": "desert_old_woman",
    "x": 3,
    "z": 3,
    "speed": 0,
