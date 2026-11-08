@@ -17,10 +17,6 @@
       "lines": 131,
       "plan": "入力の種類（キー・マウス・タッチ・ボタン）ごとの関数に分ける"
     },
-    "public/js/textures/texturesRoofsDoors.js::drawShopMark": {
-      "lines": 138,
-      "plan": "店の種類（武器・道具・酒場・宿）ごとの描画を、表で呼び分ける"
-    },
     "scripts/world/terrain_mountain.py::_mountains": {
       "lines": 110,
       "plan": "触るときに、触った分だけ小さくする（目標: 100 行以下）"
