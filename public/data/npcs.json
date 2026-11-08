@@ -2490,5 +2490,31 @@
       "はい、ご注文は？",
       "あそこの旅の人、遠くの町の噂を、よく知っているのよ。"
     ]
+  },
+  "desert_guard": {
+    "name": "砂漠の街の護衛",
+    "sdId": 329,
+    "texture": "/images/npcs/desert_guard.png",
+    "height": 2.6,
+    "aspect": 0.329,
+    "radius": 0.5,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "ここは自由都市だ。ルールを守る限り、誰でも歓迎だ。",
+      "市場で騒ぎを起こすなよ。"
+    ]
+  },
+  "desert_gate_guard": {
+    "name": "砂漠の街の護衛（門番）",
+    "texture": "/images/npcs/desert_guard.png",
+    "height": 2.6,
+    "aspect": 0.329,
+    "radius": 0.5,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "……止まれ。ミレニアム自由都市へ、ようこそ。"
+    ]
   }
 }

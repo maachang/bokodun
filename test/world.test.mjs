@@ -1845,3 +1845,14 @@ test('個人の館・家（H の自治領主の館・C の議長の館・G の�
         assert.equal(link.icon, undefined, `${town}: 館・家に、店の絵を付けない`);
     }
 });
+
+test('C（ミレニアム自由都市）の門番・護衛は、砂漠の街の護衛（sdServer 329）。人族の衛兵は置かない', () => {
+    const npcs = readJson('public/data/npcs.json');
+    assert.equal(npcs.desert_guard.sdId, 329);
+    assert.equal(npcs.desert_gate_guard.texture, npcs.desert_guard.texture, '門番も同じ画像');
+    const town = readJson('public/data/maps/town_c.json');
+    const outer = readJson(`public/data/maps/${Object.values(town.links).find(l => l.nextMap?.startsWith('w_')).nextMap}.json`);
+    const human = /^(guard_|gate_guard)/;
+    assert.ok(!town.npcs.some(n => human.test(n.id)) && town.npcs.filter(n => n.id === 'desert_guard').length >= 2, '街の護衛');
+    assert.ok(!outer.npcs.some(n => human.test(n.id)) && outer.npcs.filter(n => n.id === 'desert_gate_guard').length === 2, '外のマップの門番');
+});

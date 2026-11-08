@@ -466,7 +466,7 @@ def town_outer_extras(t, j, i):
         for gx, gy in town_gate_tiles(site):
             links[f"{gx - i * MESH},{gy - j * MESH}"] = {'nextMap': f"town_{site['id']}", 'message': f"{TOWN_NAME[site['id']]}に入る", 'spawn': {'x': w // 2 - 1 + (gx - (site['x'] - 1)), 'z': h - 3, 'angle': 0}}
         gy = site['y'] + TOWN_HH   # 壁のすぐ外（門と同じ並び）
-        pair = {'f': (('beast_soldier_kobold_gate', -2), ('beast_soldier_kobold', 1)), 'g': (('elf_soldier_golem', -2), ('elf_gate_guard_woman', 1))}.get(site['id'], (('guard_spear', -2), ('guard_light', 1)))   # F の兵士は、コボルト。G の兵士は、エルフの守備隊とウッドゴーレム
+        pair = {'f': (('beast_soldier_kobold_gate', -2), ('beast_soldier_kobold', 1)), 'g': (('elf_soldier_golem', -2), ('elf_gate_guard_woman', 1)), 'c': (('desert_gate_guard', -2), ('desert_gate_guard', 1))}.get(site['id'], (('guard_spear', -2), ('guard_light', 1)))   # F の兵士は、コボルト。G の兵士は、エルフの守備隊とウッドゴーレム
         for k, (nid, dx) in enumerate(pair):   # 門 2 マス（x-1, x）のすぐ両隣
             npcs.append({'id': nid, 'x': site['x'] + dx - i * MESH, 'z': gy - j * MESH})
     return links, npcs

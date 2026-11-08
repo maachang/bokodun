@@ -26,7 +26,8 @@ CACTI = ((37, 12), (3, 22), (16, 28))
 NPCS = [   # 砂漠の住民（sdServer の画像）。議長は、商人ギルドの前
     ('desert_middle_man', 24, 13), ('desert_woman', 6, 17), ('desert_man', 19, 22),
     ('desert_middle_woman', 14, 15), ('desert_old_man', 5, 13), ('desert_old_woman', 29, 16), ('desert_boy', 9, 22),
-    ('desert_girl', 17, 25), ('merchant_man', 22, 15), ('traveler_merchant', 20, 12), ('guard_spear', 17, 27), ('guard_light', 22, 27),
+    ('desert_girl', 17, 25), ('merchant_man', 22, 15), ('traveler_merchant', 20, 12), ('desert_guard', 17, 27), ('desert_guard', 22, 27),   # 護衛は、砂漠の街の護衛（sdServer 329）
+   
     ('priest_man', 32, 7), ('priest_woman', 35, 7),
 ]
 

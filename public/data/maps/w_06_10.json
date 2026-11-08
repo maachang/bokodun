@@ -273,12 +273,12 @@
  },
  "npcs": [
   {
-   "id": "guard_spear",
+   "id": "desert_gate_guard",
    "x": 41,
    "z": 49
   },
   {
-   "id": "guard_light",
+   "id": "desert_gate_guard",
    "x": 44,
    "z": 49
   }
