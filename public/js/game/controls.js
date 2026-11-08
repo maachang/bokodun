@@ -4,6 +4,13 @@
 
 export const controlsMethods = {
     initControls() {
+        this.initKeyDown();
+        this.initKeyUp();
+        this.initPointer();
+    },
+
+    // キーを押したとき（移動・攻撃・魔法・調べる・スロットの選択など）
+    initKeyDown() {
         window.addEventListener('keydown', (e) => {
             this.sound.init();
             // 店のメニューを開いている間は、メニューの操作だけを受け付ける
@@ -74,7 +81,10 @@ export const controlsMethods = {
             const magicKey = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
             if (magicKey) this.selectMagic(Number(magicKey[1]) - 1);
         });
+    },
 
+    // キーを離したとき
+    initKeyUp() {
         window.addEventListener('keyup', (e) => {
             // Ctrl を離したときや、矢印キーを離したときは、カメラ操作も止める
             if (e.code === 'ControlLeft' || e.code === 'ControlRight') {
@@ -109,7 +119,10 @@ export const controlsMethods = {
                     break;
             }
         });
+    },
 
+    // マウス（クリック・ポインターロック・視点の移動）
+    initPointer() {
         this.canvas.addEventListener('click', (e) => {
             this.sound.init();
             // マウスモードOFFのときは、クリックでは何もしない（魔法は Space / F）
