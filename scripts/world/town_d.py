@@ -63,6 +63,7 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
         for x in (19, 20):
             for y in (14, 15): g[y][x] = 'p'
         g[14][19] = 'Y'
+        for x, y in ((20, 14), (19, 15), (20, 15)): g[y][x] = 'j'   # 世界樹のまわりの柵（入れない。大通りの両脇の列は通れる）
     if castle: g[0][19] = g[0][20] = 'C'   # 城門（castle は、中の王城のマップ名。True なら共通の castle。G は、城を置かない）
     for x in ((19, 20) if castle else ()):
         links[f'{x},0'] = {'nextMap': castle if isinstance(castle, str) else 'castle', 'message': '王城に入る', 'back': {'x': x, 'z': 1, 'angle': 3.14159}}
@@ -87,7 +88,7 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
         assert g[y][x] == 'p', f'D の飾り ({x},{y}): 空きマスではない'
         g[y][x] = c
     if castle: legend.update({'C': 'castle_gate'})
-    if tree_center: legend['Y'] = 'world_tree'
+    if tree_center: legend['Y'] = 'world_tree'; legend['j'] = 'wooden_fence'
     for k in set(LEGEND_KEYS) | {c for f in facilities for c in (f[0], f[5], f[6])}:   # 施設の建物・扉・立て札の文字も（サンプルの凡例にない文字は、skin が決める）
         if k in city_legend: legend[k] = city_legend[k]
     if skin: legend.update(skin)   # 見た目の差し替え（雪国: 雪をかぶった屋根・石畳など）
@@ -171,12 +172,12 @@ FACILITIES_F = [(_remap(f, shopId='item_shop_f') if f[6] == 'q' else _remap(f, n
     ('S', 27, 2, 4, 1, 'd', 'k', _to('guild_smith', '鍛冶屋に入る', 'smithIcon')),   # ドワーフの鍛冶屋（鉱山の国）
     ('S', 28, 9, 4, 1, 'd', 'g', _to('guild_merchant_f', '商人ギルドに入る', 'merchantGuildIcon')),   # 商人ギルド（猫の獣人のギルド長）
 ]
-NPCS_F = [   # 兵士は、コボルト（sdServer 11）とウッドゴーレム（sdServer 51）。獣人（一般）とドワーフ。貴族・獣王・宰相・フェンリル像は、王城（castle_f）の中
+NPCS_F = [   # 兵士は、コボルト（sdServer 11）だけ（ウッドゴーレムは、エルフの国）。獣人（一般）とドワーフ。貴族・獣王・宰相・フェンリル像は、王城（castle_f）の中
     ('dwarf_smith', 28, 6), ('beast_a', 6, 17), ('beast_f_a', 12, 17), ('dwarf_man', 28, 13), ('beast_b', 24, 9),
     ('dwarf_woman', 14, 26), ('beast_f_b', 15, 21), ('beast_soldier_kobold', 17, 27), ('beast_soldier_kobold', 22, 27),
     ('dwarf_man', 30, 15), ('beast_f_a', 34, 12), ('beast_c', 8, 21), ('beast_f_c', 33, 21), ('dwarf_woman', 10, 21),
     ('beast_a', 36, 14), ('beast_d', 21, 21), ('beast_f_d', 5, 21),   # 貴族は、街に出ない（城の中の廷臣）
-    ('beast_soldier_golem', 17, 1), ('beast_soldier_golem', 22, 1),
+    ('beast_soldier_kobold_gate', 17, 1), ('beast_soldier_kobold_gate', 22, 1),
 ]
 SKIN_FOOT = {   # 山の麓の見た目: 木造の家（獣人の家）・針葉樹
     'H': 'wooden_house', 'T': 'conifer_tree_a', 'f': 'conifer_tree_b', 'v': 'conifer_tree_a',
@@ -195,7 +196,7 @@ FACILITIES_G = [(_remap(f, shopId='item_shop_g') if f[6] == 'q' else _remap(f, n
 NPCS_G = [   # エルフの住民と、世界樹を管理する長老（世界樹のそば）
     ('elf_woman_a', 6, 17), ('elf_man_a', 12, 17), ('elf_woman_b', 28, 13), ('elf_man_b', 24, 9),
     ('elf_woman_c', 14, 26), ('elf_girl', 15, 21), ('elf_boy', 24, 21), ('elf_man_c', 30, 15),
-    ('elf_guard_man', 17, 27), ('elf_guard_woman', 22, 27), ('elf_gate_guard_man', 17, 1), ('elf_gate_guard_woman', 22, 1),   # 兵士は、エルフの守備隊（sdServer 327・328）
+    ('elf_guard_man', 17, 27), ('elf_guard_woman', 22, 27), ('elf_soldier_golem', 17, 1), ('elf_soldier_golem', 22, 1),   # 兵士は、エルフの守備隊（sdServer 327・328）と、ウッドゴーレム（sdServer 51。城門の番）
     ('fairy_wisp', 8, 15), ('fairy_sylph', 30, 21), ('fairy_undine', 33, 15), ('fairy_salamander', 12, 21),   # 妖精（敵キャラの妖精系。精霊国では、街に出る・おとなしい）
     ('fairy_gnome', 26, 6), ('fairy_unicorn', 6, 21), ('fairy_pegasus', 20, 24),
 ]

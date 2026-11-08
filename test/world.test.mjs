@@ -1759,7 +1759,7 @@ test('G（森の街）: 石畳・石造りではなく森を活かす（森の�
     assert.ok(!m.npcs.some(n => /^(guard_|gate_guard)/.test(n.id)) && m.npcs.some(n => n.id === 'elf_guard_man') && m.npcs.some(n => n.id === 'elf_guard_woman'), '兵士は、エルフの守備隊（sdServer 327・328）');
     const npcsJ = readJson('public/data/npcs.json');
     assert.deepEqual([npcsJ.elf_guard_woman.sdId, npcsJ.elf_guard_man.sdId], [327, 328]);
-    assert.ok(readJson('public/data/maps/castle_g.json').npcs.some(n => n.id.startsWith('elf_gate_guard')) && !readJson('public/data/maps/castle_g.json').npcs.some(n => n.id.startsWith('guard_')), '女王の城の兵士もエルフ');
+    assert.ok(readJson('public/data/maps/castle_g.json').npcs.some(n => n.id === 'elf_soldier_golem') && !readJson('public/data/maps/castle_g.json').npcs.some(n => n.id.startsWith('guard_')), '女王の城の兵士もエルフ国（ウッドゴーレム）');
     const fairies = m.npcs.filter(n => n.id.startsWith('fairy_'));
     assert.ok(fairies.length >= 6, '妖精が街にいる');
     const npcs = readJson('public/data/npcs.json');
@@ -1770,18 +1770,34 @@ test('G（森の街）: 石畳・石造りではなく森を活かす（森の�
     assert.ok(Object.values(outer.legend).includes('wooden_wall') && !Object.values(outer.legend).includes('city_wall'), '外のマップの G の外壁は木の壁');
 });
 
-test('F（獣人国）の兵士は、敵キャラのコボルト（sdServer 11）とウッドゴーレム（sdServer 51）。街の兵士・城門・外のマップの門・王城', () => {
+test('兵士: F（獣人国）はコボルト（sdServer 11）。G（エルフ国）はエルフの守備隊（327・328）とウッドゴーレム（sdServer 51）。F にウッドゴーレムはいない', () => {
     const npcs = readJson('public/data/npcs.json');
     const enemies = readJson('public/data/enemies.json');
     const img = (sd) => `/images/enemies/${Object.values(enemies).find(e => e.sdId === sd).imageFile}`;
     assert.equal(npcs.beast_soldier_kobold.texture, img(11), 'コボルト（sdServer 11）');
-    assert.equal(npcs.beast_soldier_golem.texture, img(51), 'ウッドゴーレム（sdServer 51）');
-    const town = readJson('public/data/maps/town_f.json');
+    assert.equal(npcs.elf_soldier_golem.texture, img(51), 'ウッドゴーレム（sdServer 51）はエルフ国の兵士');
+    assert.ok(!npcs.beast_soldier_golem, '獣人国向けのウッドゴーレムはない');
     const soldier = /^(guard_|gate_guard)/;
-    assert.ok(!town.npcs.some(n => soldier.test(n.id)), '街に、人族の衛兵はいない');
-    assert.ok(town.npcs.filter(n => n.id.startsWith('beast_soldier_')).length >= 4, '街の兵士');
-    const castle = readJson('public/data/maps/castle_f.json');
-    assert.ok(!castle.npcs.some(n => soldier.test(n.id)) && castle.npcs.some(n => n.id === 'beast_soldier_golem'), '王城の兵士');
-    const outer = readJson(`public/data/maps/${Object.values(town.links).find(l => l.nextMap?.startsWith('w_')).nextMap}.json`);
-    assert.ok(outer.npcs.some(n => n.id === 'beast_soldier_golem') && outer.npcs.some(n => n.id === 'beast_soldier_kobold') && !outer.npcs.some(n => soldier.test(n.id)), '外のマップの門の兵士');
+    const townMaps = (id, castleId) => {
+        const town = readJson(`public/data/maps/town_${id}.json`);
+        const outer = readJson(`public/data/maps/${Object.values(town.links).find(l => l.nextMap?.startsWith('w_')).nextMap}.json`);
+        return [town.npcs, readJson(`public/data/maps/${castleId}.json`).npcs, outer.npcs];
+    };
+    for (const list of townMaps('f', 'castle_f')) {
+        assert.ok(!list.some(n => soldier.test(n.id) || /golem/.test(n.id)), 'F: 人族の衛兵・ゴーレムはいない');
+        assert.ok(list.some(n => n.id.startsWith('beast_soldier_kobold')), 'F: コボルトの兵士');
+    }
+    for (const list of townMaps('g', 'castle_g')) {
+        assert.ok(!list.some(n => soldier.test(n.id) || /beast_soldier/.test(n.id)), 'G: 人族の衛兵・獣人の兵士はいない');
+        assert.ok(list.some(n => n.id === 'elf_soldier_golem'), 'G: ウッドゴーレムの兵士');
+    }
+});
+
+test('G: 世界樹のまわりに柵があり、入れない（木 1 本と柵 3 マスで、2×2 の囲い。大通りの両脇の道は通れる）', () => {
+    const m = readJson('public/data/maps/town_g.json');
+    assert.equal(m.layout[14][19], 'Y');
+    for (const [x, y] of [[20, 14], [19, 15], [20, 15]]) assert.equal(objects[m.legend[m.layout[y][x]]]?.type, 'wooden_fence', `(${x},${y}) は柵`);
+    assert.equal(objects[m.legend.j].solid, true, '柵は通れない');
+    // 大通り（南北）は、柵の両脇の列（x=18・21）で、通り抜けられる
+    for (let y = 13; y <= 16; y++) for (const x of [18, 21]) assert.ok('p='.includes(m.layout[y][x]), `(${x},${y}) は通れる`);
 });

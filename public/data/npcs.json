@@ -2272,19 +2272,6 @@
       "フェンリル様の像に無礼を働けば、容赦しないぞ。"
     ]
   },
-  "beast_soldier_golem": {
-    "name": "獣人国の兵士（ウッドゴーレム）",
-    "texture": "/images/enemies/golem/wood_golem.png",
-    "height": 3.4,
-    "aspect": 0.6,
-    "radius": 0.9,
-    "speed": 0.0,
-    "wanderRadius": 0.0,
-    "lines": [
-      "……ゴゴゴ。通るなら、静かに。",
-      "……王城は、我らが守る。"
-    ]
-  },
   "elf_guard_woman": {
     "name": "エルフの守備隊（女）",
     "texture": "/images/npcs/elf_guard_woman.png",
@@ -2335,6 +2322,31 @@
     "wanderRadius": 0.0,
     "lines": [
       "……ここは、精霊と森の国。静かにお通りください。"
+    ]
+  },
+  "elf_soldier_golem": {
+    "name": "エルフ国の兵士（ウッドゴーレム）",
+    "texture": "/images/enemies/golem/wood_golem.png",
+    "height": 3.4,
+    "aspect": 0.6,
+    "radius": 0.9,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "……ゴゴゴ。森と世界樹は、我らが守る。",
+      "……通るなら、静かに。"
+    ]
+  },
+  "beast_soldier_kobold_gate": {
+    "name": "獣人国の兵士（コボルト。門番）",
+    "texture": "/images/enemies/demihuman/dog_warrior_male.png",
+    "height": 2.5,
+    "aspect": 0.465,
+    "radius": 0.5,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "……ここは獣王陛下の国だ。通るなら、騒ぎは起こすな。"
     ]
   }
 }

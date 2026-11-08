@@ -31,7 +31,7 @@ def build():
          'spawn': {'x': 12, 'z': 12, 'angle': 0}, 'environment': c['environment'], 'legend': legend,
          'layout': [''.join(r) for r in g],
          'npcs': [{'id': 'lion_king', 'x': 12, 'z': 1}, {'id': 'fox_chancellor', 'x': 10, 'z': 2},
-                  {'id': 'beast_soldier_golem', 'x': 9, 'z': 6}, {'id': 'beast_soldier_golem', 'x': 15, 'z': 6},   # 兵士: ウッドゴーレム（sdServer 51）
+                  {'id': 'beast_soldier_kobold_gate', 'x': 9, 'z': 6}, {'id': 'beast_soldier_kobold_gate', 'x': 15, 'z': 6},   # 兵士: コボルト（sdServer 11）
                   {'id': 'beast_soldier_kobold', 'x': 9, 'z': 12}, {'id': 'beast_soldier_kobold', 'x': 4, 'z': 7},   # コボルト（sdServer 11）
                   
                   {'id': 'beast_f_a', 'x': 6, 'z': 9}, {'id': 'dwarf_king', 'x': 19, 'z': 9}] + [
@@ -77,5 +77,5 @@ def build_others():
              [('guard_light', 6, 6), ('guard_light', 10, 6)]),
         # G デイラミ精霊国: エルフの女王と宰相
         hall('castle_g', '女王の城（デイラミ精霊国）', 25, 15, 12, [('elf_queen', 12, 1), ('elf_chancellor', 9, 2)],
-             [('elf_gate_guard_man', 9, 6), ('elf_gate_guard_woman', 15, 6), ('elf_man_c', 18, 10), ('elf_woman_b', 6, 10)]),
+             [('elf_soldier_golem', 9, 6), ('elf_soldier_golem', 15, 6), ('elf_man_c', 18, 10), ('elf_woman_b', 6, 10)]),
     ]
