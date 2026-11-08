@@ -1605,3 +1605,19 @@ test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つ�
     assert.ok([...road].filter(k => { const [rx, ry] = k.split(',').map(Number); return Math.abs(rx - x) <= 2 && Math.abs(ry - y) <= 2; }).length >= 6, '90 度の曲がり角のそば（道が、縦にも横にも、まわりにある）');
 });
 
+
+test('B（フランケル聖国）: 大教会が街の中心の北の最上位・王城は小さく北東・街の人は聖職者が多く、司祭・枢機卿・王は街に出ない', () => {
+    const m = readJson('public/data/maps/town_b.json');
+    assert.deepEqual([m.layout[0].length, m.layout.length], [48, 36]);
+    const rows = m.layout;
+    const jRun = Math.max(...rows.map(r => Math.max(...(r.match(/J+/g) || ['']).map(s => s.length))));
+    assert.ok(jRun >= 16, `大教会（幅 16 以上）がある: ${jRun}`);
+    assert.equal(m.links['23,5']?.nextMap, 'temple', '大教会の扉から、大神殿へ入れる');
+    assert.ok(Object.values(m.links).some(l => l.nextMap === 'temple_town'), '礼拝堂がある');
+    assert.equal(m.links['42,0']?.nextMap, 'castle', '小さな王城の城門は、北東');
+    const ids = m.npcs.map(n => n.id);
+    const clergy = ids.filter(id => /^priest_(man|woman)$/.test(id)).length;
+    assert.ok(clergy / ids.length >= 0.45, `聖職者（助祭・修道女）が多い: ${clergy}/${ids.length}`);
+    for (const bad of ['priest_senior', 'cardinal', 'king', 'prince']) assert.ok(!ids.includes(bad), `${bad} は街に出ない`);
+    assert.ok(!Object.values(m.links).some(l => ['guild_mage', 'guild_training'].includes(l.nextMap)), '魔法ギルド・職業訓練所は置かない');
+});

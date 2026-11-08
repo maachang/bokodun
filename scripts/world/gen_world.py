@@ -14,6 +14,7 @@ import terrain as T
 import town_d as TD
 import town_h as TH
 import town_e as TE
+import town_b as TB
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
 
@@ -515,8 +516,8 @@ def gen_towns(t, city_legend, env, snow_env):
         if site['id'] == 'a':   # A（雪国）: D と同じ作り（town_d.build_a）で、雪の見た目・雪の環境
             m['layout'], m['heights'] = TD.build_a(w, h, m['legend'], city_legend, m['links'], m['npcs'])
             m['environment'] = dict(snow_env, floorType='snow', fogNear=24, fogFar=72); m['decorFloor'] = 'snowCobble'   # 雪の環境（霧は、街が見えるよう薄め）
-        elif site['id'] in ('d', 'h', 'e'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
-            m['layout'], m['heights'] = {'d': TD, 'h': TH, 'e': TE}[site['id']].build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
+        elif site['id'] in ('d', 'h', 'e', 'b'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
+            m['layout'], m['heights'] = {'d': TD, 'h': TH, 'e': TE, 'b': TB}[site['id']].build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
 

@@ -31,47 +31,162 @@
   "f": "flower_bed",
   "v": "flower_bed_blue",
   "F": "plaza_fountain",
-  "G": "district_gate"
+  "G": "district_gate",
+  "C": "castle_gate",
+  "J": "temple_building",
+  "S": "shop_building",
+  "D": "temple_door",
+  "a": "adventurer_guild_sign",
+  "M": "inn_sign",
+  "q": "item_shop_sign",
+  "Q": "weapon_shop_sign",
+  "b": "wood_bridge",
+  "c": "church_sign",
+  "w": "water",
+  "d": "shop_door",
+  "N": "inn_door",
+  "I": "inn_building"
  },
  "layout": [
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWCCWWWW",
+  "WpTpppppppppppppppppppppppppppppppppppppppppppTW",
+  "WpHHHHpHHHHpppppJJJJJJJJJJJJJJJJpppppppppppppppW",
+  "WpHHHHpHHHHpppppJJJJJJJJJJJJJJJJpppppppppppppppW",
+  "WpHHHHpHHHHpppppJJJJJJJJJJJJJJJJpppppppppppppppW",
+  "WpppppppppppppppJJJJJJJDJJJJJJJJpppppppppppppppW",
+  "Wppppppppppppppppppppp==c=pppppppppppppppppppppW",
+  "WpHHHHpHHHHfpppppppppp====ppppppppppvppppppppppW",
+  "WpHHHHpHHHHppppppppppp====pppppppppppppppppppppW",
+  "WpHHHHpHHHHppppppppppp====pppppppppppppppppppppW",
   "Wppppppppppppppppppppp====pppppppppppppppppppppW",
-  "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
+  "WppSSSSppSSSSppSSSSppp====ppIIIIppJJJJJJpppppppW",
+  "WppSSSSppSSSSppSSSSppp====ppIIIIppJJJJJJpppppppW",
+  "WppSdSSppSdSSppSdSSppp====ppINIIppJJDJJJpppppppW",
+  "WppppqpppppQpppppapppp====ppppMppppppcpppppppppW",
   "Wppppppppppppppppppppp====pppppppppppppppppppppW",
-  "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
+  "Wppppppppppppfpppppppp====pppppppppvpppppppppppW",
+  "W======================FF======================W",
+  "W======================FF======================W",
+  "W==============================================W",
   "Wppppppppppppppppppppp====pppppppppppppppppppppW",
+  "WppppppppppppTpppppppf====pppppppppppppppppppppW",
   "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
   "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
+  "WpHHHHpHHHHpHHHHpHHHHp====vHHHHpHHHHpHHHHpHHHHpW",
   "Wppppppppppppppppppppp====pppppppppppppppppppppW",
-  "WppppppppppppppppppppppppppppppppppppppppppppppW",
-  "WppppppppppppppppppfppppppppfppppppppppppppppppW",
-  "WppppppppppppppppppppppppppppppppppppppppppppppW",
-  "W=================pppppFFppppp=================W",
-  "W=================pppppFFppppp=================W",
-  "W=================pppppppppppp=================W",
-  "WppppppppppppppppppfppppppppfppppppppppppppppppW",
-  "WpTpppppppppppppppppTppppppTpppppppppppppppppTpW",
-  "WpHHHHpHHHHpHHHHpppppp====ppppppHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpppppp====ppppppHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpppppp====ppppppHHHHpHHHHpHHHHpW",
   "Wppppppppppppppppppppp====pppppppppppppppppppppW",
-  "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
+  "Wpppvppppppppppppppppp====ppppppppppppppppppfppW",
+  "WwwwwwwwbbwwwwwwwwwwwwbbbbwwwwwwwwwwwwbbwwwwwwwW",
+  "WwwwwwwwbbwwwwwwwwwwwwbbbbwwwwwwwwwwwwbbwwwwwwwW",
   "Wppppppppppppppppppppp====pppppppppppppppppppppW",
   "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
   "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
   "WpHHHHpHHHHpHHHHpHHHHp====pHHHHpHHHHpHHHHpHHHHpW",
   "WpTppppppppppppppppppp====pppppppppppppppppppTpW",
-  "Wppppppppppppppppppppp====pppppppppppppppppppppW",
   "WWWWWWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWWWWWW"
  ],
- "npcs": [],
+ "npcs": [
+  {
+   "id": "priest_man",
+   "x": 7,
+   "z": 16
+  },
+  {
+   "id": "priest_man",
+   "x": 19,
+   "z": 16
+  },
+  {
+   "id": "priest_man",
+   "x": 33,
+   "z": 16
+  },
+  {
+   "id": "priest_man",
+   "x": 26,
+   "z": 21
+  },
+  {
+   "id": "priest_man",
+   "x": 14,
+   "z": 20
+  },
+  {
+   "id": "priest_woman",
+   "x": 12,
+   "z": 15
+  },
+  {
+   "id": "priest_woman",
+   "x": 29,
+   "z": 20
+  },
+  {
+   "id": "priest_woman",
+   "x": 40,
+   "z": 16
+  },
+  {
+   "id": "priest_woman",
+   "x": 20,
+   "z": 26
+  },
+  {
+   "id": "priest_woman",
+   "x": 36,
+   "z": 20
+  },
+  {
+   "id": "priest_man",
+   "x": 21,
+   "z": 8
+  },
+  {
+   "id": "priest_woman",
+   "x": 27,
+   "z": 7
+  },
+  {
+   "id": "town_man",
+   "x": 5,
+   "z": 20
+  },
+  {
+   "id": "town_old_woman",
+   "x": 14,
+   "z": 26
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 38,
+   "z": 26
+  },
+  {
+   "id": "guard_spear",
+   "x": 21,
+   "z": 33
+  },
+  {
+   "id": "guard_spear",
+   "x": 26,
+   "z": 33
+  },
+  {
+   "id": "guard_light",
+   "x": 44,
+   "z": 10
+  },
+  {
+   "id": "gate_guard",
+   "x": 40,
+   "z": 1
+  },
+  {
+   "id": "gate_guard",
+   "x": 45,
+   "z": 1
+  }
+ ],
  "links": {
   "23,35": {
    "nextMap": "w_08_13",
@@ -90,44 +205,128 @@
     "z": 27,
     "angle": 3.14159
    }
+  },
+  "42,0": {
+   "nextMap": "castle",
+   "message": "王城に入る",
+   "back": {
+    "x": 42,
+    "z": 1,
+    "angle": 3.14159
+   }
+  },
+  "43,0": {
+   "nextMap": "castle",
+   "message": "王城に入る",
+   "back": {
+    "x": 43,
+    "z": 1,
+    "angle": 3.14159
+   }
+  },
+  "4,13": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop"
+   },
+   "message": "道具屋に入る",
+   "icon": "itemShopIcon",
+   "back": {
+    "x": 4,
+    "z": 14,
+    "angle": 3.14159
+   }
+  },
+  "10,13": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 10,
+    "z": 14,
+    "angle": 3.14159
+   }
+  },
+  "16,13": {
+   "nextMap": "guild_adv",
+   "message": "冒険者ギルドに入る",
+   "icon": "advGuildIcon",
+   "back": {
+    "x": 16,
+    "z": 14,
+    "angle": 3.14159
+   }
+  },
+  "29,13": {
+   "nextMap": "city_inn",
+   "message": "巡礼者の宿・酒場に入る",
+   "icon": "innIcon",
+   "back": {
+    "x": 29,
+    "z": 14,
+    "angle": 3.14159
+   }
+  },
+  "36,13": {
+   "nextMap": "temple_town",
+   "message": "礼拝堂に入る",
+   "icon": "templeIcon",
+   "back": {
+    "x": 36,
+    "z": 14,
+    "angle": 3.14159
+   }
+  },
+  "23,5": {
+   "nextMap": "temple",
+   "message": "大教会に入る",
+   "icon": "templeIcon",
+   "back": {
+    "x": 23,
+    "z": 6,
+    "angle": 3.14159
+   }
   }
  },
  "heights": [
   "000000000000000000000000000000000000000000000000",
+  "011111111111222222222222222222222222122222222220",
+  "012222222222333322233333333333333333232222333330",
+  "012111121112322222233332222322223222232222322220",
+  "012111121112322222233332222322223222232222322220",
+  "012111121112322222233333222322223222232222322220",
+  "012211122112332222233333222232223322232222332220",
+  "012221222212333222233333332333233332232222333230",
+  "012222222222333322233333333333333333232222333330",
+  "011222222222333322222333333333333333221111222220",
+  "012222222222233211111223223222222222221111222220",
+  "012222222222322211111122222222222222211111222220",
+  "012111122222211111111221111211112111111111211110",
+  "011111122222211111122221111211112111111111111110",
+  "011111122222211111122221111211112111111111111110",
+  "011111122222222211122222111221112221111111111110",
+  "011111122222222211122222212222122221111111111110",
+  "011111111222222211122222222222222221111111111110",
+  "011111111111211111122222222222222111111111111110",
+  "011111111111211111122222222222222111111111111110",
+  "011111111111211111122222222222222111111111111110",
+  "011111111222222211122222222222222111111111111110",
+  "011111112222222211122222222222222111111111111110",
+  "011111112222222211122222222222222111111111111110",
+  "011111112222222211122222222222222111111111111110",
+  "011111112222222211122222222222221111111111111110",
+  "011111111222222211122222222222111111111111111110",
+  "011111111122222211122211112221111111111111111110",
   "000000000000000000000000000000000000000000000000",
   "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
-  "000000000000000000000000000000000000000000000000",
+  "011111111111111111111111111111111111111111111110",
+  "011111111111111111111111111111111111111111111110",
+  "012222222222222211122222222222222222221111222220",
+  "012111121111211111123321111211112111121111211110",
+  "012111121111211111123321111211112111121111211110",
   "000000000000000000000000000000000000000000000000"
  ],
  "heightStep": 0.5
