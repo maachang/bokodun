@@ -4,11 +4,6 @@
       "lines": 963,
       "bytes": 36234,
       "plan": "音の種類（足音・戦闘・環境・UI）ごとに、ファイルを分ける"
-    },
-    "scripts/world/terrain.py": {
-      "lines": 1099,
-      "bytes": 66847,
-      "plan": "build を、段階（海岸・バイオーム・川・山・街の敷地・山道）ごとの関数に分ける。各段階を、単独で試せるようにする"
     }
   },
   "funcs": {
@@ -40,10 +35,6 @@
       "lines": 363,
       "plan": "段階（地形の物体・木・川と橋・街の外観・街道）ごとの関数に分ける"
     },
-    "scripts/world/terrain.py::_mountains": {
-      "lines": 110,
-      "plan": "触るときに、触った分だけ小さくする（目標: 100 行以下）"
-    },
     "scripts/world/terrain.py::build": {
       "lines": 239,
       "plan": "terrain.py の分割計画（段階ごとの関数）と同時に"
@@ -67,6 +58,10 @@
     "public/js/textures/texturesRoofsDoors.js::drawShopMark": {
       "lines": 138,
       "plan": "店の種類（武器・道具・酒場・宿）ごとの描画を、表で呼び分ける"
+    },
+    "scripts/world/terrain_mountain.py::_mountains": {
+      "lines": 110,
+      "plan": "触るときに、触った分だけ小さくする（目標: 100 行以下）"
     }
   }
 }

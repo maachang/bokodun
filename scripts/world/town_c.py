@@ -78,7 +78,7 @@ def build(w, h, legend, city_legend, links, npcs):
     for (x, y) in CACTI:
         assert g[y][x] == 'p', f'C のサボテン ({x},{y}): 空きマスではない'
         g[y][x] = 'f'
-    for k in (set(LEGEND_KEYS) - {'K', 'U', 'Y', 'x'}) | {'T', 'f', 'v', 'F', 'G', 'W', 'p', '=', 'H'}: legend[k] = city_legend[k]
+    for k in sorted((set(LEGEND_KEYS) - {'K', 'U', 'Y', 'x'}) | {'T', 'f', 'v', 'F', 'G', 'W', 'p', '=', 'H'}): legend[k] = city_legend[k]
     legend.update(SKIN)
     for nid, x, z in NPCS:
         assert g[z][x] in 'p=', f'C の NPC {nid} ({x},{z}): 歩ける空きマスではない'

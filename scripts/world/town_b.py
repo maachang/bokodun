@@ -74,7 +74,7 @@ def build(w, h, legend, city_legend, links, npcs):
         assert g[y][x] == 'p', f'B の飾り ({x},{y}): 空きマスではない'
         g[y][x] = c
     legend.update({'C': 'castle_gate'})
-    for k in set(LEGEND_KEYS) | {c for f in FACILITIES for c in (f[0], f[5], f[6])}: legend[k] = city_legend[k]
+    for k in sorted(set(LEGEND_KEYS) | {c for f in FACILITIES for c in (f[0], f[5], f[6])}): legend[k] = city_legend[k]
     for nid, x, z in NPCS:
         assert g[z][x] in 'p=', f'B の NPC {nid} ({x},{z}): 歩ける空きマスではない'
         npcs.append({'id': nid, 'x': x, 'z': z})

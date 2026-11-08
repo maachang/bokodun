@@ -91,7 +91,7 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
         g[y][x] = c
     if castle: legend.update({'C': 'castle_gate'})
     if tree_center: legend['Y'] = 'world_tree'; legend['j'] = 'wooden_fence'
-    for k in set(LEGEND_KEYS) | {c for f in facilities for c in (f[0], f[5], f[6])}:   # 施設の建物・扉・立て札の文字も（サンプルの凡例にない文字は、skin が決める）
+    for k in sorted(set(LEGEND_KEYS) | {c for f in facilities for c in (f[0], f[5], f[6])}):   # 施設の建物・扉・立て札の文字も（サンプルの凡例にない文字は、skin が決める）
         if k in city_legend: legend[k] = city_legend[k]
     if skin: legend.update(skin)   # 見た目の差し替え（雪国: 雪をかぶった屋根・石畳など）
     for nid, x, z in npc_list:
