@@ -5,6 +5,7 @@
   - 施設: 道具屋・武器屋・冒険者ギルド・宿屋（巡礼者の宿）・礼拝堂・大教会。魔法ギルド・職業訓練所は置かない（神の奇跡が最上位のため）
   - 王城: 北の外壁の北東に、城門（2 マス）。中は既存の王城（castle）
 """
+# 骨格（作り替え）: 川・橋・東西の大通りをやめた。南の門から大教会の前まで、幅 6 の**参道**が伸び、大教会の前に**巡礼者の広場**（噴水）。西と東へ、横道（壁までは通じない）。
 import town_heights as TH
 from town_d import _shop, _to
 
@@ -34,14 +35,15 @@ def build(w, h, legend, city_legend, links, npcs):
     """B の街の中（layout・heights）を作り、legend・links・npcs に足す。(layout, heights) を返す"""
     assert (w, h) == (48, 36)
     g = [['p'] * w for _ in range(h)]
-    for y in range(6, h - 1):   # 大通り（南北。大教会の前から南の門まで）
-        for x in range(22, 26): g[y][x] = '='
-    for y in range(17, 20):     # 東西の通り
-        for x in range(1, w - 1): g[y][x] = '='
+    for y in range(6, h - 1):   # 参道（南北。幅 6。南の門から、大教会の前まで）
+        for x in range(21, 27): g[y][x] = '='
+    for y in range(14, 22):     # 巡礼者の広場（大教会の前。参道と交わる）
+        for x in range(14, 34): g[y][x] = '='
+    for ys, xs in (((14, 15), list(range(2, 14)) + list(range(34, 46))), ((26, 27), list(range(2, 21)) + list(range(27, 46)))):   # 脇の横道（広場・参道から、西と東へ）
+        for y in ys:
+            for x in xs: g[y][x] = '='
     for x in (23, 24):
-        for y in (17, 18): g[y][x] = 'F'
-    for y in (28, 29):          # 川（東西・幅 2・水は 0）。橋: 大通り 4 マス・脇道 2 マス
-        for x in range(1, w - 1): g[y][x] = 'b' if (22 <= x <= 25 or x in (8, 9, 38, 39)) else 'w'
+        for y in (16, 17): g[y][x] = 'F'
     for x in range(w): g[0][x] = g[h - 1][x] = 'W'
     for y in range(h): g[y][0] = g[y][w - 1] = 'W'
     g[h - 1][23] = g[h - 1][24] = 'G'
@@ -59,7 +61,7 @@ def build(w, h, legend, city_legend, links, npcs):
                 g[y][x] = ch
         dx, dz = x0 + doff, y0 + 2
         g[dz][dx] = door
-        assert g[dz + 1][dx + 1] == 'p', f'B の立て札 ({dx + 1},{dz + 1}): 空きマスではない'
+        assert g[dz + 1][dx + 1] in 'p=', f'B の立て札 ({dx + 1},{dz + 1}): 空きマスではない'
         g[dz + 1][dx + 1] = sign
         links[f'{dx},{dz}'] = dict(link, back={'x': dx, 'z': dz + 1, 'angle': 3.14159})
     x0, y0, wid, dep, doff, door, sign, link = CATHEDRAL   # 大教会（奥行 4）
@@ -69,8 +71,8 @@ def build(w, h, legend, city_legend, links, npcs):
     g[dz][dx] = door
     g[dz + 1][dx + 1] = sign
     links[f'{dx},{dz}'] = dict(link, back={'x': dx, 'z': dz + 1, 'angle': 3.14159})
-    for x, y, c in ((2, 1, 'T'), (46, 1, 'T'), (13, 17 - 1, 'f'), (35, 16, 'v'), (2, 34, 'T'), (45, 34, 'T'), (21, 21, 'f'), (26, 24, 'v'),
-                    (11, 7, 'f'), (36, 7, 'v'), (13, 21, 'T'), (44, 27, 'f'), (4, 27, 'v')):
+    for x, y, c in ((2, 1, 'T'), (46, 1, 'T'), (13, 17 - 1, 'f'), (35, 16, 'v'), (2, 34, 'T'), (45, 34, 'T'), (10, 20, 'f'), (31, 25, 'v'),
+                    (11, 7, 'f'), (36, 7, 'v'), (13, 21, 'T'), (44, 25, 'f'), (4, 25, 'v')):
         assert g[y][x] == 'p', f'B の飾り ({x},{y}): 空きマスではない'
         g[y][x] = c
     legend.update({'C': 'castle_gate'})
@@ -78,11 +80,9 @@ def build(w, h, legend, city_legend, links, npcs):
     for nid, x, z in NPCS:
         assert g[z][x] in 'p=', f'B の NPC {nid} ({x},{z}): 歩ける空きマスではない'
         npcs.append({'id': nid, 'x': x, 'z': z})
-    # 高さ: サンプル（city）の高さを土台に、川（0）・大教会の高台・王城区の高台（北東）を重ねる
+    # 高さ: サンプル（city）の高さを土台に、大教会の高台・王城区の高台（北東）を重ねる
     lv = TH.sample_field(w, h, 0, 0)
     fixed = set()
-    for y in (28, 29):
-        for x in range(1, w - 1): lv[y][x] = 0; fixed.add((x, y))
     for (x0_, x1_, y0_, y1_) in ((12, 35, 1, 9), (37, w - 2, 1, 8)):   # 大教会の高台（中央・北）・王城区（北東）
         for y in range(y0_, y1_ + 1):
             for x in range(x0_, x1_ + 1): lv[y][x] = 3 if lv[y][x] >= 2 else 2; fixed.add((x, y))
