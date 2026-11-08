@@ -17522,14 +17522,14 @@
     "imageFile": "field/world_tree.png",
     "sdId": 323,
     "aspect": 0.944,
-    "height": 21.74,
+    "height": 34.78,
     "fixedHeight": true,
     "cropBottom": 0.12,
-    "fullHeight": 24.7,
+    "fullHeight": 39.52,
     "colliderHalf": 1.6,
     "solid": true,
     "noShadow": true,
-    "description": "世界樹（G デイラミ精霊国の街の中心。普通の木（高さ 4.94）の 5 倍に拡大。長老が管理する。sdServer ID 323）"
+    "description": "世界樹（G デイラミ精霊国の街の中心。普通の木（高さ 4.94）の 8 倍に拡大。長老が管理する。sdServer ID 323）"
   },
   "fenrir_statue": {
     "groundShadow": true,
