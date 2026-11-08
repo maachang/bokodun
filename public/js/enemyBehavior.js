@@ -32,29 +32,8 @@ function defaultFlightHeight(def) {
     return sy > 3.0 ? 2.6 : (sy > 2.0 ? 2.0 : 1.5);
 }
 
-// 敵の定義から、動きの特徴（profile）を決める
-export function deriveProfile(def = {}) {
-    const ab = new Set(def.abilities || []);
-    const id = def.id || '';
-    const p = {
-        aiType: def.aiType || null,
-        flying: !!(def.flying ?? (ab.has('fly') || /^flying/.test(def.aiType || ''))),
-        flightHeight: def.flightHeight ?? null,
-        charge: null,
-        hop: null,
-        shoot: null,
-        pack: ab.has('pack'),
-        enrage: ab.has('enrage'),
-        flee: ab.has('flee'),
-        evasion: ab.has('evasion'),
-        regen: ab.has('regen'),
-        ambush: ab.has('ambush'),
-        knockback: ab.has('knockback'),
-        turret: !!(def.turret || ab.has('turret')) && def.turret !== false,   // 固定砲台
-        immune: new Set(def.immune || []),                                    // 魔法の、効かない属性
-    };
-    if (p.flying && p.flightHeight == null) p.flightHeight = defaultFlightHeight(def);
-
+// 遠距離攻撃の特徴（deriveProfile の一部）
+function deriveShoot(def, p, ab) {
     // 遠距離攻撃: 個別の指定 > canShoot（従来の定義） > 能力
     if (def.shoot) {
         p.shoot = { type: 'magic', range: 14, cooldown: 3, speed: 8, damage: null, ...def.shoot };
@@ -68,7 +47,10 @@ export function deriveProfile(def = {}) {
         // 飛びながら燃やす敵（ドラゴンフライなど）は、火の粉を吐く
         if (!p.shoot && p.flying && ab.has('burn')) p.shoot = { type: 'breath_fire', range: 10, cooldown: 3.2, speed: 8, damage: Math.max(4, Math.round((def.attackPower ?? 10) * 0.7)) };
     }
+}
 
+// 突進・猫・兎の特徴（deriveProfile の一部）
+function deriveCharge(id, p, def, ab) {
     // 突進（猪突猛進）: charge の能力を持つ、地上の敵。大きく跳ぶ兎は別（big_hop）
     const isRabbit = /rabbit|almiraj/.test(id);
     const isCat = /leopard|panther|tiger|lion|cheetah|^cat/.test(id) && !p.flying;
@@ -90,7 +72,10 @@ export function deriveProfile(def = {}) {
         //   よけられる（当たらずに突き抜ける）と、息切れして、長く動けず、被ダメージが増える（弱い）。当てたときは、すぐ立て直す
         if (/boar/.test(id)) p.charge = { windup: 1.1, dash: 18, speed: 6, stun: 1.8, rest: 2.2, vulnerable: 1.6 };
     }
+}
 
+// 狼（追跡）・縄張り・クマの連打（deriveProfile の一部）
+function deriveHunting(def, p, id) {
     // 狼（relentless）: 一定のそこそこ速い速さで、どこまでも追ってくる（見失っても追跡をやめない）。追っている間に、近くの仲間（群れ）が合流して、列になって追ってくる（トレイン）
     //   突進（charge）の代わりに、この追跡を使う。個別の指定: relentless: { speed, joinRadius }
     //   索敵範囲（senseScale 倍）も、追跡（見失わない・仲間を呼ぶ距離 joinRadius）も、ふつうの敵の倍ほど。相当しつこい
@@ -108,7 +93,10 @@ export function deriveProfile(def = {}) {
     // クマ（rush）: 縄張りの中を、うろうろしているが、攻撃を始めると、近くで、**連打（ラッシュ）**する。1 回は小さいが、攻撃回数が多く、
     //   まともに近づいて戦うと、体力がどんどん削られる。離れて、魔法・弓で倒すのが、有利。連打のあと、少し間を置いて、また連打する
     if (def.rush || (/bear|grizzly/.test(id) && !p.flying && def.rush !== false)) p.rush = { flurry: 2.6, flurryScale: 0.5, cool: 1.2, ...(def.rush || {}) };
+}
 
+// プレイヤーへの状態異常と、生命力吸収（deriveProfile の一部）
+function deriveInflictions(p, ab, def) {
     // 状態異常（プレイヤーへ）: 攻撃が当たったとき、能力に応じて、一定の確率で、プレイヤーを状態異常にする
     //   poison=毒（継続ダメージ）/ burn=火傷（継続ダメージ）/ slow=鈍足 / paralysis=麻痺（少しの間、動けない）/ silence=沈黙（魔法が使えない）/ curse=呪い（攻撃力が下がる）
     p.inflict = [];
@@ -121,7 +109,10 @@ export function deriveProfile(def = {}) {
     if (ab.has('curse')) p.inflict.push({ type: 'curse', chance: 0.4, t: 8, scale: 0.7 });
     if (def.inflict) p.inflict = def.inflict;
     p.lifesteal = ab.has('lifesteal') ? 0.35 : 0;   // 与えたダメージの 35% を、自分が回復する
+}
 
+// 盾・召喚・瞬間移動・潜る・待ち伏せ・範囲攻撃・盗む（deriveProfile の一部）
+function deriveSpecials(def, id, p, ab) {
     // 盾持ち（guard）: 盾・甲羅・硬い体で、正面からの近接・矢を防ぐ（ダメージ 1/4）。向きを変えるのが遅いので、横や背後へ回り込めば、効く。
     //   魔法は、防げない（魔法で倒すか、回り込んで攻撃する）。arc: 防ぐ範囲の角度、reduction: 防いだときに残るダメージの割合、turn: 向きを変える速さ（ラジアン/秒）
     if (def.guard || (/guard_heavy|guard_elite|golem|turtle|pillbug|beetle|ant_knight/.test(id) && def.guard !== false)) {
@@ -143,7 +134,10 @@ export function deriveProfile(def = {}) {
     if (def.slam || (ab.has('aoe') && def.slam !== false)) p.slam = { radius: 3.4, windup: 1.1, cool: 7, mult: 1.3, range: 12, ...(def.slam || {}) };
     // 盗む（stealItem）: 攻撃が当たると、お金の一部を盗んで、逃げる（倒すと、取り返せる）
     p.steal = ab.has('stealItem');
+}
 
+// 猛禽・固定砲台と、動き方（aiType）の決定（deriveProfile の一部）
+function deriveAerial(def, p, id) {
     // 猛禽（鷹・鷲・グリフォンなどの、鳥の頂点）: プレイヤーを獲物と認識すると、まず高く舞い上がり、そこから滑空して、速い速さで突っ込んでくる。
     //   滑空の向きは、飛び出す瞬間に決まる（途中で曲がらない）ので、よけられる。よけられると、低い所で隙ができ（被ダメージが増え）、近接で反撃できる。
     //   高い所にいる間は、近接が届かない（魔法・弓で撃ち落とす）。high: 高さ、wait: 高い所で狙う時間、glide: 滑空の速さと時間、recover: よけられたあとの隙、vulnerable: 隙の間の被ダメージ倍率
@@ -170,6 +164,37 @@ export function deriveProfile(def = {}) {
         else if (p.shoot) p.aiType = 'ranged_maintain';
         else p.aiType = 'walk_chase';
     }
+}
+
+// 敵の定義から、動きの特徴（profile）を決める
+export function deriveProfile(def = {}) {
+    const ab = new Set(def.abilities || []);
+    const id = def.id || '';
+    const p = {
+        aiType: def.aiType || null,
+        flying: !!(def.flying ?? (ab.has('fly') || /^flying/.test(def.aiType || ''))),
+        flightHeight: def.flightHeight ?? null,
+        charge: null,
+        hop: null,
+        shoot: null,
+        pack: ab.has('pack'),
+        enrage: ab.has('enrage'),
+        flee: ab.has('flee'),
+        evasion: ab.has('evasion'),
+        regen: ab.has('regen'),
+        ambush: ab.has('ambush'),
+        knockback: ab.has('knockback'),
+        turret: !!(def.turret || ab.has('turret')) && def.turret !== false,   // 固定砲台
+        immune: new Set(def.immune || []),                                    // 魔法の、効かない属性
+    };
+    if (p.flying && p.flightHeight == null) p.flightHeight = defaultFlightHeight(def);
+
+    deriveShoot(def, p, ab);
+    deriveCharge(id, p, def, ab);
+    deriveHunting(def, p, id);
+    deriveInflictions(p, ab, def);
+    deriveSpecials(def, id, p, ab);
+    deriveAerial(def, p, id);
     return p;
 }
 
