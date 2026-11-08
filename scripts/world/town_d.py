@@ -88,7 +88,8 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
         g[y][x] = c
     if castle: legend.update({'C': 'castle_gate'})
     if tree_center: legend['Y'] = 'world_tree'
-    for k in set(LEGEND_KEYS) | {c for f in facilities for c in (f[0], f[5], f[6])}: legend[k] = city_legend[k]   # 施設の建物・扉・立て札の文字も
+    for k in set(LEGEND_KEYS) | {c for f in facilities for c in (f[0], f[5], f[6])}:   # 施設の建物・扉・立て札の文字も（サンプルの凡例にない文字は、skin が決める）
+        if k in city_legend: legend[k] = city_legend[k]
     if skin: legend.update(skin)   # 見た目の差し替え（雪国: 雪をかぶった屋根・石畳など）
     for nid, x, z in npc_list:
         assert g[z][x] in 'p=', f'D の NPC {nid} ({x},{z}): 歩ける空きマスではない'
@@ -188,12 +189,13 @@ def build_f(w, h, legend, city_legend, links, npcs):
 
 # ---- G（デイラミ精霊国。大森林の中心の、エルフと精霊の街）: D と同じ作りで、街の中心に世界樹 ----
 FACILITIES_G = [(_remap(f, shopId='item_shop_g') if f[6] == 'q' else _remap(f, nextMap='guild_adv_g') if f[6] == 'a' else _remap(f, nextMap='guild_mage_g') if f[6] == 'm' else f)
-                for f in FACILITIES if f[6] not in ('r', 'c')]   # 職業訓練所・神殿は置かない（神殿の品は道具屋 item_shop_g が売る。冒険者ギルド・魔法ギルドは、長老一族の複製のマップ）
+                for f in FACILITIES if f[6] not in ('r', 'c')] + [
+    ('S', 23, 10, 3, 1, 'd', 'x', _to('elder_house_g', '長老の家に入る', 'templeIcon')),   # 世界樹のそばの、小さな長老の家（長老たちは、この中にいる）
+]   # 職業訓練所・神殿は置かない（神殿の品は道具屋 item_shop_g が売る。冒険者ギルド・魔法ギルドは、長老一族の複製のマップ）
 NPCS_G = [   # エルフの住民と、世界樹を管理する長老（世界樹のそば）
-    ('elf_elder_man', 22, 15), ('elf_elder_woman', 17, 15),   # 長老の息子と娘は、ギルド長（ギルドの中）
     ('elf_woman_a', 6, 17), ('elf_man_a', 12, 17), ('elf_woman_b', 28, 13), ('elf_man_b', 24, 9),
     ('elf_woman_c', 14, 26), ('elf_girl', 15, 21), ('elf_boy', 24, 21), ('elf_man_c', 30, 15),
-    ('guard_spear', 17, 27), ('guard_light', 22, 27), ('gate_guard', 17, 1), ('gate_guard', 22, 1),
+    ('elf_guard_man', 17, 27), ('elf_guard_woman', 22, 27), ('elf_gate_guard_man', 17, 1), ('elf_gate_guard_woman', 22, 1),   # 兵士は、エルフの守備隊（sdServer 327・328）
     ('fairy_wisp', 8, 15), ('fairy_sylph', 30, 21), ('fairy_undine', 33, 15), ('fairy_salamander', 12, 21),   # 妖精（敵キャラの妖精系。精霊国では、街に出る・おとなしい）
     ('fairy_gnome', 26, 6), ('fairy_unicorn', 6, 21), ('fairy_pegasus', 20, 24),
 ]
@@ -201,7 +203,7 @@ SKIN_FOREST = {   # 森の街: 石畳でなく森の地面・大通りは土の�
     'p': 'plaza_forest', '=': 'dirt_road', 'W': 'forest_hedge_wall',
     'H': 'wooden_house', 'S': 'wooden_house_window', 'I': 'wooden_house_window',
     'T': 'great_tree_a', 'f': 'forest_tree_b', 'v': 'forest_tree_a',
-    'z': 'grass_tuft', 'y': 'fern',
+    'z': 'grass_tuft', 'y': 'fern', 'x': 'elder_sign',
 }
 SCATTER_G = (('z', 70, 'plant'), ('y', 50, 'plant'), ('v', 22, 'tree'), ('f', 14, 'tree'))   # 草・シダ・木（広場のまわりと、街のあちこち）
 

@@ -1,5 +1,5 @@
 """国専用のギルドの中（共通のギルドのマップを複製して、受付・ギルド長・教官の街の人だけを替える）。
-  G（デイラミ精霊国）: ギルド長は、長老の一族が担う（ユーザー指定）。
+  G（デイラミ精霊国）: ギルド長は、長老の一族が担う（ユーザー指定）。長老たちは、世界樹のそばの小さな家（elder_house_g）の中にいる。
   - 冒険者ギルド（guild_adv_g・guild_adv_master_g）: ギルド長は、長老の息子（elf_elder_son）
   - 魔法ギルド（guild_mage_g・guild_mage_master_g）: ギルド長は、長老の娘（elf_elder_daughter）
   C（ミレニアム自由都市）・E（ガリレオ連盟）: 議長が、商人ギルドの奥の部屋にいる（C は砂漠の議長、E は金の亡者の議長）。
@@ -14,6 +14,7 @@ import os
 MAPS = os.path.join(os.path.dirname(__file__), '..', '..', 'public', 'data', 'maps')
 # (複製元, 新しい ID, 名前, 戻り先, 替える街の人（元 → 新）, 出口の links の替え（元 → 新）)
 GUILDS = [
+    ('guild_merchant_master', 'elder_house_g', '長老の家（デイラミ精霊国。世界樹のそば）', 'town_g', {'merchant_master_man': 'elf_elder_man', 'merchant_master_woman': 'elf_elder_woman'}, {}),
     ('guild_adv', 'guild_adv_g', '冒険者ギルド（デイラミ精霊国）', 'town_g', {}, {'guild_adv_master': 'guild_adv_master_g'}),
     ('guild_adv_master', 'guild_adv_master_g', '冒険者ギルド長の部屋（デイラミ精霊国）', 'guild_adv_g', {'adv_guild_master': 'elf_elder_son'}, {}),
     ('guild_mage', 'guild_mage_g', '魔法ギルド（デイラミ精霊国）', 'town_g', {}, {'guild_mage_master': 'guild_mage_master_g'}),

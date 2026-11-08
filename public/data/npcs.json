@@ -2284,5 +2284,57 @@
       "……ゴゴゴ。通るなら、静かに。",
       "……王城は、我らが守る。"
     ]
+  },
+  "elf_guard_woman": {
+    "name": "エルフの守備隊（女）",
+    "texture": "/images/npcs/elf_guard_woman.png",
+    "height": 2.5,
+    "aspect": 0.394,
+    "radius": 0.45,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "弓の腕なら、森の誰にも負けません。",
+      "世界樹を荒らす者は、この弓が許しません。"
+    ],
+    "sdId": 327
+  },
+  "elf_guard_man": {
+    "name": "エルフの守備隊（男）",
+    "texture": "/images/npcs/elf_guard_man.png",
+    "height": 2.5,
+    "aspect": 0.459,
+    "radius": 0.45,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "弓の腕なら、森の誰にも負けません。",
+      "世界樹を荒らす者は、この弓が許しません。"
+    ],
+    "sdId": 328
+  },
+  "elf_gate_guard_woman": {
+    "name": "エルフの守備隊（女。門番）",
+    "texture": "/images/npcs/elf_guard_woman.png",
+    "height": 2.5,
+    "aspect": 0.394,
+    "radius": 0.45,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "……ここは、精霊と森の国。静かにお通りください。"
+    ]
+  },
+  "elf_gate_guard_man": {
+    "name": "エルフの守備隊（男。門番）",
+    "texture": "/images/npcs/elf_guard_man.png",
+    "height": 2.5,
+    "aspect": 0.459,
+    "radius": 0.45,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "……ここは、精霊と森の国。静かにお通りください。"
+    ]
   }
 }

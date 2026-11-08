@@ -1692,7 +1692,10 @@ test('G（デイラミ精霊国）: 大森林の中心にある。街の中は D
     assert.equal(m.legend.Y, 'world_tree', '街の中心に世界樹');
     assert.equal(m.layout[14][19], 'Y');
     assert.equal(objects.world_tree.height, 24.7, '世界樹: 普通の木（4.94）の 5 倍');
-    assert.ok(m.npcs.some(n => n.id === 'elf_elder_man') && m.npcs.some(n => n.id === 'elf_elder_woman'), '世界樹を管理する長老');
+    assert.ok(!m.npcs.some(n => n.id.startsWith('elf_elder_')), '長老は、街の通りにいない（世界樹のそばの家の中）');
+    assert.equal(Object.values(m.links).find(l => l.nextMap === 'elder_house_g')?.message, '長老の家に入る');
+    assert.deepEqual(readJson('public/data/maps/elder_house_g.json').npcs.map(n => n.id).sort(), ['elf_elder_man', 'elf_elder_woman'], '長老たちは、長老の家の中にいる（世界樹を管理する）');
+    assert.equal(readJson('public/data/maps/elder_house_g.json').nextMap, 'town_g');
     assert.ok(!all.includes('castle'), '城門はない');
     // 街の外のマップは、大森林（街の周りが森）
     const outer = Object.values(m.links).find(l => l.nextMap?.startsWith('w_'))?.nextMap;
@@ -1752,7 +1755,11 @@ test('G（森の街）: 石畳・石造りではなく森を活かす（森の�
     const vals = Object.values(m.legend);
     for (const stone of ['plaza_stone', 'paved_road', 'city_wall', 'brick_house', 'shop_building']) assert.ok(!vals.includes(stone), `${stone}（石）は使わない`);
     const flat = m.layout.join('');
-    assert.ok((flat.match(/z/g) || []).length >= 30 && (flat.match(/y/g) || []).length >= 20 && (flat.match(/[vf]/g) || []).length >= 15, '草・シダ・木を、ばらまく');
+    assert.ok((flat.match(/z/g) || []).length >= 30 && (flat.match(/y/g) || []).length >= 20 && (flat.match(/[vfT]/g) || []).length >= 15, '草・シダ・木を、ばらまく');
+    assert.ok(!m.npcs.some(n => /^(guard_|gate_guard)/.test(n.id)) && m.npcs.some(n => n.id === 'elf_guard_man') && m.npcs.some(n => n.id === 'elf_guard_woman'), '兵士は、エルフの守備隊（sdServer 327・328）');
+    const npcsJ = readJson('public/data/npcs.json');
+    assert.deepEqual([npcsJ.elf_guard_woman.sdId, npcsJ.elf_guard_man.sdId], [327, 328]);
+    assert.ok(readJson('public/data/maps/castle_g.json').npcs.some(n => n.id.startsWith('elf_gate_guard')) && !readJson('public/data/maps/castle_g.json').npcs.some(n => n.id.startsWith('guard_')), '女王の城の兵士もエルフ');
     const fairies = m.npcs.filter(n => n.id.startsWith('fairy_'));
     assert.ok(fairies.length >= 6, '妖精が街にいる');
     const npcs = readJson('public/data/npcs.json');

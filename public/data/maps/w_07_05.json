@@ -260,12 +260,12 @@
  },
  "npcs": [
   {
-   "id": "guard_spear",
+   "id": "elf_gate_guard_man",
    "x": 41,
    "z": 48
   },
   {
-   "id": "guard_light",
+   "id": "elf_gate_guard_woman",
    "x": 44,
    "z": 48
   }

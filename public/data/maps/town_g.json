@@ -34,67 +34,58 @@
   "V": "wooden_wall",
   "C": "castle_gate",
   "Y": "world_tree",
-  "J": "temple_building",
+  "N": "inn_door",
+  "D": "temple_door",
+  "c": "church_sign",
   "I": "wooden_house_window",
   "S": "wooden_house_window",
-  "r": "training_sign",
-  "N": "inn_door",
-  "Q": "weapon_shop_sign",
-  "b": "wood_bridge",
-  "d": "shop_door",
-  "q": "item_shop_sign",
-  "c": "church_sign",
-  "M": "inn_sign",
-  "a": "adventurer_guild_sign",
   "w": "water",
-  "D": "temple_door",
+  "M": "inn_sign",
+  "b": "wood_bridge",
+  "J": "temple_building",
+  "Q": "weapon_shop_sign",
+  "d": "shop_door",
+  "r": "training_sign",
   "m": "mage_guild_sign",
+  "q": "item_shop_sign",
+  "a": "adventurer_guild_sign",
   "z": "grass_tuft",
-  "y": "fern"
+  "y": "fern",
+  "x": "elder_sign"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWVCCVWWWWWWWWWWWWWWWWWW",
   "WpTppppppppppppppp====pppppppppppppppTpW",
-  "WpHHHHpHHHHpIIIIpv====pvpppSSSSppppzpppW",
-  "WpHHHHpHHHHzIIIIpp====pppppSSSSypvpppvpW",
-  "WpHHHHpHHHHzINIIpp====ppzppSdSSppppypppW",
+  "WpHHHHpHHHHpIIIIpv====pvppySSSSpzppzpppW",
+  "WpHHHHpHHHHzIIIIpp====pppppSSSSypppppvpW",
+  "WpHHHHpHHHHzINIIpp====ypzppSdSSppppppppW",
   "WpzppzpyppzpppMyyp====yppypppmpzyyyyyzpW",
-  "Wpzpppppypyzzpppfz====pvpzpvppppzpyppppW",
-  "Wppzppppppppppzyzp====pyppppppzpppzppppW",
-  "Wpppypzpppppppzpzy====pyppyppzppvppzpppW",
-  "Wpppyppppypyppzpyz====pppzpppzyppppppppW",
-  "WpSSSSpSSSSpSSSSpp====zpppyppppppzzzpvpW",
-  "WpSSSSySSSSzSSSSpp====ppzpppzppypypzpppW",
-  "WpSdSSpSdSSpSdSSpp====pppyfppppppyppzvpW",
-  "WpppqppppQppppappp====ppzppppvpppyppzppW",
+  "Wpzpppppzpyzzpppfz====pvpzpvpppppppppppW",
+  "Wppzppppppypppyzpp====pzppppppzpppyppppW",
+  "Wpppzpzppppppyzpyz====ppppyppzppvpyypvpW",
+  "Wpppyppppypzpppppz====pppzppppppppzppppW",
+  "WpSSSSpSSSSpSSSSyp====pSSSpppzyppppppypW",
+  "WpSSSSzSSSSpSSSSpp====pSSSpypypzpvpzpppW",
+  "WpSdSSpSdSSpSdSSpp====pSdSfppzpppppppvpW",
+  "WpppqppppQpzppappp====pppxpppppyzyppzppW",
   "W==================Yp==================W",
   "W==================pp==================W",
   "W======================================W",
-  "Wppppppppppppvpfpp====ppvzppppppppzppvpW",
-  "WpHHHHpHHHHpppppTp====pTyypHHHHpHHHHpppW",
-  "WpHHHHpHHHHpzyzppp====ppyppHHHHpHHHHzppW",
-  "WpHHHHpHHHHpzzppyy====vppppHHHHpHHHHpppW",
-  "Wppzpzppppzppyppzp====pppypppppppppzpppW",
+  "Wppppypzpppppvpfpp====ppvpyppppppppppzpW",
+  "WpHHHHpHHHHzpppyTp====pTppzHHHHpHHHHpppW",
+  "WpHHHHpHHHHzzpyzzp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHppppzpp====zypppHHHHpHHHHzppW",
+  "Wppzyzpppppzppypyz====pppzpypzppppppyzpW",
   "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
   "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
-  "Wpzpyzzpyzpzpppppy====pppzppppyzpppzpzpW",
-  "WpHHHHpHHHHpppppyp====zyzzpHHHHzHHHHpppW",
-  "WpHHHHpHHHHppzpppp====ppzzpHHHHpHHHHpypW",
-  "WpHHHHyHHHHpzpzpvp====ppyppHHHHpHHHHpppW",
+  "Wpppypppyzyypzpppp====ppppzzpppppyzppypW",
+  "WpHHHHzHHHHzppzypy====pzppzHHHHpHHHHzppW",
+  "WpHHHHpHHHHppppzpp====ppzppHHHHpHHHHpypW",
+  "WpHHHHzHHHHpzppppp====pppppHHHHpHHHHpppW",
   "WpTppppppppppppppp====pppppppppppppppTpW",
   "WWWWWWWWWWWWWWWWWWVGGVWWWWWWWWWWWWWWWWWW"
  ],
  "npcs": [
-  {
-   "id": "elf_elder_man",
-   "x": 22,
-   "z": 15
-  },
-  {
-   "id": "elf_elder_woman",
-   "x": 17,
-   "z": 15
-  },
   {
    "id": "elf_woman_a",
    "x": 6,
@@ -136,22 +127,22 @@
    "z": 15
   },
   {
-   "id": "guard_spear",
+   "id": "elf_guard_man",
    "x": 17,
    "z": 27
   },
   {
-   "id": "guard_light",
+   "id": "elf_guard_woman",
    "x": 22,
    "z": 27
   },
   {
-   "id": "gate_guard",
+   "id": "elf_gate_guard_man",
    "x": 17,
    "z": 1
   },
   {
-   "id": "gate_guard",
+   "id": "elf_gate_guard_woman",
    "x": 22,
    "z": 1
   },
@@ -281,6 +272,16 @@
    "back": {
     "x": 28,
     "z": 5,
+    "angle": 3.14159
+   }
+  },
+  "24,12": {
+   "nextMap": "elder_house_g",
+   "message": "長老の家に入る",
+   "icon": "templeIcon",
+   "back": {
+    "x": 24,
+    "z": 13,
     "angle": 3.14159
    }
   }

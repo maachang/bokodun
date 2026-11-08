@@ -77,5 +77,5 @@ def build_others():
              [('guard_light', 6, 6), ('guard_light', 10, 6)]),
         # G デイラミ精霊国: エルフの女王と宰相
         hall('castle_g', '女王の城（デイラミ精霊国）', 25, 15, 12, [('elf_queen', 12, 1), ('elf_chancellor', 9, 2)],
-             [('guard_light', 9, 6), ('guard_light', 15, 6), ('elf_man_c', 18, 10), ('elf_woman_b', 6, 10)]),
+             [('elf_gate_guard_man', 9, 6), ('elf_gate_guard_woman', 15, 6), ('elf_man_c', 18, 10), ('elf_woman_b', 6, 10)]),
     ]

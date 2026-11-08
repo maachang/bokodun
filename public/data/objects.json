@@ -17704,5 +17704,21 @@
     "texture": "forestGround",
     "solid": false,
     "description": "森の街（G）の広場の地面。森の下草と落ち葉（道路ではないので、移動速度ボーナスなし）"
+  },
+  "elder_sign": {
+    "lift": true,
+    "groundShadow": true,
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "長老の家",
+    "description": "長老の家の案内標識（G デイラミ精霊国。世界樹のそば）"
   }
 }
