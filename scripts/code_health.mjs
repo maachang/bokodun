@@ -77,6 +77,14 @@ if (process.argv[1] === new URL(import.meta.url).pathname) {
         for (const [k, x] of Object.entries(v.funcs)) ledger.funcs[k] = { ...x, plan: TODO_PLAN };
     }
     if (process.argv.includes('--tighten')) {
+        // 関数が別のファイルへ移った（台帳の `旧::名前` が消え、同じ名前の違反が、別のファイルに現れた）ときは、台帳の項目（計画つき）を、新しい場所へ付け替える
+        const base = (k) => k.split('::').pop();
+        const staleFuncs = Object.keys(ledger.funcs).filter(k => !v.funcs[k]);
+        const newFuncs = Object.keys(v.funcs).filter(k => !ledger.funcs[k]);
+        for (const nk of newFuncs) {
+            const cands = staleFuncs.filter(k => base(k) === base(nk));
+            if (cands.length === 1 && newFuncs.filter(k => base(k) === base(nk)).length === 1) { ledger.funcs[nk] = { ...ledger.funcs[cands[0]] }; delete ledger.funcs[cands[0]]; console.log(`台帳を付け替え: ${cands[0]} → ${nk}`); }
+        }
         for (const k of Object.keys(ledger.files)) { if (!v.files[k]) delete ledger.files[k]; else ledger.files[k] = { ...ledger.files[k], lines: Math.min(ledger.files[k].lines, v.files[k].lines), bytes: Math.min(ledger.files[k].bytes, v.files[k].bytes) }; }
         for (const k of Object.keys(ledger.funcs)) { if (!v.funcs[k]) delete ledger.funcs[k]; else ledger.funcs[k] = { ...ledger.funcs[k], lines: Math.min(ledger.funcs[k].lines, v.funcs[k].lines) }; }
     }
