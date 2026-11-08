@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { gameSource } from './helpers/game.mjs';
+import { gameSource, texturesSource } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 
@@ -122,12 +122,12 @@ test('2. Audio Method Integrity Check (prevents TypeError: this.sound.xxx)', asy
 });
 
 test('3. Texture Method & Property Integrity Check', async (t) => {
-    const texturesJs = fs.readFileSync(path.join(projectRoot, 'public/js/textures.js'), 'utf-8');
+    const texturesJs = texturesSource();
     const gameJs = gameSource();
     const objects = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/objects.json'), 'utf-8'));
 
     // Extract static createXxx methods in textures.js
-    const methodMatches = texturesJs.matchAll(/static\s+([a-zA-Z0-9_]+)\s*\(/g);
+    const methodMatches = texturesJs.matchAll(/^ {4}(?:static\s+)?([a-zA-Z0-9_]+)\s*\(/gm);   // 分割後は、部品の中の `    createXxx() {`（static なし）も数える
     const textureGenerators = new Set();
     for (const m of methodMatches) {
         textureGenerators.add(m[1]);
@@ -168,7 +168,9 @@ test('4. Variable Scope & Syntax Static Analysis', async (t) => {
         'public/js/npc.js',
         'public/js/audio.js',
         'public/js/particles.js',
-        'public/js/sdAssetManager.js'
+        'public/js/sdAssetManager.js',
+        // 分割した部品（public/js/game/*.js・public/js/textures/*.js）も、すべて検査する
+        ...['game', 'textures'].flatMap(d => fs.readdirSync(path.join(projectRoot, 'public/js', d)).filter(f => f.endsWith('.js')).map(f => `public/js/${d}/${f}`))
     ];
 
     for (const file of jsFiles) {

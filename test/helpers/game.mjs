@@ -1,5 +1,6 @@
 // テストの補助: ゲーム本体（public/js）の読み込み。game.js を分割しても、テストが同じように動く。
 //   gameSource()      … game.js と、分割した部品（public/js/game/*.js）を、つなげたソース文字列（「ソースに○○がある」の確認用）
+//   texturesSource()  … textures.js と、分割した部品（public/js/textures/*.js）をつなげたソース
 //   copyGameModules() … public/js 以下の全ファイルを、一時フォルダへ写し、ブラウザ向けの絶対パス import（'/js/xxx.js'）を、一時フォルダの絶対パスに読み替える（GameEngine を import して試す用）
 import fs from 'node:fs';
 import os from 'node:os';
@@ -19,6 +20,12 @@ function listJs(rel = '') {
 
 export function gameSource() {
     const parts = ['game.js', ...listJs().filter(f => f.startsWith('game/')).sort()];
+    return parts.map(f => fs.readFileSync(path.join(jsDir, f), 'utf-8')).join('\n');
+}
+
+export function texturesSource() {
+    // textures.js と、分割した部品（public/js/textures/*.js）をつなげたソース
+    const parts = ['textures.js', ...listJs().filter(f => f.startsWith('textures/')).sort()];
     return parts.map(f => fs.readFileSync(path.join(jsDir, f), 'utf-8')).join('\n');
 }
 

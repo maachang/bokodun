@@ -2,7 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
-import { gameSource } from './helpers/game.mjs';
+import { gameSource, texturesSource } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 
@@ -41,7 +41,7 @@ test('湿地の木: 湿地マップの T は専用の木（swamp_tree）で、�
     assert.ok(objects.swamp_tree.aspect > 0);
     const png = fs.readFileSync(path.join(projectRoot, 'public/images/objects/swamp_tree.png'));
     assert.equal(png.readUInt8(25), 6, 'RGBA（アルファ付き）の PNG');
-    const tex = fs.readFileSync(path.join(projectRoot, 'public/js/textures.js'), 'utf-8');
+    const tex = texturesSource();
     assert.match(tex.slice(tex.indexOf('createSwampTreeTexture')), /colorSpace = THREE\.SRGBColorSpace/, '色空間の指定（二重変換で白っぽくならない）');
     // 草原など他のマップの木は従来のまま
     const grass = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/maps/grassland.json'), 'utf-8'));

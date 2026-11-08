@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
-import { gameSource } from './helpers/game.mjs';
+import { gameSource, texturesSource } from './helpers/game.mjs';
 
 const root = process.cwd();
 // マップ JSON は、物体 ID の数値の形式（layoutFormat 'ids'）なら、ゲームが使う 1 マス 1 文字の形にそろえる（public/js/mapFormat.js）
@@ -1596,7 +1596,7 @@ test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つ�
     assert.equal(objects.road_sign.texture, 'signpost');
     assert.ok(!fs.existsSync(path.join(root, 'public/images/objects/road_sign.png')), '読める絵・別の絵は、削除済み');
     const gameSrc = gameSource();
-    assert.ok(!gameSrc.includes('roadSign') && !fs.readFileSync(path.join(root, 'public/js/textures.js'), 'utf8').includes('createRoadSignTexture'), '専用のテクスチャは、ない');
+    assert.ok(!gameSrc.includes('roadSign') && !texturesSource().includes('createRoadSignTexture'), '専用のテクスチャは、ない');
     assert.equal(signs.length, 1, '分かれ道は 1 か所');
     const { x, y, msg } = signs[0];
     for (const name of ['グリーン王国', 'ダマスカス自治領', 'ガリレオ連盟']) assert.ok(msg.includes(name), `${name} が書いてある`);
@@ -1844,7 +1844,7 @@ test('植物（草・花・シダ・葦など）は、全て sdServer の画像�
     }
     for (const gone of ['grass_tuft', 'tall_grass', 'wild_flowers', 'reed', 'dry_tuft']) assert.equal(objects[gone], undefined, `${gone} は削除済み`);
     const game = gameSource();
-    const tex = fs.readFileSync(path.join(root, 'public/js/textures.js'), 'utf8');
+    const tex = texturesSource();
     for (const t of ['grassTuft', 'tallGrass', 'wildFlowers', 'dryTuft']) assert.ok(!game.includes(`${t}:`) && !game.includes(`textures.${t}`), `${t}: 自作の絵は使わない`);
     for (const f of ['createGrassTuftTexture', 'createTallGrassTexture', 'createWildFlowersTexture', 'createReedTexture', 'createDryTuftTexture']) assert.ok(!tex.includes(f), `${f}: 削除済み`);
 });

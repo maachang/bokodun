@@ -10,11 +10,6 @@
       "bytes": 92114,
       "plan": "Monster（update 877 行）の行動を、敵の種類ごとの部品（enemyBehavior.js の方式）へ分ける。Monster・Projectile を別ファイルにする"
     },
-    "public/js/textures.js": {
-      "lines": 2603,
-      "bytes": 105606,
-      "plan": "種類別に分ける（地面・建物・自然・UI・店のマーク）。起動時に全部作らず、使うときに作る（遅延生成）形へ。game.js の initTextures の表と、セットで直す"
-    },
     "scripts/world/terrain.py": {
       "lines": 1099,
       "bytes": 66847,
@@ -50,10 +45,6 @@
       "lines": 220,
       "plan": "斬撃の種類ごとの関数に分ける（表で呼び分ける）"
     },
-    "public/js/textures.js::drawShopMark": {
-      "lines": 138,
-      "plan": "店の種類（武器・道具・酒場・宿）ごとの描画を、表で呼び分ける"
-    },
     "scripts/world/gen_world.py::build_tiles": {
       "lines": 363,
       "plan": "段階（地形の物体・木・川と橋・街の外観・街道）ごとの関数に分ける"
@@ -81,6 +72,10 @@
     "public/js/game/textureSetup.js::initTextures": {
       "lines": 167,
       "plan": "テクスチャの表（名前 → 作る関数）にして、使うときに作る（遅延生成）。textures.js の分割と同時に"
+    },
+    "public/js/textures/texturesRoofsDoors.js::drawShopMark": {
+      "lines": 138,
+      "plan": "店の種類（武器・道具・酒場・宿）ごとの描画を、表で呼び分ける"
     }
   }
 }
