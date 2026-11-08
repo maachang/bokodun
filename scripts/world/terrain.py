@@ -822,7 +822,7 @@ def _desert_oases(land, biome, sx=1.0, sy=1.0):
 
 
 # 街の候補地（地図に重ねた図の A〜H）。画像のマス（1 マス = 世界の 1 マス）。実際の位置は、近くの「街に向く所」へ動かす
-TOWN_CANDIDATES = [('a', 375, 700), ('b', 515, 880), ('c', 470, 700), ('d', 640, 545), ('e', 790, 730), ('f', 590, 1060), ('g', 545, 165), ('h', 720, 360)]   # (名前, y, x)
+TOWN_CANDIDATES = [('a', 375, 700), ('b', 515, 880), ('c', 470, 700), ('d', 640, 545), ('e', 790, 730), ('f', 590, 1060), ('g', 473, 358), ('h', 720, 360)]   # (名前, y, x)
 TOWN_R_FLAT = 17   # 街の敷地（平らにして、物を置かない）の半径
 # 山の上に置く街（位置を決め打ち。雪の連峰の山頂の、平らな台地。標高は、そのまま。山道でしか行けない）: A キュラビッド帝国（ユーザー指定: ロシア風・山道でしか行けない北の帝国）
 FIXED_TOWNS = {'a': (162, 842)}   # 街 → (y, x)。台地（高さ 35・約 28×30 マス）の中。山道が、台地の東の縁を通る
@@ -846,7 +846,7 @@ def _town_sites(land, biome, pond, oasis, sx=1.0, sy=1.0):
             sites.append(dict(id=tid, y=py, x=px))
             mask_mtn |= (np.hypot(X - px, Y - py) <= TOWN_R_FLAT) & land
             continue
-        b0 = biome[cy, cx] if biome[cy, cx] in (GRASS, TROPICAL, DESERT) else GRASS     # C は砂漠（オアシスの池から 20 マス以上離す）
+        b0 = biome[cy, cx] if biome[cy, cx] in (GRASS, TROPICAL, DESERT) or (tid == 'g' and biome[cy, cx] == FOREST) else GRASS     # C は砂漠（オアシスの池から 20 マス以上離す）
         ok = base & (_distance(biome != b0).astype(np.float32) >= 12)
         for o in sites: ok &= np.hypot(X - o['x'], Y - o['y']) > 70
         if not ok.any(): continue

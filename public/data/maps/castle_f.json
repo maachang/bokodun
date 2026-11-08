@@ -1,0 +1,92 @@
+{
+ "id": "castle_f",
+ "name": "獣王の城（ライアン獣王国）",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "spawn": {
+  "x": 12,
+  "z": 12,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "brick",
+  "ambientLight": 10096512,
+  "directionalLight": 13615264,
+  "fogColor": 2761760,
+  "fogNear": 14,
+  "fogFar": 48,
+  "visibility": 0.9,
+  "skyColor": 2761760
+ },
+ "legend": {
+  "W": "brick_wall",
+  "L": "wall_sconce",
+  "R": "wall_banner_red",
+  "a": "dais_stone_3",
+  "b": "dais_stone_2",
+  "c": "dais_stone_1",
+  "A": "dais_rug_3",
+  "B": "dais_rug_2",
+  "C": "dais_rug_1",
+  "u": "castle_rug",
+  "K": "chandelier_castle_rug",
+  "k": "bookshelf_stone",
+  "t": "table_stone",
+  "2": "castle_exit",
+  "Z": "fenrir_statue"
+ },
+ "layout": [
+  "WWWRWWLWWWWWRWWWWWLWWRWWW",
+  "W0kk00000aaAAAaa00000kk0W",
+  "W00000000bbBBBbb00000000W",
+  "W00000000ccCCCcc00000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uKu0000000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uZu0000000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uKu0000000000W",
+  "W0t00000000uuu00000000t0W",
+  "W0000000000uuu0000000000W",
+  "WWWWWWWWWWWW2WWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "lion_king",
+   "x": 12,
+   "z": 1
+  },
+  {
+   "id": "fox_chancellor",
+   "x": 10,
+   "z": 2
+  },
+  {
+   "id": "guard_heavy",
+   "x": 9,
+   "z": 6
+  },
+  {
+   "id": "guard_heavy",
+   "x": 15,
+   "z": 6
+  },
+  {
+   "id": "beast_f_a",
+   "x": 6,
+   "z": 9
+  },
+  {
+   "id": "dwarf_king",
+   "x": 19,
+   "z": 9
+  }
+ ],
+ "links": {}
+}

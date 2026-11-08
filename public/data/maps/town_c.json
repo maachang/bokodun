@@ -33,28 +33,31 @@
   "F": "plaza_fountain",
   "G": "district_gate",
   "1": "market_stall_red",
+  "N": "inn_door",
+  "4": "market_stall_yellow",
+  "I": "mideast_inn",
+  "M": "inn_sign",
   "g": "merchant_guild_sign",
+  "a": "adventurer_guild_sign",
+  "Q": "weapon_shop_sign",
+  "d": "shop_door",
+  "q": "item_shop_sign",
+  "w": "water",
+  "D": "temple_door",
+  "2": "market_stall_blue",
+  "c": "church_sign",
   "S": "mideast_shop",
   "3": "market_stall_green",
-  "2": "market_stall_blue",
-  "a": "adventurer_guild_sign",
-  "w": "water",
-  "I": "mideast_inn",
-  "d": "shop_door",
-  "4": "market_stall_yellow",
-  "Q": "weapon_shop_sign",
-  "q": "item_shop_sign",
-  "N": "inn_door",
-  "M": "inn_sign",
-  "K": "mideast_guild"
+  "K": "mideast_guild",
+  "J": "mideast_temple"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "WpTppppppppppppppp====pppppppppppppppTpW",
-  "WpHHHHpHHHHpIIIIpp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHpIIIIpp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHpINIIpp====pppppHHHHpHHHHpppW",
-  "WpppppppppppppMppp====pppppppppppppppppW",
+  "WpHHHHpHHHHpIIIIpp====ppppppJJJJJJJJpppW",
+  "WpHHHHpHHHHpIIIIpp====ppppppJJJJJJJJpppW",
+  "WpHHHHpHHHHpINIIpp====ppppppJJJDJJJJpppW",
+  "WpppppppppppppMppp====ppppppppppcppppppW",
   "WpppppppppppppppTp====pTpppppppppppppppW",
   "Wppppppppppppppppp====pppppppppppppppppW",
   "Wppppppppppppppppp====pppppppppppppppppW",
@@ -82,54 +85,59 @@
  ],
  "npcs": [
   {
-   "id": "merchant_man",
+   "id": "desert_chairman",
+   "x": 29,
+   "z": 13
+  },
+  {
+   "id": "desert_middle_man",
    "x": 24,
    "z": 13
   },
   {
-   "id": "merchant_woman",
-   "x": 20,
-   "z": 12
-  },
-  {
-   "id": "traveler_merchant",
+   "id": "desert_woman",
    "x": 6,
    "z": 17
   },
   {
-   "id": "junior_merchant_man",
+   "id": "desert_man",
    "x": 19,
    "z": 22
   },
   {
-   "id": "junior_merchant_woman",
+   "id": "desert_middle_woman",
    "x": 14,
    "z": 15
   },
   {
-   "id": "town_man",
+   "id": "desert_old_man",
    "x": 5,
    "z": 13
   },
   {
-   "id": "town_middle_woman",
+   "id": "desert_old_woman",
    "x": 29,
    "z": 16
   },
   {
-   "id": "elder_man",
+   "id": "desert_boy",
    "x": 9,
    "z": 22
   },
   {
-   "id": "senior_merchant_man",
+   "id": "desert_girl",
+   "x": 17,
+   "z": 25
+  },
+  {
+   "id": "merchant_man",
    "x": 22,
    "z": 15
   },
   {
-   "id": "child_girl",
-   "x": 17,
-   "z": 25
+   "id": "traveler_merchant",
+   "x": 20,
+   "z": 12
   },
   {
    "id": "guard_spear",
@@ -140,6 +148,16 @@
    "id": "guard_light",
    "x": 22,
    "z": 27
+  },
+  {
+   "id": "priest_man",
+   "x": 32,
+   "z": 7
+  },
+  {
+   "id": "priest_woman",
+   "x": 35,
+   "z": 7
   }
  ],
  "links": {
@@ -203,6 +221,16 @@
    "icon": "innIcon",
    "back": {
     "x": 13,
+    "z": 5,
+    "angle": 3.14159
+   }
+  },
+  "31,4": {
+   "nextMap": "temple",
+   "message": "神殿に入る",
+   "icon": "templeIcon",
+   "back": {
+    "x": 31,
     "z": 5,
     "angle": 3.14159
    }

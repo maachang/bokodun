@@ -34,12 +34,12 @@
  "heightStep": 0.5,
  "sideShade": 1.0,
  "heights": [
-  "89abbbcdefghijjiihggfffffgghihggffedcbbbbcbbbaaa988888888899abbb",
-  "9abcbbcdefghijiiihggffggghhihggfffedccbbcccccbbaa9988888889abccc",
-  "9abccccddefghiiiihhgggghhiihgfffeeedccccccccccbbaa999999999abccc",
-  "9abccccddefghiiiiihhgghiihhgffeeeddddccccccbbbbbbbaaa9999aaabccc",
-  "abcdccdddeefghiiiiihhhhihgggfeedddccddcccbbbaaabccbbbaaaaabbbbcc",
-  "bcdddddddeefghiiiiiihhhhgfffeedccccccddccbbaaaabcdcccbbbbbbbbbcc",
+  "89abbbcdefghijjiihggfffffgfedcbaa987776666656666677788888899abbb",
+  "9abcbbcdefghijiiihggffggghgfedcbba9888777776777778888888889abccc",
+  "9abccccddefghiiiihhgggghhihgfedccba999888887888889999999999abccc",
+  "9abccccddefghiiiiihhgghiihhgffeddcbaaa99999899999aaaa9999aaabccc",
+  "abcdccdddeefghiiiiihhhhihgggfeedddcbbbaaaaa9aaaaabbbbaaaaabbbbcc",
+  "bcdddddddeefghiiiiiihhhhgfffeedcccccccbbbbbaaaabbccccbbbbbbbbbcc",
   "cdddddddeeffghiiiiiiihhgfeeeeddcbbbccccccbbaaaabcddddccccccccccd",
   "cddddddeefgghhiiiihhhhgfeddddddcbbbbbccccbbbaaabcdeeeddddccccccd",
   "cddddddefghhhhhiihhhggfedcccdddcbbaabbbbbccbbbbcdefffeeeddccdddd",
@@ -169,7 +169,7 @@
   "ffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffffff"
  ],
  "layout": [
-  [48,48,48,48,48,48,48,48,48,48,48,101,48,101,48,48,48,48,48,48,48,48,48,101,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,101,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,101,48,48],
+  [48,48,48,48,48,48,48,48,48,48,48,101,48,101,48,48,48,48,48,48,48,48,48,101,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,117,48,48,48,48,48,101,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,101,48,48],
   [101,48,48,101,48,48,48,48,48,48,48,48,48,48,101,48,48,48,48,101,48,48,48,101,101,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,101,48,48,48,48,48,48,48,48,101,48,48,48,48,48,48,101,48,48,48],
   [48,48,75,48,48,48,48,48,75,48,87,48,48,48,75,48,48,48,101,48,87,48,48,48,75,48,48,48,87,48,48,48,87,101,48,48,87,48,87,48,87,48,48,48,48,48,75,48,48,48,87,48,48,48,87,48,87,48,87,48,87,48,48,48],
   [48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,101,48,48,48,48,48,48,101,48,48,48,48,48,48,48,48,48,48,101,48,48,48,48,48,48,48,101,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48,48],

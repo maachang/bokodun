@@ -17570,5 +17570,133 @@
     "solid": false,
     "speedBonus": 1.3,
     "description": "砂漠の街の大通り（踏み固めた土・わだち。移動速度30%アップ。paved_road と同じ）"
+  },
+  "world_tree": {
+    "type": "tree",
+    "texture": "fWorldTree",
+    "imageFile": "field/world_tree.png",
+    "sdId": 323,
+    "aspect": 1.033,
+    "height": 24.7,
+    "fixedHeight": true,
+    "colliderHalf": 1.6,
+    "solid": true,
+    "noShadow": true,
+    "description": "世界樹（G デイラミ精霊国の街の中心。普通の木（高さ 4.94）の 5 倍に拡大。長老が管理する。sdServer ID 323）"
+  },
+  "fenrir_statue": {
+    "groundShadow": true,
+    "type": "statue",
+    "imageFile": "fenrir_statue.png",
+    "sdId": 326,
+    "aspect": 1.672,
+    "height": 4.2,
+    "pedestalHeight": 0.5,
+    "pedestalWidth": 5.0,
+    "pedestalTexture": "brick",
+    "floorTexture": "rug",
+    "radius": 2.4,
+    "solid": true,
+    "blocksProjectiles": false,
+    "glow": true,
+    "description": "フェンリル神獣の像（寝ている姿。F ライアン獣王国の王城に展示。ふつうの像の 2 倍ほどの大きさ。獣王が管理する。sdServer ID 326）"
+  },
+  "mideast_temple": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "adobeWallOchre",
+    "roofTexture": "adobeRoof",
+    "roofStyle": "flat",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "中東風の神殿（ドームと金の尖塔。C 用。宗教は神殿）",
+    "faceParts": [
+      {
+        "size": [
+          0.9,
+          1.4,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.0,
+          0.03
+        ],
+        "color": "#2a2018",
+        "basic": true
+      },
+      {
+        "size": [
+          0.648,
+          0.18,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.79,
+          0.03
+        ],
+        "color": "#2a2018",
+        "basic": true
+      },
+      {
+        "size": [
+          0.378,
+          0.18,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.97,
+          0.03
+        ],
+        "color": "#2a2018",
+        "basic": true
+      },
+      {
+        "size": [
+          0.08,
+          1.5,
+          0.07
+        ],
+        "pos": [
+          -0.55,
+          2.1,
+          0.05
+        ],
+        "color": "#f2e8d0"
+      },
+      {
+        "size": [
+          0.08,
+          1.5,
+          0.07
+        ],
+        "pos": [
+          0.55,
+          2.1,
+          0.05
+        ],
+        "color": "#f2e8d0"
+      },
+      {
+        "size": [
+          1.2000000000000002,
+          0.1,
+          0.1
+        ],
+        "pos": [
+          0,
+          1.4,
+          0.07
+        ],
+        "color": "#f2e8d0"
+      }
+    ],
+    "faceEvery": 2,
+    "dome": true,
+    "spire": true,
+    "domeTexture": "domeTile"
   }
 }

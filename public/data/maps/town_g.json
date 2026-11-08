@@ -5,20 +5,19 @@
  "tileSize": 4,
  "wallHeight": 4,
  "spawn": {
-  "x": 16,
-  "z": 23,
+  "x": 20,
+  "z": 27,
   "angle": 0
  },
  "environment": {
-  "floorType": "stone",
-  "hasCeiling": false,
-  "ambientLight": 9408660,
-  "directionalLight": 16774610,
-  "fogColor": 11713215,
+  "ambientLight": 7311222,
+  "directionalLight": 9742474,
+  "fogColor": 1714720,
   "fogNear": 22,
-  "fogFar": 75,
-  "visibility": 0.9,
-  "skyColor": 9018045
+  "fogFar": 66,
+  "visibility": 0.65,
+  "skyColor": 1714720,
+  "floorType": "grass"
  },
  "decorFloor": "cobblestone",
  "enemies": {},
@@ -26,89 +25,230 @@
   "W": "city_wall",
   "p": "plaza_stone",
   "=": "paved_road",
-  "H": "brick_house",
-  "T": "tree",
-  "f": "flower_bed",
-  "v": "flower_bed_blue",
+  "H": "wooden_house",
+  "T": "great_tree_a",
+  "f": "forest_tree_b",
+  "v": "forest_tree_a",
   "F": "plaza_fountain",
-  "G": "district_gate"
+  "G": "district_gate",
+  "Y": "world_tree",
+  "N": "inn_door",
+  "I": "inn_building",
+  "M": "inn_sign",
+  "a": "adventurer_guild_sign",
+  "Q": "weapon_shop_sign",
+  "d": "shop_door",
+  "m": "mage_guild_sign",
+  "q": "item_shop_sign",
+  "w": "water",
+  "D": "temple_door",
+  "c": "church_sign",
+  "S": "shop_building",
+  "b": "wood_bridge",
+  "r": "training_sign",
+  "J": "temple_building"
  },
  "layout": [
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "Wppppppppppppp====pppppppppppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "Wppppppppppppp====pppppppppppppW",
-  "WpHHHHpppppppp====pppppppppppppW",
-  "WpHHHHpppppppp====pppppppppppppW",
-  "WpHHHHpppppppp====pppppppppppppW",
-  "WppppppppppppppppppppppppppppppW",
-  "WppppppppppfppppppppfppppppppppW",
-  "WppppppppppppppppppppppppppppppW",
-  "W=========pppppFFppppp=========W",
-  "W=========pppppFFppppp=========W",
-  "W=========pppppppppppp=========W",
-  "WppppppppppfppppppppfppppppppppW",
-  "WpTpppppppppTppppppTpppppppppTpW",
-  "Wppppppppppppp====pppppppppppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "WpHHHHpHHHHppp====ppppHHHHpppppW",
-  "Wppppppppppppp====pppppppppppppW",
-  "Wppppppppppppp====pppppppppppppW",
-  "WpTppppppppppp====pppppppppppTpW",
-  "Wppppppppppppp====pppppppppppppW",
-  "WWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWW"
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WpTppppppppppppppp====pppppppppppppppTpW",
+  "WpHHHHpHHHHpIIIIpp====pppppSSSSppppppppW",
+  "WpHHHHpHHHHpIIIIpp====pppppSSSSppppppppW",
+  "WpHHHHpHHHHpINIIpp====pppppSdSSppppppppW",
+  "WpppppppppppppMppp====pppppppmpppppppppW",
+  "Wpppppppppppppppfp====pvpppppppppppppppW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WpSSSSpSSSSpSSSSpp====pppppppppppppppppW",
+  "WpSSSSpSSSSpSSSSpp====pppppppppppppppppW",
+  "WpSdSSpSdSSpSdSSpp====ppppfppppppppppvpW",
+  "WpppqppppQppppappp====pppppppppppppppppW",
+  "W==================Yp==================W",
+  "W==================pp==================W",
+  "W======================================W",
+  "Wppppppppppppppfpp====ppvppppppppppppppW",
+  "WpHHHHpHHHHpppppTp====pTpppHHHHpHHHHpppW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
+  "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
+  "Wppppppppppppppppp====pppppppppppppppppW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "WpTppppppppppppppp====pppppppppppppppTpW",
+  "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
  ],
- "npcs": [],
+ "npcs": [
+  {
+   "id": "elf_elder_man",
+   "x": 22,
+   "z": 15
+  },
+  {
+   "id": "elf_elder_woman",
+   "x": 17,
+   "z": 15
+  },
+  {
+   "id": "elf_woman_a",
+   "x": 6,
+   "z": 17
+  },
+  {
+   "id": "elf_man_a",
+   "x": 12,
+   "z": 17
+  },
+  {
+   "id": "elf_woman_b",
+   "x": 28,
+   "z": 13
+  },
+  {
+   "id": "elf_man_b",
+   "x": 24,
+   "z": 9
+  },
+  {
+   "id": "elf_woman_c",
+   "x": 14,
+   "z": 26
+  },
+  {
+   "id": "elf_girl",
+   "x": 15,
+   "z": 21
+  },
+  {
+   "id": "elf_boy",
+   "x": 24,
+   "z": 21
+  },
+  {
+   "id": "elf_man_c",
+   "x": 30,
+   "z": 15
+  },
+  {
+   "id": "guard_spear",
+   "x": 17,
+   "z": 27
+  },
+  {
+   "id": "guard_light",
+   "x": 22,
+   "z": 27
+  }
+ ],
  "links": {
-  "15,25": {
-   "nextMap": "w_08_02",
+  "19,29": {
+   "nextMap": "w_07_05",
    "message": "デイラミ精霊国の外へ",
    "spawn": {
-    "x": 25,
-    "z": 45,
+    "x": 42,
+    "z": 49,
     "angle": 3.14159
    }
   },
-  "16,25": {
-   "nextMap": "w_08_02",
+  "20,29": {
+   "nextMap": "w_07_05",
    "message": "デイラミ精霊国の外へ",
    "spawn": {
-    "x": 26,
-    "z": 45,
+    "x": 43,
+    "z": 49,
+    "angle": 3.14159
+   }
+  },
+  "3,12": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop_g"
+   },
+   "message": "道具屋に入る",
+   "icon": "itemShopIcon",
+   "back": {
+    "x": 3,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "8,12": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 8,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "13,12": {
+   "nextMap": "guild_adv_g",
+   "message": "冒険者ギルドに入る",
+   "icon": "advGuildIcon",
+   "back": {
+    "x": 13,
+    "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "13,4": {
+   "nextMap": "city_inn",
+   "message": "宿屋・酒場に入る",
+   "icon": "innIcon",
+   "back": {
+    "x": 13,
+    "z": 5,
+    "angle": 3.14159
+   }
+  },
+  "28,4": {
+   "nextMap": "guild_mage_g",
+   "message": "魔法ギルドに入る",
+   "icon": "mageGuildIcon",
+   "back": {
+    "x": 28,
+    "z": 5,
     "angle": 3.14159
    }
   }
  },
  "heights": [
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000",
-  "00000000000000000000000000000000"
+  "0000000000000000000000000000000000000000",
+  "0111111111111111111111111111111111111110",
+  "0122222222222222111222222222222222222210",
+  "0232222322223222222333322223222232222320",
+  "0232222322223222222333322223222232222320",
+  "0232222322223222222333322223222232222320",
+  "0233222332223322222333332222322233222320",
+  "0233323333233332222333333323332333323320",
+  "0122222222223332111223333323322222222210",
+  "0112222222222322111112332233333333333320",
+  "0122222222222332111111232233333333333320",
+  "0122222222223222111111222233333333333220",
+  "0121111222222111111112211123222232222220",
+  "0111111222222111111222211112111121111110",
+  "0111111222222111111222211112111121111110",
+  "0111111222222222111222221112211122211110",
+  "0111111222222222111222222122221222211110",
+  "0111111112222222111222222222222222211110",
+  "0111111111112111111222222222222221111110",
+  "0111111111112111111222222222222221111110",
+  "0111111111112111111222222222222221111110",
+  "0111111112222222111111222222222211111110",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0111111122222222111111222222222211111110",
+  "0111111122222222111222222222222211111110",
+  "0111111112222222111222222222221111111110",
+  "0111111111222222111222222222211111111110",
+  "0111111111111111111111111111111111111110",
+  "0000000000000000000000000000000000000000"
  ],
  "heightStep": 0.5
 }

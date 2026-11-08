@@ -14,6 +14,7 @@ FACILITIES = [   # (建物の文字, 左上 x, y, 幅, 扉の x（建物の左�
     ('S', 7, 10, 4, 1, 'd', 'Q', _shop('weapon_shop', '武器屋に入る', 'weaponShopIcon')),
     ('S', 12, 10, 4, 1, 'd', 'a', _to('guild_adv', '冒険者ギルドに入る', 'advGuildIcon')),
     ('I', 12, 2, 4, 1, 'N', 'M', _to('city_inn', '宿屋・酒場に入る', 'innIcon')),
+    ('J', 28, 2, 8, 3, 'D', 'c', _to('temple', '神殿に入る', 'templeIcon')),   # 宗教は神殿（ユーザー指定）。ドームの大きな神殿
     ('K', 25, 9, 9, 4, 'd', 'g', _to('guild_merchant', '商人ギルドに入る', 'merchantGuildIcon')),   # 商人ギルドは、ほかの 2 倍の幅（街の中心）
 ]
 POND = (27, 35, 20, 25)   # オアシスの池（x0, x1, y0, y1）
@@ -21,17 +22,18 @@ STALLS = (('1', 23, 17), ('2', 26, 17), ('3', 15, 17), ('4', 12, 17), ('1', 16, 
 PALMS = ((26, 19), (36, 19), (26, 26), (36, 26), (31, 19), (31, 26), (2, 1), (37, 1), (2, 28), (16, 6), (23, 6))   # ヤシ（オアシスのまわりと、街のすみ）
 CACTI = ((37, 12), (3, 22), (16, 28))
 
-NPCS = [
-    ('merchant_man', 24, 13), ('merchant_woman', 20, 12), ('traveler_merchant', 6, 17), ('junior_merchant_man', 19, 22),
-    ('junior_merchant_woman', 14, 15), ('town_man', 5, 13), ('town_middle_woman', 29, 16), ('elder_man', 9, 22),
-    ('senior_merchant_man', 22, 15), ('child_girl', 17, 25), ('guard_spear', 17, 27), ('guard_light', 22, 27),
+NPCS = [   # 砂漠の住民（sdServer の画像）。議長は、商人ギルドの前
+    ('desert_chairman', 29, 13), ('desert_middle_man', 24, 13), ('desert_woman', 6, 17), ('desert_man', 19, 22),
+    ('desert_middle_woman', 14, 15), ('desert_old_man', 5, 13), ('desert_old_woman', 29, 16), ('desert_boy', 9, 22),
+    ('desert_girl', 17, 25), ('merchant_man', 22, 15), ('traveler_merchant', 20, 12), ('guard_spear', 17, 27), ('guard_light', 22, 27),
+    ('priest_man', 32, 7), ('priest_woman', 35, 7),
 ]
 
-LEGEND_KEYS = ('S', 'I', 'd', 'N', 'M', 'Q', 'q', 'a', 'g', 'w', '1', '2', '3', '4')
-SOLID = set('WHSIKdN1234')
+LEGEND_KEYS = ('S', 'I', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'c', 'g', 'w', '1', '2', '3', '4')
+SOLID = set('WHSIJKdND1234')
 SKIN = {'T': 'palm', 'f': 'cactus', 'v': 'cactus',   # 木はヤシ、花壇の代わりはサボテン
         'p': 'plaza_earth', '=': 'earth_road',   # 地面は石畳ではなく土（ユーザー指示）
-        'H': 'mideast_house', 'S': 'mideast_shop', 'I': 'mideast_inn', 'K': 'mideast_guild'}   # 中東風の建物（砂色の漆喰・平らな屋根・アーチの窓・木の格子・青緑のドーム）
+        'H': 'mideast_house', 'S': 'mideast_shop', 'I': 'mideast_inn', 'K': 'mideast_guild', 'J': 'mideast_temple'}   # 中東風の建物（砂色の漆喰・平らな屋根・アーチの窓・木の格子・青緑のドーム）
 
 
 def build(w, h, legend, city_legend, links, npcs):
@@ -50,7 +52,7 @@ def build(w, h, legend, city_legend, links, npcs):
     for x in range(w): g[0][x] = g[h - 1][x] = 'W'
     for y in range(h): g[y][0] = g[y][w - 1] = 'W'
     g[h - 1][19] = g[h - 1][20] = 'G'
-    for hx, hy in ((2, 2), (7, 2), (27, 2), (32, 2), (2, 18), (7, 18), (2, 24), (7, 24), (12, 24), (27, 28 - 1)):
+    for hx, hy in ((2, 2), (7, 2), (2, 18), (7, 18), (2, 24), (7, 24), (12, 24), (27, 28 - 1)):
         if hy + 3 >= h - 1: continue
         for y in range(hy, hy + 3):
             for x in range(hx, hx + 4): g[y][x] = 'H'

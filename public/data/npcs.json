@@ -1299,5 +1299,846 @@
     "lines": [
       "……すぴー。"
     ]
+  },
+  "desert_woman": {
+    "name": "砂漠の住民（女）",
+    "sdId": 290,
+    "texture": "/images/npcs/desert_woman.png",
+    "height": 2.3,
+    "aspect": 0.386,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "日差しが強いでしょう。水は大切にね。",
+      "オアシスの水は、みんなのものよ。"
+    ]
+  },
+  "desert_man": {
+    "name": "砂漠の住民（男）",
+    "sdId": 291,
+    "texture": "/images/npcs/desert_man.png",
+    "height": 2.3,
+    "aspect": 0.365,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "この街は、金さえあれば自由だ。",
+      "砂嵐の日は、外へ出るなよ。"
+    ]
+  },
+  "desert_old_man": {
+    "name": "砂漠の住民（高齢男）",
+    "sdId": 292,
+    "texture": "/images/npcs/desert_old_man.png",
+    "height": 2.1,
+    "aspect": 0.373,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "わしが若い頃は、この街も小さな市場だった。",
+      "自由とは、自分で稼ぐことじゃ。"
+    ]
+  },
+  "desert_old_woman": {
+    "name": "砂漠の住民（高齢女）",
+    "sdId": 293,
+    "texture": "/images/npcs/desert_old_woman.png",
+    "height": 2.0,
+    "aspect": 0.363,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "昔から、神殿に祈れば砂嵐が弱まると言われておる。",
+      "水を分け合うのが、砂漠の掟じゃ。"
+    ]
+  },
+  "desert_middle_man": {
+    "name": "砂漠の住民（中年男）",
+    "sdId": 294,
+    "texture": "/images/npcs/desert_middle_man.png",
+    "height": 2.3,
+    "aspect": 0.4,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "商売は、信用が一番だ。",
+      "隊商が着いたら、市場が賑わうぞ。"
+    ]
+  },
+  "desert_middle_woman": {
+    "name": "砂漠の住民（中年女）",
+    "sdId": 295,
+    "texture": "/images/npcs/desert_middle_woman.png",
+    "height": 2.2,
+    "aspect": 0.403,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "今日は香辛料が安いわよ。",
+      "うちの子、また迷子になってないかしら。"
+    ]
+  },
+  "desert_boy": {
+    "name": "砂漠の男の子",
+    "sdId": 296,
+    "texture": "/images/npcs/desert_boy.png",
+    "height": 1.6,
+    "aspect": 0.355,
+    "radius": 0.5,
+    "speed": 1.3,
+    "wanderRadius": 4.0,
+    "lines": [
+      "オアシスで水遊びするんだ！",
+      "ラクダに乗ってみたいなあ。"
+    ]
+  },
+  "desert_girl": {
+    "name": "砂漠の女の子",
+    "sdId": 297,
+    "texture": "/images/npcs/desert_girl.png",
+    "height": 1.55,
+    "aspect": 0.353,
+    "radius": 0.5,
+    "speed": 1.3,
+    "wanderRadius": 4.0,
+    "lines": [
+      "市場で飴を買ったの。",
+      "神殿のお祭りが楽しみ。"
+    ]
+  },
+  "desert_chairman": {
+    "name": "自由都市の議長",
+    "sdId": 266,
+    "texture": "/images/npcs/desert_chairman.png",
+    "height": 2.4,
+    "aspect": 0.439,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "よく来たな、旅の者。ここは王のいない街だ。",
+      "決めるのは、商人と民の話し合い。議長など、まとめ役にすぎん。"
+    ]
+  },
+  "desert_clerk_man": {
+    "name": "商人ギルドの受付",
+    "sdId": 321,
+    "texture": "/images/npcs/desert_clerk_man.png",
+    "height": 2.3,
+    "aspect": 0.331,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "商人ギルドへようこそ。"
+    ]
+  },
+  "desert_clerk_woman": {
+    "name": "商人ギルドの受付",
+    "sdId": 322,
+    "texture": "/images/npcs/desert_clerk_woman.png",
+    "height": 2.3,
+    "aspect": 0.392,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ご用件をお伺いします。"
+    ]
+  },
+  "desert_trainer": {
+    "name": "職業訓練所の教官",
+    "sdId": 314,
+    "texture": "/images/npcs/desert_trainer.png",
+    "height": 2.7,
+    "aspect": 0.427,
+    "radius": 0.7,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "砂漠で生き抜く体を作ってやる。"
+    ]
+  },
+  "lion_king": {
+    "name": "獣王",
+    "sdId": 269,
+    "texture": "/images/npcs/lion_king.png",
+    "height": 2.9,
+    "aspect": 0.839,
+    "radius": 0.7,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "よくぞ参った、人の子よ。我が獣王だ。",
+      "フェンリル神獣は、我ら獣人の守り神。その像を守るのが、王の務めだ。"
+    ]
+  },
+  "dwarf_king": {
+    "name": "ドワーフの鍛冶王",
+    "sdId": 270,
+    "texture": "/images/npcs/dwarf_king.png",
+    "height": 2.1,
+    "aspect": 0.768,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "鉄を打たぬ王など、王ではない。",
+      "よい鉄は、よい火と、よい腕から生まれる。"
+    ]
+  },
+  "fox_chancellor": {
+    "name": "獣王国の宰相",
+    "sdId": 271,
+    "texture": "/images/npcs/fox_chancellor.png",
+    "height": 2.4,
+    "aspect": 0.39,
+    "radius": 0.5,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "陛下は豪放だが、国の舵取りは私が預かっている。",
+      "この書物には、国の歴史がすべて記してある。"
+    ]
+  },
+  "dwarf_man": {
+    "name": "ドワーフの住人（男）",
+    "sdId": 272,
+    "texture": "/images/npcs/dwarf_man.png",
+    "height": 1.9,
+    "aspect": 0.471,
+    "radius": 0.5,
+    "speed": 0.7,
+    "wanderRadius": 3.0,
+    "lines": [
+      "鉱山の景気は上々じゃ。",
+      "酒がうまいのは、いい鉄が打てた日だな。"
+    ]
+  },
+  "dwarf_woman": {
+    "name": "ドワーフの住人（女）",
+    "sdId": 275,
+    "texture": "/images/npcs/dwarf_woman.png",
+    "height": 1.8,
+    "aspect": 0.311,
+    "radius": 0.5,
+    "speed": 0.7,
+    "wanderRadius": 3.0,
+    "lines": [
+      "子供扱いしたら承知しないよ。",
+      "うちの人の鉄は、街一番さ。"
+    ]
+  },
+  "cat_noble_man": {
+    "name": "猫の獣人の貴族（男）",
+    "sdId": 273,
+    "texture": "/images/npcs/cat_noble_man.png",
+    "height": 2.3,
+    "aspect": 0.393,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "王国の貴族として、恥ずかしくない振る舞いをせねば。"
+    ]
+  },
+  "cat_noble_woman": {
+    "name": "猫の獣人の貴族（女）",
+    "sdId": 274,
+    "texture": "/images/npcs/cat_noble_woman.png",
+    "height": 2.3,
+    "aspect": 0.599,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "まあ、人間のお客様とは珍しい。"
+    ]
+  },
+  "rabbit_noble_woman": {
+    "name": "兎の獣人の貴族（女）",
+    "sdId": 276,
+    "texture": "/images/npcs/rabbit_noble_woman.png",
+    "height": 2.3,
+    "aspect": 0.628,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "王国の夜会は、毎月の楽しみですの。"
+    ]
+  },
+  "rabbit_noble_man": {
+    "name": "兎の獣人の貴族（男）",
+    "sdId": 277,
+    "texture": "/images/npcs/rabbit_noble_man.png",
+    "height": 2.3,
+    "aspect": 0.333,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "耳の良さなら、誰にも負けませんよ。"
+    ]
+  },
+  "dog_noble_man": {
+    "name": "犬の獣人の貴族（男）",
+    "sdId": 278,
+    "texture": "/images/npcs/dog_noble_man.png",
+    "height": 2.3,
+    "aspect": 0.286,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "忠義こそ、我ら犬の誇りです。"
+    ]
+  },
+  "dog_noble_woman": {
+    "name": "犬の獣人の貴族（女）",
+    "sdId": 279,
+    "texture": "/images/npcs/dog_noble_woman.png",
+    "height": 2.3,
+    "aspect": 0.544,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "小さくても、気位は高いのよ。"
+    ]
+  },
+  "gorilla_noble_man": {
+    "name": "ゴリラの獣人の貴族（男）",
+    "sdId": 280,
+    "texture": "/images/npcs/gorilla_noble_man.png",
+    "height": 2.6,
+    "aspect": 0.53,
+    "radius": 0.7,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "力は、守るために使うものだ。"
+    ]
+  },
+  "gorilla_noble_woman": {
+    "name": "ゴリラの獣人の貴族（女）",
+    "sdId": 281,
+    "texture": "/images/npcs/gorilla_noble_woman.png",
+    "height": 2.5,
+    "aspect": 0.482,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "静かに暮らすのが、一番ですわ。"
+    ]
+  },
+  "beast_a": {
+    "name": "獣人の住人",
+    "sdId": 282,
+    "texture": "/images/npcs/beast_a.png",
+    "height": 2.3,
+    "aspect": 0.373,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "山の風が気持ちいい日だな。",
+      "フェンリル様のご加護がありますように。"
+    ]
+  },
+  "beast_b": {
+    "name": "獣人の住人",
+    "sdId": 283,
+    "texture": "/images/npcs/beast_b.png",
+    "height": 2.3,
+    "aspect": 0.418,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "鉱山の入口は、街の北だ。"
+    ]
+  },
+  "beast_c": {
+    "name": "獣人の住人",
+    "sdId": 284,
+    "texture": "/images/npcs/beast_c.png",
+    "height": 2.3,
+    "aspect": 0.394,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "人間の街は、においが違うなあ。"
+    ]
+  },
+  "beast_d": {
+    "name": "獣人の住人",
+    "sdId": 285,
+    "texture": "/images/npcs/beast_d.png",
+    "height": 2.3,
+    "aspect": 0.394,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "腹が減った。肉が食いたい。"
+    ]
+  },
+  "beast_f_a": {
+    "name": "獣人の住人（女）",
+    "sdId": 287,
+    "texture": "/images/npcs/beast_f_a.png",
+    "height": 2.3,
+    "aspect": 0.327,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "王城の像に、お祈りしてきたところよ。"
+    ]
+  },
+  "beast_f_b": {
+    "name": "獣人の住人（女）",
+    "sdId": 286,
+    "texture": "/images/npcs/beast_f_b.png",
+    "height": 2.3,
+    "aspect": 0.306,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "獣人もドワーフも、仲良くやってるわ。"
+    ]
+  },
+  "beast_f_c": {
+    "name": "獣人の住人（女）",
+    "sdId": 288,
+    "texture": "/images/npcs/beast_f_c.png",
+    "height": 2.3,
+    "aspect": 0.328,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "今日は市場が混んでるわね。"
+    ]
+  },
+  "beast_f_d": {
+    "name": "獣人の住人（女）",
+    "sdId": 289,
+    "texture": "/images/npcs/beast_f_d.png",
+    "height": 2.3,
+    "aspect": 0.343,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "尻尾の手入れが大変なのよ。"
+    ]
+  },
+  "bear_trainer": {
+    "name": "職業訓練所の教官（熊の獣人）",
+    "sdId": 312,
+    "texture": "/images/npcs/bear_trainer.png",
+    "height": 2.7,
+    "aspect": 0.463,
+    "radius": 0.7,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "鍛えれば鍛えただけ、強くなる。"
+    ]
+  },
+  "fox_clerk_man": {
+    "name": "獣人族の受付（狐）",
+    "sdId": 315,
+    "texture": "/images/npcs/fox_clerk_man.png",
+    "height": 2.3,
+    "aspect": 0.322,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "いらっしゃいませ。"
+    ]
+  },
+  "tanuki_clerk_man": {
+    "name": "獣人族の受付（狸）",
+    "sdId": 316,
+    "texture": "/images/npcs/tanuki_clerk_man.png",
+    "height": 2.3,
+    "aspect": 0.358,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ご用件をどうぞ。"
+    ]
+  },
+  "mouse_clerk_man": {
+    "name": "獣人族の受付（鼠）",
+    "sdId": 317,
+    "texture": "/images/npcs/mouse_clerk_man.png",
+    "height": 2.3,
+    "aspect": 0.366,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "お待ちしておりました。"
+    ]
+  },
+  "fox_clerk_woman": {
+    "name": "獣人族の受付（狐の女）",
+    "sdId": 318,
+    "texture": "/images/npcs/fox_clerk_woman.png",
+    "height": 2.3,
+    "aspect": 0.283,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "いらっしゃいませ。"
+    ]
+  },
+  "mouse_clerk_woman": {
+    "name": "獣人族の受付（鼠の女）",
+    "sdId": 319,
+    "texture": "/images/npcs/mouse_clerk_woman.png",
+    "height": 2.3,
+    "aspect": 0.27,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "お待ちしておりました。"
+    ]
+  },
+  "tanuki_clerk_woman": {
+    "name": "獣人族の受付（狸の女）",
+    "sdId": 320,
+    "texture": "/images/npcs/tanuki_clerk_woman.png",
+    "height": 2.3,
+    "aspect": 0.302,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ご用件をどうぞ。"
+    ]
+  },
+  "tiger_adv_master": {
+    "name": "冒険者ギルド長（虎の獣人）",
+    "sdId": 324,
+    "texture": "/images/npcs/tiger_adv_master.png",
+    "height": 2.7,
+    "aspect": 0.374,
+    "radius": 0.7,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "部族長として、このギルドを預かっている。",
+      "腕に覚えがあるなら、仕事をやろう。"
+    ]
+  },
+  "cat_merchant_master": {
+    "name": "商人ギルド長（猫の獣人）",
+    "sdId": 325,
+    "texture": "/images/npcs/cat_merchant_master.png",
+    "height": 2.4,
+    "aspect": 0.475,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "商売は、品のよさが物を言う。"
+    ]
+  },
+  "elf_queen": {
+    "name": "ハイエルフの女王",
+    "sdId": 298,
+    "texture": "/images/npcs/elf_queen.png",
+    "height": 2.5,
+    "aspect": 0.529,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "よく来ました、旅の人。精霊は、あなたを見ています。"
+    ]
+  },
+  "elf_chancellor": {
+    "name": "ハイエルフの宰相",
+    "sdId": 299,
+    "texture": "/images/npcs/elf_chancellor.png",
+    "height": 2.4,
+    "aspect": 0.543,
+    "radius": 0.5,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "女王陛下に代わり、国の務めを預かっております。"
+    ]
+  },
+  "elf_elder_man": {
+    "name": "エルフの長老（男）",
+    "sdId": 300,
+    "texture": "/images/npcs/elf_elder_man.png",
+    "height": 2.3,
+    "aspect": 0.58,
+    "radius": 0.5,
+    "speed": 0.3,
+    "wanderRadius": 1.0,
+    "lines": [
+      "この世界樹は、我らエルフの命の源。わしら長老が、代々お守りしておる。",
+      "世界樹の根は、世界のすみずみまで届いておるのじゃ。"
+    ]
+  },
+  "elf_elder_woman": {
+    "name": "エルフの長老（女）",
+    "sdId": 301,
+    "texture": "/images/npcs/elf_elder_woman.png",
+    "height": 2.3,
+    "aspect": 0.6,
+    "radius": 0.5,
+    "speed": 0.3,
+    "wanderRadius": 1.0,
+    "lines": [
+      "世界樹に触れてはなりませんよ。静かに祈りなさい。",
+      "森が泣く日には、世界樹も泣くのです。"
+    ]
+  },
+  "elf_elder_son": {
+    "name": "エルフの長老の息子",
+    "sdId": 302,
+    "texture": "/images/npcs/elf_elder_son.png",
+    "height": 2.3,
+    "aspect": 0.454,
+    "radius": 0.5,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "父上は、世界樹の番人です。僕も、いつか継ぎます。",
+      "冒険者ギルドは、長老の一族が預かっている。わたしが、ギルド長だ。"
+    ]
+  },
+  "elf_elder_daughter": {
+    "name": "エルフの長老の娘",
+    "sdId": 303,
+    "texture": "/images/npcs/elf_elder_daughter.png",
+    "height": 2.3,
+    "aspect": 0.522,
+    "radius": 0.5,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "世界樹の葉が落ちたら、願いが叶うのよ。",
+      "魔法ギルドは、長老の一族が預かっています。わたしが、ギルド長です。"
+    ]
+  },
+  "elf_man_a": {
+    "name": "エルフの住人（男）",
+    "sdId": 304,
+    "texture": "/images/npcs/elf_man_a.png",
+    "height": 2.3,
+    "aspect": 0.347,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "森の恵みに感謝を。"
+    ]
+  },
+  "elf_man_b": {
+    "name": "エルフの住人（男）",
+    "sdId": 305,
+    "texture": "/images/npcs/elf_man_b.png",
+    "height": 2.3,
+    "aspect": 0.342,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "人間が街に来るのは、珍しいな。"
+    ]
+  },
+  "elf_man_c": {
+    "name": "エルフの住人（男）",
+    "sdId": 306,
+    "texture": "/images/npcs/elf_man_c.png",
+    "height": 2.3,
+    "aspect": 0.357,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "弓の腕なら、森一番だ。"
+    ]
+  },
+  "elf_woman_a": {
+    "name": "エルフの住人（女）",
+    "sdId": 307,
+    "texture": "/images/npcs/elf_woman_a.png",
+    "height": 2.3,
+    "aspect": 0.305,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "精霊の声が、今日は賑やかね。"
+    ]
+  },
+  "elf_woman_b": {
+    "name": "エルフの住人（女）",
+    "sdId": 308,
+    "texture": "/images/npcs/elf_woman_b.png",
+    "height": 2.3,
+    "aspect": 0.365,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "世界樹の下で歌うのが好きなの。"
+    ]
+  },
+  "elf_woman_c": {
+    "name": "エルフの住人（女）",
+    "sdId": 309,
+    "texture": "/images/npcs/elf_woman_c.png",
+    "height": 2.3,
+    "aspect": 0.702,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "木の実を集めに行くところよ。"
+    ]
+  },
+  "elf_girl": {
+    "name": "エルフの女の子",
+    "sdId": 310,
+    "texture": "/images/npcs/elf_girl.png",
+    "height": 1.55,
+    "aspect": 0.321,
+    "radius": 0.5,
+    "speed": 1.3,
+    "wanderRadius": 4.0,
+    "lines": [
+      "世界樹って、すっごく大きいよね！"
+    ]
+  },
+  "elf_boy": {
+    "name": "エルフの男の子",
+    "sdId": 311,
+    "texture": "/images/npcs/elf_boy.png",
+    "height": 1.6,
+    "aspect": 0.33,
+    "radius": 0.5,
+    "speed": 1.3,
+    "wanderRadius": 4.0,
+    "lines": [
+      "木登りなら負けないぞ。"
+    ]
+  },
+  "elf_trainer": {
+    "name": "職業訓練所の教官（エルフ）",
+    "sdId": 313,
+    "texture": "/images/npcs/elf_trainer.png",
+    "height": 2.5,
+    "aspect": 0.33,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "無駄のない動きが、森では生き残る道だ。"
+    ]
+  },
+  "emperor_a": {
+    "name": "キュラビッド帝国の帝王",
+    "sdId": 264,
+    "texture": "/images/npcs/emperor_a.png",
+    "height": 2.5,
+    "aspect": 0.507,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "雪の山を越えて来たか。大したものだ。"
+    ]
+  },
+  "king_d": {
+    "name": "グリーン王国の王",
+    "sdId": 265,
+    "texture": "/images/npcs/king_d.png",
+    "height": 2.4,
+    "aspect": 0.553,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "質素に暮らすのが、王の務めと心得ておる。"
+    ]
+  },
+  "pope": {
+    "name": "教皇",
+    "sdId": 267,
+    "texture": "/images/npcs/pope.png",
+    "height": 2.6,
+    "aspect": 0.614,
+    "radius": 0.7,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "迷える子羊よ、神の御許へ。……ふふ。"
+    ]
+  },
+  "chairman_e": {
+    "name": "ガリレオ連盟の議長",
+    "sdId": 268,
+    "texture": "/images/npcs/chairman_e.png",
+    "height": 2.3,
+    "aspect": 0.317,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "金は、天下の回りもの。さあ、取引しようじゃないか。"
+    ]
+  },
+  "item_keeper_f": {
+    "name": "道具屋の女将（獣人）",
+    "texture": "/images/npcs/beast_f_a.png",
+    "height": 2.3,
+    "aspect": 0.327,
+    "radius": 0.6,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "いらっしゃい。薬も、蘇生の薬も、うちで扱ってるよ。",
+      "この国には神殿がないからね。神殿の品は、うちで売るのさ。"
+    ],
+    "speechRadius": 9.5
+  },
+  "item_keeper_g": {
+    "name": "道具屋の店主（エルフ）",
+    "texture": "/images/npcs/elf_woman_a.png",
+    "height": 2.3,
+    "aspect": 0.305,
+    "radius": 0.6,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ようこそ。森の薬草と、癒やしの品をどうぞ。",
+      "神殿のないこの国では、蘇生の薬も、この店で。"
+    ],
+    "speechRadius": 9.5
   }
 }

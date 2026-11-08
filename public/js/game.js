@@ -303,6 +303,7 @@ export class GameEngine {
             fOddTree: RetroTextureGenerator.createFieldImageTexture('desert_odd_tree'),
             fTundraConifers: RetroTextureGenerator.createFieldImageTexture('tundra_conifers'),
             fConiferTreeA: RetroTextureGenerator.createFieldImageTexture('conifer_tree_a'),
+            fWorldTree: RetroTextureGenerator.createFieldImageTexture('world_tree'),   // 世界樹（G の街の中心。5 倍）
             fConiferTreeB: RetroTextureGenerator.createFieldImageTexture('conifer_tree_b'),
             fBroadleafWall: RetroTextureGenerator.createFieldImageTexture('broadleaf_wall'),
             fTundraWall: RetroTextureGenerator.createFieldImageTexture('tundra_wall'),
@@ -1936,7 +1937,7 @@ export class GameEngine {
                         const tree = new THREE.Sprite(treeMat);
                         tree.center.set(0.5, 0.0);
                         const baseH = objDef.height ?? 4.8;   // 木の高さ（省略時は標準の木）。ばらつきは、高さに比例
-                        const scaleVar = baseH + ((r * 5 + c * 3) % 4) * 0.5 * (baseH / 4.8);
+                        const scaleVar = objDef.fixedHeight ? baseH : baseH + ((r * 5 + c * 3) % 4) * 0.5 * (baseH / 4.8);   // fixedHeight: 1 本だけの特別な木（世界樹）は、高さをばらつかせない
                         tree.scale.set(scaleVar * (objDef.aspect ?? (899 / 893)), scaleVar, 1);   // aspect: 画像の幅/高さ（省略時は標準の木）
                         // Sink tree base slightly into grass (-0.08) so trunk roots naturally penetrate the terrain
                         tree.position.set(wx, -0.08, wz);

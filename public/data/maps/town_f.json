@@ -32,25 +32,26 @@
   "v": "conifer_tree_a",
   "F": "plaza_fountain",
   "G": "district_gate",
-  "S": "shop_building",
-  "m": "mage_guild_sign",
-  "a": "adventurer_guild_sign",
-  "k": "smith_sign",
-  "w": "water",
-  "J": "temple_building",
+  "C": "castle_gate",
+  "N": "inn_door",
   "I": "inn_building",
+  "k": "smith_sign",
+  "M": "inn_sign",
+  "a": "adventurer_guild_sign",
+  "Q": "weapon_shop_sign",
   "d": "shop_door",
+  "m": "mage_guild_sign",
+  "q": "item_shop_sign",
+  "w": "water",
+  "D": "temple_door",
+  "c": "church_sign",
+  "S": "shop_building",
   "b": "wood_bridge",
   "r": "training_sign",
-  "D": "temple_door",
-  "Q": "weapon_shop_sign",
-  "c": "church_sign",
-  "q": "item_shop_sign",
-  "N": "inn_door",
-  "M": "inn_sign"
+  "J": "temple_building"
  },
  "layout": [
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWCCWWWWWWWWWWWWWWWWWWW",
   "WpTppppppppppppppp====pppppppppppppppTpW",
   "WpHHHHpHHHHpIIIIpp====pppppSSSSpSSSSpppW",
   "WpHHHHpHHHHpIIIIpp====pppppSSSSpSSSSpppW",
@@ -88,27 +89,32 @@
    "z": 6
   },
   {
-   "id": "town_man",
+   "id": "beast_a",
    "x": 6,
    "z": 17
   },
   {
-   "id": "town_middle_man",
+   "id": "beast_f_a",
    "x": 12,
    "z": 17
   },
   {
-   "id": "junior_merchant_man",
+   "id": "dwarf_man",
+   "x": 28,
+   "z": 13
+  },
+  {
+   "id": "beast_b",
    "x": 24,
    "z": 9
   },
   {
-   "id": "elder_man",
+   "id": "dwarf_woman",
    "x": 14,
    "z": 26
   },
   {
-   "id": "child_boy",
+   "id": "beast_f_b",
    "x": 15,
    "z": 21
   },
@@ -123,14 +129,54 @@
    "z": 27
   },
   {
-   "id": "town_old_man",
+   "id": "cat_noble_man",
    "x": 30,
    "z": 15
   },
   {
-   "id": "traveler_man",
+   "id": "rabbit_noble_woman",
    "x": 34,
    "z": 12
+  },
+  {
+   "id": "beast_c",
+   "x": 8,
+   "z": 21
+  },
+  {
+   "id": "beast_f_c",
+   "x": 33,
+   "z": 21
+  },
+  {
+   "id": "dog_noble_woman",
+   "x": 10,
+   "z": 21
+  },
+  {
+   "id": "gorilla_noble_man",
+   "x": 36,
+   "z": 14
+  },
+  {
+   "id": "beast_d",
+   "x": 21,
+   "z": 21
+  },
+  {
+   "id": "beast_f_d",
+   "x": 5,
+   "z": 21
+  },
+  {
+   "id": "gate_guard",
+   "x": 17,
+   "z": 1
+  },
+  {
+   "id": "gate_guard",
+   "x": 22,
+   "z": 1
   }
  ],
  "links": {
@@ -152,10 +198,28 @@
     "angle": 3.14159
    }
   },
+  "19,0": {
+   "nextMap": "castle_f",
+   "message": "王城に入る",
+   "back": {
+    "x": 19,
+    "z": 1,
+    "angle": 3.14159
+   }
+  },
+  "20,0": {
+   "nextMap": "castle_f",
+   "message": "王城に入る",
+   "back": {
+    "x": 20,
+    "z": 1,
+    "angle": 3.14159
+   }
+  },
   "3,12": {
    "nextMap": "shop",
    "params": {
-    "shopId": "item_shop"
+    "shopId": "item_shop_f"
    },
    "message": "道具屋に入る",
    "icon": "itemShopIcon",

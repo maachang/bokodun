@@ -33,7 +33,7 @@ LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'm', 'r', 'c', 
 SOLID = set('WHSIJdNDC')   # 通れない（段差の確認の対象外）
 
 
-def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None, skin=None, castle=True):
+def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None, skin=None, castle=True, tree_center=False):
     """D の街の中（layout・heights）を作り、legend・links・npcs に足す。(layout, heights) を返す。
     A（雪国）も、同じ作り（サンプルの高さを土台に、川・橋・高台・城門）で、施設・街の人・見た目（skin: 凡例の文字 → 物体の名前を上書き）だけを変える"""
     facilities = facilities or FACILITIES
@@ -56,9 +56,13 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
     for x in range(w): g[0][x] = g[h - 1][x] = 'W'
     for y in range(h): g[y][0] = g[y][w - 1] = 'W'
     g[h - 1][19] = g[h - 1][20] = 'G'
-    if castle: g[0][19] = g[0][20] = 'C'   # 城門（F は、城を置かない）
+    if tree_center:   # 街の中心の噴水の代わりに、世界樹（G）。木は 1 本（19,14）で、残りは広場
+        for x in (19, 20):
+            for y in (14, 15): g[y][x] = 'p'
+        g[14][19] = 'Y'
+    if castle: g[0][19] = g[0][20] = 'C'   # 城門（castle は、中の王城のマップ名。True なら共通の castle。G は、城を置かない）
     for x in ((19, 20) if castle else ()):
-        links[f'{x},0'] = {'nextMap': 'castle', 'message': '王城に入る', 'back': {'x': x, 'z': 1, 'angle': 3.14159}}
+        links[f'{x},0'] = {'nextMap': castle if isinstance(castle, str) else 'castle', 'message': '王城に入る', 'back': {'x': x, 'z': 1, 'angle': 3.14159}}
     # 家（施設以外）
     for x0, y0 in ((2, 2), (7, 2), (2, 18), (7, 18), (27, 18), (32, 18), (2, 25), (7, 25), (27, 25), (32, 25)):
         for y in range(y0, y0 + 3):
@@ -80,6 +84,7 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
         assert g[y][x] == 'p', f'D の飾り ({x},{y}): 空きマスではない'
         g[y][x] = c
     if castle: legend.update({'C': 'castle_gate'})
+    if tree_center: legend['Y'] = 'world_tree'
     for k in set(LEGEND_KEYS) | {c for f in facilities for c in (f[0], f[5], f[6])}: legend[k] = city_legend[k]   # 施設の建物・扉・立て札の文字も
     if skin: legend.update(skin)   # 見た目の差し替え（雪国: 雪をかぶった屋根・石畳など）
     for nid, x, z in npc_list:
@@ -128,13 +133,22 @@ def build_a(w, h, legend, city_legend, links, npcs):
 
 
 # ---- F（ライアン獣王国。山の麓の、獣人とドワーフの街）: D と同じ作りで、施設・街の人・見た目を変える ----
-FACILITIES_F = [f for f in FACILITIES if f[6] not in ('m', 'c')] + [   # 魔法ギルド・神殿は置かない
+def _remap(f, **kw):   # 施設の出入口 links の差し替え（店の種類・ギルドのマップ）
+    link = dict(f[7])
+    if 'shopId' in kw: link['params'] = {'shopId': kw['shopId']}
+    if 'nextMap' in kw: link['nextMap'] = kw['nextMap']
+    return f[:7] + (link,)
+
+
+FACILITIES_F = [(_remap(f, shopId='item_shop_f') if f[6] == 'q' else f) for f in FACILITIES if f[6] not in ('m', 'c')] + [   # 魔法ギルド・神殿は置かない（神殿の品は、道具屋 item_shop_f が売る）   # 魔法ギルド・神殿は置かない
     ('S', 27, 2, 4, 1, 'd', 'k', _to('guild_smith', '鍛冶屋に入る', 'smithIcon')),   # ドワーフの鍛冶屋（鉱山の国）
 ]
-NPCS_F = [
-    ('dwarf_smith', 28, 6), ('town_man', 6, 17), ('town_middle_man', 12, 17), ('junior_merchant_man', 24, 9),
-    ('elder_man', 14, 26), ('child_boy', 15, 21), ('guard_spear', 17, 27), ('guard_light', 22, 27),
-    ('town_old_man', 30, 15), ('traveler_man', 34, 12),
+NPCS_F = [   # 獣人（一般・貴族）とドワーフ。獣王・宰相・フェンリル像は、王城（castle_f）の中
+    ('dwarf_smith', 28, 6), ('beast_a', 6, 17), ('beast_f_a', 12, 17), ('dwarf_man', 28, 13), ('beast_b', 24, 9),
+    ('dwarf_woman', 14, 26), ('beast_f_b', 15, 21), ('guard_spear', 17, 27), ('guard_light', 22, 27),
+    ('cat_noble_man', 30, 15), ('rabbit_noble_woman', 34, 12), ('beast_c', 8, 21), ('beast_f_c', 33, 21), ('dog_noble_woman', 10, 21),
+    ('gorilla_noble_man', 36, 14), ('beast_d', 21, 21), ('beast_f_d', 5, 21),
+    ('gate_guard', 17, 1), ('gate_guard', 22, 1),
 ]
 SKIN_FOOT = {   # 山の麓の見た目: 木造の家（獣人の家）・針葉樹
     'H': 'wooden_house', 'T': 'conifer_tree_a', 'f': 'conifer_tree_b', 'v': 'conifer_tree_a',
@@ -142,4 +156,22 @@ SKIN_FOOT = {   # 山の麓の見た目: 木造の家（獣人の家）・針葉
 
 
 def build_f(w, h, legend, city_legend, links, npcs):
-    return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_F, npc_list=NPCS_F, skin=SKIN_FOOT, castle=False)
+    return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_F, npc_list=NPCS_F, skin=SKIN_FOOT, castle='castle_f')
+
+
+# ---- G（デイラミ精霊国。大森林の中心の、エルフと精霊の街）: D と同じ作りで、街の中心に世界樹 ----
+FACILITIES_G = [(_remap(f, shopId='item_shop_g') if f[6] == 'q' else _remap(f, nextMap='guild_adv_g') if f[6] == 'a' else _remap(f, nextMap='guild_mage_g') if f[6] == 'm' else f)
+                for f in FACILITIES if f[6] not in ('r', 'c')]   # 職業訓練所・神殿は置かない（神殿の品は道具屋 item_shop_g が売る。冒険者ギルド・魔法ギルドは、長老一族の複製のマップ）
+NPCS_G = [   # エルフの住民と、世界樹を管理する長老（世界樹のそば）
+    ('elf_elder_man', 22, 15), ('elf_elder_woman', 17, 15),   # 長老の息子と娘は、ギルド長（ギルドの中）
+    ('elf_woman_a', 6, 17), ('elf_man_a', 12, 17), ('elf_woman_b', 28, 13), ('elf_man_b', 24, 9),
+    ('elf_woman_c', 14, 26), ('elf_girl', 15, 21), ('elf_boy', 24, 21), ('elf_man_c', 30, 15),
+    ('guard_spear', 17, 27), ('guard_light', 22, 27),
+]
+SKIN_FOREST = {   # 大森林の見た目: 木造の家・巨木（街のすみ）・森の木
+    'H': 'wooden_house', 'T': 'great_tree_a', 'f': 'forest_tree_b', 'v': 'forest_tree_a',
+}
+
+
+def build_g(w, h, legend, city_legend, links, npcs):
+    return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_G, npc_list=NPCS_G, skin=SKIN_FOREST, castle=False, tree_center=True)

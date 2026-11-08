@@ -16,6 +16,8 @@ import town_h as TH
 import town_e as TE
 import town_b as TB
 import town_c as TC
+import castle_f as CF
+import guild_g as GG
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
 
@@ -428,7 +430,7 @@ def mesh_name(row, col, biome_counts, sea_frac, mine=False):
 
 
 # 街の中の大きさ（マス）: 候補地ごと。B は大国の都、H は辺境の小さな街（枠だけの街は town_layout・D と H は専用の build）
-TOWN_SIZE = {'a': (40, 30), 'b': (48, 36), 'c': (40, 30), 'd': (40, 30), 'e': (40, 30), 'f': (40, 30), 'g': (32, 26), 'h': (36, 26)}
+TOWN_SIZE = {'a': (40, 30), 'b': (48, 36), 'c': (40, 30), 'd': (40, 30), 'e': (40, 30), 'f': (40, 30), 'g': (40, 30), 'h': (36, 26)}
 ROAD_SIGNS = {}   # 道しるべ: {(世界の行, 世界の列): 文章}（外のマップの signs に書く）
 ROAD_TOWNS = ('d', 'h', 'e')   # 石畳の街道でつなぐ街（グリーン王国・ダマスカス自治領・ガリレオ連盟。ユーザー指定）。1 本の道路網: 最初の 2 つを結び、以降は、すでにある街道のどこからでも分かれる
 START_TOWN = 'd'   # ゲーム開始の街（グリーン王国・平野の最初の街）。開始位置はその門の前（ユーザー指定）
@@ -517,6 +519,9 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
         if site['id'] == 'a':   # A（雪国）: D と同じ作り（town_d.build_a）で、雪の見た目・雪の環境
             m['layout'], m['heights'] = TD.build_a(w, h, m['legend'], city_legend, m['links'], m['npcs'])
             m['environment'] = dict(snow_env, floorType='snow', fogNear=24, fogFar=72); m['decorFloor'] = 'snowCobble'   # 雪の環境（霧は、街が見えるよう薄め）
+        elif site['id'] == 'g':   # G（大森林の中心のエルフの街）: D と同じ作り（town_d.build_g）。森の環境（霧は、街が見えるよう薄め）
+            m['layout'], m['heights'] = TD.build_g(w, h, m['legend'], city_legend, m['links'], m['npcs'])
+            m['environment'] = dict(DARK_FOREST_ENV, floorType='grass', fogNear=22, fogFar=66, ambientLight=0x6f8f76)
         elif site['id'] == 'f':   # F（山の麓の獣人とドワーフの街）: D と同じ作り（town_d.build_f）
             m['layout'], m['heights'] = TD.build_f(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         elif site['id'] in ('d', 'h', 'e', 'b', 'c'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
@@ -524,6 +529,10 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
         if site['id'] == 'c':   # C（砂漠の自由都市）: 砂漠の環境（霧は、街が見えるよう薄め）・砂の地面
             m['environment'] = dict(desert_env, floorType='desert', fogNear=24, fogFar=72); m['decorFloor'] = 'packedEarth'
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    for gm in GG.build():   # G のギルド（ギルド長は長老の一族）
+        json.dump(gm, open(os.path.join(MAPS, gm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    cf = CF.build()   # F の小さな王城（獣王・フェンリル像）
+    json.dump(cf, open(os.path.join(MAPS, cf['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
 
 def main():

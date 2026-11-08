@@ -1622,12 +1622,15 @@ test('B（フランケル聖国）: 大教会が街の中心の北の最上位�
     assert.ok(!Object.values(m.links).some(l => ['guild_mage', 'guild_training'].includes(l.nextMap)), '魔法ギルド・職業訓練所は置かない');
 });
 
-test('C（ミレニアム自由都市）: 商人ギルドが街の中心・王城も神殿もない・オアシスの池・砂漠の見た目（砂の地面・ヤシ）・市場の屋台', () => {
+test('C（ミレニアム自由都市）: 商人ギルドが街の中心・王城はなく宗教は神殿（ドーム）・オアシスの池・砂漠の見た目（砂の地面・ヤシ）・市場の屋台', () => {
     const m = readJson('public/data/maps/town_c.json');
     assert.deepEqual([m.layout[0].length, m.layout.length], [40, 30]);
     assert.equal(m.links['29,11']?.nextMap, 'guild_merchant', '商人ギルドの扉');
     const all = Object.values(m.links).map(l => l.nextMap);
-    for (const bad of ['castle', 'temple', 'guild_mage', 'guild_training']) assert.ok(!all.includes(bad), `${bad} は置かない`);
+    for (const bad of ['castle', 'guild_mage', 'guild_training']) assert.ok(!all.includes(bad), `${bad} は置かない`);
+    assert.ok(all.includes('temple'), '宗教は神殿（ユーザー指定）');
+    assert.equal(m.legend.J, 'mideast_temple');
+    assert.ok(m.npcs.some(n => n.id === 'desert_chairman') && m.npcs.filter(n => n.id.startsWith('desert_')).length >= 8, '砂漠の住民（sdServer の画像）と議長');
     assert.ok(m.layout.join('').split('w').length - 1 >= 40, 'オアシスの池（水 40 マス以上）');
     assert.equal(m.decorFloor, 'packedEarth');
     assert.deepEqual([m.legend.p, m.legend['=']], ['plaza_earth', 'earth_road'], '地面は石畳ではなく土');
@@ -1641,14 +1644,46 @@ test('C（ミレニアム自由都市）: 商人ギルドが街の中心・王�
     assert.ok(['1', '2', '3', '4'].some(c => m.layout.join('').includes(c)), '市場の屋台');
 });
 
-test('F（ライアン獣王国）: 山の麓の街。D と同じ作りで、城・神殿・魔法ギルドはなく、ドワーフの鍛冶屋・職業訓練所がある。木造の家と針葉樹', () => {
+test('F（ライアン獣王国）: 山の麓の街。D と同じ作りで、小さな王城（獣王とフェンリル像）があり、神殿・魔法ギルドはなく、ドワーフの鍛冶屋・職業訓練所がある。木造の家と針葉樹', () => {
     const m = readJson('public/data/maps/town_f.json');
     assert.deepEqual([m.layout[0].length, m.layout.length], [40, 30]);
     const all = Object.values(m.links).map(l => l.nextMap);
     for (const bad of ['castle', 'temple', 'guild_mage']) assert.ok(!all.includes(bad), `${bad} は置かない`);
+    assert.equal(m.links['19,0']?.nextMap, 'castle_f', '獣王の城');
+    const cf = readJson('public/data/maps/castle_f.json');
+    assert.ok(cf.npcs.some(n => n.id === 'lion_king'), '獣王');
+    assert.equal(Object.values(cf.legend).includes('fenrir_statue'), true, 'フェンリル像');
+    assert.ok(objects.fenrir_statue.height >= 4.0 * 1.0 && objects.fenrir_statue.sdId === 326, 'フェンリル像（sdServer 326。ふつうの像の 2 倍ほど）');
     for (const need of ['guild_smith', 'guild_training', 'guild_adv', 'city_inn']) assert.ok(all.includes(need), `${need} がある`);
+    assert.equal(Object.values(m.links).find(l => l.nextMap === 'shop' && l.params.shopId.startsWith('item_shop')).params.shopId, 'item_shop_f', '神殿の品は道具屋で売る（神殿がない）');
     assert.ok(m.npcs.some(n => n.id === 'dwarf_smith'), 'ドワーフの鍛冶屋');
+    assert.ok(m.npcs.filter(n => /^(beast_|dwarf_|cat_|rabbit_|dog_|gorilla_)/.test(n.id)).length >= 8, '獣人・ドワーフの住民（sdServer の画像）');
     assert.equal(m.legend.H, 'wooden_house');
     assert.equal(m.legend.T, 'conifer_tree_a');
-    assert.ok(!m.layout[0].includes('C'), '城門がない');
+    assert.ok(m.layout[0].includes('C'), '城門がある');
+});
+
+test('G（デイラミ精霊国）: 大森林の中心にある。街の中は D と同じ作り（城なし・訓練所なし・神殿なし。ギルド長は長老の一族）。木造の家・巨木・森の環境', () => {
+    const m = readJson('public/data/maps/town_g.json');
+    assert.deepEqual([m.layout[0].length, m.layout.length], [40, 30]);
+    const all = Object.values(m.links).map(l => l.nextMap);
+    for (const need of ['guild_mage_g', 'guild_adv_g', 'city_inn']) assert.ok(all.includes(need), `${need} がある`);
+    for (const bad of ['guild_training', 'temple', 'guild_mage', 'guild_adv']) assert.ok(!all.includes(bad), `${bad} は置かない（神殿なし。ギルドは G 専用の複製）`);
+    const shopLink = Object.values(m.links).find(l => l.nextMap === 'shop');
+    assert.equal(shopLink.params.shopId, 'item_shop_g', '神殿の品は道具屋で売る');
+    const shops = readJson('public/data/shops.json');
+    for (const id of ['item_shop_g', 'item_shop_f']) assert.ok(shops[id].goods.some(x => x.itemId === 'revive_potion'), `${id}: 神殿の品（蘇生の薬）を売る`);
+    assert.equal(readJson('public/data/maps/guild_adv_master_g.json').npcs[0].id, 'elf_elder_son', '冒険者ギルド長は長老の息子');
+    assert.equal(readJson('public/data/maps/guild_mage_master_g.json').npcs[0].id, 'elf_elder_daughter', '魔法ギルド長は長老の娘');
+    assert.equal(readJson('public/data/maps/guild_adv_g.json').links['10,4'].nextMap, 'guild_adv_master_g');
+    assert.equal(m.legend.H, 'wooden_house');
+    assert.equal(m.legend.T, 'great_tree_a');
+    assert.equal(m.legend.Y, 'world_tree', '街の中心に世界樹');
+    assert.equal(m.layout[14][19], 'Y');
+    assert.equal(objects.world_tree.height, 24.7, '世界樹: 普通の木（4.94）の 5 倍');
+    assert.ok(m.npcs.some(n => n.id === 'elf_elder_man') && m.npcs.some(n => n.id === 'elf_elder_woman'), '世界樹を管理する長老');
+    assert.ok(!all.includes('castle'), '城門はない');
+    // 街の外のマップは、大森林（街の周りが森）
+    const outer = Object.values(m.links).find(l => l.nextMap?.startsWith('w_'))?.nextMap;
+    assert.match(readJson(`public/data/maps/${outer}.json`).name, /^大森林/, '大森林の中');
 });
