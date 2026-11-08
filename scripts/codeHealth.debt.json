@@ -25,10 +25,6 @@
       "lines": 220,
       "plan": "斬撃の種類ごとの関数に分ける（表で呼び分ける）"
     },
-    "scripts/world/gen_world.py::build_tiles": {
-      "lines": 363,
-      "plan": "段階（地形の物体・木・川と橋・街の外観・街道）ごとの関数に分ける"
-    },
     "scripts/world/terrain.py::build": {
       "lines": 239,
       "plan": "terrain.py の分割計画（段階ごとの関数）と同時に"

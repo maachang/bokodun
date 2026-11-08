@@ -8,6 +8,7 @@
 使い方: python3 scripts/world/gen_world.py
 """
 import os, sys, json, glob
+from types import SimpleNamespace
 import numpy as np
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import terrain as T
@@ -60,31 +61,9 @@ def town_gate_tiles(site):
     return [(site['x'] - 1, site['y'] + TOWN_HH - 1), (site['x'], site['y'] + TOWN_HH - 1)]
 
 
-def build_tiles(t):
-    """世界全体の、マスごとの物体の文字・地面の文字（W×H の配列）。地形ごとの特徴は、ここで決める"""
-    land, biome, elev = t['land'], t['biome'], t['elev']
-    rng = np.random.default_rng(2026)
-    u = rng.random((H, W)).astype(np.float32)
-    u2 = rng.random((H, W)).astype(np.float32)
-    u3 = rng.random((H, W)).astype(np.float32)
-    patch = T.fbm(101, (40, 14, 6))
-    patch2 = T.fbm(102, (26, 9, 4))
-    obj = np.full((H, W), ord('0'), np.uint8)
-    def put(mask, ch): obj[mask] = ord(ch)
-    d_sea, d_water = t['dist_sea'], t['dist_water']
-    free = land & ~(t['deep'] | t['shallow'] | t['bridge'] | t['lagoon'])
-    ys_, xs_ = np.mgrid[0:H, 0:W].astype(np.float32)
-    sx, sy = W / 768.0, H / 640.0
-    # 傾き（隣との高さの差。急な斜面ほど大きい）
-    e = elev.astype(np.float32)
-    gx = np.abs(np.diff(e, axis=1, prepend=e[:, :1])); gy = np.abs(np.diff(e, axis=0, prepend=e[:1, :]))
-    steep = T.box_mean(gx + gy, 2)
-    # 地面の種類（文字）: 地形の既定から、特徴ごとに上書きする
-    lut = np.zeros(9, np.uint8)
-    for b, ch in BIOME_FLOOR.items(): lut[b] = ord(ch)
-    floor = lut[biome]
-    def fl(mask, ch): floor[mask] = ord(ch)
-
+def _tiles_snowFoothills(g):
+    """北の雪山と、雪山の裾野（草地・ツンドラ・針葉樹林・凍った池）の物と地面。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    biome, d_water, elev, fl, free, land, obj, patch, put, t, u, u2, u3, xs_, ys_ = g.biome, g.d_water, g.elev, g.fl, g.free, g.land, g.obj, g.patch, g.put, g.t, g.u, g.u2, g.u3, g.xs_, g.ys_
     # --- 北の雪山（連峰）---
     sn = free & (biome == SNOW)
     cl = np.abs(T.fbm(61, (34, 12, 4)) - 0.5) < 0.034                       # 断崖の線（尾根・段）
@@ -134,7 +113,14 @@ def build_tiles(t):
     fl(sn & (elev >= 16) & (ice_hi > 0.62), 'i')                               # 氷河
     fl(sn & (elev >= 8) & (elev < 14) & (ice_lo > 0.82), 'i')                  # 山の谷の、凍った所
     fl(sn & (elev >= 26) & (bare > 0.62), 'r')                                  # 高い所は、雪が深く、ところどころ岩肌（岩肌は、約 3 割）
+    g.d_cold = d_cold
+    g.lat = lat
+    g.trans = trans
 
+
+def _tiles_forest(g):
+    """西の大森林。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    biome, fl, free, land, lat, obj, put, u, u2, u3 = g.biome, g.fl, g.free, g.land, g.lat, g.obj, g.put, g.u, g.u2, g.u3
     # --- 西の大森林: 巨木（217・218 の木を 3 倍）・真っ暗・起伏が激しい。岩山や崖にはしない（普通の、通れる起伏）。迷路的にするなら、木でなく起伏で ---
     fo = free & (biome == FOREST)
     put(fo & (u3 < 0.12), 'e')                                                    # 下草（シダ）。目印になる花・断崖・空き地は、置かない
@@ -148,6 +134,10 @@ def build_tiles(t):
     for ch in 'WKe': obj[thin_fo & (obj == ord(ch))] = ord('0')
     put(thin_fo & (obj == ord('0')) & (u < 0.15), 'm')
 
+
+def _tiles_grass(g):
+    """草原。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    biome, d_water, elev, free, lat, obj, patch, patch2, put, u, u2, u3 = g.biome, g.d_water, g.elev, g.free, g.lat, g.obj, g.patch, g.patch2, g.put, g.u, g.u2, g.u3
     # --- 草原 ---
     gr = free & (biome == GRASS)
     put(gr & (u < 0.12), 'm')
@@ -163,7 +153,12 @@ def build_tiles(t):
     put(meadow_f & (u < 0.30), 'v'); put(meadow_f & (u >= 0.30) & (u < 0.42), 'w'); put(meadow_f & (u >= 0.42) & (u < 0.48), 'p')
     put(gr & (elev >= 9) & (u < 0.012) & lat, 'G')                               # 丘の上の一本木
     put(gr & (d_water <= 2) & (d_water > 0) & (u2 < 0.35) & (obj == ord('0')), 'm')  # 水辺は、草が濃い
+    g.gr = gr
 
+
+def _tiles_desert(g):
+    """砂地・オアシス・砂漠の川の岸。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    biome, d_cold, d_water, elev, fl, floor, free, gr, land, lat, obj, patch, patch2, put, t, u, u2, u3, xs_, ys_ = g.biome, g.d_cold, g.d_water, g.elev, g.fl, g.floor, g.free, g.gr, g.land, g.lat, g.obj, g.patch, g.patch2, g.put, g.t, g.u, g.u2, g.u3, g.xs_, g.ys_
     # --- 砂地 ---
     de = free & (biome == DESERT)
     put(de & (u < 0.03), 'i')
@@ -224,7 +219,12 @@ def build_tiles(t):
         th = gr & (dd_ <= 14) & (dd_ > 0) & (u6 < np.clip((14.0 - dd_.astype(np.float32)) / 8.0, 0, 1))
         for ch in GRASS_PLANTS: obj[th & (obj == ord(ch))] = ord('0')
         put(th & (obj == ord('0')) & (u2 < 0.15), repl)                        # 寒い土地は高地の雑草・砂地は乾いた草に置き換える
+    g.d_rv = d_rv
 
+
+def _tiles_tropical(g):
+    """南国。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    biome, d_sea, d_water, elev, fl, floor, free, land, lat, obj, patch, patch2, put, u, u2, u3 = g.biome, g.d_sea, g.d_water, g.elev, g.fl, g.floor, g.free, g.land, g.lat, g.obj, g.patch, g.patch2, g.put, g.u, g.u2, g.u3
     # --- 南国（入り江・小島・砂州・池・ゆるい丘とジャングルの谷）---
     tr = free & (biome == TROPICAL)
     sandy = T.fbm(81, (22, 8, 3))
@@ -248,7 +248,12 @@ def build_tiles(t):
     thin = fade & (u4 < (1.0 - d_out.astype(np.float32) / 14.0) * 0.9)
     for ch in 'MYadfrsbwpe': obj[thin & (obj == ord(ch))] = ord('0')
     put(thin & (obj == ord('0')) & (u3 < 0.3) & (floor != ord('w')), 'm')       # 白い砂の上には、草を置かない
+    g.jungle = jungle
 
+
+def _tiles_rockMines(g):
+    """東の山々と炭鉱。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    biome, elev, fl, free, land, obj, put, sx, sy, u2, u3, xs_, ys_ = g.biome, g.elev, g.fl, g.free, g.land, g.obj, g.put, g.sx, g.sy, g.u2, g.u3, g.xs_, g.ys_
     # --- 東の山々と炭鉱 ---
     ro = free & (biome == ROCK)
     strata = np.sin(elev.astype(np.float32) * 0.8 + T.fbm(91, (30, 10, 4)) * 8) > 0.5
@@ -269,6 +274,10 @@ def build_tiles(t):
     gap = ((np.floor((ang + np.pi) / (np.pi / 8)).astype(int)) % 3 == 0)         # 入口（切れ目）
     put(ring & ~gap & (u3 < 0.85), 'c')
 
+
+def _tiles_beach(g):
+    """砂浜・水辺。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    biome, d_sea, fl, free, land, obj, put, u = g.biome, g.d_sea, g.fl, g.free, g.land, g.obj, g.put, g.u
     # 砂浜（海から 3 マス以内。南国は 5 マス）: 白い砂。南の浜には、ヤシ
     beach_w = np.where(biome == TROPICAL, 5, 3)
     beach = free & (d_sea <= beach_w)
@@ -278,6 +287,11 @@ def build_tiles(t):
     d_trop = T._distance(biome == TROPICAL)
     near_trop = np.clip(1.0 - d_trop.astype(np.float32) / 40.0, 0, 1)            # 南国に近いほど多い（40 マス先でゼロ）
     put(beach & (biome != TROPICAL) & (biome != SEA) & (u < 0.05 * near_trop), 'M')   # 南国でない浜: 南国に近い所だけ、ヤシ
+
+
+def _tiles_wetland(g):
+    """湿地帯。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    biome, d_rv, d_sea, d_water, elev, free, jungle, land, obj, patch2, put, t, trans, u, u2, u3 = g.biome, g.d_rv, g.d_sea, g.d_water, g.elev, g.free, g.jungle, g.land, g.obj, g.patch2, g.put, g.t, g.trans, g.u, g.u2, g.u3
     # 水辺: ガマ
     # 湿地帯（できる原理: ①水が逃げにくい地形＝低地・盆地・川の河口（デルタ）・もと湖の場所、水を通しにくい地層。②寒冷・多湿で、枯れた草が分解されず積もる（泥炭）＝雪解け水で湿る、雪山の裾野）
     #   ・低地: 周りより低い所（盆地）。南国のジャングルの低地・雪解け水で湿る裾野（雪山から 28 マス以内の草原）の低地
@@ -297,6 +311,11 @@ def build_tiles(t):
     free_obj = np.isin(obj, [ord('0'), ord('m'), ord('e'), ord('v'), ord('w'), ord('p'), ord('b'), ord('h'), ord('o'), ord('l')])
     put(wet_w & free_obj & (d_water <= 4) & (u2 < 0.35), 'k')
     put(wet & free_obj & (d_water > 4) & (u3 < 0.15), 'z'); put(wet & free_obj & (u < 0.06), 'u')
+
+
+def _tiles_water(g):
+    """川・湖・海・河口。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    biome, land, obj, put, t = g.biome, g.land, g.obj, g.put, g.t
     # 水: 川・湖（深い所 Q・浅瀬 q）、湖の中央と海（O）、海の岸の浅瀬（q）
     lake = t['lake']
     d_nonlake = T._distance(~lake)
@@ -318,6 +337,11 @@ def build_tiles(t):
     mouth_q = np.isin(obj, [ord('q'), ord('g')]) & (d_riv <= 5) & (t['dist_sea'] <= 5)   # 河口のそばの、岸・入り江の浅瀬も、深い水に
     put(mouth_q, 'Q')
     put(t['lagoon'], 'g')                                                       # 入り江・砂州・池のふち（歩ける浅瀬）
+
+
+def _tiles_mineEntrances(g):
+    """炭鉱の入口とトロッコ。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    free, obj, sx, sy = g.free, g.obj, g.sx, g.sy
     # 炭鉱の入口とトロッコ: 掘削跡のふち（北・西・東側）に、地形ごとに少数
     for k, (mx, my) in enumerate(MINES):
         cx, cz = mx * sx, my * sy
@@ -335,6 +359,11 @@ def build_tiles(t):
                         obj[yy, xx] = ord(pch); break
                 else: continue
                 break
+
+
+def _tiles_towns(g):
+    """街（候補地）の外観。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    obj, t, xs_, ys_ = g.obj, g.t, g.xs_, g.ys_
     # --- 街（候補地 A〜H）の外観: 平らな敷地に、壁で囲んだ街。南に門（扉＋衛兵）と石畳。中は別のマップ（town_*.json） ---
     for site in t['towns']:
         px, py = site['x'], site['y']
@@ -346,6 +375,11 @@ def build_tiles(t):
         for gx, gy in town_gate_tiles(site): obj[gy, gx] = ord('7')
         obj[y1 + 1:y1 + 5, px - 3:px + 3] = ord('9')              # 門の前の石畳
         obj[y1 + 2, px + 3] = ord(TOWN_SIGN_CH)                   # 門の前の石畳の東隣に、街の名前の立て札
+
+
+def _tiles_roads(g):
+    """街道（石畳の道・石の橋・道しるべ）。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    elev, obj, t = g.elev, g.obj, g.t
     # --- 街道: 街どうしを結ぶ、石畳の道（幅 3）と、川の石の橋。門前の石畳（南の端の中央）から、門前の石畳へ ---
     sites = {s_['id']: s_ for s_ in t['towns']}
     centers = []   # 街道の中心線（道路網）
@@ -364,6 +398,11 @@ def build_tiles(t):
             ROAD_SIGNS[pos] = msg
             print('道しるべ', pos, msg)
         print(f'街道 {ROAD_TOWNS[0] if k == 1 else "網"}→{goal}: 中心線 {len(path)} マス（新しく {len(new_tiles)}）・石畳 {n_road}・石の橋 {n_bridge}')
+
+
+def _tiles_seams(g):
+    """境界線（隣のマップとの継ぎ目）の整合。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    obj = g.obj
     # --- 境界線（隣のマップとの継ぎ目）の整合 ---
     #   境界を越えると、隣のマップの同じ位置に出る。そこが、木・崖・水の中だと、近くの空きへ押し出され、川の向こう岸へ渡ったり、
     #   壁に囲まれた空間の中に入って、出られなくなったりする。継ぎ目の両側のマス（向かい合うマス）の、歩ける・歩けないを、そろえる:
@@ -391,6 +430,11 @@ def build_tiles(t):
                 fixed += int(bad.sum())
     # 継ぎ目の整合のあと、浅瀬にした所は、水のマスなので、地面の種類は、そのまま（水の下の地面は、使われない）
     print('境界線の整合: 直したマス', fixed)
+
+
+def _tiles_trails(g):
+    """山道・休憩所・吊橋。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
+    biome, elev, fl, free, land, obj, put, t, u, u2, xs_, ys_ = g.biome, g.elev, g.fl, g.free, g.land, g.obj, g.put, g.t, g.u, g.u2, g.xs_, g.ys_
     # 山道（人が切り開いた道）: 床は赤茶の土。道と、その両側 1 マスは、木・草・岩を置かない（山頂の広場も）
     trail = t['trail']
     tr1 = trail.copy()
@@ -420,6 +464,49 @@ def build_tiles(t):
     gb = T.box_mean(mb.astype(np.float32), 2) > 0
     obj[gb & land] = ord('0')
     put(mb, 'I')
+
+
+def build_tiles(t):
+    """世界全体の、マスごとの物体の文字・地面の文字（W×H の配列）。地形ごとの特徴は、ここで決める"""
+    land, biome, elev = t['land'], t['biome'], t['elev']
+    rng = np.random.default_rng(2026)
+    u = rng.random((H, W)).astype(np.float32)
+    u2 = rng.random((H, W)).astype(np.float32)
+    u3 = rng.random((H, W)).astype(np.float32)
+    patch = T.fbm(101, (40, 14, 6))
+    patch2 = T.fbm(102, (26, 9, 4))
+    obj = np.full((H, W), ord('0'), np.uint8)
+    def put(mask, ch): obj[mask] = ord(ch)
+    d_sea, d_water = t['dist_sea'], t['dist_water']
+    free = land & ~(t['deep'] | t['shallow'] | t['bridge'] | t['lagoon'])
+    ys_, xs_ = np.mgrid[0:H, 0:W].astype(np.float32)
+    sx, sy = W / 768.0, H / 640.0
+    # 傾き（隣との高さの差。急な斜面ほど大きい）
+    e = elev.astype(np.float32)
+    gx = np.abs(np.diff(e, axis=1, prepend=e[:, :1])); gy = np.abs(np.diff(e, axis=0, prepend=e[:1, :]))
+    steep = T.box_mean(gx + gy, 2)
+    # 地面の種類（文字）: 地形の既定から、特徴ごとに上書きする
+    lut = np.zeros(9, np.uint8)
+    for b, ch in BIOME_FLOOR.items(): lut[b] = ord(ch)
+    floor = lut[biome]
+    def fl(mask, ch): floor[mask] = ord(ch)
+
+    g = SimpleNamespace(biome=biome, d_sea=d_sea, d_water=d_water, elev=elev, fl=fl, floor=floor, free=free, land=land, obj=obj, patch=patch, patch2=patch2, put=put, sx=sx, sy=sy, t=t, u=u, u2=u2, u3=u3, xs_=xs_, ys_=ys_)
+    _tiles_snowFoothills(g)
+    _tiles_forest(g)
+    _tiles_grass(g)
+    _tiles_desert(g)
+    _tiles_tropical(g)
+    _tiles_rockMines(g)
+    _tiles_beach(g)
+    _tiles_wetland(g)
+    _tiles_water(g)
+    _tiles_mineEntrances(g)
+    _tiles_towns(g)
+    _tiles_roads(g)
+    _tiles_seams(g)
+    _tiles_trails(g)
+
     return obj, floor, elev
 
 
