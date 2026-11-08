@@ -12,7 +12,9 @@ import { ParticleSystem } from '/js/particles.js';
 import { SlashEffectSystem } from '/js/slashEffect.js';
 import { StrikeEffectSystem } from '/js/strikeEffect.js';
 import { tileBuilders } from '/js/game/tiles.js';
-import { updateWorldMethods } from '/js/game/updateWorld.js';
+import { updateTrapMethods } from '/js/game/updateTraps.js';
+import { updateObjectMethods } from '/js/game/updateObjects.js';
+import { updateFlowMethods } from '/js/game/updateFlow.js';
 import { updatePlayerMethods } from '/js/game/updatePlayer.js';
 import { equipmentMethods } from '/js/game/equipment.js';
 import { combatMethods } from '/js/game/combat.js';
@@ -324,4 +326,4 @@ export class GameEngine {
 }
 
 // 部品（public/js/game/*.js）のメソッドを、GameEngine に組み込む
-Object.assign(GameEngine.prototype, updateWorldMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, combatMethods, hudMethods, interactMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);
+Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, combatMethods, hudMethods, interactMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);
