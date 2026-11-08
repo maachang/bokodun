@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { copyGameModules } from './helpers/game.mjs';
 
 const root = process.cwd();
 const defs = JSON.parse(fs.readFileSync(path.join(root, 'public/data/enemies.json'), 'utf-8'));
@@ -10,15 +11,8 @@ const tex = new Proxy({}, { get: () => ({}) });
 
 // entities.js / enemyBehavior.js は、ブラウザ向けの絶対パス import なので、一時コピーを実パスに読み替えてロードする
 async function load() {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'enemybeh-'));
-    const eb = path.join(dir, 'enemyBehavior.mjs');
-    fs.copyFileSync(path.join(root, 'public/js/enemyBehavior.js'), eb);
-    const src = fs.readFileSync(path.join(root, 'public/js/entities.js'), 'utf-8')
-        .replace("'/js/three.module.js'", JSON.stringify(path.join(root, 'public/js/three.module.js')))
-        .replace("'/js/enemyBehavior.js'", JSON.stringify(eb));
-    const ent = path.join(dir, 'entities.mjs');
-    fs.writeFileSync(ent, src);
-    return { Monster: (await import(ent)).Monster, deriveProfile: (await import(eb)).deriveProfile };
+    const dir = copyGameModules('enemybeh-');   // public/js 全体の一時コピー（import は一時コピーの絶対パスに読み替え済み）
+    return { Monster: (await import(path.join(dir, 'entities.js'))).Monster, deriveProfile: (await import(path.join(dir, 'enemyBehavior.js'))).deriveProfile };
 }
 const KNOWN_AI = new Set(['stationary', 'ranged_maintain', 'bounce_leap', 'hop_pounce', 'stalker_spider', 'flying_chase', 'flying_ranged', 'worm_burrow', 'walk_chase', 'flying_dive', 'charge_dash', 'big_hop', 'pack_chase', 'cat_ambush', 'bear_rush', 'raptor_dive']);
 

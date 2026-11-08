@@ -3,18 +3,15 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { copyGameModules } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 
 // entities.js はブラウザ向けの絶対パス import ('/js/three.module.js') を使うため、
 // 一時コピーの import を実パスに読み替えてロードする
 async function loadMonster() {
-    const src = fs.readFileSync(path.join(projectRoot, 'public/js/entities.js'), 'utf-8')
-        .replace("'/js/three.module.js'", JSON.stringify(path.join(projectRoot, 'public/js/three.module.js')))
-        .replace("'/js/enemyBehavior.js'", JSON.stringify(path.join(projectRoot, 'public/js/enemyBehavior.js')));
-    const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'stealth-')), 'entities.mjs');
-    fs.writeFileSync(tmp, src);
-    return (await import(tmp)).Monster;
+    const dir = copyGameModules('stealth-');   // public/js 全体の一時コピー（import は一時コピーの絶対パスに読み替え済み）
+    return (await import(path.join(dir, 'entities.js'))).Monster;
 }
 
 const defs = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/enemies.json'), 'utf-8'));

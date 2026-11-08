@@ -6,8 +6,8 @@
       "plan": "音の種類（足音・戦闘・環境・UI）ごとに、ファイルを分ける"
     },
     "public/js/entities.js": {
-      "lines": 1580,
-      "bytes": 92114,
+      "lines": 966,
+      "bytes": 52467,
       "plan": "Monster（update 877 行）の行動を、敵の種類ごとの部品（enemyBehavior.js の方式）へ分ける。Monster・Projectile を別ファイルにする"
     },
     "scripts/world/terrain.py": {
@@ -26,7 +26,7 @@
       "plan": "敵の種類ごとの初期値を、データの表へ"
     },
     "public/js/entities.js::update": {
-      "lines": 875,
+      "lines": 278,
       "plan": "Monster.update を、段階（感知・移動・攻撃・状態の遷移）ごとの関数に分け、敵の種類ごとの行動は、enemyBehavior.js 方式の部品へ"
     },
     "public/js/game.js::constructor": {
