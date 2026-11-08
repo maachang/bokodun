@@ -5,7 +5,7 @@ import numpy as np
 import terrain as T
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
-from world_consts import BRIDGE_NEAR, ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
+from world_consts import ROAD_LOOPS, BRIDGE_NEAR, LOOPS, ROAD_ROUGH, ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
 
 
 def _tiles_snowFoothills(g):
@@ -335,6 +335,11 @@ def _tiles_roads(g):
         goal = ROAD_TOWNS[k]
         start = gate_pt(ROAD_TOWNS[0]) if not centers else centers
         path = roads.find_path(t, start, gate_pt(goal), reuse=set(centers))
+        rough = False
+        if path is None and goal in ROAD_ROUGH:   # 山・岩山・坂を通ってでも作る（遠回りでもよい）。地形は、道に沿って少し直す
+            path = roads.find_path(t, start, gate_pt(goal), margin=PARTIAL_MARGIN, reuse=set(centers), rough=True)
+            rough = path is not None
+            if rough: print(f'街道 {goal}: 山・坂を通る道（地形を {roads.flatten(elev, path, T.box_mean((t['deep'] | t['shallow'] | t['lagoon'] | t['bridge'] | t['mtn_bridge'] | (t['river'] > 0) | ~t['land']).astype(np.float32), 2) > 0)} マス直した）')
         partial = path is None and goal in ROAD_PARTIAL   # 砂漠・山・大森林の中は、石畳が作れない（砂に埋もれる・山道・樹海）。作れる所までの道と、道の終わりの立て札
         if partial: path = roads.find_path(t, start, gate_pt(goal), margin=PARTIAL_MARGIN, reuse=set(centers), partial=True)
         if k == 1: centers = []   # 最初の 2 つは、1 本目（始点は、最初の街の門前）
@@ -350,8 +355,39 @@ def _tiles_roads(g):
             pos, msg = roads.end_sign(t, obj, path[-1], gate_pt(goal), TOWN_NAME[goal], ROAD_PARTIAL[goal])
             ROAD_SIGNS[pos] = msg
             print('道の終わりの立て札', pos, msg)
-        ROAD_INFO[goal] = {'gate': list(gate_pt(goal)), 'end': list(path[-1]), 'partial': bool(partial), **({'note': ROAD_PARTIAL[goal]} if partial else {})}
+        ROAD_INFO[goal] = {'gate': list(gate_pt(goal)), 'end': list(path[-1]), 'partial': bool(partial), 'rough': rough, **({'note': ROAD_PARTIAL[goal]} if partial else {})}
         print(f'街道 {ROAD_TOWNS[0] if k == 1 else "網"}→{goal}: 中心線 {len(path)} マス（新しく {len(new_tiles)}）・石畳 {n_road}・石の橋 {n_bridge}')
+    ROAD_INFO[ROAD_TOWNS[0]] = {'gate': list(gate_pt(ROAD_TOWNS[0])), 'end': list(gate_pt(ROAD_TOWNS[0])), 'partial': False}
+    # 循環する道（ユーザー指定「ちゃんと循環できる道＝一方通行じゃなく」）: 道路網の上の道のりが、直線距離よりずっと遠い街の組に、別の道（迂回・環状）を足す
+    import collections, itertools
+    def road_dist(a, b):
+        src, dst = tuple(ROAD_INFO[a]['end']), tuple(ROAD_INFO[b]['end'])
+        near = lambda p_: min(centers, key=lambda c: abs(c[0] - p_[0]) + abs(c[1] - p_[1]))
+        s_, d_ = near(src), near(dst); dist = {s_: 0}; q = collections.deque([s_])
+        while q:
+            u = q.popleft()
+            if u == d_: return dist[u]
+            for dy, dx in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                v = (u[0] + dy, u[1] + dx)
+                if v in set_c and v not in dist: dist[v] = dist[u] + 1; q.append(v)
+        return None
+    set_c = set(centers)
+    full = [k for k in ROAD_TOWNS if not ROAD_INFO[k]['partial']]
+    cands = []
+    for a, b in itertools.combinations(full, 2):
+        eu = np.hypot(gate_pt(a)[0] - gate_pt(b)[0], gate_pt(a)[1] - gate_pt(b)[1]); rd = road_dist(a, b)
+        if rd: print(f'  道のり {a}→{b}: {rd} マス・直線 {eu:.0f} マス（比 {rd / eu:.1f}）')
+        if rd and eu < 400 and rd / eu > 1.5: cands.append((rd / eu, a, b))
+    n_loop = 0
+    for ratio, a, b in sorted(cands, reverse=True):
+        if n_loop >= LOOPS: break
+        path = roads.find_path(t, gate_pt(a), gate_pt(b), margin=100, penal=set(centers))
+        new_tiles = [c for c in path if c not in set_c] if path else []
+        if len(new_tiles) < 20: continue
+        roads.paint(t, obj, elev, path, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})
+        centers.extend(new_tiles); set_c.update(new_tiles); n_loop += 1
+        ROAD_LOOPS.append({'between': [a, b], 'tiles': len(new_tiles)})
+        print(f'循環する道 {a}⇄{b}: 迂回 {len(new_tiles)} マス（道のり/直線 = {ratio:.1f}）')
     # 石の橋のそば（BRIDGE_NEAR マス以内）の、もとからある木の橋（plank_bridge）は、無効（川に戻す）。石の橋と、二重の橋にならない
     near_stone = T.box_mean((obj == ord(roads.BRIDGE_CH)).astype(np.float32), BRIDGE_NEAR) > 0
     old = near_stone & (obj == ord('Z'))
@@ -359,10 +395,9 @@ def _tiles_roads(g):
     t['bridge'] = t['bridge'] & ~old
     print(f'石の橋のそばの木の橋を無効に: {int(old.sum())} マス')
     import json
-    ROAD_INFO[ROAD_TOWNS[0]] = {'gate': list(gate_pt(ROAD_TOWNS[0])), 'end': list(gate_pt(ROAD_TOWNS[0])), 'partial': False}
     with open(os.path.join(ROOT, 'public', 'data', 'world_roads.json'), 'w', encoding='utf-8') as fp:   # 街道の基準データ（今後の町・村づくりが、この道を基準にする）
         json.dump({'note': '街道（石畳の道）の基準データ。座標は世界のマス（[行, 列]）。centers: 道の中心線（幅 3）。towns: 街ごとの門前（gate）と道の終わり（end。partial=true は、砂漠・山・大森林で、石畳が作れる所まで）。signs: 道しるべ・道の終わりの立て札',
-                   'centers': [list(c) for c in sorted(centers)], 'towns': ROAD_INFO,
+                   'centers': [list(c) for c in sorted(centers)], 'towns': ROAD_INFO, 'loops': ROAD_LOOPS,
                    'signs': [{'pos': list(k), 'text': v} for k, v in sorted(ROAD_SIGNS.items())]}, fp, ensure_ascii=False)
 
 
@@ -408,7 +443,8 @@ def _tiles_trails(g):
     tr1[1:, :] |= trail[:-1, :]; tr1[:-1, :] |= trail[1:, :]; tr1[:, 1:] |= trail[:, :-1]; tr1[:, :-1] |= trail[:, 1:]
     ns2 = T._near_seam(ys_.astype(int), xs_.astype(int), 2)                    # 隣のマップとの境の近くには、置かない（継ぎ目の整合）
     # 山の高い所（森林限界より上の雪山・岩山）: 岩の代わりに、まばらな木（針葉樹・枯れ木）と、枯れかけた草
-    hi = free & ~ns2 & (obj == ord('0')) & (((biome == SNOW) & (elev >= 17)) | ((biome == ROCK) & (elev >= 9)))
+    road_zone = T.box_mean(np.isin(obj, [ord(roads.ROAD_CH), ord(roads.BRIDGE_CH)]).astype(np.float32), 2) > 0   # 街道のまわり（2 マス）には、木・岩を置かない（山を通る道のわき）
+    hi = free & ~ns2 & ~road_zone & (obj == ord('0')) & (((biome == SNOW) & (elev >= 17)) | ((biome == ROCK) & (elev >= 9)))
     lat2 = ((xs_.astype(int) % 2) == 1) & ((ys_.astype(int) % 2) == 1)
     put(hi & lat2 & (u2 < 0.08), 'x'); put(hi & lat2 & (u2 >= 0.08) & (u2 < 0.12), 'y'); put(hi & lat2 & (u2 >= 0.12) & (u2 < 0.16), '2')
     put(hi & (obj == ord('0')) & (u < 0.16), 'i')

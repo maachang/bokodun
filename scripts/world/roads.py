@@ -15,6 +15,12 @@ TURN_COST = 3.0       # 曲がる費用（まっすぐな道にする。細か�
 REUSE_COST = 0.2      # すでにある街道の上を歩く 1 マスの費用（重ねて使う）
 PARALLEL_COST = 3.0   # すでにある街道のすぐわき（PARALLEL_RANGE マス以内）の費用の上乗せ（並走させない）
 PARALLEL_RANGE = 6
+AVOID_ROUGH = (T.SEA,)   # 地形を無視してつなぐ道（rough）: 海だけ避ける（砂漠・山・岩山・雪・針葉樹も通る。ユーザー提案「エルフの街以外は、一旦、砂漠や山を無視してつなぐ」の試し）
+ROUGH_DZ = 10         # 地形を無視してつなぐ道（rough）で、隣のマスと許す高さの差（あとで、道の高さをなだらかに直す）
+ARENA_COST = 4.0      # 地形を無視してつなぐ道（rough）で、ボス闘技場のまわりの 1 マスの費用の上乗せ
+ROUGH_COST = 3.0      # 山・岩山・針葉樹・森林・雪の 1 マスの費用の上乗せ（草原を優先）
+TRAIL_COST = 1.0      # すでにある山道の 1 マスの費用（沿って通る）
+PENAL_COST = 12.0     # 循環する道（loop）で、すでにある街道を避ける費用の上乗せ
 SLOPE_COST = 0.6      # 高さが違う 1 段ごとの費用
 
 
@@ -25,7 +31,7 @@ def _filter3(a, fn):
     return fn(np.stack(stack), axis=0)
 
 
-def find_path(t, start, goal, margin=60, reuse=None, partial=False):
+def find_path(t, start, goal, margin=60, reuse=None, partial=False, rough=False, penal=None):
     """start・goal（(y, x)）の間の道の中心線（(y, x) の並び）。経路がなければ None。
     start は、1 点または点の集まり（すでにある街道のどこからでも出られる）。reuse: すでにある街道の中心線のマス（重ねて使い、すぐわきは並走させない）"""
     starts = [start] if isinstance(start[0], int) else list(start)
@@ -39,14 +45,17 @@ def find_path(t, start, goal, margin=60, reuse=None, partial=False):
     yy, xx = np.mgrid[sl]
     river = (t['river'][sl] > 0) & ~t['lake'][sl]
     water = t['deep'][sl] | t['shallow'][sl] | t['bridge'][sl] | t['lagoon'][sl]
-    bad = ~land[sl] | t['lake'][sl] | np.isin(t['biome'][sl], AVOID) | t['trail'][sl] \
-        | t['mtn_bridge'][sl] | t['frozen'][sl] | (water & ~river) | t['oasis']['pond'][sl]
-    for ay, ax, ar in t['arenas']: bad |= np.hypot(yy - ay, xx - ax) <= ar + 2   # ボス闘技場のまわりは避ける
+    bad = ~land[sl] | t['lake'][sl] | np.isin(t['biome'][sl], AVOID_ROUGH if rough else AVOID) | (t['trail'][sl] & ~rough) \
+        | t['mtn_bridge'][sl] | (t['frozen'][sl] & ~rough) | (water & ~river) | t['oasis']['pond'][sl]
+    arena_m = np.zeros(bad.shape, bool)
+    for ay, ax, ar in t['arenas']: arena_m |= np.hypot(yy - ay, xx - ax) <= ar + 2   # ボス闘技場のまわりは避ける（rough: 通れるが、費用を上乗せ。A の街は、山頂の広場の中にある）
+    if not rough: bad |= arena_m
     near_end = (np.hypot(yy - goal[0], xx - goal[1]) <= 9)
     for sy, sx in starts: near_end |= np.hypot(yy - sy, xx - sx) <= 9
     bad |= t['town_mask'][sl] & ~near_end
     e = el[sl]
-    ok = ~(_filter3(bad.astype(np.uint8), np.max).astype(bool)) & ((_filter3(e, np.max) - _filter3(e, np.min)) <= 4)
+    ok = ~(_filter3(bad.astype(np.uint8), np.max).astype(bool))
+    if not rough: ok &= ((_filter3(e, np.max) - _filter3(e, np.min)) <= 4)
     reuse_m = np.zeros(ok.shape, bool)
     for (ry, rx) in reuse:
         if y0 <= ry <= y1 and x0 <= rx <= x1: reuse_m[ry - y0, rx - x0] = True
@@ -55,6 +64,13 @@ def find_path(t, start, goal, margin=60, reuse=None, partial=False):
     for _ in range(PARALLEL_RANGE): near_reuse = _filter3(near_reuse.astype(np.uint8), np.max).astype(bool)
     cost_tile = np.where(water, WATER_COST, 1.0) + np.where(near_reuse & ~reuse_m, PARALLEL_COST, 0.0)
     cost_tile = np.where(reuse_m, REUSE_COST, cost_tile)
+    if rough:   # 山・岩山・針葉樹・森林・雪も通る（地形を、道に沿って少し直す）。山道（すでにある道）は、通りやすい
+        cost_tile = cost_tile + np.where(np.isin(t['biome'][sl], (T.SNOW, T.CONIFER, T.FOREST, T.ROCK)), ROUGH_COST, 0.0)
+        cost_tile = cost_tile + np.where(arena_m, ARENA_COST, 0.0)
+        cost_tile = np.where(t['trail'][sl] & ~reuse_m, np.minimum(cost_tile, TRAIL_COST), cost_tile)
+    if penal:   # 循環する道: すでにある街道は、使わない（別の道を通す）。重ならないよう費用を上乗せ
+        for (ry, rx) in penal:
+            if y0 <= ry <= y1 and x0 <= rx <= x1: cost_tile[ry - y0, rx - x0] += PENAL_COST
     h, w = ok.shape
     g = (goal[0] - y0, goal[1] - x0)
     DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))
@@ -74,8 +90,8 @@ def find_path(t, start, goal, margin=60, reuse=None, partial=False):
             v = (u[0] + dy, u[1] + dx)
             if not (0 <= v[0] < h and 0 <= v[1] < w) or not ok[v]: continue
             dz = abs(int(e[v]) - int(e[u]))
-            if dz > 1: continue
-            nc = c + cost_tile[v] + dz * SLOPE_COST + (TURN_COST if nd != d and not (reuse_m[u] and reuse_m[v]) else 0.0)
+            if dz > (ROUGH_DZ if rough else 1): continue
+            nc = c + cost_tile[v] + dz * SLOPE_COST * (2 if rough else 1) + (TURN_COST if nd != d and not (reuse_m[u] and reuse_m[v]) else 0.0)
             if nc < dist.get((v, nd), 1e18):
                 dist[(v, nd)] = nc; prev[(v, nd)] = (u, d); heapq.heappush(pq, (nc, v, nd))
     if end is None and partial and dist:   # 行けない（砂漠・山・大森林で、道が作れない）: 作れる所まで。目的地にいちばん近い（直線距離）、行ける所を、道の終わりにする
@@ -178,3 +194,34 @@ def end_sign(t, obj, end, goal, name, note):
             obj[y, x] = ord(SIGN_CH)
             return (y, x), msg
     raise AssertionError(f'道の終わりの立て札を置く空きマスがない {end}')
+
+
+def flatten(elev, path, pinned=None):
+    """道の中心線の高さを、隣どうしで 1 以下の段差のなだらかな坂にして（もとの高さになるべく近く）、道の幅 3 マスに、その高さを敷き、
+    まわりの地形を、隣どうしの段差 1 以下でなだらかにつなぐ（山の斜面を、道に沿って少し削る・盛る）。pinned: 直さないマス（水・海・橋のまわり。水の高さは 0 のまま）。
+    戻り値: 直したマス数"""
+    H, W = elev.shape
+    before = elev.copy()
+    h = [int(elev[c]) for c in path]
+    for i in range(1, len(h)): h[i] = min(max(h[i], h[i - 1] - 1), h[i - 1] + 1)
+    for i in range(len(h) - 2, -1, -1): h[i] = min(max(h[i], h[i + 1] - 1), h[i + 1] + 1)
+    for (y, x), v in zip(path, h):
+        for dy in range(-1, 2):
+            for dx in range(-1, 2):
+                yy, xx = y + dy, x + dx
+                if 0 <= yy < H and 0 <= xx < W and not (pinned is not None and pinned[yy, xx]): elev[yy, xx] = v
+    ys, xs = [c[0] for c in path], [c[1] for c in path]
+    y0, y1, x0, x1 = max(0, min(ys) - 60), min(H, max(ys) + 61), max(0, min(xs) - 60), min(W, max(xs) + 61)
+    sub = elev[y0:y1, x0:x1].astype(np.int32)
+    fixed = pinned[y0:y1, x0:x1].copy() if pinned is not None else np.zeros(sub.shape, bool)
+    fixed[0, :] = fixed[-1, :] = fixed[:, 0] = fixed[:, -1] = True   # 範囲の端は、直さない
+    for _ in range(400):   # 隣どうしの段差 1 以下になるまで、直さないマス以外を、隣に合わせる
+        p_ = np.pad(sub, 1, mode='edge')
+        nb = np.stack([p_[:-2, 1:-1], p_[2:, 1:-1], p_[1:-1, :-2], p_[1:-1, 2:]])
+        lo, hi = nb.max(axis=0) - 1, nb.min(axis=0) + 1
+        new = np.where(lo <= hi, np.clip(sub, lo, hi), hi)
+        new = np.where(fixed, sub, new)
+        if (new == sub).all(): break
+        sub = new
+    elev[y0:y1, x0:x1] = sub.astype(elev.dtype)
+    return int((elev != before).sum())
