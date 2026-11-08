@@ -51,67 +51,67 @@
   "w": "water"
  },
  "layout": [
-  "WWWWWWWWWWWWWWWWWWWCCWWWWWWWWWWWWWWWWWWW",
-  "WpTppppppppppppppp====pppppppppppppppTpW",
-  "WpHHHHpHHHHpIIIIpp====pppppSSSSpSSSSpppW",
-  "WpHHHHpHHHHpIIIIpp====pppppSSSSpSSSSpppW",
-  "WpHHHHpHHHHpINIIpp====pppppSdSSpSdSSpppW",
-  "WpppppppppppppMppp====pppppppkpppprppppW",
-  "Wpppppppppppppppfp====pvpppppppppppppppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "Wppppppppppppppppp====ppppppJJJJJJJJpppW",
-  "WpSSSSpSSSSpSSSSpp====ppppppJJJJJJJJpppW",
-  "WpSSSSpSSSSpSSSSpp====ppppppJJJDJJJJpppW",
-  "WpSdSSpSdSSpSdSSpp====ppppfpppppcppppvpW",
-  "WpppqppppQppppappp====pppppppppppppppppW",
-  "W==================FF==================W",
-  "W==================FF==================W",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WTppppppppppppppppppppppppppppppppppppTW",
+  "WppppppppppppppppppppppppppppppppppppppW",
+  "WppppppppppppppppppppppppppppppppppppppW",
+  "WppSSSSpSSSSpJJJJJJJJppSSSSpSSSSpSSSSppW",
+  "WppSSSSpSSSSpJJJJJJJJppSSSSpSSSSpSSSSppW",
+  "WppSdSSpSdSSpJJJDJJJJppSdSSpSdSSpSdSSppW",
+  "W====q====Q======c=======a====k====r===W",
   "W======================================W",
-  "Wppppppppppppppfpp====ppvppppppppppppppW",
-  "WpHHHHpHHHHpppppTp====pTpppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
-  "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
-  "WpTppppppppppppppp====pppppppppppppppTpW",
+  "Wp==HHHHHHHH==pppppppppppp==HHHHHHHH==pW",
+  "Wp==HHHHHHHH==pppppppppppp==HHHHHHHH==pW",
+  "Wp==HHHHHHHH==ppWWWWWWWWpp==HHHHHHHH==pW",
+  "Wp==pppppppp==ppWWWWWWWWpp==pppppppp==pW",
+  "Wp==HHHHHHHH==ppWWWWWWWWpp==HHHHHHHH==pW",
+  "Wp==HHHHHHHH==ppWWWWWWWWpp==HHHHHHHH==pW",
+  "Wp==HHHHHHHH==ppWWWWWWWWpp==HHHHHHHH==pW",
+  "Wp==HHHHpppp==ppWWWCCWWWpp==HHHHHHHH==pW",
+  "Wp==HHHHpppp==pppppppppppp==HHHHHHHH==pW",
+  "Wp==HHHHpppp==pppppppppppp==HHHHHHHH==pW",
+  "Wp==pIIIIppp================pppppppp==pW",
+  "Wp==pIIIIppp================pppppppp==pW",
+  "Wp==pINIIpppppvpppp==ppppfpppppppppp==pW",
+  "W======M===============================W",
+  "W======================================W",
+  "Wpppppppppppppppppp==ppppppppppppppppppW",
+  "WppHHHHpHHHHpHHHHpp==ppHHHHpHHHHpHHHHppW",
+  "WppHHHHpHHHHpHHHHpp==ppHHHHpHHHHpHHHHppW",
+  "WppHHHHpHHHHpHHHHpp==ppHHHHpHHHHpHHHHppW",
+  "WTppppppppppppppppp==pfpppppppppppppppTW",
   "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
  ],
  "npcs": [
   {
    "id": "town_man",
    "x": 6,
-   "z": 17
+   "z": 8
   },
   {
    "id": "town_old_woman",
-   "x": 12,
-   "z": 17
+   "x": 30,
+   "z": 8
   },
   {
    "id": "town_middle_woman",
-   "x": 28,
-   "z": 13
+   "x": 12,
+   "z": 22
   },
   {
    "id": "junior_merchant_woman",
    "x": 24,
-   "z": 9
+   "z": 22
   },
   {
    "id": "elder_woman",
-   "x": 6,
-   "z": 25
+   "x": 3,
+   "z": 15
   },
   {
    "id": "child_boy",
    "x": 15,
-   "z": 21
+   "z": 8
   },
   {
    "id": "guard_spear",
@@ -125,13 +125,13 @@
   },
   {
    "id": "gate_guard",
-   "x": 17,
-   "z": 1
+   "x": 18,
+   "z": 17
   },
   {
    "id": "gate_guard",
-   "x": 22,
-   "z": 1
+   "x": 21,
+   "z": 17
   }
  ],
  "links": {
@@ -153,25 +153,25 @@
     "angle": 3.14159
    }
   },
-  "19,0": {
+  "19,16": {
    "nextMap": "castle_a",
    "message": "王城に入る",
    "back": {
     "x": 19,
-    "z": 1,
+    "z": 17,
     "angle": 3.14159
    }
   },
-  "20,0": {
+  "20,16": {
    "nextMap": "castle_a",
    "message": "王城に入る",
    "back": {
     "x": 20,
-    "z": 1,
+    "z": 17,
     "angle": 3.14159
    }
   },
-  "3,12": {
+  "4,6": {
    "nextMap": "shop",
    "params": {
     "shopId": "item_shop"
@@ -179,12 +179,12 @@
    "message": "道具屋に入る",
    "icon": "itemShopIcon",
    "back": {
-    "x": 3,
-    "z": 13,
+    "x": 4,
+    "z": 7,
     "angle": 3.14159
    }
   },
-  "8,12": {
+  "9,6": {
    "nextMap": "shop",
    "params": {
     "shopId": "weapon_shop"
@@ -192,76 +192,76 @@
    "message": "武器屋に入る",
    "icon": "weaponShopIcon",
    "back": {
-    "x": 8,
-    "z": 13,
+    "x": 9,
+    "z": 7,
     "angle": 3.14159
    }
   },
-  "13,12": {
-   "nextMap": "guild_adv",
-   "message": "冒険者ギルドに入る",
-   "icon": "advGuildIcon",
-   "back": {
-    "x": 13,
-    "z": 13,
-    "angle": 3.14159
-   }
-  },
-  "13,4": {
-   "nextMap": "city_inn",
-   "message": "宿屋・酒場に入る",
-   "icon": "innIcon",
-   "back": {
-    "x": 13,
-    "z": 5,
-    "angle": 3.14159
-   }
-  },
-  "33,4": {
-   "nextMap": "guild_training",
-   "message": "職業訓練所に入る",
-   "icon": "trainingIcon",
-   "back": {
-    "x": 33,
-    "z": 5,
-    "angle": 3.14159
-   }
-  },
-  "31,11": {
+  "16,6": {
    "nextMap": "temple",
    "message": "神殿に入る",
    "icon": "templeIcon",
    "back": {
-    "x": 31,
-    "z": 12,
+    "x": 16,
+    "z": 7,
     "angle": 3.14159
    }
   },
-  "28,4": {
+  "24,6": {
+   "nextMap": "guild_adv",
+   "message": "冒険者ギルドに入る",
+   "icon": "advGuildIcon",
+   "back": {
+    "x": 24,
+    "z": 7,
+    "angle": 3.14159
+   }
+  },
+  "29,6": {
    "nextMap": "guild_smith",
    "message": "鍛冶屋に入る",
    "icon": "smithIcon",
    "back": {
-    "x": 28,
-    "z": 5,
+    "x": 29,
+    "z": 7,
+    "angle": 3.14159
+   }
+  },
+  "34,6": {
+   "nextMap": "guild_training",
+   "message": "職業訓練所に入る",
+   "icon": "trainingIcon",
+   "back": {
+    "x": 34,
+    "z": 7,
+    "angle": 3.14159
+   }
+  },
+  "6,21": {
+   "nextMap": "city_inn",
+   "message": "宿屋・酒場に入る",
+   "icon": "innIcon",
+   "back": {
+    "x": 6,
+    "z": 22,
     "angle": 3.14159
    }
   }
  },
  "heights": [
-  "0000000000000000000110000000000000000000",
+  "0000000000000000000000000000000000000000",
   "0111111111111111111111111111111111111110",
   "0122222222222222111222222222222222222210",
-  "0232222322223222222333322223222232222320",
-  "0232222322223222222333322223222232222320",
-  "0232222322223222222333322223222232222320",
-  "0233222332223322222333332222322233222320",
-  "0233323333233332222333333323332333323320",
+  "0121111211112111111233211112111121111210",
+  "0121111211112111111233211112111121111210",
+  "0121111211112111111233211112111121111210",
+  "0122211222112211111233322111221122211210",
+  "0122212222123321111233332212321222212210",
   "0122222222223332111223333323322222222210",
-  "0112222222222322111112332233333333333320",
-  "0122222222222332111111232233333333333320",
-  "0122222222223222111111222233333233333220",
-  "0121111222222111111112211123222232222220",
+  "0112222222222322111112332233222222222210",
+  "0122222222222332111111232232222222222210",
+  "0122222222223222111111222222222222222110",
+  "0121111222222111111112211112111121111110",
   "0111111222222111111222211112111121111110",
   "0111111222222111111222211112111121111110",
   "0111111222222222111222221112211122211110",
@@ -270,10 +270,10 @@
   "0111111111112111111222222222222221111110",
   "0111111111112111111222222222222221111110",
   "0111111111112111111222222222222221111110",
-  "0111111112222222111111222222222211111110",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0111111122222222111111222222222211111110",
+  "0111111112222222111222222222222221111110",
+  "0111111122222222111222222222222221111110",
+  "0111111122222222111222222222222221111110",
+  "0111111122222222111222222222222221111110",
   "0111111122222222111222222222222211111110",
   "0111111112222222111222222222221111111110",
   "0111111111222222111222222222211111111110",
