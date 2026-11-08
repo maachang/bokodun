@@ -264,12 +264,12 @@
  },
  "npcs": [
   {
-   "id": "guard_spear",
+   "id": "snow_gate_guard",
    "x": 8,
    "z": 40
   },
   {
-   "id": "guard_light",
+   "id": "snow_gate_guard",
    "x": 11,
    "z": 40
   }

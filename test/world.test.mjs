@@ -1907,3 +1907,18 @@ test('配置: 本棚・食器棚（背の高い家具）の、すぐ後ろ・隣
     }
     assert.deepEqual(bad, []);
 });
+
+test('A（キュラビッド帝国）: 外に出ている人は、すべて寒冷地の装備（snow_*）。寒冷地の人は、建物の中（A の外以外のマップ）にいない', () => {
+    const dir = path.join(root, 'public/data/maps');
+    const A_OUT = ['town_a.json', 'w_02_13.json'];   // 帝国の街の中と、帝国の街の外の門
+    const town = readJson('public/data/maps/town_a.json');
+    assert.ok(town.npcs.length > 0);
+    for (const n of town.npcs) assert.ok(/^snow_/.test(n.id), `town_a の ${n.id}: 帝国の外の人は、寒冷地の装備（snow_*）だけ`);
+    for (const f of fs.readdirSync(dir).filter(f => f.endsWith('.json'))) {
+        if (f === 'town_a.json') continue;
+        const m = readJson(`public/data/maps/${f}`);
+        for (const n of m.npcs || []) {
+            if (/^snow_/.test(n.id)) assert.ok(/^w_/.test(f) && A_OUT.includes(f) || false, `${f}: 寒冷地の人 ${n.id} が、帝国の外（街の門の外）以外にいる`);
+        }
+    }
+});
