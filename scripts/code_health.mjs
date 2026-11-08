@@ -42,9 +42,19 @@ export function measure(file) {
         const name = m && (m[1] ?? m[2]);
         if (name && !['if', 'for', 'while', 'switch', 'catch', 'function'].includes(name)) heads.push([i, name]);
     });
+    // JS は、波かっこの対応で、関数の終わりを求める（最後の関数に、後ろの `};` などが入らない）。Python は、次の定義の手前まで
+    const jsEnd = (i) => {
+        let depth = 0, started = false;
+        for (let j = i; j < lines.length; j++) {
+            const t = lines[j].replace(/'(?:\\.|[^'\\])*'|"(?:\\.|[^"\\])*"|`(?:\\.|[^`\\])*`|\/\/.*/g, '');
+            for (const ch of t) { if (ch === '{') { depth++; started = true; } else if (ch === '}') depth--; }
+            if (started && depth <= 0) return j + 1;
+        }
+        return lines.length;
+    };
     const seen = {};
     const funcs = heads.map(([i, name], k) => {
-        const end = k + 1 < heads.length ? heads[k + 1][0] : lines.length;
+        const end = file.endsWith('.py') ? (k + 1 < heads.length ? heads[k + 1][0] : lines.length) : jsEnd(i);
         seen[name] = (seen[name] ?? 0) + 1;
         return { name: seen[name] > 1 ? `${name}#${seen[name]}` : name, lines: end - i };
     });

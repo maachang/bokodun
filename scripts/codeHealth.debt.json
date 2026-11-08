@@ -10,11 +10,6 @@
       "bytes": 92114,
       "plan": "Monster（update 877 行）の行動を、敵の種類ごとの部品（enemyBehavior.js の方式）へ分ける。Monster・Projectile を別ファイルにする"
     },
-    "public/js/game.js": {
-      "lines": 2135,
-      "bytes": 114705,
-      "plan": "機能ごとに public/js/game/ へ分割する（タイルの描画は完了）。次の順: ①毎フレームの更新（update: 移動・攻撃・罠・敵・カメラ）②ミニマップ・HUD・方角 ③マップ読み込みの補助（buildNeighborDecor・buildOutsideGround・buildHeightTerrain）④店・会話のメニュー ⑤入力（initControls）。1 つ移すごとに、bun test と、ブラウザで全種類のマップの読み込み確認（.claudeWork/verify_maps.mjs）をして、コミットする"
-    },
     "public/js/textures.js": {
       "lines": 2603,
       "bytes": 105606,
@@ -28,43 +23,35 @@
   },
   "funcs": {
     "public/js/enemyBehavior.js::deriveProfile": {
-      "lines": 142,
+      "lines": 139,
       "plan": "敵のプロファイルの決め方を、表（データ）にして、条件分岐を減らす"
     },
     "public/js/entities.js::constructor": {
-      "lines": 152,
+      "lines": 150,
       "plan": "敵の種類ごとの初期値を、データの表へ"
     },
     "public/js/entities.js::update": {
-      "lines": 877,
+      "lines": 875,
       "plan": "Monster.update を、段階（感知・移動・攻撃・状態の遷移）ごとの関数に分け、敵の種類ごとの行動は、enemyBehavior.js 方式の部品へ"
     },
     "public/js/game.js::constructor": {
-      "lines": 112,
+      "lines": 111,
       "plan": "初期化を、段階（描画・入力・状態・UI）ごとの関数に分ける"
     },
-    "public/js/game.js::initTextures": {
-      "lines": 168,
-      "plan": "テクスチャの表（名前 → 作る関数）にして、使うときに作る（遅延生成）。textures.js の分割と同時に"
-    },
-    "public/js/game.js::initControls": {
-      "lines": 134,
-      "plan": "入力の種類（キー・マウス・タッチ・ボタン）ごとの関数に分ける"
-    },
     "public/js/game.js::loadMapBody": {
-      "lines": 317,
+      "lines": 313,
       "plan": "タイルの描画は分割済み（1769 → 317 行）。残りの準備（床・天井・影・NPC・敵・リンク）を、段階ごとの関数にして 100 行以下へ"
     },
     "public/js/game/tilesFloors.js::liquid_tile": {
-      "lines": 123,
+      "lines": 121,
       "plan": "水・溶岩・沼など、液体の種類ごとの関数に分ける"
     },
     "public/js/slashEffect.js::spawn": {
-      "lines": 221,
+      "lines": 220,
       "plan": "斬撃の種類ごとの関数に分ける（表で呼び分ける）"
     },
     "public/js/textures.js::drawShopMark": {
-      "lines": 140,
+      "lines": 138,
       "plan": "店の種類（武器・道具・酒場・宿）ごとの描画を、表で呼び分ける"
     },
     "scripts/world/gen_world.py::build_tiles": {
@@ -84,8 +71,16 @@
       "plan": "共通部品（壁・門・川・施設・段差の確認・飾り）を town_common.py へ。E・H・B・C の重複も、同時に解消する"
     },
     "public/js/game/mapScenery.js::buildNeighborDecor": {
-      "lines": 200,
+      "lines": 198,
       "plan": "物体の種類ごとの描画の呼び分けを表にして、繰り返しを減らす（visual* を使う形はそのまま）"
+    },
+    "public/js/game/controls.js::initControls": {
+      "lines": 131,
+      "plan": "入力の種類（キー・マウス・タッチ・ボタン）ごとの関数に分ける"
+    },
+    "public/js/game/textureSetup.js::initTextures": {
+      "lines": 167,
+      "plan": "テクスチャの表（名前 → 作る関数）にして、使うときに作る（遅延生成）。textures.js の分割と同時に"
     }
   }
 }
