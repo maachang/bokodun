@@ -5,7 +5,7 @@ import numpy as np
 import terrain as T
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
-from world_consts import ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
+from world_consts import BRIDGE_NEAR, ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
 
 
 def _tiles_snowFoothills(g):
@@ -352,6 +352,12 @@ def _tiles_roads(g):
             print('道の終わりの立て札', pos, msg)
         ROAD_INFO[goal] = {'gate': list(gate_pt(goal)), 'end': list(path[-1]), 'partial': bool(partial), **({'note': ROAD_PARTIAL[goal]} if partial else {})}
         print(f'街道 {ROAD_TOWNS[0] if k == 1 else "網"}→{goal}: 中心線 {len(path)} マス（新しく {len(new_tiles)}）・石畳 {n_road}・石の橋 {n_bridge}')
+    # 石の橋のそば（BRIDGE_NEAR マス以内）の、もとからある木の橋（plank_bridge）は、無効（川に戻す）。石の橋と、二重の橋にならない
+    near_stone = T.box_mean((obj == ord(roads.BRIDGE_CH)).astype(np.float32), BRIDGE_NEAR) > 0
+    old = near_stone & (obj == ord('Z'))
+    obj[old] = ord('Q')
+    t['bridge'] = t['bridge'] & ~old
+    print(f'石の橋のそばの木の橋を無効に: {int(old.sum())} マス')
     import json
     ROAD_INFO[ROAD_TOWNS[0]] = {'gate': list(gate_pt(ROAD_TOWNS[0])), 'end': list(gate_pt(ROAD_TOWNS[0])), 'partial': False}
     with open(os.path.join(ROOT, 'public', 'data', 'world_roads.json'), 'w', encoding='utf-8') as fp:   # 街道の基準データ（今後の町・村づくりが、この道を基準にする）

@@ -1944,3 +1944,18 @@ test('A（キュラビッド帝国）: 外に出ている人は、すべて寒�
         }
     }
 });
+
+test('街道: 石の橋のそば（12 マス以内）に、もとからある木の橋（plank_bridge）は残さない（二重の橋にしない）', () => {
+    const MESH = 64, stone = [], plank = [];
+    for (const f of fs.readdirSync(path.join(root, 'public/data/maps')).filter(n => /^w_\d\d_\d\d\.json$/.test(n))) {
+        const m = readJson(`public/data/maps/${f}`);
+        const [, j, i] = f.match(/^w_(\d\d)_(\d\d)/).map(Number);
+        m.layout.forEach((row, r) => [...row].forEach((ch, c) => {
+            const n = m.legend[ch];
+            if (n === 'stone_bridge') stone.push([i * MESH + c, j * MESH + r]);
+            if (n === 'plank_bridge') plank.push([i * MESH + c, j * MESH + r]);
+        }));
+    }
+    assert.ok(stone.length > 50);
+    for (const [px, py] of plank) assert.ok(!stone.some(([sx, sy]) => Math.abs(sx - px) <= 12 && Math.abs(sy - py) <= 12), `木の橋 (${px},${py}) が、石の橋のそばに残っている`);
+});
