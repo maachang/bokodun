@@ -3,15 +3,13 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { copyGameModules } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 
 async function loadSoundFX() {
-    const src = fs.readFileSync(path.join(projectRoot, 'public/js/audio.js'), 'utf-8')
-        .replace("'/js/three.module.js'", JSON.stringify(path.join(projectRoot, 'public/js/three.module.js')));
-    const tmp = path.join(fs.mkdtempSync(path.join(os.tmpdir(), 'footstep-')), 'audio.mjs');
-    fs.writeFileSync(tmp, src);
-    return (await import(tmp)).SoundFX;
+    const dir = copyGameModules('footstep-');   // public/js 全体の一時コピー（import は一時コピーの絶対パスに読み替え済み）
+    return (await import(path.join(dir, 'audio.js'))).SoundFX;
 }
 
 // Web Audio の最小モック（生成されたノードの数だけ数える）

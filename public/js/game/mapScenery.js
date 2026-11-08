@@ -5,6 +5,10 @@ import { worldNeighbor } from '/js/world.js';
 import { fetchMap } from '/js/mapFormat.js';
 import { NEIGHBOR_TERRAIN_RANGE, NEIGHBOR_OBJECT_RANGE, NEIGHBOR_PLANT_RANGE } from '/js/game/constants.js';
 
+// ---- 見た目の共通部品 ----
+//   今のマップの描画（タイルのループ）と、隣のマップの先読み描画（buildNeighborDecor）が、同じ関数で見た目を作る。
+//   新しい種類は、ここに見た目を書けば、両方に出る。当たり判定・対話の登録は、今のマップの側だけ。
+//   env: { rows, cols, wallH, tileSize, brickMat, standardWallGeo, charAt(列, 行)（範囲外は undefined）, defOf(文字)（物体の定義）, add(obj, isStatic) }
 export const mapSceneryMethods = {
     // 起伏のある地面: 高くなっているマスの上面と、低い隣との境の側面を作る。
     //   段差 1 は、地面と同じ模様の側面（歩いて上れる）。段差 2 以上は、崖（岩肌。mapData.cliffTexture、省略は cliffGray）

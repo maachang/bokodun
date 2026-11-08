@@ -1,11 +1,5 @@
 {
-  "files": {
-    "public/js/audio.js": {
-      "lines": 963,
-      "bytes": 36234,
-      "plan": "音の種類（足音・戦闘・環境・UI）ごとに、ファイルを分ける"
-    }
-  },
+  "files": {},
   "funcs": {
     "public/js/enemyBehavior.js::deriveProfile": {
       "lines": 139,

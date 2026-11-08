@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
-import { gameSource, texturesSource } from './helpers/game.mjs';
+import { gameSource, texturesSource, audioSource, entitiesSource } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 
@@ -95,9 +95,9 @@ test('1. JSON Schema & Integrity Validation', async (t) => {
 });
 
 test('2. Audio Method Integrity Check (prevents TypeError: this.sound.xxx)', async (t) => {
-    const audioJs = fs.readFileSync(path.join(projectRoot, 'public/js/audio.js'), 'utf-8');
+    const audioJs = audioSource();
     const gameJs = gameSource();
-    const entitiesJs = fs.readFileSync(path.join(projectRoot, 'public/js/entities.js'), 'utf-8');
+    const entitiesJs = entitiesSource();
 
     // Extract all methods defined in SoundFX class
     const methodMatches = audioJs.matchAll(/^\s*([a-zA-Z0-9_]+)\s*\([^)]*\)\s*\{/gm);
@@ -170,7 +170,7 @@ test('4. Variable Scope & Syntax Static Analysis', async (t) => {
         'public/js/particles.js',
         'public/js/sdAssetManager.js',
         // 分割した部品（public/js/game/*.js・public/js/textures/*.js）も、すべて検査する
-        ...['game', 'textures'].flatMap(d => fs.readdirSync(path.join(projectRoot, 'public/js', d)).filter(f => f.endsWith('.js')).map(f => `public/js/${d}/${f}`))
+        ...['game', 'textures', 'audio', 'monster'].flatMap(d => fs.readdirSync(path.join(projectRoot, 'public/js', d)).filter(f => f.endsWith('.js')).map(f => `public/js/${d}/${f}`))
     ];
 
     for (const file of jsFiles) {
