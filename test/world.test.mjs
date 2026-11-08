@@ -1793,13 +1793,13 @@ test('兵士: F（獣人国）はコボルト（sdServer 11）。G（エルフ�
     }
 });
 
-test('G: 世界樹のまわりを、柵で、4 辺とも囲って入れない（x 18〜21・y 13〜16 の外周と中。木は 1 マス）。通りは、柵の両脇へ迂回して行き来できる', () => {
+test('G: 世界樹のまわりを、柵で、「ロ」の形に隙間なく囲って入れない（木 1 マスのまわり 8 マス。中は木だけ）。大通りは東の列、東西の通りは南の列が通れる', () => {
     const m = readJson('public/data/maps/town_g.json');
     assert.equal(m.layout[14][19], 'Y');
     assert.equal(objects[m.legend.j].type, 'wooden_fence');
     assert.equal(objects[m.legend.j].solid, true, '柵は通れない');
-    for (let y = 13; y <= 16; y++) for (let x = 18; x <= 21; x++) if (!(x === 19 && y === 14)) assert.equal(m.layout[y][x], 'j', `(${x},${y}) は柵（隙間がない）`);
-    // 迂回: 柵の西（x 16・17）・東（x 22・23）の列は、通れる
-    for (let y = 13; y <= 17; y++) for (const x of [16, 17, 22, 23]) assert.ok('p='.includes(m.layout[y][x]), `(${x},${y}) は通れる（迂回路）`);
-    for (const x of [16, 17, 22]) assert.ok('p='.includes(m.layout[12][x]), `(${x},12) は通れる（迂回路。東の長老の家の手前まで）`);
+    for (let y = 13; y <= 15; y++) for (let x = 18; x <= 20; x++) if (!(x === 19 && y === 14)) assert.equal(m.layout[y][x], 'j', `(${x},${y}) は柵（隙間がない）`);
+    assert.equal(m.layout.join('').split('j').length - 1, 8, '柵は 8 マスだけ（「ロ」。詰まった「#」にしない）');
+    for (let y = 12; y <= 17; y++) assert.ok('p='.includes(m.layout[y][21]), `(21,${y}) は通れる（大通りの東の列）`);
+    for (let x = 1; x <= 38; x++) assert.ok('p='.includes(m.layout[16][x]), `(${x},16) は通れる（東西の通りの南の列）`);
 });

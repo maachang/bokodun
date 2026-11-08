@@ -63,8 +63,8 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
         for x in (19, 20):
             for y in (14, 15): g[y][x] = 'p'
         g[14][19] = 'Y'
-        for y in range(13, 17):   # 世界樹のまわりの柵: 木のある 2×2 を、4 辺とも囲う（x 18〜21・y 13〜16 の外周と、中の 3 マス）。通りは、柵の両脇（x 16・17 / 22・23 の列）へ迂回する
-            for x in range(18, 22):
+        for y in range(13, 16):   # 世界樹のまわりの柵: 木の 1 マスの、まわり 8 マスを、「ロ」の形に囲う（中は木だけ。大通りは、東の列 x=21 と、南の通り y=16 が、通れる）
+            for x in range(18, 21):
                 if (x, y) != (19, 14): g[y][x] = 'j'
     if castle: g[0][19] = g[0][20] = 'C'   # 城門（castle は、中の王城のマップ名。True なら共通の castle。G は、城を置かない）
     for x in ((19, 20) if castle else ()):
