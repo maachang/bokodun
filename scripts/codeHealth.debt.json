@@ -21,10 +21,6 @@
       "lines": 124,
       "plan": "共通部品（壁・門・川・施設・段差の確認・飾り）を town_common.py へ。E・H・B・C の重複も、同時に解消する"
     },
-    "public/js/game/mapScenery.js::buildNeighborDecor": {
-      "lines": 198,
-      "plan": "物体の種類ごとの描画の呼び分けを表にして、繰り返しを減らす（visual* を使う形はそのまま）"
-    },
     "public/js/game/controls.js::initControls": {
       "lines": 131,
       "plan": "入力の種類（キー・マウス・タッチ・ボタン）ごとの関数に分ける"

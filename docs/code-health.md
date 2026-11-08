@@ -19,10 +19,16 @@
 2. **定期の見直し**: 大きな機能を足したあと・節目ごとに、`bun scripts/code_health.mjs` を実行して、負債の合計と優先順位を確認する。報告して、次に分割するものを決める。
 3. **分割の手順**（1 回に 1 つ。毎回コミット）:
    - 移すのは、まとまった塊（描画の種類・機能・段階）。**中身は変えず、移すだけ**にする（挙動の変更と分けて、確認しやすくする）。
-   - `bun test`（テストは、`test/helpers/game.mjs` の `gameSource()`・`copyGameModules()` で、分割に強い読み方をする）。
+   - `bun test`（テストは、`test/helpers/game.mjs` の `gameSource()`・`copyGameModules()` で、分割に強い読み方をする）。**`test/scope_check.test.mjs`（`scripts/scope_check.mjs`）が、分割で、使っている変数の宣言を取りこぼしていないか（移した先で未定義）を、描画を実行せずに見つける**（描画のコードは、テストでは実行されないため）。
    - 描画に関わる分割は、**ブラウザの確認**: maachang を起動して `PROF=$(mktemp -d) bun scripts/verify_maps.mjs`（全種類のタイルを含むマップを順に読み込み、例外・エラーがないことを確かめる）。
    - 台帳を `--tighten` して、コミット。
 4. 外から見える名前（`export`）は、分割しても、これまでの場所から読めるようにする（`game.js` から再公開）。
+
+## 分割で気をつけること（今回の経験から）
+- コメント（`//`・`/** */`）は、メソッドと一緒に移す（取り残さない）。
+- 関数の中の `return`・`break`・`continue`、外側の変数への代入は、関数に分けると意味が変わる。道具（`.claudeWork` の分割スクリプト）は、これらを検出して止まる。
+- テストが「通る」ことと、描画が「同じ」ことは、別。描画に関わる分割は、`scripts/verify_maps.mjs`（エラーなし）と、メッシュ数・頂点数・材質数の分割前後の比較（`.claudeWork/scene_stats.mjs` の方法）で確かめる。
+- コミットは、テストの成功を確認してから（`&&` でつなぐと、失敗を素通りする）。
 
 ## 現状と優先順位
 `bun scripts/code_health.mjs` を実行すると、最新が出る。2026-11-08 時点: game.js のタイル描画（`loadMapBody` の 34 種類）を、`public/js/game/tiles*.js` へ分割済み（`loadMapBody` 1769 → 317 行・game.js 5735 → 4283 行）。次の候補は、台帳の plan の順（`update`・`textures.js`・`entities.js`）。
