@@ -1319,7 +1319,7 @@
     "sdId": 291,
     "texture": "/images/npcs/desert_man.png",
     "height": 2.3,
-    "aspect": 0.365,
+    "aspect": 0.355,
     "radius": 0.5,
     "speed": 0.9,
     "wanderRadius": 3.0,
@@ -1333,7 +1333,7 @@
     "sdId": 292,
     "texture": "/images/npcs/desert_old_man.png",
     "height": 2.1,
-    "aspect": 0.373,
+    "aspect": 0.389,
     "radius": 0.5,
     "speed": 0.5,
     "wanderRadius": 2.0,
@@ -1361,7 +1361,7 @@
     "sdId": 294,
     "texture": "/images/npcs/desert_middle_man.png",
     "height": 2.3,
-    "aspect": 0.4,
+    "aspect": 0.377,
     "radius": 0.5,
     "speed": 0.8,
     "wanderRadius": 3.0,
@@ -1389,7 +1389,7 @@
     "sdId": 296,
     "texture": "/images/npcs/desert_boy.png",
     "height": 1.6,
-    "aspect": 0.355,
+    "aspect": 0.357,
     "radius": 0.5,
     "speed": 1.3,
     "wanderRadius": 4.0,
@@ -1403,7 +1403,7 @@
     "sdId": 297,
     "texture": "/images/npcs/desert_girl.png",
     "height": 1.55,
-    "aspect": 0.353,
+    "aspect": 0.422,
     "radius": 0.5,
     "speed": 1.3,
     "wanderRadius": 4.0,
@@ -1907,7 +1907,7 @@
     "sdId": 301,
     "texture": "/images/npcs/elf_elder_woman.png",
     "height": 2.3,
-    "aspect": 0.6,
+    "aspect": 0.551,
     "radius": 0.5,
     "speed": 0.3,
     "wanderRadius": 1.0,
@@ -2515,6 +2515,104 @@
     "wanderRadius": 0.0,
     "lines": [
       "……止まれ。ミレニアム自由都市へ、ようこそ。"
+    ]
+  },
+  "snow_man": {
+    "name": "寒冷地の住民（男）",
+    "sdId": 331,
+    "texture": "/images/npcs/snow_man.png",
+    "height": 2.3,
+    "aspect": 0.433,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "今日も冷えるな。帝都の城塞は、雪にも負けない。",
+      "山道が閉ざされる前に、薪を集めておけよ。"
+    ]
+  },
+  "snow_woman": {
+    "name": "寒冷地の住民（女）",
+    "sdId": 330,
+    "texture": "/images/npcs/snow_woman.png",
+    "height": 2.2,
+    "aspect": 0.458,
+    "radius": 0.5,
+    "speed": 0.9,
+    "wanderRadius": 3.0,
+    "lines": [
+      "寒くないかい？ 温かい物を食べていきなさい。",
+      "吹雪の夜は、外へ出てはだめよ。"
+    ]
+  },
+  "snow_old_man": {
+    "name": "寒冷地の住民（高齢男）",
+    "sdId": 332,
+    "texture": "/images/npcs/snow_old_man.png",
+    "height": 2.0,
+    "aspect": 0.497,
+    "radius": 0.5,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "わしの若い頃は、もっと雪が深かった。",
+      "この城塞は、帝王様の誇りだ。"
+    ]
+  },
+  "snow_old_woman": {
+    "name": "寒冷地の住民（高齢女）",
+    "sdId": 333,
+    "texture": "/images/npcs/snow_old_woman.png",
+    "height": 1.9,
+    "aspect": 0.449,
+    "radius": 0.5,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "雪の日は、暖炉のそばが一番じゃ。",
+      "山の向こうの国は、どうしておるかのう。"
+    ]
+  },
+  "snow_boy": {
+    "name": "寒冷地の男の子",
+    "sdId": 334,
+    "texture": "/images/npcs/snow_boy.png",
+    "height": 1.55,
+    "aspect": 0.414,
+    "radius": 0.5,
+    "speed": 1.3,
+    "wanderRadius": 4.0,
+    "lines": [
+      "雪だるま作ったんだ！",
+      "もっと積もらないかなあ。"
+    ]
+  },
+  "snow_girl": {
+    "name": "寒冷地の女の子",
+    "sdId": 335,
+    "texture": "/images/npcs/snow_girl.png",
+    "height": 1.55,
+    "aspect": 0.444,
+    "radius": 0.5,
+    "speed": 1.3,
+    "wanderRadius": 4.0,
+    "lines": [
+      "雪の中でも、へっちゃらだよ。",
+      "お城の門は、とっても大きいの。"
+    ]
+  },
+  "snow_gate_guard": {
+    "name": "寒冷地の街の門番",
+    "sdId": 336,
+    "texture": "/images/npcs/snow_gate_guard.png",
+    "height": 2.6,
+    "aspect": 0.457,
+    "radius": 0.5,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "……止まれ。キュラビッド帝国の城塞へ、ようこそ。",
+      "城門の向こうは、帝王様の城だ。静かにな。"
     ]
   }
 }

@@ -21,8 +21,8 @@ def _fac(sign, x0, y0, wid=None):
 FACILITIES = [_fac('q', 3, 4), _fac('Q', 8, 4), _fac('c', 13, 4), _fac('a', 23, 4), _fac('k', 28, 4), _fac('r', 33, 4), _fac('M', 5, 19)]
 HOUSES = ((4, 9), (8, 9), (4, 13), (8, 13), (4, 16), (28, 9), (32, 9), (28, 13), (32, 13), (28, 16), (32, 16),
           (3, 25), (8, 25), (13, 25), (23, 25), (28, 25), (33, 25))   # 通りに挟まれた区画の家（4×3）
-NPCS = [('town_man', 6, 8), ('town_old_woman', 30, 8), ('town_middle_woman', 12, 22), ('junior_merchant_woman', 24, 22), ('elder_woman', 3, 15), ('child_boy', 15, 8),
-        ('guard_spear', 17, 27), ('guard_light', 22, 27), ('gate_guard', 18, 17), ('gate_guard', 21, 17)]
+NPCS = [('snow_man', 6, 8), ('snow_old_man', 30, 8), ('snow_woman', 12, 22), ('snow_woman', 24, 22), ('snow_old_woman', 3, 15), ('snow_boy', 15, 8), ('snow_girl', 26, 21),
+        ('guard_spear', 17, 27), ('guard_light', 22, 27), ('snow_gate_guard', 18, 17), ('snow_gate_guard', 21, 17)]   # 住民・門番は、sdServer の寒冷地の画像（330〜336）
 
 
 def _road(g, x0, x1, y0, y1):

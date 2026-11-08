@@ -84,34 +84,39 @@
  ],
  "npcs": [
   {
-   "id": "town_man",
+   "id": "snow_man",
    "x": 6,
    "z": 8
   },
   {
-   "id": "town_old_woman",
+   "id": "snow_old_man",
    "x": 30,
    "z": 8
   },
   {
-   "id": "town_middle_woman",
+   "id": "snow_woman",
    "x": 12,
    "z": 22
   },
   {
-   "id": "junior_merchant_woman",
+   "id": "snow_woman",
    "x": 24,
    "z": 22
   },
   {
-   "id": "elder_woman",
+   "id": "snow_old_woman",
    "x": 3,
    "z": 15
   },
   {
-   "id": "child_boy",
+   "id": "snow_boy",
    "x": 15,
    "z": 8
+  },
+  {
+   "id": "snow_girl",
+   "x": 26,
+   "z": 21
   },
   {
    "id": "guard_spear",
@@ -124,12 +129,12 @@
    "z": 27
   },
   {
-   "id": "gate_guard",
+   "id": "snow_gate_guard",
    "x": 18,
    "z": 17
   },
   {
-   "id": "gate_guard",
+   "id": "snow_gate_guard",
    "x": 21,
    "z": 17
   }
