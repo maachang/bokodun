@@ -5,7 +5,7 @@ sync_sd_images.py
 sdServer の画像を、画像ID（sdId）で問い合わせて、更新のあった画像だけを取り込み直すツール。
  - 対象: public/data/enemies.json / npcs.json / objects.json の、sdId を持つエントリ（objects.json は imageFile も持つもの）
  - 判定: sdServer の image_updated_at が、scripts/sdImages.manifest.json に保存した値と違えば更新
- - 取り込み: 透明部分を自動クロップして、エントリの画像ファイルに上書き
+ - 取り込み: 透明部分を自動クロップして、エントリの画像ファイルに上書き（エントリに cropBottom があれば、さらに画像の下をその割合だけ切り取る。fullHeight があれば、高さ = fullHeight × (1 - cropBottom)）
  - 反映: 敵は scale の幅（高さは維持）、NPC・オブジェクトは aspect を、新しい画像の縦横比で更新
  - 記録: manifest に imageUpdatedAt（sdServer 側の更新時刻）と fileUpdatedAt（画像ファイルの更新時刻）を保存
 画像の URL（/uploads/…）は更新のたびに変わるため、保存するのは ID だけで、URL は毎回 API から取得する。
@@ -92,6 +92,7 @@ def main():
         for path, key, sid, rel, kind in targets():
             dst = os.path.join(IMG, rel)
             if not os.path.exists(dst): continue
+            if json.load(open(path, encoding='utf-8'))[key].get('cropBottom'): continue   # 下を切った画像は、切り直さない（切り取りは、取り込み時の 1 回）
             im0 = Image.open(dst).convert('RGBA'); im = trim(im0)
             if im.size == im0.size: continue
             im.save(dst, optimize=True)
@@ -128,10 +129,14 @@ def main():
             seen[sid] = trim(src)
             done.add(sid)
         im = seen[sid]
+        d0 = json.load(open(path, encoding='utf-8'))[key]
+        crop = d0.get('cropBottom')   # 画像の下を切り取る割合（世界樹: 根の広がりを切る）。切った後の板の高さ = fullHeight × (1 - crop)
+        if crop: im = im.crop((0, 0, im.width, int(im.height * (1 - crop))))
         dst = os.path.join(IMG, rel)
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         im.save(dst, optimize=True)
-        apply_size(path, key, kind, json.load(open(path, encoding='utf-8'))[key], im)
+        apply_size(path, key, kind, d0, im)
+        if crop and 'fullHeight' in d0: set_field(path, key, 'height', lambda _: str(round(d0['fullHeight'] * (1 - crop), 2)))
         man[str(sid)] = {'imageUpdatedAt': api[sid]['image_updated_at'], 'fileUpdatedAt': iso(os.path.getmtime(dst))}
     json.dump(dict(sorted(man.items(), key=lambda x: int(x[0]))), open(MANIFEST, 'w'), indent=2)
     open(MANIFEST, 'a').write('\n')

@@ -1691,7 +1691,9 @@ test('G（デイラミ精霊国）: 大森林の中心にある。街の中は D
     assert.equal(m.legend.T, 'great_tree_a');
     assert.equal(m.legend.Y, 'world_tree', '街の中心に世界樹');
     assert.equal(m.layout[14][19], 'Y');
-    assert.equal(objects.world_tree.height, 24.7, '世界樹: 普通の木（4.94）の 5 倍');
+    assert.equal(objects.world_tree.fullHeight, 24.7, '世界樹: 普通の木（4.94）の 5 倍');
+    assert.equal(objects.world_tree.cropBottom, 0.12, '根の広がりを、画像の下 12% として切り取る');
+    assert.equal(objects.world_tree.height, Math.round(24.7 * (1 - 0.12) * 100) / 100, '切った後の高さ = 全体の高さ × (1 - 切り取り)（木の大きさの比は、そのまま）');
     assert.ok(!m.npcs.some(n => n.id.startsWith('elf_elder_')), '長老は、街の通りにいない（世界樹のそばの家の中）');
     assert.equal(Object.values(m.links).find(l => l.nextMap === 'elder_house_g')?.message, '長老の家に入る');
     assert.deepEqual(readJson('public/data/maps/elder_house_g.json').npcs.map(n => n.id).sort(), ['elf_elder_man', 'elf_elder_woman'], '長老たちは、長老の家の中にいる（世界樹を管理する）');
