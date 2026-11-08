@@ -11,8 +11,8 @@
       "plan": "Monster（update 877 行）の行動を、敵の種類ごとの部品（enemyBehavior.js の方式）へ分ける。Monster・Projectile を別ファイルにする"
     },
     "public/js/game.js": {
-      "lines": 4283,
-      "bytes": 242858,
+      "lines": 3479,
+      "bytes": 199459,
       "plan": "機能ごとに public/js/game/ へ分割する（タイルの描画は完了）。次の順: ①毎フレームの更新（update: 移動・攻撃・罠・敵・カメラ）②ミニマップ・HUD・方角 ③マップ読み込みの補助（buildNeighborDecor・buildOutsideGround・buildHeightTerrain）④店・会話のメニュー ⑤入力（initControls）。1 つ移すごとに、bun test と、ブラウザで全種類のマップの読み込み確認（.claudeWork/verify_maps.mjs）をして、コミットする"
     },
     "public/js/textures.js": {
@@ -58,10 +58,6 @@
     "public/js/game.js::loadMapBody": {
       "lines": 317,
       "plan": "タイルの描画は分割済み（1769 → 317 行）。残りの準備（床・天井・影・NPC・敵・リンク）を、段階ごとの関数にして 100 行以下へ"
-    },
-    "public/js/game.js::update": {
-      "lines": 863,
-      "plan": "段階（入力・プレイヤーの移動・攻撃・罠と仕掛け・敵と飛び道具・カメラ・HUD）ごとの関数に分け、public/js/game/ の部品へ移す"
     },
     "public/js/game/tilesFloors.js::liquid_tile": {
       "lines": 123,

@@ -1,5 +1,6 @@
 // 全種類のタイル（objects.json の type）を含むマップを、1 種類ずつ選び、ブラウザ（headless Chrome）で順に読み込んで、例外・console.error が出ないことを確かめる。
 // game.js などの描画コードを分割・整理したときの確認に使う（テストでは、描画の実行は確かめられないため）。
+// 各マップで、立っているだけでなく、前へ歩く（120 フレーム）・左へ回る（30 フレーム）の更新も実行して、毎フレームの処理（移動・罠・弾など）の例外を拾う。
 // 使い方: maachang -p 3012 を起動しておき、`PROF=$(mktemp -d) bun scripts/verify_maps.mjs [ポート 3012]`。追加で見たいマップは、引数の後ろに ID を並べる
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
@@ -31,7 +32,7 @@ const send = (method, params = {}) => new Promise(r => { const i = ++id; pending
 await send('Page.enable'); await send('Runtime.enable');
 await send('Page.navigate', { url: `http://localhost:${server}/` });
 await sleep(5000);
-const expr = `(async()=>{ const errs=[]; window.addEventListener('error',e=>errs.push('error: '+e.message)); window.addEventListener('unhandledrejection',e=>errs.push('reject: '+(e.reason&&e.reason.stack||e.reason))); console.error=(...a)=>{errs.push('console.error: '+a.map(String).join(' ').slice(0,200)); }; const bad=[]; for (const id of ${JSON.stringify(ids)}) { const before=errs.length; try { await window.game.loadMap(id); await new Promise(r=>setTimeout(r,700)); } catch(e) { errs.push('throw: '+e.stack); } if (window.game.currentMapId!==id || errs.length>before) bad.push(id); } return JSON.stringify({checked: ${ids.length}, bad, errs: errs.slice(0,15)}); })()`;
+const expr = `(async()=>{ const errs=[]; window.addEventListener('error',e=>errs.push('error: '+e.message)); window.addEventListener('unhandledrejection',e=>errs.push('reject: '+(e.reason&&e.reason.stack||e.reason))); console.error=(...a)=>{errs.push('console.error: '+a.map(String).join(' ').slice(0,200)); }; const bad=[]; for (const id of ${JSON.stringify(ids)}) { const before=errs.length; try { await window.game.loadMap(id); await new Promise(r=>setTimeout(r,700)); const g=window.game, x0=g.player.x, z0=g.player.z; g.keys.forward=true; for (let i=0;i<120;i++) g.update(1/60); g.keys.forward=false; g.keys.turnLeft=true; for (let i=0;i<30;i++) g.update(1/60); g.keys.turnLeft=false; if (!(Number.isFinite(g.player.x)&&Number.isFinite(g.player.z))) errs.push('NaN: '+id); } catch(e) { errs.push('throw: '+e.stack); } if (window.game.currentMapId!==id || errs.length>before) bad.push(id); } return JSON.stringify({checked: ${ids.length}, bad, errs: errs.slice(0,15)}); })()`;
 const r = await send('Runtime.evaluate', { expression: expr, awaitPromise: true, returnByValue: true, timeout: 280000 });
 const res = JSON.parse(r.result?.result?.value ?? '{"bad":["(評価に失敗)"],"errs":[]}');
 console.log(res.bad.length ? `NG: ${res.bad.join(', ')}\n${res.errs.join('\n')}` : `OK: ${res.checked} 枚、エラーなし`);
