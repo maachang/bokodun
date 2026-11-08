@@ -7,6 +7,7 @@
   - 王城: 北の外壁の城門（2 マス）。中は既存の王城（castle）。出口は入った場所（城門の前）へ戻る
 """
 import town_heights as TH
+from types import SimpleNamespace
 
 # (建物の文字, 建物の左上 x, y, 幅, 扉の x（建物の左から）, 扉の文字, 立て札の文字, 出入口 links)
 def _shop(shop_id, msg, icon): return {'nextMap': 'shop', 'params': {'shopId': shop_id}, 'message': msg, 'icon': icon}
@@ -33,14 +34,9 @@ LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'm', 'r', 'c', 
 SOLID = set('WHSIJdNDC')   # 通れない（段差の確認の対象外）
 
 
-def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None, skin=None, castle=True, tree_center=False, scatter=None, gate_flank=None):
-    """D の街の中（layout・heights）を作り、legend・links・npcs に足す。(layout, heights) を返す。
-    A（雪国）も、同じ作り（サンプルの高さを土台に、川・橋・高台・城門）で、施設・街の人・見た目（skin: 凡例の文字 → 物体の名前を上書き）だけを変える"""
-    facilities = facilities or FACILITIES
-    npc_list = npc_list or NPCS
-    assert (w, h) == (40, 30)
-    g = [['p'] * w for _ in range(h)]
-    lv = None   # 高さは、街を作り終えてから（サンプルの高さを土台にして、川・高台を重ねる）
+def _build_roads(st):
+    """大通り・広場・噴水・川と橋。共有する変数は st（段階の間の入れ物）から受け取り、後の段階で使う変数は st へ書き戻す（元は build の一部）"""
+    g, h, w = st.g, st.h, st.w
     # 大通り（南北・東西）・広場・噴水
     for y in range(1, h - 1):
         for x in range(18, 22): g[y][x] = '='
@@ -52,6 +48,11 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
     for y in (22, 23):
         for x in range(1, w - 1):
             g[y][x] = 'b' if (18 <= x <= 21 or x in (6, 7, 32, 33)) else 'w'
+
+
+def _build_walls(st):
+    """外壁・南の門・北の城門・門の両脇・世界樹の囲い。共有する変数は st（段階の間の入れ物）から受け取り、後の段階で使う変数は st へ書き戻す（元は build の一部）"""
+    castle, g, gate_flank, h, legend, links, tree_center, w = st.castle, st.g, st.gate_flank, st.h, st.legend, st.links, st.tree_center, st.w
     # 外壁・南の門・北の城門
     for x in range(w): g[0][x] = g[h - 1][x] = 'W'
     for y in range(h): g[y][0] = g[y][w - 1] = 'W'
@@ -69,6 +70,11 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
     if castle: g[0][19] = g[0][20] = 'C'   # 城門（castle は、中の王城のマップ名。True なら共通の castle。G は、城を置かない）
     for x in ((19, 20) if castle else ()):
         links[f'{x},0'] = {'nextMap': castle if isinstance(castle, str) else 'castle', 'message': '王城に入る', 'back': {'x': x, 'z': 1, 'angle': 3.14159}}
+
+
+def _build_houses(st):
+    """家と施設（扉・立て札・出入口）。共有する変数は st（段階の間の入れ物）から受け取り、後の段階で使う変数は st へ書き戻す（元は build の一部）"""
+    facilities, g, links = st.facilities, st.g, st.links
     # 家（施設以外）
     for x0, y0 in ((2, 2), (7, 2), (2, 18), (7, 18), (27, 18), (32, 18), (2, 25), (7, 25), (27, 25), (32, 25)):
         for y in range(y0, y0 + 3):
@@ -84,6 +90,11 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
         assert g[dz + 1][dx + 1] == 'p', f'D の立て札 ({dx + 1},{dz + 1}): 空きマスではない'
         g[dz + 1][dx + 1] = sign
         links[f'{dx},{dz}'] = dict(link, back={'x': dx, 'z': dz + 1, 'angle': 3.14159})
+
+
+def _build_decor(st):
+    """木・花壇・凡例・街の人。共有する変数は st（段階の間の入れ物）から受け取り、後の段階で使う変数は st へ書き戻す（元は build の一部）"""
+    castle, city_legend, facilities, g, legend, npc_list, npcs, skin, tree_center = st.castle, st.city_legend, st.facilities, st.g, st.legend, st.npc_list, st.npcs, st.skin, st.tree_center
     # 木・花壇
     for x, y, c in ((2, 1, 'T'), (37, 1, 'T'), (16, 18, 'T'), (23, 18, 'T'), (2, 28, 'T'), (37, 28, 'T'), (16, 6, 'f'), (23, 6, 'v'),
                     (26, 12, 'f'), (37, 12, 'v'), (15, 17, 'f'), (24, 17, 'v')):
@@ -97,6 +108,11 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
     for nid, x, z in npc_list:
         assert g[z][x] in 'p=', f'D の NPC {nid} ({x},{z}): 歩ける空きマスではない'
         npcs.append({'id': nid, 'x': x, 'z': z})
+
+
+def _build_scatterPlants(st):
+    """森の街の、草・シダ・木のばらまき。共有する変数は st（段階の間の入れ物）から受け取り、後の段階で使う変数は st へ書き戻す（元は build の一部）"""
+    facilities, g, h, npc_list, scatter, w = st.facilities, st.g, st.h, st.npc_list, st.scatter, st.w
     if scatter:   # 森の街: 草・シダ・木を、空きマスにばらまく（決まった乱数。扉の前・街の人・広場の中心・立て札は避ける。木は、まわりが空きマスで、間をあける）
         import random
         rnd = random.Random(20261108)
@@ -119,6 +135,11 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
                     if any(g[y + dy][x + dx] not in 'p=' for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1))): continue
                     trees.append((x, y))
                 g[y][x] = ch; put += 1
+
+
+def _build_heights(st):
+    """高さ（サンプルの高さを土台に、川・高台を重ねる。段差の確認）。共有する変数は st（段階の間の入れ物）から受け取り、後の段階で使う変数は st へ書き戻す（元は build の一部）"""
+    facilities, g, h, w = st.facilities, st.g, st.h, st.w
     # 高さ: サンプル（city）の高さを土台にして、川（0）と高台（王城区・神殿）を重ねる。段差は、歩ける隣どうしで 1 以下
     lv = TH.sample_field(w, h, 0, 0)
     fixed = set()
@@ -138,6 +159,25 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
                 xx, yy = x + dx, y + dz
                 if xx < w and yy < h and g[yy][xx] not in SOLID and g[yy][xx] != 'w':
                     assert abs(lv[y][x] - lv[yy][xx]) <= 1, f'D の段差 ({x},{y})-({xx},{yy}) が 2 以上'
+    st.lv = lv
+
+
+def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None, skin=None, castle=True, tree_center=False, scatter=None, gate_flank=None):
+    """D の街の中（layout・heights）を作り、legend・links・npcs に足す。(layout, heights) を返す。
+    A（雪国）も、同じ作り（サンプルの高さを土台に、川・橋・高台・城門）で、施設・街の人・見た目（skin: 凡例の文字 → 物体の名前を上書き）だけを変える"""
+    facilities = facilities or FACILITIES
+    npc_list = npc_list or NPCS
+    assert (w, h) == (40, 30)
+    g = [['p'] * w for _ in range(h)]
+    lv = None   # 高さは、街を作り終えてから（サンプルの高さを土台にして、川・高台を重ねる）
+    st = SimpleNamespace(castle=castle, city_legend=city_legend, facilities=facilities, g=g, gate_flank=gate_flank, h=h, legend=legend, links=links, npc_list=npc_list, npcs=npcs, scatter=scatter, skin=skin, tree_center=tree_center, w=w)
+    _build_roads(st)
+    _build_walls(st)
+    _build_houses(st)
+    _build_decor(st)
+    _build_scatterPlants(st)
+    _build_heights(st)
+    lv = st.lv
     return [''.join(r) for r in g], [''.join(TH.CH36[v] for v in r) for r in lv]
 
 

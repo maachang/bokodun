@@ -1,5 +1,6 @@
 """世界の地形: 山・山道・峡谷の橋"""
 import numpy as np
+from types import SimpleNamespace
 from collections import deque
 from terrain_base import H, MAX_LEVEL, PEAKS_ROCK, PEAKS_SNOW, ROCK, SNOW, W, _distance, fbm
 from terrain_coast import _components, _near_seam
@@ -90,10 +91,9 @@ def _switchback(path, e, ok, amp=5, pitch=4, min_len=12, max_len=60, min_grade=0
     return out
 
 
-def _mountains(elev, land, biome, blocked, sx, sy):
-    """連峰・山脈: 高い所を、段丘（崖で区切られた、広い段）にして、上れない所を作る。段丘のところどころに、ゆるやかな斜面（自然の坂）。
-    人が作った山道（4 近傍の A*。等高線に沿って、ジグザグに上る）を、段丘に切り込む（道は、元のなだらかな高さ）。山頂に、広場。
-    戻り値: elev, trail（山道のマス）, arenas（山頂の広場 [(y, x, 高さ)]）"""
+def _mountains_zones(ns_):
+    """山の帯（段丘の高さ・ゆるやかな斜面・境のそば）。共有する変数は ns_（段階の間の入れ物）から受け取り、後の段階で使う変数は ns_ へ書き戻す（元は _mountains の一部）"""
+    biome, blocked, elev, land = ns_.biome, ns_.blocked, ns_.elev, ns_.land
     Y, X = np.mgrid[0:H, 0:W]
     T0 = np.where(biome == SNOW, 8, 6)
     zone = land & np.isin(biome, [SNOW, ROCK]) & (elev >= T0)
@@ -105,6 +105,16 @@ def _mountains(elev, land, biome, blocked, sx, sy):
     d_blk = _distance(blocked)
     use_q = zone & ~ramp & ~near_seam & (d_blk > 3)
     out = np.where(use_q, np.minimum(q, MAX_LEVEL), elev).astype(np.int32)
+    ns_.X = X
+    ns_.Y = Y
+    ns_.near_seam = near_seam
+    ns_.near_seam10 = near_seam10
+    ns_.out = out
+
+
+def _mountains_arenas(ns_):
+    """山頂の広場（山頂ごと）。共有する変数は ns_（段階の間の入れ物）から受け取り、後の段階で使う変数は ns_ へ書き戻す（元は _mountains の一部）"""
+    elev, land, near_seam10, sx, sy = ns_.elev, ns_.land, ns_.near_seam10, ns_.sx, ns_.sy
     # 山頂の広場（山頂ごと）。山頂は、なだらかな高さの、最も高い所
     arenas = []
     for px, py, ph, ps in PEAKS_SNOW + PEAKS_ROCK:
@@ -115,6 +125,12 @@ def _mountains(elev, land, biome, blocked, sx, sy):
         if sub.max() < 6: continue
         iy, ix = np.unravel_index(np.argmax(sub), sub.shape); ay, ax = y0 + iy, x0 + ix
         arenas.append((int(ay), int(ax), int(elev[ay, ax])))
+    ns_.arenas = arenas
+
+
+def _mountains_trails(ns_):
+    """山道: 麓から、山頂の広場へ。共有する変数は ns_（段階の間の入れ物）から受け取り、後の段階で使う変数は ns_ へ書き戻す（元は _mountains の一部）"""
+    arenas, blocked, elev, land, near_seam = ns_.arenas, ns_.blocked, ns_.elev, ns_.land, ns_.near_seam
     # 山道: 麓（草原の低い所）から、山頂の広場へ。先にできた道は、使いやすい（費用が安い）ので、幹と枝になる
     trail = np.zeros((H, W), bool)
     arena_h = {}
@@ -147,6 +163,15 @@ def _mountains(elev, land, biome, blocked, sx, sy):
         for y, x in path:                                                # 広場の高さ: 道が広場（半径 6）に入る最初のマスの、なだらかな高さ（広場と道が、段差 1 以内でつながる）
             if (y - ay) ** 2 + (x - ax) ** 2 <= 36:
                 arena_h[(ay, ax)] = int(elev[y, x]); break
+    ns_.arena_h = arena_h
+    ns_.base = base
+    ns_.ef = ef
+    ns_.trail = trail
+
+
+def _mountains_loops(ns_):
+    """近道の山道（輪）。共有する変数は ns_（段階の間の入れ物）から受け取り、後の段階で使う変数は ns_ へ書き戻す（元は _mountains の一部）"""
+    base, ef, elev, trail = ns_.base, ns_.ef, ns_.elev, ns_.trail
     # 近道の山道（輪）: 山道を歩くと遠回りの 2 点（直線で 14〜40 マス・山道の距離が 3 倍以上）を、新しい道で結ぶ。分かれ道・回り道ができる（半分迷路）
     from collections import deque
     def tdist_(src, limit=260):
@@ -183,11 +208,23 @@ def _mountains(elev, land, biome, blocked, sx, sy):
         for y, x in path: trail[y, x] = True
         n_loop += 1
     print('山道の輪', n_loop, dbg, len(ty))
+
+
+def _mountains_widen(ns_):
+    """山道の幅（2 マス）。共有する変数は ns_（段階の間の入れ物）から受け取り、後の段階で使う変数は ns_ へ書き戻す（元は _mountains の一部）"""
+    blocked, elev, land, out, trail = ns_.blocked, ns_.elev, ns_.land, ns_.out, ns_.trail
     # 山道の幅 2 マス（右・下を足す）。高さは、なだらかな高さのまま（切り込む）
     t2 = trail.copy()
     t2[:-1, :] |= trail[1:, :]; t2[:, :-1] |= trail[:, 1:]
     t2 &= land & ~blocked
     out = np.where(t2, elev, out)
+    ns_.out = out
+    ns_.t2 = t2
+
+
+def _mountains_flatten(ns_):
+    """山頂の広場を、平らに。共有する変数は ns_（段階の間の入れ物）から受け取り、後の段階で使う変数は ns_ へ書き戻す（元は _mountains の一部）"""
+    X, Y, arena_h, arenas, blocked, land, out, trail = ns_.X, ns_.Y, ns_.arena_h, ns_.arenas, ns_.blocked, ns_.land, ns_.out, ns_.trail
     # 山頂の広場: 半径 6 を、平らに（なだらかな高さの、頂上の高さ）
     arenas = [(ay, ax, arena_h.get((ay, ax), ah)) for ay, ax, ah in arenas]
     for ay, ax, ah in arenas:
@@ -195,6 +232,23 @@ def _mountains(elev, land, biome, blocked, sx, sy):
         m = (d <= 6) & land & ~blocked
         out = np.where(m, ah, out)
         trail |= m & (d <= 5)
+    ns_.arenas = arenas
+    ns_.out = out
+    ns_.trail = trail
+
+
+def _mountains(elev, land, biome, blocked, sx, sy):
+    """連峰・山脈: 高い所を、段丘（崖で区切られた、広い段）にして、上れない所を作る。段丘のところどころに、ゆるやかな斜面（自然の坂）。
+    人が作った山道（4 近傍の A*。等高線に沿って、ジグザグに上る）を、段丘に切り込む（道は、元のなだらかな高さ）。山頂に、広場。
+    戻り値: elev, trail（山道のマス）, arenas（山頂の広場 [(y, x, 高さ)]）"""
+    ns_ = SimpleNamespace(biome=biome, blocked=blocked, elev=elev, land=land, sx=sx, sy=sy)
+    _mountains_zones(ns_)
+    _mountains_arenas(ns_)
+    _mountains_trails(ns_)
+    _mountains_loops(ns_)
+    _mountains_widen(ns_)
+    _mountains_flatten(ns_)
+    X, Y, arenas, out, t2, trail = ns_.X, ns_.Y, ns_.arenas, ns_.out, ns_.t2, ns_.trail
     # 吊橋の峡谷: 山道どうしを、まっすぐ（9〜18 マス）結ぶ近道。山道を歩くと遠回りの所だけ（山道の輪＝半分迷路）
     out, bridges, bridge_under = _gorge_bridges(out, trail, t2, land, blocked, _near_seam(Y, X, 5))
     return out, trail, arenas, bridges, bridge_under

@@ -1,13 +1,4 @@
 {
   "files": {},
-  "funcs": {
-    "scripts/world/town_d.py::build": {
-      "lines": 124,
-      "plan": "共通部品（壁・門・川・施設・段差の確認・飾り）を town_common.py へ。E・H・B・C の重複も、同時に解消する"
-    },
-    "scripts/world/terrain_mountain.py::_mountains": {
-      "lines": 110,
-      "plan": "触るときに、触った分だけ小さくする（目標: 100 行以下）"
-    }
-  }
+  "funcs": {}
 }
