@@ -5,6 +5,12 @@ import { RetroTextureGenerator } from '/js/textures.js';
 
 export const textureSetupMethods = {
     initTextures() {
+        // テクスチャの表（名前 → 画像・生成した絵）。表は、3 つのメソッドに分けて、まとめる（1 つの関数が長くならないように）
+        this.textures = { ...this.imageTextureTable(), ...this.proceduralTextureTableA(), ...this.proceduralTextureTableB() };
+    },
+
+    imageTextureTable() {
+        // 画像ファイルを読み込むテクスチャ（密林・バリア・苔の洞窟・森の樹冠・炎の柱）
         const loader = new THREE.TextureLoader();
         const denseForestTex = loader.load('/images/objects/dense_forest.jpg');
         denseForestTex.magFilter = THREE.NearestFilter;
@@ -28,8 +34,18 @@ export const textureSetupMethods = {
         const firePillarTex = loader.load('/images/effects/fire_pillar.png?v=' + Date.now());
         firePillarTex.magFilter = THREE.NearestFilter;
         firePillarTex.minFilter = THREE.NearestFilter;
+        return {
+            electricBarrier: barrierTex,
+            mossyStone: mossyCaveTex,
+            forestCanopy: forestCanopyTex,
+            denseForest: denseForestTex,
+            firePillar: firePillarTex,
+        };
+    },
 
-        this.textures = {
+    proceduralTextureTableA() {
+        // 生成した絵のテクスチャ（前半）
+        return {
             brick: RetroTextureGenerator.createBrickTexture(),
             brickWindow: RetroTextureGenerator.createBrickWindowTexture(),
             floorStone: RetroTextureGenerator.createStoneFloorTexture(),
@@ -44,11 +60,9 @@ export const textureSetupMethods = {
             woodBridge: RetroTextureGenerator.createWoodBridgeTexture(),
             cobblestone: RetroTextureGenerator.createCobblestonePathTexture(),
             magicCircle: RetroTextureGenerator.createMagicCircleTexture(),
-            electricBarrier: barrierTex,
             spikeTrap: RetroTextureGenerator.createSpikeTrapTexture(),
             pitfall: RetroTextureGenerator.createPitfallTexture(),
             door: RetroTextureGenerator.createDoorTexture(),
-            mossyStone: mossyCaveTex,
             rock: RetroTextureGenerator.createRockWallTexture(),
             slime: RetroTextureGenerator.createSlimeTexture(),
             skeleton: RetroTextureGenerator.createSkeletonTexture(),
@@ -99,6 +113,12 @@ export const textureSetupMethods = {
             desertSand: RetroTextureGenerator.createDesertSandTexture(),
             cliffGray: RetroTextureGenerator.createCliffTexture(['#7d7a78', '#6c6967', '#8a8683', '#5e5b5a', '#928e88'], '#2a2827'),
             cliffSand: RetroTextureGenerator.createCliffTexture(['#b8845a', '#a67448', '#c4936a', '#97653d', '#cfa07a'], '#4a2e1c', 31),
+        };
+    },
+
+    proceduralTextureTableB() {
+        // 生成した絵のテクスチャ（後半）
+        return {
             cliffDark: RetroTextureGenerator.createCliffTexture(['#4a4344', '#3b3536', '#574f50', '#2f2a2b', '#625858'], '#120f10', 77),
             snowGround: RetroTextureGenerator.createSpeckleFloorTexture('#f4f8ff', ['#ffffff', '#e2eaf4', '#eaf0f8']),
             forestGround: RetroTextureGenerator.createSpeckleFloorTexture('#667744', ['#566a38', '#788a50', '#876c46', '#6c5838']),   // 森の地面: 普通の、緑と茶の落ち葉の色（暗さは、環境の光と霧で出す。床自体を黒くしない）
@@ -125,8 +145,6 @@ export const textureSetupMethods = {
             thiefGuildIcon: RetroTextureGenerator.createShopIconTexture('thief'),
             barIcon: RetroTextureGenerator.createShopIconTexture('bar'),
             innIcon: RetroTextureGenerator.createShopIconTexture('inn'),
-            forestCanopy: forestCanopyTex,
-            denseForest: denseForestTex,
             woodWall: RetroTextureGenerator.createWoodWallTexture(),
             woodFloor: RetroTextureGenerator.createWoodFloorTexture(),
             marbleWall: RetroTextureGenerator.createMarbleWallTexture(),
@@ -162,13 +180,12 @@ export const textureSetupMethods = {
             buzzsawBlade: RetroTextureGenerator.createBuzzsawBladeTexture(),
             buzzsawRail: RetroTextureGenerator.createBuzzsawRailTexture(),
             swampGround: RetroTextureGenerator.createSwampGroundTexture(),
-            firePillar: firePillarTex,
             tarantulaSwamp: RetroTextureGenerator.createTarantulaSwampTexture(),
             parasiteWasp: RetroTextureGenerator.createParasiteWaspTexture(),
             mariaMosquito: RetroTextureGenerator.createMariaMosquitoTexture(),
             acidWorm: RetroTextureGenerator.createAcidWormTexture(),
             poisonMoth: RetroTextureGenerator.createPoisonMothTexture(),
-            poisonToad: RetroTextureGenerator.createPoisonToadTexture()
+            poisonToad: RetroTextureGenerator.createPoisonToadTexture(),
         };
     },
 };

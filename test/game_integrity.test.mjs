@@ -143,9 +143,9 @@ test('3. Texture Method & Property Integrity Check', async (t) => {
     }
 
     // Check all textures configured in objects.json exist in this.textures
-    const texturesInitMatch = gameJs.match(/this\.textures\s*=\s*\{([^}]+)\}/s);
-    assert.ok(texturesInitMatch, 'this.textures initialization found in game.js');
-    const initText = texturesInitMatch[1];
+    // テクスチャの表は、public/js/game/textureSetup.js（initTextures が、3 つの表をまとめる）
+    const initText = fs.readFileSync(path.join(projectRoot, 'public/js/game/textureSetup.js'), 'utf-8');
+    assert.ok(/this\.textures\s*=\s*\{/.test(initText), 'this.textures initialization found in textureSetup.js');
     
     for (const [objId, def] of Object.entries(objects)) {
         if (def.texture) {

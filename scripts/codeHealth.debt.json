@@ -25,10 +25,6 @@
       "lines": 131,
       "plan": "入力の種類（キー・マウス・タッチ・ボタン）ごとの関数に分ける"
     },
-    "public/js/game/textureSetup.js::initTextures": {
-      "lines": 167,
-      "plan": "テクスチャの表（名前 → 作る関数）にして、使うときに作る（遅延生成）。textures.js の分割と同時に"
-    },
     "public/js/textures/texturesRoofsDoors.js::drawShopMark": {
       "lines": 138,
       "plan": "店の種類（武器・道具・酒場・宿）ごとの描画を、表で呼び分ける"
