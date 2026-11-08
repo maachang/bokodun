@@ -517,6 +517,8 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
         if site['id'] == 'a':   # A（雪国）: D と同じ作り（town_d.build_a）で、雪の見た目・雪の環境
             m['layout'], m['heights'] = TD.build_a(w, h, m['legend'], city_legend, m['links'], m['npcs'])
             m['environment'] = dict(snow_env, floorType='snow', fogNear=24, fogFar=72); m['decorFloor'] = 'snowCobble'   # 雪の環境（霧は、街が見えるよう薄め）
+        elif site['id'] == 'f':   # F（山の麓の獣人とドワーフの街）: D と同じ作り（town_d.build_f）
+            m['layout'], m['heights'] = TD.build_f(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         elif site['id'] in ('d', 'h', 'e', 'b', 'c'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
             m['layout'], m['heights'] = {'d': TD, 'h': TH, 'e': TE, 'b': TB, 'c': TC}[site['id']].build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         if site['id'] == 'c':   # C（砂漠の自由都市）: 砂漠の環境（霧は、街が見えるよう薄め）・砂の地面

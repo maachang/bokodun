@@ -33,7 +33,7 @@ LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'm', 'r', 'c', 
 SOLID = set('WHSIJdNDC')   # 通れない（段差の確認の対象外）
 
 
-def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None, skin=None):
+def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None, skin=None, castle=True):
     """D の街の中（layout・heights）を作り、legend・links・npcs に足す。(layout, heights) を返す。
     A（雪国）も、同じ作り（サンプルの高さを土台に、川・橋・高台・城門）で、施設・街の人・見た目（skin: 凡例の文字 → 物体の名前を上書き）だけを変える"""
     facilities = facilities or FACILITIES
@@ -56,8 +56,8 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
     for x in range(w): g[0][x] = g[h - 1][x] = 'W'
     for y in range(h): g[y][0] = g[y][w - 1] = 'W'
     g[h - 1][19] = g[h - 1][20] = 'G'
-    g[0][19] = g[0][20] = 'C'
-    for x in (19, 20):
+    if castle: g[0][19] = g[0][20] = 'C'   # 城門（F は、城を置かない）
+    for x in ((19, 20) if castle else ()):
         links[f'{x},0'] = {'nextMap': 'castle', 'message': '王城に入る', 'back': {'x': x, 'z': 1, 'angle': 3.14159}}
     # 家（施設以外）
     for x0, y0 in ((2, 2), (7, 2), (2, 18), (7, 18), (27, 18), (32, 18), (2, 25), (7, 25), (27, 25), (32, 25)):
@@ -79,7 +79,7 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
                     (26, 12, 'f'), (37, 12, 'v'), (15, 17, 'f'), (24, 17, 'v')):
         assert g[y][x] == 'p', f'D の飾り ({x},{y}): 空きマスではない'
         g[y][x] = c
-    legend.update({'C': 'castle_gate'})
+    if castle: legend.update({'C': 'castle_gate'})
     for k in set(LEGEND_KEYS) | {c for f in facilities for c in (f[0], f[5], f[6])}: legend[k] = city_legend[k]   # 施設の建物・扉・立て札の文字も
     if skin: legend.update(skin)   # 見た目の差し替え（雪国: 雪をかぶった屋根・石畳など）
     for nid, x, z in npc_list:
@@ -125,3 +125,21 @@ SKIN_SNOW = {   # 雪国の見た目: 雪をかぶった屋根（軽く）・雪
 
 def build_a(w, h, legend, city_legend, links, npcs):
     return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_A, npc_list=NPCS_A, skin=SKIN_SNOW)
+
+
+# ---- F（ライアン獣王国。山の麓の、獣人とドワーフの街）: D と同じ作りで、施設・街の人・見た目を変える ----
+FACILITIES_F = [f for f in FACILITIES if f[6] not in ('m', 'c')] + [   # 魔法ギルド・神殿は置かない
+    ('S', 27, 2, 4, 1, 'd', 'k', _to('guild_smith', '鍛冶屋に入る', 'smithIcon')),   # ドワーフの鍛冶屋（鉱山の国）
+]
+NPCS_F = [
+    ('dwarf_smith', 28, 6), ('town_man', 6, 17), ('town_middle_man', 12, 17), ('junior_merchant_man', 24, 9),
+    ('elder_man', 14, 26), ('child_boy', 15, 21), ('guard_spear', 17, 27), ('guard_light', 22, 27),
+    ('town_old_man', 30, 15), ('traveler_man', 34, 12),
+]
+SKIN_FOOT = {   # 山の麓の見た目: 木造の家（獣人の家）・針葉樹
+    'H': 'wooden_house', 'T': 'conifer_tree_a', 'f': 'conifer_tree_b', 'v': 'conifer_tree_a',
+}
+
+
+def build_f(w, h, legend, city_legend, links, npcs):
+    return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_F, npc_list=NPCS_F, skin=SKIN_FOOT, castle=False)

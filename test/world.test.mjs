@@ -1640,3 +1640,15 @@ test('C（ミレニアム自由都市）: 商人ギルドが街の中心・王�
     for (const t of ['adobeWall', 'adobeWallOchre', 'adobeRoof', 'domeTile', 'packedEarth', 'packedEarthRoad']) assert.ok(game.includes(`${t}:`), `テクスチャ ${t}`);
     assert.ok(['1', '2', '3', '4'].some(c => m.layout.join('').includes(c)), '市場の屋台');
 });
+
+test('F（ライアン獣王国）: 山の麓の街。D と同じ作りで、城・神殿・魔法ギルドはなく、ドワーフの鍛冶屋・職業訓練所がある。木造の家と針葉樹', () => {
+    const m = readJson('public/data/maps/town_f.json');
+    assert.deepEqual([m.layout[0].length, m.layout.length], [40, 30]);
+    const all = Object.values(m.links).map(l => l.nextMap);
+    for (const bad of ['castle', 'temple', 'guild_mage']) assert.ok(!all.includes(bad), `${bad} は置かない`);
+    for (const need of ['guild_smith', 'guild_training', 'guild_adv', 'city_inn']) assert.ok(all.includes(need), `${need} がある`);
+    assert.ok(m.npcs.some(n => n.id === 'dwarf_smith'), 'ドワーフの鍛冶屋');
+    assert.equal(m.legend.H, 'wooden_house');
+    assert.equal(m.legend.T, 'conifer_tree_a');
+    assert.ok(!m.layout[0].includes('C'), '城門がない');
+});
