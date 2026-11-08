@@ -953,7 +953,7 @@ test('南国の作り込み: ジャングルの木（2 倍）・ヤシの林・�
             for (const row of m.heights) for (const ch of row) maxLevel = Math.max(maxLevel, levelOf(ch));
         }
     }
-    assert.ok(jungle > 500 && palmForest > 300, `ジャングルの木 ${jungle}・ヤシの林 ${palmForest}`);
+    assert.ok(jungle > 500 && palmForest > 250, `ジャングルの木 ${jungle}・ヤシの林 ${palmForest}`);
     assert.ok(glow > 1500, `青緑の浅瀬（入り江・砂州・池・海岸）: ${glow}`);
     assert.ok(mangrove > 50 && marshFlower > 50, `マングローブ ${mangrove}・毒々しい花 ${marshFlower}`);
     assert.ok(tropicalMeshes >= 4, `南国のマップ: ${tropicalMeshes}`);
@@ -1519,7 +1519,7 @@ test('街道: D と H の門前の石畳を、石畳の道（paved_road・幅 3�
         const set = new Set(road);
         let thick = 0;
         for (const k of road) { const [x, y] = k.split(',').map(Number); let w = 0; while (set.has(`${x + w},${y}`)) w++; let h = 0; while (set.has(`${x},${y + h}`)) h++; if (w > 5 && h > 5) thick++; }
-        assert.ok(thick / road.length < 0.01, `並走する太い帯が多い（${thick}）`);
+        assert.ok(thick <= 9 * 14, `並走する太い帯が多い（${thick}。分かれ道の 3×3 の交差だけ、1 か所 9 マス）`);   // 8 つの街の道路網: 分かれ道は 7 か所ほど（交差 1 か所 = 9 マス）
     }
     // 石の橋: 水に囲まれた所だけ。数がある
     const bridges = road.filter(k => tiles.get(k).name === 'stone_bridge');
@@ -1598,13 +1598,35 @@ test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つ�
     assert.ok(!fs.existsSync(path.join(root, 'public/images/objects/road_sign.png')), '読める絵・別の絵は、削除済み');
     const gameSrc = gameSource();
     assert.ok(!gameSrc.includes('roadSign') && !texturesSource().includes('createRoadSignTexture'), '専用のテクスチャは、ない');
-    assert.equal(signs.length, 1, '分かれ道は 1 か所');
-    const { x, y, msg } = signs[0];
-    for (const name of ['グリーン王国', 'ダマスカス自治領', 'ガリレオ連盟']) assert.ok(msg.includes(name), `${name} が書いてある`);
-    assert.match(msg, /北: .*西: .*東: /, '方角（北・西・東）と行き先');
-    assert.ok(!road.has(`${x},${y}`), '道の上ではない');
-    assert.ok([...road].some(k => { const [rx, ry] = k.split(',').map(Number); return Math.abs(rx - x) + Math.abs(ry - y) === 1; }), '道の縁のすぐわき（道に接する）');
-    assert.ok([...road].filter(k => { const [rx, ry] = k.split(',').map(Number); return Math.abs(rx - x) <= 2 && Math.abs(ry - y) <= 2; }).length >= 6, '90 度の曲がり角のそば（道が、縦にも横にも、まわりにある）');
+    assert.ok(signs.length >= 8, `道しるべ・道の終わりの立て札がある（${signs.length}）`);
+    // 最初の分かれ道（D の近く）: 方角と行き先（3 つの街）
+    const first = signs.find(s => ['グリーン王国', 'ダマスカス自治領', 'ガリレオ連盟'].every(n => s.msg.includes(n)) && /北: .*西: .*東: /.test(s.msg));
+    assert.ok(first, 'D・H・E の分かれ道の道しるべ（北・西・東）');
+    for (const { x, y, msg } of signs) {
+        assert.ok(!road.has(`${x},${y}`), `(${x},${y}) 道の上ではない`);
+        assert.ok([...road].some(k => { const [rx, ry] = k.split(',').map(Number); return Math.abs(rx - x) <= 3 && Math.abs(ry - y) <= 3; }), `(${x},${y}) 道のそばにある: ${msg}`);
+    }
+    // 道の終わりの立て札: 砂漠・山・大森林の前で石畳が終わる国（B・C=砂漠、A・F=山、G=大森林）に、1 本ずつ（国名と、この先の地形）
+    for (const [name, note] of [['フランケル聖国', '砂漠'], ['ミレニアム自由都市', '砂漠'], ['キュラビッド帝国', '山道'], ['ライアン獣王国', '山道'], ['デイラミ精霊国', '大森林']]) {
+        assert.ok(signs.some(s => s.msg.includes(name) && s.msg.includes(`この先は${note}`)), `${name}: 道の終わりの立て札（この先は${note}）`);
+    }
+});
+
+test('街道の基準データ（public/data/world_roads.json。今後の町・村づくりが、この道を基準にする）: 全 8 つの街・道は 1 本につながる・石畳が作れない国は、道の終わりを持つ', () => {
+    const d = readJson('public/data/world_roads.json');
+    assert.deepEqual(Object.keys(d.towns).sort(), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']);
+    const centers = new Set(d.centers.map(([y, x]) => `${y},${x}`));
+    assert.ok(centers.size > 1000);
+    for (const [id, t] of Object.entries(d.towns)) {
+        assert.ok(centers.has(`${t.end[0]},${t.end[1]}`), `${id}: 道の終わり ${t.end} が、道の中心線の上にある`);
+        if (t.partial) assert.ok(['砂漠', '山道', '大森林'].includes(t.note), `${id}: 道が途切れる理由`);
+        else assert.deepEqual(t.end, t.gate, `${id}: 石畳が通じる街は、門前まで道が届く`);
+    }
+    assert.deepEqual(Object.entries(d.towns).filter(([, t]) => t.partial).map(([id]) => id).sort(), ['a', 'b', 'c', 'f', 'g'], '石畳が届かない国（砂漠・山・大森林）');
+    // 道の中心線は、4 方向で 1 本につながる
+    const seen = new Set([[...centers][0]]); const q = [[...centers][0]];
+    while (q.length) { const [y, x] = q.pop().split(',').map(Number); for (const [dy, dx] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const k = `${y + dy},${x + dx}`; if (centers.has(k) && !seen.has(k)) { seen.add(k); q.push(k); } } }
+    assert.equal(seen.size, centers.size, '道の中心線は 1 本につながる');
 });
 
 

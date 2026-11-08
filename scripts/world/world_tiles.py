@@ -1,10 +1,11 @@
 """世界の、マスごとの物体と地面の生成（build_tiles と、地形ごとの段階 _tiles_*）。gen_world.py が呼ぶ"""
 from types import SimpleNamespace
+import os
 import numpy as np
 import terrain as T
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
-from world_consts import BIOME_FLOOR, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
+from world_consts import ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
 
 
 def _tiles_snowFoothills(g):
@@ -334,16 +335,30 @@ def _tiles_roads(g):
         goal = ROAD_TOWNS[k]
         start = gate_pt(ROAD_TOWNS[0]) if not centers else centers
         path = roads.find_path(t, start, gate_pt(goal), reuse=set(centers))
+        partial = path is None and goal in ROAD_PARTIAL   # 砂漠・山・大森林の中は、石畳が作れない（砂に埋もれる・山道・樹海）。作れる所までの道と、道の終わりの立て札
+        if partial: path = roads.find_path(t, start, gate_pt(goal), margin=PARTIAL_MARGIN, reuse=set(centers), partial=True)
         if k == 1: centers = []   # 最初の 2 つは、1 本目（始点は、最初の街の門前）
         assert path, f'街道 {goal}: 経路がない'
-        n_road, n_bridge = roads.paint(t, obj, elev, path, set('6789') | {TOWN_SIGN_CH})
+        n_road, n_bridge = roads.paint(t, obj, elev, path, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})   # 先に置いた道しるべは、消さない
         new_tiles = [c for c in path if c not in set(centers)]
         centers.extend(new_tiles)
         if k >= 2:   # 2 つ目以降は、既存の街道から分かれる: 分かれ道に、道しるべ（方角と行き先）
             pos, msg = roads.fork_sign(t, obj, set(centers), path[0], {gate_pt(s_): TOWN_NAME[s_] for s_ in ROAD_TOWNS[:k + 1]})
             ROAD_SIGNS[pos] = msg
             print('道しるべ', pos, msg)
+        if partial:
+            pos, msg = roads.end_sign(t, obj, path[-1], gate_pt(goal), TOWN_NAME[goal], ROAD_PARTIAL[goal])
+            ROAD_SIGNS[pos] = msg
+            print('道の終わりの立て札', pos, msg)
+        ROAD_INFO[goal] = {'gate': list(gate_pt(goal)), 'end': list(path[-1]), 'partial': bool(partial), **({'note': ROAD_PARTIAL[goal]} if partial else {})}
         print(f'街道 {ROAD_TOWNS[0] if k == 1 else "網"}→{goal}: 中心線 {len(path)} マス（新しく {len(new_tiles)}）・石畳 {n_road}・石の橋 {n_bridge}')
+    import json
+    ROAD_INFO[ROAD_TOWNS[0]] = {'gate': list(gate_pt(ROAD_TOWNS[0])), 'end': list(gate_pt(ROAD_TOWNS[0])), 'partial': False}
+    with open(os.path.join(ROOT, 'public', 'data', 'world_roads.json'), 'w', encoding='utf-8') as fp:   # 街道の基準データ（今後の町・村づくりが、この道を基準にする）
+        json.dump({'note': '街道（石畳の道）の基準データ。座標は世界のマス（[行, 列]）。centers: 道の中心線（幅 3）。towns: 街ごとの門前（gate）と道の終わり（end。partial=true は、砂漠・山・大森林で、石畳が作れる所まで）。signs: 道しるべ・道の終わりの立て札',
+                   'centers': [list(c) for c in sorted(centers)], 'towns': ROAD_INFO,
+                   'signs': [{'pos': list(k), 'text': v} for k, v in sorted(ROAD_SIGNS.items())]}, fp, ensure_ascii=False)
+
 
 
 def _tiles_seams(g):

@@ -1,7 +1,7 @@
 """街どうしを結ぶ石畳の街道と、川の石の橋。経路は、費用の最小の道（ダイクストラ）。
   - 街道は、1 本の道路網（木の形）として作る。2 つ目以降の街は、すでにある街道のどこからでも分かれてよい（分かれ道）。
     すでにある街道の上は、ほとんど費用がかからず（重ねて使う）、すぐわき（平行に走る）は、費用を上乗せする（並走しない。分かれ道は、街道に直角に近く出る）
-  - 幅 3 マス（道の両側 1 マスは、木・草・岩を置かない）。回避: 山道・森林（大森林）・針葉樹の裾野・岩山・雪山・湖・海
+  - 幅 3 マス（道の両側 1 マスは、木・草・岩を置かない）。回避: 砂漠・山道・森林（大森林）・針葉樹の裾野・岩山・雪山・湖・海
   - 川は、費用をかけて渡る（渡るマスは、石の橋にする）。高さはもとの地形のまま（もとの地形は、隣り合う歩ける所の段差が 1 以下）
 """
 import heapq
@@ -9,7 +9,7 @@ import numpy as np
 import terrain as T
 
 ROAD_CH, BRIDGE_CH, SIGN_CH = 'Á', 'Â', 'Ã'      # paved_road（石畳）・stone_bridge（石の橋）・road_sign（道しるべの立て札）
-AVOID = (T.SNOW, T.CONIFER, T.FOREST, T.ROCK, T.SEA)
+AVOID = (T.SNOW, T.CONIFER, T.FOREST, T.ROCK, T.SEA, T.DESERT)   # 砂漠は、石畳を作ってもすぐ砂に埋もれる（ユーザー指定）ので、避ける
 WATER_COST = 6.0      # 川を渡る 1 マスの費用（橋が長くなりすぎないように）
 TURN_COST = 3.0       # 曲がる費用（まっすぐな道にする。細かい階段状の斜めを避ける）
 REUSE_COST = 0.2      # すでにある街道の上を歩く 1 マスの費用（重ねて使う）
@@ -25,7 +25,7 @@ def _filter3(a, fn):
     return fn(np.stack(stack), axis=0)
 
 
-def find_path(t, start, goal, margin=60, reuse=None):
+def find_path(t, start, goal, margin=60, reuse=None, partial=False):
     """start・goal（(y, x)）の間の道の中心線（(y, x) の並び）。経路がなければ None。
     start は、1 点または点の集まり（すでにある街道のどこからでも出られる）。reuse: すでにある街道の中心線のマス（重ねて使い、すぐわきは並走させない）"""
     starts = [start] if isinstance(start[0], int) else list(start)
@@ -78,6 +78,8 @@ def find_path(t, start, goal, margin=60, reuse=None):
             nc = c + cost_tile[v] + dz * SLOPE_COST + (TURN_COST if nd != d and not (reuse_m[u] and reuse_m[v]) else 0.0)
             if nc < dist.get((v, nd), 1e18):
                 dist[(v, nd)] = nc; prev[(v, nd)] = (u, d); heapq.heappush(pq, (nc, v, nd))
+    if end is None and partial and dist:   # 行けない（砂漠・山・大森林で、道が作れない）: 作れる所まで。目的地にいちばん近い（直線距離）、行ける所を、道の終わりにする
+        end = min(dist, key=lambda k: (np.hypot(k[0][0] - g[0], k[0][1] - g[1]), dist[k]))
     if end is None: return None
     path = []
     cur = end
@@ -159,3 +161,20 @@ def fork_sign(t, obj, network, junction, towns):
             obj[y, x] = ord(SIGN_CH)
             return (y, x), msg
     raise AssertionError(f'道しるべを置く空きマスがない {junction}')
+
+
+def end_sign(t, obj, end, goal, name, note):
+    """道（partial の経路）の終わり end の、道のわきの空きマスに、立て札を置く。文章: 目的地の方角と、街の名前、この先の地形（note）。戻り値: ((行, 列), 文章)"""
+    ey, ex = end
+    vy, vx = goal[0] - ey, goal[1] - ex
+    d = COMPASS[((1 if vy > 0 else -1), 0)] if abs(vy) > abs(vx) else COMPASS[(0, (1 if vx > 0 else -1))]
+    msg = f'{d}: {name}（この先は{note}。石畳の道は、ここまで）'
+    def free(y, x):
+        return t['land'][y, x] and not (t['deep'][y, x] or t['shallow'][y, x] or t['bridge'][y, x]) and chr(obj[y, x]) not in (ROAD_CH, BRIDGE_CH, '6', '7', '8', '9')
+    sy, sx = (1 if vy > 0 else -1 if vy < 0 else 0), (1 if vx > 0 else -1 if vx < 0 else 0)
+    cands = [(ey + 2 * sy, ex + 2 * sx), (ey + 2 * sy, ex - 2 * sx), (ey - 2 * sy, ex + 2 * sx)] + [(ey + 2 * a, ex + 2 * b) for a in (-1, 0, 1) for b in (-1, 0, 1) if a or b] + [(ey + 3 * a, ex + 3 * b) for a in (-1, 0, 1) for b in (-1, 0, 1) if a or b]
+    for y, x in cands:
+        if free(y, x):
+            obj[y, x] = ord(SIGN_CH)
+            return (y, x), msg
+    raise AssertionError(f'道の終わりの立て札を置く空きマスがない {end}')
