@@ -31,8 +31,8 @@
   "v": "forest_tree_a",
   "F": "plaza_fountain",
   "G": "district_gate",
-  "V": "wooden_wall",
   "C": "castle_gate",
+  "V": "wooden_wall",
   "Y": "world_tree",
   "j": "wooden_fence",
   "D": "temple_door",
@@ -56,75 +56,75 @@
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWVCCVWWWWWWWWWWWWWWWWWW",
-  "WpTppppppppppppppp====pppppppppppppppTpW",
-  "WpHHHHpHHHHpIIIIpv====pvppySSSSpzppzpppW",
-  "WpHHHHpHHHHzIIIIpp====pppppSSSSypppppvpW",
-  "WpHHHHpHHHHzINIIpp====ypzppSdSSppppppppW",
-  "WpzppzpyppzpppMyyp====yppypppmpzyyyyyzpW",
-  "Wpzpppppzpyzzpppfz====pvpzpvpppppppppppW",
-  "Wppzppppppypppyzpp====pzppppppzpppyppppW",
-  "Wpppzpzppppppyzpyz====ppppyppzppvpyypvpW",
-  "Wpppyppppypzpppppz====pppzppppppppzppppW",
-  "WpSSSSpSSSSpSSSSyp====pSSSpppzyppppppypW",
-  "WpSSSSzSSSSpSSSSpp====pSSSpypypzpvpzpppW",
-  "WpSdSSpSdSSpSdSSpp====pSdSfppzpppppppvpW",
-  "WpppqppppQpzppapppjjj=pppxpppppyzyppzppW",
-  "W=================jYj==================W",
-  "W=================jjj==================W",
-  "W======================================W",
-  "Wppppypzpppppvpfpp====ppvpyppppppppppzpW",
-  "WpHHHHpHHHHzpppyTp====pTppzHHHHpHHHHpppW",
-  "WpHHHHpHHHHzzpyzzp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppzpp====zypppHHHHpHHHHzppW",
-  "Wppzyzpppppzppypyz====pppzpypzppppppyzpW",
-  "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
-  "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
-  "Wpppypppyzyypzpppp====ppppzzpppppyzppypW",
-  "WpHHHHzHHHHzppzypy====pzppzHHHHpHHHHzppW",
-  "WpHHHHpHHHHppppzpp====ppzppHHHHpHHHHpypW",
-  "WpHHHHzHHHHpzppppp====pppppHHHHpHHHHpppW",
-  "WpTppppppppppppppp====pppppppppppppppTpW",
+  "WTppppppppppppppppp==pppppppppppppppppTW",
+  "WpHHHHpppyppHHHHppv==pzpppppzpppHHHHpppW",
+  "WpHHHHpHHHHzHHHHpppp==vzppHHHHpzHHHHyfpW",
+  "WpHHHHzHHHHpHHHHyppp==ppppHHHHppHHHHzppW",
+  "WpyppzpHHHHpzpzzpfp==pzppyHHHHyppzHHHHpW",
+  "Wpzpyvpppzypzpzzz==zppSSSppppyppvpHHHHpW",
+  "Wpppyyzpppvpppppp==pppSSSppzpppzypHHHHpW",
+  "Wppvpppvppyzpppp======SdSppzppfpzppppppW",
+  "Wppppyppzzyyppp=========xppypzzppzpzpppW",
+  "WppySSSSpSSSSp===ppppp===ppySSSSpSSSSzpW",
+  "WpvpSSSSzSSSS===ppppppp===pySSSSpSSSSppW",
+  "WpppSdSSzSdSS==ppppppppp==ppSdSSpSdSSzpW",
+  "W=====q====Q===pppjjjppp======a====m===W",
+  "W==============pppjYjppp===============W",
+  "Wpvpppyzpyppp==pppjjjppp==pyppppvppppvpW",
+  "WpppzzpHHHHpp==ppppppppp==ppypppzypppzpW",
+  "WpHHHHpHHHHzp===ppppppp===ppvyzypHHHHppW",
+  "WpHHHHpHHHHppp===ppppp===pppyppypHHHHzpW",
+  "WpHHHHpyypzp============p===zzvppHHHHppW",
+  "Wpppppppyp====pp=======ppp====ppzppppzpW",
+  "WppvpIIII===pppp==pppppppppp====vyzpzvpW",
+  "WpppzIIII=ppppppp==yppzzpyzyfp====pzpzpW",
+  "WpppzINIIppvpzpzyp==vpyyvyy==========ppW",
+  "Wp=====M=====HHHHypp==pyzzp==========ppW",
+  "Wp===========HHHHzvpp==HHHHyppzypypHHHHW",
+  "WpHHHHpppvpypHHHHppp==pHHHHzvzHHHHyHHHHW",
+  "WpHHHHpyppzpzppzppz==fpHHHHpppHHHHyHHHHW",
+  "WTHHHHppppppppppppp==pppppppppHHHHppppTW",
   "WWWWWWWWWWWWWWWWWWVGGVWWWWWWWWWWWWWWWWWW"
  ],
  "npcs": [
   {
    "id": "elf_woman_a",
    "x": 6,
-   "z": 17
+   "z": 14
   },
   {
    "id": "elf_man_a",
-   "x": 12,
-   "z": 17
+   "x": 11,
+   "z": 15
   },
   {
    "id": "elf_woman_b",
-   "x": 28,
-   "z": 13
+   "x": 30,
+   "z": 14
   },
   {
    "id": "elf_man_b",
-   "x": 24,
-   "z": 9
+   "x": 25,
+   "z": 6
   },
   {
    "id": "elf_woman_c",
-   "x": 14,
-   "z": 26
+   "x": 12,
+   "z": 22
   },
   {
    "id": "elf_girl",
-   "x": 15,
-   "z": 21
+   "x": 16,
+   "z": 19
   },
   {
    "id": "elf_boy",
-   "x": 24,
-   "z": 21
+   "x": 25,
+   "z": 18
   },
   {
    "id": "elf_man_c",
-   "x": 30,
+   "x": 34,
    "z": 15
   },
   {
@@ -155,7 +155,7 @@
   {
    "id": "fairy_sylph",
    "x": 30,
-   "z": 21
+   "z": 18
   },
   {
    "id": "fairy_undine",
@@ -165,7 +165,7 @@
   {
    "id": "fairy_salamander",
    "x": 12,
-   "z": 21
+   "z": 20
   },
   {
    "id": "fairy_gnome",
@@ -174,13 +174,13 @@
   },
   {
    "id": "fairy_unicorn",
-   "x": 6,
-   "z": 21
+   "x": 4,
+   "z": 20
   },
   {
    "id": "fairy_pegasus",
    "x": 20,
-   "z": 24
+   "z": 22
   }
  ],
  "links": {
@@ -220,7 +220,7 @@
     "angle": 3.14159
    }
   },
-  "3,12": {
+  "5,12": {
    "nextMap": "shop",
    "params": {
     "shopId": "item_shop_g"
@@ -228,12 +228,12 @@
    "message": "道具屋に入る",
    "icon": "itemShopIcon",
    "back": {
-    "x": 3,
+    "x": 5,
     "z": 13,
     "angle": 3.14159
    }
   },
-  "8,12": {
+  "10,12": {
    "nextMap": "shop",
    "params": {
     "shopId": "weapon_shop_g"
@@ -241,65 +241,65 @@
    "message": "武器屋に入る",
    "icon": "weaponShopIcon",
    "back": {
-    "x": 8,
+    "x": 10,
     "z": 13,
     "angle": 3.14159
    }
   },
-  "13,12": {
+  "29,12": {
    "nextMap": "guild_adv_g",
    "message": "冒険者ギルドに入る",
    "icon": "advGuildIcon",
    "back": {
-    "x": 13,
+    "x": 29,
     "z": 13,
     "angle": 3.14159
    }
   },
-  "13,4": {
-   "nextMap": "city_inn_g",
-   "message": "宿屋・酒場に入る",
-   "icon": "innIcon",
-   "back": {
-    "x": 13,
-    "z": 5,
-    "angle": 3.14159
-   }
-  },
-  "28,4": {
+  "34,12": {
    "nextMap": "guild_mage_g",
    "message": "魔法ギルドに入る",
    "icon": "mageGuildIcon",
    "back": {
-    "x": 28,
-    "z": 5,
+    "x": 34,
+    "z": 13,
     "angle": 3.14159
    }
   },
-  "24,12": {
+  "6,23": {
+   "nextMap": "city_inn_g",
+   "message": "宿屋・酒場に入る",
+   "icon": "innIcon",
+   "back": {
+    "x": 6,
+    "z": 24,
+    "angle": 3.14159
+   }
+  },
+  "23,8": {
    "nextMap": "elder_house_g",
    "message": "長老の家に入る",
    "back": {
-    "x": 24,
-    "z": 13,
+    "x": 23,
+    "z": 9,
     "angle": 3.14159
    }
   }
  },
  "heights": [
-  "0000000000000000000110000000000000000000",
-  "0111111111111111111111111111111111111110",
-  "0122222222222222111222222222222222222210",
-  "0232222322223222222333322223222232222320",
-  "0232222322223222222333322223222232222320",
-  "0232222322223222222333322223222232222320",
-  "0233222332223322222333332222322233222320",
-  "0233323333233332222333333323332333323320",
+  "0000000000000000000220000000000000000000",
+  "0111111112222222222222222222222111111110",
+  "0122222223333333222333333333333222222210",
+  "0121111212223222222333322223222121111210",
+  "0121111212223222222333322223222121111210",
+  "0121111212223222222333322223222121111210",
+  "0122111222223322222333332222322122111210",
+  "0122212223233332222333333323332222212210",
   "0122222222223332111223333323322222222210",
-  "0112222222222322111112332233333333333320",
-  "0122222222222332111111232233333333333320",
-  "0122222222223222111111222233333333333220",
-  "0121111222222111111112211123222232222220",
+  "0112222222222322111112332233222222222210",
+  "0122222222222332111111232232222222222210",
+  "0122222222223222111111222222222222222110",
+  "0121111222222111111112211112111121111110",
   "0111111222222111111222211112111121111110",
   "0111111222222111111222211112111121111110",
   "0111111222222222111222221112211122211110",
@@ -308,10 +308,10 @@
   "0111111111112111111222222222222221111110",
   "0111111111112111111222222222222221111110",
   "0111111111112111111222222222222221111110",
-  "0111111112222222111111222222222211111110",
-  "0000000000000000000000000000000000000000",
-  "0000000000000000000000000000000000000000",
-  "0111111122222222111111222222222211111110",
+  "0111111112222222111222222222222221111110",
+  "0111111122222222111222222222222221111110",
+  "0111111122222222111222222222222221111110",
+  "0111111122222222111222222222222221111110",
   "0111111122222222111222222222222211111110",
   "0111111112222222111222222222221111111110",
   "0111111111222222111222222222211111111110",

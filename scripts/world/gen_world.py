@@ -17,6 +17,7 @@ import town_h as TH
 import town_e as TE
 import town_b as TB
 import town_c as TC
+import town_g as TG
 import castle_f as CF
 import guild_g as GG
 import temple_b as TPB
@@ -116,7 +117,7 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
             m['layout'], m['heights'] = TD.build_a(w, h, m['legend'], city_legend, m['links'], m['npcs'])
             m['environment'] = dict(snow_env, floorType='snow', fogNear=24, fogFar=72); m['decorFloor'] = 'snowCobble'   # 雪の環境（霧は、街が見えるよう薄め）
         elif site['id'] == 'g':   # G（大森林の中心のエルフの街）: D と同じ作り（town_d.build_g）。森の環境（霧は、街が見えるよう薄め）
-            m['layout'], m['heights'] = TD.build_g(w, h, m['legend'], city_legend, m['links'], m['npcs'])
+            m['layout'], m['heights'] = TG.build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
             m['environment'] = dict(DARK_FOREST_ENV, floorType='forest', fogNear=22, fogFar=66, ambientLight=0x6f8f76); m['decorFloor'] = 'forestGround'
         elif site['id'] == 'f':   # F（山の麓の獣人とドワーフの街）: D と同じ作り（town_d.build_f）
             m['layout'], m['heights'] = TD.build_f(w, h, m['legend'], city_legend, m['links'], m['npcs'])
