@@ -384,10 +384,21 @@ def _tiles_roads(g):
         path = roads.find_path(t, gate_pt(a), gate_pt(b), margin=100, penal=set(centers))
         new_tiles = [c for c in path if c not in set_c] if path else []
         if len(new_tiles) < 20: continue
+        # 並走しない: 街道のすぐわき（12 マス以内）を続けて進む区間が、10 マスを超えるなら、足さない（両端 20 マスは除く）
+        inner = path[20:-20]
+        run = longest = 0   # 街道のすぐわき（12 マス以内）を、続けて進む区間の、最長
+        for (y, x) in inner:
+            run = run + 1 if any((y + dy, x + dx) in set_c for dy in range(-12, 13, 3) for dx in range(-12, 13, 3)) else 0
+            longest = max(longest, run)
+        if longest > 10:
+            print(f'  循環の候補 {a}⇄{b}: 街道と並走する区間（{longest} マス）があるので、足さない')
+            continue
         roads.paint(t, obj, elev, path, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})
         centers.extend(new_tiles); set_c.update(new_tiles); n_loop += 1
         ROAD_LOOPS.append({'between': [a, b], 'tiles': len(new_tiles)})
         print(f'循環する道 {a}⇄{b}: 迂回 {len(new_tiles)} マス（道のり/直線 = {ratio:.1f}）')
+    n_merge = roads.merge_parallel(t, obj, elev, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})   # 近くで並行して進む 2 本の道は、1 本に統合（ユーザー指示）
+    print(f'並行する道を統合: {n_merge} マス')
     # 石の橋のそば（BRIDGE_NEAR マス以内）の、もとからある木の橋（plank_bridge）は、無効（川に戻す）。石の橋と、二重の橋にならない
     near_stone = T.box_mean((obj == ord(roads.BRIDGE_CH)).astype(np.float32), BRIDGE_NEAR) > 0
     old = near_stone & (obj == ord('Z'))

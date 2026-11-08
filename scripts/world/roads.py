@@ -20,6 +20,7 @@ ROUGH_DZ = 10         # 地形を無視してつなぐ道（rough）で、隣の
 ARENA_COST = 4.0      # 地形を無視してつなぐ道（rough）で、ボス闘技場のまわりの 1 マスの費用の上乗せ
 ROUGH_COST = 3.0      # 山・岩山・針葉樹・森林・雪の 1 マスの費用の上乗せ（草原を優先）
 TRAIL_COST = 1.0      # すでにある山道の 1 マスの費用（沿って通る）
+LOOP_APART = 14       # 循環する道（loop）は、すでにある街道から、このマス以上離す（並走させない）
 PENAL_COST = 12.0     # 循環する道（loop）で、すでにある街道を避ける費用の上乗せ
 SLOPE_COST = 0.6      # 高さが違う 1 段ごとの費用
 
@@ -69,8 +70,11 @@ def find_path(t, start, goal, margin=60, reuse=None, partial=False, rough=False,
         cost_tile = cost_tile + np.where(arena_m, ARENA_COST, 0.0)
         cost_tile = np.where(t['trail'][sl] & ~reuse_m, np.minimum(cost_tile, TRAIL_COST), cost_tile)
     if penal:   # 循環する道: すでにある街道は、使わない（別の道を通す）。重ならないよう費用を上乗せ
+        pm = np.zeros(ok.shape, bool)
         for (ry, rx) in penal:
-            if y0 <= ry <= y1 and x0 <= rx <= x1: cost_tile[ry - y0, rx - x0] += PENAL_COST
+            if y0 <= ry <= y1 and x0 <= rx <= x1: pm[ry - y0, rx - x0] = True
+        for _ in range(LOOP_APART): pm = _filter3(pm.astype(np.uint8), np.max).astype(bool)   # 並走させない: すでにある街道のまわり（LOOP_APART マス）にも、費用を上乗せ
+        cost_tile = cost_tile + np.where(pm, PENAL_COST, 0.0)
     h, w = ok.shape
     g = (goal[0] - y0, goal[1] - x0)
     DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))
@@ -225,3 +229,41 @@ def flatten(elev, path, pinned=None):
         sub = new
     elev[y0:y1, x0:x1] = sub.astype(elev.dtype)
     return int((elev != before).sum())
+
+
+def merge_parallel(t, obj, elev, keep_chars, max_gap=2, span=3):
+    """近くで並行して進む 2 本の道（間のすきま max_gap マス以下）を、1 本の道に統合する（すきまを石畳で埋める）。すきまが、道の向き（span マス前後）に続くところだけ（曲がり角・分かれ道は、埋めない）。
+    すきまのマスは、両側の石畳との高さの差が 1 以下のところだけ。水・橋・keep_chars（街の壁・門・立て札など）は、埋めない。戻り値: 埋めたマス数"""
+    H, W = obj.shape
+    road = np.isin(obj, [ord(ROAD_CH), ord(BRIDGE_CH)])
+    water = t['deep'] | t['shallow'] | t['bridge'] | t['lagoon'] | ~t['land']
+    keep = np.isin(obj, [ord(c) for c in keep_chars]) | np.isin(obj, [ord(BRIDGE_CH)])
+    e = elev.astype(np.int32)
+    fill = np.zeros((H, W), bool)
+    for axis in (1, 0):   # 1: 横のすきま（縦に並ぶ道）・0: 縦のすきま
+        r = road if axis == 1 else road.T
+        ee = e if axis == 1 else e.T
+        h, w = r.shape
+        for g in range(1, max_gap + 1):
+            # 行ごと: x に、すきま（g マスの道でないマス）があり、左右に道
+            ok = np.zeros((h, w), bool)
+            for x in range(1, w - g):
+                left, right = r[:, x - 1], r[:, x + g]
+                gapfree = ~r[:, x:x + g].any(axis=1)
+                ok[:, x] = left & right & gapfree & (np.abs(ee[:, x - 1] - ee[:, x + g]) <= 1 + g)
+            # すきまが、縦（道の向き）に続く: 前後 span 行のうち、ほとんど（2 * span + 1 のうち 2 * span 以上）で、同じ形
+            run = np.zeros((h, w), np.int32)
+            for d in range(-span, span + 1):
+                run += np.roll(ok, d, axis=0).astype(np.int32)
+            ok &= run >= 2 * span
+            for x in range(1, w - g):
+                cols = ok[:, x]
+                if not cols.any(): continue
+                for k in range(g):
+                    xx = x + k
+                    good = cols & ~(water[:, xx] if axis == 1 else water.T[:, xx]) & ~(keep[:, xx] if axis == 1 else keep.T[:, xx]) \
+                        & (np.abs(ee[:, xx] - ee[:, x - 1]) <= 1) & (np.abs(ee[:, xx] - ee[:, x + g]) <= 1)
+                    if axis == 1: fill[:, xx] |= good
+                    else: fill[xx, :] |= good
+    obj[fill & ~road] = ord(ROAD_CH)
+    return int(fill.sum())
