@@ -34,11 +34,12 @@
   "C": "dais_rug_1",
   "u": "castle_rug",
   "K": "chandelier_castle_rug",
-  "2": "castle_exit"
+  "2": "castle_exit",
+  "s": "hearth"
  },
  "layout": [
   "WWRLWWWWWWWWRWWWWWWWWLRWW",
-  "W00000000aaAAAaa00000000W",
+  "W0000s000aaAAAaa00000000W",
   "W00000000bbBBBbb00000000W",
   "W00000000ccCCCcc00000000W",
   "W0000000000uuu0000000000W",

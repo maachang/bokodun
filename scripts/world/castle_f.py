@@ -68,6 +68,12 @@ def hall(mid, name, w, h, dais, rulers, guards, extra_npcs=()):
 
 
 def build_others():
+    out = _others()
+    add_hearth(next(m for m in out if m['id'] == 'castle_a'), 5, 1)   # 帝王の城（雪国）: 暖炉を 1 つ（玉座の間の、北の壁ぎわ）
+    return out
+
+
+def _others():
     return [
         # A キュラビッド帝国: 帝王（雪国の若い帝王）と、重装の衛兵
         hall('castle_a', '帝王の城（キュラビッド帝国）', 25, 15, 12, [('emperor_a', 12, 1)],
@@ -79,6 +85,16 @@ def build_others():
         hall('castle_g', '女王の城（デイラミ精霊国）', 25, 15, 12, [('elf_queen', 12, 1), ('elf_chancellor', 9, 2)],
              [('elf_soldier_golem', 9, 6), ('elf_soldier_golem', 15, 6), ('elf_man_c', 18, 10), ('elf_woman_b', 6, 10)]),
     ]
+
+
+def add_hearth(m, x, y, kind='hearth'):
+    """暖炉（kind: hearth＝木の部屋用・hearth_stone＝石の部屋用）を、床のマス (x, y)（北の壁ぎわ）に置く（雪国 A の建物の中。1 部屋に 1 つ）"""
+    ch = next((k for k, v in m['legend'].items() if v == kind), None) or 's'
+    assert ch not in m['legend'] or m['legend'][ch] == kind, f"{m['id']}: 暖炉の文字 {ch} が使用中"
+    assert m['layout'][y][x] in 'F0', f"{m['id']}: 暖炉の位置 ({x},{y}) が床ではない"
+    row = m['layout'][y]; m['layout'][y] = row[:x] + ch + row[x + 1:]
+    m['legend'][ch] = kind
+    return m
 
 
 def strip_hearth(m):

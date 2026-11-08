@@ -33,7 +33,18 @@ GUILDS = [
     ('city_inn', 'city_inn_c', '宿屋・酒場（ミレニアム自由都市）', 'town_c', {}, {'city_inn_2f': 'city_inn_2f_c'}),   # 砂漠の国: 暖炉なし
     ('city_inn_2f', 'city_inn_2f_c', '宿屋の客室（ミレニアム自由都市）', 'city_inn_c', {}, {'city_inn': 'city_inn_c'}),
     ('guild_training', 'guild_training_f', '職業訓練所（ライアン獣王国）', 'town_f', {'trainer': 'bear_trainer'}, {}),
+    # A（キュラビッド帝国）: 雪国なので、建物の中に暖炉を 1 部屋に 1 つ（HEARTH_A）。街の人は、共通のまま
+    ('shop', 'shop_a', '店（キュラビッド帝国）', 'town_a', {}, {}),
+    ('guild_adv', 'guild_adv_a', '冒険者ギルド（キュラビッド帝国）', 'town_a', {}, {'guild_adv_master': 'guild_adv_master_a'}),
+    ('guild_adv_master', 'guild_adv_master_a', '冒険者ギルド長の部屋（キュラビッド帝国）', 'guild_adv_a', {}, {}),
+    ('guild_training', 'guild_training_a', '職業訓練所（キュラビッド帝国）', 'town_a', {}, {}),
+    ('city_inn', 'city_inn_a', '宿屋・酒場（キュラビッド帝国）', 'town_a', {}, {'city_inn_2f': 'city_inn_2f_a'}),
+    ('city_inn_2f', 'city_inn_2f_a', '宿屋の客室（キュラビッド帝国）', 'city_inn_a', {}, {'city_inn': 'city_inn_a'}),
 ]
+HEARTH_A = {   # 新しい ID → [(x, y, 種類)]。北の壁ぎわの床。宿屋の 1 階（city_inn）には、元から暖炉がある
+    'shop_a': [(3, 1, 'hearth')], 'guild_adv_a': [(5, 1, 'hearth')], 'guild_adv_master_a': [(4, 1, 'hearth')],
+    'guild_training_a': [(5, 1, 'hearth_stone')], 'city_inn_2f_a': [(5, 7, 'hearth'), (13, 7, 'hearth')],
+}
 
 
 def build():
@@ -46,5 +57,7 @@ def build():
         if new.endswith('_c'):   # 砂漠の国（C）は、暖炉を置かない
             from castle_f import strip_hearth
             strip_hearth(m)
+        from castle_f import add_hearth
+        for x, y, kind in HEARTH_A.get(new, []): add_hearth(m, x, y, kind)
         out.append(m)
     return out

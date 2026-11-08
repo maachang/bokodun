@@ -13,9 +13,15 @@ SOLID = set('WHSIJdNDYCK')
 FORT = (16, 23, 11, 16)   # 城塞（x0, x1, y0, y1）。門は、南の壁の真ん中（19, 20）
 _F = {f[6]: f for f in TD.FACILITIES_A}   # 立て札の文字 → 施設（建物の文字・扉・links）
 
+_A_ROOM = {'item_shop': 'shop_a', 'weapon_shop': 'shop_a', 'guild_adv': 'guild_adv_a', 'guild_training': 'guild_training_a', 'city_inn': 'city_inn_a'}   # 雪国は、暖炉つきの専用の中（店は shopId を保つ）
+
+
 def _fac(sign, x0, y0, wid=None):
     f = _F[sign]
-    return (f[0], x0, y0, wid or f[3], f[4], f[5], f[6], f[7])
+    link = dict(f[7])
+    key = (link.get('params') or {}).get('shopId') or link['nextMap']
+    if key in _A_ROOM: link['nextMap'] = _A_ROOM[key]
+    return (f[0], x0, y0, wid or f[3], f[4], f[5], f[6], link)
 
 # 施設: 北の通りの北側（扉の前は、北の通り）と、南の通りの北側（宿屋）
 FACILITIES = [_fac('q', 3, 4), _fac('Q', 8, 4), _fac('c', 13, 4), _fac('a', 23, 4), _fac('k', 28, 4), _fac('r', 33, 4), _fac('M', 5, 19)]

@@ -1,0 +1,142 @@
+{
+ "id": "city_inn_a",
+ "name": "宿屋・酒場（キュラビッド帝国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": "town_a",
+ "spawn": {
+  "x": 5,
+  "z": 10,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 4864552,
+  "fogNear": 22,
+  "fogFar": 70,
+  "visibility": 0.9,
+  "skyColor": 4864552
+ },
+ "legend": {
+  "W": "wooden_wall",
+  "F": "wood_floor",
+  "u": "rug",
+  "d": "wooden_door",
+  "E": "building_exit",
+  "U": "stairs_wood_up",
+  "t": "table",
+  "h": "chair",
+  "g": "cupboard",
+  "X": "crate",
+  "B": "bar_counter",
+  "k": "beer_keg",
+  "n": "kitchen_shelf",
+  "s": "hearth",
+  "f": "oven",
+  "o": "stove",
+  "a": "sink",
+  "i": "kitchen_hearth",
+  "j": "prep_table",
+  "l": "pot_rack",
+  "y": "sack_pile",
+  "L": "wall_sconce_wood",
+  "b": "wall_window_wood"
+ },
+ "layout": [
+  "WbWWWLWbWWWWWWWWW",
+  "WFkkFnFFsFFWfoaiW",
+  "LFFFFFFFFhhLFFlFb",
+  "WBBBBBBBBBBdFjjFW",
+  "bFFFFFFFFFFWFFFXW",
+  "WFFFFuuFFFFWnFFyW",
+  "LFhthuuhthFLWWWWL",
+  "WFFFFuuFFFFWFFFUW",
+  "WFhthuuhthFdFFFFb",
+  "LFFFFuuFFFFLFXXFW",
+  "WFFFFuuFFFFWgFFFW",
+  "WbWWWEWbWWWWWbWWW"
+ ],
+ "npcs": [
+  {
+   "id": "innkeeper",
+   "x": 4,
+   "z": 2,
+   "wanderRadius": 0.4,
+   "speed": 0.3,
+   "oz": 0.7,
+   "behindCounter": true
+  },
+  {
+   "id": "inn_cook",
+   "x": 13,
+   "z": 2,
+   "wanderRadius": 0.6,
+   "behindCounter": true
+  },
+  {
+   "id": "inn_waitress",
+   "x": 6,
+   "z": 9
+  },
+  {
+   "id": "traveler_man",
+   "x": 8,
+   "z": 7,
+   "wanderRadius": 0.6
+  },
+  {
+   "id": "traveler_merchant",
+   "x": 3,
+   "z": 7,
+   "wanderRadius": 0.6
+  },
+  {
+   "id": "drunk_old",
+   "x": 9,
+   "z": 9,
+   "wanderRadius": 0.4
+  },
+  {
+   "id": "adv_swordsman",
+   "x": 1,
+   "z": 6,
+   "wanderRadius": 0.8
+  },
+  {
+   "id": "adv_mage",
+   "x": 10,
+   "z": 6,
+   "wanderRadius": 0.8
+  },
+  {
+   "id": "adv_warrior",
+   "x": 1,
+   "z": 8,
+   "wanderRadius": 0.8
+  },
+  {
+   "id": "adv_wizard",
+   "x": 10,
+   "z": 8,
+   "wanderRadius": 0.8
+  }
+ ],
+ "enemies": {},
+ "links": {
+  "15,7": {
+   "nextMap": "city_inn_2f_a",
+   "message": "階段を上る（2階の客室へ）",
+   "dir": "e",
+   "spawn": {
+    "x": 14,
+    "z": 5,
+    "angle": 1.570795
+   }
+  }
+ }
+}

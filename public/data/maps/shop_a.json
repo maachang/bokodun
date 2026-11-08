@@ -1,0 +1,52 @@
+{
+ "id": "shop_a",
+ "name": "店（キュラビッド帝国）",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "nextMap": "town_a",
+ "spawn": {
+  "x": 3,
+  "z": 4,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "woodWall",
+  "ambientLight": 10096512,
+  "directionalLight": 13615264,
+  "fogColor": 2761760,
+  "fogNear": 14,
+  "fogFar": 48,
+  "visibility": 0.9,
+  "skyColor": 2761760
+ },
+ "legend": {
+  "W": "wooden_wall",
+  "F": "shop_floor",
+  "k": "bookshelf",
+  "t": "table",
+  "g": "cupboard",
+  "E": "building_exit",
+  "s": "hearth"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWW",
+  "WkkskkW",
+  "WgFFFgW",
+  "WtttttW",
+  "WFFFFFW",
+  "WWWEWWW"
+ ],
+ "npcs": [
+  {
+   "id": "$shopkeeper",
+   "x": 3,
+   "z": 2,
+   "oz": 0.613
+  }
+ ]
+}

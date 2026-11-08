@@ -177,7 +177,7 @@
    }
   },
   "4,6": {
-   "nextMap": "shop",
+   "nextMap": "shop_a",
    "params": {
     "shopId": "item_shop"
    },
@@ -190,7 +190,7 @@
    }
   },
   "9,6": {
-   "nextMap": "shop",
+   "nextMap": "shop_a",
    "params": {
     "shopId": "weapon_shop"
    },
@@ -213,7 +213,7 @@
    }
   },
   "24,6": {
-   "nextMap": "guild_adv",
+   "nextMap": "guild_adv_a",
    "message": "冒険者ギルドに入る",
    "icon": "advGuildIcon",
    "back": {
@@ -233,7 +233,7 @@
    }
   },
   "34,6": {
-   "nextMap": "guild_training",
+   "nextMap": "guild_training_a",
    "message": "職業訓練所に入る",
    "icon": "trainingIcon",
    "back": {
@@ -243,7 +243,7 @@
    }
   },
   "6,21": {
-   "nextMap": "city_inn",
+   "nextMap": "city_inn_a",
    "message": "宿屋・酒場に入る",
    "icon": "innIcon",
    "back": {
