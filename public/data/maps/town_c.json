@@ -56,46 +56,46 @@
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "WpTppppppppppppppp====pppppppppppppppTpW",
-  "WpUUUUUUUUppIIIIpp====ppppppJJJJJJJJpppW",
-  "WpUUUUUUUUppIIIIpp====ppppppJJJJJJJJpppW",
-  "WpUUUYUUUUppINIIpp====ppppppJJJDJJJJpppW",
-  "WpppppxpppppppMppp====ppppppppppcppppppW",
-  "WpppppppppppppppTp====pTpppppppppppppppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "Wppppppppppppppppp====pppKKKKKKKKKpppppW",
-  "WpSSSSpSSSSpSSSSpp====pppKKKKKKKKKpppppW",
-  "WpSSSSpSSSSpSSSSpp====pppKKKKdKKKKpppppW",
-  "WpSdSSpSdSSpSdSSpp====ppppppppgppppppfpW",
-  "WpppqppppQppppappp====pppppppppppppppppW",
-  "W==================FF==================W",
-  "W==================FF==================W",
-  "W======================================W",
-  "Wppppppppppp4pp3pp====p1pp2ppppppppppppW",
-  "WpHHHHpHHHHppppppp====pppppppppppppppppW",
-  "WpHHHHpHHHHppppppp====ppppTppppTppppTppW",
-  "WpHHHHpHHHHppppppp====pppppwwwwwwwwwpppW",
-  "Wppppppppppppppp1p====3ppppwwwwwwwwwpppW",
-  "Wppfpppppppppppppp====pppppwwwwwwwwwpppW",
-  "Wppppppppppppppppp====pppppwwwwwwwwwpppW",
-  "WpHHHHpHHHHpHHHHpp====pppppwwwwwwwwwpppW",
-  "WpHHHHpHHHHpHHHHpp====pppppwwwwwwwwwpppW",
-  "WpHHHHpHHHHpHHHHpp====ppppTppppTppppTppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "WpTpppppppppppppfp====pppppppppppppppppW",
+  "WTppppppppppppppppppppppppppppppppppppTW",
+  "WppppppppppppppppppppppppppppppppppppppW",
+  "WppUUUUUUUUpppppppppppppppppJJJJJJJJpppW",
+  "WppUUUUUUUUpppppppppppppppppJJJJJJJJpppW",
+  "WppUUUYUUUUpppppppppppppppppJJJDJJJJpppW",
+  "Wpp====x========pppppppppp======c====ppW",
+  "Wpp=============ppppppppp============ppW",
+  "Wppppppppppppp==ppppppppp==ppppHHHHppppW",
+  "Wppppppppppppp==KKKKKKKKK==ppppHHHHppfpW",
+  "Wppppppppppppp==KKKKKKKKK==ppppHHHHp==pW",
+  "WppSSSSpSSSSpp==KKKKdKKKK==ppppppppp==pW",
+  "WppSSSSpSSSSpppppppppgpppppppSSSSppp==pW",
+  "WppSdSSpSdSSppp1pppppp3p3ppppSSSSppp==pW",
+  "Wp===q====Q===pppppFFppppppppSdSSppp==pW",
+  "Wp============pppppFFppppp=====a======pW",
+  "Wp========2p==pppppppppppp============pW",
+  "Wp========pp==p1pp2ppppp4pppppp4pHHHHppW",
+  "WppHHHHpHHHH==pppppppppppppppppppHHHHppW",
+  "WppHHHHpHHHH==ppppp==ppppppTpppTpHHHHppW",
+  "WppHHHHpHHHH==HHHHp==pppppppwwwwwwwwpppW",
+  "Wppppppppppp==HHHHp==IIIIpppwwwwwwwwpppW",
+  "WpHHHHpHHHHp==HHHH==pIIIIpppwwwwwwwwpppW",
+  "WpHHHHpHHHHp==pppp==pINIIpppwwwwwwwwpppW",
+  "WpHHHHpHHHHp==pppp=====M===pwwwwwwwwpppW",
+  "Wppppppppppp==pppp=========pwwwwwwwwpppW",
+  "WppHHHHppppp==HHHHp==pppHHHHHHHHppppTppW",
+  "WppHHHHppppp==HHHHp==pppHHHHHHHHpppppppW",
+  "WTpHHHHppppppfHHHHp==pppHHHHHHHHppppppTW",
   "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
  ],
  "npcs": [
   {
    "id": "desert_middle_man",
-   "x": 24,
-   "z": 13
+   "x": 20,
+   "z": 12
   },
   {
    "id": "desert_woman",
    "x": 6,
-   "z": 17
+   "z": 14
   },
   {
    "id": "desert_man",
@@ -104,13 +104,13 @@
   },
   {
    "id": "desert_middle_woman",
-   "x": 14,
+   "x": 17,
    "z": 15
   },
   {
    "id": "desert_old_man",
    "x": 5,
-   "z": 13
+   "z": 15
   },
   {
    "id": "desert_old_woman",
@@ -119,8 +119,8 @@
   },
   {
    "id": "desert_boy",
-   "x": 9,
-   "z": 22
+   "x": 8,
+   "z": 17
   },
   {
    "id": "desert_girl",
@@ -134,13 +134,13 @@
   },
   {
    "id": "traveler_merchant",
-   "x": 20,
-   "z": 12
+   "x": 21,
+   "z": 13
   },
   {
    "id": "desert_guard",
-   "x": 17,
-   "z": 27
+   "x": 18,
+   "z": 26
   },
   {
    "id": "desert_guard",
@@ -149,13 +149,13 @@
   },
   {
    "id": "priest_man",
-   "x": 32,
-   "z": 7
+   "x": 31,
+   "z": 6
   },
   {
    "id": "priest_woman",
    "x": 35,
-   "z": 7
+   "z": 6
   }
  ],
  "links": {
@@ -177,7 +177,7 @@
     "angle": 3.14159
    }
   },
-  "3,12": {
+  "4,13": {
    "nextMap": "shop",
    "params": {
     "shopId": "item_shop"
@@ -185,12 +185,12 @@
    "message": "道具屋に入る",
    "icon": "itemShopIcon",
    "back": {
-    "x": 3,
-    "z": 13,
+    "x": 4,
+    "z": 14,
     "angle": 3.14159
    }
   },
-  "8,12": {
+  "9,13": {
    "nextMap": "shop",
    "params": {
     "shopId": "weapon_shop"
@@ -198,56 +198,56 @@
    "message": "武器屋に入る",
    "icon": "weaponShopIcon",
    "back": {
-    "x": 8,
-    "z": 13,
+    "x": 9,
+    "z": 14,
     "angle": 3.14159
    }
   },
-  "13,12": {
+  "30,14": {
    "nextMap": "guild_adv",
    "message": "冒険者ギルドに入る",
    "icon": "advGuildIcon",
    "back": {
-    "x": 13,
-    "z": 13,
+    "x": 30,
+    "z": 15,
     "angle": 3.14159
    }
   },
-  "13,4": {
+  "22,23": {
    "nextMap": "city_inn_c",
    "message": "宿屋・酒場に入る",
    "icon": "innIcon",
    "back": {
-    "x": 13,
-    "z": 5,
+    "x": 22,
+    "z": 24,
     "angle": 3.14159
    }
   },
-  "5,4": {
+  "6,5": {
    "nextMap": "mansion_chairman_c",
    "message": "議長の館に入る",
    "back": {
-    "x": 5,
-    "z": 5,
+    "x": 6,
+    "z": 6,
     "angle": 3.14159
    }
   },
-  "31,4": {
+  "31,5": {
    "nextMap": "temple",
    "message": "神殿に入る",
    "icon": "templeIcon",
    "back": {
     "x": 31,
-    "z": 5,
+    "z": 6,
     "angle": 3.14159
    }
   },
-  "29,11": {
+  "20,11": {
    "nextMap": "guild_merchant_c",
    "message": "商人ギルドに入る",
    "icon": "merchantGuildIcon",
    "back": {
-    "x": 29,
+    "x": 20,
     "z": 12,
     "angle": 3.14159
    }
@@ -265,7 +265,7 @@
   "0122222222223332111223333323322222222210",
   "0112222222222322111112332233222222222210",
   "0122222222222332111111232232222222222210",
-  "0122222222223222111111222222212222222110",
+  "0122222222223222111111222222222222222110",
   "0121111222222111111112211112111121111110",
   "0111111222222111111222211112111121111110",
   "0111111222222111111222211112111121111110",
@@ -274,12 +274,12 @@
   "0111111112222222111222222222222222211110",
   "0111111111112111111222222222222221111110",
   "0111111111112111111222222222222221111110",
-  "0111111111112111111222222220000000001110",
-  "0111111112222222111222222220000000001110",
-  "0111111122222222111222222220000000001110",
-  "0111111122222222111222222220000000001110",
-  "0111111122222222111222222220000000001110",
-  "0111111122222222111222222220000000001110",
+  "0111111111112111111222222222000000001110",
+  "0111111112222222111222222222000000001110",
+  "0111111122222222111222222222000000001110",
+  "0111111122222222111222222222000000001110",
+  "0111111122222222111222222222000000001110",
+  "0111111122222222111222222222000000001110",
   "0111111112222222111222222222221111111110",
   "0111111111222222111222222222211111111110",
   "0111111111111111111111111111111111111110",
