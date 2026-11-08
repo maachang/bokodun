@@ -13,10 +13,6 @@
       "lines": 111,
       "plan": "初期化を、段階（描画・入力・状態・UI）ごとの関数に分ける"
     },
-    "public/js/game.js::loadMapBody": {
-      "lines": 313,
-      "plan": "タイルの描画は分割済み（1769 → 317 行）。残りの準備（床・天井・影・NPC・敵・リンク）を、段階ごとの関数にして 100 行以下へ"
-    },
     "public/js/game/tilesFloors.js::liquid_tile": {
       "lines": 121,
       "plan": "水・溶岩・沼など、液体の種類ごとの関数に分ける"

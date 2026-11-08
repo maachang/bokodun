@@ -1040,7 +1040,8 @@ test('端の向こうの景色: 隣のマップ（斜めの角を含む 8 方向
 
 test('大森林などの負荷: 前のマップの木が溜まらない（マップごとに空にする）・動かないスプライトは行列を更新しない・霧より遠い木・草は隠す・草の材質を共有・ミニマップの壁は使い回す', () => {
     const game = gameSource();
-    const body = game.slice(game.indexOf('async loadMapBody'), game.indexOf('async loadMapBody') + 6000);
+    const body = game.slice(game.indexOf('    resetMapState() {'), game.indexOf('    resetMapState() {') + 4000);   // マップごとのリセットは、loadMapBody から分けた resetMapState
+    assert.ok(game.includes('this.resetMapState();'), 'loadMapBody が、マップごとのリセットを呼ぶ');
     assert.ok(body.includes('this.treeSprites = [];') && body.includes('this.cullSprites = [];'), 'マップごとに、木・草の一覧を空にする（前のマップの木が溜まって、毎フレームの処理が増えていた）');
     assert.ok((game.match(/matrixAutoUpdate = false/g) || []).length >= 3, '木・影・草の行列は、毎フレーム更新しない');
     assert.ok(game.includes('this.scene.fog.far * 1.1') && game.includes('this.cullSprites'), '霧より遠い木・影・草は隠す');
