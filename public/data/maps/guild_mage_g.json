@@ -52,7 +52,7 @@
  ],
  "npcs": [
   {
-   "id": "mage_clerk_woman",
+   "id": "elder_daughter_clerk",
    "x": 3,
    "z": 2,
    "speed": 0,
@@ -61,7 +61,7 @@
    "behindCounter": true
   },
   {
-   "id": "mage_clerk_man",
+   "id": "elder_son_clerk",
    "x": 7,
    "z": 2,
    "speed": 0,

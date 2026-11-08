@@ -1657,8 +1657,8 @@ test('F（ライアン獣王国）: 山の麓の街。D と同じ作りで、小
     assert.ok(cf.npcs.some(n => n.id === 'lion_king'), '獣王');
     assert.equal(Object.values(cf.legend).includes('fenrir_statue'), true, 'フェンリル像');
     assert.ok(objects.fenrir_statue.height >= 4.0 * 1.0 && objects.fenrir_statue.sdId === 326, 'フェンリル像（sdServer 326。ふつうの像の 2 倍ほど）');
-    for (const need of ['guild_smith', 'guild_training_f', 'guild_adv_f', 'guild_merchant_f', 'city_inn']) assert.ok(all.includes(need), `${need} がある`);
-    for (const bad of ['guild_training', 'guild_adv', 'guild_merchant']) assert.ok(!all.includes(bad), `${bad} は、獣人の複製（_f）に替える`);
+    for (const need of ['guild_smith_f', 'guild_training_f', 'guild_adv_f', 'guild_merchant_f', 'city_inn_f']) assert.ok(all.includes(need), `${need} がある`);
+    for (const bad of ['guild_training', 'guild_adv', 'guild_merchant', 'guild_smith', 'city_inn']) assert.ok(!all.includes(bad), `${bad} は、獣人の複製（_f）に替える`);
     const ids = (n) => readJson(`public/data/maps/${n}.json`).npcs.map(x => x.id);
     assert.ok(ids('guild_adv_f').includes('fox_clerk_man') && ids('guild_adv_f').includes('fox_clerk_woman'), '冒険者ギルドの受付は狐の獣人');
     assert.ok(ids('guild_adv_master_f').includes('tiger_adv_master'), '冒険者ギルド長は虎の獣人');
@@ -1678,7 +1678,7 @@ test('G（デイラミ精霊国）: 大森林の中心にある。街の中は D
     const m = readJson('public/data/maps/town_g.json');
     assert.deepEqual([m.layout[0].length, m.layout.length], [40, 30]);
     const all = Object.values(m.links).map(l => l.nextMap);
-    for (const need of ['guild_mage_g', 'guild_adv_g', 'city_inn']) assert.ok(all.includes(need), `${need} がある`);
+    for (const need of ['guild_mage_g', 'guild_adv_g', 'city_inn_g']) assert.ok(all.includes(need), `${need} がある`);
     for (const bad of ['guild_training', 'temple', 'guild_mage', 'guild_adv']) assert.ok(!all.includes(bad), `${bad} は置かない（神殿なし。ギルドは G 専用の複製）`);
     const shopLink = Object.values(m.links).find(l => l.nextMap === 'shop');
     assert.equal(shopLink.params.shopId, 'item_shop_g', '神殿の品は道具屋で売る');
@@ -1800,4 +1800,30 @@ test('G: 世界樹のまわりに柵があり、入れない（木 1 本と柵 3
     assert.equal(objects[m.legend.j].solid, true, '柵は通れない');
     // 大通り（南北）は、柵の両脇の列（x=18・21）で、通り抜けられる
     for (let y = 13; y <= 16; y++) for (const x of [18, 21]) assert.ok('p='.includes(m.layout[y][x]), `(${x},${y}) は通れる`);
+});
+
+test('店員: F（獣人国）は全て獣人、G（エルフ国）は全て長老の娘か息子（武器屋・道具屋・宿屋・鍛冶屋・ギルドの受付）', () => {
+    const npcs = readJson('public/data/npcs.json');
+    const shops = readJson('public/data/shops.json');
+    const tex = (id) => npcs[id].texture.replace('/images/npcs/', '').replace('.png', '');
+    // F: 獣人の画像
+    const beast = /^(beast_|fox_|tanuki_|mouse_|tiger_|cat_|bear_|lion_)/;
+    for (const id of ['weapon_shop_f', 'item_shop_f']) assert.ok(beast.test(tex(shops[id].keeper)), `${id}: 店主は獣人`);
+    for (const id of ['innkeeper_f', 'inn_cook_f', 'inn_waitress_f', 'smith_keeper_f']) assert.ok(beast.test(tex(id)), `${id}: 獣人`);
+    for (const m of ['city_inn_f', 'city_inn_2f_f', 'guild_smith_f']) {
+        for (const n of readJson(`public/data/maps/${m}.json`).npcs.filter(n => /(keeper|cook|waitress|smith)/.test(n.id))) assert.ok(beast.test(tex(n.id)), `${m}: ${n.id} は獣人`);
+    }
+    // G: 長老の娘か息子の画像
+    const elder = /^elf_elder_(son|daughter)$/;
+    for (const id of ['weapon_shop_g', 'item_shop_g']) assert.ok(elder.test(tex(shops[id].keeper)), `${id}: 店主は長老の子`);
+    for (const id of ['innkeeper_g', 'inn_cook_g', 'inn_waitress_g', 'elder_son_clerk', 'elder_daughter_clerk']) assert.ok(elder.test(tex(id)), `${id}: 長老の子`);
+    for (const m of ['city_inn_g', 'city_inn_2f_g']) {
+        for (const n of readJson(`public/data/maps/${m}.json`).npcs.filter(n => /(keeper|cook|waitress)/.test(n.id))) assert.ok(elder.test(tex(n.id)), `${m}: ${n.id}`);
+    }
+    for (const m of ['guild_adv_g', 'guild_mage_g']) {
+        const staff = readJson(`public/data/maps/${m}.json`).npcs.filter(n => /clerk/.test(n.id));
+        assert.ok(staff.length >= 2 && staff.every(n => elder.test(tex(n.id))), `${m}: 受付は長老の子`);
+    }
+    const town = (id, k) => Object.values(readJson(`public/data/maps/town_${id}.json`).links).filter(l => l.params?.shopId === k).length;
+    assert.equal(town('f', 'weapon_shop_f'), 1); assert.equal(town('g', 'weapon_shop_g'), 1);
 });

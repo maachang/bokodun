@@ -36,20 +36,20 @@
   "Y": "world_tree",
   "j": "wooden_fence",
   "r": "training_sign",
-  "I": "wooden_house_window",
-  "S": "wooden_house_window",
-  "b": "wood_bridge",
-  "J": "temple_building",
-  "q": "item_shop_sign",
-  "D": "temple_door",
+  "w": "water",
+  "c": "church_sign",
   "M": "inn_sign",
   "Q": "weapon_shop_sign",
-  "m": "mage_guild_sign",
-  "w": "water",
-  "a": "adventurer_guild_sign",
-  "N": "inn_door",
+  "S": "wooden_house_window",
   "d": "shop_door",
-  "c": "church_sign",
+  "a": "adventurer_guild_sign",
+  "D": "temple_door",
+  "J": "temple_building",
+  "N": "inn_door",
+  "b": "wood_bridge",
+  "I": "wooden_house_window",
+  "q": "item_shop_sign",
+  "m": "mage_guild_sign",
   "z": "grass_tuft",
   "y": "fern",
   "x": "elder_sign"
@@ -236,7 +236,7 @@
   "8,12": {
    "nextMap": "shop",
    "params": {
-    "shopId": "weapon_shop"
+    "shopId": "weapon_shop_g"
    },
    "message": "武器屋に入る",
    "icon": "weaponShopIcon",
@@ -257,7 +257,7 @@
    }
   },
   "13,4": {
-   "nextMap": "city_inn",
+   "nextMap": "city_inn_g",
    "message": "宿屋・酒場に入る",
    "icon": "innIcon",
    "back": {

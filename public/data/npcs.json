@@ -2129,10 +2129,10 @@
     "speechRadius": 9.5
   },
   "item_keeper_g": {
-    "name": "道具屋の店主（エルフ）",
-    "texture": "/images/npcs/elf_woman_a.png",
+    "name": "道具屋の店主（長老の娘）",
+    "texture": "/images/npcs/elf_elder_daughter.png",
     "height": 2.3,
-    "aspect": 0.305,
+    "aspect": 0.522,
     "radius": 0.6,
     "speed": 0.0,
     "wanderRadius": 0.0,
@@ -2347,6 +2347,148 @@
     "wanderRadius": 0.0,
     "lines": [
       "……ここは獣王陛下の国だ。通るなら、騒ぎは起こすな。"
+    ]
+  },
+  "weapon_keeper_f": {
+    "name": "武器屋の主人（獣人）",
+    "texture": "/images/npcs/beast_b.png",
+    "height": 2.3,
+    "aspect": 0.418,
+    "radius": 0.6,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "いらっしゃい。獣人の爪にも負けない武器が揃ってるぜ。"
+    ],
+    "speechRadius": 9.5
+  },
+  "innkeeper_f": {
+    "name": "宿屋の主人（獣人）",
+    "texture": "/images/npcs/beast_a.png",
+    "height": 2.3,
+    "aspect": 0.373,
+    "radius": 0.6,
+    "speed": 0.5,
+    "wanderRadius": 0.5,
+    "lines": [
+      "いらっしゃい。ここは宿屋と酒場だ。奥の階段から、2階の部屋に泊まれる。",
+      "旅人が集まる店でね。いろんな噂が、入ってくるのさ。",
+      "王城の地下には、迷宮があるって話だ。牢獄まであるらしいぜ。"
+    ]
+  },
+  "inn_cook_f": {
+    "name": "宿屋の料理人（獣人）",
+    "texture": "/images/npcs/beast_f_b.png",
+    "height": 2.3,
+    "aspect": 0.306,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 0.6,
+    "lines": [
+      "スープを煮ているところだよ。",
+      "水路の水は、洗い物にしか使わないよ。飲み水は、井戸の水さ。"
+    ]
+  },
+  "inn_waitress_f": {
+    "name": "酒場の給仕（獣人）",
+    "texture": "/images/npcs/beast_f_c.png",
+    "height": 2.3,
+    "aspect": 0.328,
+    "radius": 0.52,
+    "speed": 0.5,
+    "wanderRadius": 1.5,
+    "lines": [
+      "はい、ご注文は？",
+      "あそこの旅の人、遠くの町の噂を、よく知っているのよ。"
+    ]
+  },
+  "smith_keeper_f": {
+    "name": "鍛冶屋の主人（獣人）",
+    "texture": "/images/npcs/beast_d.png",
+    "height": 2.3,
+    "aspect": 0.394,
+    "radius": 0.52,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ドワーフの鉄に、獣人の力を合わせるのさ。"
+    ]
+  },
+  "weapon_keeper_g": {
+    "name": "武器屋の主人（長老の息子）",
+    "texture": "/images/npcs/elf_elder_son.png",
+    "height": 2.3,
+    "aspect": 0.454,
+    "radius": 0.6,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "いらっしゃいませ。森を傷つけない、よい弓と短剣があります。"
+    ],
+    "speechRadius": 9.5
+  },
+  "elder_son_clerk": {
+    "name": "長老の息子（受付）",
+    "texture": "/images/npcs/elf_elder_son.png",
+    "height": 2.3,
+    "aspect": 0.454,
+    "radius": 0.41,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "いらっしゃいませ。長老の一族が、お世話します。"
+    ]
+  },
+  "elder_daughter_clerk": {
+    "name": "長老の娘（受付）",
+    "texture": "/images/npcs/elf_elder_daughter.png",
+    "height": 2.3,
+    "aspect": 0.522,
+    "radius": 0.35,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "いらっしゃいませ。ご用件をどうぞ。"
+    ]
+  },
+  "innkeeper_g": {
+    "name": "宿屋の主人（長老の息子）",
+    "texture": "/images/npcs/elf_elder_son.png",
+    "height": 2.3,
+    "aspect": 0.454,
+    "radius": 0.6,
+    "speed": 0.5,
+    "wanderRadius": 0.5,
+    "lines": [
+      "いらっしゃい。ここは宿屋と酒場だ。奥の階段から、2階の部屋に泊まれる。",
+      "旅人が集まる店でね。いろんな噂が、入ってくるのさ。",
+      "王城の地下には、迷宮があるって話だ。牢獄まであるらしいぜ。"
+    ]
+  },
+  "inn_cook_g": {
+    "name": "宿屋の料理人（長老の娘）",
+    "texture": "/images/npcs/elf_elder_daughter.png",
+    "height": 2.3,
+    "aspect": 0.522,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 0.6,
+    "lines": [
+      "スープを煮ているところだよ。",
+      "水路の水は、洗い物にしか使わないよ。飲み水は、井戸の水さ。"
+    ]
+  },
+  "inn_waitress_g": {
+    "name": "酒場の給仕（長老の娘）",
+    "texture": "/images/npcs/elf_elder_daughter.png",
+    "height": 2.3,
+    "aspect": 0.522,
+    "radius": 0.52,
+    "speed": 0.5,
+    "wanderRadius": 1.5,
+    "lines": [
+      "はい、ご注文は？",
+      "あそこの旅の人、遠くの町の噂を、よく知っているのよ。"
     ]
   }
 }

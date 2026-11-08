@@ -333,5 +333,89 @@
         "price": 500
       }
     ]
+  },
+  "weapon_shop_f": {
+    "name": "武器屋",
+    "keeper": "weapon_keeper_f",
+    "goods": [
+      {
+        "name": "ショートソード",
+        "price": 120
+      },
+      {
+        "name": "ハンドアックス",
+        "price": 150
+      },
+      {
+        "name": "バックラー",
+        "price": 80
+      },
+      {
+        "name": "ロングソード",
+        "price": 300
+      },
+      {
+        "name": "レイピア",
+        "price": 280
+      },
+      {
+        "name": "バトルアックス",
+        "price": 350
+      },
+      {
+        "name": "メイス",
+        "price": 200
+      },
+      {
+        "name": "ショートスピア",
+        "price": 160
+      },
+      {
+        "name": "ラウンドシールド",
+        "price": 220
+      }
+    ]
+  },
+  "weapon_shop_g": {
+    "name": "武器屋",
+    "keeper": "weapon_keeper_g",
+    "goods": [
+      {
+        "name": "ショートソード",
+        "price": 120
+      },
+      {
+        "name": "ハンドアックス",
+        "price": 150
+      },
+      {
+        "name": "バックラー",
+        "price": 80
+      },
+      {
+        "name": "ロングソード",
+        "price": 300
+      },
+      {
+        "name": "レイピア",
+        "price": 280
+      },
+      {
+        "name": "バトルアックス",
+        "price": 350
+      },
+      {
+        "name": "メイス",
+        "price": 200
+      },
+      {
+        "name": "ショートスピア",
+        "price": 160
+      },
+      {
+        "name": "ラウンドシールド",
+        "price": 220
+      }
+    ]
   }
 }

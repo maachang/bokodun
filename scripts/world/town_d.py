@@ -167,9 +167,9 @@ def _remap(f, **kw):   # 施設の出入口 links の差し替え（店の種類
     return f[:7] + (link,)
 
 
-FACILITIES_F = [(_remap(f, shopId='item_shop_f') if f[6] == 'q' else _remap(f, nextMap='guild_adv_f') if f[6] == 'a' else _remap(f, nextMap='guild_training_f') if f[6] == 'r' else f)
+FACILITIES_F = [(_remap(f, shopId='item_shop_f') if f[6] == 'q' else _remap(f, shopId='weapon_shop_f') if f[6] == 'Q' else _remap(f, nextMap='city_inn_f') if f[6] == 'M' else _remap(f, nextMap='guild_adv_f') if f[6] == 'a' else _remap(f, nextMap='guild_training_f') if f[6] == 'r' else f)
                 for f in FACILITIES if f[6] not in ('m', 'c')] + [   # 魔法ギルド・神殿は置かない（神殿の品は、道具屋 item_shop_f が売る）。ギルドは、獣人の複製のマップ
-    ('S', 27, 2, 4, 1, 'd', 'k', _to('guild_smith', '鍛冶屋に入る', 'smithIcon')),   # ドワーフの鍛冶屋（鉱山の国）
+    ('S', 27, 2, 4, 1, 'd', 'k', _to('guild_smith_f', '鍛冶屋に入る', 'smithIcon')),   # 鍛冶屋（鉱山の国。店員は獣人）
     ('S', 28, 9, 4, 1, 'd', 'g', _to('guild_merchant_f', '商人ギルドに入る', 'merchantGuildIcon')),   # 商人ギルド（猫の獣人のギルド長）
 ]
 NPCS_F = [   # 兵士は、コボルト（sdServer 11）だけ（ウッドゴーレムは、エルフの国）。獣人（一般）とドワーフ。貴族・獣王・宰相・フェンリル像は、王城（castle_f）の中
@@ -189,7 +189,7 @@ def build_f(w, h, legend, city_legend, links, npcs):
 
 
 # ---- G（デイラミ精霊国。大森林の中心の、エルフと精霊の街）: D と同じ作りで、街の中心に世界樹 ----
-FACILITIES_G = [(_remap(f, shopId='item_shop_g') if f[6] == 'q' else _remap(f, nextMap='guild_adv_g') if f[6] == 'a' else _remap(f, nextMap='guild_mage_g') if f[6] == 'm' else f)
+FACILITIES_G = [(_remap(f, shopId='item_shop_g') if f[6] == 'q' else _remap(f, shopId='weapon_shop_g') if f[6] == 'Q' else _remap(f, nextMap='city_inn_g') if f[6] == 'M' else _remap(f, nextMap='guild_adv_g') if f[6] == 'a' else _remap(f, nextMap='guild_mage_g') if f[6] == 'm' else f)
                 for f in FACILITIES if f[6] not in ('r', 'c')] + [
     ('S', 23, 10, 3, 1, 'd', 'x', _to('elder_house_g', '長老の家に入る', 'templeIcon')),   # 世界樹のそばの、小さな長老の家（長老たちは、この中にいる）
 ]   # 職業訓練所・神殿は置かない（神殿の品は道具屋 item_shop_g が売る。冒険者ギルド・魔法ギルドは、長老一族の複製のマップ）
