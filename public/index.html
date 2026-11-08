@@ -650,8 +650,16 @@
                     <option value="dungeon">地下迷宮</option>
                     <option value="giant_test">巨大試験場</option>
                 </select>
-                <select class="sel-scene" title="世界（ボコスカ島）" onchange="if (this.value) window.game.loadMap(this.value); this.selectedIndex = 0; this.blur();">
+                <select class="sel-scene" title="世界（ボコスカ島）" onchange="if (this.value) { const sp = this.selectedOptions[0].dataset.spawn; window.game.loadMap(this.value, sp ? { spawn: JSON.parse(sp) } : {}); } this.selectedIndex = 0; this.blur();">
                     <option value="">世界（ボコスカ島）</option>
+                    <option value="w_02_13" data-spawn='{"x":9,"z":43,"angle":0}'>A キュラビッド帝国の前</option>
+                    <option value="w_08_13" data-spawn='{"x":38,"z":29,"angle":0}'>B フランケル聖国の前</option>
+                    <option value="w_06_10" data-spawn='{"x":42,"z":52,"angle":0}'>C ミレニアム自由都市の前</option>
+                    <option value="w_10_08" data-spawn='{"x":32,"z":29,"angle":0}'>D グリーン王国の前</option>
+                    <option value="w_12_11" data-spawn='{"x":22,"z":33,"angle":0}'>E ガリレオ連盟の前</option>
+                    <option value="w_10_16" data-spawn='{"x":29,"z":40,"angle":0}'>F ライアン獣王国の前</option>
+                    <option value="w_07_05" data-spawn='{"x":42,"z":51,"angle":0}'>G デイラミ精霊国の前</option>
+                    <option value="w_11_06" data-spawn='{"x":31,"z":32,"angle":0}'>H ダマスカス自治領の前</option>
                     <option value="w_09_11">最初の場所（草原）</option>
                     <option value="w_03_10">北の雪山</option>
                     <option value="w_06_07">西の大森林</option>

@@ -1687,3 +1687,19 @@ test('G（デイラミ精霊国）: 大森林の中心にある。街の中は D
     const outer = Object.values(m.links).find(l => l.nextMap?.startsWith('w_'))?.nextMap;
     assert.match(readJson(`public/data/maps/${outer}.json`).name, /^大森林/, '大森林の中');
 });
+
+test('画面上部の「世界（ボコスカ島）」の選択に、街（A〜H）の前の項目がある。選ぶと、その街の門の前（外のマップ）に出る', () => {
+    const html = fs.readFileSync(path.join(root, 'public/index.html'), 'utf8');
+    const sel = html.match(/<select[^>]*title="世界（ボコスカ島）"[\s\S]*?<\/select>/)[0];
+    assert.ok(sel.includes('dataset.spawn'), '選んだ項目の出現位置を使う');
+    for (const id of 'abcdefgh') {
+        const town = readJson(`public/data/maps/town_${id}.json`);
+        const gate = Object.entries(town.links).find(([, l]) => l.nextMap?.startsWith('w_'));
+        const outerId = gate[1].nextMap;
+        const outer = readJson(`public/data/maps/${outerId}.json`);
+        const [gx, gy] = Object.entries(outer.links).find(([, l]) => l.nextMap === `town_${id}`)[0].split(',').map(Number);
+        const m = sel.match(new RegExp(`<option value="${outerId}" data-spawn='([^']+)'>${id.toUpperCase()} [^<]+の前</option>`));
+        assert.ok(m, `${id}: 街の前の項目`);
+        assert.deepEqual(JSON.parse(m[1]), { x: gx, z: gy + 4, angle: 0 }, `${id}: 門の前（南へ 4 マス）`);
+    }
+});
