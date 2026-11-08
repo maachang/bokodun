@@ -20,7 +20,9 @@ import { hudMethods } from '/js/game/hud.js';
 import { interactMethods } from '/js/game/interact.js';
 import { controlsMethods } from '/js/game/controls.js';
 import { textureSetupMethods } from '/js/game/textureSetup.js';
-import { mapSceneryMethods } from '/js/game/mapScenery.js';
+import { mapTerrainMethods } from '/js/game/mapTerrain.js';
+import { mapVisualMethods } from '/js/game/mapVisuals.js';
+import { mapNeighborMethods } from '/js/game/mapNeighbors.js';
 import { renderSupportMethods } from '/js/game/renderSupport.js';
 import { movementMethods } from '/js/game/movement.js';
 import { TREE_SHADOWS, TREE_SHADOW_OPACITY, TEST_RUN_SPEED_SCALE, CLIMB_RISE, CLIMB_SEC, CLIMB_HOLD_SEC, compassDirection, NEIGHBOR_TERRAIN_RANGE, NEIGHBOR_OBJECT_RANGE, NEIGHBOR_PLANT_RANGE, CULL_CHUNK, FOOTSTEP_STRIDE, effectPower, HIT_FEEDBACK, SHOP_PAGE_SIZE } from '/js/game/constants.js';
@@ -322,4 +324,4 @@ export class GameEngine {
 }
 
 // 部品（public/js/game/*.js）のメソッドを、GameEngine に組み込む
-Object.assign(GameEngine.prototype, updateWorldMethods, updatePlayerMethods, mapSceneryMethods, renderSupportMethods, movementMethods, equipmentMethods, combatMethods, hudMethods, interactMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);
+Object.assign(GameEngine.prototype, updateWorldMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, combatMethods, hudMethods, interactMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);
