@@ -134,6 +134,134 @@ function ringGeometry(R, T) {
     );
 }
 
+// ---- 斬撃の形（突き・叩きつけ・素手・斬り）（spawn から分けた、形ごとの作り。c は、spawn の途中の情報。返す値は、火花の発生点） ----
+function buildThrust(c) {
+    const { add, animators, makeStar, range, setFade, size } = c;
+    let tip = { x: 0, y: 0 };
+    // 突き: 先端の尖った光の筋が走り抜け、細い筋が 2 本添う。先端に星形の閃光
+    const L = Math.max(1.4, range * 1.05 * size);
+    const rot = -(0.35 + Math.random() * 0.2);
+    const tail = 0.6;
+    const mainGeo = lineGeometry(L, 0.3 * size, 1.5);
+    const sideGeoA = lineGeometry(L * 0.8, 0.08, 1.5);
+    const sideGeoB = lineGeometry(L * 0.7, 0.06, 1.5);
+    const main = add(mainGeo, 0);
+    const sideA = add(sideGeoA, 0);
+    const sideB = add(sideGeoB, 0);
+    main.rotation.z = rot;
+    sideA.rotation.z = sideB.rotation.z = rot;
+    sideA.position.set(-Math.sin(rot) * -0.13, Math.cos(rot) * 0.13, 0);
+    sideB.position.set(-Math.sin(rot) * 0.13, Math.cos(rot) * -0.13, 0);
+    const star = makeStar(0.2);
+    tip = { x: L / 2 * Math.cos(rot), y: L / 2 * Math.sin(rot) };
+    animators.push((p) => {
+        const fade = fadeOf(p, 0.6);
+        for (const [m, delay, f, tl] of [[main, 0, 1, tail], [sideA, 0.04, 0.75, tail * 0.8], [sideB, 0.07, 0.6, tail * 0.7]]) {
+            m.material.uniforms.uHead.value = headOf(Math.max(0, p - delay), 0.3, tail);
+            m.material.uniforms.uTail.value = tl;
+            setFade(m, fade * f);
+        }
+        const q = clamp01((p - 0.22) / 0.78);
+        star.setState(tip.x, tip.y, 0.3 * size * (1 - 0.4 * q), p > 0.22 ? Math.max(0, 1 - q * 1.2) : 0);
+    });
+    return tip;
+}
+
+function buildSmash(c) {
+    const { add, animators, geometries, range, setFade, size, unitDisc, unitLine } = c;
+    let tip = { x: 0, y: 0 };
+    // 叩きつけ: 二重の衝撃波リングが広がり、外側に短い光線が放射状に走る。中心に光る円盤
+    const Rm = range * 0.3 * size;
+    const ringGeo = ringGeometry(1, 0.28);
+    geometries.push(ringGeo);
+    const ringA = add(ringGeo, 1);
+    const ringB = add(ringGeo, 1);
+    const disc = add(unitDisc, 2);
+    const rayCount = 14;
+    const rays = Array.from({ length: rayCount }, () => add(unitLine, 1));
+    const cy = -0.1;
+    animators.push((p) => {
+        const f = ease(p / 0.5);
+        const ringR = 0.12 + Rm * f;
+        ringA.position.set(0, cy, 0);
+        ringA.scale.set(ringR, ringR, 1);
+        ringB.position.set(0, cy, 0);
+        ringB.scale.setScalar(ringR * 0.7);
+        setFade(ringA, fadeOf(p, 0.3));
+        setFade(ringB, fadeOf(p, 0.3) * 0.55);
+        disc.position.set(0, cy, 0);
+        disc.scale.setScalar(Math.max(0.01, 0.75 * size * (1 - p) + 0.01));
+        setFade(disc, Math.max(0, 1 - p / 0.55));
+        rays.forEach((r, k) => {
+            const a = k * 2 * Math.PI / rayCount + 0.2;
+            const len = 0.38 * (1 - 0.5 * p) * size;
+            const dist = ringR + len * 0.35;
+            r.position.set(Math.cos(a) * dist, cy + Math.sin(a) * dist, 0);
+            r.rotation.z = a;
+            r.scale.set(len, 0.09, 1);
+            setFade(r, Math.max(0, 1 - p / 0.5));
+        });
+    });
+    tip = { x: 0, y: cy };
+    return tip;
+}
+
+function buildPunch(c) {
+    const { add, animators, geometries, makeStar, range, setFade, size } = c;
+    let tip = { x: 0, y: 0 };
+    // 素手: 星形の閃光を二重に重ね、リングを広げる
+    const starA = makeStar(0.15);
+    const starB = makeStar(0.15 + Math.PI / 8);
+    const ringGeo = ringGeometry(1, 0.28);
+    geometries.push(ringGeo);
+    const ring = add(ringGeo, 1);
+    const R = range * 0.4 * size;
+    animators.push((p) => {
+        const fade = fadeOf(p, 0.3);
+        const grow = ease(p / 0.5);
+        starA.setState(0, 0, 0.55 * R * (0.6 + 0.7 * grow), fade);
+        starB.setState(0, 0, 0.4 * R * (0.5 + 0.8 * grow), fade * 0.8);
+        const rr = (0.1 + 0.55 * ease(p / 0.6)) * R / 0.55;
+        ring.scale.set(rr, rr, 1);
+        setFade(ring, fade);
+    });
+    return tip;
+}
+
+function buildSlash(c) {
+    const { add, animators, arcDeg, effect, makeStar, range, root, setFade, size } = c;
+    let tip = { x: 0, y: 0 };
+    // slash: 両端が尖った三日月型の弧。先端が白熱して走り、尾が流れ消える。2 本目の細い弧と、切り終わりの星形の閃光つき
+    const R = Math.max(0.7, range * 0.4 * size);
+    const theta = Math.min(150, arcDeg + 48) * Math.PI / 180;
+    const a0 = Math.PI / 2 - theta / 2;
+    const tilt = (effect.tiltDeg ?? -32) * Math.PI / 180;
+    const tail = 0.7;
+    const arc = new THREE.Group();
+    arc.position.set(0, -R * 0.6, 0);
+    arc.rotation.z = tilt;
+    root.add(arc);
+    const main = add(arcGeometry(R, R * 0.6, a0, theta), 0, arc);
+    const second = add(arcGeometry(R * 0.84, R * 0.24, a0 + theta * 0.05, theta * 0.9), 0, arc);
+    const star = makeStar(0.35);
+    const endAngle = a0 + theta + tilt;
+    tip = { x: R * Math.cos(endAngle), y: -R * 0.6 + R * Math.sin(endAngle) };
+    animators.push((p) => {
+        const fade = fadeOf(p, 0.62);
+        main.material.uniforms.uHead.value = headOf(p, 0.38, tail);
+        main.material.uniforms.uTail.value = tail;
+        setFade(main, fade);
+        second.material.uniforms.uHead.value = headOf(Math.max(0, p - 0.03), 0.38, tail);
+        second.material.uniforms.uTail.value = tail * 0.85;
+        setFade(second, fade * 0.85);
+        const q = clamp01((p - 0.3) / 0.7);
+        star.setState(tip.x, tip.y, 0.34 * size * (1 - 0.5 * q), p > 0.3 ? Math.max(0, 1 - q * 1.3) : 0);
+    });
+    return tip;
+}
+
+const SHAPE_BUILDERS = { thrust: buildThrust, smash: buildSmash, punch: buildPunch, slash: buildSlash };
+
 export class SlashEffectSystem {
     // camera: エフェクトを子として取り付けるカメラ（scene に追加されている必要がある）
     constructor(camera) {
@@ -230,112 +358,8 @@ export class SlashEffectSystem {
         // 切り終わり・突き終わり・着弾の位置（火花の発生点。形ごとに決める）
         let tip = { x: 0, y: 0 };
 
-        if (shape === 'thrust') {
-            // 突き: 先端の尖った光の筋が走り抜け、細い筋が 2 本添う。先端に星形の閃光
-            const L = Math.max(1.4, range * 1.05 * size);
-            const rot = -(0.35 + Math.random() * 0.2);
-            const tail = 0.6;
-            const mainGeo = lineGeometry(L, 0.3 * size, 1.5);
-            const sideGeoA = lineGeometry(L * 0.8, 0.08, 1.5);
-            const sideGeoB = lineGeometry(L * 0.7, 0.06, 1.5);
-            const main = add(mainGeo, 0);
-            const sideA = add(sideGeoA, 0);
-            const sideB = add(sideGeoB, 0);
-            main.rotation.z = rot;
-            sideA.rotation.z = sideB.rotation.z = rot;
-            sideA.position.set(-Math.sin(rot) * -0.13, Math.cos(rot) * 0.13, 0);
-            sideB.position.set(-Math.sin(rot) * 0.13, Math.cos(rot) * -0.13, 0);
-            const star = makeStar(0.2);
-            tip = { x: L / 2 * Math.cos(rot), y: L / 2 * Math.sin(rot) };
-            animators.push((p) => {
-                const fade = fadeOf(p, 0.6);
-                for (const [m, delay, f, tl] of [[main, 0, 1, tail], [sideA, 0.04, 0.75, tail * 0.8], [sideB, 0.07, 0.6, tail * 0.7]]) {
-                    m.material.uniforms.uHead.value = headOf(Math.max(0, p - delay), 0.3, tail);
-                    m.material.uniforms.uTail.value = tl;
-                    setFade(m, fade * f);
-                }
-                const q = clamp01((p - 0.22) / 0.78);
-                star.setState(tip.x, tip.y, 0.3 * size * (1 - 0.4 * q), p > 0.22 ? Math.max(0, 1 - q * 1.2) : 0);
-            });
-        } else if (shape === 'smash') {
-            // 叩きつけ: 二重の衝撃波リングが広がり、外側に短い光線が放射状に走る。中心に光る円盤
-            const Rm = range * 0.3 * size;
-            const ringGeo = ringGeometry(1, 0.28);
-            geometries.push(ringGeo);
-            const ringA = add(ringGeo, 1);
-            const ringB = add(ringGeo, 1);
-            const disc = add(unitDisc, 2);
-            const rayCount = 14;
-            const rays = Array.from({ length: rayCount }, () => add(unitLine, 1));
-            const cy = -0.1;
-            animators.push((p) => {
-                const f = ease(p / 0.5);
-                const ringR = 0.12 + Rm * f;
-                ringA.position.set(0, cy, 0);
-                ringA.scale.set(ringR, ringR, 1);
-                ringB.position.set(0, cy, 0);
-                ringB.scale.setScalar(ringR * 0.7);
-                setFade(ringA, fadeOf(p, 0.3));
-                setFade(ringB, fadeOf(p, 0.3) * 0.55);
-                disc.position.set(0, cy, 0);
-                disc.scale.setScalar(Math.max(0.01, 0.75 * size * (1 - p) + 0.01));
-                setFade(disc, Math.max(0, 1 - p / 0.55));
-                rays.forEach((r, k) => {
-                    const a = k * 2 * Math.PI / rayCount + 0.2;
-                    const len = 0.38 * (1 - 0.5 * p) * size;
-                    const dist = ringR + len * 0.35;
-                    r.position.set(Math.cos(a) * dist, cy + Math.sin(a) * dist, 0);
-                    r.rotation.z = a;
-                    r.scale.set(len, 0.09, 1);
-                    setFade(r, Math.max(0, 1 - p / 0.5));
-                });
-            });
-            tip = { x: 0, y: cy };
-        } else if (shape === 'punch') {
-            // 素手: 星形の閃光を二重に重ね、リングを広げる
-            const starA = makeStar(0.15);
-            const starB = makeStar(0.15 + Math.PI / 8);
-            const ringGeo = ringGeometry(1, 0.28);
-            geometries.push(ringGeo);
-            const ring = add(ringGeo, 1);
-            const R = range * 0.4 * size;
-            animators.push((p) => {
-                const fade = fadeOf(p, 0.3);
-                const grow = ease(p / 0.5);
-                starA.setState(0, 0, 0.55 * R * (0.6 + 0.7 * grow), fade);
-                starB.setState(0, 0, 0.4 * R * (0.5 + 0.8 * grow), fade * 0.8);
-                const rr = (0.1 + 0.55 * ease(p / 0.6)) * R / 0.55;
-                ring.scale.set(rr, rr, 1);
-                setFade(ring, fade);
-            });
-        } else {
-            // slash: 両端が尖った三日月型の弧。先端が白熱して走り、尾が流れ消える。2 本目の細い弧と、切り終わりの星形の閃光つき
-            const R = Math.max(0.7, range * 0.4 * size);
-            const theta = Math.min(150, arcDeg + 48) * Math.PI / 180;
-            const a0 = Math.PI / 2 - theta / 2;
-            const tilt = (effect.tiltDeg ?? -32) * Math.PI / 180;
-            const tail = 0.7;
-            const arc = new THREE.Group();
-            arc.position.set(0, -R * 0.6, 0);
-            arc.rotation.z = tilt;
-            root.add(arc);
-            const main = add(arcGeometry(R, R * 0.6, a0, theta), 0, arc);
-            const second = add(arcGeometry(R * 0.84, R * 0.24, a0 + theta * 0.05, theta * 0.9), 0, arc);
-            const star = makeStar(0.35);
-            const endAngle = a0 + theta + tilt;
-            tip = { x: R * Math.cos(endAngle), y: -R * 0.6 + R * Math.sin(endAngle) };
-            animators.push((p) => {
-                const fade = fadeOf(p, 0.62);
-                main.material.uniforms.uHead.value = headOf(p, 0.38, tail);
-                main.material.uniforms.uTail.value = tail;
-                setFade(main, fade);
-                second.material.uniforms.uHead.value = headOf(Math.max(0, p - 0.03), 0.38, tail);
-                second.material.uniforms.uTail.value = tail * 0.85;
-                setFade(second, fade * 0.85);
-                const q = clamp01((p - 0.3) / 0.7);
-                star.setState(tip.x, tip.y, 0.34 * size * (1 - 0.5 * q), p > 0.3 ? Math.max(0, 1 - q * 1.3) : 0);
-            });
-        }
+        const build = SHAPE_BUILDERS[shape] ?? SHAPE_BUILDERS.slash;
+        tip = build({ add, animators, arcDeg, effect, geometries, makeStar, range, root, setFade, size, unitDisc, unitLine });
 
         // ---- 火花: 当たった点から飛び散る、尾を引く線 ----
         const sparkCount = Math.round(SPARK_COUNT * power);

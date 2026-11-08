@@ -18,7 +18,7 @@
       "plan": "水・溶岩・沼など、液体の種類ごとの関数に分ける"
     },
     "public/js/slashEffect.js::spawn": {
-      "lines": 220,
+      "lines": 116,
       "plan": "斬撃の種類ごとの関数に分ける（表で呼び分ける）"
     },
     "scripts/world/town_d.py::build": {
