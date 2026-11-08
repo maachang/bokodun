@@ -90,6 +90,7 @@ def build(w, h, legend, city_legend, links, npcs):
     TH.relax(lv, walk, fixed)
     for ch, x0, y0, wid, doff, door, sign, link in FACILITIES:
         lv[y0 + 2][x0 + doff] = lv[y0 + 3][x0 + doff]
+    for x in (42, 43): lv[0][x] = lv[1][x]   # 城門のマスの高さも、門の前のマスと同じ（高台の城門に、段差で落ちて、落下ダメージを受けない）
     lv[CATHEDRAL[1] + CATHEDRAL[3] - 1][CATHEDRAL[0] + CATHEDRAL[4]] = lv[CATHEDRAL[1] + CATHEDRAL[3]][CATHEDRAL[0] + CATHEDRAL[4]]
     for y in range(h):
         for x in range(w):

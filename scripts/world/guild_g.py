@@ -2,7 +2,7 @@
   G（デイラミ精霊国）: ギルド長は、長老の一族が担う（ユーザー指定）。長老たちは、世界樹のそばの小さな家（elder_house_g）の中にいる。
   - 冒険者ギルド（guild_adv_g・guild_adv_master_g）: ギルド長は、長老の息子（elf_elder_son）
   - 魔法ギルド（guild_mage_g・guild_mage_master_g）: ギルド長は、長老の娘（elf_elder_daughter）
-  C（ミレニアム自由都市）: 商人ギルド長は砂漠の住民（議長は、議長の館 mansion_chairman_c にいる）。E（ガリレオ連盟）: 議長が、商人ギルドの奥の部屋にいる（金の亡者の議長）。
+  C（ミレニアム自由都市）: 商人ギルド長は砂漠の住民（議長は、議長の館 mansion_chairman_c にいる）。E（ガリレオ連盟）の議長は、議長の館（mansion_chairman_e。castle_f.py）にいる。
   F（ライアン獣王国）: 受付・ギルド長・教官は、獣人（sdServer の画像）。店員（武器屋・道具屋・宿屋・鍛冶屋）も全て獣人。G の店員（武器屋・道具屋・宿屋・ギルドの受付）は、全て長老の娘か息子。
   - 冒険者ギルド（guild_adv_f・guild_adv_master_f）: 受付は狐の獣人、ギルド長は虎の獣人（部族長・女）
   - 商人ギルド（guild_merchant_f・guild_merchant_master_f）: 受付は狸の獣人、ギルド長は猫の獣人（部族長・男）と、猫の貴族の婦人
@@ -25,8 +25,6 @@ GUILDS = [
     ('guild_merchant_master', 'guild_merchant_master_f', '商人ギルド長の部屋（ライアン獣王国）', 'guild_merchant_f', {'merchant_master_man': 'cat_merchant_master', 'merchant_master_woman': 'cat_noble_woman'}, {}),
     ('guild_merchant', 'guild_merchant_c', '商人ギルド（ミレニアム自由都市）', 'town_c', {'merchant_clerk_man': 'desert_clerk_man', 'merchant_clerk_woman': 'desert_clerk_woman'}, {'guild_merchant_master': 'guild_merchant_master_c'}),
     ('guild_merchant_master', 'guild_merchant_master_c', '商人ギルド長の部屋（ミレニアム自由都市）', 'guild_merchant_c', {'merchant_master_man': 'desert_middle_man', 'merchant_master_woman': 'desert_old_woman'}, {}),
-    ('guild_merchant', 'guild_merchant_e', '商人ギルド（ガリレオ連盟）', 'town_e', {}, {'guild_merchant_master': 'guild_merchant_master_e'}),
-    ('guild_merchant_master', 'guild_merchant_master_e', '議長の部屋（ガリレオ連盟）', 'guild_merchant_e', {'merchant_master_man': 'chairman_e'}, {}),
     ('city_inn', 'city_inn_f', '宿屋・酒場（ライアン獣王国）', 'town_f', {'innkeeper': 'innkeeper_f', 'inn_cook': 'inn_cook_f', 'inn_waitress': 'inn_waitress_f'}, {'city_inn_2f': 'city_inn_2f_f'}),
     ('city_inn_2f', 'city_inn_2f_f', '宿屋の客室（ライアン獣王国）', 'city_inn_f', {'inn_waitress': 'inn_waitress_f'}, {'city_inn': 'city_inn_f'}),
     ('guild_smith', 'guild_smith_f', '鍛冶屋（ライアン獣王国）', 'town_f', {'dwarf_smith': 'smith_keeper_f'}, {}),

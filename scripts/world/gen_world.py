@@ -127,7 +127,7 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     for gm in GG.build():   # G のギルド（ギルド長は長老の一族）
         json.dump(gm, open(os.path.join(MAPS, gm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    for cm in CF.build_others() + [TPB.build(), CF.build_mansion_c()]:   # 国ごとの城（A 帝王・B 愚王・G 女王）と B の大教会（教皇）
+    for cm in CF.build_others() + [TPB.build(), CF.build_mansion_c(), CF.build_mansion_e()]:   # 国ごとの城（A 帝王・B 愚王・G 女王）と B の大教会（教皇）
         json.dump(cm, open(os.path.join(MAPS, cm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     cf = CF.build()   # F の小さな王城（獣王・フェンリル像）
     json.dump(cf, open(os.path.join(MAPS, cf['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

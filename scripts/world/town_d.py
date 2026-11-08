@@ -139,7 +139,7 @@ def _build_scatterPlants(st):
 
 def _build_heights(st):
     """高さ（サンプルの高さを土台に、川・高台を重ねる。段差の確認）。共有する変数は st（段階の間の入れ物）から受け取り、後の段階で使う変数は st へ書き戻す（元は build の一部）"""
-    facilities, g, h, w = st.facilities, st.g, st.h, st.w
+    castle, facilities, g, h, w = st.castle, st.facilities, st.g, st.h, st.w
     # 高さ: サンプル（city）の高さを土台にして、川（0）と高台（王城区・神殿）を重ねる。段差は、歩ける隣どうしで 1 以下
     lv = TH.sample_field(w, h, 0, 0)
     fixed = set()
@@ -152,6 +152,8 @@ def _build_heights(st):
     TH.relax(lv, walk, fixed)
     for ch, x0, y0, wid, doff, door, sign, link in facilities:   # 扉のマスの高さは、扉の前のマスと同じ（段差なく入れる）
         lv[y0 + 2][x0 + doff] = lv[y0 + 3][x0 + doff]
+    if castle:   # 城門のマスの高さも、門の前のマスと同じ（段差があると、門に入るとき、落下ダメージを受ける）
+        for x in (19, 20): lv[0][x] = lv[1][x]
     for y in range(h):
         for x in range(w):
             if g[y][x] in SOLID or g[y][x] == 'w': continue

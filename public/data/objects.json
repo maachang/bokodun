@@ -2798,6 +2798,7 @@
     "description": "高台の絨毯の段（高さ 0.9）"
   },
   "castle_gate": {
+    "lift": true,
     "type": "door",
     "texture": "woodDoor",
     "frameTexture": "cityWall",

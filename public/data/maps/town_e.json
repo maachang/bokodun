@@ -49,7 +49,9 @@
   "g": "merchant_guild_sign",
   "c": "church_sign",
   "w": "water",
-  "b": "wood_bridge"
+  "b": "wood_bridge",
+  "Y": "mansion_door",
+  "x": "chairman_sign"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -76,10 +78,10 @@
   "Wppppppppppppppppp====pppppppXwwwwwwwwwW",
   "Wppppppppppppppppp====ppppppppwwwwwwwwwW",
   "Wppppppppppppppppp====ppppppppbbbbbbbbwW",
-  "WpHHHHpHHHHpHHHHpp====pHHHHpppwwwlwwwwwW",
-  "WpHHHHpHHHHpHHHHpp====pHHHHppBwwwwwwwwwW",
-  "WpHHHHpHHHHpHHHHpp====pHHHHpppwwwwwLwwwW",
-  "Wppppppppppppppppp====ppppppppwwwwwwwwwW",
+  "WpHHHHHHHHppHHHHpp====pHHHHpppwwwlwwwwwW",
+  "WpHHHHHHHHppHHHHpp====pHHHHppBwwwwwwwwwW",
+  "WpHHHYHHHHppHHHHpp====pHHHHpppwwwwwLwwwW",
+  "Wpppppxppppppppppp====ppppppppwwwwwwwwwW",
   "WpTppppppppppppTpp====pppppTpppppppppppW",
   "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
  ],
@@ -191,12 +193,21 @@
    }
   },
   "3,12": {
-   "nextMap": "guild_merchant_e",
+   "nextMap": "guild_merchant",
    "message": "商人ギルドに入る",
    "icon": "merchantGuildIcon",
    "back": {
     "x": 3,
     "z": 13,
+    "angle": 3.14159
+   }
+  },
+  "5,26": {
+   "nextMap": "mansion_chairman_e",
+   "message": "議長の館に入る",
+   "back": {
+    "x": 5,
+    "z": 27,
     "angle": 3.14159
    }
   },

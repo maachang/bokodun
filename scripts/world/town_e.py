@@ -15,7 +15,8 @@ FACILITIES = [
     ('S', 7, 3, 4, 1, 'd', 'Q', _shop('weapon_shop', '武器屋に入る', 'weaponShopIcon')),
     ('I', 12, 3, 4, 1, 'N', 'M', _to('city_inn', '宿屋・酒場に入る', 'innIcon')),
     ('S', 23, 3, 4, 1, 'd', 'a', _to('guild_adv', '冒険者ギルドに入る', 'advGuildIcon')),
-    ('S', 2, 10, 4, 1, 'd', 'g', _to('guild_merchant_e', '商人ギルドに入る', 'merchantGuildIcon')),
+    ('S', 2, 10, 4, 1, 'd', 'g', _to('guild_merchant', '商人ギルドに入る', 'merchantGuildIcon')),
+    ('H', 2, 24, 8, 3, 'Y', 'x', {'nextMap': 'mansion_chairman_e', 'message': '議長の館に入る'}),   # 議長の館（国のトップの館。ほかの 2 倍の幅。扉の上の絵はなし）
     ('J', 23, 10, 4, 1, 'D', 'c', _to('temple', '神殿に入る', 'templeIcon')),   # 神殿は高台
 ]
 
@@ -31,7 +32,7 @@ NPCS = [
 ]
 
 LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'g', 'c', 'w', 'b')
-SOLID = set('WHSIJdNDLlXB')
+SOLID = set('WHSIJdNDYLlXB')
 
 
 def build(w, h, legend, city_legend, links, npcs):
@@ -57,7 +58,7 @@ def build(w, h, legend, city_legend, links, npcs):
     for y in range(h): g[y][0] = g[y][w - 1] = 'W'
     g[h - 1][19] = g[h - 1][20] = 'G'
     # 家（施設以外）
-    for hx, hy in ((2, 18), (7, 18), (12, 18), (23, 18), (2, 24), (7, 24), (12, 24), (23, 24)):
+    for hx, hy in ((2, 18), (7, 18), (12, 18), (23, 18), (12, 24), (23, 24)):
         for y in range(hy, hy + 3):
             for x in range(hx, hx + 4): g[y][x] = 'H'
     # 施設
@@ -83,6 +84,7 @@ def build(w, h, legend, city_legend, links, npcs):
         g[y][x] = c
     legend.update({'X': 'crate_out', 'B': 'barrel_out', 'L': 'ship_large', 'l': 'ship_small'})
     for k in LEGEND_KEYS: legend[k] = city_legend[k]
+    legend['Y'] = 'mansion_door'; legend['x'] = 'chairman_sign'   # 議長の館の扉・立て札
     for nid, x, z in NPCS:
         assert g[z][x] in 'p=', f'E の NPC {nid} ({x},{z}): 歩ける空きマスではない'
         npcs.append({'id': nid, 'x': x, 'z': z})

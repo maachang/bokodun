@@ -1752,7 +1752,7 @@ test('国のトップは、国ごとに違う（城・大教会・議長の部�
     assert.ok(ids('castle_f').includes('lion_king'), 'F: 獣王');
     assert.ok(ids('castle_g').includes('elf_queen'), 'G: 女王');
     assert.ok(ids('mansion_chairman_c').includes('desert_chairman'), 'C: 議長（議長の館）');
-    assert.ok(ids('guild_merchant_master_e').includes('chairman_e'), 'E: 議長');
+    assert.ok(ids('mansion_chairman_e').includes('chairman_e'), 'E: 議長（議長の館）');
     for (const [t, c] of [['a', 'castle_a'], ['b', 'castle_b'], ['d', 'castle'], ['f', 'castle_f'], ['g', 'castle_g']]) {
         assert.ok(Object.values(readJson(`public/data/maps/town_${t}.json`).links).some(l => l.nextMap === c), `${t}: 城門は ${c}`);
     }
@@ -1851,7 +1851,7 @@ test('植物（草・花・シダ・葦など）は、全て sdServer の画像�
 });
 
 test('個人の館・家（H の自治領主の館・C の議長の館・G の長老の家）の扉の上に、店・ギルド・神殿の絵（icon）を付けない', () => {
-    for (const [town, next] of [['h', 'mansion_margrave'], ['c', 'mansion_chairman_c'], ['g', 'elder_house_g']]) {
+    for (const [town, next] of [['h', 'mansion_margrave'], ['c', 'mansion_chairman_c'], ['e', 'mansion_chairman_e'], ['g', 'elder_house_g']]) {
         const link = Object.values(readJson(`public/data/maps/town_${town}.json`).links).find(l => l.nextMap === next);
         assert.ok(link, `${town}: ${next}`);
         assert.equal(link.icon, undefined, `${town}: 館・家に、店の絵を付けない`);
@@ -1867,4 +1867,42 @@ test('C（ミレニアム自由都市）の門番・護衛は、砂漠の街の�
     const human = /^(guard_|gate_guard)/;
     assert.ok(!town.npcs.some(n => human.test(n.id)) && town.npcs.filter(n => n.id === 'desert_guard').length >= 2, '街の護衛');
     assert.ok(!outer.npcs.some(n => human.test(n.id)) && outer.npcs.filter(n => n.id === 'desert_gate_guard').length === 2, '外のマップの門番');
+});
+
+test('修正: D（グリーン王国）の王城に王子はいない・E（ガリレオ連盟）に議長の館がある・扉と門に落ちない・本棚の後ろに窓がない', () => {
+    // D の王は質素で、王子（愚か者）はいない
+    const ids = (n) => readJson(`public/data/maps/${n}.json`).npcs.map(x => x.id);
+    assert.ok(ids('castle').includes('king_d') && !ids('castle').includes('prince'), 'D の王城: 王だけ（王子はいない）');
+    // E: 議長の館（議長 chairman_e）。商人ギルドは、共通のまま
+    const e = readJson('public/data/maps/town_e.json');
+    assert.equal(Object.values(e.links).find(l => l.nextMap === 'mansion_chairman_e')?.message, '議長の館に入る');
+    assert.ok(ids('mansion_chairman_e').includes('chairman_e'));
+    assert.ok(Object.values(e.links).some(l => l.nextMap === 'guild_merchant'), 'E の商人ギルドは、共通のマップ');
+    // 街の中の、すべての出入口（扉・門・城門）は、マスの高さが、前（back）のマスと同じ: 高台の門に、段差で落ちて、落下ダメージを受けない
+    for (const id of 'abcdefgh') {
+        const t = readJson(`public/data/maps/town_${id}.json`);
+        for (const [key, l] of Object.entries(t.links)) {
+            if (!l.back) continue;
+            const [x, y] = key.split(',').map(Number);
+            const h = (xx, yy) => parseInt(t.heights[yy][xx], 36);
+            assert.ok(Math.abs(h(x, y) - h(l.back.x, l.back.z)) <= 0, `town_${id} (${x},${y}): 出入口の高さが、前のマスと違う（落下ダメージ）`);
+        }
+    }
+});
+
+test('配置: 本棚・食器棚（背の高い家具）の、すぐ後ろ・隣に、窓を置かない（窓の前に、家具が立つのは、ありえない配置）', () => {
+    const tall = new Set(['bookshelf', 'bookshelf_stone', 'cupboard', 'cupboard_stone', 'wardrobe']);
+    const bad = [];
+    for (const f of fs.readdirSync(path.join(root, 'public/data/maps')).filter(f => f.endsWith('.json'))) {
+        const m = readJson(`public/data/maps/${f}`);
+        if (!m.layout || !m.legend) continue;
+        m.layout.forEach((row, y) => [...row].forEach((ch, x) => {
+            if (!tall.has(m.legend[ch])) return;
+            for (const [dx, dy] of [[0, -1], [0, 1], [-1, 0], [1, 0]]) {
+                const n = m.legend[m.layout[y + dy]?.[x + dx]] ?? '';
+                if (/window|stained/.test(n)) bad.push(`${f} (${x},${y}) の隣 (${x + dx},${y + dy}) に ${n}`);
+            }
+        }));
+    }
+    assert.deepEqual(bad, []);
 });
