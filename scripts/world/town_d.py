@@ -63,7 +63,9 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
         for x in (19, 20):
             for y in (14, 15): g[y][x] = 'p'
         g[14][19] = 'Y'
-        for x, y in ((20, 14), (19, 15), (20, 15)): g[y][x] = 'j'   # 世界樹のまわりの柵（入れない。大通りの両脇の列は通れる）
+        for y in range(13, 17):   # 世界樹のまわりの柵: 木のある 2×2 を、4 辺とも囲う（x 18〜21・y 13〜16 の外周と、中の 3 マス）。通りは、柵の両脇（x 16・17 / 22・23 の列）へ迂回する
+            for x in range(18, 22):
+                if (x, y) != (19, 14): g[y][x] = 'j'
     if castle: g[0][19] = g[0][20] = 'C'   # 城門（castle は、中の王城のマップ名。True なら共通の castle。G は、城を置かない）
     for x in ((19, 20) if castle else ()):
         links[f'{x},0'] = {'nextMap': castle if isinstance(castle, str) else 'castle', 'message': '王城に入る', 'back': {'x': x, 'z': 1, 'angle': 3.14159}}

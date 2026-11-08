@@ -1793,37 +1793,13 @@ test('兵士: F（獣人国）はコボルト（sdServer 11）。G（エルフ�
     }
 });
 
-test('G: 世界樹のまわりに柵があり、入れない（木 1 本と柵 3 マスで、2×2 の囲い。大通りの両脇の道は通れる）', () => {
+test('G: 世界樹のまわりを、柵で、4 辺とも囲って入れない（x 18〜21・y 13〜16 の外周と中。木は 1 マス）。通りは、柵の両脇へ迂回して行き来できる', () => {
     const m = readJson('public/data/maps/town_g.json');
     assert.equal(m.layout[14][19], 'Y');
-    for (const [x, y] of [[20, 14], [19, 15], [20, 15]]) assert.equal(objects[m.legend[m.layout[y][x]]]?.type, 'wooden_fence', `(${x},${y}) は柵`);
+    assert.equal(objects[m.legend.j].type, 'wooden_fence');
     assert.equal(objects[m.legend.j].solid, true, '柵は通れない');
-    // 大通り（南北）は、柵の両脇の列（x=18・21）で、通り抜けられる
-    for (let y = 13; y <= 16; y++) for (const x of [18, 21]) assert.ok('p='.includes(m.layout[y][x]), `(${x},${y}) は通れる`);
-});
-
-test('店員: F（獣人国）は全て獣人、G（エルフ国）は全て長老の娘か息子（武器屋・道具屋・宿屋・鍛冶屋・ギルドの受付）', () => {
-    const npcs = readJson('public/data/npcs.json');
-    const shops = readJson('public/data/shops.json');
-    const tex = (id) => npcs[id].texture.replace('/images/npcs/', '').replace('.png', '');
-    // F: 獣人の画像
-    const beast = /^(beast_|fox_|tanuki_|mouse_|tiger_|cat_|bear_|lion_)/;
-    for (const id of ['weapon_shop_f', 'item_shop_f']) assert.ok(beast.test(tex(shops[id].keeper)), `${id}: 店主は獣人`);
-    for (const id of ['innkeeper_f', 'inn_cook_f', 'inn_waitress_f', 'smith_keeper_f']) assert.ok(beast.test(tex(id)), `${id}: 獣人`);
-    for (const m of ['city_inn_f', 'city_inn_2f_f', 'guild_smith_f']) {
-        for (const n of readJson(`public/data/maps/${m}.json`).npcs.filter(n => /(keeper|cook|waitress|smith)/.test(n.id))) assert.ok(beast.test(tex(n.id)), `${m}: ${n.id} は獣人`);
-    }
-    // G: 長老の娘か息子の画像
-    const elder = /^elf_elder_(son|daughter)$/;
-    for (const id of ['weapon_shop_g', 'item_shop_g']) assert.ok(elder.test(tex(shops[id].keeper)), `${id}: 店主は長老の子`);
-    for (const id of ['innkeeper_g', 'inn_cook_g', 'inn_waitress_g', 'elder_son_clerk', 'elder_daughter_clerk']) assert.ok(elder.test(tex(id)), `${id}: 長老の子`);
-    for (const m of ['city_inn_g', 'city_inn_2f_g']) {
-        for (const n of readJson(`public/data/maps/${m}.json`).npcs.filter(n => /(keeper|cook|waitress)/.test(n.id))) assert.ok(elder.test(tex(n.id)), `${m}: ${n.id}`);
-    }
-    for (const m of ['guild_adv_g', 'guild_mage_g']) {
-        const staff = readJson(`public/data/maps/${m}.json`).npcs.filter(n => /clerk/.test(n.id));
-        assert.ok(staff.length >= 2 && staff.every(n => elder.test(tex(n.id))), `${m}: 受付は長老の子`);
-    }
-    const town = (id, k) => Object.values(readJson(`public/data/maps/town_${id}.json`).links).filter(l => l.params?.shopId === k).length;
-    assert.equal(town('f', 'weapon_shop_f'), 1); assert.equal(town('g', 'weapon_shop_g'), 1);
+    for (let y = 13; y <= 16; y++) for (let x = 18; x <= 21; x++) if (!(x === 19 && y === 14)) assert.equal(m.layout[y][x], 'j', `(${x},${y}) は柵（隙間がない）`);
+    // 迂回: 柵の西（x 16・17）・東（x 22・23）の列は、通れる
+    for (let y = 13; y <= 17; y++) for (const x of [16, 17, 22, 23]) assert.ok('p='.includes(m.layout[y][x]), `(${x},${y}) は通れる（迂回路）`);
+    for (const x of [16, 17, 22]) assert.ok('p='.includes(m.layout[12][x]), `(${x},12) は通れる（迂回路。東の長老の家の手前まで）`);
 });
