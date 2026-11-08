@@ -1,7 +1,8 @@
 // 戦闘・魔法・飛び道具・被弾・状態異常・落下・経験値。GameEngine のメソッド（this は GameEngine。game.js が、クラスの定義のあとで、GameEngine.prototype へ組み込む）。
 // 元は game.js の GameEngine のメソッド。移しただけで、動きは同じ（game.js が長すぎて、編集の誤りが増えるため分割した）
 import * as THREE from '/js/three.module.js';
-import { Projectile, Monster } from '/js/entities.js';
+import { Monster } from '/js/entities.js';
+import { Projectile } from '/js/projectile.js';
 import { HIT_FEEDBACK } from '/js/game/constants.js';
 
 export const combatMethods = {

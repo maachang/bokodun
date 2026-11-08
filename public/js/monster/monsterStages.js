@@ -2,7 +2,7 @@
 // 元は Monster.update の中の段階。移しただけで、動きは同じ（長すぎて、編集の誤りが増えるため分割した）
 import * as THREE from '/js/three.module.js';
 import { SENSE_DRAW_SCALE, STEALTH_DRAW_MULT, STEALTH_FADE_BAND, APPEAR_FADE_TIME } from '/js/monster/constants.js';
-import { Projectile } from '/js/entities.js';
+import { Projectile } from '/js/projectile.js';
 
 export const monsterStageMethods = {
     updateSenses(player, dt, colliders, visibility) {

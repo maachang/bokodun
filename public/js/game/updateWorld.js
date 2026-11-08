@@ -1,7 +1,7 @@
 // 世界の仕掛け・水面・弾・マップの端などの毎フレームの更新。GameEngine のメソッド（this は GameEngine。game.js が、クラスの定義のあとで、GameEngine.prototype へ組み込む）。
 // 元は GameEngine.update の中の段階。移しただけで、動きは同じ（game.js が長すぎて、編集の誤りが増えるため分割した）
 import * as THREE from '/js/three.module.js';
-import { Projectile } from '/js/entities.js';
+import { Projectile } from '/js/projectile.js';
 import { clampToWorld, edgeCrossing } from '/js/world.js';
 
 export const updateWorldMethods = {

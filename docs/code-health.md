@@ -33,7 +33,7 @@
 ## 現状（2026-11-08）
 負債台帳は、**空**（目標を超えるファイル・関数は、0）。分割の結果:
 - `game.js` 5735 → 325 行。タイルの描画（`game/tiles*.js`）・毎フレームの更新（`updateWorld`・`updatePlayer`）・マップの地形と見た目（`mapTerrain`・`mapVisuals`・`mapNeighbors`）・マップの読み込み（`mapLoad`）・描画の補助・移動・装備・戦闘・HUD・操作・入力・テクスチャの登録・初期状態は、`public/js/game/` の部品。
-- `textures.js` 2603 → 28 行（`public/js/textures/` の 6 部品）。`entities.js` 1580 → 約 680 行（`public/js/monster/` の部品）。`audio.js` 963 → 21 行（`public/js/audio/`）。
+- `textures.js` 2603 → 28 行（`public/js/textures/` の 6 部品）。`entities.js` 1580 → 249 行（`Monster` の部品は `public/js/monster/`、飛び道具 `Projectile` は `public/js/projectile.js`）。`audio.js` 963 → 21 行（`public/js/audio/`）。
 - Python: `terrain.py` 1099 → 約 360 行（`terrain_base`・`terrain_coast`・`terrain_mountain`・`terrain_sites`）。`gen_world.py` 722 → 228 行（定数は `world_consts.py`、マスごとの物体と地面の生成 `build_tiles` と各段階は `world_tiles.py`）。`terrain.py` の `build`・`town_d.py` の `build`・`_mountains` は、段階ごとの関数。
 - 確認の仕組み: 負債の台帳テスト・未定義の変数の検査（`scripts/scope_check.mjs`）・ブラウザでの確認（`scripts/verify_maps.mjs`）。
 - **これからは、この状態を保つ**: 新しいコードは目標を守り、大きくなる前に分ける。節目ごとに `bun scripts/code_health.mjs` で確認する。報告の「注意」（目標の 80% 以上＝ファイル 640 行・関数 80 行以上）に出たものは、超える前に、早めに分ける。
