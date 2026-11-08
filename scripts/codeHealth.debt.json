@@ -1,10 +1,6 @@
 {
   "files": {},
   "funcs": {
-    "public/js/game.js::constructor": {
-      "lines": 111,
-      "plan": "初期化を、段階（描画・入力・状態・UI）ごとの関数に分ける"
-    },
     "public/js/game/tilesFloors.js::liquid_tile": {
       "lines": 121,
       "plan": "水・溶岩・沼など、液体の種類ごとの関数に分ける"
