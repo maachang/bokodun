@@ -25,10 +25,6 @@
       "lines": 220,
       "plan": "斬撃の種類ごとの関数に分ける（表で呼び分ける）"
     },
-    "scripts/world/terrain.py::build": {
-      "lines": 239,
-      "plan": "terrain.py の分割計画（段階ごとの関数）と同時に"
-    },
     "scripts/world/town_d.py::build": {
       "lines": 124,
       "plan": "共通部品（壁・門・川・施設・段差の確認・飾り）を town_common.py へ。E・H・B・C の重複も、同時に解消する"

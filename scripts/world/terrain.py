@@ -8,6 +8,7 @@
 結果は、numpy の配列（W×H のマスごと）。毎回、同じ結果になる（乱数は、固定の種）。
 """
 import os
+from types import SimpleNamespace
 import numpy as np
 from collections import deque
 from PIL import Image, ImageFilter, ImageDraw
@@ -18,9 +19,9 @@ from terrain_mountain import MOUNTAIN_STEP, TRAIL_PEAKS, _astar4, _gorge_bridges
 from terrain_sites import FIXED_TOWNS, TOWN_CANDIDATES, TOWN_GATE_FRONT, TOWN_R_FLAT, _desert_oases, _town_sites   # noqa: F401（世界の地形: オアシスと街の敷地）
 
 
-def build():
-    land_i, biome_i, lake_i = read_image()
-    sx, sy = W / land_i.shape[1], H / land_i.shape[0]
+def _build_coast(g):
+    """海岸・地形の境のゆがみと、陸地・地形の種類・湖の下ごしらえ。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
+    biome_i, lake_i, land_i, sx, sy = g.biome_i, g.lake_i, g.land_i, g.sx, g.sy
     # 海岸・地形の境を、ぎざぎざにする（座標のゆがみ）
     wx = (fbm(11, (48, 16, 6)) - 0.5) * 14
     wy = (fbm(12, (48, 16, 6)) - 0.5) * 14
@@ -45,7 +46,21 @@ def build():
     oasis['flat'] = oasis['flat'] | town_mask          # 平地の街は、標高 0 に平らにする（山の上の街は、標高をそのまま）
     town_mask = town_mask | town_mask_mtn
     fring = fring | gring
+    g.biome = biome
+    g.ffrozen = ffrozen
+    g.fring = fring
+    g.lagoon = lagoon
+    g.lake = lake
+    g.land = land
+    g.oasis = oasis
+    g.pond = pond
+    g.town_mask = town_mask
+    g.towns = towns
 
+
+def _build_rivers(g):
+    """川（ゆらぎ・浅瀬・橋）と、湖との重なり。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
+    biome, lake, land, sx, sy = g.biome, g.lake, g.land, g.sx, g.sy
     # 川（世界のマス）: 線に、ゆらぎをつけて描く。浅瀬（歩いて渡れる）を、間隔をあけて作る
     river = np.zeros((H, W), np.uint8)   # 0 なし・1 深い・2 浅瀬
     d_sea0 = _distance(~land)
@@ -144,6 +159,13 @@ def build():
         if len(pts_) < 2 or (np.abs(pts_[:, None, :] - pts_[None, :, :]).sum(axis=2).max() < 3): river[comp] = 1
 
     water_deep = lake | (river == 1)
+    g.river = river
+    g.water_deep = water_deep
+
+
+def _build_lakeEdge(g):
+    """湖のふちと、川の浅瀬の整理。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
+    fring, lagoon, lake, pond, river, water_deep = g.fring, g.lagoon, g.lake, g.pond, g.river, g.water_deep
     # 湖のふちと川の浅瀬: 浅瀬
     lake_edge = lake & ~_ero(lake, 3)
     bridge = (river == 2) & ~lake
@@ -151,7 +173,15 @@ def build():
     water_deep &= ~water_shallow & ~bridge
     water_deep = water_deep | pond
     any_water = water_deep | water_shallow | bridge | lagoon
+    g.any_water = any_water
+    g.bridge = bridge
+    g.water_deep = water_deep
+    g.water_shallow = water_shallow
 
+
+def _build_snowHeights(g):
+    """高さ: 雪山（連峰）と裾野。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
+    biome, sx, sy = g.biome, g.sx, g.sy
     # 高さ
     ys, xs = np.mgrid[0:H, 0:W].astype(np.float32)
     ix, iy = xs / sx, ys / sy
@@ -170,6 +200,22 @@ def build():
     ridge2 = 1 - np.abs(2 * fbm(33, (30, 11, 4)) - 1)
     valley = fbm(35, (72, 24, 8))
     e_snow = e_snow + moraine * (1 - np.clip(peaks / 14, 0, 1)) + peaks * (0.35 + 0.95 * ridge1 ** 1.6) + 7 * ridge2 ** 2 * np.clip(peaks / 12, 0, 1) - 6 * (valley > 0.62) * np.clip(peaks / 10, 0, 1)
+    g.blur = blur
+    g.e_snow = e_snow
+    g.ix = ix
+    g.iy = iy
+    g.w_con = w_con
+    g.w_for = w_for
+    g.w_rock = w_rock
+    g.w_snow = w_snow
+    g.w_tr = w_tr
+    g.xs = xs
+    g.ys = ys
+
+
+def _build_rockHeights(g):
+    """高さ: 岩山と炭鉱のくぼ地。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
+    ix, iy, sx, sy = g.ix, g.iy, g.sx, g.sy
     # 岩山（東・南東）: 段々の山。炭鉱のまわりは、掘削跡（くぼ地）
     e_rock = np.full((H, W), 3.0, np.float32)
     for px, py, ph, ps in PEAKS_ROCK:
@@ -184,6 +230,14 @@ def build():
     e_rock = np.maximum(e_rock, 1)
     e_con = 3 + 6 * fbm(41, (60, 20, 8)) + 3 * (1 - np.abs(2 * fbm(53, (30, 10, 4)) - 1)) ** 2
     plains = 4.0 * fbm(43, (96, 32, 10))
+    g.e_con = e_con
+    g.e_rock = e_rock
+    g.plains = plains
+
+
+def _build_lowlandHeights(g):
+    """高さ: 草原の丘陵と、西の大森林。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
+    biome, blur, plains, xs, ys = g.biome, g.blur, g.plains, g.xs, g.ys
     # 草原: ゆるやかな丘陵（周期の長い起伏）。大きな丘（見晴らしの丘）が点々と。傾きは、ゆるい（道をつけやすい）。低い所は、池・川のくぼ地になる
     w_gr = blur(biome == GRASS, 12)
     hills = 1.0 + 6.0 * fbm(70, (84, 30, 9)) ** 1.3 + 2.0 * (1 - np.abs(2 * fbm(71, (44, 16, 5)) - 1)) ** 2
@@ -197,6 +251,14 @@ def build():
     ridgeF = (1 - np.abs(2 * fbm(46, (34, 12, 4)) - 1)) ** 2
     e_for = 3 + 13 * fbm(45, (28, 10, 4)) + 9 * ridgeF
     e_tr = 4 + 9 * fbm(47, (34, 12, 5)) + 3 * (1 - np.abs(2 * fbm(48, (40, 14, 5)) - 1)) ** 2   # 南国: ゆるい丘とジャングルの谷
+    g.e_for = e_for
+    g.e_tr = e_tr
+    g.plains = plains
+
+
+def _build_desertHeights(g):
+    """高さ: 砂漠の砂丘。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
+    biome, blur, e_con, e_for, e_rock, e_snow, e_tr, land, oasis, plains, w_con, w_for, w_rock, w_snow, w_tr, xs, ys = g.biome, g.blur, g.e_con, g.e_for, g.e_rock, g.e_snow, g.e_tr, g.land, g.oasis, g.plains, g.w_con, g.w_for, g.w_rock, g.w_snow, g.w_tr, g.xs, g.ys
     # 砂漠: 砂丘。風は北西から南東へ。尾根は風と直交（北東〜南西）に、平行に並ぶ。風上はゆるやか（約 3 マスで 1 段）・風下は急（1 マスで 1 段）の、のこぎり型。尾根は、ゆらぎで曲がり、ところどころ切れて、峠になる。砂漠の中心ほど高く、数か所に、星型の高い砂丘
     w_des = blur(biome == DESERT, 14)
     inner = np.clip(_distance(biome != DESERT).astype(np.float32) / 40.0, 0, 1)         # 砂漠の縁 0 → 中心 1
@@ -221,6 +283,12 @@ def build():
     elev = mount + plains * np.clip(1 - wsum, 0, 1)
     elev = np.where(land, elev, 0)
     elev = np.clip(elev, 0, MAX_LEVEL).round().astype(np.int32)
+    g.elev = elev
+
+
+def _build_settleHeights(g):
+    """高さ: 水辺・海岸へ向かって、1 マスに 1 段までに整える。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
+    any_water, biome, bridge, elev, land, oasis, sx, sy, water_deep = g.any_water, g.biome, g.bridge, g.elev, g.land, g.oasis, g.sx, g.sy, g.water_deep
     # 水辺・海岸に向かって、1 マスに 1 段までの傾きで下がる
     seeds = any_water | ~land | oasis['flat']
     dist = _distance(seeds)
@@ -231,6 +299,18 @@ def build():
     elev, trail, arenas, mtn_bridge, bridge_under = _mountains(elev, land, biome, (water_deep & ~bridge) | oasis['flat'] | ~land, sx, sy)   # 連峰・山脈: 段丘と山道
     elev[any_water | ~land | oasis['flat']] = 0
     Y_, X_ = np.mgrid[0:H, 0:W]
+    g.X_ = X_
+    g.Y_ = Y_
+    g.arenas = arenas
+    g.bridge_under = bridge_under
+    g.elev = elev
+    g.mtn_bridge = mtn_bridge
+    g.trail = trail
+
+
+def _build_mountainTown(g):
+    """山の上の街（A）: 門前から山道へのつなぎ。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build の一部）"""
+    X_, Y_, elev, land, towns, trail = g.X_, g.Y_, g.elev, g.land, g.towns, g.trail
     # 山の上の街（A）: 門前の石畳から、近くの山道へ、山道をつなぐ（山道でしか行けない）。台地の上（街と同じ高さ）を通る
     for s_ in towns:
         if s_['id'] not in FIXED_TOWNS: continue
@@ -247,6 +327,25 @@ def build():
         for y, x in path: trail[min(H - 1, y + 1), x] = trail[y, min(W - 1, x + 1)] = True   # 山道の幅 2 マス
         trail &= land
         print('山の上の街', s_['id'], 'の山道のつなぎ', len(path), 'マス')
+    g.trail = trail
+
+
+def build():
+    land_i, biome_i, lake_i = read_image()
+    sx, sy = W / land_i.shape[1], H / land_i.shape[0]
+    g = SimpleNamespace(biome_i=biome_i, lake_i=lake_i, land_i=land_i, sx=sx, sy=sy)
+    _build_coast(g)
+    _build_rivers(g)
+    _build_lakeEdge(g)
+    _build_snowHeights(g)
+    _build_rockHeights(g)
+    _build_lowlandHeights(g)
+    _build_desertHeights(g)
+    _build_settleHeights(g)
+    _build_mountainTown(g)
+    any_water, arenas, biome, bridge, bridge_under, elev, ffrozen, lagoon, lake, land, mtn_bridge, oasis, river, town_mask, towns, trail, water_deep, water_shallow = g.any_water, g.arenas, g.biome, g.bridge, g.bridge_under, g.elev, g.ffrozen, g.lagoon, g.lake, g.land, g.mtn_bridge, g.oasis, g.river, g.town_mask, g.towns, g.trail, g.water_deep, g.water_shallow
+
+
     return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, trail=trail, arenas=arenas, mtn_bridge=mtn_bridge, bridge_under=bridge_under, oasis=oasis, towns=towns, town_mask=town_mask, dist_sea=_distance(~land), dist_water=_distance(any_water))
 
 
