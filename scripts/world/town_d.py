@@ -206,9 +206,10 @@ SKIN_FOREST = {   # 森の街: 石畳でなく森の地面・大通りは土の�
     'p': 'plaza_forest', '=': 'dirt_road', 'W': 'forest_hedge_wall',
     'H': 'wooden_house', 'S': 'wooden_house_window', 'I': 'wooden_house_window',
     'T': 'great_tree_a', 'f': 'forest_tree_b', 'v': 'forest_tree_a',
-    'z': 'grass_tuft', 'y': 'fern', 'x': 'elder_sign',
+    'z': 'meadow_grass', 'y': 'fern', 'x': 'elder_sign',
 }
-SCATTER_G = (('z', 70, 'plant'), ('y', 50, 'plant'), ('v', 22, 'tree'), ('f', 14, 'tree'))   # 草・シダ・木（広場のまわりと、街のあちこち）
+SCATTER_G = (('z', 70, 'plant'), ('y', 50, 'plant'),   # 草・シダは、sdServer の画像（meadow_grass＝ID 241・fern＝ID 232）。自作の絵（grass_tuft）は使わない
+    ('v', 22, 'tree'), ('f', 14, 'tree'))   # 草・シダ・木（広場のまわりと、街のあちこち）
 
 
 def build_g(w, h, legend, city_legend, links, npcs):

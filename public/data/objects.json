@@ -2749,39 +2749,6 @@
     },
     "description": "花壇（レンガの縁に、薄紫の花の画像。歩いて通れない）"
   },
-  "grass_tuft": {
-    "type": "plant",
-    "texture": "grassTuft",
-    "count": 5,
-    "scale": [
-      1.1,
-      0.95
-    ],
-    "spread": 3.0,
-    "description": "草が生えている（低い草むら。見た目だけで、当たり判定なし）"
-  },
-  "tall_grass": {
-    "type": "plant",
-    "texture": "tallGrass",
-    "count": 4,
-    "scale": [
-      2.0,
-      2.1
-    ],
-    "spread": 2.6,
-    "description": "草が生い茂っている（背の高い草。見た目だけで、当たり判定なし）"
-  },
-  "wild_flowers": {
-    "type": "plant",
-    "texture": "wildFlowers",
-    "count": 5,
-    "scale": [
-      1.1,
-      0.95
-    ],
-    "spread": 3.0,
-    "description": "野の花（草むらに咲く小さな花。見た目だけで、当たり判定なし）"
-  },
   "castle_rug": {
     "type": "floor_tile",
     "texture": "rug",
@@ -16777,28 +16744,6 @@
     "scale": [1.74, 1.0],
     "spread": 3.0,
     "description": "花壇の花（紫の密集した花）（見た目だけで、当たり判定なし。sdServer 画像。まだどのマップにも置いていない）"
-  },
-  "reed": {
-    "type": "plant",
-    "texture": "reed",
-    "count": 4,
-    "scale": [
-      1.0,
-      1.6
-    ],
-    "spread": 3.0,
-    "description": "水辺の葦（見た目だけで、当たり判定なし）"
-  },
-  "dry_tuft": {
-    "type": "plant",
-    "texture": "dryTuft",
-    "count": 5,
-    "scale": [
-      1.2,
-      1.0
-    ],
-    "spread": 3.2,
-    "description": "高原の乾いた草（見た目だけで、当たり判定なし）"
   },
   "succulent": {
     "type": "tree",

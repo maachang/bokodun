@@ -1754,6 +1754,7 @@ test('G（森の街）: 石畳・石造りではなく森を活かす（森の�
     assert.equal(m.decorFloor, 'forestGround');
     const vals = Object.values(m.legend);
     for (const stone of ['plaza_stone', 'paved_road', 'city_wall', 'brick_house', 'shop_building']) assert.ok(!vals.includes(stone), `${stone}（石）は使わない`);
+    for (const ch of ['z', 'y']) { const o = objects[m.legend[ch]]; assert.ok(o.imageFile && Number.isInteger(o.sdId), `草・シダは sdServer の画像（${m.legend[ch]}）`); }
     const flat = m.layout.join('');
     assert.ok((flat.match(/z/g) || []).length >= 30 && (flat.match(/y/g) || []).length >= 20 && (flat.match(/[vfT]/g) || []).length >= 15, '草・シダ・木を、ばらまく');
     assert.ok(!m.npcs.some(n => /^(guard_|gate_guard)/.test(n.id)) && m.npcs.some(n => n.id === 'elf_guard_man') && m.npcs.some(n => n.id === 'elf_guard_woman'), '兵士は、エルフの守備隊（sdServer 327・328）');
@@ -1802,4 +1803,24 @@ test('G: 世界樹のまわりを、柵で、「ロ」の形に隙間なく囲�
     assert.equal(m.layout.join('').split('j').length - 1, 8, '柵は 8 マスだけ（「ロ」。詰まった「#」にしない）');
     for (let y = 12; y <= 17; y++) assert.ok('p='.includes(m.layout[y][21]), `(21,${y}) は通れる（大通りの東の列）`);
     for (let x = 1; x <= 38; x++) assert.ok('p='.includes(m.layout[16][x]), `(${x},16) は通れる（東西の通りの南の列）`);
+});
+
+test('木の柵の描画: つながる方向ごとに半分の板だけを描く（角が L 字・端が片側。全幅の板を十字に交わらせて、角の先が突き出す「#」にしない）', () => {
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf8');
+    const i = game.indexOf("case 'wooden_fence': {");
+    const body = game.slice(i, game.indexOf("case ", i + 30));
+    assert.ok(body.includes('const addPanel = (dx, dz)') && body.includes('PlaneGeometry(halfW, fenceH)'), '半分の板');
+    for (const dir of ['addPanel(-1, 0)', 'addPanel(1, 0)', 'addPanel(0, -1)', 'addPanel(0, 1)']) assert.ok(body.includes(dir), dir);
+    assert.ok(!body.includes('Horizontal X plane') && !body.includes('Vertical Z plane'), '全幅の板を、十字に交わらせない');
+});
+
+test('植物（草・花・シダ・葦など）は、全て sdServer の画像。画像のない植物の定義・自作のテクスチャ（grassTuft・tallGrass・wildFlowers・reed・dryTuft）は、置かない', () => {
+    for (const [id, o] of Object.entries(objects)) {
+        if (o.type === 'plant') assert.ok(o.imageFile && Number.isInteger(o.sdId), `${id}: 植物は sdServer の画像（imageFile・sdId）`);
+    }
+    for (const gone of ['grass_tuft', 'tall_grass', 'wild_flowers', 'reed', 'dry_tuft']) assert.equal(objects[gone], undefined, `${gone} は削除済み`);
+    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf8');
+    const tex = fs.readFileSync(path.join(root, 'public/js/textures.js'), 'utf8');
+    for (const t of ['grassTuft', 'tallGrass', 'wildFlowers', 'dryTuft']) assert.ok(!game.includes(`${t}:`) && !game.includes(`textures.${t}`), `${t}: 自作の絵は使わない`);
+    for (const f of ['createGrassTuftTexture', 'createTallGrassTexture', 'createWildFlowersTexture', 'createReedTexture', 'createDryTuftTexture']) assert.ok(!tex.includes(f), `${f}: 削除済み`);
 });

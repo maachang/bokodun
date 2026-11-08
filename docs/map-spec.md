@@ -1772,3 +1772,6 @@ Sources:
 - **G（エルフ国）**: 武器屋（`weapon_shop_g`）・道具屋（`item_shop_g`）・宿屋（`city_inn_g`・`city_inn_2f_g`）・冒険者ギルドと魔法ギルドの受付は、全て長老の娘（`elf_elder_daughter`）か息子（`elf_elder_son`）の画像（店員用の動かない定義 `elder_son_clerk`・`elder_daughter_clerk` など）。ギルド長は、前の項（43-78）。
 - 店の中のマップは、国専用に複製（`scripts/world/guild_g.py`）。
 - テスト: 「店員: F（獣人国）は全て獣人、G（エルフ国）は全て長老の娘か息子」。
+- **柵の描画の修正**（ユーザー指摘「#のまま」。原因は、角のマスで、全幅の東西の板と南北の板が、マスの中心で十字に交わり、角の先まで突き出していたこと）: `wooden_fence` は、つながる方向（東西南北の同じ文字）ごとに、中心からマスのふちまでの半分の板だけを描く。角は L 字・端は片側だけ・つながりのない 1 本は、従来どおり 1 枚。村の柵（ほかのマップ）も、同じ描画。
+- **草・シダは、sdServer の画像**（ユーザー指摘「草は画像で描画のはず」）: G の草を、自作の絵（`grass_tuft`）から、画像の `meadow_grass`（ID 241）に替えた。シダは、もともと画像（`fern`＝ID 232）。規則: `.claude/CLAUDE.md`（植物は sdServer の画像で描く）。
+- **画像以外の草を、全部削除**（ユーザー指示 2026-11-08。「以前に画像に置き換えたのに、また画像以外の草が復活している」）: 自作の絵の植物 5 つ（`grass_tuft`・`tall_grass`・`wild_flowers`・`reed`・`dry_tuft`）の定義と、テクスチャの生成（`createGrassTuftTexture` ほか 5 つ）・登録（`grassTuft`・`tallGrass`・`wildFlowers`・`reed`・`dryTuft`）を、削除した。どのマップにも使っていなかった。植物が見つからないときの代わりの絵は、画像の `fMeadowGrass`（`meadow_grass`）。テスト: 「植物は、全て sdServer の画像」（`type: plant` は、全て `imageFile`・`sdId` を持つ）。

@@ -330,8 +330,6 @@ export class GameEngine {
             fRockB: RetroTextureGenerator.createFieldImageTexture('rock_b'),
             fRockC: RetroTextureGenerator.createFieldImageTexture('rock_c'),
             fRockD: RetroTextureGenerator.createFieldImageTexture('rock_d'),
-            reed: RetroTextureGenerator.createReedTexture(),
-            dryTuft: RetroTextureGenerator.createDryTuftTexture(),
             desertSand: RetroTextureGenerator.createDesertSandTexture(),
             cliffGray: RetroTextureGenerator.createCliffTexture(['#7d7a78', '#6c6967', '#8a8683', '#5e5b5a', '#928e88'], '#2a2827'),
             cliffSand: RetroTextureGenerator.createCliffTexture(['#b8845a', '#a67448', '#c4936a', '#97653d', '#cfa07a'], '#4a2e1c', 31),
@@ -369,9 +367,6 @@ export class GameEngine {
             marbleFloor: RetroTextureGenerator.createMarbleFloorTexture(),
             rug: RetroTextureGenerator.createRugTexture(),
             woodDoor: RetroTextureGenerator.createWoodDoorTexture(),
-            grassTuft: RetroTextureGenerator.createGrassTuftTexture(),
-            tallGrass: RetroTextureGenerator.createTallGrassTexture(),
-            wildFlowers: RetroTextureGenerator.createWildFlowersTexture(),
             woodenFence: RetroTextureGenerator.createWoodenFenceTexture(),
             villageRoof: RetroTextureGenerator.createVillageRoofTexture(),
             dirtRoad: RetroTextureGenerator.createDirtRoadTexture(),
@@ -1230,7 +1225,7 @@ export class GameEngine {
         // 家具の上に、花などの画像（plants: 花壇の花）を植える。マスの位置から決まる配置（毎回同じ）
         if (objDef.plants) {
             const pl = objDef.plants;
-            const tex = this.textures[pl.texture] || this.textures.grassTuft;
+            const tex = this.textures[pl.texture] || this.textures.fMeadowGrass;
             const n = pl.count || 4;
             for (let i = 0; i < n; i++) {
                 const h1 = Math.sin((r * 12.9898 + c * 78.233 + i * 37.719) * 43758.5453) * 43758.5453;
@@ -1402,7 +1397,7 @@ export class GameEngine {
                             tree.updateMatrix(); tree.matrixAutoUpdate = false;
                             this.treeSprites.push({ sprite: tree, shadow: null, far: treeMat, near: treeMatNear, vis: true });
                         } else if (def.type === 'plant' && gr >= -NEIGHBOR_PLANT_RANGE && gr < rows + NEIGHBOR_PLANT_RANGE && gc >= -NEIGHBOR_PLANT_RANGE && gc < cols + NEIGHBOR_PLANT_RANGE) {
-                            const plantTex = this.textures[def.texture] || this.textures.grassTuft;
+                            const plantTex = this.textures[def.texture] || this.textures.fMeadowGrass;
                             this.plantMats = this.plantMats || new Map();
                             if (!this.plantMats.has(plantTex)) this.plantMats.set(plantTex, new THREE.SpriteMaterial({ map: plantTex }));
                             const [pw, ph] = def.scale || [1.2, 1.0];
@@ -1892,22 +1887,25 @@ export class GameEngine {
                         postMesh.position.set(wx, fenceH * 1.08 / 2, wz);
                         this.addStatic(postMesh);
 
-                        // If it has connections, draw matching fence panels
-                        if (isWestFence || isEastFence || (!isNorthFence && !isSouthFence)) {
-                            // Horizontal X plane
+                        // つながる方向ごとに、半分の板（中心から、そのマスのふちまで）だけを描く。角のマスは L 字・端は片側だけ（全幅の板を十字に交わらせると、角の先まで突き出して「#」に見える）。つながりのない 1 本は、従来どおり東西の板 1 枚
+                        const halfW = tileSize / 2;
+                        const addPanel = (dx, dz) => {
+                            const fGeo = new THREE.PlaneGeometry(halfW, fenceH);
+                            const fMesh = new THREE.Mesh(fGeo, fenceMat);
+                            if (dz !== 0) fMesh.rotation.y = Math.PI / 2;   // 南北は、Z 方向に伸びる板
+                            fMesh.position.set(wx + dx * halfW / 2, fenceH / 2, wz + dz * halfW / 2);
+                            this.addStatic(fMesh);
+                        };
+                        if (!isNorthFence && !isSouthFence && !isWestFence && !isEastFence) {
                             const fGeo = new THREE.PlaneGeometry(fenceW, fenceH);
                             const fMesh = new THREE.Mesh(fGeo, fenceMat);
                             fMesh.position.set(wx, fenceH / 2, wz);
                             this.addStatic(fMesh);
                         }
-                        if (isNorthFence || isSouthFence) {
-                            // Vertical Z plane
-                            const fGeo = new THREE.PlaneGeometry(fenceW, fenceH);
-                            const fMesh = new THREE.Mesh(fGeo, fenceMat);
-                            fMesh.rotation.y = Math.PI / 2;
-                            fMesh.position.set(wx, fenceH / 2, wz);
-                            this.addStatic(fMesh);
-                        }
+                        if (isWestFence) addPanel(-1, 0);
+                        if (isEastFence) addPanel(1, 0);
+                        if (isNorthFence) addPanel(0, -1);
+                        if (isSouthFence) addPanel(0, 1);
 
                         if (objDef.solid) {
                             // Full tile collision box to completely prevent slipping through between fence posts
@@ -2818,7 +2816,7 @@ export class GameEngine {
                         // 草むら・生い茂る草・野の花: 当たり判定のない見た目だけの飾り。
                         // 1 マスに count 枚のスプライトを、マスの位置から決まる配置（毎回同じ）で散らす
                         if (mapData.decorFloor) this.addFloorTile(wx, wz, tileSize, mapData.decorFloor);
-                        const plantTex = this.textures[objDef.texture] || this.textures.grassTuft;
+                        const plantTex = this.textures[objDef.texture] || this.textures.fMeadowGrass;
                         const count = objDef.count || 4;
                         const spread = objDef.spread || tileSize * 0.8;
                         const [pw, ph] = objDef.scale || [1.2, 1.0];
