@@ -328,7 +328,6 @@ export const combatMethods = {
     },
 
     updateCombat(dt) {
-        undefinedVariableForTest.x = 1;
         // 群れ（pack）: 仲間の 1 体が、プレイヤーを見つけたら、近くの仲間も、すぐ追ってくる
         this.packTimer = (this.packTimer ?? 0) - dt;
         if (this.packTimer <= 0) {
