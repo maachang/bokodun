@@ -1,0 +1,170 @@
+{
+ "id": "temple_b",
+ "name": "大教会（フランケル聖国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 12,
+ "nextMap": "town_b",
+ "spawn": {
+  "x": 10,
+  "z": 17,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "marbleWall",
+  "ambientLight": 16777215,
+  "directionalLight": 16773324,
+  "fogColor": 15985881,
+  "fogNear": 34,
+  "fogFar": 100,
+  "visibility": 1.0,
+  "skyColor": 15985881
+ },
+ "legend": {
+  "W": "temple_wall",
+  "F": "marble_floor",
+  "c": "temple_carpet",
+  "p": "temple_pillar_tall",
+  "D": "temple_exit",
+  "G": "goddess_statue_large",
+  "1": "dais_marble_1",
+  "2": "dais_marble_2",
+  "4": "dais_temple_rug_1",
+  "5": "dais_temple_rug_2",
+  "a": "stained_glass_plain_large",
+  "b": "stained_glass_angel_large",
+  "e": "stained_glass_priestess_large",
+  "f": "stained_glass_prophet_large",
+  "U": "stairs_marble_up",
+  "K": "chandelier_temple_large_rug",
+  "L": "wall_sconce_marble",
+  "R": "wall_banner_temple_tall",
+  "d": "temple_room_door",
+  "S": "stairs_marble_down"
+ },
+ "enemies": {},
+ "layout": [
+  "WWRWaLWeWWbWWfWLaWRWW",
+  "WFFFFF2225G5222FFFFFW",
+  "WFFFF11114441111FFFFW",
+  "dFFFFFFFFFFFFFFFFFFFd",
+  "WFFFFFFFFcccFFFFFFFFW",
+  "eFFFFFFFFcccFFFFFFFFf",
+  "WFFFFpFFFcKcFFFpFFFFW",
+  "dFFFFFFFFcccFFFFFFFFd",
+  "WFFFFFFFFcccFFFFFFFFW",
+  "fFFFFpFFFcccFFFpFFFFe",
+  "WFFFFFFFFcKcFFFFFFFFW",
+  "dFFFFFFFFcccFFFFFFFFd",
+  "WFFFFpFFFcccFFFpFFFFW",
+  "aFFFFFFFFcccFFFFFFFFa",
+  "WFFFFFFFFcKcFFFFFFFFW",
+  "dFFFFpFFFcccFFFpFFFFd",
+  "WFFFFFFFFcccFFFFFFFFW",
+  "WFFFFFFFFcccFFFFFFFFW",
+  "WFFFFFFFFFFFFFFFFFFFW",
+  "WWWRWWLWWDDDWWLWWRWWW"
+ ],
+ "npcs": [
+  {
+   "id": "pope",
+   "x": 10,
+   "z": 3,
+   "speed": 0,
+   "wanderRadius": 0
+  },
+  {
+   "id": "priest_woman",
+   "x": 13,
+   "z": 9
+  },
+  {
+   "id": "priest_man",
+   "x": 7,
+   "z": 13,
+   "shopId": "temple"
+  },
+  {
+   "id": "cardinal",
+   "x": 13,
+   "z": 3
+  }
+ ],
+ "links": {
+  "20,7": {
+   "nextMap": "temple_kitchen",
+   "message": "厨房に入る",
+   "back": {
+    "x": 19,
+    "z": 7,
+    "angle": 1.570795
+   }
+  },
+  "20,11": {
+   "nextMap": "temple_confession",
+   "message": "懺悔室に入る",
+   "back": {
+    "x": 19,
+    "z": 11,
+    "angle": 1.570795
+   }
+  },
+  "20,15": {
+   "nextMap": "temple_sacristy",
+   "message": "聖具室に入る",
+   "back": {
+    "x": 19,
+    "z": 15,
+    "angle": 1.570795
+   }
+  },
+  "20,3": {
+   "nextMap": "temple_refectory",
+   "message": "食堂に入る",
+   "back": {
+    "x": 19,
+    "z": 3,
+    "angle": 1.570795
+   }
+  },
+  "0,3": {
+   "nextMap": "temple_guesthouse",
+   "message": "客室（巡礼者の宿）に入る",
+   "back": {
+    "x": 1,
+    "z": 3,
+    "angle": -1.570795
+   }
+  },
+  "0,7": {
+   "nextMap": "temple_infirmary",
+   "message": "医務室に入る",
+   "back": {
+    "x": 1,
+    "z": 7,
+    "angle": -1.570795
+   }
+  },
+  "0,11": {
+   "nextMap": "temple_cloister",
+   "message": "回廊に出る",
+   "back": {
+    "x": 1,
+    "z": 11,
+    "angle": -1.570795
+   }
+  },
+  "0,15": {
+   "nextMap": "temple_almonry",
+   "message": "施し所に入る",
+   "back": {
+    "x": 1,
+    "z": 15,
+    "angle": -1.570795
+   }
+  }
+ }
+}

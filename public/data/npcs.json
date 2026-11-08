@@ -2084,7 +2084,8 @@
     "speed": 0,
     "wanderRadius": 0.0,
     "lines": [
-      "質素に暮らすのが、王の務めと心得ておる。"
+      "質素倹約こそ、王の務めじゃ。余の食事は、民と同じものじゃ。",
+      "よく来た、旅の者。この国の民は、働き者じゃよ。"
     ]
   },
   "pope": {
@@ -2140,5 +2141,148 @@
       "神殿のないこの国では、蘇生の薬も、この店で。"
     ],
     "speechRadius": 9.5
+  },
+  "king_b": {
+    "name": "愚かな王",
+    "texture": "/images/npcs/king.png",
+    "height": 2.2,
+    "aspect": 1.057,
+    "radius": 1.0,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "余は王であるぞ。……教皇様が、そうせよと仰せじゃ。うむ、そうしよう。",
+      "税を上げよ。余の宝石が足りぬ。政治？ 教皇様に任せておけばよい。"
+    ]
+  },
+  "prince_b": {
+    "name": "愚かな王子",
+    "texture": "/images/npcs/prince.png",
+    "height": 2.3,
+    "aspect": 0.624,
+    "radius": 0.7,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "父上は何もなさらぬ。僕は、もっと何もしない。",
+      "教皇様に任せておけば、安心さ。勉強？ 面倒だ。"
+    ]
+  },
+  "fairy_wisp": {
+    "name": "ウィルオーウィスプ（精霊国の妖精）",
+    "texture": "/images/enemies/fairy/will_o_wisp.png",
+    "height": 1.4,
+    "aspect": 0.413,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 3.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "ふわふわ……。ここは、森の精霊の国。"
+    ]
+  },
+  "fairy_sylph": {
+    "name": "シルフ（精霊国の妖精）",
+    "texture": "/images/enemies/fairy/sylph.png",
+    "height": 2.0,
+    "aspect": 0.62,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 3.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "風が、世界樹の葉を揺らしているわ。"
+    ]
+  },
+  "fairy_undine": {
+    "name": "ウンディーネ（精霊国の妖精）",
+    "texture": "/images/enemies/fairy/undine.png",
+    "height": 2.4,
+    "aspect": 0.301,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 3.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "世界樹の根が、きれいな水を運んでくるの。"
+    ]
+  },
+  "fairy_salamander": {
+    "name": "サラマンダー（精霊国の妖精）",
+    "texture": "/images/enemies/fairy/salamander.png",
+    "height": 1.5,
+    "aspect": 1.252,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 3.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "火は怖くないよ。森を守るための、小さな火。"
+    ]
+  },
+  "fairy_gnome": {
+    "name": "ノーム（精霊国の妖精）",
+    "texture": "/images/enemies/fairy/gnome.png",
+    "height": 1.5,
+    "aspect": 0.592,
+    "radius": 0.45,
+    "speed": 0.5,
+    "wanderRadius": 3.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "土の中は、世界樹の根でいっぱいじゃ。"
+    ]
+  },
+  "fairy_unicorn": {
+    "name": "ユニコーン（精霊国の妖精）",
+    "texture": "/images/enemies/fairy/unicorn.png",
+    "height": 2.8,
+    "aspect": 0.351,
+    "radius": 0.8,
+    "speed": 0.5,
+    "wanderRadius": 3.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "エルフの国では、心の清い者だけが、私に触れられる。"
+    ]
+  },
+  "fairy_pegasus": {
+    "name": "ペガサス（精霊国の妖精）",
+    "texture": "/images/enemies/fairy/pegasus.png",
+    "height": 3.0,
+    "aspect": 1.075,
+    "radius": 0.8,
+    "speed": 0.5,
+    "wanderRadius": 3.0,
+    "speechRadius": 2.0,
+    "lines": [
+      "ヒヒン。空から、森を見守っているの。"
+    ]
+  },
+  "beast_soldier_kobold": {
+    "name": "獣人国の兵士（コボルト）",
+    "texture": "/images/enemies/demihuman/dog_warrior_male.png",
+    "height": 2.5,
+    "aspect": 0.465,
+    "radius": 0.5,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "ここは獣王陛下の国だ。騒ぎは起こすなよ。",
+      "フェンリル様の像に無礼を働けば、容赦しないぞ。"
+    ]
+  },
+  "beast_soldier_golem": {
+    "name": "獣人国の兵士（ウッドゴーレム）",
+    "texture": "/images/enemies/golem/wood_golem.png",
+    "height": 3.4,
+    "aspect": 0.6,
+    "radius": 0.9,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "……ゴゴゴ。通るなら、静かに。",
+      "……王城は、我らが守る。"
+    ]
   }
 }

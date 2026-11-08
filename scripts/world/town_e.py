@@ -15,7 +15,7 @@ FACILITIES = [
     ('S', 7, 3, 4, 1, 'd', 'Q', _shop('weapon_shop', '武器屋に入る', 'weaponShopIcon')),
     ('I', 12, 3, 4, 1, 'N', 'M', _to('city_inn', '宿屋・酒場に入る', 'innIcon')),
     ('S', 23, 3, 4, 1, 'd', 'a', _to('guild_adv', '冒険者ギルドに入る', 'advGuildIcon')),
-    ('S', 2, 10, 4, 1, 'd', 'g', _to('guild_merchant', '商人ギルドに入る', 'merchantGuildIcon')),
+    ('S', 2, 10, 4, 1, 'd', 'g', _to('guild_merchant_e', '商人ギルドに入る', 'merchantGuildIcon')),
     ('J', 23, 10, 4, 1, 'D', 'c', _to('temple', '神殿に入る', 'templeIcon')),   # 神殿は高台
 ]
 

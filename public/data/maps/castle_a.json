@@ -1,0 +1,84 @@
+{
+ "id": "castle_a",
+ "name": "帝王の城（キュラビッド帝国）",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "spawn": {
+  "x": 12,
+  "z": 12,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "brick",
+  "ambientLight": 10096512,
+  "directionalLight": 13615264,
+  "fogColor": 2761760,
+  "fogNear": 14,
+  "fogFar": 48,
+  "visibility": 0.9,
+  "skyColor": 2761760
+ },
+ "legend": {
+  "W": "brick_wall",
+  "L": "wall_sconce",
+  "R": "wall_banner_red",
+  "a": "dais_stone_3",
+  "b": "dais_stone_2",
+  "c": "dais_stone_1",
+  "A": "dais_rug_3",
+  "B": "dais_rug_2",
+  "C": "dais_rug_1",
+  "u": "castle_rug",
+  "K": "chandelier_castle_rug",
+  "2": "castle_exit"
+ },
+ "layout": [
+  "WWRLWWWWWWWWRWWWWWWWWLRWW",
+  "W00000000aaAAAaa00000000W",
+  "W00000000bbBBBbb00000000W",
+  "W00000000ccCCCcc00000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uKu0000000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uKu0000000000W",
+  "W0000000000uuu0000000000W",
+  "W0000000000uuu0000000000W",
+  "WWWWWWWWWWWW2WWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "emperor_a",
+   "x": 12,
+   "z": 1
+  },
+  {
+   "id": "guard_heavy",
+   "x": 9,
+   "z": 5
+  },
+  {
+   "id": "guard_heavy",
+   "x": 15,
+   "z": 5
+  },
+  {
+   "id": "guard_heavy",
+   "x": 9,
+   "z": 9
+  },
+  {
+   "id": "guard_heavy",
+   "x": 15,
+   "z": 9
+  }
+ ],
+ "links": {}
+}

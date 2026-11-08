@@ -191,7 +191,7 @@
    }
   },
   "3,12": {
-   "nextMap": "guild_merchant",
+   "nextMap": "guild_merchant_e",
    "message": "商人ギルドに入る",
    "icon": "merchantGuildIcon",
    "back": {

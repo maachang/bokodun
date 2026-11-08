@@ -33,7 +33,7 @@ LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'm', 'r', 'c', 
 SOLID = set('WHSIJdNDC')   # 通れない（段差の確認の対象外）
 
 
-def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None, skin=None, castle=True, tree_center=False):
+def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None, skin=None, castle=True, tree_center=False, scatter=None, gate_flank=None):
     """D の街の中（layout・heights）を作り、legend・links・npcs に足す。(layout, heights) を返す。
     A（雪国）も、同じ作り（サンプルの高さを土台に、川・橋・高台・城門）で、施設・街の人・見た目（skin: 凡例の文字 → 物体の名前を上書き）だけを変える"""
     facilities = facilities or FACILITIES
@@ -56,6 +56,9 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
     for x in range(w): g[0][x] = g[h - 1][x] = 'W'
     for y in range(h): g[y][0] = g[y][w - 1] = 'W'
     g[h - 1][19] = g[h - 1][20] = 'G'
+    if gate_flank:   # 門の両脇だけ、壁のブロック（門の扉は、ブロックの壁にはさまれて、向きが決まる。茂みの壁の板は、壁と数えない）
+        for x in (18, 21): g[0][x] = g[h - 1][x] = 'V'
+        legend['V'] = gate_flank
     if tree_center:   # 街の中心の噴水の代わりに、世界樹（G）。木は 1 本（19,14）で、残りは広場
         for x in (19, 20):
             for y in (14, 15): g[y][x] = 'p'
@@ -90,6 +93,28 @@ def build(w, h, legend, city_legend, links, npcs, facilities=None, npc_list=None
     for nid, x, z in npc_list:
         assert g[z][x] in 'p=', f'D の NPC {nid} ({x},{z}): 歩ける空きマスではない'
         npcs.append({'id': nid, 'x': x, 'z': z})
+    if scatter:   # 森の街: 草・シダ・木を、空きマスにばらまく（決まった乱数。扉の前・街の人・広場の中心・立て札は避ける。木は、まわりが空きマスで、間をあける）
+        import random
+        rnd = random.Random(20261108)
+        keep = {(x, z) for _, x, z in npc_list}
+        for ch, x0, y0, wid, doff, door, sign, link in facilities:
+            dx, dz = x0 + doff, y0 + 2
+            keep |= {(dx, dz + 1), (dx, dz + 2), (dx + 1, dz + 1), (dx - 1, dz + 1), (dx + 1, dz + 2)}
+        for x in range(16, 24):
+            for y in range(11, 19): keep.add((x, y))
+        free = [(x, y) for y in range(2, h - 2) for x in range(2, w - 2) if g[y][x] == 'p' and (x, y) not in keep]
+        rnd.shuffle(free)
+        trees = []
+        for ch, count, kind in scatter:
+            put = 0
+            for x, y in free:
+                if put >= count: break
+                if g[y][x] != 'p': continue
+                if kind == 'tree':
+                    if any(abs(x - tx) + abs(y - ty) < 4 for tx, ty in trees): continue
+                    if any(g[y + dy][x + dx] not in 'p=' for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1), (1, 1), (-1, -1), (1, -1), (-1, 1))): continue
+                    trees.append((x, y))
+                g[y][x] = ch; put += 1
     # 高さ: サンプル（city）の高さを土台にして、川（0）と高台（王城区・神殿）を重ねる。段差は、歩ける隣どうしで 1 以下
     lv = TH.sample_field(w, h, 0, 0)
     fixed = set()
@@ -129,7 +154,7 @@ SKIN_SNOW = {   # 雪国の見た目: 雪をかぶった屋根（軽く）・雪
 
 
 def build_a(w, h, legend, city_legend, links, npcs):
-    return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_A, npc_list=NPCS_A, skin=SKIN_SNOW)
+    return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_A, npc_list=NPCS_A, skin=SKIN_SNOW, castle='castle_a')
 
 
 # ---- F（ライアン獣王国。山の麓の、獣人とドワーフの街）: D と同じ作りで、施設・街の人・見た目を変える ----
@@ -140,15 +165,17 @@ def _remap(f, **kw):   # 施設の出入口 links の差し替え（店の種類
     return f[:7] + (link,)
 
 
-FACILITIES_F = [(_remap(f, shopId='item_shop_f') if f[6] == 'q' else f) for f in FACILITIES if f[6] not in ('m', 'c')] + [   # 魔法ギルド・神殿は置かない（神殿の品は、道具屋 item_shop_f が売る）   # 魔法ギルド・神殿は置かない
+FACILITIES_F = [(_remap(f, shopId='item_shop_f') if f[6] == 'q' else _remap(f, nextMap='guild_adv_f') if f[6] == 'a' else _remap(f, nextMap='guild_training_f') if f[6] == 'r' else f)
+                for f in FACILITIES if f[6] not in ('m', 'c')] + [   # 魔法ギルド・神殿は置かない（神殿の品は、道具屋 item_shop_f が売る）。ギルドは、獣人の複製のマップ
     ('S', 27, 2, 4, 1, 'd', 'k', _to('guild_smith', '鍛冶屋に入る', 'smithIcon')),   # ドワーフの鍛冶屋（鉱山の国）
+    ('S', 28, 9, 4, 1, 'd', 'g', _to('guild_merchant_f', '商人ギルドに入る', 'merchantGuildIcon')),   # 商人ギルド（猫の獣人のギルド長）
 ]
-NPCS_F = [   # 獣人（一般・貴族）とドワーフ。獣王・宰相・フェンリル像は、王城（castle_f）の中
+NPCS_F = [   # 兵士は、コボルト（sdServer 11）とウッドゴーレム（sdServer 51）。獣人（一般）とドワーフ。貴族・獣王・宰相・フェンリル像は、王城（castle_f）の中
     ('dwarf_smith', 28, 6), ('beast_a', 6, 17), ('beast_f_a', 12, 17), ('dwarf_man', 28, 13), ('beast_b', 24, 9),
-    ('dwarf_woman', 14, 26), ('beast_f_b', 15, 21), ('guard_spear', 17, 27), ('guard_light', 22, 27),
-    ('cat_noble_man', 30, 15), ('rabbit_noble_woman', 34, 12), ('beast_c', 8, 21), ('beast_f_c', 33, 21), ('dog_noble_woman', 10, 21),
-    ('gorilla_noble_man', 36, 14), ('beast_d', 21, 21), ('beast_f_d', 5, 21),
-    ('gate_guard', 17, 1), ('gate_guard', 22, 1),
+    ('dwarf_woman', 14, 26), ('beast_f_b', 15, 21), ('beast_soldier_kobold', 17, 27), ('beast_soldier_kobold', 22, 27),
+    ('dwarf_man', 30, 15), ('beast_f_a', 34, 12), ('beast_c', 8, 21), ('beast_f_c', 33, 21), ('dwarf_woman', 10, 21),
+    ('beast_a', 36, 14), ('beast_d', 21, 21), ('beast_f_d', 5, 21),   # 貴族は、街に出ない（城の中の廷臣）
+    ('beast_soldier_golem', 17, 1), ('beast_soldier_golem', 22, 1),
 ]
 SKIN_FOOT = {   # 山の麓の見た目: 木造の家（獣人の家）・針葉樹
     'H': 'wooden_house', 'T': 'conifer_tree_a', 'f': 'conifer_tree_b', 'v': 'conifer_tree_a',
@@ -166,12 +193,18 @@ NPCS_G = [   # エルフの住民と、世界樹を管理する長老（世界�
     ('elf_elder_man', 22, 15), ('elf_elder_woman', 17, 15),   # 長老の息子と娘は、ギルド長（ギルドの中）
     ('elf_woman_a', 6, 17), ('elf_man_a', 12, 17), ('elf_woman_b', 28, 13), ('elf_man_b', 24, 9),
     ('elf_woman_c', 14, 26), ('elf_girl', 15, 21), ('elf_boy', 24, 21), ('elf_man_c', 30, 15),
-    ('guard_spear', 17, 27), ('guard_light', 22, 27),
+    ('guard_spear', 17, 27), ('guard_light', 22, 27), ('gate_guard', 17, 1), ('gate_guard', 22, 1),
+    ('fairy_wisp', 8, 15), ('fairy_sylph', 30, 21), ('fairy_undine', 33, 15), ('fairy_salamander', 12, 21),   # 妖精（敵キャラの妖精系。精霊国では、街に出る・おとなしい）
+    ('fairy_gnome', 26, 6), ('fairy_unicorn', 6, 21), ('fairy_pegasus', 20, 24),
 ]
-SKIN_FOREST = {   # 大森林の見た目: 木造の家・巨木（街のすみ）・森の木
-    'H': 'wooden_house', 'T': 'great_tree_a', 'f': 'forest_tree_b', 'v': 'forest_tree_a',
+SKIN_FOREST = {   # 森の街: 石畳でなく森の地面・大通りは土の道・外壁は茂みの壁・建物は木造・木は森の木
+    'p': 'plaza_forest', '=': 'dirt_road', 'W': 'forest_hedge_wall',
+    'H': 'wooden_house', 'S': 'wooden_house_window', 'I': 'wooden_house_window',
+    'T': 'great_tree_a', 'f': 'forest_tree_b', 'v': 'forest_tree_a',
+    'z': 'grass_tuft', 'y': 'fern',
 }
+SCATTER_G = (('z', 70, 'plant'), ('y', 50, 'plant'), ('v', 22, 'tree'), ('f', 14, 'tree'))   # 草・シダ・木（広場のまわりと、街のあちこち）
 
 
 def build_g(w, h, legend, city_legend, links, npcs):
-    return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_G, npc_list=NPCS_G, skin=SKIN_FOREST, castle=False, tree_center=True)
+    return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_G, npc_list=NPCS_G, skin=SKIN_FOREST, castle='castle_g', tree_center=True, scatter=SCATTER_G, gate_flank='wooden_wall')

@@ -15,7 +15,7 @@ FACILITIES = [   # (建物の文字, 左上 x, y, 幅, 扉の x（建物の左�
     ('S', 12, 10, 4, 1, 'd', 'a', _to('guild_adv', '冒険者ギルドに入る', 'advGuildIcon')),
     ('I', 12, 2, 4, 1, 'N', 'M', _to('city_inn', '宿屋・酒場に入る', 'innIcon')),
     ('J', 28, 2, 8, 3, 'D', 'c', _to('temple', '神殿に入る', 'templeIcon')),   # 宗教は神殿（ユーザー指定）。ドームの大きな神殿
-    ('K', 25, 9, 9, 4, 'd', 'g', _to('guild_merchant', '商人ギルドに入る', 'merchantGuildIcon')),   # 商人ギルドは、ほかの 2 倍の幅（街の中心）
+    ('K', 25, 9, 9, 4, 'd', 'g', _to('guild_merchant_c', '商人ギルドに入る', 'merchantGuildIcon')),   # 商人ギルドは、ほかの 2 倍の幅（街の中心）
 ]
 POND = (27, 35, 20, 25)   # オアシスの池（x0, x1, y0, y1）
 STALLS = (('1', 23, 17), ('2', 26, 17), ('3', 15, 17), ('4', 12, 17), ('1', 16, 21), ('3', 22, 21))   # 広場の屋台
@@ -23,7 +23,7 @@ PALMS = ((26, 19), (36, 19), (26, 26), (36, 26), (31, 19), (31, 26), (2, 1), (37
 CACTI = ((37, 12), (3, 22), (16, 28))
 
 NPCS = [   # 砂漠の住民（sdServer の画像）。議長は、商人ギルドの前
-    ('desert_chairman', 29, 13), ('desert_middle_man', 24, 13), ('desert_woman', 6, 17), ('desert_man', 19, 22),
+    ('desert_middle_man', 24, 13), ('desert_woman', 6, 17), ('desert_man', 19, 22),
     ('desert_middle_woman', 14, 15), ('desert_old_man', 5, 13), ('desert_old_woman', 29, 16), ('desert_boy', 9, 22),
     ('desert_girl', 17, 25), ('merchant_man', 22, 15), ('traveler_merchant', 20, 12), ('guard_spear', 17, 27), ('guard_light', 22, 27),
     ('priest_man', 32, 7), ('priest_woman', 35, 7),

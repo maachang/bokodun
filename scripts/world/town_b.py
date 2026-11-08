@@ -15,7 +15,7 @@ FACILITIES = [   # (建物の文字, 建物の左上 x, y, 幅, 扉の x（建�
     ('I', 28, 11, 4, 1, 'N', 'M', _to('city_inn', '巡礼者の宿・酒場に入る', 'innIcon')),
     ('J', 34, 11, 6, 2, 'D', 'c', _to('temple_town', '礼拝堂に入る', 'templeIcon')),
 ]
-CATHEDRAL = (16, 2, 16, 4, 7, 'D', 'c', _to('temple', '大教会に入る', 'templeIcon'))   # 左上 x・y・幅・奥行・扉の x（左から）・扉・立て札・links
+CATHEDRAL = (16, 2, 16, 4, 7, 'D', 'c', _to('temple_b', '大教会に入る', 'templeIcon'))   # 左上 x・y・幅・奥行・扉の x（左から）・扉・立て札・links
 
 NPCS = [   # 聖職者が多い（助祭・修道女）。一般人は少し。衛兵
     ('priest_man', 7, 16), ('priest_man', 19, 16), ('priest_man', 33, 16), ('priest_man', 26, 21), ('priest_man', 14, 20),
@@ -47,7 +47,7 @@ def build(w, h, legend, city_legend, links, npcs):
     g[h - 1][23] = g[h - 1][24] = 'G'
     g[0][42] = g[0][43] = 'C'   # 小さな王城の城門（北東）
     for x in (42, 43):
-        links[f'{x},0'] = {'nextMap': 'castle', 'message': '王城に入る', 'back': {'x': x, 'z': 1, 'angle': 3.14159}}
+        links[f'{x},0'] = {'nextMap': 'castle_b', 'message': '王城に入る', 'back': {'x': x, 'z': 1, 'angle': 3.14159}}
     for x0, y0 in ((2, 2), (7, 2), (2, 7), (7, 7), (2, 22), (7, 22), (12, 22), (17, 22), (27, 22), (32, 22), (37, 22), (42, 22),
                    (2, 31), (7, 31), (12, 31), (17, 31), (27, 31), (32, 31), (37, 31), (42, 31)):
         for y in range(y0, y0 + 3):

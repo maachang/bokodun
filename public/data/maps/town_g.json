@@ -17,68 +17,72 @@
   "fogFar": 66,
   "visibility": 0.65,
   "skyColor": 1714720,
-  "floorType": "grass"
+  "floorType": "forest"
  },
- "decorFloor": "cobblestone",
+ "decorFloor": "forestGround",
  "enemies": {},
  "legend": {
-  "W": "city_wall",
-  "p": "plaza_stone",
-  "=": "paved_road",
+  "W": "forest_hedge_wall",
+  "p": "plaza_forest",
+  "=": "dirt_road",
   "H": "wooden_house",
   "T": "great_tree_a",
   "f": "forest_tree_b",
   "v": "forest_tree_a",
   "F": "plaza_fountain",
   "G": "district_gate",
+  "V": "wooden_wall",
+  "C": "castle_gate",
   "Y": "world_tree",
+  "J": "temple_building",
+  "I": "wooden_house_window",
+  "S": "wooden_house_window",
+  "r": "training_sign",
   "N": "inn_door",
-  "I": "inn_building",
+  "Q": "weapon_shop_sign",
+  "b": "wood_bridge",
+  "d": "shop_door",
+  "q": "item_shop_sign",
+  "c": "church_sign",
   "M": "inn_sign",
   "a": "adventurer_guild_sign",
-  "Q": "weapon_shop_sign",
-  "d": "shop_door",
-  "m": "mage_guild_sign",
-  "q": "item_shop_sign",
   "w": "water",
   "D": "temple_door",
-  "c": "church_sign",
-  "S": "shop_building",
-  "b": "wood_bridge",
-  "r": "training_sign",
-  "J": "temple_building"
+  "m": "mage_guild_sign",
+  "z": "grass_tuft",
+  "y": "fern"
  },
  "layout": [
-  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWVCCVWWWWWWWWWWWWWWWWWW",
   "WpTppppppppppppppp====pppppppppppppppTpW",
-  "WpHHHHpHHHHpIIIIpp====pppppSSSSppppppppW",
-  "WpHHHHpHHHHpIIIIpp====pppppSSSSppppppppW",
-  "WpHHHHpHHHHpINIIpp====pppppSdSSppppppppW",
-  "WpppppppppppppMppp====pppppppmpppppppppW",
-  "Wpppppppppppppppfp====pvpppppppppppppppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "WpSSSSpSSSSpSSSSpp====pppppppppppppppppW",
-  "WpSSSSpSSSSpSSSSpp====pppppppppppppppppW",
-  "WpSdSSpSdSSpSdSSpp====ppppfppppppppppvpW",
-  "WpppqppppQppppappp====pppppppppppppppppW",
+  "WpHHHHpHHHHpIIIIpv====pvpppSSSSppppzpppW",
+  "WpHHHHpHHHHzIIIIpp====pppppSSSSypvpppvpW",
+  "WpHHHHpHHHHzINIIpp====ppzppSdSSppppypppW",
+  "WpzppzpyppzpppMyyp====yppypppmpzyyyyyzpW",
+  "Wpzpppppypyzzpppfz====pvpzpvppppzpyppppW",
+  "Wppzppppppppppzyzp====pyppppppzpppzppppW",
+  "Wpppypzpppppppzpzy====pyppyppzppvppzpppW",
+  "Wpppyppppypyppzpyz====pppzpppzyppppppppW",
+  "WpSSSSpSSSSpSSSSpp====zpppyppppppzzzpvpW",
+  "WpSSSSySSSSzSSSSpp====ppzpppzppypypzpppW",
+  "WpSdSSpSdSSpSdSSpp====pppyfppppppyppzvpW",
+  "WpppqppppQppppappp====ppzppppvpppyppzppW",
   "W==================Yp==================W",
   "W==================pp==================W",
   "W======================================W",
-  "Wppppppppppppppfpp====ppvppppppppppppppW",
-  "WpHHHHpHHHHpppppTp====pTpppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
+  "Wppppppppppppvpfpp====ppvzppppppppzppvpW",
+  "WpHHHHpHHHHpppppTp====pTyypHHHHpHHHHpppW",
+  "WpHHHHpHHHHpzyzppp====ppyppHHHHpHHHHzppW",
+  "WpHHHHpHHHHpzzppyy====vppppHHHHpHHHHpppW",
+  "Wppzpzppppzppyppzp====pppypppppppppzpppW",
   "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
   "WwwwwwbbwwwwwwwwwwbbbbwwwwwwwwwwbbwwwwwW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
-  "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
+  "Wpzpyzzpyzpzpppppy====pppzppppyzpppzpzpW",
+  "WpHHHHpHHHHpppppyp====zyzzpHHHHzHHHHpppW",
+  "WpHHHHpHHHHppzpppp====ppzzpHHHHpHHHHpypW",
+  "WpHHHHyHHHHpzpzpvp====ppyppHHHHpHHHHpppW",
   "WpTppppppppppppppp====pppppppppppppppTpW",
-  "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
+  "WWWWWWWWWWWWWWWWWWVGGVWWWWWWWWWWWWWWWWWW"
  ],
  "npcs": [
   {
@@ -140,6 +144,51 @@
    "id": "guard_light",
    "x": 22,
    "z": 27
+  },
+  {
+   "id": "gate_guard",
+   "x": 17,
+   "z": 1
+  },
+  {
+   "id": "gate_guard",
+   "x": 22,
+   "z": 1
+  },
+  {
+   "id": "fairy_wisp",
+   "x": 8,
+   "z": 15
+  },
+  {
+   "id": "fairy_sylph",
+   "x": 30,
+   "z": 21
+  },
+  {
+   "id": "fairy_undine",
+   "x": 33,
+   "z": 15
+  },
+  {
+   "id": "fairy_salamander",
+   "x": 12,
+   "z": 21
+  },
+  {
+   "id": "fairy_gnome",
+   "x": 26,
+   "z": 6
+  },
+  {
+   "id": "fairy_unicorn",
+   "x": 6,
+   "z": 21
+  },
+  {
+   "id": "fairy_pegasus",
+   "x": 20,
+   "z": 24
   }
  ],
  "links": {
@@ -158,6 +207,24 @@
    "spawn": {
     "x": 43,
     "z": 49,
+    "angle": 3.14159
+   }
+  },
+  "19,0": {
+   "nextMap": "castle_g",
+   "message": "王城に入る",
+   "back": {
+    "x": 19,
+    "z": 1,
+    "angle": 3.14159
+   }
+  },
+  "20,0": {
+   "nextMap": "castle_g",
+   "message": "王城に入る",
+   "back": {
+    "x": 20,
+    "z": 1,
     "angle": 3.14159
    }
   },

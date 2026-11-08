@@ -17698,5 +17698,11 @@
     "dome": true,
     "spire": true,
     "domeTexture": "domeTile"
+  },
+  "plaza_forest": {
+    "type": "floor_tile",
+    "texture": "forestGround",
+    "solid": false,
+    "description": "森の街（G）の広場の地面。森の下草と落ち葉（道路ではないので、移動速度ボーナスなし）"
   }
 }

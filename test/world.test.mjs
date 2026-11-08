@@ -1339,7 +1339,7 @@ test('街（候補地 A〜H）: 外のマップに壁と門（扉＋衛兵）・
             const outer = readJson(`public/data/maps/${l.nextMap}.json`);
             const oc = Math.floor(l.spawn.x), orow = Math.floor(l.spawn.z);
             assert.ok(outerWalk(outer, oc, orow), `town_${id}: 出た先が歩ける所`);
-            assert.match(outer.legend[outer.layout[orow][oc]], /^plaza_(stone(_snow)?|earth)$/);   // A（雪国）は雪の積もった石畳・C（砂漠）は土
+            assert.match(outer.legend[outer.layout[orow][oc]], /^plaza_(stone(_snow)?|earth|forest)$/);   // A（雪国）は雪の積もった石畳・C（砂漠）は土・G（森）は森の地面
             // 外の門のマスから、この街へ入る links があり、出現位置が、街の中の歩ける所
             const back = Object.values(outer.links).filter((x) => x.nextMap === `town_${id}`);
             assert.equal(back.length, 2, `${l.nextMap}: 街 ${id} へ入る門が 2 マス`);
@@ -1363,9 +1363,9 @@ test('街（候補地 A〜H）: 敷地は、水・川・マップの境から離
     for (const id of 'abcdefgh'.split('')) {
         const t = readJson(`public/data/maps/town_${id}.json`);
         const outer = readJson(`public/data/maps/${Object.values(t.links)[0].nextMap}.json`);
-        const rows = outer.layout.map((r, i) => [r, i]).filter(([r]) => r.includes(Object.entries(outer.legend).find(([, v]) => v === 'city_wall')?.[0] ?? '#'));
+        const rows = outer.layout.map((r, i) => [r, i]).filter(([r]) => r.includes(Object.entries(outer.legend).find(([, v]) => v === (id === 'g' ? 'wooden_wall' : 'city_wall'))?.[0] ?? '#'));   // G（森の街）の外壁は、木の壁
         assert.ok(rows.length >= 12, `${outer.id}: 街の外壁がある`);
-        const wallCh = Object.entries(outer.legend).find(([, v]) => v === 'city_wall')[0];
+        const wallCh = Object.entries(outer.legend).find(([, v]) => v === (id === 'g' ? 'wooden_wall' : 'city_wall'))[0];
         const rs = rows.map(([, i]) => i), cs = [];
         rows.forEach(([r]) => [...r].forEach((ch, c) => { if (ch === wallCh) cs.push(c); }));
         const margin = id === 'a' ? 2 : 8;   // 山の上の街（A）は、山頂の平らな台地の広さに合わせる（台地は、マップの境のすぐ内側まで）
@@ -1612,9 +1612,11 @@ test('B（フランケル聖国）: 大教会が街の中心の北の最上位�
     const rows = m.layout;
     const jRun = Math.max(...rows.map(r => Math.max(...(r.match(/J+/g) || ['']).map(s => s.length))));
     assert.ok(jRun >= 16, `大教会（幅 16 以上）がある: ${jRun}`);
-    assert.equal(m.links['23,5']?.nextMap, 'temple', '大教会の扉から、大神殿へ入れる');
+    assert.equal(m.links['23,5']?.nextMap, 'temple_b', '大教会の扉から、B の大教会（教皇）へ入れる');
+    assert.ok(readJson('public/data/maps/temple_b.json').npcs.some(n => n.id === 'pope') && readJson('public/data/maps/temple_b.json').npcs.some(n => n.id === 'cardinal'), '教皇と枢機卿は、大教会の中');
     assert.ok(Object.values(m.links).some(l => l.nextMap === 'temple_town'), '礼拝堂がある');
-    assert.equal(m.links['42,0']?.nextMap, 'castle', '小さな王城の城門は、北東');
+    assert.equal(m.links['42,0']?.nextMap, 'castle_b', '小さな王城の城門は、北東');
+    assert.deepEqual(readJson('public/data/maps/castle_b.json').npcs.slice(0, 2).map(n => n.id), ['king_b', 'prince_b'], '愚かな王と王子');
     const ids = m.npcs.map(n => n.id);
     const clergy = ids.filter(id => /^priest_(man|woman)$/.test(id)).length;
     assert.ok(clergy / ids.length >= 0.45, `聖職者（助祭・修道女）が多い: ${clergy}/${ids.length}`);
@@ -1625,12 +1627,13 @@ test('B（フランケル聖国）: 大教会が街の中心の北の最上位�
 test('C（ミレニアム自由都市）: 商人ギルドが街の中心・王城はなく宗教は神殿（ドーム）・オアシスの池・砂漠の見た目（砂の地面・ヤシ）・市場の屋台', () => {
     const m = readJson('public/data/maps/town_c.json');
     assert.deepEqual([m.layout[0].length, m.layout.length], [40, 30]);
-    assert.equal(m.links['29,11']?.nextMap, 'guild_merchant', '商人ギルドの扉');
+    assert.equal(m.links['29,11']?.nextMap, 'guild_merchant_c', '商人ギルドの扉');
+    assert.ok(readJson('public/data/maps/guild_merchant_master_c.json').npcs.some(n => n.id === 'desert_chairman'), '議長は、商人ギルドの奥の部屋');
     const all = Object.values(m.links).map(l => l.nextMap);
     for (const bad of ['castle', 'guild_mage', 'guild_training']) assert.ok(!all.includes(bad), `${bad} は置かない`);
     assert.ok(all.includes('temple'), '宗教は神殿（ユーザー指定）');
     assert.equal(m.legend.J, 'mideast_temple');
-    assert.ok(m.npcs.some(n => n.id === 'desert_chairman') && m.npcs.filter(n => n.id.startsWith('desert_')).length >= 8, '砂漠の住民（sdServer の画像）と議長');
+    assert.ok(m.npcs.filter(n => n.id.startsWith('desert_')).length >= 7, '砂漠の住民（sdServer の画像）');
     assert.ok(m.layout.join('').split('w').length - 1 >= 40, 'オアシスの池（水 40 マス以上）');
     assert.equal(m.decorFloor, 'packedEarth');
     assert.deepEqual([m.legend.p, m.legend['=']], ['plaza_earth', 'earth_road'], '地面は石畳ではなく土');
@@ -1644,7 +1647,7 @@ test('C（ミレニアム自由都市）: 商人ギルドが街の中心・王�
     assert.ok(['1', '2', '3', '4'].some(c => m.layout.join('').includes(c)), '市場の屋台');
 });
 
-test('F（ライアン獣王国）: 山の麓の街。D と同じ作りで、小さな王城（獣王とフェンリル像）があり、神殿・魔法ギルドはなく、ドワーフの鍛冶屋・職業訓練所がある。木造の家と針葉樹', () => {
+test('F（ライアン獣王国）: 山の麓の街。D と同じ作りで、小さな王城（獣王とフェンリル像）があり、神殿・魔法ギルドはなく、ドワーフの鍛冶屋・職業訓練所・商人ギルドがある。ギルドは獣人。木造の家と針葉樹', () => {
     const m = readJson('public/data/maps/town_f.json');
     assert.deepEqual([m.layout[0].length, m.layout.length], [40, 30]);
     const all = Object.values(m.links).map(l => l.nextMap);
@@ -1654,10 +1657,18 @@ test('F（ライアン獣王国）: 山の麓の街。D と同じ作りで、小
     assert.ok(cf.npcs.some(n => n.id === 'lion_king'), '獣王');
     assert.equal(Object.values(cf.legend).includes('fenrir_statue'), true, 'フェンリル像');
     assert.ok(objects.fenrir_statue.height >= 4.0 * 1.0 && objects.fenrir_statue.sdId === 326, 'フェンリル像（sdServer 326。ふつうの像の 2 倍ほど）');
-    for (const need of ['guild_smith', 'guild_training', 'guild_adv', 'city_inn']) assert.ok(all.includes(need), `${need} がある`);
+    for (const need of ['guild_smith', 'guild_training_f', 'guild_adv_f', 'guild_merchant_f', 'city_inn']) assert.ok(all.includes(need), `${need} がある`);
+    for (const bad of ['guild_training', 'guild_adv', 'guild_merchant']) assert.ok(!all.includes(bad), `${bad} は、獣人の複製（_f）に替える`);
+    const ids = (n) => readJson(`public/data/maps/${n}.json`).npcs.map(x => x.id);
+    assert.ok(ids('guild_adv_f').includes('fox_clerk_man') && ids('guild_adv_f').includes('fox_clerk_woman'), '冒険者ギルドの受付は狐の獣人');
+    assert.ok(ids('guild_adv_master_f').includes('tiger_adv_master'), '冒険者ギルド長は虎の獣人');
+    assert.ok(ids('guild_merchant_f').includes('tanuki_clerk_man'), '商人ギルドの受付は狸の獣人');
+    assert.ok(ids('guild_merchant_master_f').includes('cat_merchant_master'), '商人ギルド長は猫の獣人');
+    assert.deepEqual(ids('guild_training_f'), ['bear_trainer'], '職業訓練所の教官は熊の獣人');
+    assert.equal(readJson('public/data/maps/guild_adv_f.json').links['10,4'].nextMap, 'guild_adv_master_f');
     assert.equal(Object.values(m.links).find(l => l.nextMap === 'shop' && l.params.shopId.startsWith('item_shop')).params.shopId, 'item_shop_f', '神殿の品は道具屋で売る（神殿がない）');
     assert.ok(m.npcs.some(n => n.id === 'dwarf_smith'), 'ドワーフの鍛冶屋');
-    assert.ok(m.npcs.filter(n => /^(beast_|dwarf_|cat_|rabbit_|dog_|gorilla_)/.test(n.id)).length >= 8, '獣人・ドワーフの住民（sdServer の画像）');
+    assert.ok(m.npcs.filter(n => /^(beast_|dwarf_)/.test(n.id)).length >= 8, '獣人・ドワーフの住民（sdServer の画像）');
     assert.equal(m.legend.H, 'wooden_house');
     assert.equal(m.legend.T, 'conifer_tree_a');
     assert.ok(m.layout[0].includes('C'), '城門がある');
@@ -1702,4 +1713,68 @@ test('画面上部の「世界（ボコスカ島）」の選択に、街（A〜H
         assert.ok(m, `${id}: 街の前の項目`);
         assert.deepEqual(JSON.parse(m[1]), { x: gx, z: gy + 4, angle: 0 }, `${id}: 門の前（南へ 4 マス）`);
     }
+});
+
+test('国のトップは、国ごとに違う（城・大教会・議長の部屋）: A 帝王・B 愚王と教皇・C と E 議長・D 質素な王・F 獣王・G 女王', () => {
+    const ids = (n) => readJson(`public/data/maps/${n}.json`).npcs.map(x => x.id);
+    assert.ok(ids('castle_a').includes('emperor_a'), 'A: 帝王');
+    assert.ok(ids('castle_b').includes('king_b') && !ids('castle_b').includes('king'), 'B: 愚かな王');
+    assert.ok(ids('temple_b').includes('pope'), 'B: 教皇');
+    assert.ok(ids('castle').includes('king_d') && !ids('castle').includes('king'), 'D: 質素な王');
+    assert.ok(ids('castle_f').includes('lion_king'), 'F: 獣王');
+    assert.ok(ids('castle_g').includes('elf_queen'), 'G: 女王');
+    assert.ok(ids('guild_merchant_master_c').includes('desert_chairman'), 'C: 議長');
+    assert.ok(ids('guild_merchant_master_e').includes('chairman_e'), 'E: 議長');
+    for (const [t, c] of [['a', 'castle_a'], ['b', 'castle_b'], ['d', 'castle'], ['f', 'castle_f'], ['g', 'castle_g']]) {
+        assert.ok(Object.values(readJson(`public/data/maps/town_${t}.json`).links).some(l => l.nextMap === c), `${t}: 城門は ${c}`);
+    }
+    const npcs = readJson('public/data/npcs.json');
+    for (const id of ['emperor_a', 'king_d', 'pope', 'chairman_e', 'lion_king', 'elf_queen', 'desert_chairman']) assert.ok(npcs[id].sdId, `${id}: sdServer の画像`);
+});
+
+test('厳守: 貴族・国の代表（王・王子・女王・宰相・帝王・教皇・枢機卿・議長・上位聖職者）は、屋外（街の通り・外のマップ）に出ない。城・屋敷・神殿・ギルドの中だけ', () => {
+    const npcs = readJson('public/data/npcs.json');
+    const forbidden = /(noble|king|prince|queen|chancellor|emperor|pope|cardinal|chairman|baron|viscount|marquis|duke|margrave|priest_senior|elder_son|elder_daughter)/;
+    const outdoor = fs.readdirSync(path.join(root, 'public/data/maps')).filter(f => /^(w_\d\d_\d\d|town_[a-h]|city|town|village)\.json$/.test(f));
+    assert.ok(outdoor.length > 100);
+    for (const f of outdoor) {
+        const m = readJson(`public/data/maps/${f}`);
+        for (const n of m.npcs || []) {
+            assert.ok(!forbidden.test(n.id) && !forbidden.test(npcs[n.id]?.name ?? ''), `${f}: ${n.id}（${npcs[n.id]?.name}）は、屋外に出ない（貴族・国の代表）`);
+        }
+    }
+});
+
+test('G（森の街）: 石畳・石造りではなく森を活かす（森の地面・土の道・茂みの壁・木造・草とシダと木）。精霊国の妖精（敵キャラの妖精系）が街に出る', () => {
+    const m = readJson('public/data/maps/town_g.json');
+    assert.deepEqual([m.legend.p, m.legend['='], m.legend.W, m.legend.H, m.legend.S], ['plaza_forest', 'dirt_road', 'forest_hedge_wall', 'wooden_house', 'wooden_house_window'], '森の街の見た目');
+    assert.equal(m.decorFloor, 'forestGround');
+    const vals = Object.values(m.legend);
+    for (const stone of ['plaza_stone', 'paved_road', 'city_wall', 'brick_house', 'shop_building']) assert.ok(!vals.includes(stone), `${stone}（石）は使わない`);
+    const flat = m.layout.join('');
+    assert.ok((flat.match(/z/g) || []).length >= 30 && (flat.match(/y/g) || []).length >= 20 && (flat.match(/[vf]/g) || []).length >= 15, '草・シダ・木を、ばらまく');
+    const fairies = m.npcs.filter(n => n.id.startsWith('fairy_'));
+    assert.ok(fairies.length >= 6, '妖精が街にいる');
+    const npcs = readJson('public/data/npcs.json');
+    const enemies = readJson('public/data/enemies.json');
+    for (const f of fairies) assert.ok(Object.values(enemies).some(e => e.family === 'fairy' && npcs[f.id].texture === `/images/enemies/${e.imageFile}`), `${f.id}: 敵キャラの妖精系の画像`);
+    // 外のマップの外観も、木の壁・木造
+    const outer = readJson(`public/data/maps/${Object.values(m.links).find(l => l.nextMap?.startsWith('w_')).nextMap}.json`);
+    assert.ok(Object.values(outer.legend).includes('wooden_wall') && !Object.values(outer.legend).includes('city_wall'), '外のマップの G の外壁は木の壁');
+});
+
+test('F（獣人国）の兵士は、敵キャラのコボルト（sdServer 11）とウッドゴーレム（sdServer 51）。街の兵士・城門・外のマップの門・王城', () => {
+    const npcs = readJson('public/data/npcs.json');
+    const enemies = readJson('public/data/enemies.json');
+    const img = (sd) => `/images/enemies/${Object.values(enemies).find(e => e.sdId === sd).imageFile}`;
+    assert.equal(npcs.beast_soldier_kobold.texture, img(11), 'コボルト（sdServer 11）');
+    assert.equal(npcs.beast_soldier_golem.texture, img(51), 'ウッドゴーレム（sdServer 51）');
+    const town = readJson('public/data/maps/town_f.json');
+    const soldier = /^(guard_|gate_guard)/;
+    assert.ok(!town.npcs.some(n => soldier.test(n.id)), '街に、人族の衛兵はいない');
+    assert.ok(town.npcs.filter(n => n.id.startsWith('beast_soldier_')).length >= 4, '街の兵士');
+    const castle = readJson('public/data/maps/castle_f.json');
+    assert.ok(!castle.npcs.some(n => soldier.test(n.id)) && castle.npcs.some(n => n.id === 'beast_soldier_golem'), '王城の兵士');
+    const outer = readJson(`public/data/maps/${Object.values(town.links).find(l => l.nextMap?.startsWith('w_')).nextMap}.json`);
+    assert.ok(outer.npcs.some(n => n.id === 'beast_soldier_golem') && outer.npcs.some(n => n.id === 'beast_soldier_kobold') && !outer.npcs.some(n => soldier.test(n.id)), '外のマップの門の兵士');
 });

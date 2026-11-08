@@ -270,12 +270,12 @@
  },
  "npcs": [
   {
-   "id": "guard_spear",
+   "id": "beast_soldier_golem",
    "x": 28,
    "z": 37
   },
   {
-   "id": "guard_light",
+   "id": "beast_soldier_kobold",
    "x": 31,
    "z": 37
   }

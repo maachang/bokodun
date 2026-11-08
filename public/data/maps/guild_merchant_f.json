@@ -1,0 +1,91 @@
+{
+ "id": "guild_merchant_f",
+ "name": "商人ギルド（ライアン獣王国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "nextMap": "town_f",
+ "spawn": {
+  "x": 5,
+  "z": 7,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 2760728,
+  "fogNear": 20,
+  "fogFar": 60,
+  "visibility": 0.9,
+  "skyColor": 2760728
+ },
+ "legend": {
+  "W": "wooden_wall",
+  "F": "wood_floor",
+  "E": "building_exit",
+  "u": "rug",
+  "t": "table",
+  "h": "chair",
+  "C": "counter",
+  "L": "wall_sconce_wood",
+  "K": "chandelier_mansion_rug",
+  "Q": "quest_board",
+  "X": "crate",
+  "k": "bookshelf",
+  "a": "wall_window_wood",
+  "d": "wooden_door"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWaWWWaWWW",
+  "WXXFFFFFXXW",
+  "WFFFFFFFFFW",
+  "LCCCCCCCCCL",
+  "WFFFFuFFFFd",
+  "WXFFFKFFFXW",
+  "LFhtFuFthFL",
+  "WFFFFuFFFFW",
+  "WaWWWEWaWWW"
+ ],
+ "npcs": [
+  {
+   "id": "tanuki_clerk_man",
+   "x": 4,
+   "z": 2,
+   "speed": 0,
+   "wanderRadius": 0,
+   "oz": 0.71,
+   "behindCounter": true
+  },
+  {
+   "id": "tanuki_clerk_woman",
+   "x": 6,
+   "z": 2,
+   "speed": 0,
+   "wanderRadius": 0,
+   "oz": 0.708,
+   "behindCounter": true
+  },
+  {
+   "id": "senior_merchant_man",
+   "x": 8,
+   "z": 5,
+   "speed": 0.4,
+   "wanderRadius": 1.5
+  }
+ ],
+ "links": {
+  "10,4": {
+   "nextMap": "guild_merchant_master_f",
+   "message": "ギルド長の部屋に入る",
+   "back": {
+    "x": 9,
+    "z": 4,
+    "angle": 1.570795
+   }
+  }
+ }
+}

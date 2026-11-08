@@ -68,14 +68,24 @@
    "z": 2
   },
   {
-   "id": "guard_heavy",
+   "id": "beast_soldier_golem",
    "x": 9,
    "z": 6
   },
   {
-   "id": "guard_heavy",
+   "id": "beast_soldier_golem",
    "x": 15,
    "z": 6
+  },
+  {
+   "id": "beast_soldier_kobold",
+   "x": 9,
+   "z": 12
+  },
+  {
+   "id": "beast_soldier_kobold",
+   "x": 4,
+   "z": 7
   },
   {
    "id": "beast_f_a",
@@ -86,6 +96,46 @@
    "id": "dwarf_king",
    "x": 19,
    "z": 9
+  },
+  {
+   "id": "cat_noble_man",
+   "x": 5,
+   "z": 4
+  },
+  {
+   "id": "cat_noble_woman",
+   "x": 7,
+   "z": 4
+  },
+  {
+   "id": "rabbit_noble_man",
+   "x": 17,
+   "z": 4
+  },
+  {
+   "id": "rabbit_noble_woman",
+   "x": 19,
+   "z": 4
+  },
+  {
+   "id": "dog_noble_man",
+   "x": 5,
+   "z": 11
+  },
+  {
+   "id": "dog_noble_woman",
+   "x": 7,
+   "z": 11
+  },
+  {
+   "id": "gorilla_noble_man",
+   "x": 17,
+   "z": 11
+  },
+  {
+   "id": "gorilla_noble_woman",
+   "x": 19,
+   "z": 11
   }
  ],
  "links": {}

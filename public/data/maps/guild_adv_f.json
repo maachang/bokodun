@@ -1,0 +1,115 @@
+{
+ "id": "guild_adv_f",
+ "name": "冒険者ギルド（ライアン獣王国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "nextMap": "town_f",
+ "spawn": {
+  "x": 5,
+  "z": 7,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 2760728,
+  "fogNear": 20,
+  "fogFar": 60,
+  "visibility": 0.9,
+  "skyColor": 2760728
+ },
+ "legend": {
+  "W": "wooden_wall",
+  "M": "island_map",
+  "F": "wood_floor",
+  "E": "building_exit",
+  "u": "rug",
+  "t": "table",
+  "h": "chair",
+  "C": "counter",
+  "L": "wall_sconce_wood",
+  "K": "chandelier_mansion_rug",
+  "Q": "quest_board",
+  "X": "crate",
+  "k": "bookshelf",
+  "a": "wall_window_wood",
+  "d": "wooden_door"
+ },
+ "enemies": {},
+ "layout": [
+  "WWaWWMaWWWW",
+  "WQFFFFFFFQW",
+  "WFFFFFFFFFW",
+  "LCCCCCCCCCL",
+  "WFFFFuFFFFd",
+  "WFFFFKFFFFW",
+  "LFhtFuFthFL",
+  "WFFFFuFFFFW",
+  "WaWWWEWaWWW"
+ ],
+ "npcs": [
+  {
+   "id": "fox_clerk_man",
+   "x": 3,
+   "z": 2,
+   "speed": 0,
+   "wanderRadius": 0,
+   "oz": 0.71,
+   "behindCounter": true
+  },
+  {
+   "id": "fox_clerk_woman",
+   "x": 7,
+   "z": 2,
+   "speed": 0,
+   "wanderRadius": 0,
+   "oz": 0.725,
+   "behindCounter": true
+  },
+  {
+   "id": "adv_swordsman",
+   "x": 2,
+   "z": 4,
+   "wanderRadius": 0.8
+  },
+  {
+   "id": "adv_mage",
+   "x": 8,
+   "z": 4,
+   "wanderRadius": 0.8
+  },
+  {
+   "id": "adv_warrior",
+   "x": 3,
+   "z": 7,
+   "wanderRadius": 0.8
+  },
+  {
+   "id": "adv_scout",
+   "x": 7,
+   "z": 7,
+   "wanderRadius": 0.8
+  },
+  {
+   "id": "adv_lancer",
+   "x": 9,
+   "z": 5,
+   "wanderRadius": 0.8
+  }
+ ],
+ "links": {
+  "10,4": {
+   "nextMap": "guild_adv_master_f",
+   "message": "ギルド長の部屋に入る",
+   "back": {
+    "x": 9,
+    "z": 4,
+    "angle": 1.570795
+   }
+  }
+ }
+}

@@ -33,19 +33,19 @@
   "F": "plaza_fountain",
   "G": "district_gate",
   "C": "castle_gate",
-  "N": "inn_door",
+  "J": "temple_building",
   "I": "inn_building",
-  "M": "inn_sign",
-  "a": "adventurer_guild_sign",
+  "S": "shop_building",
+  "N": "inn_door",
   "Q": "weapon_shop_sign",
+  "b": "wood_bridge",
   "d": "shop_door",
   "q": "item_shop_sign",
-  "w": "water",
-  "D": "temple_door",
   "c": "church_sign",
-  "S": "shop_building",
-  "b": "wood_bridge",
-  "J": "temple_building"
+  "M": "inn_sign",
+  "a": "adventurer_guild_sign",
+  "w": "water",
+  "D": "temple_door"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWCCWWWW",
@@ -207,7 +207,7 @@
    }
   },
   "42,0": {
-   "nextMap": "castle",
+   "nextMap": "castle_b",
    "message": "王城に入る",
    "back": {
     "x": 42,
@@ -216,7 +216,7 @@
    }
   },
   "43,0": {
-   "nextMap": "castle",
+   "nextMap": "castle_b",
    "message": "王城に入る",
    "back": {
     "x": 43,
@@ -281,7 +281,7 @@
    }
   },
   "23,5": {
-   "nextMap": "temple",
+   "nextMap": "temple_b",
    "message": "大教会に入る",
    "icon": "templeIcon",
    "back": {

@@ -33,22 +33,23 @@
   "F": "plaza_fountain",
   "G": "district_gate",
   "C": "castle_gate",
-  "N": "inn_door",
+  "g": "merchant_guild_sign",
+  "J": "temple_building",
   "I": "inn_building",
+  "S": "shop_building",
+  "r": "training_sign",
+  "N": "inn_door",
+  "Q": "weapon_shop_sign",
+  "b": "wood_bridge",
   "k": "smith_sign",
+  "d": "shop_door",
+  "q": "item_shop_sign",
+  "c": "church_sign",
   "M": "inn_sign",
   "a": "adventurer_guild_sign",
-  "Q": "weapon_shop_sign",
-  "d": "shop_door",
-  "m": "mage_guild_sign",
-  "q": "item_shop_sign",
   "w": "water",
   "D": "temple_door",
-  "c": "church_sign",
-  "S": "shop_building",
-  "b": "wood_bridge",
-  "r": "training_sign",
-  "J": "temple_building"
+  "m": "mage_guild_sign"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWCCWWWWWWWWWWWWWWWWWWW",
@@ -60,10 +61,10 @@
   "Wpppppppppppppppfp====pvpppppppppppppppW",
   "Wppppppppppppppppp====pppppppppppppppppW",
   "Wppppppppppppppppp====pppppppppppppppppW",
-  "Wppppppppppppppppp====pppppppppppppppppW",
-  "WpSSSSpSSSSpSSSSpp====pppppppppppppppppW",
-  "WpSSSSpSSSSpSSSSpp====pppppppppppppppppW",
-  "WpSdSSpSdSSpSdSSpp====ppppfppppppppppvpW",
+  "Wppppppppppppppppp====ppppppSSSSpppppppW",
+  "WpSSSSpSSSSpSSSSpp====ppppppSSSSpppppppW",
+  "WpSSSSpSSSSpSSSSpp====ppppppSdSSpppppppW",
+  "WpSdSSpSdSSpSdSSpp====ppppfpppgppppppvpW",
   "WpppqppppQppppappp====pppppppppppppppppW",
   "W==================FF==================W",
   "W==================FF==================W",
@@ -119,22 +120,22 @@
    "z": 21
   },
   {
-   "id": "guard_spear",
+   "id": "beast_soldier_kobold",
    "x": 17,
    "z": 27
   },
   {
-   "id": "guard_light",
+   "id": "beast_soldier_kobold",
    "x": 22,
    "z": 27
   },
   {
-   "id": "cat_noble_man",
+   "id": "dwarf_man",
    "x": 30,
    "z": 15
   },
   {
-   "id": "rabbit_noble_woman",
+   "id": "beast_f_a",
    "x": 34,
    "z": 12
   },
@@ -149,12 +150,12 @@
    "z": 21
   },
   {
-   "id": "dog_noble_woman",
+   "id": "dwarf_woman",
    "x": 10,
    "z": 21
   },
   {
-   "id": "gorilla_noble_man",
+   "id": "beast_a",
    "x": 36,
    "z": 14
   },
@@ -169,12 +170,12 @@
    "z": 21
   },
   {
-   "id": "gate_guard",
+   "id": "beast_soldier_golem",
    "x": 17,
    "z": 1
   },
   {
-   "id": "gate_guard",
+   "id": "beast_soldier_golem",
    "x": 22,
    "z": 1
   }
@@ -243,7 +244,7 @@
    }
   },
   "13,12": {
-   "nextMap": "guild_adv",
+   "nextMap": "guild_adv_f",
    "message": "冒険者ギルドに入る",
    "icon": "advGuildIcon",
    "back": {
@@ -263,7 +264,7 @@
    }
   },
   "33,4": {
-   "nextMap": "guild_training",
+   "nextMap": "guild_training_f",
    "message": "職業訓練所に入る",
    "icon": "trainingIcon",
    "back": {
@@ -281,6 +282,16 @@
     "z": 5,
     "angle": 3.14159
    }
+  },
+  "29,11": {
+   "nextMap": "guild_merchant_f",
+   "message": "商人ギルドに入る",
+   "icon": "merchantGuildIcon",
+   "back": {
+    "x": 29,
+    "z": 12,
+    "angle": 3.14159
+   }
   }
  },
  "heights": [
@@ -295,7 +306,7 @@
   "0122222222223332111223333323322222222210",
   "0112222222222322111112332233333333333320",
   "0122222222222332111111232233333333333320",
-  "0122222222223222111111222233333333333220",
+  "0122222222223222111111222233323333333220",
   "0121111222222111111112211123222232222220",
   "0111111222222111111222211112111121111110",
   "0111111222222111111222211112111121111110",

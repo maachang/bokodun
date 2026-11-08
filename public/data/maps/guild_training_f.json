@@ -1,0 +1,62 @@
+{
+ "id": "guild_training_f",
+ "name": "職業訓練所（ライアン獣王国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "nextMap": "town_f",
+ "spawn": {
+  "x": 5,
+  "z": 7,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "brick",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 2760728,
+  "fogNear": 20,
+  "fogFar": 60,
+  "visibility": 0.9,
+  "skyColor": 2760728
+ },
+ "legend": {
+  "W": "brick_wall",
+  "F": "brick_floor",
+  "E": "brick_exit",
+  "u": "rug",
+  "t": "table_stone",
+  "h": "chair_stone",
+  "C": "counter_stone",
+  "A": "weapon_rack_stone",
+  "D": "training_dummy_stone",
+  "V": "anvil_stone",
+  "s": "hearth_stone",
+  "X": "crate_stone",
+  "L": "wall_sconce",
+  "a": "wall_window_stone"
+ },
+ "enemies": {},
+ "layout": [
+  "WaWWWaWWWaW",
+  "aFFAFFFAFFa",
+  "WFFFFFFFFFW",
+  "LDFFFFFFFDL",
+  "WFFFFFFFFFW",
+  "LDFFFFFFFDL",
+  "WFFFFFFFFFW",
+  "aFFFFFFFFFa",
+  "WaWWWEWaWWW"
+ ],
+ "npcs": [
+  {
+   "id": "bear_trainer",
+   "x": 5,
+   "z": 3,
+   "speed": 0,
+   "wanderRadius": 0
+  }
+ ]
+}

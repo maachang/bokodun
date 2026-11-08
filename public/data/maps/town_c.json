@@ -32,22 +32,22 @@
   "v": "cactus",
   "F": "plaza_fountain",
   "G": "district_gate",
+  "g": "merchant_guild_sign",
   "1": "market_stall_red",
-  "N": "inn_door",
   "4": "market_stall_yellow",
   "I": "mideast_inn",
-  "M": "inn_sign",
-  "g": "merchant_guild_sign",
-  "a": "adventurer_guild_sign",
+  "S": "mideast_shop",
+  "N": "inn_door",
+  "2": "market_stall_blue",
   "Q": "weapon_shop_sign",
   "d": "shop_door",
+  "3": "market_stall_green",
   "q": "item_shop_sign",
+  "c": "church_sign",
+  "M": "inn_sign",
+  "a": "adventurer_guild_sign",
   "w": "water",
   "D": "temple_door",
-  "2": "market_stall_blue",
-  "c": "church_sign",
-  "S": "mideast_shop",
-  "3": "market_stall_green",
   "K": "mideast_guild",
   "J": "mideast_temple"
  },
@@ -84,11 +84,6 @@
   "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
  ],
  "npcs": [
-  {
-   "id": "desert_chairman",
-   "x": 29,
-   "z": 13
-  },
   {
    "id": "desert_middle_man",
    "x": 24,
@@ -236,7 +231,7 @@
    }
   },
   "29,11": {
-   "nextMap": "guild_merchant",
+   "nextMap": "guild_merchant_c",
    "message": "商人ギルドに入る",
    "icon": "merchantGuildIcon",
    "back": {

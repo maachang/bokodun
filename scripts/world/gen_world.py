@@ -18,6 +18,7 @@ import town_b as TB
 import town_c as TC
 import castle_f as CF
 import guild_g as GG
+import temple_b as TPB
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
 
@@ -465,7 +466,8 @@ def town_outer_extras(t, j, i):
         for gx, gy in town_gate_tiles(site):
             links[f"{gx - i * MESH},{gy - j * MESH}"] = {'nextMap': f"town_{site['id']}", 'message': f"{TOWN_NAME[site['id']]}に入る", 'spawn': {'x': w // 2 - 1 + (gx - (site['x'] - 1)), 'z': h - 3, 'angle': 0}}
         gy = site['y'] + TOWN_HH   # 壁のすぐ外（門と同じ並び）
-        for k, (nid, dx) in enumerate((('guard_spear', -2), ('guard_light', 1))):   # 門 2 マス（x-1, x）のすぐ両隣
+        pair = (('beast_soldier_golem', -2), ('beast_soldier_kobold', 1)) if site['id'] == 'f' else (('guard_spear', -2), ('guard_light', 1))   # F の兵士は、ウッドゴーレムとコボルト
+        for k, (nid, dx) in enumerate(pair):   # 門 2 マス（x-1, x）のすぐ両隣
             npcs.append({'id': nid, 'x': site['x'] + dx - i * MESH, 'z': gy - j * MESH})
     return links, npcs
 
@@ -521,7 +523,7 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
             m['environment'] = dict(snow_env, floorType='snow', fogNear=24, fogFar=72); m['decorFloor'] = 'snowCobble'   # 雪の環境（霧は、街が見えるよう薄め）
         elif site['id'] == 'g':   # G（大森林の中心のエルフの街）: D と同じ作り（town_d.build_g）。森の環境（霧は、街が見えるよう薄め）
             m['layout'], m['heights'] = TD.build_g(w, h, m['legend'], city_legend, m['links'], m['npcs'])
-            m['environment'] = dict(DARK_FOREST_ENV, floorType='grass', fogNear=22, fogFar=66, ambientLight=0x6f8f76)
+            m['environment'] = dict(DARK_FOREST_ENV, floorType='forest', fogNear=22, fogFar=66, ambientLight=0x6f8f76); m['decorFloor'] = 'forestGround'
         elif site['id'] == 'f':   # F（山の麓の獣人とドワーフの街）: D と同じ作り（town_d.build_f）
             m['layout'], m['heights'] = TD.build_f(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         elif site['id'] in ('d', 'h', 'e', 'b', 'c'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
@@ -531,6 +533,8 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     for gm in GG.build():   # G のギルド（ギルド長は長老の一族）
         json.dump(gm, open(os.path.join(MAPS, gm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+    for cm in CF.build_others() + [TPB.build()]:   # 国ごとの城（A 帝王・B 愚王・G 女王）と B の大教会（教皇）
+        json.dump(cm, open(os.path.join(MAPS, cm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     cf = CF.build()   # F の小さな王城（獣王・フェンリル像）
     json.dump(cf, open(os.path.join(MAPS, cf['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
 
@@ -578,6 +582,10 @@ def main():
                 if site['id'] == 'a' and town_outer_id(site) == f'w_{j:02d}_{i:02d}':   # A（雪国）の外観: 雪をかぶった屋根・雪の積もった門前の石畳
                     if '8' in legend: legend['8'] = 'brick_house_snow'
                     if '9' in legend: legend['9'] = 'plaza_stone_snow'
+                if site['id'] == 'g' and town_outer_id(site) == f'w_{j:02d}_{i:02d}':   # G（森の街）の外観: 木の壁・木造の家・森の地面
+                    if '6' in legend: legend['6'] = 'wooden_wall'
+                    if '8' in legend: legend['8'] = 'wooden_house'
+                    if '9' in legend: legend['9'] = 'plaza_forest'
                 if site['id'] == 'c' and town_outer_id(site) == f'w_{j:02d}_{i:02d}':   # C（砂漠の自由都市）の外観: 中東風の家
                     if '8' in legend: legend['8'] = 'mideast_house'
                     if '9' in legend: legend['9'] = 'plaza_earth'   # 門前も土
