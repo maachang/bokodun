@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { gameSource } from './helpers/game.mjs';
 
 const root = process.cwd();
 // マップ JSON は、物体 ID の数値の形式（layoutFormat 'ids'）なら、ゲームが使う 1 マス 1 文字の形にそろえる（public/js/mapFormat.js）
@@ -593,7 +594,7 @@ test('山道の吊橋（rope_bridge）: 同じ高さの床・両端は同じ高�
     const deck = lv(...cells[0]);
     assert.ok(cells.every(([r, c]) => lv(r, c) === deck), '床は、すべて同じ高さ');
     const isBridge = (r, c) => m.layout[r]?.[c] === ch;
-    const gameSrc = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const gameSrc = gameSource();
     assert.ok(gameSrc.includes('bridgeLayerLevel(h, this.bridgeUnder, ref)'), '橋のマスは、橋の上・橋の下の 2 層（橋の下を通れる）');
     assert.ok(gameSrc.includes('if (this.heightLevelAtTile(r + dr, c + dc) > deckLv - 2) continue;'), '手すりは、橋の脇（谷）だけ。橋の端は塞がない');
     assert.ok(Number.isInteger(m.bridgeUnder) && m.bridgeUnder <= deck - 3, `橋の下の谷の底（${m.bridgeUnder}）は、橋（${deck}）より 3 段以上低い（降りられない）`);
@@ -688,7 +689,7 @@ test('地下迷宮（dungeon）: 天井に届かない高さ・上り 1 段/下�
 
 // 高低差のあるマスの物体: 床の高さまで持ち上がる種類だけを置く（宝箱が高台の床に埋まる・液体が地面の下に隠れて、ダメージだけ受ける、を防ぐ）
 test('高低差のあるマップ: 高いマスに置く物体は、持ち上げの対象（LIFT_TYPES・lift: true）。液体（溶岩・水・急流）は、高さ 0 のマスだけ', () => {
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     const lift = new Set([...game.match(/const LIFT_TYPES = new Set\(\[([^\]]*)\]/)[1].matchAll(/'([^']+)'/g)].map(x => x[1]));
     assert.ok(lift.has('chest') && lift.has('portal'), '宝箱・ポータルも持ち上げる');
     assert.ok(game.includes('sameFloorAs(ch.floorY)'), '宝箱は、同じ床の高さからだけ開けられる');
@@ -709,9 +710,9 @@ test('高低差のあるマップ: 高いマスに置く物体は、持ち上げ
 });
 
 test('海（sea_tile）: マップを読み込むたびに、海のマスを空にする（前のマップの海が、当たり判定に残らない）。1 マスずつ描かない', () => {
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     assert.ok((game.match(/this\.seaCells = \[\]/g) || []).length >= 2, '初期化と、マップの読み込みごとのリセット');
-    assert.ok(game.includes("case 'sea_tile'") && game.includes('buildSea(rows, cols, tileSize)'), '海は、水面 1 枚＋当たり判定');
+    assert.ok(game.includes('    sea_tile(t) {') && game.includes('buildSea(rows, cols, tileSize)'), '海は、水面 1 枚＋当たり判定');
     assert.ok(game.includes('floorTypeAt(r, c)'), 'マスごとの地面の種類（floorLayer）');
     assert.equal(objects.sea.type, 'sea_tile');
 });
@@ -731,7 +732,7 @@ test('街・町・村のマップに、岩（boulder）は置かない', () => {
 });
 
 test('世界: 端の高さが何段でも越えられる（マップの外の高さは、近い端のマスと同じ）。岩は置かない。花は、新しい画像', () => {
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     assert.ok(game.includes('Math.min(Math.max(r, 0), hm.length - 1)'), 'マップの外の高さは、近い端のマス');
     // 端のマスが 3 段以上の境が、実際にある（この修正が効く）
     let high = 0, rocks = 0, oldFlower = 0;
@@ -754,14 +755,14 @@ test('世界: 端の高さが何段でも越えられる（マップの外の高
 });
 
 test('テスト用: 走る速さ（Shift）は 5 倍。速くても、壁・崖をすり抜けないよう、0.5 以下に分けて動かす', () => {
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     assert.ok(game.includes('export const TEST_RUN_SPEED_SCALE = 5;'), '倍率');
     assert.ok(game.includes('runSpeed: 13.0 * TEST_RUN_SPEED_SCALE'), '走る速さに掛ける');
     assert.ok(game.includes('Math.ceil(moveLen / 0.5)'), '移動を分ける');
 });
 
 test('マップ間の移動: 読み込み中は動かず、落下ダメージも受けない（古い位置のまま、新しい地形の段差を落下と判定していた）', () => {
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     const body = (name) => game.slice(game.indexOf(`    ${name}(`), game.indexOf(`    ${name}(`) + 900);
     assert.ok(body('movePlayer').includes('if (this.nav?.busy) return;'), '読み込み中は movePlayer が動かない');
     assert.ok(body('applyHeightFall').includes('if (this.nav?.busy) return;'), '読み込み中は落下ダメージなし');
@@ -836,7 +837,7 @@ test('世界の川: 本流・支流・三角州に加えて、山（雪山の麓
     assert.ok(mountainStreamMeshes >= 5, `山のマップを流れる川: ${mountainStreamMeshes}`);
     assert.equal(objects.plank_bridge.type, 'bridge_deck');
     assert.ok(objects.plank_bridge.waterBelow && objects.plank_bridge.railOnWater && !objects.plank_bridge.solid, '橋の下は水・脇は手すり・歩ける');
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     assert.ok(game.includes('objDef.waterBelow') && game.includes('objDef.railOnWater'), '橋の下の水・水の側の手すり');
 });
 
@@ -867,7 +868,7 @@ test('世界の森: 林の壁（tree_wall）は使わない。森は ID 217・21
     assert.ok(Math.abs(objects.forest_tree_a.height - objects.grass_tree.height * 2) < 1e-6);
     assert.ok(Math.abs(objects.great_tree_a.height - objects.grass_tree.height * 3) < 1e-6);
     assert.ok(objects.great_tree_a.colliderHalf > objects.forest_tree_a.colliderHalf, '巨木は幹が太い');
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     assert.ok(game.includes('objDef.colliderHalf ?? 0.6') && game.includes('this.treeMats'), '幹の太さ・材質の共有');
 });
 
@@ -1004,7 +1005,7 @@ test('川の橋: すべての橋が、両岸をつなぐ（橋のマスが 4 近
 });
 
 test('端の向こうの景色: 隣のマップ（斜めの角を含む 8 方向）を、本物のマス（高さ・崖・地面の種類・水・木・草・岩）で描く', () => {
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     assert.ok(game.includes('await this.buildNeighborDecor(mapId, cols, rows, tileSize, mapData, floorMatOf)'), '隣のマップを描く');
     assert.ok(/def\?\.type === 'floor_tile' && !\(def\.elevation > 0\)[\s\S]{0,400}flat\(waterMats\.floors/.test(game), '隣のマップの床（石畳の街道・門前の石畳）も描く（切り替えの前から、道が見える）');
     assert.ok(/waterMats\.planks\.has\(def\.texture\)[\s\S]{0,300}flat\(waterMats\.planks\.get\(def\.texture\)/.test(game) && !game.includes('waterMats.plank '), '隣のマップの橋の床は、画像ごとの材質（石の橋が、木の板で描かれない）');
@@ -1038,7 +1039,7 @@ test('端の向こうの景色: 隣のマップ（斜めの角を含む 8 方向
 });
 
 test('大森林などの負荷: 前のマップの木が溜まらない（マップごとに空にする）・動かないスプライトは行列を更新しない・霧より遠い木・草は隠す・草の材質を共有・ミニマップの壁は使い回す', () => {
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     const body = game.slice(game.indexOf('async loadMapBody'), game.indexOf('async loadMapBody') + 6000);
     assert.ok(body.includes('this.treeSprites = [];') && body.includes('this.cullSprites = [];'), 'マップごとに、木・草の一覧を空にする（前のマップの木が溜まって、毎フレームの処理が増えていた）');
     assert.ok((game.match(/matrixAutoUpdate = false/g) || []).length >= 3, '木・影・草の行列は、毎フレーム更新しない');
@@ -1050,7 +1051,7 @@ test('木の足元の影: 小さな木にだけ影がある（TREE_SHADOWS = tru
     const big = ['forest_tree_a', 'forest_tree_b', 'great_tree_a', 'great_tree_b', 'conifer_forest_a', 'conifer_forest_b', 'great_conifer_a', 'great_conifer_b', 'tropical_forest_a', 'tropical_forest_b', 'tropical_palm_forest'];
     for (const n of big) assert.equal(objects[n].noShadow, true, `${n}: 影なし`);
     for (const n of ['grass_tree', 'tropical_tree', 'palm', 'swamp_tree_a', 'conifer_tree_a', 'conifer_tree_b', 'dark_tree']) assert.ok(!objects[n].noShadow, `${n}: 小さな木は、スイッチで、影が戻る`);
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     assert.ok(game.includes('export const TREE_SHADOWS = true;'), '影のスイッチ: 小さな木だけ、影あり');
     assert.ok(game.includes('if (TREE_SHADOWS && !objDef.noShadow) {') && game.includes('shadow: shadowMesh'), '影の処理');
     assert.ok(game.includes('new THREE.InstancedMesh(this.treeShadowGeo, this.treeShadowMat'), '影は、区画ごとの InstancedMesh にまとめる（描画の命令を増やさない）');
@@ -1275,7 +1276,7 @@ test('山の吊橋: 世界に 5 か所以上・橋の下の谷の底（bridgeUnd
 });
 
 test('崖のよじ登り: ちょうど 2 段高い崖だけ・前を押し続けて始まり・2 秒かかる・攻撃を受けると中断して落ちる', () => {
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     assert.ok(game.includes('export const CLIMB_RISE = 2;') && game.includes('export const CLIMB_SEC = 2.0;') && game.includes('export const CLIMB_HOLD_SEC = 0.3;'), '登れる高さ 2 段・2 秒・0.3 秒押し続ける');
     assert.ok(game.includes('if (diff === CLIMB_RISE) this._climbBump'), 'ちょうど 2 段高い崖だけ（3 段以上は、登れない）');
     assert.ok(game.includes('if (this.player.climb) return;'), '登っている間は、歩けない');
@@ -1284,7 +1285,7 @@ test('崖のよじ登り: ちょうど 2 段高い崖だけ・前を押し続け
 });
 
 test('スタミナ: ダッシュ・攻撃・登りで減り、0 で止まり、20% まで戻ると再開（仮の値）', () => {
-    const g = fs.readFileSync('public/js/game.js', 'utf8');
+    const g = gameSource();
     const c = JSON.parse(fs.readFileSync('public/data/combat.json', 'utf8'));
     assert.ok(c.stamina.climbCost > 0);
     for (const k of ['useStamina(this.staminaCost(\'dash\') * dt)', 'staminaExhausted', 'updateStamina(dt)', 'this.staminaCost(\'attack\'', 'useStamina(this.staminaDef?.climbCost']) assert.ok(g.includes(k), k);
@@ -1292,7 +1293,7 @@ test('スタミナ: ダッシュ・攻撃・登りで減り、0 で止まり、2
 });
 
 test('スタミナ: やられて復活するとき、全回復する', () => {
-    const g = fs.readFileSync('public/js/game.js', 'utf8');
+    const g = gameSource();
     assert.equal(g.split('this.player.stamina = this.player.maxStamina; this.player.staminaExhausted = false;').length - 1, 4);
 });
 
@@ -1316,7 +1317,7 @@ test('草原のブラッシュアップ: 丘陵・ため池・林がある', () 
 });
 
 test('描画の負荷: 木・草・花の板は、区画ごとにまとめて隠す。距離の判定は、動いたときだけ。隣の草・花は近くだけ', () => {
-    const g = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const g = gameSource();
     for (const k of ['export const CULL_CHUNK = 32', 'export const NEIGHBOR_PLANT_RANGE = 10', 'buildCullChunks() {', 'updateCullChunks() {', 'this.buildCullChunks();', 'this.updateCullChunks();', 'this.cullChunks = [];', "def.type === 'plant' && gr >= -NEIGHBOR_PLANT_RANGE"]) assert.ok(g.includes(k), k);
     assert.ok(g.includes('if (!this._cullDirty && Math.abs(p.x - this._cullX) + Math.abs(p.z - this._cullZ) < 1'), '動いたときだけ判定する');
 });
@@ -1409,7 +1410,7 @@ test('地面の影: 立て札・像・噴水（groundShadow）と、建物・壁
     must(['city_wall', 'brick_house', 'wooden_house', 'shop_building', 'inn_building', 'temple_building'], 'baseShadow');
     for (const [k, v] of Object.entries(objects)) if (v.baseShadow) assert.equal(v.type, 'block', `${k}: baseShadow は壁・建物（block）だけ`);
     for (const n of ['cliff_rock_wall', 'rock_wall', 'brick_wall']) assert.ok(!objects[n].baseShadow, `${n}: 崖・岩壁・ダンジョンの壁は、影なし`);
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const game = gameSource();
     assert.ok(game.includes('buildGroundShadows(tileSize)') && game.includes('groundShadowItems'), '地面の影の処理');
     assert.equal((game.match(/new THREE\.InstancedMesh\(geo, mat, items\.length\)/g) || []).length, 1, 'InstancedMesh を作る処理は 1 か所（丸い影・壁の帯で共有）');
 });
@@ -1594,7 +1595,7 @@ test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つ�
     // 立て札の絵は、全て、読めない創作の文字の絵（signpost）。読める絵（road_sign.png などの別ファイル）・専用のテクスチャは、ない
     assert.equal(objects.road_sign.texture, 'signpost');
     assert.ok(!fs.existsSync(path.join(root, 'public/images/objects/road_sign.png')), '読める絵・別の絵は、削除済み');
-    const gameSrc = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf8');
+    const gameSrc = gameSource();
     assert.ok(!gameSrc.includes('roadSign') && !fs.readFileSync(path.join(root, 'public/js/textures.js'), 'utf8').includes('createRoadSignTexture'), '専用のテクスチャは、ない');
     assert.equal(signs.length, 1, '分かれ道は 1 か所');
     const { x, y, msg } = signs[0];
@@ -1662,7 +1663,7 @@ test('C（ミレニアム自由都市）: 商人ギルドが街の中心・王�
     assert.deepEqual([m.legend.H, m.legend.S, m.legend.I, m.legend.K], ['mideast_house', 'mideast_shop', 'mideast_inn', 'mideast_guild'], '中東風の建物');
     for (const id of ['mideast_house', 'mideast_shop', 'mideast_inn', 'mideast_guild']) assert.equal(objects[id].roofStyle, 'flat', `${id}: 平らな屋根`);
     assert.ok(objects.mideast_guild.dome && objects.mideast_guild.spire, '商人ギルドは、ドームと尖塔');
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf8');
+    const game = gameSource();
     for (const t of ['adobeWall', 'adobeWallOchre', 'adobeRoof', 'domeTile', 'packedEarth', 'packedEarthRoad']) assert.ok(game.includes(`${t}:`), `テクスチャ ${t}`);
     assert.ok(['1', '2', '3', '4'].some(c => m.layout.join('').includes(c)), '市場の屋台');
 });
@@ -1829,9 +1830,9 @@ test('G: 世界樹のまわりを、柵で、「ロ」の形に隙間なく囲�
 });
 
 test('木の柵の描画: つながる方向ごとに半分の板だけを描く（角が L 字・端が片側。全幅の板を十字に交わらせて、角の先が突き出す「#」にしない）', () => {
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf8');
-    const i = game.indexOf("case 'wooden_fence': {");
-    const body = game.slice(i, game.indexOf("case ", i + 30));
+    const game = gameSource();
+    const i = game.indexOf('    wooden_fence(t) {');
+    const body = game.slice(i, game.indexOf('\n    },', i));
     assert.ok(body.includes('const addPanel = (dx, dz)') && body.includes('PlaneGeometry(halfW, fenceH)'), '半分の板');
     for (const dir of ['addPanel(-1, 0)', 'addPanel(1, 0)', 'addPanel(0, -1)', 'addPanel(0, 1)']) assert.ok(body.includes(dir), dir);
     assert.ok(!body.includes('Horizontal X plane') && !body.includes('Vertical Z plane'), '全幅の板を、十字に交わらせない');
@@ -1842,7 +1843,7 @@ test('植物（草・花・シダ・葦など）は、全て sdServer の画像�
         if (o.type === 'plant') assert.ok(o.imageFile && Number.isInteger(o.sdId), `${id}: 植物は sdServer の画像（imageFile・sdId）`);
     }
     for (const gone of ['grass_tuft', 'tall_grass', 'wild_flowers', 'reed', 'dry_tuft']) assert.equal(objects[gone], undefined, `${gone} は削除済み`);
-    const game = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf8');
+    const game = gameSource();
     const tex = fs.readFileSync(path.join(root, 'public/js/textures.js'), 'utf8');
     for (const t of ['grassTuft', 'tallGrass', 'wildFlowers', 'dryTuft']) assert.ok(!game.includes(`${t}:`) && !game.includes(`textures.${t}`), `${t}: 自作の絵は使わない`);
     for (const f of ['createGrassTuftTexture', 'createTallGrassTexture', 'createWildFlowersTexture', 'createReedTexture', 'createDryTuftTexture']) assert.ok(!tex.includes(f), `${f}: 削除済み`);

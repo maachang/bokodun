@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { copyGameModules } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 const readJson = (f) => JSON.parse(fs.readFileSync(path.join(projectRoot, f), 'utf-8'));
@@ -95,11 +96,7 @@ test('村人のセリフ: 近づくと出る（離れるまで同じセリフ）
 
 // ゲーム側（GameEngine）: 村人が立てない場所の判定、プレイヤーとの衝突、セリフ
 async function loadGame() {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'npcgame-'));
-    for (const f of ['game', 'textures', 'entities', 'npc', 'mapNavigator', 'world', 'mapFormat', 'enemyBehavior', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'sdAssetManager', 'three.module']) {
-        const src = fs.readFileSync(path.join(projectRoot, `public/js/${f}.js`), 'utf-8').replaceAll("'/js/", "'./");
-        fs.writeFileSync(path.join(dir, `${f}.js`), src);
-    }
+    const dir = copyGameModules('npcgame-');
     const { GameEngine } = await import(path.join(dir, 'game.js'));
     const { Npc } = await import(path.join(dir, 'npc.js'));
     return { GameEngine, Npc };

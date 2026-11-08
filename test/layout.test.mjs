@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { PANELS, REGIONS, resolveLayout, regionElementId, applyLayoutToDom } from '../public/js/layout.js';
+import { gameSource } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 const layoutConfig = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/layout.json'), 'utf-8'));
@@ -93,7 +94,7 @@ test('layout.json と index.html の整合', async (t) => {
     });
 
     await t.test('game.js が getElementById で参照する id は、すべて index.html に存在する', () => {
-        const game = fs.readFileSync(path.join(projectRoot, 'public/js/game.js'), 'utf-8');
+        const game = gameSource();
         const ids = [...game.matchAll(/getElementById\('([^']+)'\)/g)].map(m => m[1]);
         assert.ok(ids.length > 5);
         for (const id of new Set(ids)) assert.ok(indexHtml.includes(`id="${id}"`) || ['viewport'].includes(id), `id=${id}`);

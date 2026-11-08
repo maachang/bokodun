@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { copyGameModules } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 const readJson = (f) => JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data', f), 'utf-8'));
@@ -13,11 +14,7 @@ const enemyDefs = readJson('enemies.json');
 
 // ブラウザ向けの絶対パス import ('/js/xxx.js') を相対パスに読み替えた一時コピーを作ってロードする
 async function loadModules() {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'equipment-'));
-    for (const f of ['game', 'textures', 'entities', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'npc', 'mapNavigator', 'world', 'mapFormat', 'enemyBehavior', 'sdAssetManager', 'three.module']) {
-        const src = fs.readFileSync(path.join(projectRoot, `public/js/${f}.js`), 'utf-8').replaceAll("'/js/", "'./");
-        fs.writeFileSync(path.join(dir, `${f}.js`), src);
-    }
+    const dir = copyGameModules('equipment-');
     const { GameEngine } = await import(path.join(dir, 'game.js'));
     const { Monster, Projectile } = await import(path.join(dir, 'entities.js'));
     const { SlashEffectSystem } = await import(path.join(dir, 'slashEffect.js'));

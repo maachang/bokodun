@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
 import { execFileSync } from 'node:child_process';
+import { gameSource } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 
@@ -95,7 +96,7 @@ test('1. JSON Schema & Integrity Validation', async (t) => {
 
 test('2. Audio Method Integrity Check (prevents TypeError: this.sound.xxx)', async (t) => {
     const audioJs = fs.readFileSync(path.join(projectRoot, 'public/js/audio.js'), 'utf-8');
-    const gameJs = fs.readFileSync(path.join(projectRoot, 'public/js/game.js'), 'utf-8');
+    const gameJs = gameSource();
     const entitiesJs = fs.readFileSync(path.join(projectRoot, 'public/js/entities.js'), 'utf-8');
 
     // Extract all methods defined in SoundFX class
@@ -122,7 +123,7 @@ test('2. Audio Method Integrity Check (prevents TypeError: this.sound.xxx)', asy
 
 test('3. Texture Method & Property Integrity Check', async (t) => {
     const texturesJs = fs.readFileSync(path.join(projectRoot, 'public/js/textures.js'), 'utf-8');
-    const gameJs = fs.readFileSync(path.join(projectRoot, 'public/js/game.js'), 'utf-8');
+    const gameJs = gameSource();
     const objects = JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data/objects.json'), 'utf-8'));
 
     // Extract static createXxx methods in textures.js

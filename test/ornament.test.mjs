@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { gameSource } from './helpers/game.mjs';
 
 const root = process.cwd();
 const readJson = (f) => JSON.parse(fs.readFileSync(path.join(root, f), 'utf-8'));
@@ -40,9 +41,9 @@ test('飾り: 王城に、シャンデリア・壁の燭台・旗があり、壁
 });
 
 test('飾り: game.js に hanging と wall_deco の描画がある', () => {
-    const src = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
-    assert.match(src, /case 'hanging':/);
-    assert.match(src, /case 'wall_deco':/);
+    const src = gameSource();
+    assert.match(src, /\n    hanging\(t\) \{/);
+    assert.match(src, /\n    wall_deco\(t\) \{/);
 });
 
 test('飾り: 神殿に飾りがある（大神殿は大シャンデリアと旗、街の神殿は吊り燭台、村の神殿は壁の燭台のみ）', () => {
@@ -82,7 +83,7 @@ test('貴族の屋敷: 街の扉から入れ、1階と2階が階段でつなが�
 });
 
 test('描画: マスごとの天井・床は、全体の天井・床と同じ平面に置かない（動くたびにちらつくため）', () => {
-    const src = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+    const src = gameSource();
     const ceil = src.match(/addCeilingTile\(wx, wz, tileSize, wallH, textureKey\) \{[\s\S]*?\n    \}/)[0];
     assert.match(ceil, /position\.set\(wx, wallH - 0\.05, wz\)/);
     const floor = src.match(/addFloorTile\(wx, wz, tileSize, textureKey\) \{[\s\S]*?\n    \}/)[0];

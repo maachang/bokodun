@@ -2,9 +2,10 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import { PANELS, resolveLayout } from '../public/js/layout.js';
+import { gameSource } from './helpers/game.mjs';
 
 // game.js は three.js を読み込むので、方角の関数だけを、ソースから取り出して試す
-const src = fs.readFileSync('public/js/game.js', 'utf8');
+const src = gameSource();
 const m = src.match(/export const COMPASS_NAMES = (\[.*?\]);\nexport function compassDirection\(angle\) \{([\s\S]*?)\n\}/);
 const compassDirection = new Function('angle', `const COMPASS_NAMES = ${m[1]};${m[2]}`);
 

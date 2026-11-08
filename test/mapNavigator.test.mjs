@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { copyGameModules } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 async function loadNavigator() {
@@ -72,11 +73,7 @@ test('階段の向き: dir の指定が優先。通れる隣が1つだけなら�
 
 // GameEngine に組み込まれた動き: 読み込みの遅い（初めて開く）マップへの移動で、扉の中から毎フレーム enterMap が呼ばれても、1 回しか移動しない
 async function loadEngine() {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'navgame-'));
-    for (const f of ['game', 'textures', 'entities', 'npc', 'mapNavigator', 'world', 'mapFormat', 'enemyBehavior', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'sdAssetManager', 'three.module']) {
-        const src = fs.readFileSync(path.join(projectRoot, `public/js/${f}.js`), 'utf-8').replaceAll("'/js/", "'./");
-        fs.writeFileSync(path.join(dir, `${f}.js`), src);
-    }
+    const dir = copyGameModules('navgame-');
     const { GameEngine } = await import(path.join(dir, 'game.js'));
     const { MapNavigator } = await import(path.join(dir, 'mapNavigator.js'));
     return { GameEngine, MapNavigator };

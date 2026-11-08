@@ -3,13 +3,11 @@ import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
+import { copyGameModules, gameSource } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 async function load() {
-    const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'merge-'));
-    for (const f of ['game', 'textures', 'entities', 'npc', 'mapNavigator', 'world', 'mapFormat', 'enemyBehavior', 'audio', 'particles', 'slashEffect', 'strikeEffect', 'sdAssetManager', 'three.module']) {
-        fs.writeFileSync(path.join(dir, `${f}.js`), fs.readFileSync(path.join(projectRoot, `public/js/${f}.js`), 'utf-8').replaceAll("'/js/", "'./"));
-    }
+    const dir = copyGameModules('merge-');
     return { ...(await import(path.join(dir, 'game.js'))), THREE: await import(path.join(dir, 'three.module.js')) };
 }
 
@@ -48,7 +46,7 @@ test('描画の負荷: 動かない部品は、同じ材質ごとに1つのメ�
 });
 
 test('描画の負荷: 床・天井・壁・家具などの追加は addStatic を通す（まとめる対象）。扉・罠・水・宝箱は通さない', () => {
-    const src = fs.readFileSync(path.join(projectRoot, 'public/js/game.js'), 'utf-8');
+    const src = gameSource();
     assert.match(src, /this\.mergeStaticMeshes\(\);/);
     for (const name of ['cellMesh', 'tileMesh', 'stepMesh', 'postMesh']) assert.match(src, new RegExp(`this\\.addStatic\\(${name}\\)`), name);
     // 壁・家は、見た目の共通部品（visualBlock）の中で、env.add(..., true)（= addStatic と同じ）を通す

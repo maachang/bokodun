@@ -2,13 +2,14 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { gameSource } from './helpers/game.mjs';
 
 const root = process.cwd();
 const readJson = (f) => JSON.parse(fs.readFileSync(path.join(root, f), 'utf-8'));
 const objects = readJson('public/data/objects.json');
 const temple = readJson('public/data/maps/temple.json');
 const city = readJson('public/data/maps/city.json');
-const tex = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf-8');
+const tex = gameSource();
 
 test('画像のオブジェクト（像・壁の画像）: 画像ファイルがあり、縦横比と高さが決まっている', () => {
     const list = Object.entries(objects).filter(([, o]) => ['statue', 'wall_image'].includes(o.type));

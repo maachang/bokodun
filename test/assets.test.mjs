@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { gameSource } from './helpers/game.mjs';
 
 const projectRoot = process.cwd();
 
@@ -26,7 +27,7 @@ test('参照している画像ファイルの存在', async (t) => {
     await t.test('エフェクト系の画像（火柱）は public/images/effects/ にある（objects/ には置かない）', () => {
         assert.ok(fs.existsSync(path.join(projectRoot, 'public/images/effects/fire_pillar.png')));
         assert.equal(fs.existsSync(path.join(projectRoot, 'public/images/objects/fire_pillar.png')), false);
-        const game = fs.readFileSync(path.join(projectRoot, 'public/js/game.js'), 'utf-8');
+        const game = gameSource();
         assert.ok(game.includes('/images/effects/fire_pillar.png'));
     });
 });

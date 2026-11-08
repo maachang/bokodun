@@ -2,6 +2,7 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import fs from 'node:fs';
 import path from 'node:path';
+import { gameSource } from './helpers/game.mjs';
 
 const root = process.cwd();
 const readJson = (f) => JSON.parse(fs.readFileSync(path.join(root, f), 'utf-8'));
@@ -356,7 +357,7 @@ test('壁際の設備: かまど・オーブン・流し台・暖炉・食器棚
         const body = d.parts[0];
         assert.equal(body.size[0], 4, `${b}${s}: 本体の幅がマスいっぱい`);
     }
-    const game = fs.readFileSync('public/js/game.js', 'utf8');
+    const game = gameSource();
     assert.ok(game.includes('autoTurn'), '壁に自動で向きを合わせる処理');
 });
 
@@ -373,7 +374,7 @@ test('厨房らしさ: 全部の台所に、調理台・台所の暖炉・鍋つ
 });
 
 test('扉: 壁が高い建物（大神殿など）でも、扉は標準の高さで頭打ちにして、上をまぐさでふさぐ。壁が5以下は、壁の高さのまま', () => {
-    const game = fs.readFileSync('public/js/game.js', 'utf8');
+    const game = gameSource();
     assert.ok(game.includes('const doorH = Math.min(env.wallH, objDef.doorHeight ?? (env.wallH <= 5 ? env.wallH : 4.5))'), '扉の高さの頭打ち');
     assert.ok(game.includes('まぐさ'), 'まぐさ');
     assert.ok(game.includes('openY: doorH * 1.45'), '開く量は扉の高さが基準');
@@ -417,12 +418,12 @@ test('カウンターの店員: ギルド・酒場・店の、カウンターや
         }
         assert.ok(found > 0, `${id}: カウンターの奥の店員`);
     }
-    assert.ok(fs.readFileSync('public/js/game.js', 'utf8').includes('n.oz ?? 0'), 'oz を使う');
+    assert.ok(gameSource().includes('n.oz ?? 0'), 'oz を使う');
 });
 
 test('看板: ギルド・鍛冶屋・訓練所・盗賊ギルド・酒場の入口にも、店と同じ看板（アイコン）が出る', () => {
     const rd = id => JSON.parse(fs.readFileSync(`public/data/maps/${id}.json`, 'utf8'));
-    const game = fs.readFileSync('public/js/game.js', 'utf8');
+    const game = gameSource();
     const expected = { guild_adv: 'advGuildIcon', guild_mage: 'mageGuildIcon', guild_merchant: 'merchantGuildIcon', guild_smith: 'smithIcon', guild_training: 'trainingIcon', guild_thief: 'thiefGuildIcon', slum_bar: 'barIcon' };
     const links = [...Object.values(rd('city').links), ...Object.values(rd('city_slum').links)];
     for (const [dest, icon] of Object.entries(expected)) {
@@ -456,7 +457,7 @@ test('宿屋・酒場: 一般街の宿屋の建物に入口があり、1階（�
     assert.equal(l.nextMap, 'city_inn'); assert.equal(l.icon, 'innIcon'); assert.ok(l.back);
     assert.equal(city.legend[city.layout[5][14]], 'inn_door', '宿屋の建物の扉');
     assert.ok(Object.values(city.legend).includes('inn_sign'), '宿屋の標識');
-    assert.ok(fs.readFileSync('public/js/game.js', 'utf8').includes("innIcon: RetroTextureGenerator.createShopIconTexture('inn')"));
+    assert.ok(gameSource().includes("innIcon: RetroTextureGenerator.createShopIconTexture('inn')"));
     const names1 = Object.values(f1.legend), names2 = Object.values(f2.legend);
     for (const n of ['bar_counter', 'beer_keg', 'hearth', 'building_exit', 'stairs_wood_up']) assert.ok(names1.includes(n), `1階: ${n}`);
     for (const n of ['straw_bed_wood', 'bed', 'stairs_wood_down']) assert.ok(names2.includes(n), `2階: ${n}`);
@@ -469,7 +470,7 @@ test('宿屋・酒場: 一般街の宿屋の建物に入口があり、1階（�
 
 test('宿屋・酒場の立て札: 扉の横の立て札にも、マーク入りの板（宿屋＝ベッド、酒場＝ジョッキ）が付く', () => {
     const o = JSON.parse(fs.readFileSync('public/data/objects.json', 'utf8'));
-    const game = fs.readFileSync('public/js/game.js', 'utf8');
+    const game = gameSource();
     assert.equal(o.inn_sign.texture, 'innSign'); assert.equal(o.bar_sign.texture, 'barSign');
     assert.ok(game.includes("innSign: RetroTextureGenerator.createShopSignTexture('inn')") && game.includes("barSign: RetroTextureGenerator.createShopSignTexture('bar')"));
 });
