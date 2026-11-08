@@ -362,6 +362,22 @@ export class SlashEffectSystem {
         tip = build({ add, animators, arcDeg, effect, geometries, makeStar, range, root, setFade, size, unitDisc, unitLine });
 
         // ---- 火花: 当たった点から飛び散る、尾を引く線 ----
+        const { sparkCount } = this.addSparks(power, base, core, geometries, materials, meshes, animators, root, tip, size);
+
+        const { flashGeometry, flashMat, flashBase, flash } = this.makeScreenFlash(base, power);
+
+        const apply = (p) => { for (const a of animators) a(p); };
+        apply(0);
+        this.camera.add(root);
+        this.camera.add(flash);
+        this.effects.push({
+            shape, group: root, meshes, flash, flashMat, flashBase, flashGeometry,
+            geometries, materials, apply, duration, t: 0, fade: 1, sparkCount
+        });
+    }
+
+    // 火花: 当たった点から飛び散る、尾を引く線（spawn の一部）
+    addSparks(power, base, core, geometries, materials, meshes, animators, root, tip, size) {
         const sparkCount = Math.round(SPARK_COUNT * power);
         const sparkGeo = lineGeometry(1, 1, 1.0);
         geometries.push(sparkGeo);
@@ -386,8 +402,11 @@ export class SlashEffectSystem {
                 s.mesh.scale.set((s.len + 0.02) * (1 - p) * size, 0.014, 1);
             }
         });
+        return { sparkCount };
+    }
 
-        // ---- 画面全体のフラッシュ（ヒットの瞬間に、画面がエフェクトの色で短く光る）----
+    // 画面全体のフラッシュ（ヒットの瞬間に、画面がエフェクトの色で短く光る。spawn の一部）
+    makeScreenFlash(base, power) {
         const flashGeometry = new THREE.PlaneGeometry(4, 3);
         const flashMat = new THREE.MeshBasicMaterial({
             color: base, transparent: true, opacity: 0, depthTest: false, depthWrite: false, blending: THREE.AdditiveBlending
@@ -397,15 +416,7 @@ export class SlashEffectSystem {
         const flash = new THREE.Mesh(flashGeometry, flashMat);
         flash.renderOrder = RENDER_ORDER - 1;
         flash.position.set(0, 0, -SCREEN_DISTANCE + 0.05);
-
-        const apply = (p) => { for (const a of animators) a(p); };
-        apply(0);
-        this.camera.add(root);
-        this.camera.add(flash);
-        this.effects.push({
-            shape, group: root, meshes, flash, flashMat, flashBase, flashGeometry,
-            geometries, materials, apply, duration, t: 0, fade: 1, sparkCount
-        });
+        return { flashGeometry, flashMat, flashBase, flash };
     }
 
     update(dt) {
