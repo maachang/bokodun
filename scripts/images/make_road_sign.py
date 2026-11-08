@@ -1,13 +1,15 @@
-"""道しるべ（road_sign）の絵を、立て札（signpost.png）から作る。板の英語の文字を消し、世の中に存在しない文字（創作の文字）を、同じ彫りの調子で彫る。矢印は、そのまま残す。
-使い方: python3 scripts/images/make_road_sign.py（決定的。乱数は固定）"""
+"""立て札の絵（public/images/objects/signpost.png）を作る。元の絵（板に、英語の地名が読める立て札）の英語の文字を消し、世の中に存在しない文字（創作の文字）を、同じ彫りの調子で彫る。矢印は、そのまま残す。
+全ての立て札（街の名前・施設・道しるべ・山道など。type が signpost で、texture が signpost のもの）が、この絵を使う（読める立て札の絵は、使わないので、削除した）。
+元の絵は、.claudeWork/signpost_readable_original.png に退避してある（AI 専用の作業領域。リポジトリには入れない）。
+使い方: python3 scripts/images/make_road_sign.py（決定的。乱数は固定）。出力は signpost.png を上書きする"""
 import os
 import random
 import numpy as np
 from PIL import Image, ImageDraw, ImageFilter
 
 ROOT = os.path.join(os.path.dirname(__file__), '..', '..')
-SRC = os.path.join(ROOT, 'public', 'images', 'objects', 'signpost.png')
-DST = os.path.join(ROOT, 'public', 'images', 'objects', 'road_sign.png')
+SRC = os.path.join(ROOT, '.claudeWork', 'signpost_readable_original.png')
+DST = os.path.join(ROOT, 'public', 'images', 'objects', 'signpost.png')
 
 # 文字を消す範囲（矢印・釘は含めない）と、文字を彫る列（(x 左, x 右, y 上, y 下, 単語ごとの文字数)）
 PLANKS = [

@@ -345,7 +345,6 @@ export class GameEngine {
             ashGround: RetroTextureGenerator.createSpeckleFloorTexture('#3a3430', ['#2a2522', '#4a423c', '#554a42', '#1f1b19']),
             boulder: RetroTextureGenerator.createBoulderTexture(),
             signpost: RetroTextureGenerator.createSignpostTexture(),
-            roadSign: RetroTextureGenerator.createRoadSignTexture(),   // 道しるべ（文字は、創作の文字）
             weaponShopSign: RetroTextureGenerator.createShopSignTexture('weapon'),
             itemShopSign: RetroTextureGenerator.createShopSignTexture('item'),
             innSign: RetroTextureGenerator.createShopSignTexture('inn'),

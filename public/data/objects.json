@@ -963,7 +963,7 @@
     "lift": true,
     "groundShadow": true,
     "type": "signpost",
-    "texture": "roadSign",
+    "texture": "signpost",
     "solid": true,
     "blocksProjectiles": false,
     "scale": [1.9, 2.0, 1.0],

@@ -1591,10 +1591,11 @@ test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つ�
             }
         }));
     }
-    // 道しるべの絵: 英語の地名の入った立て札（signpost）ではなく、創作の文字の専用の絵（roadSign）
-    assert.equal(objects.road_sign.texture, 'roadSign');
-    assert.ok(fs.existsSync(path.join(root, 'public/images/objects/road_sign.png')), '専用の絵がある');
-    assert.match(fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf8'), /roadSign: RetroTextureGenerator\.createRoadSignTexture\(\)/);
+    // 立て札の絵は、全て、読めない創作の文字の絵（signpost）。読める絵（road_sign.png などの別ファイル）・専用のテクスチャは、ない
+    assert.equal(objects.road_sign.texture, 'signpost');
+    assert.ok(!fs.existsSync(path.join(root, 'public/images/objects/road_sign.png')), '読める絵・別の絵は、削除済み');
+    const gameSrc = fs.readFileSync(path.join(root, 'public/js/game.js'), 'utf8');
+    assert.ok(!gameSrc.includes('roadSign') && !fs.readFileSync(path.join(root, 'public/js/textures.js'), 'utf8').includes('createRoadSignTexture'), '専用のテクスチャは、ない');
     assert.equal(signs.length, 1, '分かれ道は 1 か所');
     const { x, y, msg } = signs[0];
     for (const name of ['グリーン王国', 'ダマスカス自治領', 'ガリレオ連盟']) assert.ok(msg.includes(name), `${name} が書いてある`);
