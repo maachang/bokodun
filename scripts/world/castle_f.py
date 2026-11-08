@@ -72,13 +72,23 @@ def build_others():
         # A キュラビッド帝国: 帝王（雪国の若い帝王）と、重装の衛兵
         hall('castle_a', '帝王の城（キュラビッド帝国）', 25, 15, 12, [('emperor_a', 12, 1)],
              [('guard_heavy', 9, 5), ('guard_heavy', 15, 5), ('guard_heavy', 9, 9), ('guard_heavy', 15, 9)]),
-        # B フランケル聖国: 狭い城に、愚かな王と王子（実権は教皇にある）。衛兵は少ない
-        hall('castle_b', '王の城（フランケル聖国。狭い）', 17, 11, 8, [('king_b', 8, 1), ('prince_b', 6, 2)],
+        # B フランケル聖国: 狭い城に、愚かな王と王子（玉座に並ぶ）（実権は教皇にある）。衛兵は少ない
+        hall('castle_b', '王の城（フランケル聖国。狭い）', 17, 11, 8, [('king_b', 8, 1), ('prince_b', 9, 1)],   # 王と王子は、サンプルの王城（castle: 王 9,1・王子 10,1）と同じく、玉座の段の一番上に並ぶ
              [('guard_light', 6, 6), ('guard_light', 10, 6)]),
         # G デイラミ精霊国: エルフの女王と宰相
         hall('castle_g', '女王の城（デイラミ精霊国）', 25, 15, 12, [('elf_queen', 12, 1), ('elf_chancellor', 9, 2)],
              [('elf_soldier_golem', 9, 6), ('elf_soldier_golem', 15, 6), ('elf_man_c', 18, 10), ('elf_woman_b', 6, 10)]),
     ]
+
+
+def strip_hearth(m):
+    """暖炉（hearth）を、書棚か食器棚に替える（砂漠の国には、暖炉を置かない。調理用の炉・かまど・台所の炉は、残す）"""
+    rev = {v: k for k, v in m['legend'].items()}
+    repl = rev.get('bookshelf') or rev.get('cupboard')
+    for ch in [k for k, v in m['legend'].items() if v == 'hearth']:
+        m['layout'] = [r.replace(ch, repl) for r in m['layout']]
+        m['legend'].pop(ch)
+    return m
 
 
 def build_mansion_c():
@@ -91,6 +101,7 @@ def build_mansion_c():
     rows[1][12] = 'F'
     m['layout'] = [''.join(r) for r in rows]
     m['links'].pop('12,1', None)
+    strip_hearth(m)   # 砂漠の国なので、暖炉は置かない
     for n in m['npcs']:
-        if n['id'] == 'margrave_man': n['id'] = 'desert_chairman'
+        if n['id'] == 'margrave_man': n['id'] = 'desert_chairman'; n['x'] = 6; n['z'] = 2   # 北の壁の書棚の前の、赤い絨毯の上（元の辺境伯は、東寄りの端）
     return m

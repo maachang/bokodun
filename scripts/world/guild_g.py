@@ -32,6 +32,8 @@ GUILDS = [
     ('guild_smith', 'guild_smith_f', '鍛冶屋（ライアン獣王国）', 'town_f', {'dwarf_smith': 'smith_keeper_f'}, {}),
     ('city_inn', 'city_inn_g', '宿屋・酒場（デイラミ精霊国）', 'town_g', {'innkeeper': 'innkeeper_g', 'inn_cook': 'inn_cook_g', 'inn_waitress': 'inn_waitress_g'}, {'city_inn_2f': 'city_inn_2f_g'}),
     ('city_inn_2f', 'city_inn_2f_g', '宿屋の客室（デイラミ精霊国）', 'city_inn_g', {'inn_waitress': 'inn_waitress_g'}, {'city_inn': 'city_inn_g'}),
+    ('city_inn', 'city_inn_c', '宿屋・酒場（ミレニアム自由都市）', 'town_c', {}, {'city_inn_2f': 'city_inn_2f_c'}),   # 砂漠の国: 暖炉なし
+    ('city_inn_2f', 'city_inn_2f_c', '宿屋の客室（ミレニアム自由都市）', 'city_inn_c', {}, {'city_inn': 'city_inn_c'}),
     ('guild_training', 'guild_training_f', '職業訓練所（ライアン獣王国）', 'town_f', {'trainer': 'bear_trainer'}, {}),
 ]
 
@@ -43,5 +45,8 @@ def build():
         m['id'] = new; m['name'] = name; m['nextMap'] = back
         for n in m.get('npcs', []): n['id'] = npc_map.get(n['id'], n['id'])
         for l in m.get('links', {}).values(): l['nextMap'] = link_map.get(l['nextMap'], l['nextMap'])
+        if new.endswith('_c'):   # 砂漠の国（C）は、暖炉を置かない
+            from castle_f import strip_hearth
+            strip_hearth(m)
         out.append(m)
     return out

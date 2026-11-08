@@ -13,7 +13,7 @@ FACILITIES = [   # (建物の文字, 左上 x, y, 幅, 扉の x（建物の左�
     ('S', 2, 10, 4, 1, 'd', 'q', _shop('item_shop', '道具屋に入る', 'itemShopIcon')),
     ('S', 7, 10, 4, 1, 'd', 'Q', _shop('weapon_shop', '武器屋に入る', 'weaponShopIcon')),
     ('S', 12, 10, 4, 1, 'd', 'a', _to('guild_adv', '冒険者ギルドに入る', 'advGuildIcon')),
-    ('I', 12, 2, 4, 1, 'N', 'M', _to('city_inn', '宿屋・酒場に入る', 'innIcon')),
+    ('I', 12, 2, 4, 1, 'N', 'M', _to('city_inn_c', '宿屋・酒場に入る', 'innIcon')),
     ('U', 2, 2, 8, 3, 'Y', 'x', {'nextMap': 'mansion_chairman_c', 'message': '議長の館に入る'}),   # 議長の館（扉の上の絵は、なし。H の自治領主の館と同じ。店・ギルドの絵を流用しない）（国のトップの館。ほかの 2 倍の幅）
     ('J', 28, 2, 8, 3, 'D', 'c', _to('temple', '神殿に入る', 'templeIcon')),   # 宗教は神殿（ユーザー指定）。ドームの大きな神殿
     ('K', 25, 9, 9, 4, 'd', 'g', _to('guild_merchant_c', '商人ギルドに入る', 'merchantGuildIcon')),   # 商人ギルドは、ほかの 2 倍の幅（街の中心）

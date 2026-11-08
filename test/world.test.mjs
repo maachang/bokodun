@@ -1616,7 +1616,11 @@ test('B（フランケル聖国）: 大教会が街の中心の北の最上位�
     assert.ok(readJson('public/data/maps/temple_b.json').npcs.some(n => n.id === 'pope') && readJson('public/data/maps/temple_b.json').npcs.some(n => n.id === 'cardinal'), '教皇と枢機卿は、大教会の中');
     assert.ok(Object.values(m.links).some(l => l.nextMap === 'temple_town'), '礼拝堂がある');
     assert.equal(m.links['42,0']?.nextMap, 'castle_b', '小さな王城の城門は、北東');
-    assert.deepEqual(readJson('public/data/maps/castle_b.json').npcs.slice(0, 2).map(n => n.id), ['king_b', 'prince_b'], '愚かな王と王子');
+    const cb = readJson('public/data/maps/castle_b.json');
+    assert.deepEqual(cb.npcs.slice(0, 2).map(n => n.id), ['king_b', 'prince_b'], '愚かな王と王子');
+    const [kg, pr] = cb.npcs;
+    assert.ok(kg.z === pr.z && Math.abs(kg.x - pr.x) === 1, '王と王子は、玉座の段の上に、横に並ぶ（サンプルの王城と同じ）');
+    assert.ok(['dais_stone_3', 'dais_rug_3'].includes(cb.legend[cb.layout[kg.z][kg.x]]) && ['dais_stone_3', 'dais_rug_3'].includes(cb.legend[cb.layout[pr.z][pr.x]]), '二人とも、一番上の段にいる');
     const ids = m.npcs.map(n => n.id);
     const clergy = ids.filter(id => /^priest_(man|woman)$/.test(id)).length;
     assert.ok(clergy / ids.length >= 0.45, `聖職者（助祭・修道女）が多い: ${clergy}/${ids.length}`);
@@ -1628,6 +1632,8 @@ test('C（ミレニアム自由都市）: 商人ギルドが街の中心・王�
     const m = readJson('public/data/maps/town_c.json');
     assert.deepEqual([m.layout[0].length, m.layout.length], [40, 30]);
     assert.equal(m.links['29,11']?.nextMap, 'guild_merchant_c', '商人ギルドの扉');
+    assert.ok(Object.values(m.links).some(l => l.nextMap === 'city_inn_c'), '宿屋は C 専用（暖炉なし）');
+    for (const id of ['city_inn_c', 'city_inn_2f_c', 'mansion_chairman_c']) assert.ok(!Object.values(readJson(`public/data/maps/${id}.json`).legend).includes('hearth'), `${id}: 砂漠の国に暖炉はない`);
     const mansion = Object.values(m.links).find(l => l.nextMap === 'mansion_chairman_c');
     assert.equal(mansion?.message, '議長の館に入る', '国のトップ（議長）の館がある');
     assert.equal(m.legend.U, 'mideast_mansion'); assert.equal(m.legend.x, 'chairman_sign');
@@ -1635,6 +1641,10 @@ test('C（ミレニアム自由都市）: 商人ギルドが街の中心・王�
     const mc = readJson('public/data/maps/mansion_chairman_c.json');
     assert.ok(mc.npcs.some(n => n.id === 'desert_chairman') && !mc.npcs.some(n => n.id === 'margrave_man'), '館の主は議長');
     assert.equal(mc.nextMap, 'town_c');
+    const chairman = mc.npcs.find(n => n.id === 'desert_chairman');
+    assert.ok(!Object.values(mc.legend).includes('hearth'), '砂漠の国なので、暖炉はない');
+    assert.equal(mc.legend[mc.layout[chairman.z - 1][chairman.x]], 'bookshelf', '議長は、北の壁の書棚の前');
+    assert.equal(mc.legend[mc.layout[chairman.z][chairman.x]], 'rug', '議長は、赤い絨毯の上');
     assert.ok(!Object.values(mc.links).some(l => l.nextMap === 'mansion_margrave_2f'), '辺境伯の 2 階へは、行かない');
     assert.ok(!readJson('public/data/maps/guild_merchant_master_c.json').npcs.some(n => n.id === 'desert_chairman'), '議長は、ギルドではなく館にいる');
     const all = Object.values(m.links).map(l => l.nextMap);
