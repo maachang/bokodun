@@ -3,6 +3,43 @@
 // 元は game.js の loadMapBody の switch の case。移しただけで、描画の中身は同じ（game.js が長すぎて、編集の誤りが増えるため分割した）
 import * as THREE from '/js/three.module.js';
 
+// 溶岩の上の、立ちのぼる熱の揺らぎ（1 マスに 3 枚の板。プレイヤーのほうを向いて、ゆらぐ。liquid_tile から分けた）
+function addLavaHaze(game, wx, wz, waterSurfaceY, tileSize) {
+    // Spawn 3 layered billboard sprites per lava tile that rise vertically and face player
+    const hazeMat = new THREE.SpriteMaterial({
+        map: game.textures.heatHaze,
+        transparent: true,
+        opacity: 0.65,
+        blending: THREE.AdditiveBlending,
+        depthWrite: false
+    });
+
+    // Positions scattered slightly across the tile with balanced heat shimmer volume
+    const hazeOffsets = [
+        { ox: 0, oz: 0, baseScale: 2.2, phase: 0 },
+        { ox: -tileSize * 0.22, oz: tileSize * 0.2, baseScale: 1.8, phase: 1.8 },
+        { ox: tileSize * 0.25, oz: -tileSize * 0.18, baseScale: 1.9, phase: 3.5 }
+    ];
+
+    hazeOffsets.forEach(ho => {
+        const sprite = new THREE.Sprite(hazeMat.clone());
+        sprite.center.set(0.5, 0.0); // Exact bottom contact with lava surface
+        sprite.scale.set(ho.baseScale, ho.baseScale * 0.55, 1);
+        sprite.position.set(wx + ho.ox, waterSurfaceY, wz + ho.oz);
+        game.scene.add(sprite);
+        game.heatHazePlanes.push({
+            sprite: sprite,
+            baseX: wx + ho.ox,
+            baseZ: wz + ho.oz,
+            baseY: waterSurfaceY,
+            baseScale: ho.baseScale,
+            phase: ho.phase,
+            tileX: wx,
+            tileZ: wz
+        });
+    });
+}
+
 export const tilesFloors = {
     floor_tile(t) {
         const { objDef, tileSize, wallH, wx, wz } = t;
@@ -165,42 +202,7 @@ export const tilesFloors = {
 
         // If lava, add rising 3D heat wisps/smoke
         // （溶岩 1 マスごとの点光源は置かない: 火山では 566 個になり、GPU の上限を超えて、地面などの材質が描画されなくなるため）
-        if (isLava) {
-
-            // Spawn 3 layered billboard sprites per lava tile that rise vertically and face player
-            const hazeMat = new THREE.SpriteMaterial({
-                map: this.textures.heatHaze,
-                transparent: true,
-                opacity: 0.65,
-                blending: THREE.AdditiveBlending,
-                depthWrite: false
-            });
-
-            // Positions scattered slightly across the tile with balanced heat shimmer volume
-            const hazeOffsets = [
-                { ox: 0, oz: 0, baseScale: 2.2, phase: 0 },
-                { ox: -tileSize * 0.22, oz: tileSize * 0.2, baseScale: 1.8, phase: 1.8 },
-                { ox: tileSize * 0.25, oz: -tileSize * 0.18, baseScale: 1.9, phase: 3.5 }
-            ];
-
-            hazeOffsets.forEach(ho => {
-                const sprite = new THREE.Sprite(hazeMat.clone());
-                sprite.center.set(0.5, 0.0); // Exact bottom contact with lava surface
-                sprite.scale.set(ho.baseScale, ho.baseScale * 0.55, 1);
-                sprite.position.set(wx + ho.ox, waterSurfaceY, wz + ho.oz);
-                this.scene.add(sprite);
-                this.heatHazePlanes.push({
-                    sprite: sprite,
-                    baseX: wx + ho.ox,
-                    baseZ: wz + ho.oz,
-                    baseY: waterSurfaceY,
-                    baseScale: ho.baseScale,
-                    phase: ho.phase,
-                    tileX: wx,
-                    tileZ: wz
-                });
-            });
-        }
+        if (isLava) addLavaHaze(this, wx, wz, waterSurfaceY, tileSize);
 
         if (objDef.solid) {
             this.colliders.push({

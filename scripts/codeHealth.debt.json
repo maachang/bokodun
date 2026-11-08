@@ -1,10 +1,6 @@
 {
   "files": {},
   "funcs": {
-    "public/js/game/tilesFloors.js::liquid_tile": {
-      "lines": 121,
-      "plan": "水・溶岩・沼など、液体の種類ごとの関数に分ける"
-    },
     "scripts/world/town_d.py::build": {
       "lines": 124,
       "plan": "共通部品（壁・門・川・施設・段差の確認・飾り）を town_common.py へ。E・H・B・C の重複も、同時に解消する"
