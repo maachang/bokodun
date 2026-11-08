@@ -5,10 +5,6 @@
       "lines": 139,
       "plan": "敵のプロファイルの決め方を、表（データ）にして、条件分岐を減らす"
     },
-    "public/js/entities.js::constructor": {
-      "lines": 150,
-      "plan": "敵の種類ごとの初期値を、データの表へ"
-    },
     "public/js/game.js::constructor": {
       "lines": 111,
       "plan": "初期化を、段階（描画・入力・状態・UI）ごとの関数に分ける"

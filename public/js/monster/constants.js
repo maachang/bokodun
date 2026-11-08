@@ -18,3 +18,18 @@ export const LOST_TIME = 4.0;            // 追跡中に見失ってから未発
 export const DEATH_FLASH_TIME = 0.1;
 export const DEATH_FALL_END = 0.7;
 export const DEATH_DURATION = 1.3;
+
+// 敵のアイコン（HUD の、敵の一覧の絵）。テクスチャのキー → 画像（ここにないときは、imageFile か、種類の名前から決める）
+export const ENEMY_ICON_MAP = {
+    goblinArcher: '/images/enemies/demihuman/goblin_archer.png',
+    goblin: '/images/enemies/demihuman/goblin_mage.png',
+    skeleton: '/images/enemies/undead/skeleton.png',
+    mimic: '/images/enemies/golem/mimic.png',
+    tarantulaSwamp: '/images/enemies/insect/tarantula_swamp.png',
+    parasiteWasp: '/images/enemies/insect/parasite_wasp.png',
+    mariaMosquito: '/images/enemies/insect/maria_mosquito.png',
+    acidWorm: '/images/enemies/insect/acid_worm.png',
+    poisonMoth: '/images/enemies/insect/poison_moth.png',
+    poisonToad: '/images/enemies/reptile/poison_toad.png',
+    slime: '/images/enemies/slime/slime.png'
+};

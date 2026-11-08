@@ -52,7 +52,7 @@ export function measure(file) {
         }
         return lines.length;
     };
-    const seen = {};
+    const seen = Object.create(null);   // （{} だと、constructor という名前が、標準の constructor と衝突する）
     const funcs = heads.map(([i, name], k) => {
         const end = file.endsWith('.py') ? (k + 1 < heads.length ? heads[k + 1][0] : lines.length) : jsEnd(i);
         seen[name] = (seen[name] ?? 0) + 1;
