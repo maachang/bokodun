@@ -2614,5 +2614,103 @@
       "……止まれ。キュラビッド帝国の城塞へ、ようこそ。",
       "城門の向こうは、帝王様の城だ。静かにな。"
     ]
+  },
+  "mage_archmage_j": {
+    "name": "魔導国の大魔導師",
+    "sdId": 337,
+    "texture": "/images/npcs/mage_archmage_j.png",
+    "height": 2.4,
+    "aspect": 0.441,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "よう来たの、旅の者。魔法とは、世界の仕組みを読み解く学問じゃ。",
+      "ほっほ。杖を振るだけが魔法ではないぞ。"
+    ]
+  },
+  "mage_chancellor_j": {
+    "name": "魔導国の宰相（ウィザード）",
+    "sdId": 338,
+    "texture": "/images/npcs/mage_chancellor_j.png",
+    "height": 2.3,
+    "aspect": 0.37,
+    "radius": 0.5,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "大魔導師様は、研究となると、政務をお忘れになる。私が国を預かっています。",
+      "規律なき魔法は、ただの災いです。"
+    ]
+  },
+  "mage_researcher_man": {
+    "name": "魔法研究者（男）",
+    "sdId": 339,
+    "texture": "/images/npcs/mage_researcher_man.png",
+    "height": 2.3,
+    "aspect": 0.403,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "この魔導書、写本のはずが、原本より詳しいのだ。",
+      "呪文の韻を、ひとつ間違えるだけで、大惨事になる。"
+    ]
+  },
+  "mage_researcher_woman": {
+    "name": "魔法研究者（女）",
+    "sdId": 340,
+    "texture": "/images/npcs/mage_researcher_woman.png",
+    "height": 2.2,
+    "aspect": 0.449,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 3.0,
+    "lines": [
+      "魔力の流れは、水の流れによく似ているの。",
+      "今日の実験は、うまくいきそう。"
+    ]
+  },
+  "mage_apprentice_girl": {
+    "name": "魔法見習い（女の子）",
+    "sdId": 341,
+    "texture": "/images/npcs/mage_apprentice_girl.png",
+    "height": 1.55,
+    "aspect": 0.422,
+    "radius": 0.5,
+    "speed": 1.3,
+    "wanderRadius": 4.0,
+    "lines": [
+      "わたし、いつか大魔導師様みたいになるの！",
+      "火の呪文、まだ上手に出せないんだ。"
+    ]
+  },
+  "mage_apprentice_boy": {
+    "name": "魔法見習い（男の子）",
+    "sdId": 342,
+    "texture": "/images/npcs/mage_apprentice_boy.png",
+    "height": 1.6,
+    "aspect": 0.404,
+    "radius": 0.5,
+    "speed": 1.3,
+    "wanderRadius": 4.0,
+    "lines": [
+      "ほうきで空を飛ぶ練習をしてるんだ。",
+      "先生の杖、こっそり触っちゃった。"
+    ]
+  },
+  "queen_i": {
+    "name": "カナロア公国の女王",
+    "sdId": 343,
+    "texture": "/images/npcs/queen_i.png",
+    "height": 2.3,
+    "aspect": 0.364,
+    "radius": 0.5,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "ようこそ、水の都へ。大湖の恵みは、国の宝です。",
+      "公爵家は、いまや公国。民と湖を守るのが、わたくしの務めです。"
+    ]
   }
 }

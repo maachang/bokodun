@@ -17828,8 +17828,8 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "公爵の館",
-    "description": "公爵の館の案内標識（I カナロア公国）"
+    "message": "女王の館",
+    "description": "女王の館の案内標識（I カナロア公国）"
   },
   "adobe_wall": {
     "baseShadow": true,

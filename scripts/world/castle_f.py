@@ -84,9 +84,9 @@ def _others():
         # G デイラミ精霊国: エルフの女王と宰相
         hall('castle_g', '女王の城（デイラミ精霊国）', 25, 15, 12, [('elf_queen', 12, 1), ('elf_chancellor', 9, 2)],
              [('elf_soldier_golem', 9, 6), ('elf_soldier_golem', 15, 6), ('elf_man_c', 18, 10), ('elf_woman_b', 6, 10)]),
-        # J カラー魔導国: 魔法の国の長（魔法ギルドマスターの絵・台詞を借りる。専用の NPC 画像ができたら差し替え）と、衛兵・魔導士
-        hall('castle_j', '魔導王の城（カラー魔導国）', 25, 15, 12, [('mage_guild_master', 12, 1)],
-             [('guard_light', 9, 6), ('guard_light', 15, 6), ('adv_wizard', 18, 10), ('mage_clerk_woman', 6, 10)]),
+        # J カラー魔導国: 大魔導師（好々爺）と、女性の宰相（ウィザード）。衛兵・魔導士・研究者
+        hall('castle_j', '魔導王の城（カラー魔導国）', 25, 15, 12, [('mage_archmage_j', 12, 1), ('mage_chancellor_j', 9, 2)],
+             [('guard_light', 9, 6), ('guard_light', 15, 6), ('adv_wizard', 18, 10), ('mage_researcher_woman', 6, 10)]),
     ]
 
 
@@ -133,8 +133,8 @@ def build_mansion_c():
 
 
 def build_mansion_i():
-    """I（カナロア公国）の公爵の館。主はカナロア公爵（duke_man。公爵は、屋敷の中だけ）"""
-    return _chairman_mansion('mansion_duke_i', '公爵の館（カナロア公国）', 'town_i', 'duke_man', False)
+    """I（カナロア公国）の館（id は mansion_duke_i のまま）。主は大湖の公国女王（queen_i。屋敷の中だけ）"""
+    return _chairman_mansion('mansion_duke_i', '女王の館（カナロア公国）', 'town_i', 'queen_i', False)
 
 
 def build_mansion_e():

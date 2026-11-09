@@ -186,7 +186,7 @@
   },
   "34,26": {
    "nextMap": "mansion_duke_i",
-   "message": "公爵の館に入る",
+   "message": "女王の館に入る",
    "back": {
     "x": 34,
     "z": 27,

@@ -1,6 +1,6 @@
 {
  "id": "mansion_duke_i",
- "name": "公爵の館（カナロア公国）",
+ "name": "女王の館（カナロア公国）",
  "type": "indoor",
  "tileSize": 4,
  "wallHeight": 5,
@@ -72,7 +72,7 @@
  ],
  "npcs": [
   {
-   "id": "duke_man",
+   "id": "queen_i",
    "x": 6,
    "z": 2
   },

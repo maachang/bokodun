@@ -1788,8 +1788,8 @@ test('国のトップは、国ごとに違う（城・大教会・議長の部�
 
 test('厳守: 貴族・国の代表（王・王子・女王・宰相・帝王・教皇・枢機卿・議長・上位聖職者）は、屋外（街の通り・外のマップ）に出ない。城・屋敷・神殿・ギルドの中だけ', () => {
     const npcs = readJson('public/data/npcs.json');
-    const forbidden = /(noble|king|prince|queen|chancellor|emperor|pope|cardinal|chairman|baron|viscount|marquis|duke|margrave|priest_senior|elder_son|elder_daughter)/;
-    const outdoor = fs.readdirSync(path.join(root, 'public/data/maps')).filter(f => /^(w_\d\d_\d\d|town_[a-h]|city|town|village)\.json$/.test(f));
+    const forbidden = /(noble|archmage|king|prince|queen|chancellor|emperor|pope|cardinal|chairman|baron|viscount|marquis|duke|margrave|priest_senior|elder_son|elder_daughter)/;
+    const outdoor = fs.readdirSync(path.join(root, 'public/data/maps')).filter(f => /^(w_\d\d_\d\d|town_[a-j]|city|town|village)\.json$/.test(f));
     assert.ok(outdoor.length > 100);
     for (const f of outdoor) {
         const m = readJson(`public/data/maps/${f}`);

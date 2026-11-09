@@ -262,10 +262,12 @@ def build_g(w, h, legend, city_legend, links, npcs):
 FACILITIES_J = [f for f in FACILITIES if f[6] not in ('m', 'c')] + [   # 小さな魔法ギルド・神殿は置かない（神殿の品は道具屋が売る）。代わりに、大きな建物（高台の幅 8）が、魔導院（魔法ギルド）
     ('J', 28, 9, 8, 3, 'D', 'm', _to('guild_mage', '魔導院（魔法ギルド）に入る', 'mageGuildIcon')),
 ]
-NPCS_J = [   # 魔導士と、一般の住民。魔導国の長・衛兵の一部は、城（castle_j）の中（長は街に出ない）
-    ('adv_mage', 6, 17), ('adv_wizard', 12, 17), ('town_middle_woman', 28, 13), ('junior_merchant_woman', 24, 9),
-    ('town_old_woman', 6, 25), ('child_boy', 15, 21), ('guard_spear', 17, 27), ('guard_light', 22, 27),
+NPCS_J = [   # 魔導士・研究者・見習い（ヒューマン系の魔法使い）と、一般の住民。大魔導師・宰相は、城（castle_j）の中（街の通りには出ない）
+    ('mage_researcher_man', 6, 17), ('adv_mage', 12, 17), ('mage_researcher_woman', 28, 13), ('adv_wizard', 24, 9),
+    ('mage_apprentice_girl', 6, 25), ('mage_apprentice_boy', 15, 21), ('guard_spear', 17, 27), ('guard_light', 22, 27),
     ('gate_guard', 17, 1), ('gate_guard', 22, 1),
+    ('adv_mage', 34, 12), ('adv_wizard', 8, 21), ('mage_researcher_woman', 33, 21), ('mage_apprentice_girl', 10, 21),
+    ('mage_apprentice_boy', 36, 14), ('mage_researcher_man', 21, 21), ('adv_mage', 5, 21), ('town_middle_woman', 30, 15),
 ]
 
 

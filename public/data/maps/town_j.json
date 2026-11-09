@@ -82,32 +82,32 @@
  ],
  "npcs": [
   {
-   "id": "adv_mage",
+   "id": "mage_researcher_man",
    "x": 6,
    "z": 17
   },
   {
-   "id": "adv_wizard",
+   "id": "adv_mage",
    "x": 12,
    "z": 17
   },
   {
-   "id": "town_middle_woman",
+   "id": "mage_researcher_woman",
    "x": 28,
    "z": 13
   },
   {
-   "id": "junior_merchant_woman",
+   "id": "adv_wizard",
    "x": 24,
    "z": 9
   },
   {
-   "id": "town_old_woman",
+   "id": "mage_apprentice_girl",
    "x": 6,
    "z": 25
   },
   {
-   "id": "child_boy",
+   "id": "mage_apprentice_boy",
    "x": 15,
    "z": 21
   },
@@ -130,6 +130,46 @@
    "id": "gate_guard",
    "x": 22,
    "z": 1
+  },
+  {
+   "id": "adv_mage",
+   "x": 34,
+   "z": 12
+  },
+  {
+   "id": "adv_wizard",
+   "x": 8,
+   "z": 21
+  },
+  {
+   "id": "mage_researcher_woman",
+   "x": 33,
+   "z": 21
+  },
+  {
+   "id": "mage_apprentice_girl",
+   "x": 10,
+   "z": 21
+  },
+  {
+   "id": "mage_apprentice_boy",
+   "x": 36,
+   "z": 14
+  },
+  {
+   "id": "mage_researcher_man",
+   "x": 21,
+   "z": 21
+  },
+  {
+   "id": "adv_mage",
+   "x": 5,
+   "z": 21
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 30,
+   "z": 15
   }
  ],
  "links": {

@@ -55,9 +55,14 @@
  ],
  "npcs": [
   {
-   "id": "mage_guild_master",
+   "id": "mage_archmage_j",
    "x": 12,
    "z": 1
+  },
+  {
+   "id": "mage_chancellor_j",
+   "x": 9,
+   "z": 2
   },
   {
    "id": "guard_light",
@@ -75,7 +80,7 @@
    "z": 10
   },
   {
-   "id": "mage_clerk_woman",
+   "id": "mage_researcher_woman",
    "x": 6,
    "z": 10
   }
