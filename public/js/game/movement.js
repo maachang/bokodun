@@ -163,6 +163,11 @@ export const movementMethods = {
         if (this.nav?.busy) return;
         if (this.player.climb) return;   // 崖をよじ登っている間は、歩けない
         this._climbBump = null;
+        if ((this.player.debugLift || 0) > 0) {   // デバッグで浮いている間（Shift+U）: 通れない所（壁・崖・敵）を無視して、そのまま進む。高さの記録は、そのマスに合わせる（降りたとき、落下にしない）
+            this.player.x += dx; this.player.z += dz;
+            if (this.heightMap) this.player.heightLevel = this.heightLevelAt(this.player.x, this.player.z, this.player.heightLevel);
+            return;
+        }
         this.depenetrateFromWalls();
         const prevX = this.player.x;
         const prevZ = this.player.z;
