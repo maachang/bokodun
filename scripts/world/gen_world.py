@@ -129,9 +129,6 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
             m['layout'], m['heights'] = TF.build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         elif site['id'] in ('d', 'h', 'e', 'b', 'c', 'i'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
             m['layout'], m['heights'] = {'d': TD, 'h': TH, 'e': TE, 'b': TB, 'c': TC, 'i': TI}[site['id']].build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
-        if site['id'] == 'b':   # B（フランケル聖国）の街の中: 白亜の壁・白い家
-            for k_, v_ in (('W', 'white_wall'), ('H', 'white_house')):
-                if k_ in m['legend']: m['legend'][k_] = v_
         if site['id'] == 'c':   # C（砂漠の自由都市）: 砂漠の環境（霧は、街が見えるよう薄め）・砂の地面
             m['environment'] = dict(desert_env, floorType='desert', fogNear=24, fogFar=72); m['decorFloor'] = 'packedEarth'
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

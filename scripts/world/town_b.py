@@ -14,7 +14,7 @@ FACILITIES = [   # (建物の文字, 建物の左上 x, y, 幅, 扉の x（建�
     ('S', 9, 11, 4, 1, 'd', 'Q', _shop('weapon_shop', '武器屋に入る', 'weaponShopIcon')),
     ('S', 15, 11, 4, 1, 'd', 'a', _to('guild_adv', '冒険者ギルドに入る', 'advGuildIcon')),
     ('I', 28, 11, 4, 1, 'N', 'M', _to('city_inn', '巡礼者の宿・酒場に入る', 'innIcon')),
-    ('J', 34, 11, 6, 2, 'D', 'c', _to('temple_town', '礼拝堂に入る', 'templeIcon')),
+    ('K', 34, 11, 6, 2, 'D', 'k', _to('temple_town', '礼拝堂に入る', 'templeIcon')),
 ]
 CATHEDRAL = (16, 2, 16, 4, 7, 'D', 'c', _to('temple_b', '大教会に入る', 'templeIcon'))   # 左上 x・y・幅・奥行・扉の x（左から）・扉・立て札・links
 
@@ -28,7 +28,8 @@ NPCS = [   # 聖職者が多い（助祭・修道女）。一般人は少し。�
 ]
 
 LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'c', 'w', 'b')
-SOLID = set('WHSIJdNDC')
+SOLID = set('WHSIJKdNDC')
+SKIN_B = {'S': 'white_shop', 'I': 'white_inn', 'H': 'white_house', 'W': 'white_wall', 'K': 'chapel_building', 'k': 'chapel_sign'}   # 聖国の見た目: 白亜の店・宿・家・壁。礼拝堂は、大教会と区別（青い屋根・「礼拝堂」の立て札）
 
 
 def build(w, h, legend, city_legend, links, npcs):
@@ -76,7 +77,7 @@ def build(w, h, legend, city_legend, links, npcs):
         assert g[y][x] == 'p', f'B の飾り ({x},{y}): 空きマスではない'
         g[y][x] = c
     legend.update({'C': 'castle_gate'})
-    for k in sorted(set(LEGEND_KEYS) | {c for f in FACILITIES for c in (f[0], f[5], f[6])}): legend[k] = city_legend[k]
+    for k in sorted(set(LEGEND_KEYS) | {c for f in FACILITIES for c in (f[0], f[5], f[6])}): legend[k] = city_legend.get(k) or SKIN_B[k]
     for nid, x, z in NPCS:
         assert g[z][x] in 'p=', f'B の NPC {nid} ({x},{z}): 歩ける空きマスではない'
         npcs.append({'id': nid, 'x': x, 'z': z})
@@ -99,4 +100,5 @@ def build(w, h, legend, city_legend, links, npcs):
                 xx, yy = x + dx, y + dz
                 if xx < w and yy < h and g[yy][xx] not in SOLID and g[yy][xx] != 'w':
                     assert abs(lv[y][x] - lv[yy][xx]) <= 1, f'B の段差 ({x},{y})-({xx},{yy}) が 2 以上'
+    legend.update(SKIN_B)   # 聖国の見た目（白亜の壁・家・店・宿。礼拝堂）
     return [''.join(r) for r in g], [''.join(TH.CH36[v] for v in r) for r in lv]
