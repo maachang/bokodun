@@ -233,7 +233,7 @@ export const mapLoadMethods = {
                         const d = objDef.shadowSize ?? (objDef.type === 'signpost' ? (objDef.scale?.[0] ?? 1.9) * 0.9 : (objDef.radius ?? 0.5) * 2.6);   // 影の直径: 物の幅から決める
                         this.groundShadowItems.round.push({ x: wx, z: wz, y: lifted, d });
                     }
-                    if (objDef.baseShadow) {
+                    if (objDef.baseShadow && !mapData.environment?.hasCeiling) {   // 屋外の建物の影。天井のある室内には、出さない
                         const lvl = this.heightLevelAtTile(r, c);
                         for (const [dr, dc] of [[-1, 0], [1, 0], [0, -1], [0, 1]]) {
                             const rr = r + dr, cc = c + dc;
