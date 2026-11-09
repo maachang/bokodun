@@ -5,7 +5,7 @@ import numpy as np
 import terrain as T
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
-from world_consts import ROAD_LOOPS, LOOP_NEAR, BRIDGE_NEAR, LOOPS, ROAD_ROUGH, ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
+from world_consts import ROAD_LOOPS, LOOP_NEAR, COAST_ROADS, BRIDGE_NEAR, LOOPS, ROAD_ROUGH, ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
 
 
 def _tiles_snowFoothills(g):
@@ -325,6 +325,25 @@ def _tiles_towns(g):
         obj[y1 + 2, px + 3] = ord(TOWN_SIGN_CH)                   # 門の前の石畳の東隣に、街の名前の立て札
 
 
+def _coast_roads(g, centers, set_c, gate_pt):
+    """海岸線に沿う道（COAST_ROADS の街の組）。海から近い所を通りやすくした探索。通れない所（岩山・火山の裾）は、山・坂を通る方式（rough）で、地形を道に沿って少し直す。すでにある街道と並走する区間は、街道に統合する"""
+    elev, obj, t = g.elev, g.obj, g.t
+    for a, b in COAST_ROADS:
+        path = roads.find_path(t, gate_pt(a), gate_pt(b), margin=100, coast=True)
+        rough = path is None
+        if rough: path = roads.find_path(t, gate_pt(a), gate_pt(b), margin=100, coast=True, rough=True)
+        if not path: print(f'海岸線の道 {a}→{b}: 経路がない'); continue
+        path, n_join = roads.merge_loop(t, path, set_c, LOOP_NEAR)
+        if rough:
+            water = T.box_mean((t['deep'] | t['shallow'] | t['lagoon'] | t['bridge'] | t['mtn_bridge'] | (t['river'] > 0) | ~t['land']).astype(np.float32), 2) > 0
+            print(f'  海岸線の道 {a}→{b}: 山・坂を通る（地形を {roads.flatten(elev, path, water)} マス直した）')
+        new_tiles = list(dict.fromkeys(c for c in path if c not in set_c))
+        roads.paint(t, obj, elev, path, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})
+        centers.extend(new_tiles); set_c.update(new_tiles)
+        ROAD_LOOPS.append({'between': [a, b], 'tiles': len(new_tiles), 'coast': True})
+        print(f'海岸線の道 {a}⇄{b}: {len(new_tiles)} マス（街道に統合 {n_join} か所）')
+
+
 def _tiles_roads(g):
     """街道（石畳の道・石の橋・道しるべ）。共有する変数は g（段階の間の入れ物）から受け取り、後の段階で使う変数は g へ書き戻す（元は build_tiles の一部）"""
     elev, obj, t = g.elev, g.obj, g.t
@@ -396,6 +415,7 @@ def _tiles_roads(g):
         centers.extend(new_tiles); set_c.update(new_tiles); n_loop += 1
         ROAD_LOOPS.append({'between': [a, b], 'tiles': len(new_tiles)})
         print(f'循環する道 {a}⇄{b}: 迂回 {len(new_tiles)} マス（道のり/直線 = {ratio:.1f}）')
+    _coast_roads(g, centers, set_c, gate_pt)
     n_merge = roads.merge_parallel(t, obj, elev, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})   # 近くで並行して進む 2 本の道は、1 本に統合（ユーザー指示）
     print(f'並行する道を統合: {n_merge} マス')
     print(f'道のわきの段差を直した: {roads.fix_steps(elev, obj, t)} マス')   # 道の地ならしで残った、高さの差 2 以上（崖でない所）

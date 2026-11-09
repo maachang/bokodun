@@ -22,6 +22,9 @@ ROUGH_COST = 3.0      # 山・岩山・針葉樹・森林・雪の 1 マスの�
 TRAIL_COST = 1.0      # すでにある山道の 1 マスの費用（沿って通る）
 LOOP_APART = 14       # 循環する道（loop）は、すでにある街道から、このマス以上離す（並走させない）
 PENAL_COST = 12.0     # 循環する道（loop）で、すでにある街道を避ける費用の上乗せ
+COAST_NEAR = 8        # 海岸線の道（coast）: 海からこのマス以内を、通りやすくする
+COAST_COST = 1.0      # 海岸線の道（coast）で、海から COAST_NEAR マスより内陸の 1 マスの費用の上乗せ
+COAST_TURN = 15.0     # 海岸線の道（coast）で、曲がる費用（海岸の斜めに合わせた細かい階段を避け、まっすぐな区間にする）
 SLOPE_COST = 0.6      # 高さが違う 1 段ごとの費用
 
 
@@ -32,7 +35,7 @@ def _filter3(a, fn):
     return fn(np.stack(stack), axis=0)
 
 
-def find_path(t, start, goal, margin=60, reuse=None, partial=False, rough=False, penal=None):
+def find_path(t, start, goal, margin=60, reuse=None, partial=False, rough=False, penal=None, coast=False):
     """start・goal（(y, x)）の間の道の中心線（(y, x) の並び）。経路がなければ None。
     start は、1 点または点の集まり（すでにある街道のどこからでも出られる）。reuse: すでにある街道の中心線のマス（重ねて使い、すぐわきは並走させない）"""
     starts = [start] if isinstance(start[0], int) else list(start)
@@ -75,6 +78,10 @@ def find_path(t, start, goal, margin=60, reuse=None, partial=False, rough=False,
             if y0 <= ry <= y1 and x0 <= rx <= x1: pm[ry - y0, rx - x0] = True
         for _ in range(LOOP_APART): pm = _filter3(pm.astype(np.uint8), np.max).astype(bool)   # 並走させない: すでにある街道のまわり（LOOP_APART マス）にも、費用を上乗せ
         cost_tile = cost_tile + np.where(pm, PENAL_COST, 0.0)
+    if coast:   # 海岸線の道: 海から COAST_NEAR マス以内は、ふつうの費用。それより内陸は、費用を上乗せ（海岸に沿って通る）。海（波打ち際）そのものは、bad と ok の 3×3 判定で、すでに避けている
+        sea_m = ~land[sl] | t['deep'][sl] | t['lagoon'][sl] | (t['biome'][sl] == T.SEA)
+        for _ in range(COAST_NEAR): sea_m = _filter3(sea_m.astype(np.uint8), np.max).astype(bool)
+        cost_tile = cost_tile + np.where(sea_m, 0.0, COAST_COST)
     h, w = ok.shape
     g = (goal[0] - y0, goal[1] - x0)
     DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))
@@ -95,7 +102,7 @@ def find_path(t, start, goal, margin=60, reuse=None, partial=False, rough=False,
             if not (0 <= v[0] < h and 0 <= v[1] < w) or not ok[v]: continue
             dz = abs(int(e[v]) - int(e[u]))
             if dz > (ROUGH_DZ if rough else 1): continue
-            nc = c + cost_tile[v] + dz * SLOPE_COST * (2 if rough else 1) + (TURN_COST if nd != d and not (reuse_m[u] and reuse_m[v]) else 0.0)
+            nc = c + cost_tile[v] + dz * SLOPE_COST * (2 if rough else 1) + ((COAST_TURN if coast else TURN_COST) if nd != d and not (reuse_m[u] and reuse_m[v]) else 0.0)
             if nc < dist.get((v, nd), 1e18):
                 dist[(v, nd)] = nc; prev[(v, nd)] = (u, d); heapq.heappush(pq, (nc, v, nd))
     if end is None and partial and dist:   # 行けない（砂漠・山・大森林で、道が作れない）: 作れる所まで。目的地にいちばん近い（直線距離）、行ける所を、道の終わりにする
@@ -286,7 +293,7 @@ def merge_loop(t, path, set_c, near_r):
     nearest = lambda p_: min(set_c, key=lambda c: abs(c[0] - p_[0]) + abs(c[1] - p_[1]))
     parts = [path[q] for q in range(len(path)) if keep_i[q]]
     for p_ in joins:
-        link = find_path(t, p_, nearest(p_), margin=60, reuse=set_c)
+        link = find_path(t, p_, nearest(p_), margin=60, reuse=set_c) or find_path(t, p_, nearest(p_), margin=60, reuse=set_c, rough=True)   # 通常の探索で行けない所（火山の裾など）は、山・坂を通る方式で、街道につなぐ
         if link: parts += link
     return parts, len(joins)
 
