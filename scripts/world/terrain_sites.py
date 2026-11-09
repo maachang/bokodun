@@ -26,6 +26,7 @@ def _desert_oases(land, biome, sx=1.0, sy=1.0):
         if not m.any(): continue
         sc = np.where(m, dd, -1)
         py, px = np.unravel_index(np.argmax(sc), sc.shape)
+        if not picks: py, px = OASIS_TOWN_AT   # 最初（街を作る大きなオアシス）は、位置を決め打ち
         if all((py - a) ** 2 + (px - b) ** 2 > 90 ** 2 for a, b, _k in picks): picks.append((int(py), int(px), 'town' if not picks else 'small'))
         if len(picks) >= 2: break
     noise = (fbm(99, (14, 5, 2)) - 0.5) * 0.5
@@ -47,6 +48,11 @@ def _desert_oases(land, biome, sx=1.0, sy=1.0):
 
 # 街の候補地（地図に重ねた図の A〜H）。画像のマス（1 マス = 世界の 1 マス）。実際の位置は、近くの「街に向く所」へ動かす
 TOWN_CANDIDATES = [('a', 375, 700), ('b', 515, 880), ('c', 470, 700), ('d', 640, 545), ('e', 790, 730), ('f', 590, 1060), ('g', 473, 358), ('h', 720, 360)]   # (名前, y, x)
+
+
+OASIS_TOWN_AT = (412, 740)   # 街を作る大きなオアシスの中心（行, 列）。湖と、その南の街（C）が、1 枚のマップ（w_06_11: 行 384〜447）に収まり、街の壁が、マップの境から 8 マス以上離れる位置（ユーザー指示「C は湖の下あたり」）
+OASIS_TOWNS = {'c': 4}   # 砂漠のオアシスの、すぐ南に置く街 → 壁の北端と、池・浅瀬の南端の間のマス数（ユーザー指示「C は、湖の下あたり」。壁は、水から 3 マス以上離す規則を守る）
+OASIS_WALL_HH = 6                # 街の外壁の半分の高さ（world_consts の TOWN_HH と同じ値。循環 import を避けて、ここに持つ）
 
 
 TOWN_R_FLAT = 17   # 街の敷地（平らにして、物を置かない）の半径
@@ -71,6 +77,14 @@ def _town_sites(land, biome, pond, oasis, sx=1.0, sy=1.0):
     base = land & (d_sea >= 20) & (d_river >= 28) & (d_pond >= 20) & ~_near_seam(Y.astype(int), X.astype(int), 20)
     sites = []; mask = np.zeros((H, W), bool); mask_mtn = np.zeros((H, W), bool)
     for tid, cy, cx in TOWN_CANDIDATES:
+        if tid in OASIS_TOWNS and oasis.get('town') is not None:   # オアシスの南: 池・浅瀬の南端から、壁の北端まで OASIS_TOWNS[tid] マス。列は、オアシスの中心
+            oy, ox = oasis['town']
+            water = (oasis['pond'] | oasis['ring'])[:, ox - 8:ox + 9].any(axis=1)
+            bottom = max(y for y in range(max(0, oy - 30), min(H, oy + 31)) if water[y])
+            py, px = bottom + OASIS_TOWNS[tid] + OASIS_WALL_HH, ox
+            sites.append(dict(id=tid, y=py, x=px))
+            mask |= (np.hypot(X - px, Y - py) <= TOWN_R_FLAT) & land
+            continue
         if tid in FIXED_TOWNS:   # 山の上の街: 決め打ち。標高は変えない（mask_mtn は、物を置かない範囲だけ）
             py, px = FIXED_TOWNS[tid]
             sites.append(dict(id=tid, y=py, x=px))

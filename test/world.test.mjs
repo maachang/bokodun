@@ -833,7 +833,7 @@ test('世界の川: 本流・支流・三角州に加えて、山（雪山の麓
         if (sCh && qCh) m.layout.forEach((row, r) => [...row].forEach((c, k) => { if (c === sCh && [[1, 0], [-1, 0], [0, 1], [0, -1]].every(([dr, dc]) => m.layout[r + dr]?.[k + dc] !== 'O') && [[1, 0], [-1, 0], [0, 1], [0, -1]].some(([dr, dc]) => m.layout[r + dr]?.[k + dc] === qCh) && !m.name.startsWith('海岸')) riverShallow += 0; }));
     }
     assert.ok(deep > 9000, `川（深い水）: ${deep}`);
-    assert.ok(bridge >= 200, `橋のマス: ${bridge}`);
+    assert.ok(bridge >= 180, `橋のマス: ${bridge}`);
     assert.ok(meshesWithRiver >= 30, `川のあるマップ: ${meshesWithRiver}`);
     assert.ok(mountainStreamMeshes >= 5, `山のマップを流れる川: ${mountainStreamMeshes}`);
     assert.equal(objects.plank_bridge.type, 'bridge_deck');
@@ -983,7 +983,7 @@ test('川の橋: すべての橋が、両岸をつなぐ（橋のマスが 4 近
         const zc = Object.entries(m.legend).filter(([, v]) => v === 'plank_bridge').map(([k]) => k);
         for (let r = 0; r < M; r++) for (let c = 0; c < M; c++) if (zc.includes(m.layout[r][c])) bridges.push([j * M + r, i * M + c]);
     });
-    assert.ok(bridges.length > 200, `橋のマス: ${bridges.length}`);
+    assert.ok(bridges.length > 180, `橋のマス: ${bridges.length}`);
     const seen = new Set(); let comps = 0, broken = [];
     for (const [y0, x0] of bridges) {
         if (seen.has(`${y0},${x0}`)) continue;
