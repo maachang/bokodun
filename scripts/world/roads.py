@@ -267,3 +267,25 @@ def merge_parallel(t, obj, elev, keep_chars, max_gap=2, span=3):
                     else: fill[xx, :] |= good
     obj[fill & ~road] = ord(ROAD_CH)
     return int(fill.sum())
+
+
+def merge_loop(t, path, set_c, near_r):
+    """循環する道の、街道のすぐわき（near_r マス以内）を 10 マス超続く区間を切り捨て、両端を街道につなぐ（2 本を 1 つにして、途中で分岐）。戻り値: (新しい経路, 分岐の数)"""
+    near = [any((y + dy, x + dx) in set_c for dy in range(-near_r, near_r + 1) for dx in range(-near_r, near_r + 1)) for (y, x) in path]
+    keep_i = [True] * len(path); joins = []
+    i = 20
+    while i < len(path) - 20:
+        if not near[i]: i += 1; continue
+        j = i
+        while j < len(path) - 20 and near[j]: j += 1
+        if j - i > 10:
+            for q in range(i, j): keep_i[q] = False
+            joins += [path[i - 1], path[j]]
+        i = j
+    if not joins: return path, 0
+    nearest = lambda p_: min(set_c, key=lambda c: abs(c[0] - p_[0]) + abs(c[1] - p_[1]))
+    parts = [path[q] for q in range(len(path)) if keep_i[q]]
+    for p_ in joins:
+        link = find_path(t, p_, nearest(p_), margin=60, reuse=set_c)
+        if link: parts += link
+    return parts, len(joins)

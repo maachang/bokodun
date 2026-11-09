@@ -5,7 +5,7 @@ import numpy as np
 import terrain as T
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
-from world_consts import ROAD_LOOPS, BRIDGE_NEAR, LOOPS, ROAD_ROUGH, ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
+from world_consts import ROAD_LOOPS, LOOP_NEAR, BRIDGE_NEAR, LOOPS, ROAD_ROUGH, ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
 
 
 def _tiles_snowFoothills(g):
@@ -385,14 +385,12 @@ def _tiles_roads(g):
         new_tiles = [c for c in path if c not in set_c] if path else []
         if len(new_tiles) < 20: continue
         # 並走しない: 街道のすぐわき（12 マス以内）を続けて進む区間が、10 マスを超えるなら、足さない（両端 20 マスは除く）
-        inner = path[20:-20]
-        run = longest = 0   # 街道のすぐわき（12 マス以内）を、続けて進む区間の、最長
-        for (y, x) in inner:
-            run = run + 1 if any((y + dy, x + dx) in set_c for dy in range(-12, 13, 3) for dx in range(-12, 13, 3)) else 0
-            longest = max(longest, run)
-        if longest > 10:
-            print(f'  循環の候補 {a}⇄{b}: 街道と並走する区間（{longest} マス）があるので、足さない')
-            continue
+        # 並走する区間は、街道に統合する（ユーザー指示「2 本を 1 つにして、途中で分岐」）: 街道のすぐわき（LOOP_NEAR マス以内）を 10 マス超続く区間は、切り捨てて、両端を街道につなぐ
+        path, n_join = roads.merge_loop(t, path, set_c, LOOP_NEAR)
+        if n_join:
+            new_tiles = list(dict.fromkeys(c for c in path if c not in set_c))
+            if len(new_tiles) < 20: continue
+            print(f'  循環の候補 {a}⇄{b}: 街道と並走する区間を、街道に統合（分岐 {n_join} か所）')
         roads.paint(t, obj, elev, path, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})
         centers.extend(new_tiles); set_c.update(new_tiles); n_loop += 1
         ROAD_LOOPS.append({'between': [a, b], 'tiles': len(new_tiles)})
