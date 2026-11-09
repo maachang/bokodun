@@ -43,7 +43,7 @@ GUILDS = [
 ]
 HEARTH_A = {   # 新しい ID → [(x, y, 種類)]。北の壁ぎわの床。宿屋の 1 階（city_inn）には、元から暖炉がある
     'shop_a': [(3, 1, 'hearth')], 'guild_adv_a': [(5, 1, 'hearth')], 'guild_adv_master_a': [(4, 1, 'hearth')],
-    'guild_training_a': [(5, 1, 'hearth_stone')], 'city_inn_2f_a': [(5, 7, 'hearth'), (13, 7, 'hearth')],
+    'guild_training_a': [(5, 1, 'hearth_stone')], 'city_inn_2f_a': [(5, 7, 'hearth'), (14, 7, 'hearth')],
 }
 
 
