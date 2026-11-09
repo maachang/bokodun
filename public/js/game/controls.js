@@ -32,6 +32,15 @@ export const controlsMethods = {
                     return;
                 }
             }
+            // デバッグ（上から地形を確認する）: Shift+B 真下を見る（もう一度で戻す）・Shift+U 浮き上がる（上限あり。離しても、その高さのまま）・Shift+D 沈む（地面より下へは行かない）・Shift+0 カメラと浮きをリセット。旋回は、そのまま
+            if (e.shiftKey && ['KeyB', 'KeyU', 'KeyD', 'Digit0', 'Numpad0'].includes(e.code)) {
+                if (e.code === 'KeyB') this.player.lookDown = !this.player.lookDown;
+                else if (e.code === 'KeyU') this.keys.dbgUp = true;
+                else if (e.code === 'KeyD') this.keys.dbgDown = true;
+                else { this.player.lookDown = false; this.player.debugLift = 0; this.player.pitch = 0; }
+                e.preventDefault();
+                return;
+            }
             switch (e.code) {
                 case 'KeyW': case 'ArrowUp':
                     this.keys.forward = true;
@@ -92,6 +101,8 @@ export const controlsMethods = {
             }
             const camRelease = { ArrowUp: 'camUp', ArrowDown: 'camDown', ArrowLeft: 'camLeft', ArrowRight: 'camRight' }[e.code];
             if (camRelease) this.keys[camRelease] = false;
+            if (e.code === 'KeyU') this.keys.dbgUp = false;
+            if (e.code === 'KeyD') this.keys.dbgDown = false;
             switch (e.code) {
                 case 'KeyW': case 'ArrowUp':
                     this.keys.forward = false;

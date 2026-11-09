@@ -3,13 +3,30 @@
 import * as THREE from '/js/three.module.js';
 import { FOOTSTEP_STRIDE } from '/js/game/constants.js';
 
+const DEBUG_LIFT_MAX = 60;   // デバッグで浮き上がれる、目線の上限（64×64 のマップ全体が見える高さ）
+
 export const updatePlayerMethods = {
+    // 浮いている間は、霧を遠くへ（上から、地形が霧で消えないように）。戻したら、元の霧に戻す（マップが変わって霧が作り直されたときは、保存を捨てる）
+    applyDebugFog() {
+        const fog = this.scene.fog;
+        if (!fog) return;
+        const lifted = (this.player.debugLift || 0) > 0;
+        if (lifted && !this._dbgFog) { this._dbgFog = { fog, near: fog.near, far: fog.far }; }
+        if (lifted && this._dbgFog) { if (this._dbgFog.fog !== fog) this._dbgFog = { fog, near: fog.near, far: fog.far }; fog.near = 2000; fog.far = 4000; }
+        else if (!lifted && this._dbgFog) { if (this._dbgFog.fog === fog) { fog.near = this._dbgFog.near; fog.far = this._dbgFog.far; } this._dbgFog = null; }
+    },
+
     updatePlayerMovement(dt) {
         if (this.keys.turnLeft) this.player.angle += this.player.rotSpeed * dt;
         if (this.keys.turnRight) this.player.angle -= this.player.rotSpeed * dt;
         // Ctrl+矢印キー: 視点の上下（pitch）と、ゆっくりした旋回（狙いの微調整）
         if (this.keys.camUp) this.player.pitch = Math.min(0.6, this.player.pitch + 1.2 * dt);
         if (this.keys.camDown) this.player.pitch = Math.max(-0.6, this.player.pitch - 1.2 * dt);
+        // デバッグ（Shift+U / Shift+D）: 目線だけを浮かせる・沈める（上限 DEBUG_LIFT_MAX・下は地面まで）。当たり判定・移動は、そのまま
+        const lift0 = this.player.debugLift || 0;
+        if (this.keys.dbgUp) this.player.debugLift = Math.min(DEBUG_LIFT_MAX, lift0 + 25 * dt);
+        if (this.keys.dbgDown) this.player.debugLift = Math.max(0, lift0 - 25 * dt);
+        this.applyDebugFog();
         if (this.keys.camLeft) this.player.angle += this.player.rotSpeed * 0.35 * dt;
         if (this.keys.camRight) this.player.angle -= this.player.rotSpeed * 0.35 * dt;
 
@@ -187,13 +204,13 @@ export const updatePlayerMethods = {
         if (this.player.climb) this.updateClimb(dt);   // よじ登り中: 目線の高さは、登りの動きで決める
         const targetFloorY = this.getFloorHeight(this.player.x, this.player.z, this.player.heightLevel);
         if (!this.player.climb) this.player.floorY = (this.player.floorY ?? targetFloorY) + (targetFloorY - (this.player.floorY ?? targetFloorY)) * Math.min(1, dt * 10);
-        const eyeHeight = 1.8 + this.player.floorY - playerFloorDepth - (this.player.isFalling ? this.player.fallDepth : 0);
+        const eyeHeight = 1.8 + (this.player.debugLift || 0) + this.player.floorY - playerFloorDepth - (this.player.isFalling ? this.player.fallDepth : 0);
         this.updateCullChunks();   // 木の描画（近い木は従来どおり・遠い木は切り抜き）と、霧で見えなくなる遠さの木・影・草の非表示（区画ごと。1 マス動いたときだけ）
         this.camera.position.set(this.player.x, eyeHeight, this.player.z);
         this.fitCameraFar();   // 高い所では、描画距離をのばす
         this.camera.rotation.set(0, 0, 0);
         this.camera.rotateY(this.player.angle);
-        this.camera.rotateX(this.player.pitch);
+        this.camera.rotateX(this.player.lookDown ? -Math.PI / 2 : this.player.pitch);   // lookDown（Shift+B）: 真下（旋回は、そのまま）
 
         // カメラの揺れ（強い一撃の手応え）。時間とともに小さくなる
         if (this.cameraShake.time > 0) {
