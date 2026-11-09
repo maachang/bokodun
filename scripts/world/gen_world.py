@@ -225,6 +225,7 @@ def main():
     start = town_outer_id(next(site for site in t['towns'] if site['id'] == START_TOWN))
     json.dump({'mapSize': MESH, 'start': start, 'arenas': [[a, b, c] for a, b, c in t['arenas']], 'grid': grid}, open(os.path.join(ROOT, 'public', 'data', 'world.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=2)
     print('マップ数', len(info), 'start', start)
+    import subprocess; subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'world_map_image.py')], check=True)   # 世界全体の 1 枚の地図（道の確認用）
 
 
 if __name__ == '__main__':
