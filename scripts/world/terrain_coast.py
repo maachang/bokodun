@@ -261,3 +261,30 @@ def _expand_desert_north(land, biome, reach=22):
         grow = (biome[y] == GRASS) & land[y] & (d <= R[y])
         out[y] = np.where(grow, DESERT, out[y])
     return out
+
+
+def _harbor_inlet(land, biome, towns, tid='e', gap=5, w_tip=7, w_sea=15):
+    """港町（E）のすぐ東に、海から入り江をのばす（ユーザー指示「E は、街のすぐ横が海」）。海岸から北へ、うねりながら細くなり、街の壁の東（gap マス先）で終わる（先は丸い）。
+    land（陸の真偽）と biome を、その場で書きかえる（水にした所は、海）。街の中の港の水路（東の岸）と、外の海が、つながって見える。戻り値: 掘ったマス数"""
+    H_, W_ = land.shape
+    site = next((s_ for s_ in towns if s_['id'] == tid), None)
+    if site is None: return 0
+    cy, cx = site['y'], site['x']
+    x_c = cx + 8 + gap + w_tip // 2      # 入り江の先の中心の列（街の壁の東端 = 中心 + 8）
+    y_tip = cy - 2
+    y = y_tip
+    while y < H_ - 1 and land[y, min(W_ - 1, x_c)]: y += 1   # 海岸（中心線が、海に出る行）
+    y_sea = y + 6
+    carved = 0
+    for yy in range(y_tip, min(H_, y_sea + 1)):
+        t = (yy - y_tip) / max(1, y_sea - y_tip)
+        half = (w_tip + (w_sea - w_tip) * t) / 2.0
+        xm = x_c + 3.0 * np.sin(yy / 9.0) * min(1.0, t * 3)    # うねり（先は、まっすぐ）
+        for xx in range(int(xm - half) - 1, int(xm + half) + 2):
+            if not (0 <= xx < W_): continue
+            r_ = abs(xx - xm)
+            if r_ <= half:
+                if yy < y_tip + half and np.hypot(yy - (y_tip + half), xx - xm) > half: continue   # 先を丸くする
+                if land[yy, xx]: carved += 1
+                land[yy, xx] = False; biome[yy, xx] = SEA
+    return carved

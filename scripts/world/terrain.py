@@ -14,7 +14,7 @@ from collections import deque
 from PIL import Image, ImageFilter, ImageDraw
 
 from terrain_base import BRIDGE_WIDTH, CONIFER, DESERT, FOREST, GH, GRASS, GW, H, IMAGE, MAX_LEVEL, MESH, MINES, MINE_R, NAMES, NORTH_POLY, PEAKS_ROCK, PEAKS_SNOW, RIVERS, ROCK, ROOT, SEA, SNOW, TROPICAL, TROPICAL_POLY, W, _dil, _distance, _ero, _fill_holes, _largest, _lipschitz, _mesh_frac, _mode_filter, _scale, _shrink_lake, box_mean, fbm, gauss, noise, read_image   # noqa: F401（世界の地形の読み取りの基礎: 定数・画像の読み込み・ノイズ・距離・フィルタの道具）
-from terrain_coast import _avoid_seams, _components, _expand_desert_north, _foothill_ponds, _grass_ponds, _near_seam, _reshape_coast, _shape_coast, _tropical_coast   # noqa: F401（世界の地形: 海岸の形・南国の海岸・池・砂漠の拡張）
+from terrain_coast import _avoid_seams, _components, _expand_desert_north, _foothill_ponds, _harbor_inlet, _grass_ponds, _near_seam, _reshape_coast, _shape_coast, _tropical_coast   # noqa: F401（世界の地形: 海岸の形・南国の海岸・池・砂漠の拡張）
 from terrain_mountain import MOUNTAIN_STEP, TRAIL_PEAKS, _astar4, _gorge_bridges, _mountains, _switchback, _zigzag   # noqa: F401（世界の地形: 山・山道・峡谷の橋）
 from terrain_sites import FIXED_TOWNS, TOWN_CANDIDATES, TOWN_GATE_FRONT, TOWN_R_FLAT, _desert_oases, _town_sites   # noqa: F401（世界の地形: オアシスと街の敷地）
 
@@ -43,6 +43,7 @@ def _build_coast(g):
     pond = pond | oasis['pond']
     fring = fring | oasis['ring']
     towns, town_mask, town_mask_mtn = _town_sites(land, biome, pond, oasis, sx, sy)   # 街の敷地（候補地 A〜H）
+    print('E の港の入り江:', _harbor_inlet(land, biome, towns), 'マス掘った')   # 港町 E の東に、海から入り江（街のすぐ横を、海に）
     oasis['flat'] = oasis['flat'] | town_mask          # 平地の街は、標高 0 に平らにする（山の上の街は、標高をそのまま）
     town_mask = town_mask | town_mask_mtn
     fring = fring | gring
