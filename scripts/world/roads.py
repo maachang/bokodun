@@ -25,6 +25,7 @@ PENAL_COST = 12.0     # 循環する道（loop）で、すでにある街道を�
 COAST_NEAR = 8        # 海岸線の道（coast）: 海からこのマス以内を、通りやすくする
 COAST_COST = 1.0      # 海岸線の道（coast）で、海から COAST_NEAR マスより内陸の 1 マスの費用の上乗せ
 COAST_TURN = 15.0     # 海岸線の道（coast）で、曲がる費用（海岸の斜めに合わせた細かい階段を避け、まっすぐな区間にする）
+GRASS_COST = 3.0      # 草原を通る道（grass）で、草原以外の 1 マスの費用の上乗せ
 SLOPE_COST = 0.6      # 高さが違う 1 段ごとの費用
 
 
@@ -35,7 +36,7 @@ def _filter3(a, fn):
     return fn(np.stack(stack), axis=0)
 
 
-def find_path(t, start, goal, margin=60, reuse=None, partial=False, rough=False, penal=None, coast=False):
+def find_path(t, start, goal, margin=60, reuse=None, partial=False, rough=False, penal=None, coast=False, grass=False):
     """start・goal（(y, x)）の間の道の中心線（(y, x) の並び）。経路がなければ None。
     start は、1 点または点の集まり（すでにある街道のどこからでも出られる）。reuse: すでにある街道の中心線のマス（重ねて使い、すぐわきは並走させない）"""
     starts = [start] if isinstance(start[0], int) else list(start)
@@ -82,6 +83,8 @@ def find_path(t, start, goal, margin=60, reuse=None, partial=False, rough=False,
         sea_m = ~land[sl] | t['deep'][sl] | t['lagoon'][sl] | (t['biome'][sl] == T.SEA)
         for _ in range(COAST_NEAR): sea_m = _filter3(sea_m.astype(np.uint8), np.max).astype(bool)
         cost_tile = cost_tile + np.where(sea_m, 0.0, COAST_COST)
+    if grass:   # 草原を通る道: 草原以外（砂漠・岩山・森など。rough で通れる所）は、費用を上乗せ（草原を優先）
+        cost_tile = cost_tile + np.where(t['biome'][sl] == T.GRASS, 0.0, GRASS_COST)
     h, w = ok.shape
     g = (goal[0] - y0, goal[1] - x0)
     DIRS = ((1, 0), (-1, 0), (0, 1), (0, -1))
@@ -102,7 +105,7 @@ def find_path(t, start, goal, margin=60, reuse=None, partial=False, rough=False,
             if not (0 <= v[0] < h and 0 <= v[1] < w) or not ok[v]: continue
             dz = abs(int(e[v]) - int(e[u]))
             if dz > (ROUGH_DZ if rough else 1): continue
-            nc = c + cost_tile[v] + dz * SLOPE_COST * (2 if rough else 1) + ((COAST_TURN if coast else TURN_COST) if nd != d and not (reuse_m[u] and reuse_m[v]) else 0.0)
+            nc = c + cost_tile[v] + dz * SLOPE_COST * (2 if rough else 1) + ((COAST_TURN if coast or grass else TURN_COST) if nd != d and not (reuse_m[u] and reuse_m[v]) else 0.0)
             if nc < dist.get((v, nd), 1e18):
                 dist[(v, nd)] = nc; prev[(v, nd)] = (u, d); heapq.heappush(pq, (nc, v, nd))
     if end is None and partial and dist:   # 行けない（砂漠・山・大森林で、道が作れない）: 作れる所まで。目的地にいちばん近い（直線距離）、行ける所を、道の終わりにする

@@ -1521,7 +1521,7 @@ test('街道: D と H の門前の石畳を、石畳の道（paved_road・幅 3�
         const set = new Set(road);
         let thick = 0;
         for (const k of road) { const [x, y] = k.split(',').map(Number); let w = 0; while (set.has(`${x + w},${y}`)) w++; let h = 0; while (set.has(`${x},${y + h}`)) h++; if (w > 5 && h > 5) thick++; }
-        assert.ok(thick <= 9 * 24, `並走する太い帯が多い（${thick}。分かれ道の 3×3 の交差だけ、1 か所 9 マス）`);   // 8 つの街の道路網: 分かれ道は 7 か所ほど（交差 1 か所 = 9 マス）。海岸線の道（E→F）が街道と分かれる所で、4 か所ぶん（9×4）増えた
+        assert.ok(thick <= 9 * 28, `並走する太い帯が多い（${thick}。分かれ道の 3×3 の交差だけ、1 か所 9 マス）`);   // 8 つの街の道路網: 分かれ道は 7 か所ほど（交差 1 か所 = 9 マス）。海岸線の道（E→F）が街道と分かれる所で、4 か所ぶん（9×4）増え、草原の道（D→B）の分岐・合流で、さらに 4 か所ぶん増えた
     }
     // 石の橋: 水に囲まれた所だけ。数がある
     const bridges = road.filter(k => tiles.get(k).name === 'stone_bridge');
