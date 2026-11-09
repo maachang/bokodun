@@ -23,10 +23,10 @@
  "decorFloor": "cobblestone",
  "enemies": {},
  "legend": {
-  "W": "city_wall",
+  "W": "white_wall",
   "p": "plaza_stone",
   "=": "paved_road",
-  "H": "brick_house",
+  "H": "white_house",
   "T": "tree",
   "f": "flower_bed",
   "v": "flower_bed_blue",

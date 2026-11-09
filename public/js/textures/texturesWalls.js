@@ -315,18 +315,17 @@ export const wallTextures = {
     },
 
     // 15. City Stone Wall (European fortified city wall / rampart with stone blocks)
-    createCityWallTexture() {
+    createCityWallTexture(mortar = '#262930', stoneColors = ['#6e7682', '#7b8391', '#5a616d', '#8a93a3', '#646c78']) {   // 引数: 目地の色・石の色（B 聖国は、白い石）
         const canvas = document.createElement('canvas');
         canvas.width = 64;
         canvas.height = 64;
         const ctx = canvas.getContext('2d');
 
         // Dark grey mortar
-        ctx.fillStyle = '#262930';
+        ctx.fillStyle = mortar;
         ctx.fillRect(0, 0, 64, 64);
 
         // Ashlar dressed stone blocks (clean European castle/city wall stones)
-        const stoneColors = ['#6e7682', '#7b8391', '#5a616d', '#8a93a3', '#646c78'];
         const rowH = 16;
         for (let r = 0; r < 4; r++) {
             const shift = (r % 2 === 0) ? 0 : 16;

@@ -247,19 +247,18 @@ export const roofDoorTextures = {
     },
 
     // 18. City Slate Blue Roof Texture (French/German Parisian blue slate roofs)
-    createCityRoofTexture() {
+    createCityRoofTexture(base = '#1e2430', slateColors = ['#334155', '#3f4f66', '#2b384a', '#475569']) {   // 引数: 下地の色・瓦の色（B 聖国は、青い屋根）
         const canvas = document.createElement('canvas');
         canvas.width = 64;
         canvas.height = 64;
         const ctx = canvas.getContext('2d');
 
         // Dark navy slate base
-        ctx.fillStyle = '#1e2430';
+        ctx.fillStyle = base;
         ctx.fillRect(0, 0, 64, 64);
 
         // Blue-grey slate shingles
         const rowH = 8;
-        const slateColors = ['#334155', '#3f4f66', '#2b384a', '#475569'];
         for (let y = 0; y < 64; y += rowH) {
             const shift = ((y / rowH) % 2 === 0) ? 0 : 8;
             for (let x = -8; x < 64; x += 16) {

@@ -158,6 +158,8 @@ export const textureSetupMethods = {
             shopWall: RetroTextureGenerator.createShopWallTexture(),
             innWall: RetroTextureGenerator.createInnWallTexture(),
             cityRoof: RetroTextureGenerator.createCityRoofTexture(),
+            whiteWall: RetroTextureGenerator.createCityWallTexture('#9aa3b2', ['#f2f4f8', '#e6eaf1', '#fafbfd', '#dde3ed', '#eef1f6']),   // フランケル聖国（B）: 白亜の壁・家
+            holyRoof: RetroTextureGenerator.createCityRoofTexture('#23407a', ['#3b6ac0', '#2f58a8', '#4b7ad0', '#3560b4']),   // 聖国の青い屋根
             pavedRoad: RetroTextureGenerator.createPavedRoadTexture(),
             snowRoof: RetroTextureGenerator.createSnowRoofTexture(),       // 雪国（A）: 雪をかぶった屋根・雪の積もった石畳・大通り
             snowCobble: RetroTextureGenerator.createSnowCobbleTexture(),

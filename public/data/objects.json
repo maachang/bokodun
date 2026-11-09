@@ -17838,5 +17838,131 @@
     "solid": true,
     "blocksProjectiles": true,
     "description": "砂漠の街（C）を囲む土壁（砂色の漆喰・日干しレンガ。上の縁に赤土色の帯）"
+  },
+  "white_wall": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "whiteWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "聖国（B フランケル聖国）の街を囲む白亜の壁（白い石の城壁）"
+  },
+  "white_house": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "whiteWall",
+    "roofTexture": "holyRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "聖国（B フランケル聖国）の白亜の住宅（白い壁・青い屋根）",
+    "faceParts": [
+      {
+        "size": [
+          1.0,
+          1.1,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.0,
+          0.03
+        ],
+        "color": "#bcdcf0",
+        "basic": true
+      },
+      {
+        "size": [
+          1.2,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.6,
+          0.05
+        ],
+        "color": "#d8d0c0"
+      },
+      {
+        "size": [
+          1.2,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          1.4,
+          0.05
+        ],
+        "color": "#d8d0c0"
+      },
+      {
+        "size": [
+          0.1,
+          1.3,
+          0.07
+        ],
+        "pos": [
+          -0.55,
+          2.0,
+          0.05
+        ],
+        "color": "#d8d0c0"
+      },
+      {
+        "size": [
+          0.1,
+          1.3,
+          0.07
+        ],
+        "pos": [
+          0.55,
+          2.0,
+          0.05
+        ],
+        "color": "#d8d0c0"
+      },
+      {
+        "size": [
+          0.06,
+          1.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.0,
+          0.06
+        ],
+        "color": "#d8d0c0"
+      },
+      {
+        "size": [
+          1.5,
+          0.12,
+          0.25
+        ],
+        "pos": [
+          0,
+          1.32,
+          0.12
+        ],
+        "color": "#b8b0a0"
+      },
+      {
+        "size": [
+          1.4,
+          0.12,
+          0.12
+        ],
+        "pos": [
+          0,
+          2.75,
+          0.07
+        ],
+        "color": "#a8a090"
+      }
+    ],
+    "faceEvery": 2
   }
 }

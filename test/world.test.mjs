@@ -1366,9 +1366,9 @@ test('街（候補地 A〜H）: 敷地は、水・川・マップの境から離
     for (const id of 'abcdefgh'.split('')) {
         const t = readJson(`public/data/maps/town_${id}.json`);
         const outer = readJson(`public/data/maps/${Object.values(t.links)[0].nextMap}.json`);
-        const rows = outer.layout.map((r, i) => [r, i]).filter(([r]) => r.includes(Object.entries(outer.legend).find(([, v]) => v === ({ g: 'wooden_wall', c: 'adobe_wall' }[id] ?? 'city_wall'))?.[0] ?? '#'));   // G（森の街）の外壁は、木の壁
+        const rows = outer.layout.map((r, i) => [r, i]).filter(([r]) => r.includes(Object.entries(outer.legend).find(([, v]) => v === ({ g: 'wooden_wall', c: 'adobe_wall', b: 'white_wall' }[id] ?? 'city_wall'))?.[0] ?? '#'));   // G（森の街）の外壁は、木の壁
         assert.ok(rows.length >= 12, `${outer.id}: 街の外壁がある`);
-        const wallCh = Object.entries(outer.legend).find(([, v]) => v === ({ g: 'wooden_wall', c: 'adobe_wall' }[id] ?? 'city_wall'))[0];
+        const wallCh = Object.entries(outer.legend).find(([, v]) => v === ({ g: 'wooden_wall', c: 'adobe_wall', b: 'white_wall' }[id] ?? 'city_wall'))[0];
         const rs = rows.map(([, i]) => i), cs = [];
         rows.forEach(([r]) => [...r].forEach((ch, c) => { if (ch === wallCh) cs.push(c); }));
         const margin = id === 'a' ? 2 : 8;   // 山の上の街（A）は、山頂の平らな台地の広さに合わせる（台地は、マップの境のすぐ内側まで）
