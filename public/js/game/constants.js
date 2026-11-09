@@ -3,6 +3,8 @@
 export const TREE_SHADOWS = true;
 // 木の影の濃さ（地面の種類ごと。environment.floorType。明るい地面は薄く、目立ちすぎないように。ない種類は 1）
 export const TREE_SHADOW_OPACITY = { snow: 0.5, tundra: 0.7, desert: 0.7, redEarth: 0.8 };
+// 木の影だけに掛ける、濃さの倍率（濃すぎたので薄くした。壁の足元・単体の物の影には、掛けない）
+export const TREE_SHADOW_SCALE = 0.5;
 
 // テスト用: 走る速さ（Shift）の倍率。広い世界を、すばやく見て回るため。通常の速さに戻すときは 1 にする（歩く速さは、そのまま）
 export const TEST_RUN_SPEED_SCALE = 5;

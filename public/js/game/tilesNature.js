@@ -3,7 +3,7 @@
 // 元は game.js の loadMapBody の switch の case。移しただけで、描画の中身は同じ（game.js が長すぎて、編集の誤りが増えるため分割した）
 import * as THREE from '/js/three.module.js';
 import { Monster } from '/js/entities.js';
-import { TREE_SHADOWS, TREE_SHADOW_OPACITY } from '/js/game/constants.js';
+import { TREE_SHADOWS, TREE_SHADOW_OPACITY, TREE_SHADOW_SCALE } from '/js/game/constants.js';
 
 export const tilesNature = {
     tree(t) {
@@ -47,7 +47,7 @@ export const tilesNature = {
                 this.treeShadowMat = new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(shadowCanvas), transparent: true, depthWrite: false });
                 this.treeShadowGeo = new THREE.PlaneGeometry(3.2, 3.2);
             }
-            this.treeShadowMat.opacity = TREE_SHADOW_OPACITY[mapData.environment?.floorType] ?? 1;   // 全部の木で共有する材質: 開いたマップの地面に合わせる
+            this.treeShadowMat.opacity = (TREE_SHADOW_OPACITY[mapData.environment?.floorType] ?? 1) * TREE_SHADOW_SCALE;   // 全部の木で共有する材質: 開いたマップの地面に合わせる
             shadowMesh = new THREE.Mesh(this.treeShadowGeo, this.treeShadowMat);
             shadowMesh.rotation.x = -Math.PI / 2;
             const shadowK = Math.min(3, Math.max(1, baseH / 5.2));
