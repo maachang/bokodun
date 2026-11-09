@@ -1614,9 +1614,9 @@ test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つ�
     for (const name of ['フランケル聖国', 'ミレニアム自由都市', 'キュラビッド帝国', 'ライアン獣王国']) assert.ok(!signs.some(s => s.msg.includes(name) && s.msg.includes('石畳の道は、ここまで')), `${name}: 門前まで道がつながる（終わりの立て札はない）`);
 });
 
-test('街道の基準データ（public/data/world_roads.json。今後の町・村づくりが、この道を基準にする）: 全 9 つの街・道は 1 本につながる・石畳が作れない国は、道の終わりを持つ', () => {
+test('街道の基準データ（public/data/world_roads.json。今後の町・村づくりが、この道を基準にする）: 全 10 の街・道は 1 本につながる・石畳が作れない国は、道の終わりを持つ', () => {
     const d = readJson('public/data/world_roads.json');
-    assert.deepEqual(Object.keys(d.towns).sort(), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']);
+    assert.deepEqual(Object.keys(d.towns).sort(), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j']);
     const centers = new Set(d.centers.map(([y, x]) => `${y},${x}`));
     assert.ok(centers.size > 1000);
     for (const [id, t] of Object.entries(d.towns)) {
@@ -1625,7 +1625,7 @@ test('街道の基準データ（public/data/world_roads.json。今後の町・�
         else assert.deepEqual(t.end, t.gate, `${id}: 石畳が通じる街は、門前まで道が届く`);
     }
     assert.deepEqual(Object.entries(d.towns).filter(([, t]) => t.partial).map(([id]) => id).sort(), ['g'], '石畳が届かないのは、大森林の中の G だけ');
-    assert.deepEqual(Object.entries(d.towns).filter(([, t]) => t.rough).map(([id]) => id).sort(), ['a', 'b', 'c', 'f'], '山・砂漠・坂を通ってつないだ国（地形を、道に沿って少し直した）');
+    assert.deepEqual(Object.entries(d.towns).filter(([, t]) => t.rough).map(([id]) => id).sort(), ['a', 'b', 'c', 'f', 'j'], '山・砂漠・坂を通ってつないだ国（地形を、道に沿って少し直した）');
     assert.ok(d.loops.length >= 1, `循環する道（迂回・環状）がある: ${d.loops.length}`);
     // 道の中心線は、4 方向で 1 本につながる
     const seen = new Set([[...centers][0]]); const q = [[...centers][0]];

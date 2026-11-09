@@ -17056,6 +17056,22 @@
     "message": "カナロア公国",
     "description": "街の入口の近くの立て札（カナロア公国。外のマップ用）"
   },
+  "town_sign_j": {
+    "lift": true,
+    "groundShadow": true,
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "カラー魔導国",
+    "description": "街の入口の近くの立て札（カラー魔導国。外のマップ用）"
+  },
   "mideast_house": {
     "baseShadow": true,
     "type": "block",

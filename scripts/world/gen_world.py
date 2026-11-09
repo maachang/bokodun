@@ -122,6 +122,9 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
         elif site['id'] == 'g':   # G（大森林の中心のエルフの街）: D と同じ作り（town_d.build_g）。森の環境（霧は、街が見えるよう薄め）
             m['layout'], m['heights'] = TG.build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
             m['environment'] = dict(DARK_FOREST_ENV, floorType='forest', fogNear=22, fogFar=66, ambientLight=0x6f8f76); m['decorFloor'] = 'forestGround'
+        elif site['id'] == 'j':   # J（大森林の前の魔導国）: D と同じ作り（town_d.build_j）。森の環境（霧は、街が見えるよう薄め）
+            m['layout'], m['heights'] = TD.build_j(w, h, m['legend'], city_legend, m['links'], m['npcs'])
+            m['environment'] = dict(DARK_FOREST_ENV, floorType='forest', fogNear=22, fogFar=66, ambientLight=0x6f8f76); m['decorFloor'] = 'forestGround'
         elif site['id'] == 'f':   # F（山の麓の獣人とドワーフの街）: 段々の斜面（town_f.build）
             m['layout'], m['heights'] = TF.build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         elif site['id'] in ('d', 'h', 'e', 'b', 'c', 'i'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）

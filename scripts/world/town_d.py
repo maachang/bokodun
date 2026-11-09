@@ -256,3 +256,18 @@ SCATTER_G = (('z', 70, 'plant'), ('y', 50, 'plant'),   # 草・シダは、sdSer
 
 def build_g(w, h, legend, city_legend, links, npcs):
     return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_G, npc_list=NPCS_G, skin=SKIN_FOREST, castle='castle_g', tree_center=True, scatter=SCATTER_G, gate_flank='wooden_wall')
+
+
+# ---- J（カラー魔導国。大森林の前の、魔法が発達した国）: D と同じ作りで、施設・街の人を変える ----
+FACILITIES_J = [f for f in FACILITIES if f[6] not in ('m', 'c')] + [   # 小さな魔法ギルド・神殿は置かない（神殿の品は道具屋が売る）。代わりに、大きな建物（高台の幅 8）が、魔導院（魔法ギルド）
+    ('J', 28, 9, 8, 3, 'D', 'm', _to('guild_mage', '魔導院（魔法ギルド）に入る', 'mageGuildIcon')),
+]
+NPCS_J = [   # 魔導士と、一般の住民。魔導国の長・衛兵の一部は、城（castle_j）の中（長は街に出ない）
+    ('adv_mage', 6, 17), ('adv_wizard', 12, 17), ('town_middle_woman', 28, 13), ('junior_merchant_woman', 24, 9),
+    ('town_old_woman', 6, 25), ('child_boy', 15, 21), ('guard_spear', 17, 27), ('guard_light', 22, 27),
+    ('gate_guard', 17, 1), ('gate_guard', 22, 1),
+]
+
+
+def build_j(w, h, legend, city_legend, links, npcs):
+    return build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_J, npc_list=NPCS_J, castle='castle_j')

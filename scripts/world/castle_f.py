@@ -84,6 +84,9 @@ def _others():
         # G デイラミ精霊国: エルフの女王と宰相
         hall('castle_g', '女王の城（デイラミ精霊国）', 25, 15, 12, [('elf_queen', 12, 1), ('elf_chancellor', 9, 2)],
              [('elf_soldier_golem', 9, 6), ('elf_soldier_golem', 15, 6), ('elf_man_c', 18, 10), ('elf_woman_b', 6, 10)]),
+        # J カラー魔導国: 魔法の国の長（魔法ギルドマスターの絵・台詞を借りる。専用の NPC 画像ができたら差し替え）と、衛兵・魔導士
+        hall('castle_j', '魔導王の城（カラー魔導国）', 25, 15, 12, [('mage_guild_master', 12, 1)],
+             [('guard_light', 9, 6), ('guard_light', 15, 6), ('adv_wizard', 18, 10), ('mage_clerk_woman', 6, 10)]),
     ]
 
 

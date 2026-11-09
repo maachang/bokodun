@@ -47,7 +47,7 @@ def _desert_oases(land, biome, sx=1.0, sy=1.0):
 
 
 # 街の候補地（地図に重ねた図の A〜H）。画像のマス（1 マス = 世界の 1 マス）。実際の位置は、近くの「街に向く所」へ動かす
-TOWN_CANDIDATES = [('a', 375, 700), ('b', 515, 880), ('c', 470, 700), ('d', 640, 545), ('e', 790, 730), ('f', 590, 1060), ('g', 473, 358), ('h', 720, 360), ('i', 419, 977)]   # (名前, y, x)
+TOWN_CANDIDATES = [('a', 375, 700), ('b', 515, 880), ('c', 470, 700), ('d', 640, 545), ('e', 790, 730), ('f', 590, 1060), ('g', 473, 358), ('h', 720, 360), ('i', 419, 977), ('j', 485, 478)]   # (名前, y, x)
 
 
 OASIS_TOWN_AT = (412, 740)   # 街を作る大きなオアシスの中心（行, 列）。湖と、その南の街（C）が、1 枚のマップ（w_06_11: 行 384〜447）に収まり、街の壁が、マップの境から 8 マス以上離れる位置（ユーザー指示「C は湖の下あたり」）
@@ -56,6 +56,7 @@ OASIS_WALL_HH = 6                # 街の外壁の半分の高さ（world_consts
 
 
 LAKE_TOWNS = {'i': (419, 977)}   # カナロア大湖（東の中ほどの大きな湖）の、東の岸（ほぼ縦にまっすぐ）に、壁の西側を直接当てる街（水の都。ユーザー指示: I カナロア公国。湖の右上）→ 街の中心 (y, x)。壁の西端 x=969 が、マップの境（960）から 8 マス以上
+FOREST_TOWNS = {'j': (485, 478)}   # 大森林の前（河の南）の街: 決め打ち（(8-8) の河の南 11 マス。壁はマップの境から 8 マス以上・水から 3 マス以上。ユーザー指示: J カラー魔導国。大森林の前の河の麓）→ 街の中心 (y, x)
 TOWN_R_FLAT = 17   # 街の敷地（平らにして、物を置かない）の半径
 
 
@@ -86,8 +87,8 @@ def _town_sites(land, biome, pond, oasis, sx=1.0, sy=1.0):
             sites.append(dict(id=tid, y=py, x=px))
             mask |= (np.hypot(X - px, Y - py) <= TOWN_R_FLAT) & land
             continue
-        if tid in LAKE_TOWNS:   # 湖の東岸の街: 決め打ち（川から 28 マス・海から 20 マスの規則は使わない）。湖の水は、_lake_bay が壁のすぐ西まで広げる
-            py, px = LAKE_TOWNS[tid]
+        if tid in LAKE_TOWNS or tid in FOREST_TOWNS:   # 湖の東岸の街: 決め打ち（川から 28 マス・海から 20 マスの規則は使わない）。湖の水は、_lake_bay が壁のすぐ西まで広げる
+            py, px = (LAKE_TOWNS.get(tid) or FOREST_TOWNS[tid])
             sites.append(dict(id=tid, y=py, x=px))
             mask |= (np.hypot(X - px, Y - py) <= TOWN_R_FLAT) & land
             continue
