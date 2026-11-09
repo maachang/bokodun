@@ -6,10 +6,11 @@ import { fetchMap } from '/js/mapFormat.js';
 
 export const mapTerrainMethods = {
     // 石畳の道（paved_road・paved_road_snow）のマスなら、段差 1 の側面に貼る画像の鍵 'road:<画像>'。そうでなければ null（地面の模様のまま）
-    roadSideKey(mapData, r, c) {
+    //   bridge=true: 石の橋（stone_bridge）のマスも、石畳として数える（橋の脇の、高くなった地面の側面。低い隣が橋のとき）
+    roadSideKey(mapData, r, c, bridge = false) {
         const ch = mapData.layout?.[r]?.[c];
         const name = ch && ch !== '0' ? mapData.legend?.[ch] : null;
-        return (name === 'paved_road' || name === 'paved_road_snow') ? 'road:' + this.objectDefinitions?.[name]?.texture : null;
+        return (name === 'paved_road' || name === 'paved_road_snow' || (bridge && name === 'stone_bridge')) ? 'road:' + this.objectDefinitions?.[name]?.texture : null;
     },
 
     // 起伏のある地面: 高くなっているマスの上面と、低い隣との境の側面を作る。
@@ -61,7 +62,7 @@ export const mapTerrainMethods = {
                     if (!inMap || nh >= h) continue;
                     const drop = h - nh;
                     const faceH = drop * step;
-                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMatFor(h) : matFor(sideMats, h, mapData.sideShade ?? 0.78, this.roadSideKey(mapData, r, c) || ft));   // 段差 1: 石畳の道のマスは、側面も石畳の色
+                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMatFor(h) : matFor(sideMats, h, mapData.sideShade ?? 0.78, this.roadSideKey(mapData, r, c) || this.roadSideKey(mapData, r + dz, c + dx, true) || ft));   // 段差 1: 石畳の道のマスは、側面も石畳の色
                     face.rotation.y = rotY;
                     face.position.set(wx + dx * tileSize / 2, nh * step + faceH / 2, wz + dz * tileSize / 2);
                     this.addStatic(face);

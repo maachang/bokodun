@@ -164,7 +164,7 @@ export const mapNeighborMethods = {
             const faceH = drop * step;
             // 面の向きは、低いほうへ。reversed で、今のマップのほうが高いとき（nh > lv）は、このマス（低い側）へ向ける
             const toward = (!reversed || nh < lv) ? rotY : rotY + Math.PI;
-            wall(drop >= 2 ? cliffMat : matFor(sideMats, hi, mapData.sideShade ?? 0.78, this.roadSideKey(nd, r, c) || ft), wx + dx * ts / 2, lo * step + faceH / 2, wz + dz * ts / 2, faceH, toward);
+            wall(drop >= 2 ? cliffMat : matFor(sideMats, hi, mapData.sideShade ?? 0.78, this.roadSideKey(nd, r, c) || (!reversed && this.roadSideKey(nd, rr, cc, true)) || ft), wx + dx * ts / 2, lo * step + faceH / 2, wz + dz * ts / 2, faceH, toward);
         }
         return lv;
     },
