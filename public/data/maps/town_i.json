@@ -125,6 +125,46 @@
    "id": "guard_light",
    "x": 17,
    "z": 27
+  },
+  {
+   "id": "town_woman",
+   "x": 23,
+   "z": 3
+  },
+  {
+   "id": "town_girl",
+   "x": 37,
+   "z": 3
+  },
+  {
+   "id": "town_old_woman",
+   "x": 30,
+   "z": 5
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 37,
+   "z": 17
+  },
+  {
+   "id": "child_girl",
+   "x": 17,
+   "z": 19
+  },
+  {
+   "id": "merchant_woman",
+   "x": 19,
+   "z": 6
+  },
+  {
+   "id": "junior_merchant_woman",
+   "x": 22,
+   "z": 9
+  },
+  {
+   "id": "elder_woman",
+   "x": 19,
+   "z": 15
   }
  ],
  "links": {

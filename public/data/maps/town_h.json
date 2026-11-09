@@ -111,6 +111,11 @@
    "id": "guard_light",
    "x": 19,
    "z": 24
+  },
+  {
+   "id": "town_woman",
+   "x": 2,
+   "z": 21
   }
  ],
  "links": {

@@ -125,6 +125,26 @@
    "id": "guard_light",
    "x": 22,
    "z": 27
+  },
+  {
+   "id": "town_woman",
+   "x": 15,
+   "z": 3
+  },
+  {
+   "id": "town_girl",
+   "x": 2,
+   "z": 3
+  },
+  {
+   "id": "town_old_woman",
+   "x": 2,
+   "z": 17
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 8,
+   "z": 5
   }
  ],
  "links": {

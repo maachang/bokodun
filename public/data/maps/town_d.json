@@ -131,6 +131,36 @@
    "id": "gate_guard",
    "x": 22,
    "z": 1
+  },
+  {
+   "id": "town_woman",
+   "x": 37,
+   "z": 4
+  },
+  {
+   "id": "town_girl",
+   "x": 37,
+   "z": 25
+  },
+  {
+   "id": "town_old_woman",
+   "x": 2,
+   "z": 6
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 12,
+   "z": 6
+  },
+  {
+   "id": "child_girl",
+   "x": 17,
+   "z": 12
+  },
+  {
+   "id": "merchant_woman",
+   "x": 37,
+   "z": 14
   }
  ],
  "links": {

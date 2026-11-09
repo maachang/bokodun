@@ -18,6 +18,7 @@ import town_e as TE
 import town_b as TB
 import town_c as TC
 import town_i as TI
+import town_npc_extra as TNX
 import town_g as TG
 import town_a as TA
 import town_f as TF
@@ -131,6 +132,7 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
             m['layout'], m['heights'] = {'d': TD, 'h': TH, 'e': TE, 'b': TB, 'c': TC, 'i': TI}[site['id']].build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         if site['id'] == 'c':   # C（砂漠の自由都市）: 砂漠の環境（霧は、街が見えるよう薄め）・砂の地面
             m['environment'] = dict(desert_env, floorType='desert', fogNear=24, fogFar=72); m['decorFloor'] = 'packedEarth'
+        TNX.add(site['id'], m['npcs'])   # 国力のランクに合わせた、通りの人の追加（town_npc_extra.py）
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     for gm in GG.build():   # G のギルド（ギルド長は長老の一族）
         json.dump(gm, open(os.path.join(MAPS, gm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
