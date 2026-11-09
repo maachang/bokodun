@@ -6,6 +6,14 @@ import { FOOTSTEP_STRIDE } from '/js/game/constants.js';
 const DEBUG_LIFT_MAX = 60;   // デバッグで浮き上がれる、目線の上限（64×64 のマップ全体が見える高さ）
 
 export const updatePlayerMethods = {
+    updateDebugCamera(dt) {
+        // デバッグ（Shift+U / Shift+D）: 目線だけを浮かせる・沈める（上限 DEBUG_LIFT_MAX・下は地面まで）。当たり判定・移動は、そのまま
+        const lift0 = this.player.debugLift || 0;
+        if (this.keys.dbgUp) this.player.debugLift = Math.min(DEBUG_LIFT_MAX, lift0 + 25 * dt);
+        if (this.keys.dbgDown) this.player.debugLift = Math.max(0, lift0 - 25 * dt);
+        this.applyDebugFog();
+    },
+
     // 浮いている間は、霧を遠くへ（上から、地形が霧で消えないように）。戻したら、元の霧に戻す（マップが変わって霧が作り直されたときは、保存を捨てる）
     applyDebugFog() {
         const fog = this.scene.fog;
@@ -22,11 +30,7 @@ export const updatePlayerMethods = {
         // Ctrl+矢印キー: 視点の上下（pitch）と、ゆっくりした旋回（狙いの微調整）
         if (this.keys.camUp) this.player.pitch = Math.min(0.6, this.player.pitch + 1.2 * dt);
         if (this.keys.camDown) this.player.pitch = Math.max(-0.6, this.player.pitch - 1.2 * dt);
-        // デバッグ（Shift+U / Shift+D）: 目線だけを浮かせる・沈める（上限 DEBUG_LIFT_MAX・下は地面まで）。当たり判定・移動は、そのまま
-        const lift0 = this.player.debugLift || 0;
-        if (this.keys.dbgUp) this.player.debugLift = Math.min(DEBUG_LIFT_MAX, lift0 + 25 * dt);
-        if (this.keys.dbgDown) this.player.debugLift = Math.max(0, lift0 - 25 * dt);
-        this.applyDebugFog();
+        this.updateDebugCamera(dt);
         if (this.keys.camLeft) this.player.angle += this.player.rotSpeed * 0.35 * dt;
         if (this.keys.camRight) this.player.angle -= this.player.rotSpeed * 0.35 * dt;
 
