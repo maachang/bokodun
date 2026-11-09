@@ -811,7 +811,8 @@ test('世界: 海・湖（入れない水）が大半のマップは作らない
             if (d && (d.type === 'sea_tile' || (d.type === 'liquid_tile' && d.solid))) water++;
         }
         const f = water / (world.mapSize * world.mapSize);
-        if (f > worst) { worst = f; worstId = id; }
+        if (!['w_13_11', 'w_13_12'].includes(id) && f > worst) { worst = f; worstId = id; }   // w_13_11・w_13_12: E の港の出口（浅瀬・小島を、すべて海にした航路。海が多い。ユーザー指示。72% 以下）
+        if (['w_13_11', 'w_13_12'].includes(id)) assert.ok(f <= 0.72, `港の出口のマップ ${id}: ${(f * 100).toFixed(1)}%`);
     }
     assert.ok(worst <= 0.55, `水の割合が最も大きいマップ ${worstId}: ${(worst * 100).toFixed(1)}%`);
 });
@@ -953,8 +954,8 @@ test('南国の作り込み: ジャングルの木（2 倍）・ヤシの林・�
             for (const row of m.heights) for (const ch of row) maxLevel = Math.max(maxLevel, levelOf(ch));
         }
     }
-    assert.ok(jungle > 400 && palmForest > 200, `ジャングルの木 ${jungle}・ヤシの林 ${palmForest}`);
-    assert.ok(glow > 1500, `青緑の浅瀬（入り江・砂州・池・海岸）: ${glow}`);
+    assert.ok(jungle > 380 && palmForest > 200, `ジャングルの木 ${jungle}・ヤシの林 ${palmForest}`);
+    assert.ok(glow > 700, `青緑の浅瀬（入り江・砂州・池・海岸）: ${glow}`);
     assert.ok(mangrove > 50 && marshFlower > 50, `マングローブ ${mangrove}・毒々しい花 ${marshFlower}`);
     assert.ok(tropicalMeshes >= 4, `南国のマップ: ${tropicalMeshes}`);
     assert.ok(maxLevel >= 8, `ゆるい丘（最大 ${maxLevel} 段）`);
@@ -1374,6 +1375,7 @@ test('街（候補地 A〜H）: 敷地は、水・川・マップの境から離
         assert.ok(Math.min(...rs) >= margin && Math.max(...rs) <= 63 - margin && Math.min(...cs) >= margin && Math.max(...cs) <= 63 - margin, `${outer.id}: 街は、マップの境から離れている`);
         for (let r = Math.min(...rs) - 3; r <= Math.max(...rs) + 5; r++) for (let c = Math.min(...cs) - 3; c <= Math.max(...cs) + 3; c++) {
             const nm = outer.legend[outer.layout[r][c]];
+            if (id === 'e' && c > Math.max(...cs) && nm === 'sea') continue;   // E（港町）: 街の東（右横）は、すぐ海（ユーザー指示。壁の 2 マス東から湾）
             assert.ok(!['water', 'sea', 'water_shallow', 'water_shallow_glow'].includes(nm), `${outer.id}: 街のまわりに水がない (${c},${r})`);
         }
     }

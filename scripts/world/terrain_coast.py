@@ -263,31 +263,37 @@ def _expand_desert_north(land, biome, reach=22):
     return out
 
 
-def _harbor_inlet(land, biome, towns, tid='e', gap=4, r_tip=15, w_sea=56):
-    """港町（E）のすぐ東に、海の湾（くぼみ）をのばす（ユーザー指示「川に見える。完全に横が海のくぼみ」）。街の壁の東（gap マス先）に、半径 r_tip の丸い湾の先を置き、そこから南の海岸まで、幅が w_sea まで広がる湾にする（岸は、ゆるくうねる）。
-    land（陸の真偽）と biome を、その場で書きかえる（水にした所は、海）。街の敷地の平らな所にも、かかる（街の壁の外）。戻り値: (掘ったマス数, 湾の真偽。浅瀬にしない所の印)"""
+def _harbor_inlet(land, biome, towns, tid='e', gap=0, w_top=26, w_sea=28, w_mouth=66, r_corner=10, past=70):
+    """港町（E）の東に、街のすぐ横から海になる湾をのばす（ユーザー指示「街の右横は、すぐ海」「海の出口の浅瀬・小島は、船の通行の邪魔になるので、全部海に」）。
+    西の岸は、街の壁の東（gap マス先）から、ほぼまっすぐ（±1 のゆらぎ）。東の岸は、幅 w_top → w_sea へ広がる。北の角は丸い。南は、海岸・出口の浅瀬・小島・砂州（海岸の先 past マス）を、すべて海にして、沖へ通す。
+    land（陸の真偽）と biome を、その場で書きかえる（水にした所は、海）。戻り値: (掘ったマス数, 湾と航路の真偽。浅瀬・小島にしない所の印)"""
     H_, W_ = land.shape
     site = next((s_ for s_ in towns if s_['id'] == tid), None)
     if site is None: return 0, np.zeros((H_, W_), bool)
     cy, cx = site['y'], site['x']
-    x_c = cx + 8 + gap + r_tip              # 湾の先（丸い所）の中心の列。西の端が、街の壁の東端（中心 + 8）から gap マス先
-    y_c = cy
-    y, run = y_c, 0
-    while y < H_ - 1 and run < 12:   # 海岸（中心線が、本物の海に出る行）: 内陸の池・湖（陸の中の水）では止まらない。水が 12 マス続いたら、海
-        run = run + 1 if not land[y, min(W_ - 1, x_c)] else 0
+    x_w = cx + 8 + gap                       # 西の岸（街の壁の東端は、中心 + 8）
+    y_top = cy - 12
+    xc = x_w + w_top // 2
+    y, run = cy + 20, 0
+    while y < H_ - 1 and run < 12:           # 海岸（中心線が、本物の海に出る行）: 内陸の池・湖・入り江（陸の中の水）では止まらない
+        run = run + 1 if not land[y, min(W_ - 1, xc)] else 0
         y += 1
-    y_sea = y - 12 + 8
+    y_end = min(H_ - 1, y - 12 + past)
+    y_mouth = y - 12 - 2                     # 出口が開き始める行（海岸のあたり）
     carved = 0
     mask = np.zeros((H_, W_), bool)
-    for yy in range(y_c - r_tip, min(H_, y_sea + 1)):
-        t = max(0.0, (yy - y_c) / max(1, y_sea - y_c))
-        half = r_tip + (w_sea / 2.0 - r_tip) * t
-        half *= 1.0 + 0.07 * np.sin(yy / 5.0)                   # 岸のうねり
-        xm = x_c + 4.0 * np.sin(yy / 17.0) * t                 # 湾の中心線のゆらぎ（先は、まっすぐ）
-        if yy < y_c: half = np.sqrt(max(0.0, r_tip ** 2 - (yy - y_c) ** 2))   # 先を丸くする
-        for xx in range(int(xm - half) - 1, int(xm + half) + 2):
-            if not (0 <= xx < W_) or abs(xx - xm) > half: continue
-            if xx < cx + 8 + gap: continue                      # 街の壁と、gap マスの陸を残す
+    for yy in range(y_top, y_end + 1):
+        t = min(1.0, max(0.0, (yy - y_top) / max(1, (y - 12) - y_top)))
+        x0 = x_w                                 # 西の岸は、壁のすぐ東から、まっすぐ（隙間をつくらない）
+        x1 = x_w + int(w_top + (w_sea - w_top) * t) + int(round(2.0 * np.sin(yy / 11.0)))
+        if yy >= y_mouth:                                                # 出口（海岸から先）は、東へ大きく開く: 浅瀬・小島・砂州を、すべて海にする
+            ramp = min(1.0, (yy - y_mouth) / 8.0)
+            x1 = max(x1, x_w + int(w_sea + (w_mouth - w_sea) * ramp))
+        for xx in range(x0, x1 + 1):
+            if not (0 <= xx < W_): continue
+            dy = y_top + r_corner - yy                                   # 北の東の角だけ丸くする（西の角は、壁のすぐ横まで、四角のまま）
+            if dy > 0:
+                if xx > x1 - r_corner and np.hypot(xx - (x1 - r_corner), dy) > r_corner: continue
             if land[yy, xx]: carved += 1
             land[yy, xx] = False; biome[yy, xx] = SEA; mask[yy, xx] = True
     return carved, mask

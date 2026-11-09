@@ -316,7 +316,7 @@ def _tiles_towns(g):
     for site in t['towns']:
         px, py = site['x'], site['y']
         zone = t['town_mask'] & (np.hypot(xs_ - px, ys_ - py) <= T.TOWN_R_FLAT)
-        obj[zone] = ord('0')                                      # 敷地の物（木・草・花）を、すべて取り除く
+        obj[zone & ~t['harbor']] = ord('0')                       # 敷地の物（木・草・花）を、すべて取り除く（E の港の湾の水は、消さない）
         x0, x1, y0, y1 = px - TOWN_HW, px + TOWN_HW - 1, py - TOWN_HH, py + TOWN_HH - 1
         obj[y0:y1 + 1, x0:x1 + 1] = ord('8')                      # 壁の中は、家々の屋根（入れない）
         obj[y0, x0:x1 + 1] = ord('6'); obj[y1, x0:x1 + 1] = ord('6'); obj[y0:y1 + 1, x0] = ord('6'); obj[y0:y1 + 1, x1] = ord('6')
