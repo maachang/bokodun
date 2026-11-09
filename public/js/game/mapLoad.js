@@ -291,7 +291,6 @@ export const mapLoadMethods = {
         this.player.lastSafePos = { x: this.player.x, z: this.player.z };
         this.player.angle = spawn.angle || 0;
         this.player.pitch = 0;
-        this.player.lookDown = false; this.player.debugLift = 0;   // デバッグ（Shift+B・U・D）の状態も、リセット
         this.player.knockback.set(0, 0, 0);
         this.player.isFalling = false;
         this.player.fallDepth = 0;
