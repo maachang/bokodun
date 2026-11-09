@@ -1375,7 +1375,8 @@ test('街（候補地 A〜H）: 敷地は、水・川・マップの境から離
         assert.ok(Math.min(...rs) >= margin && Math.max(...rs) <= 63 - margin && Math.min(...cs) >= margin && Math.max(...cs) <= 63 - margin, `${outer.id}: 街は、マップの境から離れている`);
         for (let r = Math.min(...rs) - 3; r <= Math.max(...rs) + 5; r++) for (let c = Math.min(...cs) - 3; c <= Math.max(...cs) + 3; c++) {
             const nm = outer.legend[outer.layout[r][c]];
-            if (id === 'e' && c > Math.max(...cs) && nm === 'sea') continue;   // E（港町）: 街の東（右横）は、すぐ海（ユーザー指示。壁の 2 マス東から湾）
+            if (id === 'e' && c > Math.max(...cs) && nm === 'sea') continue;
+            if (id === 'i' && c < Math.min(...cs) && ['water', 'water_shallow'].includes(nm)) continue;   // I（湖の街）: 街の西（左横）は、すぐ湖（ユーザー指示: 水の都。壁のすぐ西から湖）   // E（港町）: 街の東（右横）は、すぐ海（ユーザー指示。壁の 2 マス東から湾）
             assert.ok(!['water', 'sea', 'water_shallow', 'water_shallow_glow'].includes(nm), `${outer.id}: 街のまわりに水がない (${c},${r})`);
         }
     }
@@ -1521,7 +1522,7 @@ test('街道: D と H の門前の石畳を、石畳の道（paved_road・幅 3�
         const set = new Set(road);
         let thick = 0;
         for (const k of road) { const [x, y] = k.split(',').map(Number); let w = 0; while (set.has(`${x + w},${y}`)) w++; let h = 0; while (set.has(`${x},${y + h}`)) h++; if (w > 5 && h > 5) thick++; }
-        assert.ok(thick <= 9 * 28, `並走する太い帯が多い（${thick}。分かれ道の 3×3 の交差だけ、1 か所 9 マス）`);   // 8 つの街の道路網: 分かれ道は 7 か所ほど（交差 1 か所 = 9 マス）。海岸線の道（E→F）が街道と分かれる所で、4 か所ぶん（9×4）増え、草原の道（D→B）の分岐・合流で、さらに 4 か所ぶん増えた
+        assert.ok(thick <= 9 * 32, `並走する太い帯が多い（${thick}。分かれ道の 3×3 の交差だけ、1 か所 9 マス）`);   // 8 つの街の道路網: 分かれ道は 7 か所ほど（交差 1 か所 = 9 マス）。海岸線の道（E→F）が街道と分かれる所で、4 か所ぶん（9×4）増え、草原の道（D→B）の分岐・合流で、さらに 4 か所ぶん増え、I（カナロア公国）の道の分岐・合流で、さらに 4 か所ぶん増えた
     }
     // 石の橋: 水に囲まれた所だけ。数がある
     const bridges = road.filter(k => tiles.get(k).name === 'stone_bridge');
@@ -1613,9 +1614,9 @@ test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つ�
     for (const name of ['フランケル聖国', 'ミレニアム自由都市', 'キュラビッド帝国', 'ライアン獣王国']) assert.ok(!signs.some(s => s.msg.includes(name) && s.msg.includes('石畳の道は、ここまで')), `${name}: 門前まで道がつながる（終わりの立て札はない）`);
 });
 
-test('街道の基準データ（public/data/world_roads.json。今後の町・村づくりが、この道を基準にする）: 全 8 つの街・道は 1 本につながる・石畳が作れない国は、道の終わりを持つ', () => {
+test('街道の基準データ（public/data/world_roads.json。今後の町・村づくりが、この道を基準にする）: 全 9 つの街・道は 1 本につながる・石畳が作れない国は、道の終わりを持つ', () => {
     const d = readJson('public/data/world_roads.json');
-    assert.deepEqual(Object.keys(d.towns).sort(), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']);
+    assert.deepEqual(Object.keys(d.towns).sort(), ['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i']);
     const centers = new Set(d.centers.map(([y, x]) => `${y},${x}`));
     assert.ok(centers.size > 1000);
     for (const [id, t] of Object.entries(d.towns)) {

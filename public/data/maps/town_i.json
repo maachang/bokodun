@@ -1,0 +1,258 @@
+{
+ "id": "town_i",
+ "name": "カナロア公国",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "spawn": {
+  "x": 20,
+  "z": 27,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 11713215,
+  "fogNear": 22,
+  "fogFar": 75,
+  "visibility": 0.9,
+  "skyColor": 9018045
+ },
+ "decorFloor": "cobblestone",
+ "enemies": {},
+ "legend": {
+  "W": "city_wall",
+  "p": "plaza_stone",
+  "=": "paved_road",
+  "H": "brick_house",
+  "T": "tree",
+  "f": "flower_bed",
+  "v": "flower_bed_blue",
+  "F": "plaza_fountain",
+  "G": "district_gate",
+  "X": "crate_out",
+  "B": "barrel_out",
+  "L": "ship_large",
+  "l": "ship_small",
+  "S": "shop_building",
+  "I": "inn_building",
+  "J": "temple_building",
+  "d": "shop_door",
+  "N": "inn_door",
+  "D": "temple_door",
+  "M": "inn_sign",
+  "Q": "weapon_shop_sign",
+  "q": "item_shop_sign",
+  "a": "adventurer_guild_sign",
+  "g": "merchant_guild_sign",
+  "c": "church_sign",
+  "w": "water",
+  "b": "wood_bridge",
+  "Y": "mansion_door",
+  "x": "duke_sign"
+ },
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "Wpppppppppppppppppp==pppTppppppppppppTpW",
+  "WwwwwwwwwwpppJJJJpp==ppppppppppppppppppW",
+  "WwwwwwwwwwXppJJJJpp==ppppppppppppppppppW",
+  "WwbbbbbbbbpppJJDJpp==ppppppppppppppppppW",
+  "Wwwlwwwwwwppppcppvp==ppfpppppppppppppppW",
+  "WwwwwwwwwwBpppppppp==ppppppppppppppppppW",
+  "WwwwwLwwwwpppSSSSpp==pppIIIIpSSSSpSSSSpW",
+  "WwwwwwwlwwXppSSSSpp==pppIIIIpSSSSpSSSSpW",
+  "WwwwwwwwwwpppSSdSpp==pppIINIpSSdSpSSdSpW",
+  "Wwbbbbbbbb====a==========M====Q====q===W",
+  "Wwwwwwwwww=============================W",
+  "WwwwwwwwwwwwwbbwwwwbbwwwwwwwwwbbwwwwwwwW",
+  "WwwwwLwwwwwwwbbwwwwbbwwwwwwwwwbbwwwwwwwW",
+  "Wwwwwwwwlw=============================W",
+  "Wwwwwwwwww=============================W",
+  "Wwwwwwwwwwppppppppp==ppppppppppppppppppW",
+  "Wwbbbbbbbbpppppppvp==ppfpppppppppppppppW",
+  "Wwwwwwwwwwppppppppp==ppppppppppppppppppW",
+  "WwwwwwwwwwBpHHHHppp==pppHHHHpHHHHpSSSSpW",
+  "WwwwwLwlwwppHHHHppp==pppHHHHpHHHHpSSSSpW",
+  "WwwwwwwwwwXpHHHHppp==pppHHHHpHHHHpSSdSpW",
+  "Wwwwwwwwwwppppppppp==ppppppppppppppgpppW",
+  "Wwbbbbbbbbppppppppp==ppppppppppppppppppW",
+  "WwwwwwlwwwppHHHHppp==pppHHHHppHHHHHHHHpW",
+  "WwwwwwwwwwBpHHHHppp==pppHHHHppHHHHHHHHpW",
+  "WwwwLwwwwwppHHHHppp==pppHHHHppHHHHYHHHpW",
+  "Wwwwwwwwwwppppppppp==ppppppppppppxpppppW",
+  "WpppppppppppTpppppp==pppTppppppppppppTpW",
+  "WWWWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "town_man",
+   "x": 34,
+   "z": 11
+  },
+  {
+   "id": "town_middle_man",
+   "x": 13,
+   "z": 11
+  },
+  {
+   "id": "elder_man",
+   "x": 27,
+   "z": 14
+  },
+  {
+   "id": "child_boy",
+   "x": 24,
+   "z": 17
+  },
+  {
+   "id": "traveler_merchant",
+   "x": 13,
+   "z": 15
+  },
+  {
+   "id": "merchant_man",
+   "x": 17,
+   "z": 11
+  },
+  {
+   "id": "guard_spear",
+   "x": 22,
+   "z": 27
+  },
+  {
+   "id": "guard_light",
+   "x": 17,
+   "z": 27
+  }
+ ],
+ "links": {
+  "36,9": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop"
+   },
+   "message": "道具屋に入る",
+   "icon": "itemShopIcon",
+   "back": {
+    "x": 36,
+    "z": 10,
+    "angle": 3.14159
+   }
+  },
+  "31,9": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 31,
+    "z": 10,
+    "angle": 3.14159
+   }
+  },
+  "26,9": {
+   "nextMap": "city_inn",
+   "message": "宿屋・酒場に入る",
+   "icon": "innIcon",
+   "back": {
+    "x": 26,
+    "z": 10,
+    "angle": 3.14159
+   }
+  },
+  "15,9": {
+   "nextMap": "guild_adv",
+   "message": "冒険者ギルドに入る",
+   "icon": "advGuildIcon",
+   "back": {
+    "x": 15,
+    "z": 10,
+    "angle": 3.14159
+   }
+  },
+  "36,21": {
+   "nextMap": "guild_merchant",
+   "message": "商人ギルドに入る",
+   "icon": "merchantGuildIcon",
+   "back": {
+    "x": 36,
+    "z": 22,
+    "angle": 3.14159
+   }
+  },
+  "34,26": {
+   "nextMap": "mansion_duke_i",
+   "message": "公爵の館に入る",
+   "back": {
+    "x": 34,
+    "z": 27,
+    "angle": 3.14159
+   }
+  },
+  "15,4": {
+   "nextMap": "temple",
+   "message": "神殿に入る",
+   "icon": "templeIcon",
+   "back": {
+    "x": 15,
+    "z": 5,
+    "angle": 3.14159
+   }
+  },
+  "19,29": {
+   "nextMap": "w_06_15",
+   "message": "カナロア公国の外へ",
+   "spawn": {
+    "x": 16,
+    "z": 42,
+    "angle": 3.14159
+   }
+  },
+  "20,29": {
+   "nextMap": "w_06_15",
+   "message": "カナロア公国の外へ",
+   "spawn": {
+    "x": 17,
+    "z": 42,
+    "angle": 3.14159
+   }
+  }
+ },
+ "heights": [
+  "0000000000000000000000000000000000000000",
+  "0111111111112222221111111111111111111110",
+  "0000000000123333332221112222222222222210",
+  "0000000000123222233321111112111121111210",
+  "0000000000123222233321111112111121111210",
+  "0000000000123222233321111112111121111210",
+  "0000000000122111233321111122111221112210",
+  "0000000000122122333321111233212222122210",
+  "0000000000133233333221112333222222222210",
+  "0000000000123322332111112222222222222110",
+  "0000000000122222221111112222222222222210",
+  "0000000000111111111111111111111111111110",
+  "0000000000000000000000000000000000000000",
+  "0000000000000000000000000000000000000000",
+  "0000000000111111111111111111111111111110",
+  "0000000000122111222221112222222221111110",
+  "0000000000122212222221112222222221111110",
+  "0000000000122222222221112222222111111110",
+  "0000000000122222222221111112111111111110",
+  "0000000000122222222221111112111111111110",
+  "0000000000122222222221111112111111111110",
+  "0000000000122222222221112222222111111110",
+  "0000000000122222222221112222222211111110",
+  "0000000000122222222221112222222211111110",
+  "0000000000122222222221112222222211111110",
+  "0000000000122222222221112222222211111110",
+  "0000000000122222222221112222222111111110",
+  "0000000000122222222221112222221111111110",
+  "0111111111111111111111111111111111111110",
+  "0000000000000000000000000000000000000000"
+ ],
+ "heightStep": 0.5
+}

@@ -129,6 +129,11 @@ def build_mansion_c():
     return _chairman_mansion('mansion_chairman_c', '議長の館（ミレニアム自由都市）', 'town_c', 'desert_chairman', True)
 
 
+def build_mansion_i():
+    """I（カナロア公国）の公爵の館。主はカナロア公爵（duke_man。公爵は、屋敷の中だけ）"""
+    return _chairman_mansion('mansion_duke_i', '公爵の館（カナロア公国）', 'town_i', 'duke_man', False)
+
+
 def build_mansion_e():
     """E（ガリレオ連盟）の議長の館。主は金の亡者の議長（chairman_e）"""
     return _chairman_mansion('mansion_chairman_e', '議長の館（ガリレオ連盟）', 'town_e', 'chairman_e', False)

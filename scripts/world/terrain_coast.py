@@ -297,3 +297,14 @@ def _harbor_inlet(land, biome, towns, tid='e', gap=0, w_top=26, w_sea=28, w_mout
             if land[yy, xx]: carved += 1
             land[yy, xx] = False; biome[yy, xx] = SEA; mask[yy, xx] = True
     return carved, mask
+
+
+def _lake_bay(lake, towns, tid='i', x_from=950):
+    """湖の東岸の街（I カナロア公国）: 壁の西側（壁の行すべて）のすぐ西まで、湖の水を広げる（水の都。壁と湖の間に、地面を残さない）。湖はもとからつながっているので、細い入り江にはならない。戻り値: (湖, 広げたマス数)"""
+    site = next((s for s in towns if s['id'] == tid), None)
+    if site is None: return lake, 0
+    lake = lake.copy()
+    y0, y1, x1 = site['y'] - 6, site['y'] + 5, site['x'] - 8   # 壁の行（TOWN_HH=6）と、壁の西端の列（TOWN_HW=8）
+    before = int(lake.sum())
+    lake[y0:y1 + 1, x_from:x1] = True
+    return lake, int(lake.sum()) - before

@@ -17040,6 +17040,22 @@
     "message": "ダマスカス自治領",
     "description": "街の入口の近くの立て札（ダマスカス自治領。外のマップ用）"
   },
+  "town_sign_i": {
+    "lift": true,
+    "groundShadow": true,
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "カナロア公国",
+    "description": "街の入口の近くの立て札（カナロア公国。外のマップ用）"
+  },
   "mideast_house": {
     "baseShadow": true,
     "type": "block",
@@ -17782,6 +17798,22 @@
     "radius": 0.5,
     "message": "議長の館",
     "description": "議長の館の案内標識（C ミレニアム自由都市）"
+  },
+  "duke_sign": {
+    "lift": true,
+    "groundShadow": true,
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "公爵の館",
+    "description": "公爵の館の案内標識（I カナロア公国）"
   },
   "adobe_wall": {
     "baseShadow": true,

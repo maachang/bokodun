@@ -17,6 +17,7 @@ import town_h as TH
 import town_e as TE
 import town_b as TB
 import town_c as TC
+import town_i as TI
 import town_g as TG
 import town_a as TA
 import town_f as TF
@@ -123,14 +124,14 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
             m['environment'] = dict(DARK_FOREST_ENV, floorType='forest', fogNear=22, fogFar=66, ambientLight=0x6f8f76); m['decorFloor'] = 'forestGround'
         elif site['id'] == 'f':   # F（山の麓の獣人とドワーフの街）: 段々の斜面（town_f.build）
             m['layout'], m['heights'] = TF.build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
-        elif site['id'] in ('d', 'h', 'e', 'b', 'c'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
-            m['layout'], m['heights'] = {'d': TD, 'h': TH, 'e': TE, 'b': TB, 'c': TC}[site['id']].build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
+        elif site['id'] in ('d', 'h', 'e', 'b', 'c', 'i'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
+            m['layout'], m['heights'] = {'d': TD, 'h': TH, 'e': TE, 'b': TB, 'c': TC, 'i': TI}[site['id']].build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         if site['id'] == 'c':   # C（砂漠の自由都市）: 砂漠の環境（霧は、街が見えるよう薄め）・砂の地面
             m['environment'] = dict(desert_env, floorType='desert', fogNear=24, fogFar=72); m['decorFloor'] = 'packedEarth'
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     for gm in GG.build():   # G のギルド（ギルド長は長老の一族）
         json.dump(gm, open(os.path.join(MAPS, gm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    for cm in CF.build_others() + [TPB.build(), CF.build_mansion_c(), CF.build_mansion_e()]:   # 国ごとの城（A 帝王・B 愚王・G 女王）と B の大教会（教皇）
+    for cm in CF.build_others() + [TPB.build(), CF.build_mansion_c(), CF.build_mansion_e(), CF.build_mansion_i()]:   # 国ごとの城（A 帝王・B 愚王・G 女王）と B の大教会（教皇）
         json.dump(cm, open(os.path.join(MAPS, cm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     cf = CF.build()   # F の小さな王城（獣王・フェンリル像）
     json.dump(cf, open(os.path.join(MAPS, cf['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
