@@ -87,14 +87,14 @@
   "9abcccccccccbbbbcccdddefghhhhihhggffffeeddddddeefghhhhhhggggggff",
   "9abccccccccccbbbccccddefghihhhhhhggffeeedddddddefghhhhhhhgggggff",
   "abcddccccccccccccccccddefghihhhhhhgfeedddeeddddefghhhhhhhggggfff",
-  "bcccddddddddddddccccccdefghihhhhhhgfeddddeeeddeefghhhhhggggggffe",
-  "bbccdddddddddedddcccccdefghihhhhihgfedcddeeeeeefgghhhhhgggggfeed",
-  "abbcdeeeddddeeeddcccccdefghihhghhgfedcccdeeeeeeffgghhhhhhggfeddc",
-  "abbcdefeeddeeeeeddddddefghiihhghihgfedccddddddeefffgghhhggfedccb",
-  "aabcdeffeddeefeeddddeefghiihihghiihgfeddccccdddeeeffgghhgfedcbba",
-  "aabcdeffeedeeffeedeeffghhhhghhghhihgfeddcccccddddeefghhgfedcbaa9",
-  "aabcdeffeeeefffffeffgghhgggfggghhhhgfedccbbbccddeeffghgfedcba998",
-  "aabcdefeeddefggggfggggggfffefffggggfeddcccbcccddefggggfedcba9887"
+  "bcccddddddddddddccccccdefghihhhhhhgfeddddeeeddeefghhhhhggggggffg",
+  "bbccdddddddddedddcccccdefghihhhhihgfedcddeeeeeefgghhhhgggggggggf",
+  "abbcdeeeddddeeeddcccccdefghihhghhgfedcccdeeeeeeffgghhgfffffffffe",
+  "abbcdefeeddeeeeeddddddefghiihhghihgfedccddddddeefffggfeeeeeeeeed",
+  "aabcdeffeddeefeeddddeefghijjihghiihgfeddccccdddeeefffedddddddddc",
+  "aabcdeffeedeeffeedeeffghijkjihghhihgfeddcccccddddeefedcccccccccb",
+  "aabcdeffeeeefffffeffgghijjjjihghhihgfedccbbbccddeeeedcbbbbbbbbba",
+  "aabcdefeeddefggggfgghhiiiiiiihhhhhgfeddcccbcccddeeddcbaaaaaaaaa9"
  ],
  "floorLegend": {
   "f": "forest"

@@ -281,6 +281,7 @@ def _tiles_water(g):
     # 河口: 川の水から 3 マス以内の海は、岸の浅瀬にせず、深い水（川が途切れず海へ続く。河口を歩いて渡れない）
     d_riv = T._distance(t['river'] > 0)
     put(sea & (d_riv <= 3) & (d_land <= 3), 'Q')
+    put(sea & t['harbor'], 'O')   # 港（E の湾）: 浅瀬なし。深い水だけ（座礁しない）
     mouth_q = np.isin(obj, [ord('q'), ord('g')]) & (d_riv <= 5) & (t['dist_sea'] <= 5)   # 河口のそばの、岸・入り江の浅瀬も、深い水に
     put(mouth_q, 'Q')
     put(t['lagoon'], 'g')                                                       # 入り江・砂州・池のふち（歩ける浅瀬）
@@ -397,6 +398,7 @@ def _tiles_roads(g):
         print(f'循環する道 {a}⇄{b}: 迂回 {len(new_tiles)} マス（道のり/直線 = {ratio:.1f}）')
     n_merge = roads.merge_parallel(t, obj, elev, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})   # 近くで並行して進む 2 本の道は、1 本に統合（ユーザー指示）
     print(f'並行する道を統合: {n_merge} マス')
+    print(f'道のわきの段差を直した: {roads.fix_steps(elev, obj, t)} マス')   # 道の地ならしで残った、高さの差 2 以上（崖でない所）
     # 石の橋のそば（BRIDGE_NEAR マス以内）の、もとからある木の橋（plank_bridge）は、無効（川に戻す）。石の橋と、二重の橋にならない
     near_stone = T.box_mean((obj == ord(roads.BRIDGE_CH)).astype(np.float32), BRIDGE_NEAR) > 0
     old = near_stone & (obj == ord('Z'))

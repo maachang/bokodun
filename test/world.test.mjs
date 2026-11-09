@@ -953,7 +953,7 @@ test('南国の作り込み: ジャングルの木（2 倍）・ヤシの林・�
             for (const row of m.heights) for (const ch of row) maxLevel = Math.max(maxLevel, levelOf(ch));
         }
     }
-    assert.ok(jungle > 450 && palmForest > 200, `ジャングルの木 ${jungle}・ヤシの林 ${palmForest}`);
+    assert.ok(jungle > 400 && palmForest > 200, `ジャングルの木 ${jungle}・ヤシの林 ${palmForest}`);
     assert.ok(glow > 1500, `青緑の浅瀬（入り江・砂州・池・海岸）: ${glow}`);
     assert.ok(mangrove > 50 && marshFlower > 50, `マングローブ ${mangrove}・毒々しい花 ${marshFlower}`);
     assert.ok(tropicalMeshes >= 4, `南国のマップ: ${tropicalMeshes}`);

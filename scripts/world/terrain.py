@@ -43,10 +43,14 @@ def _build_coast(g):
     pond = pond | oasis['pond']
     fring = fring | oasis['ring']
     towns, town_mask, town_mask_mtn = _town_sites(land, biome, pond, oasis, sx, sy)   # 街の敷地（候補地 A〜H）
-    print('E の港の入り江:', _harbor_inlet(land, biome, towns), 'マス掘った')   # 港町 E の東に、海から入り江（街のすぐ横を、海に）
+    n_bay, harbor = _harbor_inlet(land, biome, towns)
+    harbor = _dil(harbor, 7)   # 湾と、そのまわり 3 マス: 浅瀬・青緑の浅瀬にしない（深い水だけ。座礁しない港）
+    lagoon &= ~harbor
+    print('E の港の入り江:', n_bay, 'マス掘った')   # 港町 E の東に、海から入り江（街のすぐ横を、海に）
     oasis['flat'] = oasis['flat'] | town_mask          # 平地の街は、標高 0 に平らにする（山の上の街は、標高をそのまま）
     town_mask = town_mask | town_mask_mtn
     fring = fring | gring
+    g.harbor = harbor
     g.biome = biome
     g.ffrozen = ffrozen
     g.fring = fring
@@ -353,7 +357,7 @@ def build():
     any_water, arenas, biome, bridge, bridge_under, elev, ffrozen, lagoon, lake, land, mtn_bridge, oasis, river, town_mask, towns, trail, water_deep, water_shallow = g.any_water, g.arenas, g.biome, g.bridge, g.bridge_under, g.elev, g.ffrozen, g.lagoon, g.lake, g.land, g.mtn_bridge, g.oasis, g.river, g.town_mask, g.towns, g.trail, g.water_deep, g.water_shallow
 
 
-    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, trail=trail, arenas=arenas, mtn_bridge=mtn_bridge, bridge_under=bridge_under, oasis=oasis, towns=towns, town_mask=town_mask, dist_sea=_distance(~land), dist_water=_distance(any_water))
+    return dict(land=land, biome=biome, deep=water_deep, shallow=water_shallow, lagoon=lagoon, frozen=ffrozen, bridge=bridge, lake=lake, river=river, elev=elev, trail=trail, arenas=arenas, mtn_bridge=mtn_bridge, bridge_under=bridge_under, oasis=oasis, towns=towns, town_mask=town_mask, harbor=g.harbor, dist_sea=_distance(~land), dist_water=_distance(any_water))
 
 
 if __name__ == '__main__':

@@ -97,13 +97,14 @@
  ],
  "floorLegend": {
   "i": "ice",
+  "m": "redEarth",
   "r": "rock",
   "s": "snow"
  },
  "floorLayer": [
-  "rrrrsssssssssssssssssssrrrrrrrrrrrrrssssssssssssssssssssssssssss",
-  "rrrssssssssssssssssssssrrrrrrrrrrrrrssssssssssssssssssssssssssss",
-  "rrrsssssssssssssssssssssrrrrrrrrrrrrrsssrrssssissssssiiissssssss",
+  "rrrrsssssssssssssssssssrrrrrrrrrrrrrsssssssssssssssssssssssssssm",
+  "rrrssssssssssssssssssssrrrrrrrrrrrrrsssssssssssssssssssssssssssm",
+  "rrrsssssssssssssssssssssrrrrrrrrrrrrrsssrrssssissssssiiisssssssm",
   "ssssssssssssssssssssssssrrrrrrrrrrrrrsssrsssssisssssiiiiisssssss",
   "sssssssssssssssssssssssssrrrrrrrrrrrrrsssssssssiisiiiiiiiiisssss",
   "ssssssssssssssssssssssssssrrrrrrrrrrrrsssssssssiiiiiiiiiiiiissss",

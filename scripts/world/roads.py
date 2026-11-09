@@ -289,3 +289,26 @@ def merge_loop(t, path, set_c, near_r):
         link = find_path(t, p_, nearest(p_), margin=60, reuse=set_c)
         if link: parts += link
     return parts, len(joins)
+
+
+def fix_steps(elev, obj, t, hi=8):
+    """道の地ならし（flatten）のあとに残った、高さの差 2 以上の段（どちらも hi 未満＝崖でない所）を、高いほうを下げて、1 以下にする。
+    道・橋・水のマスは動かさない（高いほうが道なら、低いほうを上げる）。崖（hi 以上）は、そのまま。戻り値: 直したマス数"""
+    keep = np.isin(obj, [ord(ROAD_CH), ord(BRIDGE_CH)]) | t['deep'] | t['shallow'] | t['bridge'] | t['lagoon'] | ~t['land']
+    n = 0
+    for _ in range(40):
+        changed = 0
+        for ax in (0, 1):
+            for sl_a, sl_b in (((slice(1, None), slice(None)), (slice(None, -1), slice(None))), ((slice(None), slice(1, None)), (slice(None), slice(None, -1)))):
+                if ax == 1 and sl_a[1] == slice(None): continue
+                if ax == 0 and sl_a[0] == slice(None): continue
+                a, b = elev[sl_a], elev[sl_b]; ka, kb = keep[sl_a], keep[sl_b]
+                for (x, y, kx, ky) in ((a, b, ka, kb), (b, a, kb, ka)):   # x が高いほう
+                    bad = (x - y > 1) & (x < hi) & (y < hi)
+                    lower = bad & ~kx
+                    x[lower] = (y + 1)[lower]; changed += int(lower.sum())
+                    raise_ = bad & kx & ~ky & (x - y > 1)
+                    y[raise_] = (x - 1)[raise_]; changed += int(raise_.sum())
+        n += changed
+        if not changed: break
+    return n
