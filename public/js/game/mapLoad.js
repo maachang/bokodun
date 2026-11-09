@@ -125,7 +125,7 @@ export const mapLoadMethods = {
     async buildFloorAndGround(mapData, env, tileSize, rows, cols, waterMap, holeFloorMap, mapId) {
         const floorMats = new Map();
         const floorMatOf = (ft) => {
-            if (!floorMats.has(ft)) floorMats.set(ft, new THREE.MeshLambertMaterial({ map: this.floorTextureOf(ft) }));
+            if (!floorMats.has(ft)) floorMats.set(ft, new THREE.MeshLambertMaterial({ map: ft.startsWith('road:') ? this.textures[ft.slice(5)] : this.floorTextureOf(ft) }));   // 'road:<画像>': 石畳の道の段差の側面
             return floorMats.get(ft);
         };
         const floorTypeAt = (r, c) => {

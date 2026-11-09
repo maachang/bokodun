@@ -5,6 +5,13 @@ import { worldNeighbor } from '/js/world.js';
 import { fetchMap } from '/js/mapFormat.js';
 
 export const mapTerrainMethods = {
+    // 石畳の道（paved_road・paved_road_snow）のマスなら、段差 1 の側面に貼る画像の鍵 'road:<画像>'。そうでなければ null（地面の模様のまま）
+    roadSideKey(mapData, r, c) {
+        const ch = mapData.layout?.[r]?.[c];
+        const name = ch && ch !== '0' ? mapData.legend?.[ch] : null;
+        return (name === 'paved_road' || name === 'paved_road_snow') ? 'road:' + this.objectDefinitions?.[name]?.texture : null;
+    },
+
     // 起伏のある地面: 高くなっているマスの上面と、低い隣との境の側面を作る。
     //   段差 1 は、地面と同じ模様の側面（歩いて上れる）。段差 2 以上は、崖（岩肌。mapData.cliffTexture、省略は cliffGray）
     buildHeightTerrain(mapData, rows, cols, tileSize, floorMats, floorMatOf, floorTypeAt) {
@@ -54,7 +61,7 @@ export const mapTerrainMethods = {
                     if (!inMap || nh >= h) continue;
                     const drop = h - nh;
                     const faceH = drop * step;
-                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMatFor(h) : matFor(sideMats, h, mapData.sideShade ?? 0.78, ft));
+                    const face = new THREE.Mesh(new THREE.PlaneGeometry(tileSize, faceH), drop >= 2 ? cliffMatFor(h) : matFor(sideMats, h, mapData.sideShade ?? 0.78, this.roadSideKey(mapData, r, c) || ft));   // 段差 1: 石畳の道のマスは、側面も石畳の色
                     face.rotation.y = rotY;
                     face.position.set(wx + dx * tileSize / 2, nh * step + faceH / 2, wz + dz * tileSize / 2);
                     this.addStatic(face);
