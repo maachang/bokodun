@@ -5,7 +5,7 @@ import numpy as np
 import terrain as T
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
-from world_consts import ROAD_LOOPS, LOOP_NEAR, COAST_ROADS, GRASS_ROADS, BRIDGE_NEAR, LOOPS, ROAD_ROUGH, ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
+from world_consts import ROAD_LOOPS, LOOP_NEAR, COAST_ROADS, DIRECT_ROADS, GRASS_ROADS, BRIDGE_NEAR, LOOPS, ROAD_ROUGH, ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
 
 
 def _tiles_snowFoothills(g):
@@ -417,6 +417,7 @@ def _tiles_roads(g):
         print(f'循環する道 {a}⇄{b}: 迂回 {len(new_tiles)} マス（道のり/直線 = {ratio:.1f}）')
     _coast_roads(g, centers, set_c, gate_pt)
     _coast_roads(g, centers, set_c, gate_pt, GRASS_ROADS, {'grass': True}, '草原の道')
+    _coast_roads(g, centers, set_c, gate_pt, DIRECT_ROADS, {}, '直結の道')
     n_merge = roads.merge_parallel(t, obj, elev, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})   # 近くで並行して進む 2 本の道は、1 本に統合（ユーザー指示）
     print(f'並行する道を統合: {n_merge} マス')
     print(f'道のわきの段差を直した: {roads.fix_steps(elev, obj, t)} マス')   # 道の地ならしで残った、高さの差 2 以上（崖でない所）
