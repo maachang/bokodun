@@ -20419,5 +20419,53 @@
     ],
     "description": "神殿のシャンデリア（壁の高さ6用）（床は木張り。K マカヒキ国用）",
     "floorTexture": "woodFloor"
+  },
+  "fusuma_wall": {
+    "type": "block",
+    "texture": "fusuma",
+    "ceilingTexture": "woodWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "ふすま（K マカヒキ国の城の中の、部屋の仕切り。白い和紙に黒い枠）"
+  },
+  "fusuma_gold": {
+    "type": "block",
+    "texture": "fusumaGold",
+    "ceilingTexture": "woodWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "金のふすま（K マカヒキ国の城の、上段の間・大広間の仕切り。松の絵）"
+  },
+  "shoji_wall": {
+    "type": "block",
+    "texture": "shoji",
+    "ceilingTexture": "woodWall",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "障子の壁（K マカヒキ国の城の外の壁）"
+  },
+  "dais_tatami_1": {
+    "type": "floor_tile",
+    "texture": "tatami",
+    "ceilingTexture": "woodWall",
+    "elevation": 0.3,
+    "solid": false,
+    "description": "上段の畳の段（高さ 0.3。K マカヒキ国の城）"
+  },
+  "dais_tatami_2": {
+    "type": "floor_tile",
+    "texture": "tatami",
+    "ceilingTexture": "woodWall",
+    "elevation": 0.6,
+    "solid": false,
+    "description": "上段の畳の段（高さ 0.6。K マカヒキ国の城）"
+  },
+  "dais_tatami_3": {
+    "type": "floor_tile",
+    "texture": "tatami",
+    "ceilingTexture": "woodWall",
+    "elevation": 0.9,
+    "solid": false,
+    "description": "上段の畳の段（高さ 0.9。K マカヒキ国の城）"
   }
 }

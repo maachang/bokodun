@@ -657,6 +657,90 @@ export const wallTextures = {
         return texture;
     },
 
+    // ふすま・障子の共通の下地（K マカヒキ国の城の中）: 64×64 の canvas と、テクスチャ化
+    _edoPanel(draw) {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        draw(ctx);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    },
+
+    // 白いふすま: 和紙（うすい灰白）に、黒い木の枠（縁・上下の鴨居と敷居・中央の継ぎ目）と、引き手（小さな丸）
+    createFusumaTexture() {
+        return this._edoPanel(ctx => {
+            ctx.fillStyle = '#ece6d4';
+            ctx.fillRect(0, 0, 64, 64);
+            for (let i = 0; i < 40; i++) {
+                ctx.fillStyle = 'rgba(150,130,100,0.10)';
+                ctx.fillRect(Math.floor(Math.random() * 64), Math.floor(Math.random() * 64), 3, 1);
+            }
+            ctx.fillStyle = '#2a1e16';
+            ctx.fillRect(0, 0, 64, 4);
+            ctx.fillRect(0, 60, 64, 4);
+            ctx.fillRect(0, 0, 2, 64);
+            ctx.fillRect(62, 0, 2, 64);
+            ctx.fillRect(31, 4, 2, 56);
+            ctx.fillStyle = '#6a5a44';
+            ctx.fillRect(27, 30, 3, 3);
+            ctx.fillRect(34, 30, 3, 3);
+        });
+    },
+
+    // 金のふすま（金碧障壁画）: 金箔の地に、松の木（黒い幹と緑の枝葉）と、遠くの山、雲（白）
+    createFusumaGoldTexture() {
+        return this._edoPanel(ctx => {
+            ctx.fillStyle = '#d9a93c';
+            ctx.fillRect(0, 0, 64, 64);
+            for (let y = 4; y < 60; y += 8) {
+                for (let x = 2; x < 62; x += 8) {
+                    ctx.fillStyle = (x + y) % 16 === 0 ? '#e6bc50' : '#cf9e34';
+                    ctx.fillRect(x, y, 7, 7);
+                }
+            }
+            ctx.fillStyle = '#4a7a5a';   // 遠くの山
+            ctx.fillRect(0, 44, 22, 3);
+            ctx.fillRect(4, 41, 12, 3);
+            ctx.fillStyle = '#f4ecd0';   // 雲
+            ctx.fillRect(40, 14, 18, 3);
+            ctx.fillRect(44, 11, 10, 3);
+            ctx.fillStyle = '#241812';   // 松の幹
+            ctx.fillRect(30, 30, 4, 30);
+            ctx.fillRect(26, 40, 6, 3);
+            ctx.fillRect(34, 34, 8, 3);
+            ctx.fillStyle = '#2f5a3a';   // 松の葉
+            ctx.fillRect(18, 24, 18, 5);
+            ctx.fillRect(24, 19, 16, 5);
+            ctx.fillRect(36, 30, 14, 4);
+            ctx.fillRect(14, 34, 12, 4);
+            ctx.fillStyle = '#2a1e16';   // 黒い枠
+            ctx.fillRect(0, 0, 64, 4);
+            ctx.fillRect(0, 60, 64, 4);
+            ctx.fillRect(0, 0, 2, 64);
+            ctx.fillRect(62, 0, 2, 64);
+        });
+    },
+
+    // 障子（城の外の壁）: 白い和紙に、細い格子（組子）。枠は木
+    createShojiTexture() {
+        return this._edoPanel(ctx => {
+            ctx.fillStyle = '#f4f0e2';
+            ctx.fillRect(0, 0, 64, 64);
+            ctx.fillStyle = '#8a6a44';
+            for (let x = 0; x <= 64; x += 16) ctx.fillRect(x, 0, 2, 64);
+            for (let y = 0; y <= 64; y += 12) ctx.fillRect(0, y, 64, 2);
+            ctx.fillStyle = '#3a2a1c';
+            ctx.fillRect(0, 0, 64, 5);
+            ctx.fillRect(0, 59, 64, 5);
+        });
+    },
+
     // 畳（K マカヒキ国の部屋の床）: い草の薄緑の畳が 2 枚（縦に長い）。縁は暗い緑の布。目は細かい縦の線
     createTatamiTexture() {
         const canvas = document.createElement('canvas');

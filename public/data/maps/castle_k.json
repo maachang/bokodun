@@ -13,47 +13,41 @@
   "floorType": "stone",
   "hasCeiling": true,
   "footstep": "stone",
-  "ceilingTexture": "brick",
-  "ambientLight": 10096512,
-  "directionalLight": 13615264,
-  "fogColor": 2761760,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 13615264,
+  "directionalLight": 16773328,
+  "fogColor": 3811868,
   "fogNear": 14,
   "fogFar": 48,
   "visibility": 0.9,
-  "skyColor": 2761760
+  "skyColor": 3811868
  },
  "legend": {
-  "W": "brick_wall",
-  "L": "wall_sconce",
-  "R": "wall_banner_red",
-  "a": "dais_stone_3",
-  "b": "dais_stone_2",
-  "c": "dais_stone_1",
-  "A": "dais_stone_3",
-  "B": "dais_stone_2",
-  "C": "dais_stone_1",
-  "u": "wood_floor",
-  "K": "chandelier_castle_wood",
-  "2": "castle_exit",
   "_": "tatami",
-  "F": "wood_floor"
+  "S": "fusuma_wall",
+  "G": "fusuma_gold",
+  "H": "shoji_wall",
+  "a": "dais_tatami_3",
+  "b": "dais_tatami_2",
+  "c": "dais_tatami_1",
+  "2": "castle_exit"
  },
  "layout": [
-  "WWRLWWWWWWWWRWWWWWWWWLRWW",
-  "WFFFFFFFFaaAAAaaFFFFFFFFW",
-  "WF_______bbBBBbb_______FW",
-  "WF_______ccCCCcc_______FW",
-  "WF_________uuu_________FW",
-  "WF_________uKu_________FW",
-  "WF_________uuu_________FW",
-  "WF_________uuu_________FW",
-  "WF_________uuu_________FW",
-  "WF_________uuu_________FW",
-  "WF_________uuu_________FW",
-  "WF_________uKu_________FW",
-  "WF_________uuu_________FW",
-  "WFFFFFFFFFFuuuFFFFFFFFFFW",
-  "WWWWWWWWWWWW2WWWWWWWWWWWW"
+  "HHHHHHGGGGGGGGGGGGGHHHHHH",
+  "H____G___aaaaaaa___G____H",
+  "H____G___bbbbbbb___G____H",
+  "H________ccccccc________H",
+  "H____G_____________G____H",
+  "H____G_____________G____H",
+  "HS_SSGGGGGG___GGGGGGS_SSH",
+  "H____S____S___S____S____H",
+  "H_______________________H",
+  "H____S____S___S____S____H",
+  "HS_SSSS_SSSS_SSSS_SSS_SSH",
+  "H____S____S___S____S____H",
+  "H_______________________H",
+  "H____S____S___S____S____H",
+  "HHHHHHHHHHHH2HHHHHHHHHHHH"
  ],
  "npcs": [
   {
@@ -67,39 +61,9 @@
    "z": 2
   },
   {
-   "id": "guard_k",
-   "x": 9,
-   "z": 6
-  },
-  {
-   "id": "guard_k",
-   "x": 15,
-   "z": 6
-  },
-  {
-   "id": "guard_k",
-   "x": 9,
-   "z": 10
-  },
-  {
-   "id": "guard_k",
-   "x": 15,
-   "z": 10
-  },
-  {
    "id": "daimyo_wife_k",
    "x": 15,
    "z": 2
-  },
-  {
-   "id": "daimyo_retainer_k",
-   "x": 6,
-   "z": 5
-  },
-  {
-   "id": "daimyo_master_k",
-   "x": 18,
-   "z": 5
   },
   {
    "id": "sword_bearer_k",
@@ -107,14 +71,49 @@
    "z": 2
   },
   {
+   "id": "guard_k",
+   "x": 7,
+   "z": 3
+  },
+  {
+   "id": "guard_k",
+   "x": 17,
+   "z": 3
+  },
+  {
+   "id": "guard_k",
+   "x": 7,
+   "z": 5
+  },
+  {
+   "id": "guard_k",
+   "x": 17,
+   "z": 5
+  },
+  {
+   "id": "daimyo_retainer_k",
+   "x": 8,
+   "z": 8
+  },
+  {
+   "id": "daimyo_master_k",
+   "x": 16,
+   "z": 8
+  },
+  {
    "id": "maid_k",
-   "x": 5,
-   "z": 11
+   "x": 2,
+   "z": 8
   },
   {
    "id": "daimyo_cook_k",
-   "x": 19,
-   "z": 11
+   "x": 22,
+   "z": 12
+  },
+  {
+   "id": "maid_k",
+   "x": 2,
+   "z": 3
   }
  ],
  "links": {}
