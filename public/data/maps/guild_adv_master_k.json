@@ -1,0 +1,57 @@
+{
+ "id": "guild_adv_master_k",
+ "name": "冒険者ギルド長の部屋（マカヒキ国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "nextMap": "guild_adv_k",
+ "spawn": {
+  "x": 1,
+  "z": 3,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 2760728,
+  "fogNear": 20,
+  "fogFar": 60,
+  "visibility": 0.9,
+  "skyColor": 2760728
+ },
+ "legend": {
+  "W": "wooden_wall",
+  "F": "wood_floor",
+  "E": "building_exit",
+  "u": "rug",
+  "t": "table",
+  "k": "bookshelf",
+  "g": "cupboard",
+  "K": "chandelier_mansion_rug",
+  "L": "wall_sconce_wood",
+  "a": "wall_window_wood",
+  "_": "tatami"
+ },
+ "layout": [
+  "WWWWLWWWW",
+  "Wkkg_kkgW",
+  "L__uuu__L",
+  "E__uKu_tW",
+  "L__uuu__L",
+  "W_______W",
+  "WaWWLWaWW"
+ ],
+ "npcs": [
+  {
+   "id": "adv_guild_master",
+   "x": 5,
+   "z": 3,
+   "speed": 0,
+   "wanderRadius": 0
+  }
+ ],
+ "enemies": {}
+}

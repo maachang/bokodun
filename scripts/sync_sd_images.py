@@ -15,7 +15,7 @@ sdServer の画像を、画像ID（sdId）で問い合わせて、更新のあ�
   python3 scripts/sync_sd_images.py --apply    # 更新のあった画像を取り込む
   python3 scripts/sync_sd_images.py --apply --force   # 時刻に関係なく、全件取り込む
   python3 scripts/sync_sd_images.py --retrim   # 取り込み済みの画像の透明な余白を、すべて切り直す（sdServer には、つながない）
-  オプション: --sd http://127.0.0.1:3000（sdServer の URL）、--id 121（指定IDだけ）
+  オプション: --sd http://127.0.0.1:3010（sdServer の URL）、--id 121（指定IDだけ）
 """
 import argparse, datetime, io, json, os, re, sys, urllib.request
 from PIL import Image
@@ -79,7 +79,7 @@ def set_field(path, key, field, fn):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument('--sd', default='http://127.0.0.1:3000')
+    ap.add_argument('--sd', default='http://127.0.0.1:3010')
     ap.add_argument('--apply', action='store_true')
     ap.add_argument('--force', action='store_true')
     ap.add_argument('--id', type=int)

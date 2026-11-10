@@ -357,7 +357,7 @@ def build():
     _build_desertHeights(g)
     _build_settleHeights(g)
     _build_mountainTown(g)
-    g.land, g.biome, g.elev, g.towns, g.town_mask = add_island(g.land, g.biome, g.elev, g.towns, g.town_mask)   # マカヒキ島（K: 江戸時代風の国。南西の海の 3×3 メッシュ）: 本島の地形・山道（乱数を使う処理）がすべて終わった後に足す（既存の地形を変えない）
+    add_island(g)   # マカヒキ島（K: 江戸時代風の国。南西の海の 3×3 メッシュ）: 本島の地形・山道（乱数を使う処理）がすべて終わった後に足す（既存の地形を変えない）
     any_water, arenas, biome, bridge, bridge_under, elev, ffrozen, lagoon, lake, land, mtn_bridge, oasis, river, town_mask, towns, trail, water_deep, water_shallow = g.any_water, g.arenas, g.biome, g.bridge, g.bridge_under, g.elev, g.ffrozen, g.lagoon, g.lake, g.land, g.mtn_bridge, g.oasis, g.river, g.town_mask, g.towns, g.trail, g.water_deep, g.water_shallow
 
 

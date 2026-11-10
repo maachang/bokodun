@@ -31,7 +31,7 @@
   "f": "flower_bed",
   "v": "flower_bed_blue",
   "F": "plaza_fountain",
-  "G": "district_gate",
+  "G": "edo_gate",
   "C": "castle_gate",
   "D": "temple_door",
   "I": "edo_inn",
@@ -214,7 +214,7 @@
    }
   },
   "3,12": {
-   "nextMap": "shop",
+   "nextMap": "shop_k",
    "params": {
     "shopId": "item_shop"
    },
@@ -227,7 +227,7 @@
    }
   },
   "8,12": {
-   "nextMap": "shop",
+   "nextMap": "shop_k",
    "params": {
     "shopId": "weapon_shop"
    },
@@ -240,7 +240,7 @@
    }
   },
   "13,12": {
-   "nextMap": "guild_adv",
+   "nextMap": "guild_adv_k",
    "message": "冒険者ギルドに入る",
    "icon": "advGuildIcon",
    "back": {
@@ -250,7 +250,7 @@
    }
   },
   "13,4": {
-   "nextMap": "city_inn",
+   "nextMap": "city_inn_k",
    "message": "宿屋・酒場に入る",
    "icon": "innIcon",
    "back": {
@@ -260,7 +260,7 @@
    }
   },
   "33,4": {
-   "nextMap": "guild_training",
+   "nextMap": "guild_training_k",
    "message": "職業訓練所に入る",
    "icon": "trainingIcon",
    "back": {
@@ -270,7 +270,7 @@
    }
   },
   "31,11": {
-   "nextMap": "temple",
+   "nextMap": "shrine_k",
    "message": "神社に入る",
    "icon": "templeIcon",
    "back": {

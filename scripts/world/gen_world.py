@@ -19,6 +19,7 @@ import town_b as TB
 import town_c as TC
 import town_i as TI
 import town_k as TK
+import interior_k as IK
 import town_npc_extra as TNX
 import town_g as TG
 import town_a as TA
@@ -137,7 +138,7 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
             m['environment'] = dict(desert_env, floorType='desert', fogNear=24, fogFar=72); m['decorFloor'] = 'packedEarth'
         TNX.add(site['id'], m['npcs'])   # 国力のランクに合わせた、通りの人の追加（town_npc_extra.py）
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    for gm in GG.build():   # G のギルド（ギルド長は長老の一族）
+    for gm in GG.build() + IK.build():   # G のギルド（ギルド長は長老の一族）
         json.dump(gm, open(os.path.join(MAPS, gm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     for cm in CF.build_others() + [TPB.build(), CF.build_mansion_c(), CF.build_mansion_e(), CF.build_mansion_i()]:   # 国ごとの城（A 帝王・B 愚王・G 女王）と B の大教会（教皇）
         json.dump(cm, open(os.path.join(MAPS, cm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
@@ -195,7 +196,7 @@ def main():
                 if site['id'] == 'b' and town_outer_id(site) == f'w_{j:02d}_{i:02d}':   # B（フランケル聖国）の外観: 白亜の壁・白い家（青い屋根）
                     if '6' in legend: legend['6'] = 'white_wall'
                     if '8' in legend: legend['8'] = 'white_house'
-                if site['id'] == 'k' and town_outer_id(site) == f'w_{j:02d}_{i:02d}': legend.update({k: v for k, v in (('6', 'edo_wall'), ('8', 'edo_house')) if k in legend})   # K（マカヒキ国）の外観: 白い漆喰の壁・町家
+                if site['id'] == 'k' and town_outer_id(site) == f'w_{j:02d}_{i:02d}': legend.update({k: v for k, v in (('6', 'edo_wall'), ('7', 'edo_gate'), ('8', 'edo_house')) if k in legend})   # K（マカヒキ国）の外観: 白い漆喰の壁・町家
                 if site['id'] == 'c' and town_outer_id(site) == f'w_{j:02d}_{i:02d}':   # C（砂漠の自由都市）の外観: 中東風の家
                     if '6' in legend: legend['6'] = 'adobe_wall'   # 街の壁も土壁
                     if '8' in legend: legend['8'] = 'mideast_house'

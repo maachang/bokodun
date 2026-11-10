@@ -592,4 +592,29 @@ export const wallTextures = {
         texture.wrapT = THREE.RepeatWrapping;
         return texture;
     },
+
+    // 畳（K マカヒキ国の部屋の床）: い草の薄緑の畳が 2 枚（縦に長い）。縁は暗い緑の布。目は細かい縦の線
+    createTatamiTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#2f3a22';   // 畳の縁（布）と、畳どうしの隙間
+        ctx.fillRect(0, 0, 64, 64);
+        const tones = ['#b9c27f', '#aeb874', '#c2ca88', '#b3bd79'];
+        for (let k = 0; k < 2; k++) {
+            ctx.fillStyle = tones[Math.floor(Math.random() * tones.length)];
+            ctx.fillRect(k * 32 + 3, 2, 26, 60);
+            ctx.fillStyle = 'rgba(70, 80, 40, 0.18)';   // い草の目
+            for (let x = 5; x < 28; x += 3) ctx.fillRect(k * 32 + x, 2, 1, 60);
+            ctx.fillStyle = 'rgba(255, 255, 230, 0.12)';
+            ctx.fillRect(k * 32 + 4, 3, 24, 2);
+        }
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    },
 };

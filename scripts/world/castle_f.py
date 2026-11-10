@@ -69,8 +69,21 @@ def hall(mid, name, w, h, dais, rulers, guards, extra_npcs=()):
 
 def build_others():
     out = _others()
+    _tatami_hall(next(m for m in out if m['id'] == 'castle_k'))   # 殿様の城: 大広間は畳・外周（壁ぎわ 1 マス）は木張りの廊下
     add_hearth(next(m for m in out if m['id'] == 'castle_a'), 5, 1)   # 帝王の城（雪国）: 暖炉を 1 つ（玉座の間の、北の壁ぎわ）
     return out
+
+
+def _tatami_hall(m):
+    """玉座の間の、空いた床（'0'）を、畳に。壁ぎわの 1 周（廊下）は木張りの床（wood_floor）。絨毯・段の所は、そのまま"""
+    w, h = len(m['layout'][0]), len(m['layout'])
+    assert '_' not in m['legend'] and 'F' not in m['legend']
+    rows = [list(r) for r in m['layout']]
+    for y in range(1, h - 1):
+        for x in range(1, w - 1):
+            if rows[y][x] == '0': rows[y][x] = 'F' if x in (1, w - 2) or y in (1, h - 2) else '_'
+    m['layout'] = [''.join(r) for r in rows]
+    m['legend']['_'] = 'tatami'; m['legend']['F'] = 'wood_floor'
 
 
 def _others():

@@ -1,0 +1,100 @@
+{
+ "id": "shrine_k",
+ "name": "神社の拝殿（マカヒキ国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 6,
+ "nextMap": "town_k",
+ "spawn": {
+  "x": 5,
+  "z": 7,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "marbleWall",
+  "ambientLight": 16777215,
+  "directionalLight": 16773324,
+  "fogColor": 15985881,
+  "fogNear": 34,
+  "fogFar": 100,
+  "visibility": 1.0,
+  "skyColor": 15985881
+ },
+ "legend": {
+  "W": "temple_wall",
+  "F": "wood_floor",
+  "p": "temple_pillar",
+  "D": "temple_exit",
+  "G": "goddess_statue",
+  "1": "dais_marble_1",
+  "2": "dais_marble_2",
+  "4": "dais_temple_rug_1",
+  "5": "dais_temple_rug_2",
+  "a": "stained_glass_plain",
+  "b": "stained_glass_angel",
+  "e": "stained_glass_priestess",
+  "f": "stained_glass_prophet",
+  "K": "hanging_candles_rug",
+  "L": "wall_sconce_marble",
+  "d": "temple_room_door",
+  "U": "stairs_marble_up",
+  "i": "wall_window_curtain_marble",
+  "_": "tatami"
+ },
+ "enemies": {},
+ "layout": [
+  "WLaWWbWWeLW",
+  "WUF25G52FFW",
+  "LFF11411FFL",
+  "WFFFFFFFFFd",
+  "eFFF_K_FFFf",
+  "WFpF___FpFW",
+  "fFFF___FFFe",
+  "WFpF_K_FpFW",
+  "LFFF___FFFL",
+  "WiWLDDDLWiW"
+ ],
+ "npcs": [
+  {
+   "id": "priest_man",
+   "x": 5,
+   "z": 3,
+   "speed": 0,
+   "wanderRadius": 0,
+   "shopId": "temple_town"
+  },
+  {
+   "id": "priest_woman",
+   "x": 8,
+   "z": 4
+  },
+  {
+   "id": "priest_man",
+   "x": 2,
+   "z": 6
+  }
+ ],
+ "links": {
+  "10,3": {
+   "nextMap": "temple_town_dining",
+   "message": "食堂に入る",
+   "back": {
+    "x": 9,
+    "z": 3,
+    "angle": 1.570795
+   }
+  },
+  "1,1": {
+   "nextMap": "shrine_k_2f",
+   "message": "階段を上る（2階へ）",
+   "dir": "n",
+   "spawn": {
+    "x": 2,
+    "z": 5,
+    "angle": -1.570795
+   }
+  }
+ }
+}

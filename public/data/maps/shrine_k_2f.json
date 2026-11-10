@@ -1,0 +1,83 @@
+{
+ "id": "shrine_k_2f",
+ "name": "神社の社務所（マカヒキ国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 6,
+ "nextMap": "shrine_k",
+ "spawn": {
+  "x": 2,
+  "z": 5,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "marbleWall",
+  "ambientLight": 16777215,
+  "directionalLight": 16773324,
+  "fogColor": 15985881,
+  "fogNear": 34,
+  "fogFar": 100,
+  "visibility": 1.0,
+  "skyColor": 15985881
+ },
+ "legend": {
+  "W": "temple_wall",
+  "F": "wood_floor",
+  "t": "table_marble",
+  "h": "chair_marble",
+  "k": "bookshelf_marble",
+  "g": "cupboard_marble",
+  "e": "bed_marble",
+  "L": "wall_sconce_marble",
+  "d": "temple_room_door",
+  "C": "wall_window_curtain_marble",
+  "S": "stairs_marble_down",
+  "K": "chandelier_temple_rug",
+  "a": "wash_stand_marble",
+  "b": "garderobe_marble",
+  "_": "tatami"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWCWWWWWWWCWWWW",
+  "Waeb__k_Wak___e_W",
+  "L_______W_______L",
+  "W____th_W____th_W",
+  "WWLWdWLWWWLWdWLWW",
+  "CSFFFFFFKFFFFFFFC",
+  "WFFFFFFFFFFFFFFFW",
+  "WWLWdWLWWWLWdWLWW",
+  "Wga___g_Wag_____W",
+  "L_______W___ht__L",
+  "W_e_e_e_W_e___e_W",
+  "WWWWCWWWWWWWCWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "priest_man",
+   "x": 12,
+   "z": 2,
+   "wanderRadius": 0.8
+  },
+  {
+   "id": "priest_woman",
+   "x": 4,
+   "z": 9,
+   "wanderRadius": 0.8
+  }
+ ],
+ "links": {
+  "1,5": {
+   "nextMap": "shrine_k",
+   "message": "階段を下りる（1階へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 1,
+    "angle": 3.14159
+   }
+  }
+ }
+}

@@ -1,0 +1,51 @@
+{
+ "id": "shop_k",
+ "name": "店（マカヒキ国）",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "nextMap": "town_k",
+ "spawn": {
+  "x": 3,
+  "z": 4,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 10096512,
+  "directionalLight": 13615264,
+  "fogColor": 2761760,
+  "fogNear": 14,
+  "fogFar": 48,
+  "visibility": 0.9,
+  "skyColor": 2761760
+ },
+ "legend": {
+  "W": "wooden_wall",
+  "F": "wood_floor",
+  "k": "bookshelf",
+  "t": "table",
+  "g": "cupboard",
+  "E": "building_exit",
+  "_": "tatami"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWW",
+  "Wkk_kkW",
+  "Wg___gW",
+  "WtttttW",
+  "WFFFFFW",
+  "WWWEWWW"
+ ],
+ "npcs": [
+  {
+   "id": "$shopkeeper",
+   "x": 3,
+   "z": 2,
+   "oz": 0.613
+  }
+ ]
+}

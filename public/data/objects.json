@@ -18312,10 +18312,10 @@
   "edo_wall": {
     "baseShadow": true,
     "type": "block",
-    "texture": "edoPlaster",
+    "texture": "edoWood",
     "solid": true,
     "blocksProjectiles": true,
-    "description": "マカヒキ国（K）の街を囲む白い漆喰の壁（下は、なまこ壁）"
+    "description": "マカヒキ国（K）の街を囲む木の板塀（黒ずんだ板張り）"
   },
   "edo_house": {
     "baseShadow": true,
@@ -18794,5 +18794,22 @@
     "radius": 0.5,
     "message": "マカヒキ国（マカヒキ島）",
     "description": "街の入口の近くの立て札（マカヒキ国。外のマップ用）"
+  },
+  "edo_gate": {
+    "lift": true,
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "edoWood",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "message": "マカヒキ国の大門",
+    "description": "マカヒキ国（K）の街の大きな木の門（太い板張りの柱と扉）"
+  },
+  "tatami": {
+    "type": "floor_tile",
+    "texture": "tatami",
+    "ceilingTexture": "woodWall",
+    "solid": false,
+    "description": "畳の床（K マカヒキ国の部屋。天井つき）"
   }
 }

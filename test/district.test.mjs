@@ -385,7 +385,7 @@ test('扉: 壁が高い建物（大神殿など）でも、扉は標準の高さ
         const m = rd(f.replace('.json', ''));
         if ((m.wallHeight ?? 4) > 5 && Object.values(m.legend).some(n => o[n]?.type === 'door')) tall++;
     }
-    assert.equal(tall, 5, '壁が高く扉のあるマップ（大神殿・神殿2階・街の神殿と2階・B の大教会）');
+    assert.equal(tall, 7, '壁が高く扉のあるマップ（大神殿・神殿2階・街の神殿と2階・B の大教会・K の神社と社務所）');
 });
 
 test('窓: 普通の建物の外壁（民家・レンガの家・店・宿・神殿の建物）に、1マスおきに窓が付く。地上の部屋の外壁にも窓がある', () => {

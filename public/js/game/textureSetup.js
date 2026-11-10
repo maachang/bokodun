@@ -161,6 +161,7 @@ export const textureSetupMethods = {
             whiteWall: RetroTextureGenerator.createCityWallTexture('#9aa3b2', ['#f2f4f8', '#e6eaf1', '#fafbfd', '#dde3ed', '#eef1f6']),   // フランケル聖国（B）: 白亜の壁・家
             holyRoof: RetroTextureGenerator.createCityRoofTexture('#23407a', ['#3b6ac0', '#2f58a8', '#4b7ad0', '#3560b4']),   // 聖国の青い屋根
             edoPlaster: RetroTextureGenerator.createEdoPlasterTexture(),   // マカヒキ国（K。江戸風）: 白い漆喰の壁・黒い板張りの町家・灰黒の瓦屋根
+            tatami: RetroTextureGenerator.createTatamiTexture(),   // 畳（K の部屋の床）
             edoWood: RetroTextureGenerator.createEdoWoodTexture(),
             edoRoof: RetroTextureGenerator.createCityRoofTexture('#14171b', ['#262b32', '#2f353d', '#20252b', '#383f48']),
             pavedRoad: RetroTextureGenerator.createPavedRoadTexture(),
