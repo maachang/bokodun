@@ -629,6 +629,34 @@ export const wallTextures = {
         return texture;
     },
 
+    // 神社の社殿の壁（K マカヒキ国）: 朱塗りの板壁。縦の板の継ぎ目と、上下の黒い横木
+    createEdoShrineTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#9a2c1e';
+        ctx.fillRect(0, 0, 64, 64);
+        const reds = ['#c0402c', '#b43a28', '#c84a34', '#a83424'];
+        for (let x = 0; x < 64; x += 8) {
+            ctx.fillStyle = reds[Math.floor(Math.random() * reds.length)];
+            ctx.fillRect(x + 1, 0, 6, 64);
+            ctx.fillStyle = 'rgba(60,0,0,0.3)';
+            ctx.fillRect(x + 4, 0, 1, 64);
+        }
+        ctx.fillStyle = '#2a1812';
+        ctx.fillRect(0, 0, 64, 4);
+        ctx.fillRect(0, 60, 64, 4);
+        ctx.fillStyle = '#e8e4dc';   // 足元の白い基壇
+        ctx.fillRect(0, 54, 64, 6);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    },
+
     // 畳（K マカヒキ国の部屋の床）: い草の薄緑の畳が 2 枚（縦に長い）。縁は暗い緑の布。目は細かい縦の線
     createTatamiTexture() {
         const canvas = document.createElement('canvas');

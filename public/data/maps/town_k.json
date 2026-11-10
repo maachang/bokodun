@@ -32,7 +32,7 @@
   "v": "flower_bed_blue",
   "F": "plaza_fountain",
   "G": "edo_gate",
-  "C": "castle_gate",
+  "C": "edo_castle_gate",
   "D": "temple_door",
   "I": "edo_inn",
   "J": "edo_shrine",
@@ -58,10 +58,12 @@
   "e": "edo_lantern",
   "h": "edo_chochin",
   "k": "edo_kousatsu",
-  "t": "edo_tensui"
+  "t": "edo_tensui",
+  "V": "edo_yagura",
+  "O": "edo_torii"
  },
  "layout": [
-  "WWWWWWWWWWWWWWWWWWWCCWWWWWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWVVWCCWVVWWWWWWWWWWWWWWWW",
   "WpTpppppppppppppPPPPPPPPpppppppppppppTpW",
   "WpHHHHpUUUUpIIIIPPPPPPPPppppppppSSSSpppW",
   "WpHHHHpUUUUpIIIIph====ppppppppppSSSSpppW",
@@ -74,7 +76,7 @@
   "WpSSSSpSSSSpSSSSpp====ppppppJJJJJJJJpppW",
   "WpSSSSpSSSSpSSSSpp====ppppppJJJDJJJJpppW",
   "WpSdSSpSdSSpSdSSpp====epppfPPPPPcPPPPvpW",
-  "WpppqppppQppppappe====pppppppppppppppppW",
+  "WpppqppppQppppappe====pppppppppOpppppppW",
   "W==================FF==================W",
   "W==================FF==================W",
   "W======================================W",

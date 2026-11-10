@@ -165,6 +165,7 @@ export const textureSetupMethods = {
             tatami: RetroTextureGenerator.createTatamiTexture(),   // 畳（K の部屋の床）
             edoWood: RetroTextureGenerator.createEdoWoodTexture(),
             edoMachiya: RetroTextureGenerator.createEdoMachiyaTexture(),
+            edoShrine: RetroTextureGenerator.createEdoShrineTexture(),
             edoRoof: RetroTextureGenerator.createCityRoofTexture('#14171b', ['#262b32', '#2f353d', '#20252b', '#383f48']),
             pavedRoad: RetroTextureGenerator.createPavedRoadTexture(),
             snowRoof: RetroTextureGenerator.createSnowRoofTexture(),       // 雪国（A）: 雪をかぶった屋根・雪の積もった石畳・大通り

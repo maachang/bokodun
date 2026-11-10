@@ -18732,12 +18732,12 @@
   "edo_shrine": {
     "baseShadow": true,
     "type": "block",
-    "texture": "edoPlaster",
+    "texture": "edoShrine",
     "roofTexture": "edoRoof",
     "hasRoof": true,
     "solid": true,
     "blocksProjectiles": true,
-    "description": "マカヒキ国（K）の神社の建物（白い漆喰の壁・瓦屋根）",
+    "description": "マカヒキ国（K）の神社の建物（朱塗りの壁・瓦屋根）",
     "faceParts": [
       {
         "size": [
@@ -19535,5 +19535,150 @@
     ],
     "blocksProjectiles": false,
     "description": "天水桶（K マカヒキ国の防火用の水桶。歩いて通れない）"
+  },
+  "edo_yagura": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "edoPlaster",
+    "roofTexture": "edoRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "マカヒキ国（K）の城の櫓（白い漆喰の壁・小さな窓・瓦屋根。城門の両わき）",
+    "faceParts": [
+      {
+        "size": [
+          0.5,
+          0.7,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.6,
+          0.03
+        ],
+        "color": "#1c1a18"
+      },
+      {
+        "size": [
+          0.7,
+          0.08,
+          0.07
+        ],
+        "pos": [
+          0,
+          3.0,
+          0.05
+        ],
+        "color": "#3a3d44"
+      },
+      {
+        "size": [
+          1.9,
+          0.1,
+          0.35
+        ],
+        "pos": [
+          0,
+          3.4,
+          0.17
+        ],
+        "color": "#3a3d44"
+      }
+    ],
+    "faceEvery": 1
+  },
+  "edo_castle_gate": {
+    "lift": true,
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "edoPlaster",
+    "solid": true,
+    "interactionDistance": 2.2,
+    "nextMap": "castle_k",
+    "message": "城に入る",
+    "description": "マカヒキ国（K）の城門（白い漆喰の門柱と、大きな木の扉。中へ入ると殿様の城へ移動）"
+  },
+  "edo_torii": {
+    "groundShadow": true,
+    "shadowSize": 4.0,
+    "type": "furniture",
+    "parts": [
+      {
+        "size": [
+          0.4,
+          3.2,
+          0.4
+        ],
+        "pos": [
+          -1.4,
+          1.6,
+          0
+        ],
+        "color": "#c0402c"
+      },
+      {
+        "size": [
+          0.4,
+          3.2,
+          0.4
+        ],
+        "pos": [
+          1.4,
+          1.6,
+          0
+        ],
+        "color": "#c0402c"
+      },
+      {
+        "size": [
+          3.8,
+          0.3,
+          0.5
+        ],
+        "pos": [
+          0,
+          3.1,
+          0
+        ],
+        "color": "#2a1812"
+      },
+      {
+        "size": [
+          3.4,
+          0.25,
+          0.35
+        ],
+        "pos": [
+          0,
+          2.6,
+          0
+        ],
+        "color": "#c0402c"
+      },
+      {
+        "size": [
+          0.3,
+          0.5,
+          0.3
+        ],
+        "pos": [
+          0,
+          2.85,
+          0
+        ],
+        "color": "#c0402c"
+      }
+    ],
+    "collider": [
+      0.5,
+      0.5
+    ],
+    "colliderOffset": [
+      -1.4,
+      0
+    ],
+    "blocksProjectiles": false,
+    "description": "神社の鳥居（K マカヒキ国。朱塗り。くぐって通れる）"
   }
 }

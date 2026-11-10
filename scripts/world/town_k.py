@@ -26,7 +26,7 @@ NPCS_K = [   # 一般の住民（町人）・侍・船頭。殿様・家老は�
     ('merchant_old_k', 34, 12), ('machi_woman_k', 8, 21), ('okappiki_k', 33, 21), ('machi_woman_k', 10, 21),
     ('ronin_k', 36, 14), ('child_girl_k', 21, 21), ('child_boy_k', 5, 21), ('machi_woman_k', 30, 15),
 ]
-SKIN_EDO = {'H': 'edo_house', 'S': 'edo_shop', 'I': 'edo_inn', 'J': 'edo_shrine', 'W': 'edo_wall', 'G': 'edo_gate', 'z': 'ferry_sign', 'p': 'plaza_dirt', '=': 'dirt_road', 'P': 'plaza_stone'}   # 地面は土（広場 plaza_dirt・通り dirt_road）。石畳（P）は城門前・橋のたもと・神社の参道だけ。壁は木の板塀・門は大きな木の門
+SKIN_EDO = {'H': 'edo_house', 'S': 'edo_shop', 'I': 'edo_inn', 'J': 'edo_shrine', 'W': 'edo_wall', 'G': 'edo_gate', 'z': 'ferry_sign', 'p': 'plaza_dirt', '=': 'dirt_road', 'P': 'plaza_stone', 'C': 'edo_castle_gate'}   # 地面は土（広場 plaza_dirt・通り dirt_road）。石畳（P）は城門前・橋のたもと・神社の参道だけ。壁は木の板塀・門は大きな木の門
 SHIPS_K = (('L', 12, 22), ('L', 27, 23), ('l', 14, 23), ('l', 25, 22), ('l', 36, 22), ('l', 3, 23))   # 川（港）に浮かぶ船（見た目だけ）
 
 HOUSE_KINDS = ('H', 'U', 'H', 'Y', 'X')   # 町家の並びの変化: 町家・土蔵・町家・長屋・茶屋（建物ごとに順に）
@@ -49,14 +49,14 @@ def diversify(g):
     return g
 
 
-DECOR_K = {'e': ((17, 6), (22, 12), (17, 13), (22, 5)), 'h': ((17, 9), (22, 9), (17, 3), (22, 17)), 'k': ((23, 7),), 't': ((6, 5), (11, 5), (9, 21), (13, 21), (30, 17), (33, 5))}   # 街並みの飾り: 石灯籠・提灯の柱・高札場・天水桶（広場 p の上）
-DECOR_OBJ = {'e': 'edo_lantern', 'h': 'edo_chochin', 'k': 'edo_kousatsu', 't': 'edo_tensui'}
+DECOR_K = {'e': ((17, 6), (22, 12), (17, 13), (22, 5)), 'h': ((17, 9), (22, 9), (17, 3), (22, 17)), 'k': ((23, 7),), 'V': ((16, 0), (17, 0), (22, 0), (23, 0)), 'O': ((31, 13),), 't': ((6, 5), (11, 5), (9, 21), (13, 21), (30, 17), (33, 5))}   # 街並みの飾り: 石灯籠・提灯の柱・高札場・天水桶（広場 p の上）
+DECOR_OBJ = {'e': 'edo_lantern', 'h': 'edo_chochin', 'k': 'edo_kousatsu', 't': 'edo_tensui', 'V': 'edo_yagura', 'O': 'edo_torii'}
 
 
 def decorate(g):
     for ch, ps in DECOR_K.items():
         for x, y in ps:
-            assert g[y][x] in 'pP', f'K の飾り {ch} ({x},{y}): 広場ではない'
+            assert g[y][x] in ('W' if ch == 'V' else 'pP'), f'K の飾り {ch} ({x},{y}): 広場ではない'
             g[y][x] = ch
     return g
 
