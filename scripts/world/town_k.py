@@ -49,6 +49,18 @@ def diversify(g):
     return g
 
 
+DECOR_K = {'e': ((17, 6), (22, 12), (17, 13), (22, 5)), 'h': ((17, 9), (22, 9), (17, 3), (22, 17)), 'k': ((23, 7),), 't': ((6, 5), (11, 5), (9, 21), (13, 21), (30, 17), (33, 5))}   # 街並みの飾り: 石灯籠・提灯の柱・高札場・天水桶（広場 p の上）
+DECOR_OBJ = {'e': 'edo_lantern', 'h': 'edo_chochin', 'k': 'edo_kousatsu', 't': 'edo_tensui'}
+
+
+def decorate(g):
+    for ch, ps in DECOR_K.items():
+        for x, y in ps:
+            assert g[y][x] in 'pP', f'K の飾り {ch} ({x},{y}): 広場ではない'
+            g[y][x] = ch
+    return g
+
+
 STONE_ROWS = ((1, 16, 23), (2, 16, 23), (27, 16, 23), (28, 16, 23), (12, 27, 36), (21, 5, 8), (21, 17, 22), (21, 31, 34), (24, 5, 8), (24, 17, 22), (24, 31, 34))   # (行, 開始 x, 終了 x): 城門の前・南門の前・神社の参道・橋のたもと
 
 
@@ -61,6 +73,7 @@ def build_k(w, h, legend, city_legend, links, npcs):
     for y, x0, x1 in STONE_ROWS:   # 石畳を残す所（土の地面の上の、要所）
         for x in range(x0, x1 + 1):
             if g[y][x] in 'p=': g[y][x] = 'P'
-    diversify(g)
+    diversify(g); decorate(g)
+    legend.update({c: o for c, o in DECOR_OBJ.items()})
     legend.update({'L': 'ship_large', 'l': 'ship_small', 'U': 'edo_kura', 'Y': 'edo_nagaya', 'X': 'edo_chaya'})
     return [''.join(r) for r in g], heights
