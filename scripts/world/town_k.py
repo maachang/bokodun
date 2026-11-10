@@ -29,6 +29,26 @@ NPCS_K = [   # 一般の住民（町人）・侍・船頭。殿様・家老は�
 SKIN_EDO = {'H': 'edo_house', 'S': 'edo_shop', 'I': 'edo_inn', 'J': 'edo_shrine', 'W': 'edo_wall', 'G': 'edo_gate', 'z': 'ferry_sign', 'p': 'plaza_dirt', '=': 'dirt_road', 'P': 'plaza_stone'}   # 地面は土（広場 plaza_dirt・通り dirt_road）。石畳（P）は城門前・橋のたもと・神社の参道だけ。壁は木の板塀・門は大きな木の門
 SHIPS_K = (('L', 12, 22), ('L', 27, 23), ('l', 14, 23), ('l', 25, 22), ('l', 36, 22), ('l', 3, 23))   # 川（港）に浮かぶ船（見た目だけ）
 
+HOUSE_KINDS = ('H', 'U', 'H', 'Y', 'X')   # 町家の並びの変化: 町家・土蔵・町家・長屋・茶屋（建物ごとに順に）
+
+
+def diversify(g):
+    """住宅（H）の建物（つながった H）を、順に、土蔵（U）・長屋（Y）・茶屋（X）に替える（建物の形・扉・施設は、そのまま）"""
+    seen, n = set(), 0
+    for y in range(len(g)):
+        for x in range(len(g[0])):
+            if g[y][x] != 'H' or (x, y) in seen: continue
+            st, comp = [(x, y)], []
+            seen.add((x, y))
+            while st:
+                cx, cy = st.pop(); comp.append((cx, cy))
+                for nx, ny in ((cx + 1, cy), (cx - 1, cy), (cx, cy + 1), (cx, cy - 1)):
+                    if 0 <= ny < len(g) and 0 <= nx < len(g[0]) and g[ny][nx] == 'H' and (nx, ny) not in seen: seen.add((nx, ny)); st.append((nx, ny))
+            k = HOUSE_KINDS[n % len(HOUSE_KINDS)]; n += 1
+            for cx, cy in comp: g[cy][cx] = k
+    return g
+
+
 STONE_ROWS = ((1, 16, 23), (2, 16, 23), (27, 16, 23), (28, 16, 23), (12, 27, 36), (21, 5, 8), (21, 17, 22), (21, 31, 34), (24, 5, 8), (24, 17, 22), (24, 31, 34))   # (行, 開始 x, 終了 x): 城門の前・南門の前・神社の参道・橋のたもと
 
 
@@ -41,5 +61,6 @@ def build_k(w, h, legend, city_legend, links, npcs):
     for y, x0, x1 in STONE_ROWS:   # 石畳を残す所（土の地面の上の、要所）
         for x in range(x0, x1 + 1):
             if g[y][x] in 'p=': g[y][x] = 'P'
-    legend.update({'L': 'ship_large', 'l': 'ship_small'})
+    diversify(g)
+    legend.update({'L': 'ship_large', 'l': 'ship_small', 'U': 'edo_kura', 'Y': 'edo_nagaya', 'X': 'edo_chaya'})
     return [''.join(r) for r in g], heights

@@ -18869,5 +18869,294 @@
     "ceilingTexture": "woodWall",
     "solid": false,
     "description": "畳の床（K マカヒキ国の部屋。天井つき）"
+  },
+  "edo_kura": {
+    "baseShadow": true,
+    "type": "block",
+    "roofTexture": "edoRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "texture": "edoPlaster",
+    "description": "マカヒキ国（K）の土蔵（白い漆喰の壁・小さな鉄格子の窓・瓦屋根）",
+    "faceParts": [
+      {
+        "size": [
+          0.6,
+          0.7,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.4,
+          0.03
+        ],
+        "color": "#1c1a18",
+        "basic": true
+      },
+      {
+        "size": [
+          0.8,
+          0.08,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.8,
+          0.05
+        ],
+        "color": "#4a4a50"
+      },
+      {
+        "size": [
+          0.8,
+          0.08,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.0,
+          0.05
+        ],
+        "color": "#4a4a50"
+      },
+      {
+        "size": [
+          0.06,
+          0.7,
+          0.07
+        ],
+        "pos": [
+          -0.15,
+          2.4,
+          0.06
+        ],
+        "color": "#4a4a50"
+      },
+      {
+        "size": [
+          0.06,
+          0.7,
+          0.07
+        ],
+        "pos": [
+          0.15,
+          2.4,
+          0.06
+        ],
+        "color": "#4a4a50"
+      },
+      {
+        "size": [
+          1.8,
+          0.1,
+          0.35
+        ],
+        "pos": [
+          0,
+          3.2,
+          0.17
+        ],
+        "color": "#3a3d44"
+      }
+    ],
+    "faceEvery": 3
+  },
+  "edo_nagaya": {
+    "baseShadow": true,
+    "type": "block",
+    "roofTexture": "edoRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "texture": "edoMachiya",
+    "description": "マカヒキ国（K）の長屋（なまこ壁・小さな格子窓が並ぶ・瓦屋根）",
+    "faceParts": [
+      {
+        "size": [
+          0.7,
+          0.8,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.1,
+          0.03
+        ],
+        "color": "#e6dcb8",
+        "basic": true
+      },
+      {
+        "size": [
+          0.9,
+          0.08,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.55,
+          0.05
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          0.9,
+          0.08,
+          0.07
+        ],
+        "pos": [
+          0,
+          1.65,
+          0.05
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          0.08,
+          0.9,
+          0.07
+        ],
+        "pos": [
+          -0.4,
+          2.1,
+          0.05
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          0.08,
+          0.9,
+          0.07
+        ],
+        "pos": [
+          0.4,
+          2.1,
+          0.05
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          0.05,
+          0.8,
+          0.07
+        ],
+        "pos": [
+          -0.13,
+          2.1,
+          0.06
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          0.05,
+          0.8,
+          0.07
+        ],
+        "pos": [
+          0.13,
+          2.1,
+          0.06
+        ],
+        "color": "#2a2118"
+      }
+    ],
+    "faceEvery": 1
+  },
+  "edo_chaya": {
+    "baseShadow": true,
+    "type": "block",
+    "roofTexture": "edoRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "texture": "edoMachiya",
+    "description": "マカヒキ国（K）の茶屋（赤い暖簾と縁台・瓦の庇）",
+    "faceParts": [
+      {
+        "size": [
+          1.5,
+          0.9,
+          0.04
+        ],
+        "pos": [
+          0,
+          1.9,
+          0.03
+        ],
+        "color": "#f4ecd0",
+        "basic": true
+      },
+      {
+        "size": [
+          1.7,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.4,
+          0.05
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          1.4,
+          0.7,
+          0.06
+        ],
+        "pos": [
+          0,
+          2.05,
+          0.14
+        ],
+        "color": "#b02a2a"
+      },
+      {
+        "size": [
+          0.35,
+          0.5,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.05,
+          0.15
+        ],
+        "color": "#f0ece0"
+      },
+      {
+        "size": [
+          1.8,
+          0.1,
+          0.5
+        ],
+        "pos": [
+          0,
+          3.1,
+          0.22
+        ],
+        "color": "#3a3d44"
+      },
+      {
+        "size": [
+          1.6,
+          0.12,
+          0.5
+        ],
+        "pos": [
+          0,
+          0.5,
+          0.4
+        ],
+        "color": "#7a5a34"
+      }
+    ],
+    "faceEvery": 2
   }
 }
