@@ -60,7 +60,9 @@
   "k": "edo_kousatsu",
   "t": "edo_tensui",
   "V": "edo_yagura",
-  "O": "edo_torii"
+  "O": "edo_torii",
+  "g": "komainu_k_w",
+  "K": "komainu_k_e"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWVVWCCWVVWWWWWWWWWWWWWWWW",
@@ -75,7 +77,7 @@
   "Wpppppppppppppppph====hpppppJJJJJJJJpppW",
   "WpSSSSpSSSSpSSSSpp====ppppppJJJJJJJJpppW",
   "WpSSSSpSSSSpSSSSpp====ppppppJJJDJJJJpppW",
-  "WpSdSSpSdSSpSdSSpp====epppfPPPPPcPPPPvpW",
+  "WpSdSSpSdSSpSdSSpp====epppfPPPgPKcPPPvpW",
   "WpppqppppQppppappe====pppppppppOpppppppW",
   "W==================FF==================W",
   "W==================FF==================W",
