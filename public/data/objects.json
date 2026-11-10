@@ -20467,5 +20467,11 @@
     "elevation": 0.9,
     "solid": false,
     "description": "上段の畳の段（高さ 0.9。K マカヒキ国の城）"
+  },
+  "garden_sand": {
+    "type": "floor_tile",
+    "texture": "whiteSand",
+    "solid": false,
+    "description": "中庭の白砂（K マカヒキ国の城。天井なし）"
   }
 }

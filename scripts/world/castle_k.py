@@ -1,32 +1,44 @@
-"""K（マカヒキ国）の殿様の城の中。江戸時代の城の御殿（表御殿）を手本に、全面畳・ふすまで区切った部屋が、玄関から奥へ、雁行して連なる。
-  手本（江戸城の本丸御殿・二条城の二の丸御殿）: 玄関（車寄）→ 遠侍（控室）→ 式台 → 大広間（上段の間）→ 蘇鉄の間（廊下）→ 黒書院 → 白書院（最奥）。
-  表の奥に、大奥（御台所の居所）。台所は、玄関の脇。格式の高い部屋（大広間・黒書院・白書院）は、金の松のふすま。ほかは白いふすま。外の壁は障子
-  作り方: 全体を壁で埋め、部屋（床）をくり抜き、部屋と部屋の間の壁を、ふすまに。戸口（ふすまの途切れ）でつなぐ
+"""K（マカヒキ国）の殿様の城の中。江戸時代の城の御殿（江戸城の本丸御殿・二条城の二の丸御殿）を手本に、棟が、渡り廊下と中庭でつながる。
+  - 表（南）: 玄関 → 式台 → 大広間（北に上段。殿様。上段の背後は、金のふすまの壁で、戸口なし）。式台の左右に、遠侍（控室）と台所
+  - 渡り廊下（木張り）: 大広間の左右を北へ通り、北の縁側（廊下）で、ぐるりとつながる。中庭に面する側は、開いている
+  - 中庭: 大広間の北。空が見える白砂の庭（松・池・石灯籠）。南は大広間の壁、北は縁側
+  - 奥（北の棟）: 黒書院・白書院（縁側から入る）。東西の端に、大奥（御台所の居所）と、家老の間
+  - 床は、部屋が畳、廊下が木張り、中庭が白砂。格式の高い部屋（大広間・黒書院・白書院）の壁は、金の松のふすま。ほかは白いふすま。外の壁は障子
+  作り方: 全体を壁で埋め、区画（部屋・廊下・庭）をくり抜き、区画の間の壁を、ふすまに。戸口（ふすまの途切れ）でつなぐ
 """
-W, H = 35, 25
-# 部屋: 名前 → (x0, y0, x1, y1)（床の範囲。両端を含む）。金の間（GOLD）の壁は、金のふすま
-ROOMS = {
-    'genkan': (14, 21, 20, 23), 'toozamurai': (3, 18, 12, 23), 'shidai': (14, 17, 20, 19), 'daidokoro': (22, 18, 31, 23),
-    'ohiroma': (6, 10, 28, 15), 'hikae_l': (1, 10, 4, 15), 'hikae_r': (30, 10, 33, 15),
-    'rouka': (6, 7, 28, 8), 'kuro': (6, 2, 16, 5), 'shiro': (18, 2, 28, 5), 'oku': (30, 2, 33, 8), 'karo_room': (1, 2, 4, 8),
+W, H = 41, 29
+# 区画: 名前 → (種類, x0, y0, x1, y1)（両端を含む）。種類: r=部屋（畳）・c=廊下（木張り）・y=中庭（白砂。天井なし）
+AREAS = {
+    'genkan': ('r', 17, 24, 23, 27), 'toozamurai': ('r', 4, 20, 15, 27), 'shidai': ('r', 17, 20, 23, 22), 'daidokoro': ('r', 25, 20, 36, 27),
+    'ohiroma': ('r', 9, 11, 31, 18), 'corr_w': ('c', 6, 5, 7, 18), 'corr_e': ('c', 33, 5, 34, 18), 'engawa': ('c', 8, 5, 32, 5), 'yard': ('y', 8, 6, 32, 9),
+    'hikae_l': ('r', 1, 11, 4, 17), 'hikae_r': ('r', 36, 11, 39, 17), 'karo_room': ('r', 1, 1, 4, 9), 'oku': ('r', 36, 1, 39, 9),
+    'kuro': ('r', 9, 1, 19, 3), 'shiro': ('r', 21, 1, 31, 3),
 }
 GOLD = ('ohiroma', 'kuro', 'shiro')
-DOORS = [(13, 22), (17, 20), (13, 18), (21, 18), (17, 16), (5, 12), (29, 12), (17, 9), (11, 6), (23, 6), (29, 7), (5, 7), (17, 4)]   # 戸口（ふすまの途切れ）。玄関・遠侍・式台・台所・大広間・控え・廊下・書院・奥
-DAIS = {10: 'a', 11: 'b', 12: 'c'}   # 大広間の上段（北の 3 行・x 12〜22）: a=高さ 0.9・b=0.6・c=0.3
+DOORS = [(20, 23), (16, 26), (16, 21), (24, 21), (20, 19), (8, 16), (32, 16), (5, 14), (35, 14), (5, 7), (35, 7), (14, 4), (26, 4), (20, 2), (6, 19), (34, 19)]   # 戸口（ふすまの途切れ）。大広間の背後（北の壁）には、戸口を付けない
+DAIS = {11: 'a', 12: 'b', 13: 'c'}   # 大広間の上段（北の 3 行・x 15〜25）: a=高さ 0.9・b=0.6・c=0.3
+GARDEN = {'T': ((11, 7), (29, 8), (21, 6)), 'w': tuple((x, y) for x in range(23, 28) for y in (7, 8)), 'e': ((14, 9), (28, 9), (10, 6))}   # 中庭: 松・池・石灯籠
+NPCS = [   # (id, x, y)
+    ('daimyo_k', 20, 11), ('karo_k', 16, 12), ('sword_bearer_k', 22, 11),
+    ('guard_k', 11, 15), ('guard_k', 29, 15), ('guard_k', 12, 17), ('guard_k', 28, 17), ('guard_k', 18, 21), ('guard_k', 22, 21), ('guard_k', 8, 23), ('guard_k', 12, 25),
+    ('daimyo_retainer_k', 14, 2), ('daimyo_master_k', 26, 2), ('daimyo_wife_k', 37, 4), ('maid_k', 38, 7), ('maid_k', 2, 5),
+    ('maid_k', 30, 26), ('daimyo_cook_k', 32, 24), ('cook_k', 28, 22),
+]
 
 
 def _rows():
     owner = [[None] * W for _ in range(H)]
-    for n, (x0, y0, x1, y1) in ROOMS.items():
+    for n, (k, x0, y0, x1, y1) in AREAS.items():
         for y in range(y0, y1 + 1):
             for x in range(x0, x1 + 1):
-                assert owner[y][x] is None, f'{n}: 部屋が重なる ({x},{y})'
+                assert owner[y][x] is None, f'{n}: 区画が重なる ({x},{y})'
                 owner[y][x] = n
+    ch = {'r': '_', 'c': '=', 'y': 'y'}
     g = [['H'] * W for _ in range(H)]
     for y in range(H):
         for x in range(W):
-            if owner[y][x]: g[y][x] = '_'
-    for y in range(1, H - 1):   # 部屋と部屋の間の壁を、ふすまに（両側が床）。金の間に面した壁は、金のふすま
+            if owner[y][x]: g[y][x] = ch[AREAS[owner[y][x]][0]]
+    for y in range(1, H - 1):   # 区画と区画の間の壁を、ふすまに（両側が床）。金の間に面した壁は、金のふすま
         for x in range(1, W - 1):
             if owner[y][x]: continue
             for a, b in (((x - 1, y), (x + 1, y)), ((x, y - 1), (x, y + 1))):
@@ -36,26 +48,24 @@ def _rows():
         assert g[y][x] in 'SG', f'戸口 ({x},{y}) が、ふすまではない'
         g[y][x] = '_'
     for y, c in DAIS.items():
-        for x in range(12, 23): g[y][x] = c
-    g[H - 1][17] = '2'
+        for x in range(15, 26): g[y][x] = c
+    for c, ps in GARDEN.items():
+        for x, y in ps:
+            assert g[y][x] == 'y', f'中庭の飾り {c} ({x},{y}): 中庭ではない'
+            g[y][x] = c
+    g[H - 1][20] = '2'
     return [''.join(r) for r in g]
 
 
-NPCS = [   # (id, x, y)
-    ('daimyo_k', 17, 10), ('karo_k', 14, 11), ('sword_bearer_k', 19, 10),
-    ('guard_k', 8, 14), ('guard_k', 26, 14), ('guard_k', 10, 12), ('guard_k', 24, 12),
-    ('daimyo_retainer_k', 9, 4), ('daimyo_master_k', 23, 4), ('daimyo_wife_k', 31, 4), ('maid_k', 32, 7),
-    ('guard_k', 5, 20), ('guard_k', 10, 22), ('maid_k', 28, 22), ('daimyo_cook_k', 26, 20), ('cook_k', 24, 22),
-]
-
-
 def build(base):
-    """base: 元の castle_k（環境・出口などを引き継ぐ）。畳・ふすま・障子の城に作り直す"""
+    """base: 元の castle_k（出口などを引き継ぐ）。畳・ふすま・障子・渡り廊下・中庭の城に作り直す"""
     m = dict(base)
     m['layout'] = _rows()
-    m['legend'] = {'_': 'tatami', 'S': 'fusuma_wall', 'G': 'fusuma_gold', 'H': 'shoji_wall', 'a': 'dais_tatami_3', 'b': 'dais_tatami_2', 'c': 'dais_tatami_1', '2': 'castle_exit'}
-    m['environment'] = dict(base['environment'], ceilingTexture='woodWall', ambientLight=0xcfc0a0, directionalLight=0xfff0d0, fogColor=0x3a2a1c, skyColor=0x3a2a1c)   # 赤い明かり・レンガの天井をやめる（木の天井・暖かい明かり）
+    m['legend'] = {'_': 'tatami', '=': 'wood_floor', 'y': 'garden_sand', 'S': 'fusuma_wall', 'G': 'fusuma_gold', 'H': 'shoji_wall', 'a': 'dais_tatami_3', 'b': 'dais_tatami_2', 'c': 'dais_tatami_1', '2': 'castle_exit',
+                   'T': 'tree', 'w': 'water', 'e': 'edo_lantern'}
+    m['decorFloor'] = 'whiteSand'   # 飾り（松・石灯籠）の下の地面
+    m['environment'] = dict(base['environment'], hasCeiling=False, floorType='whiteSand', ambientLight=0xdcd0b4, directionalLight=0xfff4dc, fogColor=0xcfdceb, skyColor=0x8fb8e0, fogNear=22, fogFar=70)   # 全面の天井はやめる（中庭は空が見える。部屋と廊下は、床ごとに天井）
     m['npcs'] = [{'id': i, 'x': x, 'z': y} for i, x, y in NPCS]
-    for i, x, y in NPCS: assert m['layout'][y][x] in '_abc', f'{i} ({x},{y}) が床ではない'
-    m['spawn'] = {'x': 17, 'z': 22, 'angle': 0}
+    for i, x, y in NPCS: assert m['layout'][y][x] in '_=abc', f'{i} ({x},{y}) が床ではない'
+    m['spawn'] = {'x': 20, 'z': 26, 'angle': 0}
     return m
