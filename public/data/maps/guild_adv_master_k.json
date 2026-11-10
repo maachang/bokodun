@@ -26,11 +26,11 @@
   "W": "wooden_wall",
   "F": "wood_floor",
   "E": "building_exit",
-  "u": "rug",
+  "u": "wood_floor",
   "t": "table",
   "k": "bookshelf",
   "g": "cupboard",
-  "K": "chandelier_mansion_rug",
+  "K": "chandelier_mansion",
   "L": "wall_sconce_wood",
   "a": "wall_window_wood",
   "_": "tatami"

@@ -26,7 +26,7 @@
   "W": "brick_wall",
   "F": "wood_floor",
   "E": "brick_exit",
-  "u": "rug",
+  "u": "wood_floor",
   "t": "table_stone",
   "h": "chair_stone",
   "C": "counter_stone",

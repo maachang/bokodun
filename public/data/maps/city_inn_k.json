@@ -25,7 +25,7 @@
  "legend": {
   "W": "wooden_wall",
   "F": "wood_floor",
-  "u": "rug",
+  "u": "wood_floor",
   "d": "wooden_door",
   "E": "building_exit",
   "U": "stairs_wood_up",
