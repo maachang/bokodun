@@ -57,8 +57,9 @@ def shrine_hall(m):
     m['legend'].pop('K', None)
     m['environment']['ceilingTexture'] = 'shrineCeiling'
     m['legend'] = {k: {'wood_floor': 'wood_floor_shrine', 'tatami': 'tatami_shrine'}.get(v, v) for k, v in m['legend'].items()}   # 床ごとの天井も、格天井に
-    for n in m['npcs']:
-        if (n['x'], n['z']) == (5, 3): n['x'] = 7   # 賽銭箱の場所をあける
+    ks = [n for n in m['npcs'] if n['id'] == 'kannushi_k']
+    m['npcs'] = [n for n in m['npcs'] if n['id'] != 'kannushi_k'] + ks[:1]   # 神主は 1 人（お祈りの店 shopId を持つ先頭の 1 人）
+    ks[0]['x'], ks[0]['z'] = 5, 4   # 賽銭箱（5, 3）の前（南）
     return m
 
 

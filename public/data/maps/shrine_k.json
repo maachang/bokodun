@@ -62,22 +62,17 @@
  ],
  "npcs": [
   {
-   "id": "kannushi_k",
-   "x": 7,
-   "z": 3,
-   "speed": 0,
-   "wanderRadius": 0,
-   "shopId": "temple_town"
-  },
-  {
    "id": "miko_k",
    "x": 8,
    "z": 4
   },
   {
    "id": "kannushi_k",
-   "x": 2,
-   "z": 6
+   "x": 5,
+   "z": 4,
+   "speed": 0,
+   "wanderRadius": 0,
+   "shopId": "temple_town"
   }
  ],
  "links": {
