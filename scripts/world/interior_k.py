@@ -63,6 +63,27 @@ def shrine_hall(m):
     return m
 
 
+def shrine_office(m):
+    """神社の社務所（2 階）: 畳の座敷をふすまで区切り、廊下（木張り）をはさむ。ベッド・洗面台などの宿屋風をやめ、文机・座布団・火鉢・箪笥・行灯にする"""
+    rows = [list(r) for r in m['layout']]
+    h, w = len(rows), len(rows[0])
+    for y in range(h):
+        for x in range(w):
+            c = rows[y][x]
+            inner = 0 < x < w - 1 and 0 < y < h - 1
+            if c == 'W' and inner: rows[y][x] = 'Z'   # 座敷の仕切りは、ふすま
+            elif c == 'd': rows[y][x] = '_'   # 座敷の出入口: 開けたふすま
+            elif c in 'eb': rows[y][x] = '_'   # ベッド・衣装棚（客室の家具）をやめる
+            elif c == 'a': rows[y][x] = 'B' if (x, y) in ((9, 1), (2, 8)) else '_'   # 洗面台 → 火鉢（2 つ）
+            elif c == 'L': rows[y][x] = 'A'   # 洋風の燭台 → 行灯
+            elif c == 'K': rows[y][x] = 'N'   # 廊下の明かり → 御神燈
+    m['layout'] = [''.join(r) for r in rows]
+    m['legend'].update({'Z': 'fusuma_wall', 'B': 'edo_hibachi', 'A': 'edo_andon', 't': 'edo_bunki', 'h': 'edo_zabuton', 'g': 'edo_tansu', 'N': 'edo_goshintou'})
+    for c in 'edbaLK': m['legend'].pop(c, None)
+    m['legend'].pop('b', None)
+    return m
+
+
 def woodify(m, objs):
     """凡例の石・レンガ・大理石の部品を木造に替える。環境（天井・明かり）も木造の中に"""
     def sw(v):
@@ -111,5 +132,6 @@ def build():
         for n in m['npcs']: n['id'] = NPC_SWAP.get(new, {}).get(n['id'], n['id'])   # 江戸風の人（神主・巫女・料理人）に差し替え
         if new in WOODIFY: m = woodify(no_rug(m), objs)
         if new == 'shrine_k': m = shrine_hall(m)
+        if new == 'shrine_k_2f': m = shrine_office(m)
         out.append(no_rug(m))
     return out
