@@ -168,6 +168,7 @@ export const textureSetupMethods = {
             edoShrine: RetroTextureGenerator.createEdoShrineTexture(),
             fusuma: RetroTextureGenerator.createFusumaTexture(),
             fusumaGold: RetroTextureGenerator.createFusumaGoldTexture(),
+            wallGoldPine: RetroTextureGenerator.createWallGoldPineTexture(),
             shoji: RetroTextureGenerator.createShojiTexture(),
             edoRoof: RetroTextureGenerator.createCityRoofTexture('#14171b', ['#262b32', '#2f353d', '#20252b', '#383f48']),
             pavedRoad: RetroTextureGenerator.createPavedRoadTexture(),

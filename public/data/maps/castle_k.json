@@ -5,8 +5,8 @@
  "tileSize": 4,
  "wallHeight": 5,
  "spawn": {
-  "x": 20,
-  "z": 26,
+  "x": 13,
+  "z": 22,
   "angle": 0
  },
  "environment": {
@@ -33,115 +33,104 @@
   "b": "dais_tatami_2",
   "c": "dais_tatami_1",
   "2": "castle_exit",
+  "P": "wall_gold",
+  "N": "wall_tokonoma",
+  "D": "wall_chigaidana",
   "T": "tree",
   "w": "water",
   "e": "edo_lantern"
  },
  "layout": [
-  "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
-  "H____HHHH___________G___________HHHH____H",
-  "H____HHHH_______________________HHHH____H",
-  "H____HHHH___________G___________HHHH____H",
-  "H____HHHHGGGGG_GGGGGHGGGGG_GGGGGHHHH____H",
-  "H____S=============================S____H",
-  "H____S==yyeyyyyyyyyyyTyyyyyyyyyyy==S____H",
-  "H_____==yyyTyyyyyyyyyyywwwwwyyyyy==_____H",
-  "H____S==yyyyyyyyyyyyyyywwwwwyTyyy==S____H",
-  "H____S==yyyyyyeyyyyyyyyyyyyyeyyyy==S____H",
-  "HSSSSH==HGGGGGGGGGGGGGGGGGGGGGGGH==HSSSSH",
-  "H____S==G______aaaaaaaaaaa______G==S____H",
-  "H____S==G______bbbbbbbbbbb______G==S____H",
-  "H____S==G______ccccccccccc______G==S____H",
-  "H_____==G_______________________G==_____H",
-  "H____S==G_______________________G==S____H",
-  "H____S==_________________________==S____H",
-  "H____S==G_______________________G==S____H",
-  "HHHHHH==G_______________________G==HHHHHH",
-  "HHHHHH_SHGGGGGGGHGGG_GGGHGGGGGGGHS_HHHHHH",
-  "HHHH____________S_______S____________HHHH",
-  "HHHH_________________________________HHHH",
-  "HHHH____________S_______S____________HHHH",
-  "HHHH____________HSSS_SSSH____________HHHH",
-  "HHHH____________S_______S____________HHHH",
-  "HHHH____________S_______S____________HHHH",
-  "HHHH____________________S____________HHHH",
-  "HHHH____________S_______S____________HHHH",
-  "HHHHHHHHHHHHHHHHHHHH2HHHHHHHHHHHHHHHHHHHH"
+  "HHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+  "H____HHHH_____G_____HHH____H",
+  "H____HHHH___________HHH____H",
+  "H____HHHH_____G_____HHH____H",
+  "H____HHHHGG_GGHGG_GGHHH____H",
+  "H____S================S____H",
+  "H____S==yyyyyyyyyyyy==S____H",
+  "H_____==yyTyywwwwyyy==_____H",
+  "H____S==yyyyywwwwyTy==S____H",
+  "H____S==yyyeyyyyyeyy==S____H",
+  "HSSSSH==HPPPPNDPPPPH==HSSSSH",
+  "H____S==G_aaaaaaaa_G==S____H",
+  "H____S==G_bbbbbbbb_G==S____H",
+  "H_____==G_cccccccc_G==_____H",
+  "H____S==G__________G==S____H",
+  "H____S==____________==S____H",
+  "H____S==G__________G==S____H",
+  "HHSSSH_SHGHGG_GGGHGH_SHSSSHH",
+  "HH________S______S________HH",
+  "HH________________________HH",
+  "HH________HSS_SSSH________HH",
+  "HH________S______S________HH",
+  "HH_______________S________HH",
+  "HH________S______S________HH",
+  "HHHHHHHHHHHHH2HHHHHHHHHHHHHH"
  ],
  "npcs": [
   {
    "id": "daimyo_k",
-   "x": 20,
+   "x": 13,
    "z": 11
   },
   {
    "id": "karo_k",
-   "x": 16,
+   "x": 10,
    "z": 12
   },
   {
    "id": "sword_bearer_k",
-   "x": 22,
+   "x": 15,
    "z": 11
   },
   {
    "id": "guard_k",
-   "x": 11,
+   "x": 10,
    "z": 15
   },
   {
    "id": "guard_k",
-   "x": 29,
+   "x": 17,
    "z": 15
   },
   {
    "id": "guard_k",
    "x": 12,
-   "z": 17
+   "z": 18
   },
   {
    "id": "guard_k",
-   "x": 28,
-   "z": 17
+   "x": 15,
+   "z": 18
   },
   {
    "id": "guard_k",
-   "x": 18,
-   "z": 21
-  },
-  {
-   "id": "guard_k",
-   "x": 22,
-   "z": 21
+   "x": 4,
+   "z": 20
   },
   {
    "id": "guard_k",
    "x": 8,
-   "z": 23
-  },
-  {
-   "id": "guard_k",
-   "x": 12,
-   "z": 25
+   "z": 22
   },
   {
    "id": "daimyo_retainer_k",
-   "x": 14,
+   "x": 11,
    "z": 2
   },
   {
    "id": "daimyo_master_k",
-   "x": 26,
+   "x": 17,
    "z": 2
   },
   {
    "id": "daimyo_wife_k",
-   "x": 37,
+   "x": 24,
    "z": 4
   },
   {
    "id": "maid_k",
-   "x": 38,
+   "x": 25,
    "z": 7
   },
   {
@@ -151,18 +140,18 @@
   },
   {
    "id": "maid_k",
-   "x": 30,
-   "z": 26
+   "x": 19,
+   "z": 22
   },
   {
    "id": "daimyo_cook_k",
-   "x": 32,
-   "z": 24
+   "x": 23,
+   "z": 22
   },
   {
    "id": "cook_k",
-   "x": 28,
-   "z": 22
+   "x": 21,
+   "z": 20
   }
  ],
  "links": {},

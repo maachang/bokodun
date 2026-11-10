@@ -741,6 +741,36 @@ export const wallTextures = {
         });
     },
 
+    // 上段の間の、背後の壁（K マカヒキ国の城）: 金箔の壁に、大きな松の絵（枠・継ぎ目のない壁画）。上の長押（黒い木の横木）と、下の畳寄せ
+    createWallGoldPineTexture() {
+        return this._edoPanel(ctx => {
+            ctx.fillStyle = '#d9a93c';
+            ctx.fillRect(0, 0, 64, 64);
+            for (let y = 6; y < 58; y += 8) {
+                for (let x = 0; x < 64; x += 8) {
+                    ctx.fillStyle = (x + y) % 16 === 0 ? '#e6bc50' : '#cf9e34';
+                    ctx.fillRect(x, y, 8, 8);
+                }
+            }
+            ctx.fillStyle = '#241812';   // 太い幹と枝
+            ctx.fillRect(28, 14, 7, 46);
+            ctx.fillRect(14, 30, 16, 4);
+            ctx.fillRect(35, 24, 20, 4);
+            ctx.fillStyle = '#2f5a3a';   // 松の葉（横に広がる塊）
+            ctx.fillRect(6, 24, 22, 6);
+            ctx.fillRect(10, 18, 16, 6);
+            ctx.fillRect(36, 18, 24, 6);
+            ctx.fillRect(40, 12, 16, 6);
+            ctx.fillRect(18, 10, 24, 6);
+            ctx.fillStyle = '#f4ecd0';   // 霞
+            ctx.fillRect(0, 44, 18, 3);
+            ctx.fillRect(46, 48, 18, 3);
+            ctx.fillStyle = '#2a1e16';   // 長押・畳寄せ
+            ctx.fillRect(0, 0, 64, 6);
+            ctx.fillRect(0, 58, 64, 6);
+        });
+    },
+
     // 畳（K マカヒキ国の部屋の床）: い草の薄緑の畳が 2 枚（縦に長い）。縁は暗い緑の布。目は細かい縦の線
     createTatamiTexture() {
         const canvas = document.createElement('canvas');
