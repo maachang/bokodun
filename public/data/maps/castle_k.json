@@ -85,6 +85,36 @@
    "id": "samurai_k",
    "x": 15,
    "z": 10
+  },
+  {
+   "id": "daimyo_wife_k",
+   "x": 15,
+   "z": 2
+  },
+  {
+   "id": "daimyo_retainer_k",
+   "x": 6,
+   "z": 5
+  },
+  {
+   "id": "daimyo_master_k",
+   "x": 18,
+   "z": 5
+  },
+  {
+   "id": "sword_bearer_k",
+   "x": 13,
+   "z": 2
+  },
+  {
+   "id": "maid_k",
+   "x": 5,
+   "z": 11
+  },
+  {
+   "id": "daimyo_cook_k",
+   "x": 19,
+   "z": 11
   }
  ],
  "links": {}

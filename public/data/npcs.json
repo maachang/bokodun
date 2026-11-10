@@ -2715,29 +2715,31 @@
   },
   "daimyo_k": {
     "name": "マカヒキ国の殿様",
-    "texture": "/images/npcs/king.png",
+    "texture": "/images/npcs/daimyo_k.png",
     "height": 2.2,
-    "aspect": 1.057,
+    "aspect": 1.208,
     "radius": 0.5,
     "speed": 0,
     "wanderRadius": 0.0,
     "lines": [
       "うむ、よう参った。この島は、海の幸と米に恵まれておる。",
       "異国の者よ、国の掟を守れば、好きに逗留するがよい。"
-    ]
+    ],
+    "sdId": 344
   },
   "karo_k": {
     "name": "マカヒキ国の家老",
-    "texture": "/images/npcs/elder_man.png",
+    "texture": "/images/npcs/karo_k.png",
     "height": 2.1,
-    "aspect": 0.396,
+    "aspect": 0.897,
     "radius": 0.5,
     "speed": 0.4,
     "wanderRadius": 1.0,
     "lines": [
       "殿は、のんびりしたお方でな。政は、この家老が預かっておる。",
       "近ごろは、ガリレオ連盟の船が増えた。ありがたいが、油断はならぬ。"
-    ]
+    ],
+    "sdId": 346
   },
   "samurai_k": {
     "name": "マカヒキ国の侍",
@@ -2766,29 +2768,31 @@
   },
   "machi_man_k": {
     "name": "城下の町人",
-    "texture": "/images/npcs/town_man.png",
+    "texture": "/images/npcs/machi_man_k.png",
     "height": 2.3,
-    "aspect": 0.455,
+    "aspect": 0.423,
     "radius": 0.5,
     "speed": 0.5,
     "wanderRadius": 2.0,
     "lines": [
       "いい天気だのう。魚が、よう獲れるぞ。",
       "城下は、にぎやかなもんだ。"
-    ]
+    ],
+    "sdId": 354
   },
   "machi_woman_k": {
     "name": "城下の町人の女",
-    "texture": "/images/npcs/town_middle_woman.png",
+    "texture": "/images/npcs/machi_woman_k.png",
     "height": 2.2,
-    "aspect": 0.382,
+    "aspect": 0.409,
     "radius": 0.5,
     "speed": 0.5,
     "wanderRadius": 2.0,
     "lines": [
       "旅の人かい？ うちの団子を食べていきな。",
       "海の向こうの話を、聞かせておくれよ。"
-    ]
+    ],
+    "sdId": 355
   },
   "ferryman_k": {
     "name": "渡し船の船頭",
@@ -2801,6 +2805,230 @@
     "lines": [
       "ガリレオ連盟の港まで、渡し船が出ているよ。",
       "波は穏やかだ。乗っていくかい。"
+    ]
+  },
+  "daimyo_wife_k": {
+    "name": "マカヒキ国の御台所",
+    "sdId": 347,
+    "texture": "/images/npcs/daimyo_wife_k.png",
+    "height": 1.9,
+    "aspect": 1.139,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0,
+    "lines": [
+      "殿は、のんびりしたお方でのう。",
+      "遠くから、よう参られた。"
+    ]
+  },
+  "daimyo_retainer_k": {
+    "name": "マカヒキ国の家臣",
+    "sdId": 348,
+    "texture": "/images/npcs/daimyo_retainer_k.png",
+    "height": 2.3,
+    "aspect": 0.453,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0,
+    "lines": [
+      "殿のお許しなく、奥へは通せぬ。",
+      "この島の掟を、守られよ。"
+    ]
+  },
+  "daimyo_master_k": {
+    "name": "マカヒキ国の剣術指南役",
+    "sdId": 349,
+    "texture": "/images/npcs/daimyo_master_k.png",
+    "height": 2.3,
+    "aspect": 0.436,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0,
+    "lines": [
+      "腕に覚えがあるなら、道場を訪ねてみるがよい。",
+      "剣は心。迷いがあれば、刃も鈍る。"
+    ]
+  },
+  "daimyo_cook_k": {
+    "name": "マカヒキ国の料理番",
+    "sdId": 351,
+    "texture": "/images/npcs/daimyo_cook_k.png",
+    "height": 2.3,
+    "aspect": 0.381,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0,
+    "lines": [
+      "殿の膳は、わしが預かっておる。",
+      "味付けに、手は抜かぬ。"
+    ]
+  },
+  "sword_bearer_k": {
+    "name": "殿様の刀持ち",
+    "sdId": 350,
+    "texture": "/images/npcs/sword_bearer_k.png",
+    "height": 1.9,
+    "aspect": 0.991,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0,
+    "lines": [
+      "殿の刀を、お守りしておる。",
+      "わしは、動かぬ。それが務めよ。"
+    ]
+  },
+  "cook_k": {
+    "name": "料理人",
+    "sdId": 352,
+    "texture": "/images/npcs/cook_k.png",
+    "height": 2.3,
+    "aspect": 0.409,
+    "radius": 0.5,
+    "speed": 0.3,
+    "wanderRadius": 0.6,
+    "lines": [
+      "魚は、新しいのが一番よ。",
+      "うちの煮物は、評判だぞ。"
+    ]
+  },
+  "maid_k": {
+    "name": "城の奉公人",
+    "sdId": 353,
+    "texture": "/images/npcs/maid_k.png",
+    "height": 2.2,
+    "aspect": 0.392,
+    "radius": 0.5,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "お掃除の途中でございます。",
+      "失礼いたします。"
+    ]
+  },
+  "merchant_man_k": {
+    "name": "城下の商人",
+    "sdId": 356,
+    "texture": "/images/npcs/merchant_man_k.png",
+    "height": 2.3,
+    "aspect": 0.454,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "いらっしゃい。何をお探しで？",
+      "安くしとくよ。…ほかの客には内緒だがな。"
+    ]
+  },
+  "merchant_old_k": {
+    "name": "城下の商人（老）",
+    "sdId": 357,
+    "texture": "/images/npcs/merchant_old_k.png",
+    "height": 2.3,
+    "aspect": 0.468,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "わしは、この島で、四十年商いをしておる。",
+      "商いは、信用が一番じゃ。"
+    ]
+  },
+  "merchant_woman_k": {
+    "name": "城下の商人の女",
+    "sdId": 358,
+    "texture": "/images/npcs/merchant_woman_k.png",
+    "height": 2.2,
+    "aspect": 0.416,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "あら、旅の人？ 高いものは、ないよ。",
+      "うちの反物は、本物だよ。"
+    ]
+  },
+  "ronin_k": {
+    "name": "浪人",
+    "sdId": 359,
+    "texture": "/images/npcs/ronin_k.png",
+    "height": 2.5,
+    "aspect": 0.414,
+    "radius": 0.5,
+    "speed": 0.3,
+    "wanderRadius": 1.5,
+    "lines": [
+      "仕える主を、探しておる。",
+      "…腹が減った。"
+    ]
+  },
+  "okappiki_k": {
+    "name": "岡っ引き",
+    "sdId": 360,
+    "texture": "/images/npcs/okappiki_k.png",
+    "height": 2.3,
+    "aspect": 0.429,
+    "radius": 0.5,
+    "speed": 0.4,
+    "wanderRadius": 2.0,
+    "lines": [
+      "おい、そこの旅の者。何か、よからぬことは、しておらんだろうな。",
+      "ここらで揉め事を起こせば、ただでは済まんぞ。"
+    ]
+  },
+  "child_girl_k": {
+    "name": "城下の女の子",
+    "sdId": 361,
+    "texture": "/images/npcs/child_girl_k.png",
+    "height": 1.6,
+    "aspect": 0.38,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 2.5,
+    "lines": [
+      "こんにちは！",
+      "お船は、おっきいね！"
+    ]
+  },
+  "child_boy_k": {
+    "name": "城下の男の子",
+    "sdId": 362,
+    "texture": "/images/npcs/child_boy_k.png",
+    "height": 1.6,
+    "aspect": 0.353,
+    "radius": 0.5,
+    "speed": 0.8,
+    "wanderRadius": 2.5,
+    "lines": [
+      "おいら、大きくなったら、侍になるんだ。",
+      "かけっこ、しよう！"
+    ]
+  },
+  "kannushi_k": {
+    "name": "神社の神主",
+    "sdId": 363,
+    "texture": "/images/npcs/kannushi_k.png",
+    "height": 2.3,
+    "aspect": 0.423,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0,
+    "lines": [
+      "ようお参りじゃ。",
+      "この島の神様は、海を見守っておられる。"
+    ]
+  },
+  "miko_k": {
+    "name": "神社の巫女",
+    "sdId": 364,
+    "texture": "/images/npcs/miko_k.png",
+    "height": 2.2,
+    "aspect": 0.396,
+    "radius": 0.5,
+    "speed": 0.3,
+    "wanderRadius": 0.6,
+    "lines": [
+      "お参りですか？ どうぞ、ごゆっくり。",
+      "おみくじも、ございますよ。"
     ]
   }
 }

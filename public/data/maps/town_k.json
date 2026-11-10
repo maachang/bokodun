@@ -91,7 +91,7 @@
    "z": 17
   },
   {
-   "id": "machi_woman_k",
+   "id": "merchant_woman_k",
    "x": 28,
    "z": 13
   },
@@ -101,7 +101,7 @@
    "z": 9
   },
   {
-   "id": "machi_man_k",
+   "id": "merchant_man_k",
    "x": 15,
    "z": 21
   },
@@ -136,7 +136,7 @@
    "z": 21
   },
   {
-   "id": "machi_man_k",
+   "id": "merchant_old_k",
    "x": 34,
    "z": 12
   },
@@ -146,7 +146,7 @@
    "z": 21
   },
   {
-   "id": "machi_man_k",
+   "id": "okappiki_k",
    "x": 33,
    "z": 21
   },
@@ -156,17 +156,17 @@
    "z": 21
   },
   {
-   "id": "machi_man_k",
+   "id": "ronin_k",
    "x": 36,
    "z": 14
   },
   {
-   "id": "machi_woman_k",
+   "id": "child_girl_k",
    "x": 21,
    "z": 21
   },
   {
-   "id": "machi_man_k",
+   "id": "child_boy_k",
    "x": 5,
    "z": 21
   },

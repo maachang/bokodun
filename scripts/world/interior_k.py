@@ -23,6 +23,7 @@ INTERIORS = [
     ('temple_town', 'shrine_k', '神社の拝殿（マカヒキ国）', 'town_k', {'temple_town_2f': 'shrine_k_2f'}, lambda x, y, w, h: False),   # 拝殿: 木張り（大理石をやめる）。絨毯の所は畳
     ('temple_town_2f', 'shrine_k_2f', '神社の社務所（マカヒキ国）', 'shrine_k', {'temple_town': 'shrine_k'}, lambda x, y, w, h: y not in (5, 6)),   # 2 階: 部屋は畳・絨毯の廊下は木張り
 ]
+NPC_SWAP = {'shrine_k': {'priest_man': 'kannushi_k', 'priest_woman': 'miko_k'}, 'shrine_k_2f': {'priest_man': 'kannushi_k', 'priest_woman': 'miko_k'}, 'city_inn_k': {'inn_cook': 'cook_k'}}
 FLOORS = ('wood_floor', 'shop_floor', 'brick_floor', 'marble_floor')
 
 
@@ -49,5 +50,6 @@ def build():
         if src == 'temple_town_2f': m['legend'].pop('u', None)
         m['environment'].pop('footstep', None)   # 足音の種類は付けない（ほかの木造の中と同じ）
         m['layout'] = [''.join(r) for r in rows]
+        for n in m['npcs']: n['id'] = NPC_SWAP.get(new, {}).get(n['id'], n['id'])   # 江戸風の人（神主・巫女・料理人）に差し替え
         out.append(m)
     return out

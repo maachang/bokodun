@@ -2,7 +2,7 @@
 施設・街の人・見た目（白い漆喰の壁・黒い板張りの町家・瓦屋根）を変える。
   - 港: 街の南の川（東西）に、船（見た目）。川沿いの「渡し場」（小屋）から、E（ガリレオ連盟）の港へ渡し船で行く（扉＝移動。E の港にも、同じ渡し場）
   - 城: 北の城門から、殿様の城（castle_k）。殿様・家老は、城の中だけ（街の通りには出ない）
-  - 街の人の画像は、仮（既存の画像）。侍・町人などの画像は、sdServer で作ってもらって、差し替える（npcs.json の daimyo_k・karo_k・samurai_k・machi_*）
+  - 街の人の画像は、sdServer の江戸風（ID 344〜364）。侍（samurai_k・samurai_gate_k）と船頭（ferryman_k）だけ、仮の画像のまま
 """
 from town_d import FACILITIES, _to, build
 
@@ -21,10 +21,10 @@ def _k_fac(f):
 
 FACILITIES_K = [_k_fac(f) for f in FACILITIES if f[6] != 'm'] + [FERRY_K]
 NPCS_K = [   # 一般の住民（町人）・侍・船頭。殿様・家老は、城（castle_k）の中
-    ('machi_man_k', 6, 17), ('machi_woman_k', 28, 13), ('samurai_k', 24, 9), ('machi_man_k', 15, 21), ('machi_woman_k', 6, 25),
+    ('machi_man_k', 6, 17), ('merchant_woman_k', 28, 13), ('samurai_k', 24, 9), ('merchant_man_k', 15, 21), ('machi_woman_k', 6, 25),
     ('samurai_k', 17, 27), ('samurai_k', 22, 27), ('samurai_gate_k', 17, 1), ('samurai_gate_k', 22, 1), ('ferryman_k', 12, 21),
-    ('machi_man_k', 34, 12), ('machi_woman_k', 8, 21), ('machi_man_k', 33, 21), ('machi_woman_k', 10, 21),
-    ('machi_man_k', 36, 14), ('machi_woman_k', 21, 21), ('machi_man_k', 5, 21), ('machi_woman_k', 30, 15),
+    ('merchant_old_k', 34, 12), ('machi_woman_k', 8, 21), ('okappiki_k', 33, 21), ('machi_woman_k', 10, 21),
+    ('ronin_k', 36, 14), ('child_girl_k', 21, 21), ('child_boy_k', 5, 21), ('machi_woman_k', 30, 15),
 ]
 SKIN_EDO = {'H': 'edo_house', 'S': 'edo_shop', 'I': 'edo_inn', 'J': 'edo_shrine', 'W': 'edo_wall', 'G': 'edo_gate', 'z': 'ferry_sign'}   # 壁は木の板塀・門は大きな木の門
 SHIPS_K = (('L', 12, 22), ('L', 27, 23), ('l', 14, 23), ('l', 25, 22), ('l', 36, 22), ('l', 3, 23))   # 川（港）に浮かぶ船（見た目だけ）

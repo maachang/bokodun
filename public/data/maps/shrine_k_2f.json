@@ -56,13 +56,13 @@
  ],
  "npcs": [
   {
-   "id": "priest_man",
+   "id": "kannushi_k",
    "x": 12,
    "z": 2,
    "wanderRadius": 0.8
   },
   {
-   "id": "priest_woman",
+   "id": "miko_k",
    "x": 4,
    "z": 9,
    "wanderRadius": 0.8

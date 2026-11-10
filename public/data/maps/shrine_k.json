@@ -58,7 +58,7 @@
  ],
  "npcs": [
   {
-   "id": "priest_man",
+   "id": "kannushi_k",
    "x": 5,
    "z": 3,
    "speed": 0,
@@ -66,12 +66,12 @@
    "shopId": "temple_town"
   },
   {
-   "id": "priest_woman",
+   "id": "miko_k",
    "x": 8,
    "z": 4
   },
   {
-   "id": "priest_man",
+   "id": "kannushi_k",
    "x": 2,
    "z": 6
   }
