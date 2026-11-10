@@ -102,7 +102,7 @@ def _others():
              [('guard_light', 9, 6), ('guard_light', 15, 6), ('adv_wizard', 18, 10), ('mage_researcher_woman', 6, 10)]),
         # K マカヒキ国: 殿様（江戸風）と、家老。侍が控える
         hall('castle_k', '殿様の城（マカヒキ国）', 25, 15, 12, [('daimyo_k', 12, 1), ('karo_k', 9, 2)],
-             [('samurai_k', 9, 6), ('samurai_k', 15, 6), ('samurai_k', 9, 10), ('samurai_k', 15, 10), ('daimyo_wife_k', 15, 2), ('daimyo_retainer_k', 6, 5), ('daimyo_master_k', 18, 5), ('sword_bearer_k', 13, 2), ('maid_k', 5, 11), ('daimyo_cook_k', 19, 11)]),
+             [('guard_k', 9, 6), ('guard_k', 15, 6), ('guard_k', 9, 10), ('guard_k', 15, 10), ('daimyo_wife_k', 15, 2), ('daimyo_retainer_k', 6, 5), ('daimyo_master_k', 18, 5), ('sword_bearer_k', 13, 2), ('maid_k', 5, 11), ('daimyo_cook_k', 19, 11)]),
     ]
 
 
