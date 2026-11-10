@@ -82,6 +82,8 @@ export const textureSetupMethods = {
             fConiferWall: RetroTextureGenerator.createFieldImageTexture('conifer_wall'),
             fOddTree: RetroTextureGenerator.createFieldImageTexture('desert_odd_tree'),
             fTundraConifers: RetroTextureGenerator.createFieldImageTexture('tundra_conifers'),
+            fPineK: RetroTextureGenerator.createFieldImageTexture('pine_k'),   // 松（マカヒキ国の城の中庭）
+            fUmeK: RetroTextureGenerator.createFieldImageTexture('ume_k'),   // 梅（同上）
             fConiferTreeA: RetroTextureGenerator.createFieldImageTexture('conifer_tree_a'),
             fWorldTree: RetroTextureGenerator.createFieldImageTexture('world_tree'),   // 世界樹（G の街の中心。5 倍）
             fConiferTreeB: RetroTextureGenerator.createFieldImageTexture('conifer_tree_b'),

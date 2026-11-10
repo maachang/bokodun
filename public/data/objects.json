@@ -20690,5 +20690,7 @@
       }
     ],
     "description": "違い棚（地袋・天袋つき。上段の間の、床の間の脇）"
-  }
+  },
+  "pine_k": {"type": "tree", "texture": "fPineK", "imageFile": "field/pine_k.png", "sdId": 367, "aspect": 0.903, "height": 5.0, "solid": true, "description": "日本の松の木（sdServer ID 367。マカヒキ国の城の中庭）"},
+  "ume_k": {"type": "tree", "texture": "fUmeK", "imageFile": "field/ume_k.png", "sdId": 368, "aspect": 1.057, "height": 4.2, "solid": true, "description": "日本の梅の木（sdServer ID 368。マカヒキ国の城の中庭）"}
 }

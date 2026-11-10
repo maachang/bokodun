@@ -18,7 +18,7 @@ AREAS = {
 GOLD = ('ohiroma', 'kuro', 'shiro')
 DOORS = [(13, 20), (10, 22), (10, 19), (17, 19), (13, 17), (6, 17), (20, 17), (8, 15), (19, 15), (5, 13), (22, 13), (5, 7), (22, 7), (11, 4), (17, 4), (14, 2)]   # 戸口（ふすまの途切れ）。大広間の背後（北の壁）には、戸口を付けない
 DAIS = {11: 'a', 12: 'b', 13: 'c'}   # 大広間の上段（北の 3 行・x 10〜17）: a=高さ 0.9・b=0.6・c=0.3
-GARDEN = {'T': ((10, 7), (18, 8)), 'w': tuple((x, y) for x in range(13, 17) for y in (7, 8)), 'e': ((11, 9), (17, 9))}   # 中庭: 松・池・石灯籠
+GARDEN = {'T': ((10, 7), (18, 8)), 'U': ((9, 9), (19, 6)), 'w': tuple((x, y) for x in range(13, 17) for y in (7, 8)), 'e': ((11, 9), (17, 9))}   # 中庭: 松・梅・池・石灯籠
 NPCS = [   # (id, x, y)
     ('daimyo_k', 13, 11), ('karo_k', 10, 12), ('sword_bearer_k', 15, 11),
     ('guard_k', 10, 15), ('guard_k', 17, 15), ('guard_k', 12, 18), ('guard_k', 15, 18), ('guard_k', 4, 20), ('guard_k', 8, 22),
@@ -66,7 +66,7 @@ def build(base):
     m = dict(base)
     m['layout'] = _rows()
     m['legend'] = {'_': 'tatami', '=': 'wood_floor', 'y': 'garden_sand', 'S': 'fusuma_wall', 'G': 'fusuma_gold', 'H': 'shoji_wall', 'a': 'dais_tatami_3', 'b': 'dais_tatami_2', 'c': 'dais_tatami_1', '2': 'castle_exit', 'P': 'wall_gold', 'N': 'wall_tokonoma', 'D': 'wall_chigaidana',
-                   'T': 'tree', 'w': 'water', 'e': 'edo_lantern'}
+                   'T': 'pine_k', 'U': 'ume_k', 'w': 'water', 'e': 'edo_lantern'}
     m['decorFloor'] = 'whiteSand'   # 飾り（松・石灯籠）の下の地面
     m['environment'] = dict(base['environment'], hasCeiling=False, floorType='whiteSand', ambientLight=0xdcd0b4, directionalLight=0xfff4dc, fogColor=0xcfdceb, skyColor=0x8fb8e0, fogNear=22, fogFar=70)   # 全面の天井はやめる（中庭は空が見える。部屋と廊下は、床ごとに天井）
     m['npcs'] = [{'id': i, 'x': x, 'z': y} for i, x, y in NPCS]
