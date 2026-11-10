@@ -2743,28 +2743,30 @@
   },
   "samurai_k": {
     "name": "マカヒキ国の侍",
-    "texture": "/images/npcs/guard_spear.png",
+    "texture": "/images/npcs/samurai_k.png",
     "height": 2.6,
-    "aspect": 0.374,
+    "aspect": 0.487,
     "radius": 0.5,
     "speed": 0.3,
     "wanderRadius": 1.5,
     "lines": [
       "わしは、マカヒキ国の侍。城下の見回りをしておる。",
       "怪しい動きはするなよ。"
-    ]
+    ],
+    "sdId": 365
   },
   "samurai_gate_k": {
     "name": "マカヒキ国の門番",
-    "texture": "/images/npcs/guard_spear.png",
+    "texture": "/images/npcs/samurai_gate_k.png",
     "height": 2.6,
-    "aspect": 0.373,
+    "aspect": 0.487,
     "radius": 0.5,
     "speed": 0.0,
     "wanderRadius": 0.0,
     "lines": [
       "ここは、マカヒキ国の城下町じゃ。"
-    ]
+    ],
+    "sdId": 365
   },
   "machi_man_k": {
     "name": "城下の町人",
