@@ -593,6 +593,42 @@ export const wallTextures = {
         return texture;
     },
 
+    // 町家の壁（K マカヒキ国）: 上は黒ずんだ縦板、下は「なまこ壁」（黒い瓦を貼り、白い漆喰の目地を盛り上げる）。1 マスの高さの下 4 割がなまこ
+    createEdoMachiyaTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        const boards = ['#4a3628', '#413024', '#523c2c', '#3a2b20'];
+        ctx.fillStyle = '#1e1712';
+        ctx.fillRect(0, 0, 64, 40);
+        for (let x = 0; x < 64; x += 8) {
+            ctx.fillStyle = boards[Math.floor(Math.random() * boards.length)];
+            ctx.fillRect(x + 1, 0, 6, 40);
+            ctx.fillStyle = 'rgba(0,0,0,0.25)';
+            ctx.fillRect(x + 4, 0, 1, 40);
+        }
+        ctx.fillStyle = '#e4dfd0';   // なまこ壁: 白い目地（斜めの格子）の上に、黒い瓦
+        ctx.fillRect(0, 40, 64, 24);
+        const tiles = ['#2c3036', '#34383e', '#262a30'];
+        for (let y = 42; y < 64; y += 8) {
+            for (let x = 0; x < 64; x += 8) {
+                ctx.fillStyle = tiles[Math.floor(Math.random() * tiles.length)];
+                ctx.fillRect(x + 1, y, 6, 6);
+            }
+        }
+        ctx.fillStyle = '#f4f0e4';   // 腰の上の、白い漆喰の帯
+        ctx.fillRect(0, 38, 64, 4);
+        ctx.fillStyle = '#16100c';
+        ctx.fillRect(0, 36, 64, 2);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    },
+
     // 畳（K マカヒキ国の部屋の床）: い草の薄緑の畳が 2 枚（縦に長い）。縁は暗い緑の布。目は細かい縦の線
     createTatamiTexture() {
         const canvas = document.createElement('canvas');
