@@ -29,7 +29,7 @@ LEGEND = {
     'c': 'cliff_rock_wall', 'Y': 'tropical_tree', 'E': 'mine_entrance', '3': 'mine_entrance_e', '4': 'mine_entrance_w', '5': 'mine_entrance_n', 't': 'mine_cart',   # 炭鉱の入口: E=南向き・3=東向き・4=西向き・5=北向き
     
     '6': 'city_wall', '7': 'district_gate', '8': 'brick_house', '9': 'plaza_stone',   # 街（候補地 A〜H）の外観: 壁・門・家・門の前の石畳
-    'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge', roads.ROAD_CH: 'paved_road', roads.BRIDGE_CH: 'stone_bridge', roads.SIGN_CH: 'road_sign', 'I': 'rope_bridge', '1': 'cave_torch', '2': 'riverside_tree',
+    'Q': 'water', 'q': 'water_shallow', 'O': 'sea', 'Z': 'plank_bridge', 'Þ': 'ship_large', 'þ': 'ship_small', roads.ROAD_CH: 'paved_road', roads.BRIDGE_CH: 'stone_bridge', roads.SIGN_CH: 'road_sign', 'I': 'rope_bridge', '1': 'cave_torch', '2': 'riverside_tree',
 }
 
 

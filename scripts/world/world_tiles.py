@@ -323,6 +323,16 @@ def _tiles_towns(g):
         for gx, gy in town_gate_tiles(site): obj[gy, gx] = ord('7')
         obj[y1 + 1:y1 + 5, px - 3:px + 3] = ord('9')              # 門の前の石畳
         obj[y1 + 2, px + 3] = ord(TOWN_SIGN_CH)                   # 門の前の石畳の東隣に、街の名前の立て札
+        if site['id'] == 'k1': _k1_pier(obj, px, py)
+
+
+def _k1_pier(obj, px, py):
+    """コマチ港町（K1）の外の港: 壁の東の深い海（terrain_island の港）に、桟橋（木の橋）と係留した船。町の中の港と同じ海"""
+    y1 = py + TOWN_HH - 1
+    for x in range(px + 4, px + 4 + 14): obj[y1 + 3, x] = ord('Z')   # 桟橋: 門の前の石畳の東から、海へ
+    for ch, dy, dx in (('þ', 1, 11), ('Þ', -4, 12), ('þ', -TOWN_HH * 2 + 3, 10)):   # 船（桟橋のそば・沖・北）
+        assert obj[y1 + dy, px + dx] == ord('O'), f'K1 の外の船 ({px + dx},{y1 + dy}): 海ではない'
+        obj[y1 + dy, px + dx] = ord(ch)
 
 
 def _coast_roads(g, centers, set_c, gate_pt, pairs=COAST_ROADS, opt={'coast': True}, name='海岸線の道'):
@@ -454,8 +464,8 @@ def _tiles_seams(g):
     #   境界を越えると、隣のマップの同じ位置に出る。そこが、木・崖・水の中だと、近くの空きへ押し出され、川の向こう岸へ渡ったり、
     #   壁に囲まれた空間の中に入って、出られなくなったりする。継ぎ目の両側のマス（向かい合うマス）の、歩ける・歩けないを、そろえる:
     #   片方が歩けて、もう片方が通れない物（木・崖・柱）なら、通れない物を取り除く。深い水・海なら、浅瀬（歩ける）にする。
-    solid_codes = np.array([ord(c) for c in SOLID_CH], np.uint8)
-    deep_codes = np.array([ord('Q'), ord('O')], np.uint8)
+    solid_codes = np.array([ord(c) for c in SOLID_CH], np.uint16)
+    deep_codes = np.array([ord('Q'), ord('O')], np.uint16)
     def walk(a): return ~(np.isin(a, solid_codes) | np.isin(a, deep_codes))
     fixed = 0
     for axis, size, count in ((1, W, GW), (0, H, GH)):
@@ -523,7 +533,7 @@ def build_tiles(t):
     u3 = rng.random((H, W)).astype(np.float32)
     patch = T.fbm(101, (40, 14, 6))
     patch2 = T.fbm(102, (26, 9, 4))
-    obj = np.full((H, W), ord('0'), np.uint8)
+    obj = np.full((H, W), ord('0'), np.uint16)   # 物体の文字コード（2 バイト: 65535 まで。1 バイトの 255 の上限はなくす）
     def put(mask, ch): obj[mask] = ord(ch)
     d_sea, d_water = t['dist_sea'], t['dist_water']
     free = land & ~(t['deep'] | t['shallow'] | t['bridge'] | t['lagoon'])
@@ -534,7 +544,7 @@ def build_tiles(t):
     gx = np.abs(np.diff(e, axis=1, prepend=e[:, :1])); gy = np.abs(np.diff(e, axis=0, prepend=e[:1, :]))
     steep = T.box_mean(gx + gy, 2)
     # 地面の種類（文字）: 地形の既定から、特徴ごとに上書きする
-    lut = np.zeros(9, np.uint8)
+    lut = np.zeros(9, np.uint16)
     for b, ch in BIOME_FLOOR.items(): lut[b] = ord(ch)
     floor = lut[biome]
     def fl(mask, ch): floor[mask] = ord(ch)
