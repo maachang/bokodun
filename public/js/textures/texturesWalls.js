@@ -535,4 +535,61 @@ export const wallTextures = {
         texture.minFilter = THREE.NearestFilter;
         return texture;
     },
+
+    // 江戸風（K マカヒキ国）: 白い漆喰の壁（下の 1/4 は、なまこ壁＝黒い平瓦に白い目地の格子）。上の縁に、黒い横の梁
+    createEdoPlasterTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#faf6ea';
+        ctx.fillRect(0, 0, 64, 64);
+        for (let i = 0; i < 90; i++) {   // 漆喰のむら
+            ctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,0.35)' : 'rgba(120,110,90,0.12)';
+            ctx.fillRect(Math.random() * 62, Math.random() * 44, 2, 2);
+        }
+        ctx.fillStyle = '#2a2622';   // 上の黒い梁
+        ctx.fillRect(0, 0, 64, 5);
+        ctx.fillStyle = '#4a423a';
+        ctx.fillRect(0, 5, 64, 1);
+        ctx.fillStyle = '#2a2d33';   // なまこ壁（下の帯）: 黒い平瓦 + 白い目地（斜め格子）
+        ctx.fillRect(0, 46, 64, 18);
+        ctx.fillStyle = '#e8e4d8';
+        for (let k = -2; k < 10; k++) {
+            ctx.fillRect(k * 8, 46, 2, 18);
+        }
+        for (let y = 46; y < 64; y += 6) ctx.fillRect(0, y, 64, 2);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    },
+
+    // 江戸風（K マカヒキ国）: 黒い板張りの壁（縦板・桟・格子）。町家
+    createEdoWoodTexture() {
+        const canvas = document.createElement('canvas');
+        canvas.width = 64;
+        canvas.height = 64;
+        const ctx = canvas.getContext('2d');
+        ctx.fillStyle = '#1e1712';
+        ctx.fillRect(0, 0, 64, 64);
+        const boards = ['#4a3628', '#413024', '#523c2c', '#3a2b20'];
+        for (let x = 0; x < 64; x += 8) {
+            ctx.fillStyle = boards[Math.floor(Math.random() * boards.length)];
+            ctx.fillRect(x + 1, 0, 6, 64);
+            ctx.fillStyle = 'rgba(0,0,0,0.25)';
+            ctx.fillRect(x + 4, 0, 1, 64);
+        }
+        ctx.fillStyle = '#16100c';   // 横の桟
+        ctx.fillRect(0, 14, 64, 3);
+        ctx.fillRect(0, 46, 64, 3);
+        const texture = new THREE.CanvasTexture(canvas);
+        texture.magFilter = THREE.NearestFilter;
+        texture.minFilter = THREE.NearestFilter;
+        texture.wrapS = THREE.RepeatWrapping;
+        texture.wrapT = THREE.RepeatWrapping;
+        return texture;
+    },
 };

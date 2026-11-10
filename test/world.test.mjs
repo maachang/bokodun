@@ -80,7 +80,7 @@ test('世界を歩ける: 出発点から、段差 1 までの道で、歩ける
             const d = ch === '0' ? null : objects[m.legend[ch]];
             const solid = d && (d.type === 'tree' || d.type === 'tree_wall' || d.type === 'boulder' || d.type === 'sea_tile' || (d.type === 'liquid_tile' && d.solid));
             const k = (j * M + r) * W + i * M + c;
-            blocked[k] = solid ? 1 : 0;
+            blocked[k] = solid || (j >= 11 && j <= 13 && i >= 1 && i <= 3) ? 1 : 0;   // マカヒキ島（行 12〜14・列 2〜4 のメッシュ）は、別の島（船で渡る）。歩いて行ける割合の対象外
             level[k] = levelOf(m.heights[r][c]);
         }
         if (id === world.start) start = [j * M + Math.floor(m.spawn.z), i * M + Math.floor(m.spawn.x)];
@@ -811,7 +811,9 @@ test('世界: 海・湖（入れない水）が大半のマップは作らない
             if (d && (d.type === 'sea_tile' || (d.type === 'liquid_tile' && d.solid))) water++;
         }
         const f = water / (world.mapSize * world.mapSize);
-        if (!['w_13_11', 'w_13_12'].includes(id) && f > worst) { worst = f; worstId = id; }   // w_13_11・w_13_12: E の港の出口（浅瀬・小島を、すべて海にした航路。海が多い。ユーザー指示。72% 以下）
+        const island = /^w_1[1-3]_0[1-3]$/.test(id);   // マカヒキ島のメッシュ（3×3 の島の、四隅・辺は、海が多い）
+        if (island) assert.ok(f <= 0.85, `島のマップ ${id}: ${(f * 100).toFixed(1)}%`);
+        if (!island && !['w_13_11', 'w_13_12'].includes(id) && f > worst) { worst = f; worstId = id; }   // w_13_11・w_13_12: E の港の出口（浅瀬・小島を、すべて海にした航路。海が多い。ユーザー指示。72% 以下）
         if (['w_13_11', 'w_13_12'].includes(id)) assert.ok(f <= 0.72, `港の出口のマップ ${id}: ${(f * 100).toFixed(1)}%`);
     }
     assert.ok(worst <= 0.55, `水の割合が最も大きいマップ ${worstId}: ${(worst * 100).toFixed(1)}%`);
@@ -1788,8 +1790,8 @@ test('国のトップは、国ごとに違う（城・大教会・議長の部�
 
 test('厳守: 貴族・国の代表（王・王子・女王・宰相・帝王・教皇・枢機卿・議長・上位聖職者）は、屋外（街の通り・外のマップ）に出ない。城・屋敷・神殿・ギルドの中だけ', () => {
     const npcs = readJson('public/data/npcs.json');
-    const forbidden = /(noble|archmage|king|prince|queen|chancellor|emperor|pope|cardinal|chairman|baron|viscount|marquis|duke|margrave|priest_senior|elder_son|elder_daughter)/;
-    const outdoor = fs.readdirSync(path.join(root, 'public/data/maps')).filter(f => /^(w_\d\d_\d\d|town_[a-j]|city|town|village)\.json$/.test(f));
+    const forbidden = /(noble|archmage|daimyo|karo_k|king|prince|queen|chancellor|emperor|pope|cardinal|chairman|baron|viscount|marquis|duke|margrave|priest_senior|elder_son|elder_daughter)/;
+    const outdoor = fs.readdirSync(path.join(root, 'public/data/maps')).filter(f => /^(w_\d\d_\d\d|town_[a-k]|city|town|village)\.json$/.test(f));
     assert.ok(outdoor.length > 100);
     for (const f of outdoor) {
         const m = readJson(`public/data/maps/${f}`);

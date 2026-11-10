@@ -1,0 +1,29 @@
+"""K（マカヒキ国・マカヒキ島。江戸時代風の独自の国）の街の中身。D（town_d.py）と同じ作り（サンプルの高さ・川・橋・高台・城門）で、
+施設・街の人・見た目（白い漆喰の壁・黒い板張りの町家・瓦屋根）を変える。
+  - 港: 街の南の川（東西）に、船（見た目）。川沿いの「渡し場」（小屋）から、E（ガリレオ連盟）の港へ渡し船で行く（扉＝移動。E の港にも、同じ渡し場）
+  - 城: 北の城門から、殿様の城（castle_k）。殿様・家老は、城の中だけ（街の通りには出ない）
+  - 街の人の画像は、仮（既存の画像）。侍・町人などの画像は、sdServer で作ってもらって、差し替える（npcs.json の daimyo_k・karo_k・samurai_k・machi_*）
+"""
+from town_d import FACILITIES, NPCS_J, _to, build
+
+# 渡し場: 川沿いの小屋（幅 4）。扉の前（13,21）から、川の船着き場。E の港の渡し場の前（27,8）へ、渡し船で行く（back は付けない: 片道ずつの移動）
+FERRY_K = ('S', 12, 18, 4, 1, 'd', 'z', {'nextMap': 'town_e', 'message': '渡し船に乗る（ガリレオ連盟の港へ）', 'spawn': {'x': 27, 'z': 8, 'angle': 3.14159}})
+FACILITIES_K = [(f[:7] + (dict(f[7], message='神社に入る'),) if f[6] == 'c' else f) for f in FACILITIES if f[6] != 'm'] + [FERRY_K]
+NPCS_K = [   # 一般の住民（町人）・侍・船頭。殿様・家老は、城（castle_k）の中
+    ('machi_man_k', 6, 17), ('machi_woman_k', 28, 13), ('samurai_k', 24, 9), ('machi_man_k', 15, 21), ('machi_woman_k', 6, 25),
+    ('samurai_k', 17, 27), ('samurai_k', 22, 27), ('samurai_gate_k', 17, 1), ('samurai_gate_k', 22, 1), ('ferryman_k', 12, 21),
+    ('machi_man_k', 34, 12), ('machi_woman_k', 8, 21), ('machi_man_k', 33, 21), ('machi_woman_k', 10, 21),
+    ('machi_man_k', 36, 14), ('machi_woman_k', 21, 21), ('machi_man_k', 5, 21), ('machi_woman_k', 30, 15),
+]
+SKIN_EDO = {'H': 'edo_house', 'S': 'edo_shop', 'I': 'edo_inn', 'J': 'edo_shrine', 'W': 'edo_wall', 'z': 'ferry_sign'}
+SHIPS_K = (('L', 12, 22), ('L', 27, 23), ('l', 14, 23), ('l', 25, 22), ('l', 36, 22), ('l', 3, 23))   # 川（港）に浮かぶ船（見た目だけ）
+
+
+def build_k(w, h, legend, city_legend, links, npcs):
+    layout, heights = build(w, h, legend, city_legend, links, npcs, facilities=FACILITIES_K, npc_list=NPCS_K, skin=SKIN_EDO, castle='castle_k')
+    g = [list(r) for r in layout]
+    for ch, x, y in SHIPS_K:
+        assert g[y][x] == 'w', f'K の船 ({x},{y}): 水ではない'
+        g[y][x] = ch
+    legend.update({'L': 'ship_large', 'l': 'ship_small'})
+    return [''.join(r) for r in g], heights

@@ -2712,5 +2712,95 @@
       "ようこそ、水の都へ。大湖の恵みは、国の宝です。",
       "公爵家は、いまや公国。民と湖を守るのが、わたくしの務めです。"
     ]
+  },
+  "daimyo_k": {
+    "name": "マカヒキ国の殿様",
+    "texture": "/images/npcs/king.png",
+    "height": 2.2,
+    "aspect": 1.057,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "うむ、よう参った。この島は、海の幸と米に恵まれておる。",
+      "異国の者よ、国の掟を守れば、好きに逗留するがよい。"
+    ]
+  },
+  "karo_k": {
+    "name": "マカヒキ国の家老",
+    "texture": "/images/npcs/elder_man.png",
+    "height": 2.1,
+    "aspect": 0.396,
+    "radius": 0.5,
+    "speed": 0.4,
+    "wanderRadius": 1.0,
+    "lines": [
+      "殿は、のんびりしたお方でな。政は、この家老が預かっておる。",
+      "近ごろは、ガリレオ連盟の船が増えた。ありがたいが、油断はならぬ。"
+    ]
+  },
+  "samurai_k": {
+    "name": "マカヒキ国の侍",
+    "texture": "/images/npcs/guard_spear.png",
+    "height": 2.6,
+    "aspect": 0.374,
+    "radius": 0.5,
+    "speed": 0.3,
+    "wanderRadius": 1.5,
+    "lines": [
+      "わしは、マカヒキ国の侍。城下の見回りをしておる。",
+      "怪しい動きはするなよ。"
+    ]
+  },
+  "samurai_gate_k": {
+    "name": "マカヒキ国の門番",
+    "texture": "/images/npcs/guard_spear.png",
+    "height": 2.6,
+    "aspect": 0.373,
+    "radius": 0.5,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ここは、マカヒキ国の城下町じゃ。"
+    ]
+  },
+  "machi_man_k": {
+    "name": "城下の町人",
+    "texture": "/images/npcs/town_man.png",
+    "height": 2.3,
+    "aspect": 0.455,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "いい天気だのう。魚が、よう獲れるぞ。",
+      "城下は、にぎやかなもんだ。"
+    ]
+  },
+  "machi_woman_k": {
+    "name": "城下の町人の女",
+    "texture": "/images/npcs/town_middle_woman.png",
+    "height": 2.2,
+    "aspect": 0.382,
+    "radius": 0.5,
+    "speed": 0.5,
+    "wanderRadius": 2.0,
+    "lines": [
+      "旅の人かい？ うちの団子を食べていきな。",
+      "海の向こうの話を、聞かせておくれよ。"
+    ]
+  },
+  "ferryman_k": {
+    "name": "渡し船の船頭",
+    "texture": "/images/npcs/merchant_man.png",
+    "height": 2.4,
+    "aspect": 0.485,
+    "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ガリレオ連盟の港まで、渡し船が出ているよ。",
+      "波は穏やかだ。乗っていくかい。"
+    ]
   }
 }

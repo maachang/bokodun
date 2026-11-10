@@ -18308,5 +18308,491 @@
     "radius": 0.5,
     "message": "礼拝堂",
     "description": "礼拝堂の案内標識（B。建物の前に立てる）"
+  },
+  "edo_wall": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "edoPlaster",
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "マカヒキ国（K）の街を囲む白い漆喰の壁（下は、なまこ壁）"
+  },
+  "edo_house": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "edoWood",
+    "roofTexture": "edoRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "マカヒキ国（K）の町家（黒い板張りの壁・灰黒の瓦屋根）",
+    "faceParts": [
+      {
+        "size": [
+          1.0,
+          1.1,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.0,
+          0.03
+        ],
+        "color": "#efe6c8",
+        "basic": true
+      },
+      {
+        "size": [
+          1.2,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.6,
+          0.05
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          1.2,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          1.4,
+          0.05
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          0.1,
+          1.3,
+          0.07
+        ],
+        "pos": [
+          -0.55,
+          2.0,
+          0.05
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          0.1,
+          1.3,
+          0.07
+        ],
+        "pos": [
+          0.55,
+          2.0,
+          0.05
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          0.06,
+          1.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.0,
+          0.06
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          1.5,
+          0.12,
+          0.25
+        ],
+        "pos": [
+          0,
+          1.32,
+          0.12
+        ],
+        "color": "#2a2118"
+      },
+      {
+        "size": [
+          1.4,
+          0.12,
+          0.12
+        ],
+        "pos": [
+          0,
+          2.75,
+          0.07
+        ],
+        "color": "#2a2118"
+      }
+    ],
+    "faceEvery": 2
+  },
+  "edo_shop": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "edoWood",
+    "roofTexture": "edoRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "マカヒキ国（K）の商家（黒い板張りの壁・瓦屋根）",
+    "faceParts": [
+      {
+        "size": [
+          1.8,
+          1.2,
+          0.04
+        ],
+        "pos": [
+          0,
+          1.7,
+          0.03
+        ],
+        "color": "#d0e8f0",
+        "basic": true
+      },
+      {
+        "size": [
+          2.0,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.35,
+          0.05
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          2.0,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          1.1,
+          0.05
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          0.1,
+          1.3,
+          0.07
+        ],
+        "pos": [
+          -0.95,
+          1.7,
+          0.05
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          0.1,
+          1.3,
+          0.07
+        ],
+        "pos": [
+          0.95,
+          1.7,
+          0.05
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          0.06,
+          1.2,
+          0.07
+        ],
+        "pos": [
+          0,
+          1.7,
+          0.06
+        ],
+        "color": "#5a3a1e"
+      },
+      {
+        "size": [
+          2.4,
+          0.1,
+          0.7
+        ],
+        "pos": [
+          0,
+          2.6,
+          0.35
+        ],
+        "color": "#a03030"
+      },
+      {
+        "size": [
+          2.4,
+          0.08,
+          0.1
+        ],
+        "pos": [
+          0,
+          2.5,
+          0.7
+        ],
+        "color": "#e8e0d0"
+      }
+    ],
+    "faceEvery": 2
+  },
+  "edo_inn": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "edoWood",
+    "roofTexture": "edoRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "マカヒキ国（K）の旅籠（黒い板張りの壁・瓦屋根）",
+    "faceParts": [
+      {
+        "size": [
+          1.1,
+          1.1,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.0,
+          0.03
+        ],
+        "color": "#f4d58a",
+        "basic": true
+      },
+      {
+        "size": [
+          1.3,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.6,
+          0.05
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          1.3,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          1.4,
+          0.05
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          0.1,
+          1.3,
+          0.07
+        ],
+        "pos": [
+          -0.6,
+          2.0,
+          0.05
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          0.1,
+          1.3,
+          0.07
+        ],
+        "pos": [
+          0.6,
+          2.0,
+          0.05
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          0.06,
+          1.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.0,
+          0.06
+        ],
+        "color": "#3a2a1a"
+      },
+      {
+        "size": [
+          0.45,
+          1.3,
+          0.08
+        ],
+        "pos": [
+          -1.0,
+          2.0,
+          0.07
+        ],
+        "color": "#7a4e28"
+      },
+      {
+        "size": [
+          0.45,
+          1.3,
+          0.08
+        ],
+        "pos": [
+          1.0,
+          2.0,
+          0.07
+        ],
+        "color": "#7a4e28"
+      }
+    ],
+    "faceEvery": 2
+  },
+  "edo_shrine": {
+    "baseShadow": true,
+    "type": "block",
+    "texture": "edoPlaster",
+    "roofTexture": "edoRoof",
+    "hasRoof": true,
+    "solid": true,
+    "blocksProjectiles": true,
+    "description": "マカヒキ国（K）の神社の建物（白い漆喰の壁・瓦屋根）",
+    "faceParts": [
+      {
+        "size": [
+          0.7,
+          1.9,
+          0.04
+        ],
+        "pos": [
+          0,
+          2.1,
+          0.03
+        ],
+        "color": "#6a8adf",
+        "basic": true
+      },
+      {
+        "size": [
+          0.9,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          3.1,
+          0.05
+        ],
+        "color": "#e8e4dc"
+      },
+      {
+        "size": [
+          0.9,
+          0.1,
+          0.07
+        ],
+        "pos": [
+          0,
+          1.15,
+          0.05
+        ],
+        "color": "#e8e4dc"
+      },
+      {
+        "size": [
+          0.1,
+          2.0,
+          0.07
+        ],
+        "pos": [
+          -0.4,
+          2.1,
+          0.05
+        ],
+        "color": "#e8e4dc"
+      },
+      {
+        "size": [
+          0.1,
+          2.0,
+          0.07
+        ],
+        "pos": [
+          0.4,
+          2.1,
+          0.05
+        ],
+        "color": "#e8e4dc"
+      },
+      {
+        "size": [
+          0.06,
+          1.9,
+          0.07
+        ],
+        "pos": [
+          0,
+          2.1,
+          0.06
+        ],
+        "color": "#e8e4dc"
+      }
+    ],
+    "faceEvery": 2
+  },
+  "ferry_sign": {
+    "lift": true,
+    "groundShadow": true,
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "渡し船（船着き場）",
+    "description": "渡し船の案内標識（E ガリレオ連盟の港と、K マカヒキ国の港）"
+  },
+  "town_sign_k": {
+    "lift": true,
+    "groundShadow": true,
+    "type": "signpost",
+    "texture": "signpost",
+    "solid": true,
+    "blocksProjectiles": false,
+    "scale": [
+      1.9,
+      2.0,
+      1.0
+    ],
+    "radius": 0.5,
+    "message": "マカヒキ国（マカヒキ島）",
+    "description": "街の入口の近くの立て札（マカヒキ国。外のマップ用）"
   }
 }

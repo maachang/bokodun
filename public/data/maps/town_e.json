@@ -51,7 +51,8 @@
   "w": "water",
   "b": "wood_bridge",
   "Y": "mansion_door",
-  "x": "chairman_sign"
+  "x": "chairman_sign",
+  "z": "ferry_sign"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -59,11 +60,11 @@
   "Wpppppppppppppppppp==ppJJJJpppwwwwwwwwwW",
   "Wpppppppppppppppppp==ppJJJJppXwwwwwwwwwW",
   "Wpppppppppppppppppp==ppJDJJpppbbbbbbbbwW",
-  "Wpppppppppppppppfpp==pvppcppppwwwwwwlwwW",
-  "Wpppppppppppppppppp==ppppppppBwwwwwwwwwW",
-  "WpSSSSpSSSSpIIIIppp==ppSSSSpppwwwwLwwwwW",
-  "WpSSSSpSSSSpIIIIppp==ppSSSSppXwwlwwwwwwW",
-  "WpSdSSpSdSSpINIIppp==ppSdSSpppwwwwwwwwwW",
+  "Wpppppppppppppppfpp==pvppcpSSSwwwwwwlwwW",
+  "Wpppppppppppppppppp==ppppppSSSwwwwwwwwwW",
+  "WpSSSSpSSSSpIIIIppp==ppSSSSdSSwwwwLwwwwW",
+  "WpSSSSpSSSSpIIIIppp==ppSSSSpzXwwlwwwwwwW",
+  "WpSdSSpSdSSpINIIppp==ppSdSSppBwwwwwwwwwW",
   "W===q====Q====M==========a====bbbbbbbbwW",
   "W=============================wwwwwwwwwW",
   "WwwwwwwwbbwwwwwwwwwbbwwwwbbwwwwwwwwwwwwW",
@@ -240,6 +241,15 @@
     "z": 5,
     "angle": 3.14159
    }
+  },
+  "27,7": {
+   "nextMap": "town_k",
+   "message": "渡し船に乗る（マカヒキ島へ）",
+   "spawn": {
+    "x": 13,
+    "z": 21,
+    "angle": 3.14159
+   }
   }
  },
  "heights": [
@@ -248,9 +258,9 @@
   "0122222222222222111222333333210000000000",
   "0121111211112111111233322223210000000000",
   "0121111211112111111233322223210000000000",
-  "0121111211112111111233322223210000000000",
-  "0122111221112211111233321112210000000000",
-  "0122212222123321111233332212210000000000",
+  "0121111211112111111233322223110000000000",
+  "0122111221112211111233321111210000000000",
+  "0122212222123321111233332213310000000000",
   "0122222222223332111223333323310000000000",
   "0112222222222222111112332233210000000000",
   "0122222222222222111111222222210000000000",

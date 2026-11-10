@@ -19,20 +19,21 @@ FACILITIES = [
     ('S', 2, 19, 4, 1, 'd', 'g', _to('guild_merchant', '商人ギルドに入る', 'merchantGuildIcon')),
     ('H', 2, 24, 8, 3, 'Y', 'x', {'nextMap': 'mansion_chairman_e', 'message': '議長の館に入る'}),   # 議長の館（国のトップの館。ほかの 2 倍の幅。扉の上の絵はなし）
     ('J', 23, 2, 4, 1, 'D', 'c', _to('temple', '神殿に入る', 'templeIcon')),   # 神殿は高台
+    ('S', 27, 5, 3, 0, 'd', 'z', {'nextMap': 'town_k', 'message': '渡し船に乗る（マカヒキ島へ）', 'spawn': {'x': 13, 'z': 21, 'angle': 3.14159}}),   # 渡し場（扉は西端。立て札を桟橋の入口（29,4）から外す）（港の岸壁の西。K マカヒキ国の港へ渡し船）
 ]
 
 HARBOR = (30, 38, 2, 27)       # 港の水（x0, x1, y0, y1）
 QUAY_X = 29                    # 岸壁の列
 PIER_ROWS = (4, 10, 17, 23)    # 桟橋の行（x30〜37）
 SHIPS = (('L', 34, 7), ('L', 34, 13), ('L', 34, 20), ('L', 35, 26), ('l', 32, 8), ('l', 31, 14), ('l', 32, 20), ('l', 33, 24), ('l', 36, 5))   # 帆船（大・小）
-CRATES = (('X', 29, 3), ('B', 29, 6), ('X', 29, 8), ('B', 29, 19), ('X', 29, 21), ('B', 29, 25))   # 岸壁の木箱・樽
+CRATES = (('X', 29, 3), ('B', 29, 9), ('X', 29, 8), ('B', 29, 19), ('X', 29, 21), ('B', 29, 25))   # 岸壁の木箱・樽
 
 NPCS = [
     ('town_man', 5, 11), ('town_middle_man', 26, 11), ('elder_man', 12, 14), ('child_boy', 15, 17),
     ('traveler_merchant', 26, 15), ('merchant_man', 22, 11), ('guard_spear', 17, 27), ('guard_light', 22, 27),
 ]
 
-LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'g', 'c', 'w', 'b')
+LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'g', 'c', 'w', 'b')   # 渡し場の立て札 'z' は、legend['z'] = 'ferry_sign'
 SOLID = set('WHSIJdNDYLlXB')
 
 
@@ -77,7 +78,7 @@ def _buildings_and_decor(g, legend, city_legend, links, npcs):
         g[dz][dx] = door
         assert g[dz + 1][dx] in 'p=' and g[dz + 1][dx + 1] in 'p=', f'E の立て札 ({dx + 1},{dz + 1}): 空きマスではない'
         g[dz + 1][dx + 1] = sign
-        links[f'{dx},{dz}'] = dict(link, back={'x': dx, 'z': dz + 1, 'angle': 3.14159})
+        links[f'{dx},{dz}'] = dict(link) if 'spawn' in link else dict(link, back={'x': dx, 'z': dz + 1, 'angle': 3.14159})
     for ch, x, y in SHIPS:
         assert g[y][x] == 'w', f'E の船 ({x},{y}): 水ではない'
         g[y][x] = ch
@@ -89,7 +90,7 @@ def _buildings_and_decor(g, legend, city_legend, links, npcs):
         g[y][x] = c
     legend.update({'X': 'crate_out', 'B': 'barrel_out', 'L': 'ship_large', 'l': 'ship_small'})
     for k in LEGEND_KEYS: legend[k] = city_legend[k]
-    legend['Y'] = 'mansion_door'; legend['x'] = 'chairman_sign'   # 議長の館の扉・立て札
+    legend['Y'] = 'mansion_door'; legend['x'] = 'chairman_sign'; legend['z'] = 'ferry_sign'   # 議長の館の扉・立て札
     for nid, x, z in NPCS:
         assert g[z][x] in 'p=', f'E の NPC {nid} ({x},{z}): 歩ける空きマスではない'
         npcs.append({'id': nid, 'x': x, 'z': z})

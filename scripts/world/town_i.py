@@ -18,11 +18,16 @@ def build(w, h, legend, city_legend, links, npcs):
     layout, heights = TE.build(w, h, legend, city_legend, e_links, e_npcs)
     for k, v in e_links.items():
         x, z = map(int, k.split(','))
+        if v.get('nextMap') == 'town_k': continue   # E の渡し場（K マカヒキ島行き）は、I にはない（港は、E だけ）
         v = dict(v)
         if 'back' in v: v['back'] = dict(v['back'], x=w - 1 - v['back']['x'])
         if v.get('nextMap') == 'mansion_chairman_e': v['nextMap'] = 'mansion_duke_i'; v['message'] = '女王の館に入る'
         links[f'{w - 1 - x},{z}'] = v
     for k, v in gate_links.items(): links[k] = v
     for n in e_npcs: npcs.append(dict(n, x=w - 1 - n['x']))
+    rows = [list(r) for r in layout]   # E の渡し場（建物の扉と立て札）は、I にはない: 扉を壁に、立て札を石畳に戻す
+    assert rows[7][27] == 'd' and rows[8][28] == 'z'
+    rows[7][27] = 'S'; rows[8][28] = 'p'
+    layout = [''.join(r) for r in rows]
     legend['x'] = 'duke_sign'   # 女王の館の立て札（物体名は duke_sign のまま）（E の議長の館の立て札を置き換え）
     return [_mirror_row(r, w) for r in layout], [_mirror_row(r, w) for r in heights]

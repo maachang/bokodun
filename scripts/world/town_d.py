@@ -89,7 +89,7 @@ def _build_houses(st):
         g[dz][dx] = door
         assert g[dz + 1][dx + 1] == 'p', f'D の立て札 ({dx + 1},{dz + 1}): 空きマスではない'
         g[dz + 1][dx + 1] = sign
-        links[f'{dx},{dz}'] = dict(link, back={'x': dx, 'z': dz + 1, 'angle': 3.14159})
+        links[f'{dx},{dz}'] = dict(link) if 'spawn' in link else dict(link, back={'x': dx, 'z': dz + 1, 'angle': 3.14159})   # spawn がある（渡し船など、別の街へ渡る）移動は、戻る位置を記録しない
 
 
 def _build_decor(st):
