@@ -1,13 +1,11 @@
 """K（マカヒキ国・マカヒキ島。江戸時代風の独自の国）の街の中身。D（town_d.py）と同じ作り（サンプルの高さ・川・橋・高台・城門）で、
 施設・街の人・見た目（白い漆喰の壁・黒い板張りの町家・瓦屋根）を変える。
-  - 港: 街の南の川（東西）に、船（見た目）。川沿いの「渡し場」（小屋）から、E（ガリレオ連盟）の港へ渡し船で行く（扉＝移動。E の港にも、同じ渡し場）
+  - 川: 街の南の川（東西）に、船（見た目）。海には面していない。渡し船は、東の海辺の港町 K1（コマチ港町。town_k1.py）から、E（ガリレオ連盟）の港へ
   - 城: 北の城門から、殿様の城（castle_k）。殿様・家老は、城の中だけ（街の通りには出ない）
   - 街の人の画像は、sdServer の江戸風（ID 344〜364）。船頭（ferryman_k）だけ、仮の画像のまま（侍・門番は ID 365）
 """
 from town_d import FACILITIES, _to, build
 
-# 渡し場: 川沿いの小屋（幅 4）。扉の前（13,21）から、川の船着き場。E の港の渡し場の前（27,8）へ、渡し船で行く（back は付けない: 片道ずつの移動）
-FERRY_K = ('S', 12, 18, 4, 1, 'd', 'z', {'nextMap': 'town_e', 'message': '渡し船に乗る（ガリレオ連盟の港へ）', 'spawn': {'x': 27, 'z': 8, 'angle': 3.14159}})
 _K_ROOM = {'item_shop': 'shop_k', 'weapon_shop': 'shop_k', 'guild_adv': 'guild_adv_k', 'guild_training': 'guild_training_k', 'city_inn': 'city_inn_k', 'temple': 'shrine_k'}   # K 専用の中（畳・木張り。interior_k.py。店は shopId を保つ）
 
 
@@ -19,10 +17,10 @@ def _k_fac(f):
     return f[:7] + (link,)
 
 
-FACILITIES_K = [_k_fac(f) for f in FACILITIES if f[6] != 'm'] + [FERRY_K]
+FACILITIES_K = [_k_fac(f) for f in FACILITIES if f[6] != 'm']   # 渡し場は、K1（コマチ港町）へ移した（マカヒキ国の街は、海に面していない）
 NPCS_K = [   # 一般の住民（町人）・侍・船頭。殿様・家老は、城（castle_k）の中
     ('machi_man_k', 6, 17), ('merchant_woman_k', 28, 13), ('samurai_k', 24, 9), ('merchant_man_k', 15, 21), ('machi_woman_k', 6, 25),
-    ('samurai_k', 17, 27), ('samurai_k', 22, 27), ('samurai_gate_k', 17, 1), ('samurai_gate_k', 22, 1), ('ferryman_k', 12, 21),
+    ('samurai_k', 17, 27), ('samurai_k', 22, 27), ('samurai_gate_k', 17, 1), ('samurai_gate_k', 22, 1),
     ('merchant_old_k', 34, 12), ('machi_woman_k', 8, 21), ('okappiki_k', 33, 21), ('machi_woman_k', 10, 21),
     ('ronin_k', 36, 14), ('child_girl_k', 21, 21), ('child_boy_k', 5, 21), ('machi_woman_k', 30, 15),
 ]
@@ -49,7 +47,7 @@ def diversify(g):
     return g
 
 
-DECOR_K = {'e': ((17, 6), (22, 12), (17, 13), (22, 5)), 'h': ((17, 9), (22, 9), (17, 3), (22, 17)), 'k': ((23, 7),), 'V': ((16, 0), (17, 0), (22, 0), (23, 0)), 'O': ((31, 13),), 'g': ((30, 12),), 'K': ((32, 12),), 't': ((6, 5), (11, 5), (9, 21), (13, 21), (30, 17), (30, 5))}   # 街並みの飾り: 石灯籠・提灯の柱・高札場・天水桶（広場 p の上）
+DECOR_K = {'e': ((17, 6), (22, 12), (17, 13), (22, 5)), 'h': ((17, 9), (22, 9), (17, 3), (22, 17)), 'k': ((23, 7),), 'V': ((16, 0), (17, 0), (22, 0), (23, 0)), 'O': ((31, 13),), 'g': ((30, 12),), 'K': ((32, 12),), 't': ((6, 5), (11, 5), (9, 21), (30, 17), (30, 5))}   # 街並みの飾り: 石灯籠・提灯の柱・高札場・天水桶（広場 p の上）
 DECOR_OBJ = {'e': 'edo_lantern', 'h': 'edo_chochin', 'k': 'edo_kousatsu', 't': 'edo_tensui', 'V': 'edo_yagura', 'O': 'edo_torii', 'g': 'komainu_k_w', 'K': 'komainu_k_e'}
 
 

@@ -420,6 +420,7 @@ def _tiles_roads(g):
     _coast_roads(g, centers, set_c, gate_pt, DIRECT_ROADS, {}, '直結の道')
     n_merge = roads.merge_parallel(t, obj, elev, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})   # 近くで並行して進む 2 本の道は、1 本に統合（ユーザー指示）
     print(f'並行する道を統合: {n_merge} マス')
+    _island_roads(g)   # マカヒキ島の道（本島の道が、すべてできた後）
     print(f'道のわきの段差を直した: {roads.fix_steps(elev, obj, t)} マス')   # 道の地ならしで残った、高さの差 2 以上（崖でない所）
     # 石の橋のそば（BRIDGE_NEAR マス以内）の、もとからある木の橋（plank_bridge）は、無効（川に戻す）。石の橋と、二重の橋にならない
     near_stone = T.box_mean((obj == ord(roads.BRIDGE_CH)).astype(np.float32), BRIDGE_NEAR) > 0
@@ -433,6 +434,17 @@ def _tiles_roads(g):
                    'centers': [list(c) for c in sorted(centers)], 'towns': ROAD_INFO, 'loops': ROAD_LOOPS,
                    'signs': [{'pos': list(k), 'text': v} for k, v in sorted(ROAD_SIGNS.items())]}, fp, ensure_ascii=False)
 
+
+
+def _island_roads(g):
+    """マカヒキ島の道（マカヒキ国の街の門前 → コマチ港町の門前）。島なので、本島の街道とはつながらない。街道の基準データ（world_roads.json）には入れない"""
+    elev, obj, t = g.elev, g.obj, g.t
+    sites = {s_['id']: s_ for s_ in t['towns']}
+    gate = lambda k: (sites[k]['y'] + TOWN_HH + 3, sites[k]['x'])
+    path = roads.find_path(t, gate('k'), gate('k1'), margin=40)
+    assert path, '島の道（K → K1）: 経路がない'
+    n_road, n_bridge = roads.paint(t, obj, elev, path, set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH})
+    print(f'島の道 K→K1: 中心線 {len(path)} マス・道 {n_road}・橋 {n_bridge}')
 
 
 def _tiles_seams(g):

@@ -19,6 +19,7 @@ import town_b as TB
 import town_c as TC
 import town_i as TI
 import town_k as TK
+import town_k1 as TK1
 import interior_k as IK
 import town_npc_extra as TNX
 import town_g as TG
@@ -67,7 +68,7 @@ def town_outer_extras(t, j, i):
         for gx, gy in town_gate_tiles(site):
             links[f"{gx - i * MESH},{gy - j * MESH}"] = {'nextMap': f"town_{site['id']}", 'message': f"{TOWN_NAME[site['id']]}に入る", 'spawn': {'x': w // 2 - 1 + (gx - (site['x'] - 1)), 'z': h - 3, 'angle': 0}}
         gy = site['y'] + TOWN_HH   # 壁のすぐ外（門と同じ並び）
-        pair = {'f': (('beast_soldier_kobold_gate', -2), ('beast_soldier_kobold', 1)), 'g': (('elf_soldier_golem', -2), ('elf_gate_guard_woman', 1)), 'c': (('desert_gate_guard', -2), ('desert_gate_guard', 1)), 'a': (('snow_gate_guard', -2), ('snow_gate_guard', 1)), 'k': (('samurai_gate_k', -2), ('samurai_k', 1))}.get(site['id'], (('guard_spear', -2), ('guard_light', 1)))   # F の兵士は、コボルト。G の兵士は、エルフの守備隊とウッドゴーレム
+        pair = {'f': (('beast_soldier_kobold_gate', -2), ('beast_soldier_kobold', 1)), 'g': (('elf_soldier_golem', -2), ('elf_gate_guard_woman', 1)), 'c': (('desert_gate_guard', -2), ('desert_gate_guard', 1)), 'a': (('snow_gate_guard', -2), ('snow_gate_guard', 1)), 'k': (('samurai_gate_k', -2), ('samurai_k', 1)), 'k1': (('samurai_gate_k', -2), ('samurai_k', 1))}.get(site['id'], (('guard_spear', -2), ('guard_light', 1)))   # F の兵士は、コボルト。G の兵士は、エルフの守備隊とウッドゴーレム
         for k, (nid, dx) in enumerate(pair):   # 門 2 マス（x-1, x）のすぐ両隣
             npcs.append({'id': nid, 'x': site['x'] + dx - i * MESH, 'z': gy - j * MESH})
     return links, npcs
@@ -130,6 +131,8 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
             m['environment'] = dict(DARK_FOREST_ENV, floorType='forest', fogNear=22, fogFar=66, ambientLight=0x6f8f76); m['decorFloor'] = 'forestGround'
         elif site['id'] == 'k':   # K（マカヒキ島の江戸風の国）: D と同じ作り（town_k.build_k）。渡し場・江戸風の見た目
             m['layout'], m['heights'] = TK.build_k(w, h, m['legend'], city_legend, m['links'], m['npcs']); m['decorFloor'] = 'edoGround'
+        elif site['id'] == 'k1':   # K1（コマチ港町: マカヒキ島の東の海辺の港）: E の港の作りと K の江戸風の見た目（town_k1.build）
+            m['layout'], m['heights'] = TK1.build(w, h, m['legend'], city_legend, m['links'], m['npcs']); m['decorFloor'] = 'edoGround'
         elif site['id'] == 'f':   # F（山の麓の獣人とドワーフの街）: 段々の斜面（town_f.build）
             m['layout'], m['heights'] = TF.build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         elif site['id'] in ('d', 'h', 'e', 'b', 'c', 'i'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）
@@ -144,6 +147,12 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
         json.dump(cm, open(os.path.join(MAPS, cm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     cf = CF.build()   # F の小さな王城（獣王・フェンリル像）
     json.dump(cf, open(os.path.join(MAPS, cf['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
+
+
+def island_legend(j, i, legend):
+    """マカヒキ島（行 11〜13・列 1〜3 のメッシュ）の道: 江戸風の土の道・木の橋（石畳・石の橋ではない。本島の街道とは別）"""
+    if not (11 <= j <= 13 and 1 <= i <= 3): return legend
+    return {k: {'paved_road': 'dirt_road', 'stone_bridge': 'plank_bridge'}.get(v, v) for k, v in legend.items()}
 
 
 def main():
@@ -196,11 +205,12 @@ def main():
                 if site['id'] == 'b' and town_outer_id(site) == f'w_{j:02d}_{i:02d}':   # B（フランケル聖国）の外観: 白亜の壁・白い家（青い屋根）
                     if '6' in legend: legend['6'] = 'white_wall'
                     if '8' in legend: legend['8'] = 'white_house'
-                if site['id'] == 'k' and town_outer_id(site) == f'w_{j:02d}_{i:02d}': legend.update({k: v for k, v in (('6', 'edo_wall'), ('7', 'edo_gate'), ('8', 'edo_house')) if k in legend})   # K（マカヒキ国）の外観: 白い漆喰の壁・町家
+                if site['id'] in ('k', 'k1') and town_outer_id(site) == f'w_{j:02d}_{i:02d}': legend.update({k: v for k, v in (('6', 'edo_wall'), ('7', 'edo_gate'), ('8', 'edo_house')) if k in legend})   # K（マカヒキ国）の外観: 白い漆喰の壁・町家
                 if site['id'] == 'c' and town_outer_id(site) == f'w_{j:02d}_{i:02d}':   # C（砂漠の自由都市）の外観: 中東風の家
                     if '6' in legend: legend['6'] = 'adobe_wall'   # 街の壁も土壁
                     if '8' in legend: legend['8'] = 'mideast_house'
                     if '9' in legend: legend['9'] = 'plaza_earth'   # 門前も土
+            legend = island_legend(j, i, legend)
             mid = f'w_{j:02d}_{i:02d}'
             # 出現位置: 中央に近い、歩ける陸のマス
             solid = set(SOLID_CH) | set('QO')

@@ -1,0 +1,258 @@
+{
+ "id": "town_k1",
+ "name": "コマチ港町",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "spawn": {
+  "x": 18,
+  "z": 23,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 11713215,
+  "fogNear": 22,
+  "fogFar": 75,
+  "visibility": 0.9,
+  "skyColor": 9018045
+ },
+ "decorFloor": "edoGround",
+ "enemies": {},
+ "legend": {
+  "W": "edo_wall",
+  "p": "plaza_dirt",
+  "=": "dirt_road",
+  "H": "edo_house",
+  "T": "tree",
+  "f": "flower_bed",
+  "v": "flower_bed_blue",
+  "F": "plaza_fountain",
+  "G": "edo_gate",
+  "S": "edo_shop",
+  "I": "edo_inn",
+  "d": "shop_door",
+  "N": "inn_door",
+  "M": "inn_sign",
+  "Q": "weapon_shop_sign",
+  "q": "item_shop_sign",
+  "w": "water",
+  "b": "wood_bridge",
+  "J": "edo_shrine",
+  "z": "ferry_sign",
+  "P": "plaza_stone",
+  "C": "edo_castle_gate",
+  "U": "edo_kura",
+  "Y": "edo_nagaya",
+  "X": "edo_chaya",
+  "e": "edo_lantern",
+  "h": "edo_chochin",
+  "t": "edo_tensui",
+  "R": "crate_out",
+  "B": "barrel_out",
+  "L": "ship_large",
+  "l": "ship_small"
+ },
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "Wpppppppppppppppp==pppppppPppppppppW",
+  "WpHHHHpUUUUpHHHHp==pppYYYYPwwwwwwwwW",
+  "WpHHHHpUUUUpHHHHp==pppYYYYRwwlwwwwwW",
+  "WpHHHHpUUUUpHHHHp==pppYYYYBwwwwwwwwW",
+  "Wpppppppppppppppp==pppppepPbbbbbbbwW",
+  "Wpppppppppppppppp==pppppppPwwwwwwwwW",
+  "WpSSSSpIIIIpppppp==pSSSSppPwwwwwwwwW",
+  "WpSSSSpIIIIpppppp==pSSSSppPwwwwLwwwW",
+  "WpSdSSpINIIppppph==hSdSSppRwwwwwwlwW",
+  "WhppqppppMppppptp==pppQpppPwwwwwwwwW",
+  "W=========================PbbbbbbbwW",
+  "W=========================PwwwwwwwwW",
+  "Wpppppppppppppppp==pppppppPwwlwwwwwW",
+  "Wpppppppppppppppp==pppppppBwwwwLwwwW",
+  "WpXXXXpHHHHpUUUUp==ppSSSSpPwwwwwwwwW",
+  "WpXXXXpHHHHpUUUUp==ppSSSSpPwwwwwwwwW",
+  "WpXXXXpHHHHpUUUUp==ppSdSSpPbbbbbbbwW",
+  "Wpppppppppppppppp==ppppzepPwwwwwwwwW",
+  "Wpppppppppppppppp==pppppppPwwwwwwwwW",
+  "WpHHHHpYYYYpXXXXp==ppHHHHpPwwwLwwwwW",
+  "WpHHHHpYYYYpXXXXp==ppHHHHpRwwwwwwlwW",
+  "WpHHHHpYYYYpXXXXe==epHHHHpBwwwwwwwwW",
+  "Wpppppppppppppppp==pppppppPwwwwwwwwW",
+  "Wpppppppppppppppp==pppppppPppppppppW",
+  "WWWWWWWWWWWWWWWWWGGWWWWWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "fisherman_k",
+   "x": 25,
+   "z": 6
+  },
+  {
+   "id": "fisherman_k",
+   "x": 25,
+   "z": 13
+  },
+  {
+   "id": "fisherman_k",
+   "x": 24,
+   "z": 19
+  },
+  {
+   "id": "ferryman_k",
+   "x": 20,
+   "z": 18
+  },
+  {
+   "id": "merchant_man_k",
+   "x": 14,
+   "z": 14
+  },
+  {
+   "id": "merchant_woman_k",
+   "x": 10,
+   "z": 10
+  },
+  {
+   "id": "machi_woman_k",
+   "x": 5,
+   "z": 13
+  },
+  {
+   "id": "machi_man_k",
+   "x": 9,
+   "z": 18
+  },
+  {
+   "id": "child_boy_k",
+   "x": 5,
+   "z": 18
+  },
+  {
+   "id": "child_girl_k",
+   "x": 16,
+   "z": 16
+  },
+  {
+   "id": "okappiki_k",
+   "x": 24,
+   "z": 13
+  },
+  {
+   "id": "ronin_k",
+   "x": 5,
+   "z": 24
+  },
+  {
+   "id": "merchant_old_k",
+   "x": 19,
+   "z": 16
+  },
+  {
+   "id": "samurai_k",
+   "x": 15,
+   "z": 23
+  },
+  {
+   "id": "samurai_k",
+   "x": 20,
+   "z": 23
+  }
+ ],
+ "links": {
+  "17,25": {
+   "nextMap": "w_12_03",
+   "message": "コマチ港町の外へ",
+   "spawn": {
+    "x": 22,
+    "z": 29,
+    "angle": 3.14159
+   }
+  },
+  "18,25": {
+   "nextMap": "w_12_03",
+   "message": "コマチ港町の外へ",
+   "spawn": {
+    "x": 23,
+    "z": 29,
+    "angle": 3.14159
+   }
+  },
+  "3,9": {
+   "nextMap": "shop_k",
+   "params": {
+    "shopId": "item_shop"
+   },
+   "message": "道具屋に入る",
+   "icon": "itemShopIcon",
+   "back": {
+    "x": 3,
+    "z": 10,
+    "angle": 3.14159
+   }
+  },
+  "8,9": {
+   "nextMap": "city_inn_k",
+   "message": "旅籠・酒場に入る",
+   "icon": "innIcon",
+   "back": {
+    "x": 8,
+    "z": 10,
+    "angle": 3.14159
+   }
+  },
+  "21,9": {
+   "nextMap": "shop_k",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 21,
+    "z": 10,
+    "angle": 3.14159
+   }
+  },
+  "22,17": {
+   "nextMap": "town_e",
+   "message": "渡し船に乗る（ガリレオ連盟の港へ）",
+   "spawn": {
+    "x": 27,
+    "z": 8,
+    "angle": 3.14159
+   }
+  }
+ },
+ "heights": [
+  "000000000000000000000000000000000000",
+  "011111111111111111111111111111111110",
+  "012222222222222211122222221000000000",
+  "012111121111211111123321111000000000",
+  "012111121111211111123321111000000000",
+  "012111121111211111123321111000000000",
+  "012211122111221111123332111000000000",
+  "012221222212332111123333221000000000",
+  "012222222222333211122333321000000000",
+  "011222222222232211111133221000000000",
+  "012222222222233211111123221000000000",
+  "012222222222322211111122221000000000",
+  "012111122222211111111221111000000000",
+  "011111122222211111122221111000000000",
+  "011111122222211111122221111000000000",
+  "011111122222222211122222111000000000",
+  "011111122222222211122222211000000000",
+  "011111111222222211122222221000000000",
+  "011111111111211111122222221000000000",
+  "011111111111211111122222221000000000",
+  "011111111111211111122222221000000000",
+  "011111111222222211122222221000000000",
+  "011111112222222211122222221000000000",
+  "011111112222222211122222221000000000",
+  "011111112222222211122222221222222110",
+  "000000000000000000000000000000000000"
+ ],
+ "heightStep": 0.5
+}
