@@ -5,8 +5,8 @@
  "tileSize": 4,
  "wallHeight": 5,
  "spawn": {
-  "x": 12,
-  "z": 12,
+  "x": 17,
+  "z": 22,
   "angle": 0
  },
  "environment": {
@@ -33,87 +33,112 @@
   "2": "castle_exit"
  },
  "layout": [
-  "HHHHHHGGGGGGGGGGGGGHHHHHH",
-  "H____G___aaaaaaa___G____H",
-  "H____G___bbbbbbb___G____H",
-  "H________ccccccc________H",
-  "H____G_____________G____H",
-  "H____G_____________G____H",
-  "HS_SSGGGGGG___GGGGGGS_SSH",
-  "H____S____S___S____S____H",
-  "H_______________________H",
-  "H____S____S___S____S____H",
-  "HS_SSSS_SSSS_SSSS_SSS_SSH",
-  "H____S____S___S____S____H",
-  "H_______________________H",
-  "H____S____S___S____S____H",
-  "HHHHHHHHHHHH2HHHHHHHHHHHH"
+  "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+  "HHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+  "H____G___________G___________G____H",
+  "H____G___________G___________G____H",
+  "H____G_______________________G____H",
+  "H____G___________G___________G____H",
+  "H____HGGGGG_GGGGGHGGGGG_GGGGGH____H",
+  "H_________________________________H",
+  "H____S_______________________S____H",
+  "HSSSSHGGGGGGGGGGG_GGGGGGGGGGGHSSSSH",
+  "H____G______aaaaaaaaaaa______G____H",
+  "H____G______bbbbbbbbbbb______G____H",
+  "H___________ccccccccccc___________H",
+  "H____G_______________________G____H",
+  "H____G_______________________G____H",
+  "H____G_______________________G____H",
+  "HHHHHHHHHHHHHHGGG_GGGHHHHHHHHHHHHHH",
+  "HHHHHHHHHHHHHH_______HHHHHHHHHHHHHH",
+  "HHH_____________________________HHH",
+  "HHH__________S_______S__________HHH",
+  "HHH__________HSSS_SSSH__________HHH",
+  "HHH__________S_______S__________HHH",
+  "HHH__________________S__________HHH",
+  "HHH__________S_______S__________HHH",
+  "HHHHHHHHHHHHHHHHH2HHHHHHHHHHHHHHHHH"
  ],
  "npcs": [
   {
    "id": "daimyo_k",
-   "x": 12,
-   "z": 1
+   "x": 17,
+   "z": 10
   },
   {
    "id": "karo_k",
-   "x": 9,
-   "z": 2
-  },
-  {
-   "id": "daimyo_wife_k",
-   "x": 15,
-   "z": 2
+   "x": 14,
+   "z": 11
   },
   {
    "id": "sword_bearer_k",
-   "x": 13,
-   "z": 2
+   "x": 19,
+   "z": 10
   },
   {
    "id": "guard_k",
-   "x": 7,
-   "z": 3
-  },
-  {
-   "id": "guard_k",
-   "x": 17,
-   "z": 3
-  },
-  {
-   "id": "guard_k",
-   "x": 7,
-   "z": 5
-  },
-  {
-   "id": "guard_k",
-   "x": 17,
-   "z": 5
-  },
-  {
-   "id": "daimyo_retainer_k",
    "x": 8,
-   "z": 8
+   "z": 14
   },
   {
-   "id": "daimyo_master_k",
-   "x": 16,
-   "z": 8
+   "id": "guard_k",
+   "x": 26,
+   "z": 14
   },
   {
-   "id": "maid_k",
-   "x": 2,
-   "z": 8
-  },
-  {
-   "id": "daimyo_cook_k",
-   "x": 22,
+   "id": "guard_k",
+   "x": 10,
    "z": 12
   },
   {
+   "id": "guard_k",
+   "x": 24,
+   "z": 12
+  },
+  {
+   "id": "daimyo_retainer_k",
+   "x": 9,
+   "z": 4
+  },
+  {
+   "id": "daimyo_master_k",
+   "x": 23,
+   "z": 4
+  },
+  {
+   "id": "daimyo_wife_k",
+   "x": 31,
+   "z": 4
+  },
+  {
    "id": "maid_k",
-   "x": 2,
-   "z": 3
+   "x": 32,
+   "z": 7
+  },
+  {
+   "id": "guard_k",
+   "x": 5,
+   "z": 20
+  },
+  {
+   "id": "guard_k",
+   "x": 10,
+   "z": 22
+  },
+  {
+   "id": "maid_k",
+   "x": 28,
+   "z": 22
+  },
+  {
+   "id": "daimyo_cook_k",
+   "x": 26,
+   "z": 20
+  },
+  {
+   "id": "cook_k",
+   "x": 24,
+   "z": 22
   }
  ],
  "links": {}
