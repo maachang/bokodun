@@ -129,7 +129,7 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
             m['layout'], m['heights'] = TD.build_j(w, h, m['legend'], city_legend, m['links'], m['npcs'])
             m['environment'] = dict(DARK_FOREST_ENV, floorType='forest', fogNear=22, fogFar=66, ambientLight=0x6f8f76); m['decorFloor'] = 'forestGround'
         elif site['id'] == 'k':   # K（マカヒキ島の江戸風の国）: D と同じ作り（town_k.build_k）。渡し場・江戸風の見た目
-            m['layout'], m['heights'] = TK.build_k(w, h, m['legend'], city_legend, m['links'], m['npcs'])
+            m['layout'], m['heights'] = TK.build_k(w, h, m['legend'], city_legend, m['links'], m['npcs']); m['decorFloor'] = 'edoGround'
         elif site['id'] == 'f':   # F（山の麓の獣人とドワーフの街）: 段々の斜面（town_f.build）
             m['layout'], m['heights'] = TF.build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         elif site['id'] in ('d', 'h', 'e', 'b', 'c', 'i'):   # D（最初の街）・H・E（大きな港）は、施設・街の人・高低・川（港）を置く（scripts/world/town_d.py・town_h.py・town_e.py）

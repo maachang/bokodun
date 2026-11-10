@@ -26,8 +26,10 @@ NPCS_K = [   # 一般の住民（町人）・侍・船頭。殿様・家老は�
     ('merchant_old_k', 34, 12), ('machi_woman_k', 8, 21), ('okappiki_k', 33, 21), ('machi_woman_k', 10, 21),
     ('ronin_k', 36, 14), ('child_girl_k', 21, 21), ('child_boy_k', 5, 21), ('machi_woman_k', 30, 15),
 ]
-SKIN_EDO = {'H': 'edo_house', 'S': 'edo_shop', 'I': 'edo_inn', 'J': 'edo_shrine', 'W': 'edo_wall', 'G': 'edo_gate', 'z': 'ferry_sign'}   # 壁は木の板塀・門は大きな木の門
+SKIN_EDO = {'H': 'edo_house', 'S': 'edo_shop', 'I': 'edo_inn', 'J': 'edo_shrine', 'W': 'edo_wall', 'G': 'edo_gate', 'z': 'ferry_sign', 'p': 'plaza_dirt', '=': 'dirt_road', 'P': 'plaza_stone'}   # 地面は土（広場 plaza_dirt・通り dirt_road）。石畳（P）は城門前・橋のたもと・神社の参道だけ。壁は木の板塀・門は大きな木の門
 SHIPS_K = (('L', 12, 22), ('L', 27, 23), ('l', 14, 23), ('l', 25, 22), ('l', 36, 22), ('l', 3, 23))   # 川（港）に浮かぶ船（見た目だけ）
+
+STONE_ROWS = ((1, 16, 23), (2, 16, 23), (27, 16, 23), (28, 16, 23), (12, 27, 36), (21, 5, 8), (21, 17, 22), (21, 31, 34), (24, 5, 8), (24, 17, 22), (24, 31, 34))   # (行, 開始 x, 終了 x): 城門の前・南門の前・神社の参道・橋のたもと
 
 
 def build_k(w, h, legend, city_legend, links, npcs):
@@ -36,5 +38,8 @@ def build_k(w, h, legend, city_legend, links, npcs):
     for ch, x, y in SHIPS_K:
         assert g[y][x] == 'w', f'K の船 ({x},{y}): 水ではない'
         g[y][x] = ch
+    for y, x0, x1 in STONE_ROWS:   # 石畳を残す所（土の地面の上の、要所）
+        for x in range(x0, x1 + 1):
+            if g[y][x] in 'p=': g[y][x] = 'P'
     legend.update({'L': 'ship_large', 'l': 'ship_small'})
     return [''.join(r) for r in g], heights

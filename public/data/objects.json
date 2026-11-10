@@ -1609,6 +1609,12 @@
     ],
     "faceEvery": 2
   },
+  "plaza_dirt": {
+    "type": "floor_tile",
+    "texture": "edoGround",
+    "solid": false,
+    "description": "K（マカヒキ国）の街の広場の、踏み固めた土の地面（道路ではないので、移動速度ボーナスなし。道路は dirt_road）"
+  },
   "paved_road": {
     "type": "floor_tile",
     "texture": "pavedRoad",
