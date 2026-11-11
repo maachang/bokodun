@@ -46,7 +46,11 @@
   "r": "training_sign",
   "c": "church_sign",
   "w": "water",
-  "b": "wood_bridge"
+  "b": "wood_bridge",
+  "1": "stall_bazaar_spice",
+  "2": "stall_bazaar_carpet",
+  "3": "stall_bazaar_sweets",
+  "4": "stall_bazaar_kebab"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -59,13 +63,13 @@
   "W==============b===================W",
   "Wppppppppppppppw====pppppppppppppppW",
   "Wppppppppppppppw====pppppppppppppppW",
-  "WpIIIIpSSSSppppw=FF=vJJJJpppHHHHpppW",
-  "WpIIIIpSSSSpfvpw=FF=fJJJJpppHHHHpppW",
+  "WpIIIIpSSSSppppw3FF=vJJJJpppHHHHpppW",
+  "WpIIIIpSSSSpfvpw=FF2fJJJJpppHHHHpppW",
   "WpINIIpSdSSppppw====pJDJJpppHHHHpppW",
-  "W===M====r=====b=======c===========W",
+  "W===M====r=====b1======c===========W",
   "W==============b===================W",
   "Wppppppppppppppw====pppppppppppppppW",
-  "Wppppppppppppppw====pppppppppppppppW",
+  "Wppppppppppppppw4===pppppppppppppppW",
   "WpHHHHpHHHHppppw====pHHHHpHHHHpHHHHW",
   "WpHHHHpHHHHppppw====pHHHHpHHHHpHHHHW",
   "WpHHHHpHHHHppppw====pHHHHpHHHHpHHHHW",
@@ -111,6 +115,56 @@
    "id": "guard_light",
    "x": 19,
    "z": 24
+  },
+  {
+   "id": "junior_merchant_man",
+   "x": 16,
+   "z": 12
+  },
+  {
+   "id": "town_man",
+   "x": 16,
+   "z": 14
+  },
+  {
+   "id": "town_man",
+   "x": 19,
+   "z": 10
+  },
+  {
+   "id": "child_boy",
+   "x": 19,
+   "z": 12
+  },
+  {
+   "id": "town_middle_man",
+   "x": 20,
+   "z": 12
+  },
+  {
+   "id": "town_middle_man",
+   "x": 16,
+   "z": 9
+  },
+  {
+   "id": "town_man",
+   "x": 16,
+   "z": 11
+  },
+  {
+   "id": "junior_merchant_man",
+   "x": 16,
+   "z": 15
+  },
+  {
+   "id": "child_boy",
+   "x": 16,
+   "z": 17
+  },
+  {
+   "id": "town_middle_man",
+   "x": 17,
+   "z": 17
   },
   {
    "id": "town_woman",

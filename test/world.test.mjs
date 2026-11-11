@@ -1485,7 +1485,7 @@ test('H（ダマスカス自治領・辺境の街）: 施設 6 つ＋自治領�
     assert.ok(t.layout.some(row => row.includes('w')) && t.layout.some(row => row.includes('b')), '川と橋');
     assert.equal(t.layout.length, 26); assert.equal(t.layout[0].length, 36);
     assert.ok(lv(29, 6) >= 2 && lv(22, 12) >= 2, '館・神殿は高台');
-    assert.ok(t.npcs.length >= 5 && t.npcs.length <= 8);
+    assert.ok(t.npcs.length >= 5 && t.npcs.length <= 20, '街の人は 5〜20 人（屋台 4 軒の売り子と客を足した 2026-11-12）');
     for (const n of t.npcs) { assert.ok(npcDefs[n.id], n.id); assert.ok(!at(n.x, n.z)?.solid, `${n.id}: 歩ける所`); }
     const walk = (c, r) => { const d = at(c, r); return !d?.solid && d?.type !== 'liquid_tile' && d?.type !== 'door'; };
     for (let r = 0; r < 26; r++) for (let c = 0; c < 36; c++) for (const [dc, dr] of [[1, 0], [0, 1]]) {

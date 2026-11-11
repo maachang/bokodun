@@ -4,7 +4,7 @@
   貴族・国の代表は置かない（売り子・客は、一般の住民・商人・子供）。置く街と数は COUNT（街ごと。変更は指示で）
 """
 STALL_CH = ('1', '2', '3', '4')
-COUNT = {'k': 8, 'k1': 6, 'e': 8, 'a': 6, 'i': 6, 'd': 6, 'b': 6, 'f': 6, 'g': 6, 'j': 6}   # H は、街の人 5〜8 人の決め（小さな辺境の街）なので置かない。c は、すでに屋台がある（見た目だけ KIND で替える）
+COUNT = {'k': 8, 'k1': 6, 'e': 8, 'a': 6, 'i': 6, 'h': 4, 'd': 6, 'b': 6, 'f': 6, 'g': 6, 'j': 6}   # H は、小さな辺境の街なので 4 軒（2026-11-12 ユーザー指示。街の人の上限は、テストで 20）。c は、すでに屋台がある（見た目だけ KIND で替える）
 EDO = ('stall_edo_soba', 'stall_edo_tempura', 'stall_edo_sushi', 'stall_edo_dango')
 PORT = ('stall_port_fish', 'stall_port_grill', 'stall_port_shell', 'stall_port_fruit')
 SNOW = ('stall_snow_pirozhki', 'stall_snow_kvass', 'stall_snow_blini', 'stall_snow_tea')
