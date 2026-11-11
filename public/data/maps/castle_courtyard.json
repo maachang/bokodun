@@ -1,112 +1,112 @@
 {
-  "id": "castle_courtyard",
-  "name": "王城の中庭 (Courtyard)",
-  "type": "open",
-  "tileSize": 4,
-  "wallHeight": 5,
-  "nextMap": "castle",
-  "spawn": {
-    "x": 18,
-    "z": 7,
-    "angle": 1.570795
+ "id": "castle_courtyard",
+ "name": "王城の中庭 (Courtyard)",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": "castle",
+ "spawn": {
+  "x": 18,
+  "z": 7,
+  "angle": 1.570795
+ },
+ "environment": {
+  "floorType": "grass",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 12373460,
+  "fogNear": 22,
+  "fogFar": 80,
+  "visibility": 0.9,
+  "skyColor": 9683955
+ },
+ "legend": {
+  "W": "brick_wall",
+  "E": "building_exit",
+  "p": "plaza_stone",
+  "H": "brick_house",
+  "d": "wooden_door",
+  "w": "well",
+  "D": "training_dummy_out",
+  "T": "tree",
+  "C": "treasure_chest"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWW",
+  "W000000000p000000000W",
+  "W00HHHH000p000HHHH00W",
+  "W00HHHH000p000HHHH00W",
+  "W00HdHH000p0T0HHHH00W",
+  "W000000000p000000000W",
+  "W0T0000000p0000000T0W",
+  "WpppppppppwpppppppppE",
+  "W000000000p000000000W",
+  "W000000000p000000000W",
+  "W000000000p000D0D000W",
+  "W0000C00T0p000000000W",
+  "W0T0000000p000D0D000W",
+  "W000000000p000000000W",
+  "WWWWWWWWWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "guard_spear",
+   "x": 15,
+   "z": 11,
+   "wanderRadius": 1.5
   },
-  "environment": {
-    "floorType": "grass",
-    "hasCeiling": false,
-    "ambientLight": 9408660,
-    "directionalLight": 16774610,
-    "fogColor": 12373460,
-    "fogNear": 22,
-    "fogFar": 80,
-    "visibility": 0.9,
-    "skyColor": 9683955
+  {
+   "id": "guard_spear",
+   "x": 9,
+   "z": 5,
+   "wanderRadius": 1.5
   },
-  "legend": {
-    "W": "brick_wall",
-    "E": "building_exit",
-    "p": "plaza_stone",
-    "H": "brick_house",
-    "d": "wooden_door",
-    "w": "well",
-    "D": "training_dummy_out",
-    "T": "tree",
-    "C": "treasure_chest"
-  },
-  "enemies": {},
-  "layout": [
-    "WWWWWWWWWWWWWWWWWWWWW",
-    "W000000000p000000000W",
-    "W00HHHH000p000HHHH00W",
-    "W00HHHH000p000HHHH00W",
-    "W00HdHH000p0T0HHHH00W",
-    "W000000000p000000000W",
-    "W0T0000000p00000C0T0W",
-    "WpppppppppwpppppppppE",
-    "W000000000p000000000W",
-    "W000000000p000000000W",
-    "W000000000p000D0D000W",
-    "W0000000T0p000000000W",
-    "W0T0000000p000D0D000W",
-    "W000000000p000000000W",
-    "WWWWWWWWWWWWWWWWWWWWW"
-  ],
-  "npcs": [
-    {
-      "id": "guard_spear",
-      "x": 15,
-      "z": 11,
-      "wanderRadius": 1.5
-    },
-    {
-      "id": "guard_spear",
-      "x": 9,
-      "z": 5,
-      "wanderRadius": 1.5
-    },
-    {
-      "id": "servant_man",
-      "x": 11,
-      "z": 8,
-      "wanderRadius": 1.5
-    }
-  ],
-  "links": {
-    "4,4": {
-      "nextMap": "castle_smithy",
-      "message": "鍛冶場に入る",
-      "back": {
-        "x": 4,
-        "z": 5,
-        "angle": 0
-      }
-    }
-  },
-  "heights": [
-    "000000000000000000000",
-    "011111111111111111110",
-    "012111122222222222210",
-    "012111122222222222210",
-    "012101122222222222210",
-    "012212222222222222210",
-    "011222222222222555510",
-    "011122222222222555510",
-    "011112222222222554510",
-    "011111222222222223210",
-    "011111111111122221110",
-    "011111111111111111110",
-    "011111111111111111110",
-    "011111111111111111110",
-    "000000000000000000000"
-  ],
-  "heightStep": 0.5,
-  "fallDamagePerLevel": 6,
-  "gimmickBoxes": [
-    {
-      "name": "terrace",
-      "r0": 5,
-      "c0": 14,
-      "r1": 10,
-      "c1": 19
-    }
-  ]
+  {
+   "id": "servant_man",
+   "x": 11,
+   "z": 8,
+   "wanderRadius": 1.5
+  }
+ ],
+ "links": {
+  "4,4": {
+   "nextMap": "castle_smithy",
+   "message": "鍛冶場に入る",
+   "back": {
+    "x": 4,
+    "z": 5,
+    "angle": 0
+   }
+  }
+ },
+ "heights": [
+  "000000000000000000000",
+  "011111111111111111110",
+  "012111122222222222210",
+  "012111122222222222210",
+  "012101122222222222210",
+  "012212222222222222210",
+  "011222222222222222210",
+  "011122222222222222210",
+  "011112222222222222210",
+  "011111222222222222210",
+  "011144443211122221110",
+  "011144441111111111110",
+  "011144441111111111110",
+  "011111111111111111110",
+  "000000000000000000000"
+ ],
+ "heightStep": 0.5,
+ "fallDamagePerLevel": 6,
+ "gimmickBoxes": [
+  {
+   "name": "terrace",
+   "r0": 9,
+   "c0": 3,
+   "r1": 13,
+   "c1": 9
+  }
+ ]
 }
