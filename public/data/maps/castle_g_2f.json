@@ -1,0 +1,100 @@
+{
+ "id": "castle_g_2f",
+ "name": "樹上の回廊（女王の城 2階）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 9,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "forest",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "woodWall",
+  "ambientLight": 12648384,
+  "directionalLight": 16777184,
+  "fogColor": 8438656,
+  "fogNear": 18,
+  "fogFar": 60,
+  "visibility": 0.9,
+  "skyColor": 8438656
+ },
+ "legend": {
+  "D": "stairs_wood_down",
+  "F": "wood_floor",
+  "H": "forest_hedge_wall",
+  "L": "wall_sconce_wood",
+  "N": "wall_window_wood",
+  "T": "table",
+  "U": "stairs_wood_up",
+  "W": "wooden_wall",
+  "e": "bed",
+  "h": "chair",
+  "k": "bookshelf",
+  "v": "flower_bed"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWNWWWWWWWWWNWWWWWWWWWNWWWWW",
+  "WFkFkFkFkFHFFFFFFFFFHFFFFFFFFFW",
+  "WFFFFFFFFFHFvFFFFFFFHFeFeFeFeFW",
+  "WFFFFFFFFFHFFFhThFFFHFFFFFFFFFW",
+  "WFFFhThFFFHFFFFFFFvFHFFFFFFFFFW",
+  "WFFFFFFFFFHFFFFFFFFFHFFFFFFFFFW",
+  "WHHHHFHHHHLHHHHFHHHHLHHHHFHHHHW",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
+  "NDFFFFFFFFFFFFFFFFFFFFFFFFFFFUN",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
+  "WWWNWWWWWNWWWWWNWWWWWNWWWWWNWWW"
+ ],
+ "npcs": [
+  {
+   "id": "elf_woman_c",
+   "x": 6,
+   "z": 3
+  },
+  {
+   "id": "elf_man_b",
+   "x": 10,
+   "z": 9
+  },
+  {
+   "id": "elf_girl",
+   "x": 20,
+   "z": 8
+  },
+  {
+   "id": "elf_boy",
+   "x": 22,
+   "z": 9
+  }
+ ],
+ "links": {
+  "1,9": {
+   "nextMap": "castle_g",
+   "message": "階段を下りる（1階へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 11,
+    "z": 16,
+    "angle": 0.0
+   }
+  },
+  "29,9": {
+   "nextMap": "castle_g_crown",
+   "message": "階段を上る（梢の庭へ）",
+   "dir": "e",
+   "spawn": {
+    "x": 2,
+    "z": 17,
+    "angle": -1.570795
+   }
+  }
+ }
+}

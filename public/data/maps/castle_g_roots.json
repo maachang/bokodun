@@ -1,0 +1,77 @@
+{
+ "id": "castle_g_roots",
+ "name": "根の洞窟（女王の城の地下。精霊の魔法陣）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 7,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "forest",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "rock",
+  "ambientLight": 6591840,
+  "directionalLight": 9742474,
+  "fogColor": 1714720,
+  "fogNear": 10,
+  "fogFar": 40,
+  "visibility": 0.75,
+  "skyColor": 1714720
+ },
+ "legend": {
+  "M": "magic_circle",
+  "R": "rock_wall",
+  "U": "stairs_wood_up",
+  "X": "crate",
+  "f": "cave_torch",
+  "v": "flower_bed",
+  "y": "plaza_forest"
+ },
+ "enemies": {},
+ "layout": [
+  "RRRRRRRRRRRRRRRRRRRRRRRRR",
+  "RyfyyyyyfyRRRyfyyyyyyyfyR",
+  "RyyyyyyyyyRRRyyyyyyyyyyyR",
+  "RyyyyvyyyyRRRyyyyyyyyyyyR",
+  "RyyyyyyyyyRRRyyyyyyyyyyyR",
+  "RyyyyyyyyyRRRyyyyyyyyyyyR",
+  "RyyyyyyyyyyyyyyyyMMMyyyyR",
+  "RUyyyyyyyyyyyyyyyMMMyyyyR",
+  "RyyyyyyyyyyyyyyyyMMMyyyyR",
+  "RyyyyyyyyyRRRyyyyyyyyyyyR",
+  "RyyyyyyyyyRRRyyyyyyyyyyyR",
+  "RyyyyvyyyyRRRyyXyyyyyXyyR",
+  "RyyyyyyyyyRRRyyyyyyyyyyyR",
+  "RyfyyyyyfyRRRyfyyyyyyyfyR",
+  "RRRRRRRRRRRRRRRRRRRRRRRRR"
+ ],
+ "npcs": [
+  {
+   "id": "elf_man_a",
+   "x": 8,
+   "z": 5
+  },
+  {
+   "id": "elf_woman_a",
+   "x": 20,
+   "z": 4
+  }
+ ],
+ "links": {
+  "1,7": {
+   "nextMap": "castle_g",
+   "message": "階段を上る（1階へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 16,
+    "angle": -1.570795
+   }
+  }
+ }
+}

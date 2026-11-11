@@ -1,0 +1,86 @@
+{
+ "id": "castle_g_crown",
+ "name": "梢の庭（女王の城。世界樹のてっぺん）",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 17,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "forest",
+  "hasCeiling": false,
+  "ambientLight": 14742480,
+  "directionalLight": 16777184,
+  "fogColor": 11591648,
+  "fogNear": 24,
+  "fogFar": 80,
+  "visibility": 0.9,
+  "skyColor": 11591648
+ },
+ "legend": {
+  "D": "stairs_wood_down",
+  "H": "forest_hedge_wall",
+  "Z": "world_tree",
+  "g": "conifer_tree_a",
+  "l": "lavender_flower",
+  "o": "bush_flower",
+  "p": "path_flower",
+  "r": "fern",
+  "y": "plaza_forest"
+ },
+ "enemies": {},
+ "layout": [
+  "HHHHHHHHHHHHHHHHHHHHHHHHH",
+  "H00000000000y00000000000H",
+  "H00000000000y00000000000H",
+  "H00g000000o0y0o000000g00H",
+  "H00000000000y00000000000H",
+  "H0000000p000y000p0000000H",
+  "H00000000000y00000000000H",
+  "H000lr000000y000000r0000H",
+  "H00000000000y00000000000H",
+  "HyyyyyyyyyyyZyyyyyyyyyyyH",
+  "H00000000000y00000000000H",
+  "H00000o00000y00000o00000H",
+  "H0000000g000y0000000l000H",
+  "H000000000p0y0p000000000H",
+  "H00000000000y00000000g00H",
+  "H00g00000000y00l00000000H",
+  "H0000000r000y000r0000000H",
+  "HD0000000000y00000000000H",
+  "HHHHHHHHHHHHHHHHHHHHHHHHH"
+ ],
+ "npcs": [
+  {
+   "id": "elf_girl",
+   "x": 6,
+   "z": 9
+  },
+  {
+   "id": "elf_boy",
+   "x": 18,
+   "z": 9
+  },
+  {
+   "id": "elf_woman_c",
+   "x": 14,
+   "z": 12
+  }
+ ],
+ "links": {
+  "1,17": {
+   "nextMap": "castle_g_2f",
+   "message": "階段を下りる（樹上の回廊へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 28,
+    "z": 9,
+    "angle": 1.570795
+   }
+  }
+ }
+}
