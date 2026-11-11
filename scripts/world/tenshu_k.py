@@ -9,14 +9,8 @@
   - 地下 25×17: 牢 4 つ・廊下・穴蔵（蔵）・井戸・牢番の詰所（石積み）
 作り方: 全体を壁で埋め、区画（部屋・廊下）をくり抜き、区画の間の壁をふすまに（1 階・2 階）。戸口は壁を抜く。家具・窓は、座標で置く（床・壁を、置く前に確かめる）
 """
-import copy
-import json
-import os
-
-MAPS = os.path.join(os.path.dirname(__file__), '..', '..', 'public', 'data', 'maps')
-PI = 3.14159
-FACE = {'n': PI, 's': 0.0, 'e': PI / 2, 'w': -PI / 2}   # 階段から降り立ったときに、向く角度（階段に背を向ける）
-STEP = {'n': (0, 1), 's': (0, -1), 'e': (-1, 0), 'w': (1, 0)}   # 階段の方向 d のとき、降り立つマスへの差（階段の反対側）
+from castle_kit import PI, arrival, finish, grid, put   # 共通の道具
+from castle_kit import make as _make
 
 LEG = {'W': 'wooden_wall', 'S': 'fusuma_wall', '_': 'tatami', '=': 'wood_floor', 'M': 'wall_window_wood', 'U': 'stairs_wood_up', 'D': 'stairs_wood_down',
        'e': 'building_exit', 'X': 'crate', 'B': 'barrel', 'R': 'weapon_rack', 'K': 'sack_pile', 'T': 'table', 'h': 'edo_hibachi', 'g': 'edo_tansu',
@@ -29,54 +23,7 @@ ENV_STONE = {'floorType': 'stone', 'hasCeiling': True, 'footstep': 'stone', 'cei
              'fogColor': 1710618, 'fogNear': 8, 'fogFar': 34, 'visibility': 0.75, 'skyColor': 1710618}
 
 
-def grid(w, h, areas, doors, kinds, wall='W', part='S'):
-    """区画（名前 → (種類, x0, y0, x1, y1)）をくり抜く。区画の間の壁は part（ふすま）。doors は、壁を抜く戸口"""
-    owner = [[None] * w for _ in range(h)]
-    for n, (k, x0, y0, x1, y1) in areas.items():
-        for y in range(y0, y1 + 1):
-            for x in range(x0, x1 + 1):
-                assert owner[y][x] is None, f'{n}: 区画が重なる ({x},{y})'
-                owner[y][x] = k
-    g = [[kinds[owner[y][x]] if owner[y][x] else wall for x in range(w)] for y in range(h)]
-    if part:
-        for y in range(1, h - 1):
-            for x in range(1, w - 1):
-                if owner[y][x]: continue
-                for a, b in (((x - 1, y), (x + 1, y)), ((x, y - 1), (x, y + 1))):
-                    if owner[a[1]][a[0]] and owner[b[1]][b[0]]: g[y][x] = part
-    for x, y in doors:
-        assert g[y][x] in (part or wall), f'戸口 ({x},{y}) が壁ではない'
-        near = [owner[y + dy][x + dx] for dx, dy in ((1, 0), (-1, 0), (0, 1), (0, -1)) if owner[y + dy][x + dx]]
-        g[y][x] = kinds['c'] if 'c' in near and kinds['c'] != kinds.get('r') else kinds[near[0]]
-    return g
-
-
-def put(g, items, was):
-    """items: {文字: [(x, y), ...]}。置く前に、そこが was（文字の集まり）か確かめる"""
-    for ch, ps in items.items():
-        for x, y in ps:
-            assert g[y][x] in was, f'{ch} を置く ({x},{y}) が {g[y][x]!r}（{was!r} のはず）'
-            g[y][x] = ch
-
-
-def arrival(x, y, d):
-    dx, dy = STEP[d]
-    return {'x': x + dx, 'z': y + dy, 'angle': FACE[d]}
-
-
-def make(mid, name, g, stairs, npcs, link_to, leg=LEG, env=ENV_WOOD, wall_h=5, spawn=None):
-    """マップを組み立てる。stairs: {'U': (x, y, d), 'D': (x, y, d)}（無い階段は書かない）。link_to: {'U': (行き先 ID, 行き先の降り立ち)}"""
-    rows = [''.join(r) for r in g]
-    used = sorted(set(''.join(rows)))
-    m = {'id': mid, 'name': name, 'type': 'indoor', 'tileSize': 4, 'wallHeight': wall_h, 'nextMap': None, 'spawn': spawn,
-         'environment': dict(env), 'legend': {c: leg[c] for c in used}, 'enemies': {}, 'layout': rows, 'npcs': [], 'links': {}}
-    for ch, (x, y, d) in stairs.items():
-        dest, spw, msg = link_to[ch]
-        m['links'][f'{x},{y}'] = {'nextMap': dest, 'message': msg, 'dir': d, 'spawn': spw}
-    for i, x, y in npcs:
-        assert g[y][x] in '_=F', f'{mid}: {i} ({x},{y}) が床ではない（{g[y][x]!r}）'
-        m['npcs'].append({'id': i, 'x': x, 'z': y})
-    return m
+def make(*a, leg=LEG, env=ENV_WOOD, **k): return _make(*a, leg=leg, env=env, **k)   # 既定は、木造の天守の凡例・環境
 
 
 # 階段（x, y, 向き）。向き＝階段のある側の壁（n=北・s=南・e=東・w=西）。降り立つマスは、その反対側
@@ -177,4 +124,4 @@ def attach(k):
 
 def build():
     """天守 1〜5 階と地下のマップ（list）"""
-    return [_floor_1f(), _floor_2f(), _floor_3f(), _floor_4f(), _floor_5f(), _basement()]
+    return finish([_floor_1f(), _floor_2f(), _floor_3f(), _floor_4f(), _floor_5f(), _basement()])

@@ -1,0 +1,57 @@
+{
+ "id": "castle_a_bell",
+ "name": "鐘楼（帝王の城）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 5,
+  "z": 6,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "brick",
+  "ambientLight": 10096512,
+  "directionalLight": 13615264,
+  "fogColor": 2761760,
+  "fogNear": 14,
+  "fogFar": 48,
+  "visibility": 0.9,
+  "skyColor": 2761760
+ },
+ "legend": {
+  "2": "castle_exit",
+  "F": "brick_floor",
+  "L": "wall_sconce",
+  "N": "wall_window_stone",
+  "S": "stove_stone",
+  "T": "table_stone",
+  "W": "brick_wall",
+  "h": "chair_stone",
+  "k": "bookshelf_stone"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWNWW",
+  "WFFkkFFFSFW",
+  "WFFFFFFFFFW",
+  "NFFFFFFFFFN",
+  "WFFFFFhTFFW",
+  "WFFFFFFFFFW",
+  "LFFFFFFFFFL",
+  "WFFFFFFFFFW",
+  "WWNWW2WWNWW"
+ ],
+ "npcs": [
+  {
+   "id": "servant_man",
+   "x": 3,
+   "z": 5
+  }
+ ],
+ "links": {}
+}

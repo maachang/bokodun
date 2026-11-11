@@ -1,0 +1,131 @@
+{
+ "id": "castle_a_2f",
+ "name": "帝王の居室（帝王の城 2階）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 9,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "brick",
+  "ambientLight": 10096512,
+  "directionalLight": 13615264,
+  "fogColor": 2761760,
+  "fogNear": 14,
+  "fogFar": 48,
+  "visibility": 0.9,
+  "skyColor": 2761760
+ },
+ "legend": {
+  "D": "stairs_stone_down",
+  "F": "brick_floor",
+  "K": "chandelier_castle_rug",
+  "L": "wall_sconce",
+  "N": "wall_window_stone",
+  "R": "wall_banner_red",
+  "S": "stove_stone",
+  "T": "table_stone",
+  "W": "brick_wall",
+  "X": "crate_stone",
+  "d": "wooden_door",
+  "e": "bed_stone",
+  "h": "chair_stone",
+  "k": "bookshelf_stone",
+  "u": "castle_rug"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWNWWWWWWWWWNWWWWWWWWWNWWWWWWWWWWWWW",
+  "WFFFSFFFWFeFeFFFFFWFFFFFFFFFWFkFkFkFW",
+  "WFFFFFFFWFFFFFFFFFWFFFFFFFFFWFFFFFFFW",
+  "WFFFFFFFWFFFFFFFFFWFFFhThFFFWFFFFFFFW",
+  "WFFFFTFFWFFFFFFFXFWFFFFFFFFFWFhThFFFW",
+  "WFFFFFFFWFFFFFFFFFWFFFFFFFFFWFFFFFFFW",
+  "WWWWFWWWLWWWWFWWWWLWWWWFWWWWLWWWFWWWW",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
+  "NDuuuuuuuKuuuuuuuuKuuuuuuuuKuuuuuuuDN",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
+  "WWWNWWdWWWRWWWNWWWRWWWNWWWRWWWdWWNWWW"
+ ],
+ "npcs": [
+  {
+   "id": "maid_head",
+   "x": 14,
+   "z": 8
+  },
+  {
+   "id": "maid",
+   "x": 11,
+   "z": 3
+  },
+  {
+   "id": "butler",
+   "x": 31,
+   "z": 3
+  },
+  {
+   "id": "guard_heavy",
+   "x": 10,
+   "z": 8
+  },
+  {
+   "id": "guard_heavy",
+   "x": 26,
+   "z": 8
+  },
+  {
+   "id": "maid",
+   "x": 24,
+   "z": 8
+  }
+ ],
+ "links": {
+  "1,9": {
+   "nextMap": "castle_a",
+   "message": "階段を下りる（1階へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 2,
+    "angle": -1.570795
+   }
+  },
+  "35,9": {
+   "nextMap": "castle_a",
+   "message": "階段を下りる（1階へ）",
+   "dir": "e",
+   "spawn": {
+    "x": 34,
+    "z": 2,
+    "angle": 1.570795
+   }
+  },
+  "6,12": {
+   "nextMap": "castle_a_watch",
+   "message": "見張りの塔へ",
+   "back": {
+    "x": 6,
+    "z": 11,
+    "angle": 0
+   }
+  },
+  "30,12": {
+   "nextMap": "castle_a_bell",
+   "message": "鐘楼へ",
+   "back": {
+    "x": 30,
+    "z": 11,
+    "angle": 0
+   }
+  }
+ }
+}

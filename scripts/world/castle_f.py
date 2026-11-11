@@ -72,7 +72,8 @@ def build_others():
     out[[m['id'] for m in out].index('castle_k')] = __import__('castle_k').build(next(m for m in out if m['id'] == 'castle_k'))   # 殿様の城: 全面畳・ふすまで区切られた狭い部屋（castle_k.py）
     tk = __import__('tenshu_k')   # 殿様の城に、天守（5 階）と地下（牢・穴蔵）をつなぐ（tenshu_k.py）
     tk.attach(next(m for m in out if m['id'] == 'castle_k')); out += tk.build()
-    add_hearth(next(m for m in out if m['id'] == 'castle_a'), 5, 1)   # 帝王の城（雪国）: 暖炉を 1 つ（玉座の間の、北の壁ぎわ）
+    fort = __import__('castle_a_fort').build()   # 帝王の城（雪国）: 中庭を囲む石の要塞（1 階・2 階・塔・中庭・氷室・牢。castle_a_fort.py）
+    out[[m['id'] for m in out].index('castle_a')] = fort[0]; out += fort[1:]
     return out
 
 

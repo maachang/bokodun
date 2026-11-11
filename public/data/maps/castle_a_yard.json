@@ -1,0 +1,72 @@
+{
+ "id": "castle_a_yard",
+ "name": "中庭（帝王の城。雪の庭）",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 12,
+  "z": 16,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "snow",
+  "hasCeiling": false,
+  "ambientLight": 16777215,
+  "directionalLight": 16777215,
+  "fogColor": 14674418,
+  "fogNear": 14,
+  "fogFar": 48,
+  "visibility": 0.85,
+  "skyColor": 14674418
+ },
+ "legend": {
+  "2": "castle_exit",
+  "I": "ice",
+  "O": "well",
+  "W": "brick_wall",
+  "o": "snow_pine",
+  "y": "plaza_stone_snow"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWW",
+  "W00000000000y00000000000W",
+  "W0o000000000y000000000o0W",
+  "W00000000000y00o00000000W",
+  "W00000III000y00000000000W",
+  "W00000III000y00000000000W",
+  "W00000000000y00000000000W",
+  "W00000000000y00000000000W",
+  "W0000o000000O00000000000W",
+  "WyyyyyyyyyyyyyyyyyyyyyyyW",
+  "W00000000000y000000o0000W",
+  "W00000000000y00000000000W",
+  "W00000000000y00000000000W",
+  "W00000000000y000III00000W",
+  "W00000000000y000III00000W",
+  "W00000000o00y00000000000W",
+  "W0o000000000y000000000o0W",
+  "W00000000000y00000000000W",
+  "WWWWWWWWWWWW2WWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "guard_heavy",
+   "x": 10,
+   "z": 9
+  },
+  {
+   "id": "guard_heavy",
+   "x": 14,
+   "z": 9
+  },
+  {
+   "id": "servant_man",
+   "x": 20,
+   "z": 14
+  }
+ ],
+ "links": {}
+}

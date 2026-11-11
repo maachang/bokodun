@@ -1,0 +1,62 @@
+{
+ "id": "castle_a_watch",
+ "name": "見張りの塔（帝王の城）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 5,
+  "z": 6,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "brick",
+  "ambientLight": 10096512,
+  "directionalLight": 13615264,
+  "fogColor": 2761760,
+  "fogNear": 14,
+  "fogFar": 48,
+  "visibility": 0.9,
+  "skyColor": 2761760
+ },
+ "legend": {
+  "2": "castle_exit",
+  "F": "brick_floor",
+  "L": "wall_sconce",
+  "N": "wall_window_stone",
+  "Q": "weapon_rack_stone",
+  "S": "stove_stone",
+  "T": "table_stone",
+  "W": "brick_wall",
+  "h": "chair_stone"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWNWW",
+  "WFFQFFFQFFW",
+  "WFFFFFFFFFW",
+  "NFFFFFFFFFN",
+  "WFFFhThFFFW",
+  "WFFFFFFFFFW",
+  "LFFFFFFFSFL",
+  "WFFFFFFFFFW",
+  "WWNWW2WWNWW"
+ ],
+ "npcs": [
+  {
+   "id": "guard_heavy",
+   "x": 5,
+   "z": 2
+  },
+  {
+   "id": "guard_heavy",
+   "x": 2,
+   "z": 5
+  }
+ ],
+ "links": {}
+}
