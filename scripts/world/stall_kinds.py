@@ -18,10 +18,11 @@ def frame(post, roof, roof_y=2.65, w=3.9, d=2.8):
     return p + [box(w, 0.1, d, 0, roof_y, 0, roof), box(3.0, 0.9, 0.7, 0, 0.45, 0.3, post), box(3.0, 0.08, 0.9, 0, 0.94, 0.3, '#8b5a2b')]
 
 
-def stripes(cols, y=2.7, n=6):
-    """日よけの縞（n 本の細い帯を、色を交互に）"""
+def stripes(cols, y=2.58, n=6):
+    """日よけの縞。前に垂れる布（遠目でも見える）と、日よけの下の面（見上げた所）に、色を交互に付ける"""
     w = 3.9 / n
-    return [box(w, 0.12, 2.8, -1.95 + w * (i + 0.5), y, 0, cols[i % len(cols)]) for i in range(n)]
+    xs = [-1.95 + w * (i + 0.5) for i in range(n)]
+    return [box(w, 0.5, 0.07, x, 2.38, 1.43, cols[i % len(cols)]) for i, x in enumerate(xs)] + [box(w, 0.06, 2.8, x, y, 0, cols[i % len(cols)]) for i, x in enumerate(xs)]
 
 
 def row(cols, y, z=0.3, size=(0.5, 0.3, 0.5)):
