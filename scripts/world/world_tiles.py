@@ -270,6 +270,10 @@ def _tiles_water(g):
     put(t['deep'] & ~lake, 'Q')
     put(lake & t['deep'], 'Q'); put(lake & t['deep'] & (d_nonlake >= 3), 'O')
     put(t['shallow'], 'q')
+    for site in t['towns']:   # I（湖の街）: 壁のすぐ西の 3 マスは、深い水（O）だけ。壁と深い水の間に、浅瀬・普通の水を残さない（港町 E・K1 と同じ。湖の岸から 3 マスは浅瀬になる規則が、壁を岸とみなしていた）
+        if site['id'] != 'i': continue
+        reg = np.zeros((H, W), bool); reg[site['y'] - TOWN_HH:site['y'] + TOWN_HH, site['x'] - TOWN_HW - 3:site['x'] - TOWN_HW] = True
+        put(reg & lake, 'O')
     # 橋のたもと（橋から 2 マス以内）は、通れる物（木・柱）を置かない。木が橋の出入り口をふさがない
     near_bridge = T.box_mean(t['bridge'].astype(np.float32), 2) > 0
     for ch in SOLID_CH: obj[near_bridge & land & (obj == ord(ch))] = ord('0')

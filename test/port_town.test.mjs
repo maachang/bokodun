@@ -53,6 +53,14 @@ for (const id of ['e', 'k1']) {
     });
 }
 
+// I（カナロア公国・湖の街）: 壁の西側のすぐ外が、どの行も深い水（浅瀬・普通の水を挟まない）。湖の街も、港町と同じ「水に密接」（浅瀬は、ユーザー指摘で不可）
+test('湖の街 i: 西の壁のすぐ外 3 マスが、どの行も深い水（sea）。壁と深い水の間に、浅瀬・水がない', () => {
+    const w = townWall('i');
+    const bad = [];
+    for (let y = w.y0; y <= w.y1; y++) for (let d = 1; d <= 3; d++) { const n = tileName(w.x0 - d, y); if (!isSea(n)) bad.push(`(${w.x0 - d},${y}) ${n}`); }
+    assert.deepEqual(bad, [], `壁の西の隣 3 マスが深い水でない: ${bad.slice(0, 8).join(' / ')}`);
+});
+
 // 町の中に港（水・桟橋・船）があるなら、町の外も港（同じ海に、桟橋と船）。K1 の外のマップ
 test('港町 k1: 町の外にも港がある。壁の東の海に、桟橋（plank_bridge）が海へ伸び、係留した船が 2 隻以上ある', () => {
     const w = townWall('k1');
