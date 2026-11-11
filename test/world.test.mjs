@@ -1435,7 +1435,7 @@ test('D（グリーン王国・最初の街）: 施設 7 つ（武器屋・道�
         const front = objects[t.legend[t.layout[r + 1][c]]];
         assert.ok(!front?.solid, `(${c},${r}): 扉の前が歩ける`);
     }
-    assert.ok(t.npcs.length >= 5 && t.npcs.length <= 16, '街の人は 5〜16 人（城門の衛兵 2 人を含む。国力 A の下限 16 人。仕様書 43-100）');
+    assert.ok(t.npcs.length >= 5 && t.npcs.length <= 32, '街の人は 5〜32 人（城門の衛兵 2 人を含む。国力 A の下限 16 人。仕様書 43-100。上限は、屋台の売り子・客 15 人を足した 2026-11-12）');
     for (const n of t.npcs) {
         assert.ok(npcDefs[n.id], `${n.id}: NPC の定義がある`);
         const o = objects[t.legend[t.layout[n.z][n.x]]];

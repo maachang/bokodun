@@ -49,7 +49,11 @@
   "m": "mage_guild_sign",
   "q": "item_shop_sign",
   "r": "training_sign",
-  "w": "water"
+  "w": "water",
+  "1": "stall_mountain_roast",
+  "2": "stall_mountain_ale",
+  "3": "stall_mountain_forge",
+  "4": "stall_mountain_mushroom"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWCCWWWWWWWWWWWWWWWWWWW",
@@ -65,8 +69,8 @@
   "WTppppppppppppppppppppppppppppppppppppTW",
   "WppHHHHSSSSppSSSSpHHHHpSSSSpSSSSpppHHHHW",
   "WppHHHHSSSSppSSSSpHHHHpSSSSpSSSSpppHHHHW",
-  "WppHHHHSdSSppSdSSpHHHHpSdSSpSdSSpppHHHHW",
-  "WppppppppqpppppQfppppppppavppprppppppppW",
+  "WppHHHHSdSSp3SdSSpHHHH2SdSSpSdSS2ppHHHHW",
+  "WppppppppqpppppQf1pppppppavppprppppppppW",
   "WppppppppppppppppppppppppppppppppppppppW",
   "Wpppp==============================ppppW",
   "Wpppp==============================ppppW",
@@ -74,7 +78,7 @@
   "Wpppp================ppppppppppppppppppW",
   "Wpppp================ppppppppppppppppppW",
   "Wpppppppppppppppppp==ppppppppppppppppppW",
-  "WppppppIIIIppHHHHpp==pppppppHHHHpHHHHppW",
+  "WppppppIIIIppHHHH4p==pppppp1HHHHpHHHHppW",
   "WppppppIIIIppHHHHpp==pppppppHHHHpHHHHppW",
   "WppppppINIIppHHHHpp==ppvppppHHHHpHHHHppW",
   "WpHHHHpppMppppppppp==ppppppppppppppppppW",
@@ -178,6 +182,81 @@
    "id": "beast_soldier_kobold_gate",
    "x": 22,
    "z": 1
+  },
+  {
+   "id": "dwarf_man",
+   "x": 17,
+   "z": 13
+  },
+  {
+   "id": "beast_a",
+   "x": 17,
+   "z": 15
+  },
+  {
+   "id": "dwarf_woman",
+   "x": 22,
+   "z": 12
+  },
+  {
+   "id": "beast_c",
+   "x": 22,
+   "z": 14
+  },
+  {
+   "id": "beast_d",
+   "x": 23,
+   "z": 14
+  },
+  {
+   "id": "dwarf_smith",
+   "x": 12,
+   "z": 12
+  },
+  {
+   "id": "dwarf_man",
+   "x": 12,
+   "z": 14
+  },
+  {
+   "id": "beast_f_a",
+   "x": 17,
+   "z": 21
+  },
+  {
+   "id": "beast_f_b",
+   "x": 17,
+   "z": 23
+  },
+  {
+   "id": "beast_a",
+   "x": 18,
+   "z": 23
+  },
+  {
+   "id": "dwarf_man",
+   "x": 27,
+   "z": 21
+  },
+  {
+   "id": "beast_b",
+   "x": 27,
+   "z": 23
+  },
+  {
+   "id": "dwarf_woman",
+   "x": 32,
+   "z": 12
+  },
+  {
+   "id": "beast_d",
+   "x": 32,
+   "z": 14
+  },
+  {
+   "id": "dwarf_man",
+   "x": 33,
+   "z": 14
   }
  ],
  "links": {

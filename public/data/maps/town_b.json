@@ -47,7 +47,11 @@
   "d": "shop_door",
   "k": "chapel_sign",
   "q": "item_shop_sign",
-  "w": "water"
+  "w": "water",
+  "1": "stall_pilgrim_candle",
+  "2": "stall_pilgrim_bread",
+  "3": "stall_pilgrim_incense",
+  "4": "stall_pilgrim_wine"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWCCWWWW",
@@ -63,18 +67,18 @@
   "Wpppppppppppppppppppp======ppppppppppppppppppppW",
   "WppSSSSppSSSSppSSSSpp======pIIIIppKKKKKKpppppppW",
   "WppSSSSppSSSSppSSSSpp======pIIIIppKKKKKKpppppppW",
-  "WppSdSSppSdSSppSdSSpp======pINIIppKKDKKKpppppppW",
+  "WppSdSSppSdSSppSdSS1p======4INIIppKKDKKKpppppppW",
   "Wp===q=====Q=====a============M======k========pW",
   "Wp============================================pW",
   "Wppppppppppppf=========FF=========pvpppppppppppW",
-  "Wppppppppppppp=========FF=========pppppppppppppW",
+  "Wppppppppppppp========2FF1========pppppppppppppW",
   "Wppppppppppppp====================pppppppppppppW",
   "Wppppppppppppp====================pppppppppppppW",
   "Wpppppppppfppp====================pppppppppppppW",
   "WppppppppppppT====================pppppppppppppW",
+  "WpHHHHpHHHHpHHHHpHHHH3=====HHHHpHHHHpHHHHpHHHHpW",
   "WpHHHHpHHHHpHHHHpHHHH======HHHHpHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpHHHH======HHHHpHHHHpHHHHpHHHHpW",
-  "WpHHHHpHHHHpHHHHpHHHH======HHHHpHHHHpHHHHpHHHHpW",
+  "WpHHHHpHHHHpHHHHpHHHH=====2HHHHpHHHHpHHHHpHHHHpW",
   "Wpppvpppppppppppppppp======ppppvppppppppppppfppW",
   "Wp============================================pW",
   "Wp============================================pW",
@@ -187,6 +191,81 @@
    "id": "gate_guard_b",
    "x": 45,
    "z": 1
+  },
+  {
+   "id": "priest_man",
+   "x": 25,
+   "z": 16
+  },
+  {
+   "id": "priest_woman",
+   "x": 25,
+   "z": 18
+  },
+  {
+   "id": "priest_woman",
+   "x": 22,
+   "z": 16
+  },
+  {
+   "id": "priest_woman",
+   "x": 22,
+   "z": 18
+  },
+  {
+   "id": "priest_man",
+   "x": 23,
+   "z": 18
+  },
+  {
+   "id": "priest_man",
+   "x": 21,
+   "z": 21
+  },
+  {
+   "id": "priest_woman",
+   "x": 21,
+   "z": 23
+  },
+  {
+   "id": "priest_woman",
+   "x": 27,
+   "z": 12
+  },
+  {
+   "id": "priest_woman",
+   "x": 27,
+   "z": 14
+  },
+  {
+   "id": "priest_man",
+   "x": 28,
+   "z": 14
+  },
+  {
+   "id": "priest_man",
+   "x": 19,
+   "z": 12
+  },
+  {
+   "id": "priest_woman",
+   "x": 19,
+   "z": 14
+  },
+  {
+   "id": "priest_woman",
+   "x": 26,
+   "z": 23
+  },
+  {
+   "id": "priest_woman",
+   "x": 26,
+   "z": 25
+  },
+  {
+   "id": "priest_man",
+   "x": 27,
+   "z": 25
   }
  ],
  "links": {

@@ -4,20 +4,32 @@
   貴族・国の代表は置かない（売り子・客は、一般の住民・商人・子供）。置く街と数は COUNT（街ごと。変更は指示で）
 """
 STALL_CH = ('1', '2', '3', '4')
-COUNT = {'k': 8, 'k1': 6, 'e': 8, 'a': 6, 'i': 6}   # H は、街の人 5〜8 人の決め（小さな辺境の街）なので置かない。c は、すでに屋台がある（見た目だけ KIND で替える）
+COUNT = {'k': 8, 'k1': 6, 'e': 8, 'a': 6, 'i': 6, 'd': 6, 'b': 6, 'f': 6, 'g': 6, 'j': 6}   # H は、街の人 5〜8 人の決め（小さな辺境の街）なので置かない。c は、すでに屋台がある（見た目だけ KIND で替える）
 EDO = ('stall_edo_soba', 'stall_edo_tempura', 'stall_edo_sushi', 'stall_edo_dango')
 PORT = ('stall_port_fish', 'stall_port_grill', 'stall_port_shell', 'stall_port_fruit')
 SNOW = ('stall_snow_pirozhki', 'stall_snow_kvass', 'stall_snow_blini', 'stall_snow_tea')
 BAZAAR = ('stall_bazaar_spice', 'stall_bazaar_carpet', 'stall_bazaar_sweets', 'stall_bazaar_kebab')
-KIND = {'k': EDO, 'k1': EDO, 'e': PORT, 'i': PORT, 'a': SNOW, 'c': BAZAAR, 'h': BAZAAR}   # 街ごとの屋台の見た目（文字 1〜4 の順。stall_kinds.py）
+EURO = ('stall_euro_bread', 'stall_euro_sausage', 'stall_euro_ale', 'stall_euro_veg')
+PILGRIM = ('stall_pilgrim_candle', 'stall_pilgrim_bread', 'stall_pilgrim_incense', 'stall_pilgrim_wine')
+MOUNTAIN = ('stall_mountain_roast', 'stall_mountain_ale', 'stall_mountain_forge', 'stall_mountain_mushroom')
+FOREST = ('stall_forest_fruit', 'stall_forest_honey', 'stall_forest_herb', 'stall_forest_tea')
+MAGE = ('stall_mage_potion', 'stall_mage_scroll', 'stall_mage_crystal', 'stall_mage_lamp')
+KIND = {'d': EURO, 'b': PILGRIM, 'f': MOUNTAIN, 'g': FOREST, 'j': MAGE, 'k': EDO, 'k1': EDO, 'e': PORT, 'i': PORT, 'a': SNOW, 'c': BAZAAR, 'h': BAZAAR}   # 街ごとの屋台の見た目（文字 1〜4 の順。stall_kinds.py）
 VENDORS = {'k': ['merchant_man_k', 'merchant_woman_k', 'merchant_old_k'], 'k1': ['merchant_man_k', 'merchant_woman_k', 'merchant_old_k'],
            'e': ['merchant_man', 'traveler_merchant', 'merchant_woman'], 'a': ['snow_man', 'snow_woman', 'snow_old_woman'],
-           'h': ['junior_merchant_man', 'town_man', 'town_middle_man'], 'i': ['merchant_woman', 'merchant_man', 'junior_merchant_woman']}
+           'h': ['junior_merchant_man', 'town_man', 'town_middle_man'], 'i': ['merchant_woman', 'merchant_man', 'junior_merchant_woman'],
+           'd': ['merchant_woman', 'junior_merchant_man', 'town_middle_woman'], 'b': ['priest_man', 'priest_woman'],
+           'f': ['dwarf_man', 'dwarf_woman', 'dwarf_smith', 'beast_f_a'], 'g': ['elf_woman_a', 'elf_man_a', 'elf_woman_b', 'elf_man_b'],
+           'j': ['mage_clerk_man', 'mage_clerk_woman', 'mage_researcher_man', 'mage_researcher_woman']}
 CUSTOMERS = {'k': ['machi_man_k', 'machi_woman_k', 'child_boy_k', 'child_girl_k'], 'k1': ['machi_man_k', 'machi_woman_k', 'child_boy_k', 'child_girl_k', 'fisherman_k'],
              'e': ['town_man', 'town_woman', 'town_girl', 'child_boy', 'town_middle_woman', 'town_old_woman'],
              'a': ['snow_boy', 'snow_girl', 'snow_man', 'snow_old_man', 'snow_woman'], 'h': ['town_man', 'town_woman', 'child_boy', 'town_middle_man'],
-             'i': ['town_girl', 'town_man', 'child_girl', 'town_middle_woman', 'town_old_woman', 'town_woman']}
+             'i': ['town_girl', 'town_man', 'child_girl', 'town_middle_woman', 'town_old_woman', 'town_woman'],
+             'd': ['town_man', 'town_woman', 'town_boy', 'town_girl', 'child_boy', 'town_old_woman'], 'b': ['priest_woman', 'priest_man'],
+             'f': ['beast_a', 'beast_b', 'beast_c', 'beast_d', 'dwarf_man', 'dwarf_woman', 'beast_f_b'], 'g': ['elf_boy', 'elf_girl', 'elf_woman_c', 'elf_man_c', 'elf_woman_a'],
+             'j': ['mage_apprentice_boy', 'mage_apprentice_girl', 'town_middle_woman', 'adv_mage']}
 WALK = 'p='
+KEEPOUT = {'g': (15, 10, 23, 18)}   # 置かない範囲（x0, y0, x1, y1）。G は、世界樹の柵のまわり（柵のすぐ外は歩けると決めている）
 
 
 def _reach(g, w, h, starts):
@@ -48,6 +60,9 @@ def add(site_id, m, city_legend):
     starts = [p for p in ((int(k.split(',')[0]), int(k.split(',')[1])) for k in m['links']) if 0 <= p[1] < h and g[p[1]][p[0]] in WALK]
     starts = starts or [next((x, y) for y in range(h) for x in range(w) if g[y][x] in WALK)]
     base = _reach(g, w, h, starts)
+    if site_id in KEEPOUT:
+        kx0, ky0, kx1, ky1 = KEEPOUT[site_id]
+        blocked |= {(x, y) for x in range(kx0, kx1 + 1) for y in range(ky0, ky1 + 1)}
     cx, cz = w / 2, h / 2
     cand = sorted(((x, y) for y in range(2, h - 2) for x in range(2, w - 2) if g[y][x] in WALK), key=lambda p: (not (g[p[1]][p[0] - 1] not in WALK or g[p[1]][p[0] + 1] not in WALK), (p[0] - cx) ** 2 + 2 * (p[1] - cz) ** 2))   # 建物沿い（通りの端）を先に。通りの真ん中を塞がない
     hs = m.get('heights')

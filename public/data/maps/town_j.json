@@ -46,7 +46,11 @@
   "m": "mage_guild_sign",
   "q": "item_shop_sign",
   "r": "training_sign",
-  "w": "water"
+  "w": "water",
+  "1": "stall_mage_potion",
+  "2": "stall_mage_scroll",
+  "3": "stall_mage_crystal",
+  "4": "stall_mage_lamp"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWCCWWWWWWWWWWWWWWWWWWW",
@@ -61,13 +65,13 @@
   "Wppppppppppppppppp====ppppppJJJJJJJJpppW",
   "WpSSSSpSSSSpSSSSpp====ppppppJJJJJJJJpppW",
   "WpSSSSpSSSSpSSSSpp====ppppppJJJDJJJJpppW",
-  "WpSdSSpSdSSpSdSSpp====ppppfpppppmppppvpW",
+  "WpSdSSpSdSSpSdSS2p====ppppfpppppmppppvpW",
   "WpppqppppQppppappp====pppppppppppppppppW",
   "W==================FF==================W",
-  "W==================FF==================W",
+  "W=================2FF1=================W",
   "W======================================W",
-  "Wppppppppppppppfpp====ppvppppppppppppppW",
-  "WpHHHHpHHHHpppppTp====pTpppHHHHpHHHHpppW",
+  "Wppppppppppppppfpp====ppv1pppppppppppppW",
+  "WpHHHHpHHHHpppppT4====3TpppHHHHpHHHHpppW",
   "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
   "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
   "Wppppppppppppppppp====pppppppppppppppppW",
@@ -170,6 +174,81 @@
    "id": "town_middle_woman",
    "x": 30,
    "z": 15
+  },
+  {
+   "id": "mage_clerk_man",
+   "x": 21,
+   "z": 14
+  },
+  {
+   "id": "mage_apprentice_boy",
+   "x": 21,
+   "z": 16
+  },
+  {
+   "id": "mage_clerk_woman",
+   "x": 18,
+   "z": 14
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 18,
+   "z": 16
+  },
+  {
+   "id": "adv_mage",
+   "x": 19,
+   "z": 16
+  },
+  {
+   "id": "mage_researcher_man",
+   "x": 22,
+   "z": 17
+  },
+  {
+   "id": "mage_apprentice_boy",
+   "x": 22,
+   "z": 19
+  },
+  {
+   "id": "mage_researcher_woman",
+   "x": 17,
+   "z": 17
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 17,
+   "z": 19
+  },
+  {
+   "id": "adv_mage",
+   "x": 18,
+   "z": 19
+  },
+  {
+   "id": "mage_clerk_man",
+   "x": 25,
+   "z": 16
+  },
+  {
+   "id": "mage_apprentice_boy",
+   "x": 25,
+   "z": 18
+  },
+  {
+   "id": "mage_clerk_woman",
+   "x": 16,
+   "z": 11
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 16,
+   "z": 13
+  },
+  {
+   "id": "adv_mage",
+   "x": 17,
+   "z": 13
   }
  ],
  "links": {

@@ -47,7 +47,11 @@
   "m": "mage_guild_sign",
   "q": "item_shop_sign",
   "r": "training_sign",
-  "w": "water"
+  "w": "water",
+  "1": "stall_euro_bread",
+  "2": "stall_euro_sausage",
+  "3": "stall_euro_ale",
+  "4": "stall_euro_veg"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWCCWWWWWWWWWWWWWWWWWWW",
@@ -62,13 +66,13 @@
   "Wppppppppppppppppp====ppppppJJJJJJJJpppW",
   "WpSSSSpSSSSpSSSSpp====ppppppJJJJJJJJpppW",
   "WpSSSSpSSSSpSSSSpp====ppppppJJJDJJJJpppW",
-  "WpSdSSpSdSSpSdSSpp====ppppfpppppcppppvpW",
+  "WpSdSSpSdSSpSdSS2p====ppppfpppppcppppvpW",
   "WpppqppppQppppappp====pppppppppppppppppW",
   "W==================FF==================W",
-  "W==================FF==================W",
+  "W=================2FF1=================W",
   "W======================================W",
-  "Wppppppppppppppfpp====ppvppppppppppppppW",
-  "WpHHHHpHHHHpppppTp====pTpppHHHHpHHHHpppW",
+  "Wppppppppppppppfpp====ppv1pppppppppppppW",
+  "WpHHHHpHHHHpppppT4====3TpppHHHHpHHHHpppW",
   "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
   "WpHHHHpHHHHppppppp====pppppHHHHpHHHHpppW",
   "Wppppppppppppppppp====pppppppppppppppppW",
@@ -131,6 +135,81 @@
    "id": "gate_guard",
    "x": 22,
    "z": 1
+  },
+  {
+   "id": "merchant_woman",
+   "x": 21,
+   "z": 14
+  },
+  {
+   "id": "town_man",
+   "x": 21,
+   "z": 16
+  },
+  {
+   "id": "junior_merchant_man",
+   "x": 18,
+   "z": 14
+  },
+  {
+   "id": "town_boy",
+   "x": 18,
+   "z": 16
+  },
+  {
+   "id": "town_girl",
+   "x": 19,
+   "z": 16
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 22,
+   "z": 17
+  },
+  {
+   "id": "child_boy",
+   "x": 22,
+   "z": 19
+  },
+  {
+   "id": "merchant_woman",
+   "x": 17,
+   "z": 17
+  },
+  {
+   "id": "town_man",
+   "x": 17,
+   "z": 19
+  },
+  {
+   "id": "town_woman",
+   "x": 18,
+   "z": 19
+  },
+  {
+   "id": "junior_merchant_man",
+   "x": 25,
+   "z": 16
+  },
+  {
+   "id": "town_boy",
+   "x": 25,
+   "z": 18
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 16,
+   "z": 11
+  },
+  {
+   "id": "child_boy",
+   "x": 16,
+   "z": 13
+  },
+  {
+   "id": "town_old_woman",
+   "x": 17,
+   "z": 13
   },
   {
    "id": "town_woman",

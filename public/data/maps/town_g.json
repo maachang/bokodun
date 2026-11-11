@@ -52,7 +52,11 @@
   "w": "water",
   "z": "meadow_grass",
   "y": "fern",
-  "x": "elder_sign"
+  "x": "elder_sign",
+  "1": "stall_forest_fruit",
+  "2": "stall_forest_honey",
+  "3": "stall_forest_herb",
+  "4": "stall_forest_tea"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWVCCVWWWWWWWWWWWWWWWWWW",
@@ -63,21 +67,21 @@
   "WpyppzpHHHHpzpzzpfp==pzppyHHHHyppzHHHHpW",
   "Wpzpyvpppzypzpzzz==zppSSSppppyppvpHHHHpW",
   "Wpppyyzpppvpppppp==pppSSSppzpppzypHHHHpW",
-  "Wppvpppvppyzpppp======SdSppzppfpzppppppW",
+  "Wppvpppvppyzpppp=====1SdSppzppfpzppppppW",
   "Wppppyppzzyyppp=========xppypzzppzpzpppW",
   "WppySSSSpSSSSp===ppppp===ppySSSSpSSSSzpW",
-  "WpvpSSSSzSSSS===ppppppp===pySSSSpSSSSppW",
-  "WpppSdSSzSdSS==ppppppppp==ppSdSSpSdSSzpW",
+  "WpvpSSSSzSSSS===ppppppp===4ySSSSpSSSSppW",
+  "WpppSdSSzSdSS2=ppppppppp==ppSdSSpSdSSzpW",
   "W=====q====Q===pppjjjppp======a====m===W",
   "W==============pppjYjppp===============W",
-  "Wpvpppyzpyppp==pppjjjppp==pyppppvppppvpW",
+  "Wpvpppyzpyppp==pppjjjppp==1yppppvppppvpW",
   "WpppzzpHHHHpp==ppppppppp==ppypppzypppzpW",
   "WpHHHHpHHHHzp===ppppppp===ppvyzypHHHHppW",
-  "WpHHHHpHHHHppp===ppppp===pppyppypHHHHzpW",
+  "WpHHHHpHHHHppp===ppppp===pp3yppypHHHHzpW",
   "WpHHHHpyypzp============p===zzvppHHHHppW",
   "Wpppppppyp====pp=======ppp====ppzppppzpW",
   "WppvpIIII===pppp==pppppppppp====vyzpzvpW",
-  "WpppzIIII=ppppppp==yppzzpyzyfp====pzpzpW",
+  "WpppzIIII=ppppppp=2yppzzpyzyfp====pzpzpW",
   "WpppzINIIppvpzpzyp==vpyyvyy==========ppW",
   "Wp=====M=====HHHHypp==pyzzp==========ppW",
   "Wp===========HHHHzvpp==HHHHyppzypypHHHHW",
@@ -181,6 +185,81 @@
    "id": "fairy_pegasus",
    "x": 20,
    "z": 22
+  },
+  {
+   "id": "elf_woman_a",
+   "x": 26,
+   "z": 14
+  },
+  {
+   "id": "elf_boy",
+   "x": 26,
+   "z": 16
+  },
+  {
+   "id": "elf_man_a",
+   "x": 13,
+   "z": 11
+  },
+  {
+   "id": "elf_woman_c",
+   "x": 13,
+   "z": 13
+  },
+  {
+   "id": "elf_man_c",
+   "x": 14,
+   "z": 13
+  },
+  {
+   "id": "elf_woman_b",
+   "x": 27,
+   "z": 17
+  },
+  {
+   "id": "elf_woman_a",
+   "x": 27,
+   "z": 19
+  },
+  {
+   "id": "elf_man_b",
+   "x": 26,
+   "z": 10
+  },
+  {
+   "id": "elf_girl",
+   "x": 26,
+   "z": 12
+  },
+  {
+   "id": "elf_woman_c",
+   "x": 27,
+   "z": 12
+  },
+  {
+   "id": "elf_woman_a",
+   "x": 21,
+   "z": 7
+  },
+  {
+   "id": "elf_man_c",
+   "x": 21,
+   "z": 9
+  },
+  {
+   "id": "elf_man_a",
+   "x": 18,
+   "z": 21
+  },
+  {
+   "id": "elf_boy",
+   "x": 18,
+   "z": 23
+  },
+  {
+   "id": "elf_girl",
+   "x": 19,
+   "z": 23
   }
  ],
  "links": {
