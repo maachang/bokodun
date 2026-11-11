@@ -17,6 +17,8 @@ def build():
         rows[y][x] = 'F'
     t['layout'] = [''.join(r) for r in rows]
     t['links'].pop('1,1', None); t['links'].pop('19,1', None)   # 上りの階段・下り（地下）の階段
+    for l in t['links'].values():
+        if l['nextMap'] == 'temple_cloister': l['nextMap'] = 'temple_cloister_b'   # 回廊・宝物庫は、B 専用（守衛は B の衛兵。マップは直接書いた JSON）
     for n in t['npcs']:
         if n['id'] == 'priest_senior': n['id'] = 'pope'; n.pop('shopId', None)
         if n['id'] == 'priest_man': n['shopId'] = 'temple'

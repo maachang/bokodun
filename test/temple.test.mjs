@@ -186,3 +186,11 @@ test('大神殿（グレードアップ）: 聖堂＋食堂・厨房・懺悔室
     assert.ok(library.layout.join('').split('').filter(ch => library.legend[ch] === 'bookshelf_marble').length >= 6, '図書室の本棚');
     assert.ok(readJson('public/data/maps/temple_infirmary.json').layout.join('').split('').filter(ch => objects[readJson('public/data/maps/temple_infirmary.json').legend[ch]]?.type === 'furniture' && readJson('public/data/maps/temple_infirmary.json').legend[ch] === 'bed_marble').length >= 6, '医務室のベッド');
 });
+
+test('B の大教会の回廊・宝物庫は専用で、宝物庫の守衛は B の衛兵（ID 371）。共有の宝物庫の守衛は、重装衛兵のまま', () => {
+    const rd = id => readJson(`public/data/maps/${id}.json`);
+    assert.ok(Object.values(rd('temple_b').links).some(l => l.nextMap === 'temple_cloister_b'), 'B の大教会 → B 専用の回廊');
+    assert.ok(Object.values(rd('temple_cloister_b').links).some(l => l.nextMap === 'temple_treasury_b'), '回廊 → B 専用の宝物庫');
+    assert.ok(rd('temple_treasury_b').npcs.some(n => n.id === 'guard_b') && !rd('temple_treasury_b').npcs.some(n => n.id === 'guard_spear'), 'B の宝物庫の守衛');
+    assert.ok(rd('temple_treasury').npcs.some(n => n.id === 'guard_spear'), '共有の宝物庫の守衛');
+});

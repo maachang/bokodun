@@ -1,0 +1,127 @@
+{
+ "id": "temple_cloister_b",
+ "name": "神殿の回廊 (Cloister)（フランケル聖国の大教会）",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": "temple_b",
+ "spawn": {
+  "x": 12,
+  "z": 6,
+  "angle": 1.570795
+ },
+ "environment": {
+  "floorType": "grass",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 12373460,
+  "fogNear": 22,
+  "fogFar": 80,
+  "visibility": 0.9,
+  "skyColor": 9683955
+ },
+ "legend": {
+  "W": "temple_wall",
+  "E": "temple_exit",
+  "L": "wall_sconce_marble",
+  "d": "temple_room_door",
+  "p": "plaza_stone",
+  "w": "plaza_fountain",
+  "f": "flower_bed",
+  "v": "flower_bed_blue",
+  "T": "tree",
+  "C": "treasure_chest"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWLWWWdWWWLWWW",
+  "WppppppppppppCW",
+  "WpppppppppppppW",
+  "Lpp000000000ppL",
+  "Wpp0T00000T0ppW",
+  "Wpp00f000v00ppW",
+  "dpp0000w0000ppE",
+  "Wpp00v000f00ppW",
+  "Wpp0T00000T0ppW",
+  "Lpp000000000ppL",
+  "WpppppppppppppW",
+  "WpppppppppppppW",
+  "WWWLWWWdWWWLWWW"
+ ],
+ "npcs": [
+  {
+   "id": "priest_man",
+   "x": 2,
+   "z": 6,
+   "wanderRadius": 1.0
+  },
+  {
+   "id": "priest_woman",
+   "x": 12,
+   "z": 10,
+   "wanderRadius": 1.5
+  },
+  {
+   "id": "elder_man",
+   "x": 7,
+   "z": 2,
+   "wanderRadius": 1.0
+  }
+ ],
+ "links": {
+  "7,0": {
+   "nextMap": "temple_chapter_house",
+   "message": "会議室（参事会室）に入る",
+   "back": {
+    "x": 7,
+    "z": 1,
+    "angle": 3.14159
+   }
+  },
+  "0,6": {
+   "nextMap": "temple_library",
+   "message": "図書室・写本室に入る",
+   "back": {
+    "x": 1,
+    "z": 6,
+    "angle": -1.570795
+   }
+  },
+  "7,12": {
+   "nextMap": "temple_treasury_b",
+   "message": "宝物庫に入る",
+   "back": {
+    "x": 7,
+    "z": 11,
+    "angle": 0
+   }
+  }
+ },
+ "heights": [
+  "000000000000000",
+  "011111111111340",
+  "012222222222210",
+  "012222222222210",
+  "012222111122210",
+  "012221111112210",
+  "012221101111210",
+  "012221111112210",
+  "012221111112210",
+  "012222211122210",
+  "012222222222210",
+  "011111111111110",
+  "000000000000000"
+ ],
+ "heightStep": 0.5,
+ "fallDamagePerLevel": 6,
+ "gimmickBoxes": [
+  {
+   "name": "walkway",
+   "r0": 0,
+   "c0": 10,
+   "r1": 3,
+   "c1": 14
+  }
+ ]
+}

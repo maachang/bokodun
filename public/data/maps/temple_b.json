@@ -149,7 +149,7 @@
    }
   },
   "0,11": {
-   "nextMap": "temple_cloister",
+   "nextMap": "temple_cloister_b",
    "message": "回廊に出る",
    "back": {
     "x": 1,
