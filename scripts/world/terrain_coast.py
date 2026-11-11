@@ -299,7 +299,10 @@ def _harbor_inlet(land, biome, towns, tid='e', gap=0, w_top=26, w_sea=28, w_mout
     return carved, mask
 
 
-def _lake_bay(lake, towns, tid='i', x_from=950):
+LAKE_BAY_X_FROM = 950   # 湖の街（I）の湾の、西の端の列（world_tiles も、湾を深い水だけにするために使う）
+
+
+def _lake_bay(lake, towns, tid='i', x_from=LAKE_BAY_X_FROM):
     """湖の東岸の街（I カナロア公国）: 壁の西側（壁の行すべて）のすぐ西まで、湖の水を広げる（水の都。壁と湖の間に、地面を残さない）。湖はもとからつながっているので、細い入り江にはならない。戻り値: (湖, 広げたマス数)"""
     site = next((s for s in towns if s['id'] == tid), None)
     if site is None: return lake, 0

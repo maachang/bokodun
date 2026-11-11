@@ -5,6 +5,7 @@ import numpy as np
 import terrain as T
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
+from terrain_coast import LAKE_BAY_X_FROM
 from world_consts import ROAD_LOOPS, LOOP_NEAR, COAST_ROADS, DIRECT_ROADS, GRASS_ROADS, BRIDGE_NEAR, LOOPS, ROAD_ROUGH, ROOT, ROAD_INFO, BIOME_FLOOR, PARTIAL_MARGIN, ROAD_PARTIAL, ROAD_SIGNS, ROAD_TOWNS, SOLID_CH, TOWN_HH, TOWN_HW, TOWN_NAME, TOWN_SIGN_CH, town_gate_tiles
 
 
@@ -270,9 +271,9 @@ def _tiles_water(g):
     put(t['deep'] & ~lake, 'Q')
     put(lake & t['deep'], 'Q'); put(lake & t['deep'] & (d_nonlake >= 3), 'O')
     put(t['shallow'], 'q')
-    for site in t['towns']:   # I（湖の街）: 壁のすぐ西の 3 マスは、深い水（O）だけ。壁と深い水の間に、浅瀬・普通の水を残さない（港町 E・K1 と同じ。湖の岸から 3 マスは浅瀬になる規則が、壁を岸とみなしていた）
+    for site in t['towns']:   # I（湖の街）: 壁の西に広げた湖（湾。_lake_bay）は、すべて深い水（O）だけ。浅瀬・普通の水を残さない（港町 E・K1 と同じ。湖の岸から 3 マスは浅瀬になる規則が、壁や湾の縁を岸とみなしていた）
         if site['id'] != 'i': continue
-        reg = np.zeros((H, W), bool); reg[site['y'] - TOWN_HH:site['y'] + TOWN_HH, site['x'] - TOWN_HW - 3:site['x'] - TOWN_HW] = True
+        reg = np.zeros((H, W), bool); reg[site['y'] - TOWN_HH:site['y'] + TOWN_HH, LAKE_BAY_X_FROM:site['x'] - TOWN_HW] = True
         put(reg & lake, 'O')
     # 橋のたもと（橋から 2 マス以内）は、通れる物（木・柱）を置かない。木が橋の出入り口をふさがない
     near_bridge = T.box_mean(t['bridge'].astype(np.float32), 2) > 0

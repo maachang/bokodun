@@ -54,11 +54,11 @@ for (const id of ['e', 'k1']) {
 }
 
 // I（カナロア公国・湖の街）: 壁の西側のすぐ外が、どの行も深い水（浅瀬・普通の水を挟まない）。湖の街も、港町と同じ「水に密接」（浅瀬は、ユーザー指摘で不可）
-test('湖の街 i: 西の壁のすぐ外 3 マスが、どの行も深い水（sea）。壁と深い水の間に、浅瀬・水がない', () => {
+test('湖の街 i: 壁の西に広げた湖（湾。世界の列 950〜壁の西端、壁の行すべて）は、すべて深い水（sea）。浅瀬・普通の水が 1 マスもない', () => {
     const w = townWall('i');
     const bad = [];
-    for (let y = w.y0; y <= w.y1; y++) for (let d = 1; d <= 3; d++) { const n = tileName(w.x0 - d, y); if (!isSea(n)) bad.push(`(${w.x0 - d},${y}) ${n}`); }
-    assert.deepEqual(bad, [], `壁の西の隣 3 マスが深い水でない: ${bad.slice(0, 8).join(' / ')}`);
+    for (let y = w.y0; y <= w.y1; y++) for (let x = 950; x < w.x0; x++) { const n = tileName(x, y); if (!isSea(n)) bad.push(`(${x},${y}) ${n}`); }
+    assert.deepEqual(bad, [], `湾に深い水でないマスがある（${bad.length} マス）: ${bad.slice(0, 8).join(' / ')}`);
 });
 
 // 町の中に港（水・桟橋・船）があるなら、町の外も港（同じ海に、桟橋と船）。K1 の外のマップ
