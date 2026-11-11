@@ -225,6 +225,20 @@ export const mapVisualMethods = {
             doorGroup.add(lintel);
         }
 
+        // 門の屋根（街の門。objects.json の gateRoof: { texture, overhang }）: 壁より上に、通り抜ける方向へ広く出る屋根を 2 段に重ねる。遠くからも、門の位置と国の違いが分かる
+        const gateRoofTex = objDef.gateRoof && this.textures[objDef.gateRoof.texture];
+        if (gateRoofTex) {
+            const roofMat = this.makeLitMaterial(objDef.gateRoof.texture, gateRoofTex);
+            const depth = env.tileSize + (objDef.gateRoof.overhang ?? 0.8) * 2;
+            const layer = (len, dep, h, y) => {
+                const m = new THREE.Mesh(new THREE.BoxGeometry(isVertical ? dep : len, h, isVertical ? len : dep), roofMat);
+                m.position.set(0, y + h / 2, 0);
+                doorGroup.add(m);
+            };
+            layer(env.tileSize, depth, 0.35, env.wallH);
+            layer(env.tileSize, depth * 0.6, 0.4, env.wallH + 0.35);
+        }
+
         doorGroup.position.set(wx, 0, wz);
         env.add(doorGroup);
 

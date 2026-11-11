@@ -3,6 +3,7 @@ import { terrainTextures } from '/js/textures/texturesTerrain.js';
 import { liquidTextures } from '/js/textures/texturesLiquids.js';
 import { wallTextures } from '/js/textures/texturesWalls.js';
 import { edoTextures } from '/js/textures/texturesEdo.js';
+import { gateTextures } from '/js/textures/texturesGates.js';
 import { roofDoorTextures } from '/js/textures/texturesRoofsDoors.js';
 import { objectTextures } from '/js/textures/texturesObjects.js';
 import { spriteTextures } from '/js/textures/texturesSprites.js';
@@ -26,4 +27,4 @@ export class RetroTextureGenerator {
 }
 
 // 部品（public/js/textures/*.js）の静的メソッドを、RetroTextureGenerator に組み込む
-Object.assign(RetroTextureGenerator, terrainTextures, liquidTextures, wallTextures, edoTextures, roofDoorTextures, objectTextures, spriteTextures);
+Object.assign(RetroTextureGenerator, terrainTextures, liquidTextures, wallTextures, edoTextures, roofDoorTextures, gateTextures, objectTextures, spriteTextures);
