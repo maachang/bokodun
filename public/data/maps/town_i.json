@@ -23,7 +23,7 @@
  "decorFloor": "cobblestone",
  "enemies": {},
  "legend": {
-  "W": "city_wall",
+  "W": "lake_wall",
   "p": "plaza_stone",
   "=": "paved_road",
   "H": "brick_house",
@@ -31,7 +31,7 @@
   "f": "flower_bed",
   "v": "flower_bed_blue",
   "F": "plaza_fountain",
-  "G": "district_gate",
+  "G": "gate_lake",
   "X": "crate_out",
   "B": "barrel_out",
   "L": "ship_large",

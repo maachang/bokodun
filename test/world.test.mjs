@@ -1336,11 +1336,11 @@ test('街（候補地 A〜H）: 外のマップに壁と門（扉＋衛兵）・
         const t = readJson(`public/data/maps/town_${id}.json`);
         assert.equal(t.type, 'open');
         // 中: 外へ出る門 2 マス（南の壁）・出た先（外のマップ）が歩ける所の石畳
-        const gates = Object.entries(t.links).filter(([k]) => { const [c, r] = k.split(',').map(Number); return t.legend[t.layout[r][c]] === 'district_gate'; });   // 施設の扉（D のみ）は、門ではない
+        const gates = Object.entries(t.links).filter(([k]) => { const [c, r] = k.split(',').map(Number); return /^(district_gate|gate_[a-z]+)$/.test(t.legend[t.layout[r][c]]); });   // 施設の扉（D のみ）は、門ではない
         assert.equal(gates.length, 2, `town_${id}: 門は 2 マス`);
         for (const [key, l] of gates) {
             const [c, r] = key.split(',').map(Number);
-            assert.equal(t.legend[t.layout[r][c]], 'district_gate');
+            assert.match(t.legend[t.layout[r][c]], /^(district_gate|gate_[a-z]+)$/);
             const outer = readJson(`public/data/maps/${l.nextMap}.json`);
             const oc = Math.floor(l.spawn.x), orow = Math.floor(l.spawn.z);
             assert.ok(outerWalk(outer, oc, orow), `town_${id}: 出た先が歩ける所`);
@@ -1425,7 +1425,7 @@ test('地面の影: 立て札・像・噴水（groundShadow）と、建物・壁
 test('D（グリーン王国・最初の街）: 施設 7 つ（武器屋・道具屋・宿屋・冒険者ギルド・神殿・魔法ギルド・職業訓練所）の扉と、街の人。中は一般街と共有', () => {
     const t = readJson('public/data/maps/town_d.json');
     const npcDefs = readJson('public/data/npcs.json');
-    const doors = Object.entries(t.links).filter(([k]) => { const [c, r] = k.split(',').map(Number); return objects[t.legend[t.layout[r][c]]]?.type === 'door' && !['district_gate', 'castle_gate'].includes(t.legend[t.layout[r][c]]); });   // 門・城門は除く
+    const doors = Object.entries(t.links).filter(([k]) => { const [c, r] = k.split(',').map(Number); return objects[t.legend[t.layout[r][c]]]?.type === 'door' && !/^(district_gate|gate_[a-z]+|castle_gate)$/.test(t.legend[t.layout[r][c]]); });   // 門・城門は除く
     assert.deepEqual(doors.map(([, l]) => l.nextMap).sort(), ['city_inn', 'guild_adv', 'guild_mage', 'guild_training', 'shop', 'shop', 'temple']);
     assert.deepEqual(doors.filter(([, l]) => l.nextMap === 'shop').map(([, l]) => l.params.shopId).sort(), ['item_shop', 'weapon_shop']);
     for (const [key, l] of doors) {
@@ -1473,7 +1473,7 @@ test('H（ダマスカス自治領・辺境の街）: 施設 6 つ＋自治領�
     const npcDefs = readJson('public/data/npcs.json');
     const at = (c, r) => objects[t.legend[t.layout[r][c]]];
     const lv = (c, r) => parseInt(t.heights[r][c], 36);
-    const doors = Object.entries(t.links).filter(([k]) => at(...k.split(',').map(Number))?.type === 'door' && t.legend[t.layout[+k.split(',')[1]][+k.split(',')[0]]] !== 'district_gate');
+    const doors = Object.entries(t.links).filter(([k]) => at(...k.split(',').map(Number))?.type === 'door' && !/^(district_gate|gate_[a-z]+)$/.test(t.legend[t.layout[+k.split(',')[1]][+k.split(',')[0]]]));
     assert.deepEqual(doors.map(([, l]) => l.nextMap).sort(), ['city_inn', 'guild_adv', 'guild_training', 'mansion_margrave', 'shop', 'shop', 'temple']);
     assert.ok(!doors.some(([, l]) => l.nextMap === 'castle'), '城はない');
     for (const [key, l] of doors) {

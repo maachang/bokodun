@@ -22,7 +22,7 @@
  "decorFloor": "forestGround",
  "enemies": {},
  "legend": {
-  "W": "city_wall",
+  "W": "mage_wall",
   "p": "plaza_stone",
   "=": "paved_road",
   "H": "brick_house",
@@ -30,7 +30,7 @@
   "f": "flower_bed",
   "v": "flower_bed_blue",
   "F": "plaza_fountain",
-  "G": "district_gate",
+  "G": "gate_mage",
   "C": "castle_gate",
   "D": "temple_door",
   "I": "inn_building",

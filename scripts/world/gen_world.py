@@ -141,6 +141,7 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
         if site['id'] == 'c':   # C（砂漠の自由都市）: 砂漠の環境（霧は、街が見えるよう薄め）・砂の地面
             m['environment'] = dict(desert_env, floorType='desert', fogNear=24, fogFar=72); m['decorFloor'] = 'packedEarth'
         TNX.add(site['id'], m['npcs'])   # 国力のランクに合わせた、通りの人の追加（town_npc_extra.py）
+        TL.apply_inside(site['id'], m)   # 中の囲いの壁・外へ出る門を、外から見た素材と同じに（town_look.py）
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     for gm in GG.build() + IK.build():   # G のギルド（ギルド長は長老の一族）
         json.dump(gm, open(os.path.join(MAPS, gm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

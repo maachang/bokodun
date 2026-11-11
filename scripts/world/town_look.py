@@ -14,3 +14,15 @@ LOOK = {
     'k': {'6': 'edo_wall', '7': 'edo_gate', '8': 'edo_house'},                                                # 島（江戸風）: 白い漆喰の壁・町家
     'k1': {'6': 'edo_wall', '7': 'edo_gate', '8': 'edo_house'},
 }
+
+INSIDE_KEEP = {'g'}   # G（精霊の森）: 中の囲いは、生け垣（森の国の作り）のまま。外の木の壁とは変えている
+
+
+def apply_inside(site_id, m):
+    """街の中のマップ m の、囲いの壁（凡例 'W'）と、外へ出る門（district_gate）を、外から見た素材（LOOK）と同じにする。
+    壁・門は、外から入って中でも見えるので、国の見た目をそろえる（ユーザー指示 2026-11-11）。書いていない国（A・D など）は、既定の city_wall・district_gate のまま"""
+    look = LOOK.get(site_id, {})
+    if '6' in look and 'W' in m['legend'] and site_id not in INSIDE_KEEP: m['legend']['W'] = look['6']
+    if '7' in look:
+        for ch, name in list(m['legend'].items()):
+            if name == 'district_gate': m['legend'][ch] = look['7']
