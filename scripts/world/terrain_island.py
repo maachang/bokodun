@@ -78,6 +78,7 @@ def add_island(g):
     lake = _blob(ys, xs, ly, lx, lr, 212) & isl
     river_deep, ford = _river(land, lake)
     ford &= ~_dil(lake, 9)   # 湖のそばには、橋をかけない（橋の両岸が陸であること）
+    ford[:] = False   # 島の川の浅瀬の橋は作らない（渡った先に道のない、中途半端な橋になる。川を渡る橋は、島の道（K → K1。world_tiles._island_roads）の橋だけ）
     shallow = lake & ~_ero(lake, 3)                    # 湖のふち: 浅瀬
     deep = (lake | river_deep) & ~shallow & ~ford
     river = np.where(river_deep, 1, 0).astype(np.uint8); river[ford] = 2
