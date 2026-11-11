@@ -81,6 +81,8 @@ def build_others():
     out[[m['id'] for m in out].index('castle_a')] = fort[0]; out += fort[1:]
     gk = __import__('castle_g_keep').build()   # 女王の城（世界樹の中）: 1 階・2 階・梢の庭・根の洞窟（castle_g_keep.py）
     out[[m['id'] for m in out].index('castle_g')] = gk[0]; out += gk[1:]
+    jk = __import__('castle_j_keep').build()   # 魔導王の城（魔導塔）: 1 階・図書室・研究室・天文台・実験場・牢（castle_j_keep.py）
+    out[[m['id'] for m in out].index('castle_j')] = jk[0]; out += jk[1:]
     keep = __import__('castle_b_keep').build()   # 王の城（聖国。狭い）: 1 階・2 階・地下の酒蔵と牢（castle_b_keep.py）
     out[[m['id'] for m in out].index('castle_b')] = keep[0]; out += keep[1:]
     return out

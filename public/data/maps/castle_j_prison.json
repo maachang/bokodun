@@ -1,0 +1,91 @@
+{
+ "id": "castle_j_prison",
+ "name": "牢（魔導王の城の地下 2階）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 6,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "brick",
+  "ambientLight": 7829400,
+  "directionalLight": 11184895,
+  "fogColor": 1710640,
+  "fogNear": 8,
+  "fogFar": 34,
+  "visibility": 0.75,
+  "skyColor": 1710640
+ },
+ "legend": {
+  "F": "brick_floor",
+  "G": "cell_door",
+  "L": "wall_sconce",
+  "T": "table_stone",
+  "U": "stairs_stone_up",
+  "W": "mage_wall",
+  "h": "chair_stone",
+  "s": "straw_bed"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWW",
+  "WFFFFWFFFFWFFFFWFFFFWWWW",
+  "WFsFFWFsFFWFsFFWFsFFWWWW",
+  "WFFFFWFFFFWFFFFWFFFFWWWW",
+  "WWGWLWWGWLWWGWLWWGWLWWWW",
+  "WFFFFFFFFFFFFFFFFFFFFFFW",
+  "WUFFFFFFFFFFFFFFFFFFFFFW",
+  "WFFFFFFFFFFFFFFFFFFFFFFW",
+  "WWWWFWWWWWWWWWWWWWWWWWWW",
+  "WFFFFFFFFWWWWWWWWWWWWWWW",
+  "WFFhThFFFWWWWWWWWWWWWWWW",
+  "WFFFFFFFFWWWWWWWWWWWWWWW",
+  "WWWWWWWWWWWWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "gaoler",
+   "x": 6,
+   "z": 10
+  },
+  {
+   "id": "prisoner_thief",
+   "x": 2,
+   "z": 3
+  },
+  {
+   "id": "prisoner_debtor",
+   "x": 12,
+   "z": 3
+  },
+  {
+   "id": "prisoner_thug",
+   "x": 17,
+   "z": 3
+  },
+  {
+   "id": "guard_light",
+   "x": 12,
+   "z": 6
+  }
+ ],
+ "links": {
+  "1,6": {
+   "nextMap": "castle_j_lab",
+   "message": "階段を上る（実験場へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 22,
+    "z": 8,
+    "angle": 1.570795
+   }
+  }
+ }
+}

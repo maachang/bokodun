@@ -1,89 +1,136 @@
 {
  "id": "castle_j",
- "name": "魔導王の城（カラー魔導国）",
+ "name": "魔導王の城（カラー魔導国。魔導塔）",
  "type": "open",
  "tileSize": 4,
  "wallHeight": 5,
+ "nextMap": null,
  "spawn": {
-  "x": 12,
-  "z": 12,
-  "angle": 0
+  "x": 14,
+  "z": 17,
+  "angle": 3.14159
  },
  "environment": {
   "floorType": "stone",
   "hasCeiling": true,
   "footstep": "stone",
   "ceilingTexture": "brick",
-  "ambientLight": 10096512,
-  "directionalLight": 13615264,
-  "fogColor": 2761760,
+  "ambientLight": 10522832,
+  "directionalLight": 13682943,
+  "fogColor": 2762304,
   "fogNear": 14,
   "fogFar": 48,
   "visibility": 0.9,
-  "skyColor": 2761760
+  "skyColor": 2762304
  },
  "legend": {
-  "W": "brick_wall",
+  "2": "castle_exit",
+  "D": "stairs_stone_down",
+  "F": "brick_floor",
   "L": "wall_sconce",
-  "R": "wall_banner_red",
+  "M": "magic_circle",
+  "N": "wall_window_stone",
+  "T": "table_stone",
+  "U": "stairs_stone_up",
+  "W": "mage_wall",
   "a": "dais_stone_3",
   "b": "dais_stone_2",
-  "c": "dais_stone_1",
-  "A": "dais_rug_3",
-  "B": "dais_rug_2",
-  "C": "dais_rug_1",
-  "u": "castle_rug",
-  "K": "chandelier_castle_rug",
-  "2": "castle_exit"
+  "e": "bed_stone",
+  "h": "chair_stone",
+  "k": "bookshelf_stone"
  },
+ "enemies": {},
  "layout": [
-  "WWRLWWWWWWWWRWWWWWWWWLRWW",
-  "W00000000aaAAAaa00000000W",
-  "W00000000bbBBBbb00000000W",
-  "W00000000ccCCCcc00000000W",
-  "W0000000000uuu0000000000W",
-  "W0000000000uKu0000000000W",
-  "W0000000000uuu0000000000W",
-  "W0000000000uuu0000000000W",
-  "W0000000000uuu0000000000W",
-  "W0000000000uuu0000000000W",
-  "W0000000000uuu0000000000W",
-  "W0000000000uKu0000000000W",
-  "W0000000000uuu0000000000W",
-  "W0000000000uuu0000000000W",
-  "WWWWWWWWWWWW2WWWWWWWWWWWW"
+  "WWWNWWWWWLWWWWWWWWWLWWWWNWWWW",
+  "WFFFFFFWFFFaaaaaaaFFFWFkFFkFW",
+  "WFeFeFFLFFFbbbbbbbFFFLFFFFFFW",
+  "NFFFFFFWFFFFFFFFFFFFFWFFFFFFN",
+  "WFFFFFFFFFFFFFFFFFFFFFFFhTFFW",
+  "WFeFFeFWFFFFFFFFFFFFFWFFFFFFW",
+  "WFFFFFFWFFFFFFFFFFFFFWFFFFFFW",
+  "WWWWWWWWWWWWLWFWLWWWWWWWWWWWW",
+  "WWWFFFFFFFFFFFFFFFFFFFFFFFWWW",
+  "WWWUFFFFFFFFFMMMFFFFFFFFFFWWW",
+  "WWWFFFFFFFFFFMMMFFFFFFFFFFWWW",
+  "WWWFFhThFFFFFMMMFFFFFhThFFWWW",
+  "WWWFFFFFFFFFFFFFFFFFFFFFFFWWW",
+  "WWWWWNWWWNWWWWFWWWWWWNWWWNWWW",
+  "WWWWWWWWWWWFFFFFFFWWWWWWWWWWW",
+  "WWWWWWWWWWWDFFFFFFWWWWWWWWWWW",
+  "WWWNWWWWWWWWWW2WWWWWWWWWNWWWW"
  ],
  "npcs": [
   {
    "id": "mage_archmage_j",
-   "x": 12,
+   "x": 14,
    "z": 1
   },
   {
    "id": "mage_chancellor_j",
-   "x": 9,
+   "x": 12,
    "z": 2
   },
   {
    "id": "guard_light",
-   "x": 9,
-   "z": 6
+   "x": 10,
+   "z": 5
   },
   {
    "id": "guard_light",
-   "x": 15,
-   "z": 6
+   "x": 18,
+   "z": 5
   },
   {
    "id": "adv_wizard",
-   "x": 18,
-   "z": 10
+   "x": 7,
+   "z": 9
   },
   {
    "id": "mage_researcher_woman",
-   "x": 6,
+   "x": 22,
+   "z": 9
+  },
+  {
+   "id": "mage_researcher_man",
+   "x": 24,
    "z": 10
+  },
+  {
+   "id": "mage_apprentice_girl",
+   "x": 3,
+   "z": 3
+  },
+  {
+   "id": "mage_apprentice_boy",
+   "x": 4,
+   "z": 4
+  },
+  {
+   "id": "guard_light",
+   "x": 14,
+   "z": 14
   }
  ],
- "links": {}
+ "links": {
+  "3,9": {
+   "nextMap": "castle_j_2f",
+   "message": "階段を上る（図書室へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 6,
+    "angle": -1.570795
+   }
+  },
+  "11,15": {
+   "nextMap": "castle_j_lab",
+   "message": "階段を下りる（実験場へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 8,
+    "angle": -1.570795
+   }
+  }
+ }
 }

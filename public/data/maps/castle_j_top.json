@@ -1,0 +1,82 @@
+{
+ "id": "castle_j_top",
+ "name": "天文台（魔導王の城の屋上）",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 8,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": false,
+  "ambientLight": 9475520,
+  "directionalLight": 13158655,
+  "fogColor": 3157600,
+  "fogNear": 14,
+  "fogFar": 50,
+  "visibility": 0.9,
+  "skyColor": 3157600
+ },
+ "legend": {
+  "D": "stairs_stone_down",
+  "M": "magic_circle",
+  "T": "table_stone",
+  "W": "mage_wall",
+  "f": "cave_torch",
+  "h": "chair_stone",
+  "k": "bookshelf_stone"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWW",
+  "W0f0000000k0000000f0W",
+  "W0000000000000000000W",
+  "W00Th00000000000hT00W",
+  "W0000000000000000000W",
+  "W0000000000000000000W",
+  "W0000000MMMMM0000000W",
+  "W0000000MMMMM0000000W",
+  "WD000000MMMMM0000000W",
+  "W0000000MMMMM0000000W",
+  "W0000000MMMMM0000000W",
+  "W0000000000000000000W",
+  "W0000000000000000000W",
+  "W00Th00000000000hT00W",
+  "W0000000000000000000W",
+  "W0f0000000k0000000f0W",
+  "WWWWWWWWWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "adv_wizard",
+   "x": 12,
+   "z": 4
+  },
+  {
+   "id": "mage_apprentice_girl",
+   "x": 6,
+   "z": 11
+  },
+  {
+   "id": "mage_researcher_man",
+   "x": 15,
+   "z": 11
+  }
+ ],
+ "links": {
+  "1,8": {
+   "nextMap": "castle_j_3f",
+   "message": "階段を下りる（研究室へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 26,
+    "z": 9,
+    "angle": 1.570795
+   }
+  }
+ }
+}
