@@ -1,0 +1,88 @@
+{
+ "id": "mansion_duke_i_2f",
+ "name": "女王の館（カナロア公国）（2階）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 9,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 4864552,
+  "fogNear": 22,
+  "fogFar": 70,
+  "visibility": 0.9,
+  "skyColor": 4864552
+ },
+ "legend": {
+  "D": "stairs_wood_down",
+  "F": "wood_floor",
+  "L": "wall_sconce_wood",
+  "N": "wall_window_curtain",
+  "T": "table",
+  "W": "lake_wall",
+  "X": "crate",
+  "e": "bed",
+  "g": "cupboard",
+  "h": "chair",
+  "k": "bookshelf"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWNWWNWWWWLWWWWWWWWWLW",
+  "WFFFFFFFgFWFFkkkkkkkkFW",
+  "WFeFFFFFFFWFFFFFFFFFFFW",
+  "LFFFFThFFFFFFFFFFFFFFFL",
+  "WFeFFFFFFFWFFFFhThFFFFW",
+  "WFFFFFFFgFWFFFFFFFFFFXW",
+  "WWWWWFWWWWWWWWWWFWWWWWW",
+  "WFFFFFFFFFFFFFFFFFFFFFW",
+  "NFFFFFFhThFFFhThFFFFFFN",
+  "WDFFFFFFFFFFFFFFFFFFFFW",
+  "NFFFFFFFFFFFFFFFFFFFFFN",
+  "WggFFFFFFFFFFFFFFFFFXXW",
+  "WWWNWWNWWWNWWWNWWWNWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "maid_head",
+   "x": 4,
+   "z": 4
+  },
+  {
+   "id": "maid",
+   "x": 12,
+   "z": 9
+  },
+  {
+   "id": "butler",
+   "x": 18,
+   "z": 9
+  },
+  {
+   "id": "servant_man",
+   "x": 15,
+   "z": 3
+  }
+ ],
+ "links": {
+  "1,9": {
+   "nextMap": "mansion_duke_i",
+   "message": "階段を下りる（1階へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 9,
+    "angle": -1.570795
+   }
+  }
+ }
+}

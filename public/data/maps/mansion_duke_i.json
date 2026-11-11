@@ -6,7 +6,7 @@
  "wallHeight": 5,
  "nextMap": "town_i",
  "spawn": {
-  "x": 6,
+  "x": 11,
   "z": 13,
   "angle": 0
  },
@@ -23,106 +23,103 @@
   "skyColor": 4864552
  },
  "legend": {
-  "W": "wooden_wall",
-  "F": "wood_floor",
-  "u": "rug",
-  "d": "wooden_door",
+  "D": "stairs_wood_down",
   "E": "building_exit",
-  "U": "stairs_wood_up",
-  "t": "table",
-  "h": "chair",
-  "e": "bed",
-  "k": "bookshelf",
-  "g": "cupboard",
-  "s": "hearth",
-  "o": "stove",
-  "X": "crate",
-  "C": "wall_window_curtain",
-  "L": "wall_sconce_wood",
+  "F": "wood_floor",
   "K": "chandelier_mansion_rug",
-  "a": "sink",
-  "b": "water_barrel",
-  "c": "wash_stand",
-  "f": "oven",
-  "i": "kitchen_hearth",
-  "j": "prep_table",
-  "l": "sack_pile",
-  "m": "pot_rack",
-  "n": "wall_utensils",
-  "q": "kitchen_shelf"
+  "L": "wall_sconce_wood",
+  "N": "wall_window_curtain",
+  "S": "stove",
+  "T": "table",
+  "U": "stairs_wood_up",
+  "W": "lake_wall",
+  "X": "crate",
+  "Y": "barrel",
+  "g": "cupboard",
+  "h": "chair",
+  "k": "bookshelf",
+  "u": "rug",
+  "w": "water_barrel"
  },
  "enemies": {},
  "layout": [
-  "WWWWWLWLWWWWWWWWnWWWW",
-  "WFkkFFsFFkkFFWfoaiogW",
-  "WFFFFuuuFFFFFWbFmFFqW",
-  "dFFFFuuuFFFFFWFFjjFFd",
-  "WFFFFuKuFFFFFdFhFFhFW",
-  "CFFFFuuuFFFFFWFFFFFlL",
-  "WFFFFuuuFFFFFWFFFFFFW",
-  "WFhthuuuhthFFWWWLWWWW",
-  "dFFFFuuuFFFFFWcFFFFFW",
-  "WFFFFuKuFFFFFWFeFFeFW",
-  "CFFFFuuuFFFFFWFFFFFFC",
-  "WFhthuuuhthFFdFFtFFFW",
-  "WFFFFuuuFFFFFWFeFFeFL",
-  "LFFFFuuuFFFFFWFFFhFFW",
-  "WFFFFuuuFFFFFWFFFFFgW",
-  "WWWCWLELWCWWWWWWWWWWW"
+  "WWWLWWWWWWWWWWWWWWWWLWW",
+  "WgFFFWkFFuuuuuFFkWwFFSW",
+  "WFFFFWFFhuuuuuhFFWFFFFW",
+  "WFThFWgFFuuuuuFFgWFFFFW",
+  "WFFFFWFFFuuuuuFFFWFFFFW",
+  "WFThFWFFFuuuuuFFFWFFFFW",
+  "WFFFFWkFFhuuuhFFkWXFFXW",
+  "WWFWWWWWWWWFWWWWWWWFWWW",
+  "LFFFFFFFFFuuuFFFFFFFFFW",
+  "WUFFFFFFFFuuuFFFFFFFFFL",
+  "WFFFhThFFFuuuFFFhThFFFN",
+  "NFFFFFFFFFuKuFFFFFFFFFW",
+  "WFFFFFFFFFuuuFFFFFFFFFN",
+  "NFFFhThFFFuuuFFFhThFFDW",
+  "WXYFFFFFFFuuuFFFFFFFFFW",
+  "WWWNWWNWWLWEWLWWNWWNWWW"
  ],
  "npcs": [
   {
    "id": "queen_i",
-   "x": 6,
+   "x": 11,
    "z": 2
   },
   {
    "id": "butler",
-   "x": 4,
-   "z": 13
+   "x": 9,
+   "z": 4
   },
   {
-   "id": "maid",
+   "id": "maid_head",
+   "x": 13,
+   "z": 4
+  },
+  {
+   "id": "guard_light",
    "x": 10,
-   "z": 12
+   "z": 9
+  },
+  {
+   "id": "guard_light",
+   "x": 12,
+   "z": 9
   },
   {
    "id": "maid",
-   "x": 15,
-   "z": 3
+   "x": 3,
+   "z": 4
   },
   {
    "id": "servant_man",
-   "x": 17,
-   "z": 11,
-   "wanderRadius": 0.8
+   "x": 20,
+   "z": 4
+  },
+  {
+   "id": "maid",
+   "x": 19,
+   "z": 3
   }
  ],
  "links": {
-  "0,3": {
-   "nextMap": "mansion_chapel",
-   "message": "礼拝堂に入る",
-   "back": {
-    "x": 1,
-    "z": 3,
+  "1,9": {
+   "nextMap": "mansion_duke_i_2f",
+   "message": "階段を上る（2階へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 9,
     "angle": -1.570795
    }
   },
-  "0,8": {
-   "nextMap": "mansion_steward",
-   "message": "家令の執務室に入る",
-   "back": {
-    "x": 1,
-    "z": 8,
-    "angle": -1.570795
-   }
-  },
-  "20,3": {
-   "nextMap": "mansion_pantry",
-   "message": "食料庫・酒蔵に入る",
-   "back": {
-    "x": 19,
-    "z": 3,
+  "21,13": {
+   "nextMap": "mansion_duke_i_vault",
+   "message": "階段を下りる（地下へ）",
+   "dir": "e",
+   "spawn": {
+    "x": 20,
+    "z": 5,
     "angle": 1.570795
    }
   }

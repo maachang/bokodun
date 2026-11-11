@@ -138,35 +138,3 @@ def strip_hearth(m):
         m['layout'] = [r.replace(ch, repl) for r in m['layout']]
         m['legend'].pop(ch)
     return m
-
-
-def _chairman_mansion(mid, name, town, chairman_id, no_hearth):
-    """議長の館（1 階）。H の自治領主の館（辺境伯の屋敷 mansion_margrave）を複製し、主を議長（chairman_id）に替える。
-    辺境伯の 2 階への階段は、なくす（共通の 2 階は、辺境伯の屋敷に戻る作りのため）。礼拝堂・家令の部屋・食料庫は、共通のまま。
-    議長の位置は、赤い絨毯の上の、北の壁（暖炉か書棚）の前（元の辺境伯は、東寄りの端）"""
-    m = json.load(open(os.path.join(os.path.dirname(CASTLE), 'mansion_margrave.json'), encoding='utf-8'))
-    m['id'] = mid; m['name'] = name; m['nextMap'] = town
-    rows = [list(r) for r in m['layout']]
-    assert rows[1][12] == 'U'
-    rows[1][12] = 'F'
-    m['layout'] = [''.join(r) for r in rows]
-    m['links'].pop('12,1', None)
-    if no_hearth: strip_hearth(m)   # 砂漠の国は、暖炉を置かない
-    for n in m['npcs']:
-        if n['id'] == 'margrave_man': n['id'] = chairman_id; n['x'] = 6; n['z'] = 2
-    return m
-
-
-def build_mansion_c():
-    """C（ミレニアム自由都市）の議長の館。主は砂漠の議長（desert_chairman）。暖炉なし"""
-    return _chairman_mansion('mansion_chairman_c', '議長の館（ミレニアム自由都市）', 'town_c', 'desert_chairman', True)
-
-
-def build_mansion_i():
-    """I（カナロア公国）の館（id は mansion_duke_i のまま）。主は大湖の公国女王（queen_i。屋敷の中だけ）"""
-    return _chairman_mansion('mansion_duke_i', '女王の館（カナロア公国）', 'town_i', 'queen_i', False)
-
-
-def build_mansion_e():
-    """E（ガリレオ連盟）の議長の館。主は金の亡者の議長（chairman_e）"""
-    return _chairman_mansion('mansion_chairman_e', '議長の館（ガリレオ連盟）', 'town_e', 'chairman_e', False)

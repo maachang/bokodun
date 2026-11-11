@@ -1,0 +1,89 @@
+{
+ "id": "mansion_chairman_c_2f",
+ "name": "議長の館（ミレニアム自由都市）（2階）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 18,
+  "z": 9,
+  "angle": 1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 4864552,
+  "fogNear": 22,
+  "fogFar": 70,
+  "visibility": 0.9,
+  "skyColor": 4864552
+ },
+ "legend": {
+  "D": "stairs_wood_down",
+  "F": "wood_floor",
+  "L": "wall_sconce_wood",
+  "N": "wall_window_wood",
+  "T": "table",
+  "W": "adobe_wall",
+  "X": "crate",
+  "e": "bed",
+  "g": "cupboard",
+  "h": "chair",
+  "k": "bookshelf",
+  "u": "rug"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWNWWNWWWLWWWLWWWWWW",
+  "WFFFFFFFgFWFkkkkkkkFW",
+  "WFeFFFFFFFWFFFFFFFFFW",
+  "NFFFFThFFFFFFFFFFFFFL",
+  "WFeFFFFFFFWFFFhThFFFW",
+  "WXFFFFFFgFWFFFFFFFFXW",
+  "WWWWWFWWWWWWWWWFWWWWW",
+  "WFFFFFFFFFFFFFFFFFFFW",
+  "WFFFFhThFFFFFhThFFFFL",
+  "NFuuuuuuuuuuuuuuuuuDW",
+  "WFFFFFFFFFFFFFFFFFFFW",
+  "WXXFFFFFFFFFFFFFFggFW",
+  "WWWWNWWWWNWNWWWWNWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "maid_head",
+   "x": 4,
+   "z": 4
+  },
+  {
+   "id": "maid",
+   "x": 14,
+   "z": 9
+  },
+  {
+   "id": "servant_man",
+   "x": 8,
+   "z": 10
+  },
+  {
+   "id": "merchant_woman",
+   "x": 12,
+   "z": 3
+  }
+ ],
+ "links": {
+  "19,9": {
+   "nextMap": "mansion_chairman_c",
+   "message": "階段を下りる（1階へ）",
+   "dir": "e",
+   "spawn": {
+    "x": 18,
+    "z": 6,
+    "angle": 1.570795
+   }
+  }
+ }
+}

@@ -27,6 +27,7 @@ import town_g as TG
 import town_a as TA
 import town_f as TF
 import castle_f as CF
+import mansion_keep as MK
 import guild_g as GG
 import temple_b as TPB
 import roads
@@ -145,7 +146,7 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     for gm in GG.build() + IK.build():   # G のギルド（ギルド長は長老の一族）
         json.dump(gm, open(os.path.join(MAPS, gm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
-    for cm in CF.build_others() + [TPB.build(), CF.build_mansion_c(), CF.build_mansion_e(), CF.build_mansion_i()]:   # 国ごとの城（A 帝王・B 愚王・G 女王）と B の大教会（教皇）
+    for cm in CF.build_others() + [TPB.build()] + MK.build():   # 国ごとの城（A 帝王・B 愚王・G 女王）と B の大教会（教皇）・C 議長・E 議長・I 女王の館（3 階建て）
         json.dump(cm, open(os.path.join(MAPS, cm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     for cf in CF.build_f():   # F の獣王の城（岩山をくり抜いた城。獣王・フェンリル像・坑道・闘技場）
         json.dump(cf, open(os.path.join(MAPS, cf['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

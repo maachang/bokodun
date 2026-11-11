@@ -1,0 +1,90 @@
+{
+ "id": "mansion_chairman_e_2f",
+ "name": "議長の館（ガリレオ連盟）（2階）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 3,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 4864552,
+  "fogNear": 22,
+  "fogFar": 70,
+  "visibility": 0.9,
+  "skyColor": 4864552
+ },
+ "legend": {
+  "D": "stairs_marble_down",
+  "F": "marble_floor",
+  "L": "wall_sconce_marble",
+  "N": "wall_window_curtain_marble",
+  "T": "table_marble",
+  "W": "white_wall",
+  "X": "crate_marble",
+  "c": "treasure_chest",
+  "e": "bed_marble",
+  "g": "cupboard_marble",
+  "h": "chair_marble",
+  "k": "bookshelf_marble",
+  "u": "rug"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWNWWLWWNWWLWWNWWWWW",
+  "WFFcFcFcFcFcFcFcFcFcFFW",
+  "WFFFFFFFFFFFFFFFFFFFFFW",
+  "WDuuuuThuuuuuuuhTuuuuFL",
+  "WFFFFFFFFFFFFFFFFFFFFXW",
+  "WFFFFFFFFFFFFFFFFFFFFXW",
+  "WWWWWFWWWWWWWWWWFWWWWWW",
+  "WFFFFFFFFFFWFFFFFFFFFFW",
+  "NFeFFFFFFgFWFFFhThFFFFW",
+  "WFFFFFFFFFFFFFFFFFFFFFL",
+  "NFeFFFFFFgFWFFFFFFFFFFW",
+  "WFFFFcFFFFFWFkkkkkkkkFW",
+  "WWWWNWWWNWWWLWWWWWLWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "merchant_master_man",
+   "x": 10,
+   "z": 3
+  },
+  {
+   "id": "guard_light",
+   "x": 18,
+   "z": 4
+  },
+  {
+   "id": "merchant_clerk_woman",
+   "x": 18,
+   "z": 9
+  },
+  {
+   "id": "maid_head",
+   "x": 4,
+   "z": 9
+  }
+ ],
+ "links": {
+  "1,3": {
+   "nextMap": "mansion_chairman_e",
+   "message": "階段を下りる（1階へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 8,
+    "angle": -1.570795
+   }
+  }
+ }
+}
