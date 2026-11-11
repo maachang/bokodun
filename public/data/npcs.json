@@ -3047,5 +3047,48 @@
       "怪しい動きをすれば、容赦せぬぞ。"
     ]
   },
-  "fisherman_k": {"name": "漁師", "sdId": 370, "texture": "/images/npcs/fisherman_k.png", "height": 2.3, "aspect": 0.447, "radius": 0.5, "speed": 0.5, "wanderRadius": 2.0, "lines": ["今日は大漁だ。魚を見ていくかい？", "海は気まぐれでな。凪の日は、ありがたいよ。", "コマチの魚は、江戸の台所を支えてるんだ。"]}
+  "fisherman_k": {"name": "漁師", "sdId": 370, "texture": "/images/npcs/fisherman_k.png", "height": 2.3, "aspect": 0.447, "radius": 0.5, "speed": 0.5, "wanderRadius": 2.0, "lines": ["今日は大漁だ。魚を見ていくかい？", "海は気まぐれでな。凪の日は、ありがたいよ。", "コマチの魚は、江戸の台所を支えてるんだ。"]},
+  "guard_b": {
+    "name": "フランケル聖国の衛兵",
+    "sdId": 371,
+    "texture": "/images/npcs/guard_b.png",
+    "height": 2.6,
+    "aspect": 0.35,
+    "radius": 0.5,
+    "speed": 0.6,
+    "wanderRadius": 2.0,
+    "lines": [
+      "聖国へようこそ。巡礼の方か？",
+      "神の御名のもとに、秩序を守っている。"
+    ]
+  },
+  "gate_guard_b": {
+    "name": "フランケル聖国の門番",
+    "sdId": 371,
+    "texture": "/images/npcs/gate_guard_b.png",
+    "height": 2.6,
+    "aspect": 0.35,
+    "radius": 0.5,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ここはフランケル聖国の正門だ。",
+      "通ってよし。聖なる地では、静かにな。"
+    ]
+  },
+  "gate_guard_light": {
+    "name": "城門の衛兵（軽装）",
+    "sdId": 2,
+    "texture": "/images/npcs/guard_light.png",
+    "height": 2.4,
+    "aspect": 0.321,
+    "radius": 0.45,
+    "speed": 0.0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ここは王城の正門だ。陛下に会うなら、静かにな。",
+      "王様は……まあ、見ればわかる。",
+      "通ってよし。くれぐれも、失礼のないように。"
+    ]
+  }
 }

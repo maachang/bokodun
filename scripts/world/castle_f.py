@@ -93,7 +93,7 @@ def _others():
              [('guard_heavy', 9, 5), ('guard_heavy', 15, 5), ('guard_heavy', 9, 9), ('guard_heavy', 15, 9)]),
         # B フランケル聖国: 狭い城に、愚かな王と王子（玉座に並ぶ）（実権は教皇にある）。衛兵は少ない
         hall('castle_b', '王の城（フランケル聖国。狭い）', 17, 11, 8, [('king_b', 8, 1), ('prince_b', 9, 1)],   # 王と王子は、サンプルの王城（castle: 王 9,1・王子 10,1）と同じく、玉座の段の一番上に並ぶ
-             [('guard_light', 6, 6), ('guard_light', 10, 6)]),
+             [('guard_b', 6, 6), ('guard_b', 10, 6)]),   # 聖国の衛兵（sdServer ID 371）
         # G デイラミ精霊国: エルフの女王と宰相
         hall('castle_g', '女王の城（デイラミ精霊国）', 25, 15, 12, [('elf_queen', 12, 1), ('elf_chancellor', 9, 2)],
              [('elf_soldier_golem', 9, 6), ('elf_soldier_golem', 15, 6), ('elf_man_c', 18, 10), ('elf_woman_b', 6, 10)]),

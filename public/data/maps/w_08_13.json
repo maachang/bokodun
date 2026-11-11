@@ -266,12 +266,12 @@
  },
  "npcs": [
   {
-   "id": "guard_spear",
+   "id": "guard_b",
    "x": 37,
    "z": 26
   },
   {
-   "id": "guard_light",
+   "id": "guard_b",
    "x": 40,
    "z": 26
   }

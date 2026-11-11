@@ -30,7 +30,7 @@ CRATES = (('X', 29, 3), ('B', 29, 9), ('X', 29, 8), ('B', 29, 19), ('X', 29, 21)
 
 NPCS = [
     ('town_man', 5, 11), ('town_middle_man', 26, 11), ('elder_man', 12, 14), ('child_boy', 15, 17),
-    ('traveler_merchant', 26, 15), ('merchant_man', 22, 11), ('guard_spear', 17, 27), ('guard_light', 22, 27),
+    ('traveler_merchant', 26, 15), ('merchant_man', 22, 11), ('guard_light', 17, 27), ('guard_light', 22, 27),   # 衛兵（軽装）だけ。重装の衛兵は D だけ
 ]
 
 LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'g', 'c', 'w', 'b')   # 渡し場の立て札 'z' は、legend['z'] = 'ferry_sign'

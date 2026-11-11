@@ -26,7 +26,7 @@ FACILITIES = [
 # 街の人（一般街の NPC を流用）。歩ける空きマスに置く
 NPCS = [
     ('town_man', 6, 17), ('town_boy', 12, 17), ('town_middle_man', 28, 13), ('junior_merchant_man', 24, 9),
-    ('elder_man', 14, 26), ('child_boy', 15, 21), ('guard_spear', 17, 27), ('guard_light', 22, 27),
+    ('elder_man', 14, 26), ('child_boy', 15, 21), ('guard_spear', 17, 27), ('guard_spear', 22, 27),   # D（グリーン王国）の衛兵・門番は、重装の衛兵（sdServer ID 9）だけ
     ('gate_guard', 17, 1), ('gate_guard', 22, 1),   # 城門の衛兵
 ]
 
@@ -264,8 +264,8 @@ FACILITIES_J = [f for f in FACILITIES if f[6] not in ('m', 'c')] + [   # 小さ�
 ]
 NPCS_J = [   # 魔導士・研究者・見習い（ヒューマン系の魔法使い）と、一般の住民。大魔導師・宰相は、城（castle_j）の中（街の通りには出ない）
     ('mage_researcher_man', 6, 17), ('adv_mage', 12, 17), ('mage_researcher_woman', 28, 13), ('adv_wizard', 24, 9),
-    ('mage_apprentice_girl', 6, 25), ('mage_apprentice_boy', 15, 21), ('guard_spear', 17, 27), ('guard_light', 22, 27),
-    ('gate_guard', 17, 1), ('gate_guard', 22, 1),
+    ('mage_apprentice_girl', 6, 25), ('mage_apprentice_boy', 15, 21), ('guard_light', 17, 27), ('guard_light', 22, 27),   # D 以外は、衛兵（軽装。ID 2）だけ
+    ('gate_guard_light', 17, 1), ('gate_guard_light', 22, 1),
     ('adv_mage', 34, 12), ('adv_wizard', 8, 21), ('mage_researcher_woman', 33, 21), ('mage_apprentice_girl', 10, 21),
     ('mage_apprentice_boy', 36, 14), ('mage_researcher_man', 21, 21), ('adv_mage', 5, 21), ('town_middle_woman', 30, 15),
 ]

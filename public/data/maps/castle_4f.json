@@ -99,14 +99,14 @@
       "z": 8
     },
     {
-      "id": "guard_heavy",
+      "id": "guard_spear",
       "x": 14,
       "z": 9,
       "speed": 0,
       "wanderRadius": 0
     },
     {
-      "id": "guard_heavy",
+      "id": "guard_spear",
       "x": 12,
       "z": 9,
       "speed": 0,

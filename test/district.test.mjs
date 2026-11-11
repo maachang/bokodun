@@ -258,7 +258,7 @@ test('王城（グレードアップ）: 礼拝堂・中庭・衛兵詰所・パ
     const used = new Set(Object.values(f4.legend));
     assert.ok(used.has('bed_stone') && used.has('bookshelf_stone') && used.has('cupboard_stone'), '寝室・書斎・衣装棚');
     const ids = f4.npcs.map(n => n.id);
-    assert.ok(ids.includes('butler') && ids.includes('maid_head') && ids.includes('guard_heavy'), '執事・メイド長・衛兵');
+    assert.ok(ids.includes('butler') && ids.includes('maid_head') && ids.includes('guard_spear'), '執事・メイド長・衛兵');
     assert.ok(!ids.includes('king') && !ids.includes('prince'), '王・王子は、玉座の間にいる（4階には置かない）');
 });
 

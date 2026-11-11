@@ -23,7 +23,7 @@ FACILITIES = [
 
 NPCS = [
     ('town_man', 5, 8), ('junior_merchant_man', 13, 14), ('elder_man', 23, 8), ('child_boy', 12, 16),
-    ('town_middle_man', 28, 14), ('guard_spear', 16, 24), ('guard_light', 19, 24),
+    ('town_middle_man', 28, 14), ('guard_light', 16, 24), ('guard_light', 19, 24),   # 衛兵（軽装）だけ
 ]
 
 LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'r', 'c', 'w', 'b')

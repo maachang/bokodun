@@ -52,7 +52,7 @@
   ],
   "npcs": [
     {
-      "id": "guard_light",
+      "id": "guard_spear",
       "x": 15,
       "z": 11,
       "wanderRadius": 1.5

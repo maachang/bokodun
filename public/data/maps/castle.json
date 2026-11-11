@@ -88,12 +88,12 @@
       "z": 1
     },
     {
-      "id": "guard_heavy",
+      "id": "guard_spear",
       "x": 7,
       "z": 2
     },
     {
-      "id": "guard_heavy",
+      "id": "guard_spear",
       "x": 12,
       "z": 2
     },
@@ -108,12 +108,12 @@
       "z": 14
     },
     {
-      "id": "guard_light",
+      "id": "guard_spear",
       "x": 17,
       "z": 4
     },
     {
-      "id": "guard_light",
+      "id": "guard_spear",
       "x": 2,
       "z": 4
     },
@@ -192,24 +192,24 @@
       "z": 3
     },
     {
-      "id": "guard_heavy",
+      "id": "guard_spear",
       "x": 32,
       "z": 3,
       "speed": 0,
       "wanderRadius": 0
     },
     {
-      "id": "guard_light",
+      "id": "guard_spear",
       "x": 22,
       "z": 13
     },
     {
-      "id": "guard_light",
+      "id": "guard_spear",
       "x": 27,
       "z": 13
     },
     {
-      "id": "guard_light",
+      "id": "guard_spear",
       "x": 24,
       "z": 12
     },
@@ -224,7 +224,7 @@
       "z": 13
     },
     {
-      "id": "guard_heavy",
+      "id": "guard_spear",
       "x": 27,
       "z": 15
     },

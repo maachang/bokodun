@@ -23,8 +23,8 @@ NPCS = [   # 聖職者が多い（助祭・修道女）。一般人は少し。�
     ('priest_woman', 12, 15), ('priest_woman', 29, 20), ('priest_woman', 40, 16), ('priest_woman', 20, 26), ('priest_woman', 36, 20),
     ('priest_man', 21, 8), ('priest_woman', 27, 7),   # 大教会の前
     ('town_man', 5, 20), ('town_old_woman', 14, 26), ('town_middle_woman', 38, 26),
-    ('guard_spear', 21, 33), ('guard_spear', 26, 33), ('guard_light', 44, 10),
-    ('gate_guard', 40, 1), ('gate_guard', 45, 1),   # 城門の衛兵
+    ('guard_b', 21, 33), ('guard_b', 26, 33), ('guard_b', 44, 10),   # 聖国の衛兵（sdServer ID 371。十字軍風）
+    ('gate_guard_b', 40, 1), ('gate_guard_b', 45, 1),   # 城門の門番（同じ画像）
 ]
 
 LEGEND_KEYS = ('S', 'I', 'J', 'd', 'N', 'D', 'M', 'Q', 'q', 'a', 'c', 'w', 'b')

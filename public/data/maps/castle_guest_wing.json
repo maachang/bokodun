@@ -110,7 +110,7 @@
       "wanderRadius": 0.8
     },
     {
-      "id": "guard_heavy",
+      "id": "guard_spear",
       "x": 24,
       "z": 7,
       "wanderRadius": 1.0
