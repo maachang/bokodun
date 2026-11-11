@@ -23,6 +23,7 @@ import town_k1 as TK1
 import town_look as TL
 import interior_k as IK
 import town_npc_extra as TNX
+import town_stalls as TS
 import town_g as TG
 import town_a as TA
 import town_f as TF
@@ -141,6 +142,7 @@ def gen_towns(t, city_legend, env, snow_env, desert_env):
             m['layout'], m['heights'] = {'d': TD, 'h': TH, 'e': TE, 'b': TB, 'c': TC, 'i': TI}[site['id']].build(w, h, m['legend'], city_legend, m['links'], m['npcs'])
         if site['id'] == 'c':   # C（砂漠の自由都市）: 砂漠の環境（霧は、街が見えるよう薄め）・砂の地面
             m['environment'] = dict(desert_env, floorType='desert', fogNear=24, fogFar=72); m['decorFloor'] = 'packedEarth'
+        TS.add(site['id'], m, city_legend)   # 屋台と、屋台の前の賑わい（town_stalls.py）
         TNX.add(site['id'], m['npcs'])   # 国力のランクに合わせた、通りの人の追加（town_npc_extra.py）
         TL.apply_inside(site['id'], m)   # 中の囲いの壁・外へ出る門を、外から見た素材と同じに（town_look.py）
         json.dump(m, open(os.path.join(MAPS, m['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)

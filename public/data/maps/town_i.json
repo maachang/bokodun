@@ -52,7 +52,11 @@
   "b": "wood_bridge",
   "Y": "mansion_door",
   "x": "duke_sign",
-  "z": "ferry_sign"
+  "z": "ferry_sign",
+  "1": "stall_port_fish",
+  "2": "stall_port_grill",
+  "3": "stall_port_shell",
+  "4": "stall_port_fruit"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -64,7 +68,7 @@
   "WwwwwwwwwwSSSpppppp==ppppppppppppppppppW",
   "WwwwwLwwwwSSSSSSSpp==pppIIIIpSSSSpSSSSpW",
   "WwwwwwwlwwXppSSSSpp==pppIIIIpSSSSpSSSSpW",
-  "WwwwwwwwwwBppSSdSpp==pppIINIpSSdSpSSdSpW",
+  "WwwwwwwwwwBppSSdSpp==pp1IINIpSSdSpSSdSpW",
   "Wwbbbbbbbb====a==========M====Q====q===W",
   "Wwwwwwwwww=============================W",
   "WwwwwwwwwwwwwbbwwwwbbwwwwwwwwwbbwwwwwwwW",
@@ -72,10 +76,10 @@
   "Wwwwwwwwlw=============================W",
   "Wwwwwwwwww=============================W",
   "Wwwwwwwwwwppppppppp==ppppppppppppppppppW",
-  "Wwbbbbbbbbpppppppvp==ppfpppppppppppppppW",
+  "Wwbbbbbbbbpppppppv1==p2fpppppppppppppppW",
   "Wwwwwwwwwwppppppppp==ppppppppppppppppppW",
-  "WwwwwwwwwwBpHHHHppp==pppHHHHpHHHHpSSSSpW",
-  "WwwwwLwlwwppHHHHppp==pppHHHHpHHHHpSSSSpW",
+  "WwwwwwwwwwBpHHHHppp==pppHHHH2HHHHpSSSSpW",
+  "WwwwwLwlwwppHHHH4pp==pp3HHHHpHHHHpSSSSpW",
   "WwwwwwwwwwXpHHHHppp==pppHHHHpHHHHpSSdSpW",
   "Wwwwwwwwwwppppppppp==ppppppppppppppgpppW",
   "Wwbbbbbbbbppppppppp==ppppppppppppppppppW",
@@ -126,6 +130,76 @@
    "id": "guard_light",
    "x": 17,
    "z": 27
+  },
+  {
+   "id": "merchant_woman",
+   "x": 18,
+   "z": 16
+  },
+  {
+   "id": "town_girl",
+   "x": 18,
+   "z": 18
+  },
+  {
+   "id": "merchant_man",
+   "x": 22,
+   "z": 16
+  },
+  {
+   "id": "child_girl",
+   "x": 22,
+   "z": 18
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 23,
+   "z": 18
+  },
+  {
+   "id": "junior_merchant_woman",
+   "x": 23,
+   "z": 19
+  },
+  {
+   "id": "town_old_woman",
+   "x": 23,
+   "z": 21
+  },
+  {
+   "id": "merchant_woman",
+   "x": 16,
+   "z": 19
+  },
+  {
+   "id": "town_girl",
+   "x": 16,
+   "z": 21
+  },
+  {
+   "id": "town_man",
+   "x": 17,
+   "z": 21
+  },
+  {
+   "id": "merchant_man",
+   "x": 23,
+   "z": 8
+  },
+  {
+   "id": "child_girl",
+   "x": 23,
+   "z": 10
+  },
+  {
+   "id": "junior_merchant_woman",
+   "x": 28,
+   "z": 18
+  },
+  {
+   "id": "town_old_woman",
+   "x": 28,
+   "z": 20
   },
   {
    "id": "town_woman",

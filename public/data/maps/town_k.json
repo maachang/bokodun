@@ -62,7 +62,11 @@
   "l": "ship_small",
   "U": "edo_kura",
   "Y": "edo_nagaya",
-  "X": "edo_chaya"
+  "X": "edo_chaya",
+  "1": "stall_edo_soba",
+  "2": "stall_edo_tempura",
+  "3": "stall_edo_sushi",
+  "4": "stall_edo_dango"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWVVWCCWVVWWWWWWWWWWWWWWWW",
@@ -77,13 +81,13 @@
   "Wpppppppppppppppph====hpppppJJJJJJJJpppW",
   "WpSSSSpSSSSpSSSSpp====ppppppJJJJJJJJpppW",
   "WpSSSSpSSSSpSSSSpp====ppppppJJJDJJJJpppW",
-  "WpSdSSpSdSSpSdSSpp====epppfPPPgPKcPPPvpW",
+  "WpSdSSpSdSSpSdSS2p===3epp3fPPPgPKcPPPvpW",
   "WpppqppppQppppappe====pppppppppOpppppppW",
   "W==================FF==================W",
-  "W==================FF==================W",
+  "W=================2FF1=================W",
   "W======================================W",
-  "Wppppppppppppppfpp====hpvppppptppppppppW",
-  "WpHHHHpYYYYpppppTp====pTpppXXXXpHHHHpppW",
+  "Wppppppppppppp4fpp====hpv1pppptppppppppW",
+  "WpHHHHpYYYYpppppT4====pTpppXXXXpHHHHpppW",
   "WpHHHHpYYYYppppppp====pppppXXXXpHHHHpppW",
   "WpHHHHpYYYYppppppp====pppppXXXXpHHHHpppW",
   "WppppPPPPtpppppppPPPPPPppppppppPPPPppppW",
@@ -181,6 +185,101 @@
    "id": "machi_woman_k",
    "x": 30,
    "z": 15
+  },
+  {
+   "id": "merchant_man_k",
+   "x": 21,
+   "z": 14
+  },
+  {
+   "id": "machi_man_k",
+   "x": 21,
+   "z": 16
+  },
+  {
+   "id": "merchant_woman_k",
+   "x": 18,
+   "z": 14
+  },
+  {
+   "id": "child_boy_k",
+   "x": 18,
+   "z": 16
+  },
+  {
+   "id": "child_girl_k",
+   "x": 19,
+   "z": 16
+  },
+  {
+   "id": "merchant_old_k",
+   "x": 21,
+   "z": 11
+  },
+  {
+   "id": "machi_man_k",
+   "x": 21,
+   "z": 13
+  },
+  {
+   "id": "merchant_man_k",
+   "x": 17,
+   "z": 17
+  },
+  {
+   "id": "child_boy_k",
+   "x": 17,
+   "z": 19
+  },
+  {
+   "id": "child_girl_k",
+   "x": 18,
+   "z": 19
+  },
+  {
+   "id": "merchant_woman_k",
+   "x": 25,
+   "z": 16
+  },
+  {
+   "id": "machi_man_k",
+   "x": 25,
+   "z": 18
+  },
+  {
+   "id": "merchant_old_k",
+   "x": 16,
+   "z": 11
+  },
+  {
+   "id": "child_boy_k",
+   "x": 16,
+   "z": 13
+  },
+  {
+   "id": "merchant_man_k",
+   "x": 25,
+   "z": 11
+  },
+  {
+   "id": "machi_man_k",
+   "x": 25,
+   "z": 13
+  },
+  {
+   "id": "merchant_woman_k",
+   "x": 14,
+   "z": 16
+  },
+  {
+   "id": "child_boy_k",
+   "x": 14,
+   "z": 18
+  },
+  {
+   "id": "child_girl_k",
+   "x": 15,
+   "z": 18
   }
  ],
  "links": {

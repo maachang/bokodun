@@ -48,7 +48,11 @@
   "m": "mage_guild_sign",
   "q": "item_shop_sign",
   "r": "training_sign",
-  "w": "water"
+  "w": "water",
+  "1": "stall_snow_pirozhki",
+  "2": "stall_snow_kvass",
+  "3": "stall_snow_blini",
+  "4": "stall_snow_tea"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -63,10 +67,10 @@
   "Wp==HHHHHHHH==pppppppppppp==HHHHHHHH==pW",
   "Wp==HHHHHHHH==pppppppppppp==HHHHHHHH==pW",
   "Wp==HHHHHHHH==ppWWWWWWWWpp==HHHHHHHH==pW",
-  "Wp==pppppppp==ppWWWWWWWWpp==pppppppp==pW",
+  "Wp==pppppppp==p4WWWWWWWW3p==pppppppp==pW",
   "Wp==HHHHHHHH==ppWWWWWWWWpp==HHHHHHHH==pW",
   "Wp==HHHHHHHH==ppWWWWWWWWpp==HHHHHHHH==pW",
-  "Wp==HHHHHHHH==ppWWWWWWWWpp==HHHHHHHH==pW",
+  "Wp==HHHHHHHH2=p2WWWWWWWW1p=1HHHHHHHH==pW",
   "Wp==HHHHpppp==ppWWWCCWWWpp==HHHHHHHH==pW",
   "Wp==HHHHpppp==pppppppppppp==HHHHHHHH==pW",
   "Wp==HHHHpppp==pppppppppppp==HHHHHHHH==pW",
@@ -137,6 +141,71 @@
    "id": "snow_gate_guard",
    "x": 21,
    "z": 17
+  },
+  {
+   "id": "snow_man",
+   "x": 24,
+   "z": 14
+  },
+  {
+   "id": "snow_boy",
+   "x": 24,
+   "z": 16
+  },
+  {
+   "id": "snow_woman",
+   "x": 15,
+   "z": 14
+  },
+  {
+   "id": "snow_man",
+   "x": 15,
+   "z": 16
+  },
+  {
+   "id": "snow_old_woman",
+   "x": 24,
+   "z": 11
+  },
+  {
+   "id": "snow_woman",
+   "x": 24,
+   "z": 13
+  },
+  {
+   "id": "snow_man",
+   "x": 15,
+   "z": 11
+  },
+  {
+   "id": "snow_girl",
+   "x": 15,
+   "z": 13
+  },
+  {
+   "id": "snow_woman",
+   "x": 27,
+   "z": 14
+  },
+  {
+   "id": "snow_old_man",
+   "x": 27,
+   "z": 16
+  },
+  {
+   "id": "snow_old_woman",
+   "x": 12,
+   "z": 14
+  },
+  {
+   "id": "snow_boy",
+   "x": 12,
+   "z": 16
+  },
+  {
+   "id": "snow_girl",
+   "x": 13,
+   "z": 16
   }
  ],
  "links": {

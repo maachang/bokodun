@@ -54,7 +54,11 @@
   "R": "crate_out",
   "B": "barrel_out",
   "L": "ship_large",
-  "l": "ship_small"
+  "l": "ship_small",
+  "1": "stall_edo_soba",
+  "2": "stall_edo_tempura",
+  "3": "stall_edo_sushi",
+  "4": "stall_edo_dango"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -66,18 +70,18 @@
   "Wpppppppppppppppp==pppppppPwwwwwwwwW",
   "WpSSSSpIIIIpppppp==pSSSSppPwwwwwwwwW",
   "WpSSSSpIIIIpppppp==pSSSSppPwwwwLwwwW",
-  "WpSdSSpINIIppppph==hSdSSppRwwwwwwlwW",
-  "WhppqppppMppppptp==pppQpppPwwwwwwwwW",
+  "WpSdSSpINIIppppph=1hSdSSppRwwwwwwlwW",
+  "WhppqppppMpppp2tp==pppQpp4PwwwwwwwwW",
   "W=========================PbbbbbbbwW",
   "W=========================PwwwwwwwwW",
   "Wpppppppppppppppp==pppppppPwwlwwwwwW",
   "Wpppppppppppppppp==pppppppBwwwwLwwwW",
-  "WpXXXXpHHHHpUUUUp==ppSSSSpPwwwwwwwwW",
-  "WpXXXXpHHHHpUUUUp==ppSSSSpPwwwwwwwwW",
+  "WpXXXXpHHHH3UUUUp==ppSSSSpPwwwwwwwwW",
+  "WpXXXXpHHHHpUUUUp==ppSSSS1PwwwwwwwwW",
   "WpXXXXpHHHHpUUUUp==ppSdSSpPbbbbbbbwW",
   "Wpppppppppppppppp==ppppzepPwwwwwwwwW",
   "Wpppppppppppppppp==pppppppPwwwwwwwwW",
-  "WpHHHHpYYYYpXXXXp==ppHHHHpPwwwLwwwwW",
+  "WpHHHHpYYYYpXXXX2==ppHHHHpPwwwLwwwwW",
   "WpHHHHpYYYYpXXXXp==ppHHHHpRwwwwwwlwW",
   "WpHHHHpYYYYpXXXXe==epHHHHpBwwwwwwwwW",
   "Wpppppppppppppppp==pppppppPwwwwwwwwW",
@@ -159,6 +163,76 @@
    "id": "samurai_k",
    "x": 20,
    "z": 23
+  },
+  {
+   "id": "merchant_man_k",
+   "x": 18,
+   "z": 8
+  },
+  {
+   "id": "machi_man_k",
+   "x": 18,
+   "z": 10
+  },
+  {
+   "id": "merchant_woman_k",
+   "x": 14,
+   "z": 9
+  },
+  {
+   "id": "child_boy_k",
+   "x": 14,
+   "z": 11
+  },
+  {
+   "id": "child_girl_k",
+   "x": 15,
+   "z": 11
+  },
+  {
+   "id": "merchant_old_k",
+   "x": 11,
+   "z": 14
+  },
+  {
+   "id": "fisherman_k",
+   "x": 11,
+   "z": 16
+  },
+  {
+   "id": "merchant_man_k",
+   "x": 25,
+   "z": 9
+  },
+  {
+   "id": "machi_woman_k",
+   "x": 25,
+   "z": 11
+  },
+  {
+   "id": "merchant_woman_k",
+   "x": 25,
+   "z": 15
+  },
+  {
+   "id": "child_girl_k",
+   "x": 25,
+   "z": 17
+  },
+  {
+   "id": "merchant_old_k",
+   "x": 16,
+   "z": 19
+  },
+  {
+   "id": "machi_man_k",
+   "x": 16,
+   "z": 21
+  },
+  {
+   "id": "machi_woman_k",
+   "x": 17,
+   "z": 21
   }
  ],
  "links": {

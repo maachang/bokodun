@@ -52,7 +52,11 @@
   "b": "wood_bridge",
   "Y": "mansion_door",
   "x": "chairman_sign",
-  "z": "ferry_sign"
+  "z": "ferry_sign",
+  "1": "stall_port_fish",
+  "2": "stall_port_grill",
+  "3": "stall_port_shell",
+  "4": "stall_port_fruit"
  },
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
@@ -63,19 +67,19 @@
   "Wpppppppppppppppfpp==pvppcpSSSwwwwwwlwwW",
   "Wpppppppppppppppppp==ppppppSSSwwwwwwwwwW",
   "WpSSSSpSSSSpIIIIppp==ppSSSSdSSwwwwLwwwwW",
-  "WpSSSSpSSSSpIIIIppp==ppSSSSpzXwwlwwwwwwW",
-  "WpSdSSpSdSSpINIIppp==ppSdSSppBwwwwwwwwwW",
+  "WpSSSSpSSSSpIIIIppp==p4SSSSpzXwwlwwwwwwW",
+  "WpSdSSpSdSSpINII2pp==ppSdSSppBwwwwwwwwwW",
   "W===q====Q====M==========a====bbbbbbbbwW",
   "W=============================wwwwwwwwwW",
   "WwwwwwwwbbwwwwwwwwwbbwwwwbbwwwwwwwwwwwwW",
   "WwwwwwwwbbwwwwwwwwwbbwwwwbbwwwwwwwLwwwwW",
   "W=============================wlwwwwwwwW",
-  "W=============================wwwwwwwwwW",
+  "W============================1wwwwwwwwwW",
   "Wpppppppppppppppppp==pppppppppwwwwwwwwwW",
-  "Wpppppppppppppppfpp==pvpppppppbbbbbbbbwW",
+  "Wpppppppppppppppf2p==1vpppppppbbbbbbbbwW",
   "Wpppppppppppppppppp==pppppppppwwwwwwwwwW",
-  "WpSSSSpHHHHpHHHHppp==pppHHHHpBwwwwwwwwwW",
-  "WpSSSSpHHHHpHHHHppp==pppHHHHppwwlwLwwwwW",
+  "WpSSSSpHHHHpHHHHppp==pppHHHH3BwwwwwwwwwW",
+  "WpSSSSpHHHHpHHHH4pp==pp3HHHHppwwlwLwwwwW",
   "WpSdSSpHHHHpHHHHppp==pppHHHHpXwwwwwwwwwW",
   "Wpppgpppppppppppppp==pppppppppwwwwwwwwwW",
   "Wpppppppppppppppppp==pppppppppbbbbbbbbwW",
@@ -126,6 +130,101 @@
    "id": "guard_light",
    "x": 22,
    "z": 27
+  },
+  {
+   "id": "merchant_man",
+   "x": 21,
+   "z": 16
+  },
+  {
+   "id": "town_man",
+   "x": 21,
+   "z": 18
+  },
+  {
+   "id": "traveler_merchant",
+   "x": 17,
+   "z": 16
+  },
+  {
+   "id": "town_girl",
+   "x": 17,
+   "z": 18
+  },
+  {
+   "id": "child_boy",
+   "x": 18,
+   "z": 18
+  },
+  {
+   "id": "merchant_woman",
+   "x": 23,
+   "z": 19
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 23,
+   "z": 21
+  },
+  {
+   "id": "merchant_man",
+   "x": 16,
+   "z": 19
+  },
+  {
+   "id": "town_man",
+   "x": 16,
+   "z": 21
+  },
+  {
+   "id": "town_woman",
+   "x": 17,
+   "z": 21
+  },
+  {
+   "id": "traveler_merchant",
+   "x": 29,
+   "z": 14
+  },
+  {
+   "id": "town_girl",
+   "x": 29,
+   "z": 16
+  },
+  {
+   "id": "merchant_woman",
+   "x": 16,
+   "z": 8
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 16,
+   "z": 10
+  },
+  {
+   "id": "town_old_woman",
+   "x": 17,
+   "z": 10
+  },
+  {
+   "id": "merchant_man",
+   "x": 28,
+   "z": 18
+  },
+  {
+   "id": "town_man",
+   "x": 28,
+   "z": 20
+  },
+  {
+   "id": "traveler_merchant",
+   "x": 22,
+   "z": 7
+  },
+  {
+   "id": "town_girl",
+   "x": 22,
+   "z": 9
   },
   {
    "id": "town_woman",
