@@ -1,73 +1,73 @@
 {
-  "id": "castle_bakehouse",
-  "name": "王城のパン焼き所・醸造所 (Bakehouse & Brewhouse)",
-  "type": "indoor",
-  "tileSize": 4,
-  "wallHeight": 5,
-  "nextMap": "castle",
-  "spawn": {
-    "x": 4,
-    "z": 5,
-    "angle": 0
+ "id": "castle_bakehouse",
+ "name": "王城のパン焼き所・醸造所 (Bakehouse & Brewhouse)",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": "castle",
+ "spawn": {
+  "x": 4,
+  "z": 5,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "brick",
+  "ambientLight": 10096512,
+  "directionalLight": 13615264,
+  "fogColor": 2761760,
+  "fogNear": 14,
+  "fogFar": 48,
+  "visibility": 0.9,
+  "skyColor": 2761760
+ },
+ "legend": {
+  "W": "brick_wall",
+  "F": "brick_floor",
+  "E": "brick_exit",
+  "t": "table_stone",
+  "o": "stove_stone",
+  "X": "crate_stone",
+  "B": "barrel_stone",
+  "L": "wall_sconce",
+  "a": "water_barrel_stone",
+  "b": "oven_stone",
+  "c": "sack_pile_stone",
+  "d": "prep_table_stone",
+  "f": "pot_rack_stone",
+  "i": "kitchen_shelf_stone",
+  "j": "wall_window_stone"
+ },
+ "enemies": {},
+ "layout": [
+  "WWjWWWWWW",
+  "WbFbFBBcW",
+  "LaFFfFFFL",
+  "WcFFdFFiW",
+  "jFFFFFFFj",
+  "WBFFFFFBW",
+  "WWjWEWjWW"
+ ],
+ "npcs": [
+  {
+   "id": "maid",
+   "x": 2,
+   "z": 3,
+   "wanderRadius": 0.8
   },
-  "environment": {
-    "floorType": "stone",
-    "hasCeiling": true,
-    "footstep": "stone",
-    "ceilingTexture": "brick",
-    "ambientLight": 10096512,
-    "directionalLight": 13615264,
-    "fogColor": 2761760,
-    "fogNear": 14,
-    "fogFar": 48,
-    "visibility": 0.9,
-    "skyColor": 2761760
+  {
+   "id": "servant_man",
+   "x": 6,
+   "z": 4,
+   "wanderRadius": 0.8
   },
-  "legend": {
-    "W": "brick_wall",
-    "F": "brick_floor",
-    "E": "brick_exit",
-    "t": "table_stone",
-    "o": "stove_stone",
-    "X": "crate_stone",
-    "B": "barrel_stone",
-    "L": "wall_sconce",
-    "a": "water_barrel_stone",
-    "b": "oven_stone",
-    "c": "sack_pile_stone",
-    "d": "prep_table_stone",
-    "f": "pot_rack_stone",
-    "i": "kitchen_shelf_stone",
-    "j": "wall_window_stone"
-  },
-  "enemies": {},
-  "layout": [
-    "WWjWWWWWW",
-    "WbFbFBBcW",
-    "LFaFfFFFL",
-    "WcFFdFFiW",
-    "jFFFFFFFj",
-    "WBFFFFFBW",
-    "WWjWEWjWW"
-  ],
-  "npcs": [
-    {
-      "id": "maid",
-      "x": 2,
-      "z": 3,
-      "wanderRadius": 0.8
-    },
-    {
-      "id": "servant_man",
-      "x": 6,
-      "z": 4,
-      "wanderRadius": 0.8
-    },
-    {
-      "id": "maid",
-      "x": 5,
-      "z": 2,
-      "wanderRadius": 0.6
-    }
-  ]
+  {
+   "id": "maid",
+   "x": 5,
+   "z": 2,
+   "wanderRadius": 0.6
+  }
+ ]
 }
