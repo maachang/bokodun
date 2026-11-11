@@ -1,0 +1,127 @@
+{
+ "id": "mansion_lord_h",
+ "name": "自治領主の館（ダマスカス自治領）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": "town_h",
+ "spawn": {
+  "x": 10,
+  "z": 12,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 4864552,
+  "fogNear": 22,
+  "fogFar": 70,
+  "visibility": 0.9,
+  "skyColor": 4864552
+ },
+ "legend": {
+  "D": "stairs_wood_down",
+  "E": "building_exit",
+  "F": "wood_floor",
+  "K": "chandelier_mansion_rug",
+  "L": "wall_sconce_wood",
+  "N": "wall_window_curtain",
+  "R": "wall_banner_red_wood",
+  "S": "stove",
+  "T": "table",
+  "U": "stairs_wood_up",
+  "W": "wooden_wall",
+  "X": "crate",
+  "Y": "barrel",
+  "g": "cupboard",
+  "h": "chair",
+  "k": "bookshelf",
+  "u": "rug",
+  "w": "water_barrel"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWLWWWWWWWWWWWLWWWW",
+  "WXXgFXXWgkkkkkgWwFFSW",
+  "WYFFFFYWFuuuuuFWFFFFW",
+  "WFFFFFFWhuuuuuhWFFFFW",
+  "WFFFFFFWFuhThuFWhThFW",
+  "WXFFFFXWFuuuuuFWFFFFW",
+  "WWWFWWWWWWWFWWWWWFWWW",
+  "LFFFFFFFFuuuFFFFFFFFW",
+  "WXFFFFFFFuuuFFFFFFFUL",
+  "NFFhThFFFuKuFFhThFFFW",
+  "WFFFFFFFFuuuFFFFFFFFN",
+  "NFFFFFFFFuuuFFFFFFFFW",
+  "WDFhThFFFuuuFFhThFFFN",
+  "WFFFFFFFFuuuFFFFFFFFW",
+  "WWWNWWNRWLEWWRNWWNWWW"
+ ],
+ "npcs": [
+  {
+   "id": "margrave_man",
+   "x": 11,
+   "z": 2
+  },
+  {
+   "id": "guard_heavy",
+   "x": 9,
+   "z": 8
+  },
+  {
+   "id": "guard_heavy",
+   "x": 11,
+   "z": 8
+  },
+  {
+   "id": "guard_light",
+   "x": 8,
+   "z": 5
+  },
+  {
+   "id": "butler",
+   "x": 7,
+   "z": 9
+  },
+  {
+   "id": "maid",
+   "x": 18,
+   "z": 3
+  },
+  {
+   "id": "servant_man",
+   "x": 3,
+   "z": 3
+  },
+  {
+   "id": "adv_clerk_man",
+   "x": 13,
+   "z": 12
+  }
+ ],
+ "links": {
+  "19,8": {
+   "nextMap": "mansion_lord_h_2f",
+   "message": "階段を上る（2階へ）",
+   "dir": "e",
+   "spawn": {
+    "x": 18,
+    "z": 9,
+    "angle": 1.570795
+   }
+  },
+  "1,12": {
+   "nextMap": "mansion_lord_h_vault",
+   "message": "階段を下りる（地下へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 5,
+    "angle": -1.570795
+   }
+  }
+ }
+}

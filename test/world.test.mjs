@@ -1474,7 +1474,7 @@ test('H（ダマスカス自治領・辺境の街）: 施設 6 つ＋自治領�
     const at = (c, r) => objects[t.legend[t.layout[r][c]]];
     const lv = (c, r) => parseInt(t.heights[r][c], 36);
     const doors = Object.entries(t.links).filter(([k]) => at(...k.split(',').map(Number))?.type === 'door' && !/^(district_gate|gate_[a-z]+)$/.test(t.legend[t.layout[+k.split(',')[1]][+k.split(',')[0]]]));
-    assert.deepEqual(doors.map(([, l]) => l.nextMap).sort(), ['city_inn', 'guild_adv', 'guild_training', 'mansion_margrave', 'shop', 'shop', 'temple']);
+    assert.deepEqual(doors.map(([, l]) => l.nextMap).sort(), ['city_inn', 'guild_adv', 'guild_training', 'mansion_lord_h', 'shop', 'shop', 'temple']);
     assert.ok(!doors.some(([, l]) => l.nextMap === 'castle'), '城はない');
     for (const [key, l] of doors) {
         const [c, r] = key.split(',').map(Number);
@@ -1882,7 +1882,7 @@ test('植物（草・花・シダ・葦など）は、全て sdServer の画像�
 });
 
 test('個人の館・家（H の自治領主の館・C の議長の館・G の長老の家）の扉の上に、店・ギルド・神殿の絵（icon）を付けない', () => {
-    for (const [town, next] of [['h', 'mansion_margrave'], ['c', 'mansion_chairman_c'], ['e', 'mansion_chairman_e'], ['g', 'elder_house_g']]) {
+    for (const [town, next] of [['h', 'mansion_lord_h'], ['c', 'mansion_chairman_c'], ['e', 'mansion_chairman_e'], ['g', 'elder_house_g']]) {
         const link = Object.values(readJson(`public/data/maps/town_${town}.json`).links).find(l => l.nextMap === next);
         assert.ok(link, `${town}: ${next}`);
         assert.equal(link.icon, undefined, `${town}: 館・家に、店の絵を付けない`);

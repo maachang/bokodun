@@ -1,0 +1,80 @@
+{
+ "id": "mansion_lord_h_vault",
+ "name": "自治領主の館（ダマスカス自治領）（地下）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 5,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "brick",
+  "ambientLight": 9474192,
+  "directionalLight": 11184810,
+  "fogColor": 1710640,
+  "fogNear": 10,
+  "fogFar": 40,
+  "visibility": 0.8,
+  "skyColor": 1710640
+ },
+ "legend": {
+  "F": "brick_floor",
+  "G": "cell_door",
+  "L": "wall_sconce",
+  "U": "stairs_stone_up",
+  "W": "brick_wall",
+  "X": "crate_stone",
+  "Y": "barrel_stone",
+  "c": "treasure_chest",
+  "s": "straw_bed",
+  "w": "water_barrel_stone"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWW",
+  "WFXFFwFYWFXFFFFFFcFXW",
+  "WFFFFFFFWFFFFFFFFFFFW",
+  "WWWWFWWWWWWWWWFWWWWWL",
+  "WFFFFFFFFFFFFFFFFFFFW",
+  "LUFFFFFFFFFFFFFFFFFFW",
+  "WFFFFFFFFFFFFFFFFFFFW",
+  "WWWWWGWWWWWWWWWFWWWWW",
+  "WFFFFFFFFYWFFYFFFFFFW",
+  "WFsFFFFFFFWXFFFFFFFXW",
+  "WWWWLWWWWWWWWWWWLWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "guard_light",
+   "x": 10,
+   "z": 5
+  },
+  {
+   "id": "servant_man",
+   "x": 5,
+   "z": 2
+  },
+  {
+   "id": "prisoner_thug",
+   "x": 3,
+   "z": 8
+  }
+ ],
+ "links": {
+  "1,5": {
+   "nextMap": "mansion_lord_h",
+   "message": "階段を上る（1階へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 12,
+    "angle": -1.570795
+   }
+  }
+ }
+}

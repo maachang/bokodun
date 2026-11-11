@@ -174,7 +174,7 @@
    }
   },
   "29,5": {
-   "nextMap": "mansion_margrave",
+   "nextMap": "mansion_lord_h",
    "message": "自治領主の館に入る",
    "back": {
     "x": 29,

@@ -1,6 +1,7 @@
 """C・E・I の議長・女王の屋敷。1 部屋の複製をやめ、国ごとに、1 階・2 階・地下の 3 階建てに作る（共通の道具は castle_kit.py）。
   - C（ミレニアム自由都市）mansion_chairman_c: 砂色の土壁の商人の館。1 階（商談の広間・議長の執務室。暖炉なし）・2 階の私室・地下の金庫室
   - E（ガリレオ連盟）mansion_chairman_e: 大理石の成金の館。1 階（大広間・議長の間・帳場・食堂）・2 階の宝物の間・地下の金庫
+  - H（ダマスカス自治領）mansion_lord_h: 辺境の自治領主の館（木の壁。砦に近い）。1 階（広間・軍議の間・武器庫・厨房）・2 階の私室・地下の貯蔵庫と牢
   - I（カナロア公国）mansion_duke_i: 青みのある石の湖畔の館。1 階（謁見の間・食堂・厨房）・2 階の女王の私室と書斎・地下の船着き場の倉
   制約（test/world.test.mjs）: C の議長は北の壁の書棚の前・赤い絨毯の上。C に暖炉は置かない。扉の上に絵（icon）は付けない
 """
@@ -8,7 +9,7 @@ from castle_kit import arrival, finish, grid, make as _make, put
 
 COMMON = {'W': 'wooden_wall', 'F': 'wood_floor', 'u': 'rug', 'T': 'table', 'h': 'chair', 'e': 'bed', 'k': 'bookshelf', 'g': 'cupboard', 'X': 'crate', 'Y': 'barrel',
           'N': 'wall_window_curtain', 'L': 'wall_sconce_wood', 'K': 'chandelier_mansion_rug', 'U': 'stairs_wood_up', 'D': 'stairs_wood_down', 'E': 'building_exit',
-          'S': 'stove', 'w': 'water_barrel', 'c': 'treasure_chest', 'G': 'cell_door'}
+          'S': 'stove', 'w': 'water_barrel', 'c': 'treasure_chest', 'G': 'cell_door', 'R': 'wall_banner_red_wood', 's': 'straw_bed'}
 ENV = {'floorType': 'stone', 'hasCeiling': True, 'ceilingTexture': 'woodWall', 'ambientLight': 15259832, 'directionalLight': 13615264, 'fogColor': 4864552,
        'fogNear': 22, 'fogFar': 70, 'visibility': 0.9, 'skyColor': 4864552}
 ENV_DEEP = dict(ENV, ambientLight=9474192, directionalLight=11184810, fogColor=1710640, fogNear=10, fogFar=40, visibility=0.8, skyColor=1710640, ceilingTexture='brick')
@@ -25,18 +26,20 @@ LOOK = {
     'e': _leg(W='white_wall', F='marble_floor', T='table_marble', h='chair_marble', e='bed_marble', k='bookshelf_marble', g='cupboard_marble', X='crate_marble',
               N='wall_window_curtain_marble', L='wall_sconce_marble', U='stairs_marble_up', D='stairs_marble_down', S='stove_marble', w='water_barrel_marble'),
     'i': _leg(W='lake_wall'),
+    'h': _leg(),
 }
 DEEP = {'W': 'brick_wall', 'F': 'brick_floor', 'L': 'wall_sconce', 'U': 'stairs_stone_up', 'T': 'table_stone', 'h': 'chair_stone', 'X': 'crate_stone', 'Y': 'barrel_stone',
-        'w': 'water_barrel_stone', 'g': 'cupboard'}
+        'w': 'water_barrel_stone', 'g': 'cupboard', 'G': 'cell_door', 's': 'straw_bed'}
 # 階段（x, y, 階段のある壁の側）。1f は上り U（2 階へ）と下り D（地下へ）、2f は下り D（1 階へ）、vault は上り U（1 階へ）
 ST = {
     'c': {'1f': {'U': (19, 6, 'e'), 'D': (1, 12, 'w')}, '2f': {'D': (19, 9, 'e')}, 'vault': {'U': (1, 5, 'w')}},
     'e': {'1f': {'U': (1, 8, 'w'), 'D': (21, 12, 'e')}, '2f': {'D': (1, 3, 'w')}, 'vault': {'U': (21, 5, 'e')}},
+    'h': {'1f': {'U': (19, 8, 'e'), 'D': (1, 12, 'w')}, '2f': {'D': (19, 9, 'e')}, 'vault': {'U': (1, 5, 'w')}},
     'i': {'1f': {'U': (1, 9, 'w'), 'D': (21, 13, 'e')}, '2f': {'D': (1, 9, 'w')}, 'vault': {'U': (21, 5, 'e')}},
 }
-IDS = {'c': 'mansion_chairman_c', 'e': 'mansion_chairman_e', 'i': 'mansion_duke_i'}
-TOWN = {'c': 'town_c', 'e': 'town_e', 'i': 'town_i'}
-NAME = {'c': '議長の館（ミレニアム自由都市）', 'e': '議長の館（ガリレオ連盟）', 'i': '女王の館（カナロア公国）'}
+IDS = {'c': 'mansion_chairman_c', 'e': 'mansion_chairman_e', 'i': 'mansion_duke_i', 'h': 'mansion_lord_h'}
+TOWN = {'c': 'town_c', 'e': 'town_e', 'i': 'town_i', 'h': 'town_h'}
+NAME = {'c': '議長の館（ミレニアム自由都市）', 'e': '議長の館（ガリレオ連盟）', 'i': '女王の館（カナロア公国）', 'h': '自治領主の館（ダマスカス自治領）'}
 
 
 def mk(k, floor, g, npcs, up=None, down=None, **kw):
@@ -188,8 +191,47 @@ def _ivault():
                   {'Y': [(1, 1), (2, 1), (1, 2), (13, 1), (14, 1), (15, 1), (9, 8), (9, 9), (21, 9)], 'X': [(7, 1), (19, 1), (11, 9), (12, 9)], 'w': [(1, 9)]})
 
 
+# ---------------- H: 辺境の自治領主の館（砦に近い木の館）----------------
+def _h1f():
+    """北に、武器庫（西）・軍議の間（中央。自治領主）・厨房（東）。南は、長机の並ぶ広間（衛兵が立つ）"""
+    areas = {'arm': ('F', 1, 1, 6, 5), 'war': ('F', 8, 1, 14, 5), 'kit': ('F', 16, 1, 19, 5), 'hall': ('F', 1, 7, 19, 13)}
+    g = grid(21, 15, areas, [(3, 6), (11, 6), (17, 6)], {'F': 'F'}, part=None)
+    for y in range(1, 6):
+        for x in range(9, 14): g[y][x] = 'u'
+    for y in range(7, 14):
+        for x in (9, 10, 11): g[y][x] = 'u'
+    put(g, {'k': [(x, 1) for x in range(9, 14)], 'T': [(11, 4)], 'h': [(10, 4), (12, 4), (8, 3), (14, 3)], 'g': [(8, 1), (14, 1)]}, 'Fu')
+    put(g, {'X': [(1, 1), (2, 1), (5, 1), (6, 1), (1, 5), (6, 5)], 'Y': [(1, 2), (6, 2)], 'g': [(3, 1)], 'S': [(19, 1)], 'w': [(16, 1)], 'T': [(17, 4)], 'h': [(16, 4), (18, 4)]}, 'F')
+    put(g, {'K': [(10, 9)], 'T': [(4, 9), (4, 12), (15, 9), (15, 12)], 'h': [(3, 9), (5, 9), (3, 12), (5, 12), (14, 9), (16, 9), (14, 12), (16, 12)], 'U': [(19, 8)], 'D': [(1, 12)], 'X': [(1, 8)]}, 'Fu')
+    put(g, {'N': [(3, 14), (6, 14), (14, 14), (17, 14), (0, 9), (0, 11), (20, 10), (20, 12)], 'R': [(7, 14), (13, 14)], 'L': [(0, 7), (20, 8), (4, 0), (16, 0), (9, 14)]}, 'W')
+    npcs = [('margrave_man', 11, 2), ('guard_heavy', 9, 8), ('guard_heavy', 11, 8), ('guard_light', 8, 5), ('butler', 7, 9), ('maid', 18, 3), ('servant_man', 3, 3), ('adv_clerk_man', 13, 12)]
+    return _first('h', g, npcs, 10)
+
+
+def _h2f():
+    """自治領主の私室（西）・夫人の部屋（東）・回廊"""
+    areas = {'bed': ('F', 1, 1, 9, 5), 'lady': ('F', 11, 1, 19, 5), 'gal': ('F', 1, 7, 19, 11)}
+    g = grid(21, 13, areas, [(10, 3), (5, 6), (15, 6)], {'F': 'F'}, part=None)
+    for x in range(2, 19): g[9][x] = 'u'
+    put(g, {'e': [(2, 2), (2, 4)], 'g': [(8, 1), (8, 5)], 'T': [(5, 3)], 'h': [(6, 3)], 'k': [(x, 1) for x in range(12, 16)]}, 'F')
+    put(g, {'e': [(18, 2)], 'T': [(16, 4)], 'h': [(15, 4), (17, 4)], 'X': [(19, 5)]}, 'F')
+    put(g, {'D': [(19, 9)]}, 'F')
+    put(g, {'T': [(6, 8), (14, 8)], 'h': [(5, 8), (7, 8), (13, 8), (15, 8)], 'X': [(1, 11), (2, 11)], 'g': [(18, 11), (17, 11)]}, 'F')
+    put(g, {'N': [(3, 0), (6, 0), (18, 0), (4, 12), (9, 12), (11, 12), (16, 12), (0, 3), (0, 9), (20, 3)], 'L': [(10, 0), (20, 8)]}, 'W')
+    npcs = [('margrave_woman', 15, 3), ('maid_head', 4, 4), ('maid', 12, 9), ('servant_man', 8, 10)]
+    return mk('h', '2f', g, npcs, down=('mansion_lord_h', '1f', 'U', '階段を下りる（1階へ）'))
+
+
+def _hvault():
+    """貯蔵庫（樽・木箱）と、南西の牢（牢の扉・藁の寝床・囚人）"""
+    m = _vault('h', 21, [(1, 7), (9, 19)], [(1, 9), (11, 19)], [(17, 1)],
+               [('guard_light', 10, 5), ('servant_man', 5, 2), ('prisoner_thug', 3, 8)],
+               {'X': [(2, 1), (10, 1), (19, 1), (11, 9), (19, 9)], 'Y': [(7, 1), (9, 8), (13, 8)], 'w': [(5, 1)], 'G': [(5, 7)], 's': [(2, 9)]})
+    return m
+
+
 def build():
     """C・E・I の館のマップ（list）。1 階の id は mansion_chairman_c・mansion_chairman_e・mansion_duke_i のまま"""
     out = []
-    for fns in ((_c1f, _c2f, _cvault), (_e1f, _e2f, _evault), (_i1f, _i2f, _ivault)): out += finish([f() for f in fns])
+    for fns in ((_c1f, _c2f, _cvault), (_e1f, _e2f, _evault), (_i1f, _i2f, _ivault), (_h1f, _h2f, _hvault)): out += finish([f() for f in fns])
     return out

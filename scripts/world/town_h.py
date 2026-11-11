@@ -1,6 +1,6 @@
 """H（ダマスカス自治領・辺境の街）の中身。手本は、一般街（city）と貴族街（city_noble）。街の中は、この build が丸ごと作る。
   - 施設 7 つ: 道具屋・武器屋・宿屋・神殿・冒険者ギルド・職業訓練所（ユーザー指定）＋ 自治領主の館（城はなく、最高権力者が住む館）
-  - 中のマップは、既存を共有する（shop・city_inn・temple・guild_*。館は mansion_margrave＝辺境伯の屋敷）
+  - 中のマップは、既存を共有する（shop・city_inn・temple・guild_*。館は mansion_lord_h＝自治領主の館（mansion_keep.py。3 階建て））
   - 街の人（NPC）は、一般街・町の NPC を流用して、少数を置く
   - 高低: サンプル（city）の高さを土台にし（town_heights.sample_field）、館・神殿の高台（2〜3）と、川（南北・幅 1、水は 0。橋は東西の通りと南の脇道）を重ねる。段差は 1 ずつ
   - 入口の前の通りは 2 マス（一般街と同じ。扉の前の立て札の段が、東西の通り）
@@ -15,7 +15,7 @@ FACILITIES = [
     ('S', 2, 3, 4, 1, 'd', 'Q', _shop('weapon_shop', '武器屋に入る', 'weaponShopIcon')),
     ('S', 7, 3, 4, 1, 'd', 'q', _shop('item_shop', '道具屋に入る', 'itemShopIcon')),
     ('S', 21, 3, 4, 1, 'd', 'a', _to('guild_adv', '冒険者ギルドに入る', 'advGuildIcon')),
-    ('H', 26, 3, 8, 3, 'Y', None, _to('mansion_margrave', '自治領主の館に入る')),   # 館は、ほかの 2 倍の幅（高台）
+    ('H', 26, 3, 8, 3, 'Y', None, _to('mansion_lord_h', '自治領主の館に入る')),   # 館は、ほかの 2 倍の幅（高台）
     ('I', 2, 10, 4, 1, 'N', 'M', _to('city_inn', '宿屋・酒場に入る', 'innIcon')),
     ('S', 7, 10, 4, 1, 'd', 'r', _to('guild_training', '職業訓練所に入る', 'trainingIcon')),
     ('J', 21, 10, 4, 1, 'D', 'c', _to('temple', '神殿に入る', 'templeIcon')),   # 神殿は高台
