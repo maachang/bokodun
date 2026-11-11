@@ -1733,7 +1733,7 @@ Sources:
 ### 43-80. 国のトップを、国ごとに作り直す（2026-11-08。「城に入ると皆愚王になっている。城は作り直したほうがよい」）
 - **原因**: A・B・D の城門が、全部、共通の王城（`castle`）につながっていて、中の王が全部、同じ愚王の画像だった。
 - **作り直し**（`scripts/world/castle_f.py` の `hall`・`build_others`。D の城の部品で、1 部屋の玉座の間）:
-  - A（`castle_a`）: 帝王（`emperor_a`。若い帝王）と、重装の衛兵 4 人。
+  - A（`castle_a`）: 帝王（`emperor_a`。若い帝王）と、守衛 4 人（sdServer ID 16。キー `guard_heavy`）。
   - B（`castle_b`。狭い 17×11）: 愚かな王（`king_b`）と王子（`prince_b`）。実権は教皇。衛兵 2 人。台詞も、愚王らしく。
   - B の大教会（`temple_b`。`scripts/world/temple_b.py`）: 共通の大神殿を複製し、教皇（`pope`）と枢機卿（`cardinal`）を祭壇に。売り場は、助祭へ。2 階・地下への階段は、なくした。
   - D（共通の `castle`）: 王を、質素倹約の王（`king_d`。sdServer 265）に替えた（王子は、そのまま）。

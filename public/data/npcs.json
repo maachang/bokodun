@@ -157,7 +157,7 @@
     ]
   },
   "guard_heavy": {
-    "name": "重装の衛兵",
+    "name": "守衛",
     "sdId": 16,
     "texture": "/images/npcs/guard_heavy.png",
     "height": 2.8,
@@ -171,7 +171,7 @@
     ]
   },
   "guard_spear": {
-    "name": "城の衛兵",
+    "name": "重装衛兵",
     "sdId": 9,
     "texture": "/images/npcs/guard_spear.png",
     "height": 2.6,
@@ -199,7 +199,7 @@
     ]
   },
   "gate_guard": {
-    "name": "城門の衛兵",
+    "name": "城門の重装衛兵",
     "sdId": 9,
     "texture": "/images/npcs/guard_spear.png",
     "height": 2.6,

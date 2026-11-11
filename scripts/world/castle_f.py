@@ -88,7 +88,7 @@ def _tatami_hall(m):
 
 def _others():
     return [
-        # A キュラビッド帝国: 帝王（雪国の若い帝王）と、重装の衛兵
+        # A キュラビッド帝国: 帝王（雪国の若い帝王）と、守衛（sdServer ID 16。キー guard_heavy）
         hall('castle_a', '帝王の城（キュラビッド帝国）', 25, 15, 12, [('emperor_a', 12, 1)],
              [('guard_heavy', 9, 5), ('guard_heavy', 15, 5), ('guard_heavy', 9, 9), ('guard_heavy', 15, 9)]),
         # B フランケル聖国: 狭い城に、愚かな王と王子（玉座に並ぶ）（実権は教皇にある）。衛兵は少ない
