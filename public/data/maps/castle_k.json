@@ -39,10 +39,12 @@
   "T": "pine_k",
   "U": "ume_k",
   "w": "water",
-  "e": "edo_lantern"
+  "e": "edo_lantern",
+  "o": "wooden_door",
+  "v": "stairs_wood_down"
  },
  "layout": [
-  "HHHHHHHHHHHHHHHHHHHHHHHHHHHH",
+  "HHoHHHHHHHHHHHHHHHHHHHHHHHHH",
   "H____HHHH_____G_____HHH____H",
   "H____HHHH___________HHH____H",
   "H____HHHH_____G_____HHH____H",
@@ -65,7 +67,7 @@
   "HH________HSS_SSSH________HH",
   "HH________S______S________HH",
   "HH_______________S________HH",
-  "HH________S______S________HH",
+  "HHv_______S______S________HH",
   "HHHHHHHHHHHHH2HHHHHHHHHHHHHH"
  ],
  "npcs": [
@@ -155,6 +157,26 @@
    "z": 20
   }
  ],
- "links": {},
+ "links": {
+  "2,0": {
+   "nextMap": "tenshu_k_1f",
+   "message": "渡櫓から天守へ",
+   "back": {
+    "x": 2,
+    "z": 1,
+    "angle": 3.14159
+   }
+  },
+  "2,23": {
+   "nextMap": "castle_k_basement",
+   "message": "階段を下りる（地下の牢・穴蔵へ）",
+   "dir": "s",
+   "spawn": {
+    "x": 2,
+    "z": 7,
+    "angle": -1.570795
+   }
+  }
+ },
  "decorFloor": "whiteSand"
 }

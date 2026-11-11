@@ -70,6 +70,8 @@ def hall(mid, name, w, h, dais, rulers, guards, extra_npcs=()):
 def build_others():
     out = _others()
     out[[m['id'] for m in out].index('castle_k')] = __import__('castle_k').build(next(m for m in out if m['id'] == 'castle_k'))   # 殿様の城: 全面畳・ふすまで区切られた狭い部屋（castle_k.py）
+    tk = __import__('tenshu_k')   # 殿様の城に、天守（5 階）と地下（牢・穴蔵）をつなぐ（tenshu_k.py）
+    tk.attach(next(m for m in out if m['id'] == 'castle_k')); out += tk.build()
     add_hearth(next(m for m in out if m['id'] == 'castle_a'), 5, 1)   # 帝王の城（雪国）: 暖炉を 1 つ（玉座の間の、北の壁ぎわ）
     return out
 

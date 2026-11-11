@@ -1,0 +1,99 @@
+{
+ "id": "castle_k_basement",
+ "name": "地下（牢・穴蔵。殿様の城。マカヒキ国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 7,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "brick",
+  "ambientLight": 7829367,
+  "directionalLight": 11184810,
+  "fogColor": 1710618,
+  "fogNear": 8,
+  "fogFar": 34,
+  "visibility": 0.75,
+  "skyColor": 1710618
+ },
+ "legend": {
+  "F": "brick_floor",
+  "K": "sack_pile_stone",
+  "L": "wall_sconce",
+  "O": "well",
+  "U": "stairs_stone_up",
+  "W": "rock_wall",
+  "X": "crate_stone",
+  "b": "barrel_stone",
+  "c": "cell_door",
+  "h": "chair_stone",
+  "s": "straw_bed",
+  "t": "table_stone"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WFFFFWWFFFFWWFFFFWWFFFFFW",
+  "WFsFFWWFsFFWWFsFFWWFFsFFW",
+  "WFFFFLWFFFFLWFFFFLWFFFFFW",
+  "WFFFFWWFFFFWWFFFFWWFFFFFW",
+  "WFFFFWWFFFFWWFFFFWWFFFFFW",
+  "WWcWWWWWcWWWWWcWWWWWWcWWW",
+  "WUFFFFFFFFFFFFFFFFFFFFFFW",
+  "WWWWWFWWWWWWWWWFWWWWWFWWW",
+  "WbbFFFFFFFFWWFFFFFWFFFFFW",
+  "WbFFFFFFKFFWWFFFFFWFFFFFW",
+  "WFFFFFFFFFFWWFFFFFWFFFFFW",
+  "WFFFFFFFFFFWWFFOFFWFFthFW",
+  "WFFFFFFFFFFWWFFFFFWFFFFFW",
+  "WXFFFXFFFKFWWFFFFFWFFFFFW",
+  "WFFFFFFFFFFWWFFFFFWFFFFFW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "gaoler",
+   "x": 21,
+   "z": 11
+  },
+  {
+   "id": "guard_k",
+   "x": 20,
+   "z": 7
+  },
+  {
+   "id": "prisoner_thief",
+   "x": 3,
+   "z": 3
+  },
+  {
+   "id": "prisoner_thug",
+   "x": 9,
+   "z": 3
+  },
+  {
+   "id": "prisoner_debtor",
+   "x": 15,
+   "z": 3
+  }
+ ],
+ "links": {
+  "1,7": {
+   "nextMap": "castle_k",
+   "message": "階段を上る（殿様の城へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 22,
+    "angle": 0.0
+   }
+  }
+ }
+}

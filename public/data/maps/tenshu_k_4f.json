@@ -1,0 +1,71 @@
+{
+ "id": "tenshu_k_4f",
+ "name": "天守 4階（城主の最後の間。マカヒキ国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 1,
+  "z": 6,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 4864552,
+  "fogNear": 22,
+  "fogFar": 70,
+  "visibility": 1.0,
+  "skyColor": 4864552
+ },
+ "legend": {
+  "D": "stairs_wood_down",
+  "N": "wall_tokonoma",
+  "U": "stairs_wood_up",
+  "W": "wooden_wall",
+  "_": "tatami",
+  "a": "edo_andon",
+  "c": "dais_tatami_1",
+  "m": "edo_manmaku",
+  "q": "edo_sanbo"
+ },
+ "enemies": {},
+ "layout": [
+  "WWmaWNWamWW",
+  "W________UW",
+  "W___ccc___W",
+  "m_________m",
+  "W____q____W",
+  "m_________m",
+  "W_________W",
+  "WD________W",
+  "WWWmWWWmWWW"
+ ],
+ "npcs": [],
+ "links": {
+  "1,7": {
+   "nextMap": "tenshu_k_3f",
+   "message": "階段を下りる（3階へ）",
+   "dir": "s",
+   "spawn": {
+    "x": 10,
+    "z": 2,
+    "angle": 3.14159
+   }
+  },
+  "9,1": {
+   "nextMap": "tenshu_k_5f",
+   "message": "階段を上る（5階へ）",
+   "dir": "n",
+   "spawn": {
+    "x": 1,
+    "z": 4,
+    "angle": 0.0
+   }
+  }
+ }
+}

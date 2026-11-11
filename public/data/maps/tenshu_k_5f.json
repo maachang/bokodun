@@ -1,0 +1,67 @@
+{
+ "id": "tenshu_k_5f",
+ "name": "天守 5階（作戦会議・物見。マカヒキ国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 1,
+  "z": 4,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 4864552,
+  "fogNear": 22,
+  "fogFar": 70,
+  "visibility": 1.0,
+  "skyColor": 4864552
+ },
+ "legend": {
+  "=": "wood_floor",
+  "D": "stairs_wood_down",
+  "I": "island_map",
+  "M": "wall_window_wood",
+  "T": "table",
+  "W": "wooden_wall"
+ },
+ "enemies": {},
+ "layout": [
+  "WWMWIWMWW",
+  "W=======W",
+  "M=======M",
+  "W===T===W",
+  "M=======M",
+  "WD======W",
+  "WWMWWWMWW"
+ ],
+ "npcs": [
+  {
+   "id": "guard_k",
+   "x": 6,
+   "z": 4
+  },
+  {
+   "id": "daimyo_retainer_k",
+   "x": 6,
+   "z": 2
+  }
+ ],
+ "links": {
+  "1,5": {
+   "nextMap": "tenshu_k_4f",
+   "message": "階段を下りる（4階へ）",
+   "dir": "s",
+   "spawn": {
+    "x": 9,
+    "z": 2,
+    "angle": 3.14159
+   }
+  }
+ }
+}

@@ -1,0 +1,92 @@
+{
+ "id": "tenshu_k_2f",
+ "name": "天守 2階（武具の蔵・兵の詰所。マカヒキ国）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 8,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "ceilingTexture": "woodWall",
+  "ambientLight": 15259832,
+  "directionalLight": 13615264,
+  "fogColor": 4864552,
+  "fogNear": 22,
+  "fogFar": 70,
+  "visibility": 1.0,
+  "skyColor": 4864552
+ },
+ "legend": {
+  "=": "wood_floor",
+  "B": "barrel",
+  "D": "stairs_wood_down",
+  "M": "wall_window_wood",
+  "R": "weapon_rack",
+  "T": "table",
+  "U": "stairs_wood_up",
+  "W": "wooden_wall",
+  "X": "crate",
+  "_": "tatami",
+  "h": "edo_hibachi",
+  "z": "edo_zabuton"
+ },
+ "enemies": {},
+ "layout": [
+  "WWMWWMWWWMWWMWW",
+  "W=R==R=W_____UW",
+  "W======W______W",
+  "M=====BW___T__M",
+  "W=====XW______W",
+  "WR======__h___W",
+  "W======W_z__z_W",
+  "MB=====W______M",
+  "W====X=W______W",
+  "W=D====W______W",
+  "WWWMWWWWWWWMWWW"
+ ],
+ "npcs": [
+  {
+   "id": "guard_k",
+   "x": 9,
+   "z": 2
+  },
+  {
+   "id": "guard_k",
+   "x": 12,
+   "z": 7
+  },
+  {
+   "id": "guard_k",
+   "x": 4,
+   "z": 5
+  }
+ ],
+ "links": {
+  "2,9": {
+   "nextMap": "tenshu_k_1f",
+   "message": "階段を下りる（1階へ）",
+   "dir": "s",
+   "spawn": {
+    "x": 7,
+    "z": 2,
+    "angle": 3.14159
+   }
+  },
+  "13,1": {
+   "nextMap": "tenshu_k_3f",
+   "message": "階段を上る（3階へ）",
+   "dir": "n",
+   "spawn": {
+    "x": 2,
+    "z": 6,
+    "angle": 0.0
+   }
+  }
+ }
+}
