@@ -45,7 +45,7 @@ def _f1():
     npcs = [('mage_archmage_j', 14, 1), ('mage_chancellor_j', 12, 2), ('guard_light', 10, 5), ('guard_light', 18, 5), ('adv_wizard', 7, 9), ('mage_researcher_woman', 22, 9),
             ('mage_researcher_man', 24, 10), ('mage_apprentice_girl', 3, 3), ('mage_apprentice_boy', 4, 4), ('guard_light', 14, 14)]
     lk = _stairs('1f', ('castle_j_2f', '2f', 'D'), ('castle_j_lab', 'lab', 'U'), '階段を上る（図書室へ）', '階段を下りる（実験場へ）')
-    return make('castle_j', '魔導王の城（カラー魔導国。魔導塔）', g, ST['1f'], npcs, lk, spawn=arrival(14, 16, 'n'), mtype='open')
+    return make('castle_j', '魔導王の城（カラー魔導国。魔導塔）', g, ST['1f'], npcs, lk, spawn=arrival(14, 16, 's'), mtype='open')
 
 
 def _library():

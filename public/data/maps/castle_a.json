@@ -7,8 +7,8 @@
  "nextMap": null,
  "spawn": {
   "x": 18,
-  "z": 21,
-  "angle": 3.14159
+  "z": 19,
+  "angle": 0.0
  },
  "environment": {
   "floorType": "stone",

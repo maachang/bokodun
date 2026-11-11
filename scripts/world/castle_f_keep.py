@@ -44,7 +44,7 @@ def _f1():
             ('cat_noble_man', 11, 3), ('cat_noble_woman', 11, 5), ('rabbit_noble_man', 23, 3), ('rabbit_noble_woman', 23, 5),
             ('dog_noble_man', 11, 8), ('dog_noble_woman', 13, 8), ('gorilla_noble_man', 21, 8), ('gorilla_noble_woman', 23, 8)]
     lk = {'U': ('castle_f_2f', arrival(*ST['2f']['D']), '階段を上る（2階へ）'), 'D': ('castle_f_mine', arrival(*ST['mine']['U']), '階段を下りる（坑道へ）')}
-    return make('castle_f', '獣王の城（ライアン獣王国）', g, ST['1f'], npcs, lk, spawn=arrival(17, 16, 'n'), mtype='open')
+    return make('castle_f', '獣王の城（ライアン獣王国）', g, ST['1f'], npcs, lk, spawn=arrival(17, 16, 's'), mtype='open')
 
 
 def _f2():

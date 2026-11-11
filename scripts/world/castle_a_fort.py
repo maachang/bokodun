@@ -55,7 +55,7 @@ def _f1():
             ('guard_heavy', 25, 18), ('guard_heavy', 32, 16), ('guard_heavy', 32, 3), ('inn_cook', 3, 13), ('maid', 5, 17), ('servant_man', 4, 7), ('maid_head', 20, 17)]
     lk = {'U1': ('castle_a_2f', arrival(*ST['2f']['D1']), '階段を上る（2階の西へ）'), 'U2': ('castle_a_2f', arrival(*ST['2f']['D2']), '階段を上る（2階の東へ）'),
           'D': ('castle_a_icehouse', arrival(*ST['ice']['U']), '階段を下りる（氷室へ）')}
-    m = make('castle_a', '帝王の城（キュラビッド帝国）', g, ST['1f'], npcs, lk, env=ENV, spawn=arrival(18, 20, 'n'), mtype='open')
+    m = make('castle_a', '帝王の城（キュラビッド帝国）', g, ST['1f'], npcs, lk, env=ENV, spawn=arrival(18, 20, 's'), mtype='open')
     m['links'][f'{YARD_DOOR[0]},{YARD_DOOR[1]}'] = {'nextMap': 'castle_a_yard', 'message': '中庭に出る', 'back': {'x': YARD_DOOR[0], 'z': YARD_DOOR[1] - 1, 'angle': 0}}
     return m
 

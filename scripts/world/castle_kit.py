@@ -78,6 +78,7 @@ def check_walk(m):
     def name(x, y): return leg.get(L[y][x], '0')
     def solid(n): return n != '0' and o.get(n, {}).get('solid') is not False and o.get(n, {}).get('type') not in ('floor_tile', 'stairs', 'door', 'hanging')   # 吊り燭台・松明などは通れる（solid: false）
     sp = (int(m['spawn']['x']), int(m['spawn']['z']))
+    if not (0 <= sp[0] < w and 0 <= sp[1] < h) or solid(name(*sp)): return [f'出現位置 {sp} が、マップの外か、通れないマス']
     seen, q = {sp}, deque([sp])
     while q:
         x, y = q.popleft()

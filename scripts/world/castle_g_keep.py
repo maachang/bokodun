@@ -35,7 +35,7 @@ def _f1():
     npcs = [('elf_queen', 15, 1), ('elf_chancellor', 13, 2), ('elf_soldier_golem', 13, 6), ('elf_soldier_golem', 17, 6), ('elf_soldier_golem', 12, 12), ('elf_soldier_golem', 18, 12),
             ('elf_man_c', 3, 4), ('elf_woman_b', 26, 6), ('elf_guard_man', 4, 15), ('elf_guard_woman', 7, 15), ('elf_woman_a', 24, 15), ('elf_man_a', 28, 12)]
     lk = {'U': ('castle_g_2f', arrival(*ST['2f']['D']), '階段を上る（樹上の回廊へ）'), 'D': ('castle_g_roots', arrival(*ST['roots']['U']), '階段を下りる（根の洞窟へ）')}
-    return make('castle_g', '女王の城（デイラミ精霊国。世界樹の中）', g, ST['1f'], npcs, lk, spawn=arrival(15, 18, 'n'), mtype='open')
+    return make('castle_g', '女王の城（デイラミ精霊国。世界樹の中）', g, ST['1f'], npcs, lk, spawn=arrival(15, 18, 's'), mtype='open')
 
 
 def _f2():

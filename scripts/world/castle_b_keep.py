@@ -46,7 +46,7 @@ def _f1():
     npcs = [('king_b', 14, 1), ('prince_b', 15, 1), ('guard_b', 12, 5), ('guard_b', 18, 5), ('guard_b', 2, 9), ('priest_man', 26, 5), ('priest_man', 28, 5),
             ('priest_woman', 3, 2), ('butler', 10, 9), ('maid', 20, 9)]
     lk = {'U': ('castle_b_2f', arrival(*ST['2f']['D']), '階段を上る（2階の私室へ）'), 'D': ('castle_b_cellar', arrival(*ST['cellar']['U']), '階段を下りる（酒蔵・牢へ）')}
-    return make('castle_b', '王の城（フランケル聖国。狭い）', g, ST['1f'], npcs, lk, env=ENV, spawn=arrival(15, 14, 'n'), mtype='open')
+    return make('castle_b', '王の城（フランケル聖国。狭い）', g, ST['1f'], npcs, lk, env=ENV, spawn=arrival(15, 14, 's'), mtype='open')
 
 
 def _f2():
