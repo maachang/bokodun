@@ -1,0 +1,93 @@
+{
+ "id": "castle_b_2f",
+ "name": "王と王子の私室（王の城 2階）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 15,
+  "z": 8,
+  "angle": 0.0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "marbleWall",
+  "ambientLight": 16777215,
+  "directionalLight": 16773324,
+  "fogColor": 15985881,
+  "fogNear": 24,
+  "fogFar": 70,
+  "visibility": 1.0,
+  "skyColor": 15985881
+ },
+ "legend": {
+  "D": "stairs_marble_down",
+  "F": "marble_floor",
+  "L": "wall_sconce_marble",
+  "M": "bar_counter",
+  "N": "wall_window_curtain_marble",
+  "T": "table_marble",
+  "W": "white_wall",
+  "Y": "beer_keg",
+  "e": "bed_marble",
+  "h": "chair_marble",
+  "k": "bookshelf_marble",
+  "u": "temple_carpet"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWNWWWWWWWWWWWWWWWWWNWWWWWW",
+  "WFFFFFFFMFYYFWFuFWFYYFFFFFFFFFW",
+  "WFeFeFFFFFFFFLFuFLFFFFFFFFFFeFW",
+  "WFFFFFFFFFFFYWFuFWFFFFFFFFFFFFW",
+  "WFFFFFFFFFFFFWFuFWFFFFFFFFFFFFW",
+  "NFFFFFFFFFFFFFFuFFFFFFFFFFFFFFN",
+  "WFFFFFhThFFFFWFuFWFFFFFhThFFFFW",
+  "WFFFFFFFFFFFFWFuFWFFFFFFFFFFFFW",
+  "WkFFFFFFFFFFFLFuFLFFFFFFFFkFFFW",
+  "WFFFFFFFFFFFFWFDFWFFFFFFFFFFFFW",
+  "WWWWWWNWWWWWWWWWWWWWWWWWNWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "maid",
+   "x": 6,
+   "z": 4
+  },
+  {
+   "id": "maid",
+   "x": 24,
+   "z": 4
+  },
+  {
+   "id": "maid_head",
+   "x": 22,
+   "z": 8
+  },
+  {
+   "id": "priest_man",
+   "x": 15,
+   "z": 6
+  },
+  {
+   "id": "butler",
+   "x": 10,
+   "z": 8
+  }
+ ],
+ "links": {
+  "15,9": {
+   "nextMap": "castle_b",
+   "message": "階段を下りる（1階へ）",
+   "dir": "s",
+   "spawn": {
+    "x": 8,
+    "z": 8,
+    "angle": -1.570795
+   }
+  }
+ }
+}

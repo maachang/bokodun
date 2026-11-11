@@ -74,6 +74,8 @@ def build_others():
     tk.attach(next(m for m in out if m['id'] == 'castle_k')); out += tk.build()
     fort = __import__('castle_a_fort').build()   # 帝王の城（雪国）: 中庭を囲む石の要塞（1 階・2 階・塔・中庭・氷室・牢。castle_a_fort.py）
     out[[m['id'] for m in out].index('castle_a')] = fort[0]; out += fort[1:]
+    keep = __import__('castle_b_keep').build()   # 王の城（聖国。狭い）: 1 階・2 階・地下の酒蔵と牢（castle_b_keep.py）
+    out[[m['id'] for m in out].index('castle_b')] = keep[0]; out += keep[1:]
     return out
 
 

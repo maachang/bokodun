@@ -1651,7 +1651,8 @@ test('B（フランケル聖国）: 大教会が街の中心の北の最上位�
     assert.deepEqual(cb.npcs.slice(0, 2).map(n => n.id), ['king_b', 'prince_b'], '愚かな王と王子');
     const [kg, pr] = cb.npcs;
     assert.ok(kg.z === pr.z && Math.abs(kg.x - pr.x) === 1, '王と王子は、玉座の段の上に、横に並ぶ（サンプルの王城と同じ）');
-    assert.ok(['dais_stone_3', 'dais_rug_3'].includes(cb.legend[cb.layout[kg.z][kg.x]]) && ['dais_stone_3', 'dais_rug_3'].includes(cb.legend[cb.layout[pr.z][pr.x]]), '二人とも、一番上の段にいる');
+    const TOP = ['dais_stone_3', 'dais_rug_3', 'dais_marble_3', 'dais_temple_rug_3'];   // 王城は大理石の段（聖国の見た目）
+    assert.ok(TOP.includes(cb.legend[cb.layout[kg.z][kg.x]]) && TOP.includes(cb.legend[cb.layout[pr.z][pr.x]]), '二人とも、一番上の段にいる');
     const ids = m.npcs.map(n => n.id);
     const clergy = ids.filter(id => /^priest_(man|woman)$/.test(id)).length;
     assert.ok(clergy / ids.length >= 0.45, `聖職者（助祭・修道女）が多い: ${clergy}/${ids.length}`);

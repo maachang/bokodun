@@ -4,72 +4,140 @@
  "type": "open",
  "tileSize": 4,
  "wallHeight": 5,
+ "nextMap": null,
  "spawn": {
-  "x": 8,
-  "z": 8,
-  "angle": 0
+  "x": 15,
+  "z": 15,
+  "angle": 3.14159
  },
  "environment": {
   "floorType": "stone",
   "hasCeiling": true,
   "footstep": "stone",
-  "ceilingTexture": "brick",
-  "ambientLight": 10096512,
-  "directionalLight": 13615264,
-  "fogColor": 2761760,
-  "fogNear": 14,
-  "fogFar": 48,
-  "visibility": 0.9,
-  "skyColor": 2761760
+  "ceilingTexture": "marbleWall",
+  "ambientLight": 16777215,
+  "directionalLight": 16773324,
+  "fogColor": 15985881,
+  "fogNear": 24,
+  "fogFar": 70,
+  "visibility": 1.0,
+  "skyColor": 15985881
  },
  "legend": {
-  "W": "brick_wall",
-  "L": "wall_sconce",
-  "R": "wall_banner_red",
-  "a": "dais_stone_3",
-  "b": "dais_stone_2",
-  "c": "dais_stone_1",
-  "A": "dais_rug_3",
-  "B": "dais_rug_2",
-  "C": "dais_rug_1",
-  "u": "castle_rug",
-  "K": "chandelier_castle_rug",
-  "2": "castle_exit"
+  "2": "castle_exit",
+  "A": "dais_temple_rug_3",
+  "B": "dais_temple_rug_2",
+  "C": "dais_temple_rug_1",
+  "D": "stairs_marble_down",
+  "F": "marble_floor",
+  "K": "chandelier_temple_rug",
+  "L": "wall_sconce_marble",
+  "N": "wall_window_curtain_marble",
+  "P": "temple_pew",
+  "R": "wall_banner_temple",
+  "T": "table_marble",
+  "U": "stairs_marble_up",
+  "V": "sack_pile_marble",
+  "W": "white_wall",
+  "X": "crate_marble",
+  "a": "dais_marble_3",
+  "b": "dais_marble_2",
+  "c": "dais_marble_1",
+  "g": "goddess_statue_small",
+  "h": "chair_marble",
+  "k": "bookshelf_marble",
+  "u": "temple_carpet"
  },
+ "enemies": {},
  "layout": [
-  "WWRLWWWWRWWWWLRWW",
-  "W00000aAAAa00000W",
-  "W00000bBBBb00000W",
-  "W00000cCCCc00000W",
-  "W000000uuu000000W",
-  "W000000uuu000000W",
-  "W000000uuu000000W",
-  "W000000uuu000000W",
-  "W000000uuu000000W",
-  "W000000uuu000000W",
-  "WWWWWWWW2WWWWWWWW"
+  "WWWNWWWWWLWRWWWRWWWRWLWWWWWNWWW",
+  "WFFgFFWFFFFFaaAAAaaFFFFFWFkFFkW",
+  "WFFFFFWFFFFFbbBBBbbFFFFFWFFFFFW",
+  "NFPFPFFFFFFFccCCCccFFFFFFFhThFN",
+  "WFFFFFWFFFFFFFuuuFFFFFFFWFFFFFW",
+  "WFPFPFLFFFFFFFuKuFFFFFFFLFFFFFW",
+  "WFFFFFWFFFFFFFuuuFFFFFFFWFFFFFW",
+  "WWWWWWWWWWLWWWWuWWWWWWWWWWWWWWW",
+  "WFFFFFWUFFFFFFuuuFFFFFFFWFFFFFW",
+  "WFFFFFFFFFFFFFuKuFFFFFFFFFFFXXW",
+  "NFFFFFWWWWWWWWWuWWWWWWWWWFFFFFN",
+  "WFhThFWWWWWWWFuuuFWWWWWWWFFFFVW",
+  "WFFFFFWWWWWWWFuKuFWWWWWWWFXFXFW",
+  "WFFDFFWWWWWWWFuuuFWWWWWWWFFFFFW",
+  "WWWNWWWWWNWWWWW2WWWWWNWWWWWNWWW"
  ],
  "npcs": [
   {
    "id": "king_b",
-   "x": 8,
+   "x": 14,
    "z": 1
   },
   {
    "id": "prince_b",
-   "x": 9,
+   "x": 15,
    "z": 1
   },
   {
    "id": "guard_b",
-   "x": 6,
-   "z": 6
+   "x": 12,
+   "z": 5
   },
   {
    "id": "guard_b",
+   "x": 18,
+   "z": 5
+  },
+  {
+   "id": "guard_b",
+   "x": 2,
+   "z": 9
+  },
+  {
+   "id": "priest_man",
+   "x": 26,
+   "z": 5
+  },
+  {
+   "id": "priest_man",
+   "x": 28,
+   "z": 5
+  },
+  {
+   "id": "priest_woman",
+   "x": 3,
+   "z": 2
+  },
+  {
+   "id": "butler",
    "x": 10,
-   "z": 6
+   "z": 9
+  },
+  {
+   "id": "maid",
+   "x": 20,
+   "z": 9
   }
  ],
- "links": {}
+ "links": {
+  "7,8": {
+   "nextMap": "castle_b_2f",
+   "message": "階段を上る（2階の私室へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 15,
+    "z": 8,
+    "angle": 0.0
+   }
+  },
+  "3,13": {
+   "nextMap": "castle_b_cellar",
+   "message": "階段を下りる（酒蔵・牢へ）",
+   "dir": "s",
+   "spawn": {
+    "x": 2,
+    "z": 6,
+    "angle": -1.570795
+   }
+  }
+ }
 }
