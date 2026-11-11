@@ -1,0 +1,111 @@
+{
+ "id": "castle_f_arena",
+ "name": "闘技場（獣王の城の地下 2階）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 22,
+  "z": 17,
+  "angle": 1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "rock",
+  "ambientLight": 7829367,
+  "directionalLight": 11184810,
+  "fogColor": 1710618,
+  "fogNear": 10,
+  "fogFar": 40,
+  "visibility": 0.8,
+  "skyColor": 1710618
+ },
+ "legend": {
+  "F": "tower_stone_gray",
+  "Q": "weapon_rack_stone",
+  "U": "stairs_stone_up",
+  "W": "rock_wall",
+  "d": "training_dummy_stone",
+  "f": "cave_torch",
+  "q": "sand_tile"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WFfFQFFFFFFFfFFFFFFFQFfFW",
+  "WFFFFFFFFFFFFFFFFFFFFFFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFqqqqdqqqqqqqqqdqqqqFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFqqqqdqqqqqqqqqdqqqqFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFqqqqqqqqqqqqqqqqqqqFFW",
+  "WFFFFFFFFFFFFFFFFFFFFFFFW",
+  "WFfFFFFFFFFFFFFFFFFFFFfUW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "beast_a",
+   "x": 4,
+   "z": 2
+  },
+  {
+   "id": "beast_b",
+   "x": 9,
+   "z": 1
+  },
+  {
+   "id": "beast_c",
+   "x": 15,
+   "z": 2
+  },
+  {
+   "id": "beast_d",
+   "x": 20,
+   "z": 2
+  },
+  {
+   "id": "beast_f_b",
+   "x": 3,
+   "z": 16
+  },
+  {
+   "id": "beast_f_c",
+   "x": 21,
+   "z": 16
+  },
+  {
+   "id": "beast_soldier_kobold",
+   "x": 11,
+   "z": 9
+  },
+  {
+   "id": "beast_soldier_kobold",
+   "x": 13,
+   "z": 9
+  }
+ ],
+ "links": {
+  "23,17": {
+   "nextMap": "castle_f_mine",
+   "message": "階段を上る（坑道へ）",
+   "dir": "e",
+   "spawn": {
+    "x": 26,
+    "z": 13,
+    "angle": 1.570795
+   }
+  }
+ }
+}

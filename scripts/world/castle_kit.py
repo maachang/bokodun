@@ -76,7 +76,7 @@ def check_walk(m):
     L, leg = m['layout'], m['legend']
     h, w = len(L), len(L[0])
     def name(x, y): return leg.get(L[y][x], '0')
-    def solid(n): return n != '0' and o.get(n, {}).get('type') not in ('floor_tile', 'stairs', 'door', 'hanging')   # 吊り燭台などは、天井から下がる（通れる）
+    def solid(n): return n != '0' and o.get(n, {}).get('solid') is not False and o.get(n, {}).get('type') not in ('floor_tile', 'stairs', 'door', 'hanging')   # 吊り燭台・松明などは通れる（solid: false）
     sp = (int(m['spawn']['x']), int(m['spawn']['z']))
     seen, q = {sp}, deque([sp])
     while q:

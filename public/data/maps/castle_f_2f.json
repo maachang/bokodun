@@ -1,0 +1,83 @@
+{
+ "id": "castle_f_2f",
+ "name": "獣王の私室・客室（獣王の城 2階）",
+ "type": "indoor",
+ "tileSize": 4,
+ "wallHeight": 5,
+ "nextMap": null,
+ "spawn": {
+  "x": 2,
+  "z": 2,
+  "angle": -1.570795
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": true,
+  "footstep": "stone",
+  "ceilingTexture": "rock",
+  "ambientLight": 10096512,
+  "directionalLight": 13615264,
+  "fogColor": 2761760,
+  "fogNear": 14,
+  "fogFar": 48,
+  "visibility": 0.9,
+  "skyColor": 2761760
+ },
+ "legend": {
+  "D": "stairs_stone_down",
+  "F": "tower_stone_gray",
+  "K": "chandelier_castle_rug",
+  "L": "wall_sconce",
+  "Q": "weapon_rack_stone",
+  "T": "table_stone",
+  "W": "rock_wall",
+  "e": "bed_stone",
+  "h": "chair_stone",
+  "k": "bookshelf_stone",
+  "s": "straw_bed",
+  "u": "castle_rug"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
+  "WDuuuuuuuKuuuuuuuKuuuuuuuKuuuuuuuFW",
+  "WFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFW",
+  "WWWWWWWFWWLWWWWWWWFWLWWWWFWWWWWFWWW",
+  "WFFFFFFFFFFFQFWFFFFFFFWFFFFFWFFFFFW",
+  "WFsFsFsFFFFFFFWkFFFFFkWFeFeFWFeFeFW",
+  "WFFFFFFFFhThFFLFFFFFFFLFFFFFLFFFFFW",
+  "WFFFFFFFFFFFFFWkFhThFkWFFFFFWFFFFFW",
+  "WFFFFFFFFFFFFFWFFFFFFFWFFFFFWFFFFFW",
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "dwarf_woman",
+   "x": 10,
+   "z": 2
+  },
+  {
+   "id": "beast_c",
+   "x": 22,
+   "z": 2
+  },
+  {
+   "id": "beast_soldier_kobold",
+   "x": 20,
+   "z": 2
+  }
+ ],
+ "links": {
+  "1,2": {
+   "nextMap": "castle_f",
+   "message": "階段を下りる（1階へ）",
+   "dir": "w",
+   "spawn": {
+    "x": 2,
+    "z": 12,
+    "angle": -1.570795
+   }
+  }
+ }
+}

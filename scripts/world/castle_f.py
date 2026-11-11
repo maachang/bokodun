@@ -67,6 +67,11 @@ def hall(mid, name, w, h, dais, rulers, guards, extra_npcs=()):
     return m
 
 
+def build_f():
+    """F の獣王の城（岩山をくり抜いた城）: 1 階 castle_f・2 階・坑道・闘技場のマップ（list。castle_f_keep.py）"""
+    return __import__('castle_f_keep').build()
+
+
 def build_others():
     out = _others()
     out[[m['id'] for m in out].index('castle_k')] = __import__('castle_k').build(next(m for m in out if m['id'] == 'castle_k'))   # 殿様の城: 全面畳・ふすまで区切られた狭い部屋（castle_k.py）
