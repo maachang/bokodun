@@ -21,9 +21,9 @@
   "skyColor": 11064805
  },
  "legend": {
-  "54": "city_wall",
-  "55": "district_gate",
-  "56": "brick_house",
+  "54": "wooden_wall",
+  "55": "gate_wood",
+  "56": "plank_house",
   "57": "plaza_stone",
   "71": "grass_tree",
   "75": "great_tree_b",

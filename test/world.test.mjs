@@ -1350,7 +1350,7 @@ test('街（候補地 A〜H）: 外のマップに壁と門（扉＋衛兵）・
             assert.equal(back.length, 2, `${l.nextMap}: 街 ${id} へ入る門が 2 マス`);
             for (const b of back) assert.equal(objects[t.legend[t.layout[Math.floor(b.spawn.z)][Math.floor(b.spawn.x)]]]?.solid ?? false, false);
             assert.ok(outer.npcs.length >= 2, '門の衛兵');
-            for (const [k2] of Object.entries(outer.links)) { const [c2, r2] = k2.split(',').map(Number); assert.equal(outer.legend[outer.layout[r2][c2]], 'district_gate'); }
+            for (const [k2] of Object.entries(outer.links)) { const [c2, r2] = k2.split(',').map(Number); assert.match(outer.legend[outer.layout[r2][c2]], /^(district_gate|gate_[a-z]+|edo_gate)$/); }   // 外の門は、国ごとの素材（scripts/world/town_look.py）
         }
         // 中の歩ける所は、出現位置からすべてつながる（門のマスは通れない物として数える）
         const H = t.layout.length, W = t.layout[0].length;
@@ -1368,9 +1368,10 @@ test('街（候補地 A〜H）: 敷地は、水・川・マップの境から離
     for (const id of 'abcdefgh'.split('')) {
         const t = readJson(`public/data/maps/town_${id}.json`);
         const outer = readJson(`public/data/maps/${Object.values(t.links)[0].nextMap}.json`);
-        const rows = outer.layout.map((r, i) => [r, i]).filter(([r]) => r.includes(Object.entries(outer.legend).find(([, v]) => v === ({ g: 'wooden_wall', c: 'adobe_wall', b: 'white_wall' }[id] ?? 'city_wall'))?.[0] ?? '#'));   // G（森の街）の外壁は、木の壁
+        const [gx, gy] = Object.entries(outer.links).find(([, l]) => l.nextMap === `town_${id}`)[0].split(',').map(Number);
+        const wallCh = outer.layout[gy][gx - 2];   // 外壁の文字: 門のすぐ隣の壁（国ごとに素材が違う）
+        const rows = outer.layout.map((r, i) => [r, i]).filter(([r]) => r.includes(wallCh));
         assert.ok(rows.length >= 12, `${outer.id}: 街の外壁がある`);
-        const wallCh = Object.entries(outer.legend).find(([, v]) => v === ({ g: 'wooden_wall', c: 'adobe_wall', b: 'white_wall' }[id] ?? 'city_wall'))[0];
         const rs = rows.map(([, i]) => i), cs = [];
         rows.forEach(([r]) => [...r].forEach((ch, c) => { if (ch === wallCh) cs.push(c); }));
         const margin = id === 'a' ? 2 : 8;   // 山の上の街（A）は、山頂の平らな台地の広さに合わせる（台地は、マップの境のすぐ内側まで）
