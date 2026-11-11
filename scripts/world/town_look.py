@@ -9,8 +9,8 @@ LOOK = {
     'f': {'6': 'rock_wall', '7': 'gate_rock', '8': 'rock_house'},                                             # 獣人とドワーフ: 岩の壁・岩の門
     'g': {'6': 'wooden_wall', '7': 'gate_wood', '8': 'wooden_house', '9': 'plaza_forest'},                    # 精霊の森: 木の壁・木の門・森の地面
     'h': {'6': 'wooden_wall', '7': 'gate_plank', '8': 'plank_house'},                                          # 辺境: 木の壁・板張りの家
-    'i': {'6': 'mossy_stone_wall', '7': 'gate_moss', '8': 'lake_house'},                                                        # 湖の公国: 苔むした石
-    'j': {'6': 'temple_wall', '7': 'gate_mage', '8': 'temple_building'},                                    # 魔導国: 大理石の壁・建物
+    'i': {'6': 'lake_wall', '7': 'gate_lake', '8': 'lake_house'},   # 湖の公国: 青みのある灰色の石（苔むした石は、洞窟の壁に見えるのでやめた）
+    'j': {'6': 'mage_wall', '7': 'gate_mage', '8': 'mage_house'},   # 魔導国: 紫がかった灰色の石（真っ白な大理石は、暗い森の中で浮くのでやめた）
     'k': {'6': 'edo_wall', '7': 'edo_gate', '8': 'edo_house'},                                                # 島（江戸風）: 白い漆喰の壁・町家
     'k1': {'6': 'edo_wall', '7': 'edo_gate', '8': 'edo_house'},
 }

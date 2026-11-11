@@ -167,6 +167,8 @@ export const textureSetupMethods = {
             innWall: RetroTextureGenerator.createInnWallTexture(),
             cityRoof: RetroTextureGenerator.createCityRoofTexture(),
             whiteWall: RetroTextureGenerator.createCityWallTexture('#9aa3b2', ['#f2f4f8', '#e6eaf1', '#fafbfd', '#dde3ed', '#eef1f6']),   // フランケル聖国（B）: 白亜の壁・家
+            lakeStone: RetroTextureGenerator.createCityWallTexture('#2a3038', ['#6a7c8e', '#76899c', '#5a6c7e', '#8296aa', '#64768a']),   // カナロア公国（I）: 青みのある灰色の石の壁・家（湖の街）
+            mageStone: RetroTextureGenerator.createCityWallTexture('#2c2a34', ['#8a8794', '#9794a2', '#7a7786', '#a29fae', '#847f90']),   // カラー魔導国（J）: 紫がかった灰色の石の壁・建物（真っ白にしない）
             holyRoof: RetroTextureGenerator.createCityRoofTexture('#23407a', ['#3b6ac0', '#2f58a8', '#4b7ad0', '#3560b4']),   // 聖国の青い屋根
             edoPlaster: RetroTextureGenerator.createEdoPlasterTexture(),   // マカヒキ国（K。江戸風）: 白い漆喰の壁・黒い板張りの町家・灰黒の瓦屋根
             tatami: RetroTextureGenerator.createTatamiTexture(),   // 畳（K の部屋の床）
