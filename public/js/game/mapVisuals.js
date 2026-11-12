@@ -307,7 +307,7 @@ export const mapVisualMethods = {
         if (!tex) return;
         const { c, r, isVertical } = q;
         if (env.defOf(isVertical ? env.charAt(c, r + 1) : env.charAt(c + 1, r)) !== objDef) return;   // 継ぎ目は、右（下）隣が同じ門のときだけ。門の端のマスは、付けない
-        const mat = new THREE.MeshLambertMaterial({ map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.6, transparent: true, alphaTest: 0.5 });   // 盾は、少し自ら光る（G の森のような暗い所でも、紋章が読める）
+        const mat = new THREE.MeshLambertMaterial({ map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: objDef.crestGlow ?? 0.6, transparent: true, alphaTest: 0.5, fog: objDef.crestFog !== false });   // crestGlow: 光り方・crestFog: false で霧に隠れない（A の吹雪など）   // 盾は、少し自ら光る（G の森のような暗い所でも、紋章が読める）
         const w = 2.4, h = w * 1.25, off = env.tileSize / 2 + 0.05;   // 柱の奥行きは、マスいっぱい。柱の手前の面から、少し出す
         for (const side of [1, -1]) {
             const plate = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
