@@ -18,7 +18,7 @@ def build(w, h, legend, city_legend, links, npcs):
     layout, heights = TE.build(w, h, legend, city_legend, e_links, e_npcs)
     for k, v in e_links.items():
         x, z = map(int, k.split(','))
-        if v.get('nextMap') in ('town_k', 'town_k1'): continue   # E の渡し場（K1 コマチ港町行き）は、I にはない（港は、E だけ）
+        if v.get('nextMap') in ('town_k', 'town_k1') or (v.get('params') or {}).get('shopId') == 'ferry_e': continue   # E の渡し場（K1 コマチ港町行き。今は売り場 shop の ferry_e）は、I にはない（港は、E だけ）
         v = dict(v)
         if 'back' in v: v['back'] = dict(v['back'], x=w - 1 - v['back']['x'])
         if v.get('nextMap') == 'mansion_chairman_e': v['nextMap'] = 'mansion_duke_i'; v['message'] = '女王の館に入る'
