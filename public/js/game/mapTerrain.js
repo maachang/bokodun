@@ -5,12 +5,12 @@ import { worldNeighbor } from '/js/world.js';
 import { fetchMap } from '/js/mapFormat.js';
 
 export const mapTerrainMethods = {
-    // 石畳の道（paved_road・paved_road_snow）のマスなら、段差 1 の側面に貼る画像の鍵 'road:<画像>'。そうでなければ null（地面の模様のまま）
+    // 石畳の道（paved_road・paved_road_snow）・土の道（dirt_road）のマスなら、段差 1 の側面に貼る画像の鍵 'road:<画像>'。そうでなければ null（地面の模様のまま）
     //   bridge=true: 石の橋（stone_bridge）のマスも、石畳として数える（橋の脇の、高くなった地面の側面。低い隣が橋のとき）
     roadSideKey(mapData, r, c, bridge = false) {
         const ch = mapData.layout?.[r]?.[c];
         const name = ch && ch !== '0' ? mapData.legend?.[ch] : null;
-        return (name === 'paved_road' || name === 'paved_road_snow' || (bridge && name === 'stone_bridge')) ? 'road:' + this.objectDefinitions?.[name]?.texture : null;
+        return (name === 'paved_road' || name === 'paved_road_snow' || name === 'dirt_road' || (bridge && name === 'stone_bridge')) ? 'road:' + this.objectDefinitions?.[name]?.texture : null;
     },
 
     // 起伏のある地面: 高くなっているマスの上面と、低い隣との境の側面を作る。
