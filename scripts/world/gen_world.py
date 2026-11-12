@@ -34,7 +34,7 @@ import temple_b as TPB
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
 
-from world_consts import BIOME_FLOOR, BIOME_NAME, CH36, DARK_FOREST_ENV, ENV_FROM, FLOOR, HEIGHT_STEP, LEGEND, MAPS, ROAD_SIGNS, ROAD_TOWNS, ROOT, SOLID_CH, START_TOWN, TOWN_HH, TOWN_HW, TOWN_LEGEND_KEYS, TOWN_NAME, TOWN_SIGN_CH, TOWN_SIZE, TROPICAL_ENV, town_gate_tiles   # noqa: F401（世界の生成の定数: パス・凡例・地面の文字・環境・街の名前と大きさ・街道の街（gen_world.py と world_tiles.py が使う））
+from world_consts import BIOME_FLOOR, BIOME_NAME, CH36, DARK_FOREST_ENV, ENV_FROM, FLOOR, HEIGHT_STEP, LEGEND, MAPS, ROAD_SIGNS, ROAD_TOWNS, ROOT, SOLID_CH, START_TOWN, TOWN_HH, TOWN_HW, TOWN_LEGEND_KEYS, TOWN_NAME, TOWN_RANK, TOWN_SIGN_CH, TOWN_SIZE, TROPICAL_ENV, town_gate_tiles   # noqa: F401（世界の生成の定数: パス・凡例・地面の文字・環境・街の名前と大きさ・街道の街（gen_world.py と world_tiles.py が使う））
 from world_tiles import _tiles_beach, _tiles_desert, _tiles_forest, _tiles_grass, _tiles_mineEntrances, _tiles_roads, _tiles_rockMines, _tiles_seams, _tiles_snowFoothills, _tiles_towns, _tiles_trails, _tiles_tropical, _tiles_water, _tiles_wetland, build_tiles   # noqa: F401（世界の、マスごとの物体と地面の生成（build_tiles と、地形ごとの段階 _tiles_*）。gen_world.py が呼ぶ）
 
 
@@ -72,6 +72,7 @@ def town_outer_extras(t, j, i):
             links[f"{gx - i * MESH},{gy - j * MESH}"] = {'nextMap': f"town_{site['id']}", 'message': f"{TOWN_NAME[site['id']]}に入る", 'spawn': {'x': w // 2 - 1 + (gx - (site['x'] - 1)), 'z': h - 3, 'angle': 0}}
         gy = site['y'] + TOWN_HH   # 壁のすぐ外（門と同じ並び）
         pair = {'f': (('beast_soldier_kobold_gate', -2), ('beast_soldier_kobold', 1)), 'g': (('elf_soldier_golem', -2), ('elf_gate_guard_woman', 1)), 'c': (('desert_gate_guard', -2), ('desert_gate_guard', 1)), 'a': (('snow_gate_guard', -2), ('snow_gate_guard', 1)), 'k': (('samurai_gate_k', -2), ('samurai_k', 1)), 'k1': (('samurai_gate_k', -2), ('samurai_k', 1)), 'b': (('guard_b', -2), ('guard_b', 1)), 'd': (('guard_spear', -2), ('guard_spear', 1))}.get(site['id'], (('guard_light', -2), ('guard_light', 1)))   # F の兵士は、コボルト。G の兵士は、エルフの守備隊とウッドゴーレム
+        if TOWN_RANK.get(site['id'], '街') == '町': pair = pair[:1]   # 町は、衛兵 1 人（門の隣）。街は、両隣に 2 人
         for k, (nid, dx) in enumerate(pair):   # 門 2 マス（x-1, x）のすぐ両隣
             npcs.append({'id': nid, 'x': site['x'] + dx - i * MESH, 'z': gy - j * MESH})
     return links, npcs

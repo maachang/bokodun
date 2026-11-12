@@ -16931,7 +16931,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "キュラビッド帝国",
+    "message": "【街】キュラビッド帝国",
     "description": "街の入口の近くの立て札（キュラビッド帝国。外のマップ用）"
   },
   "town_sign_b": {
@@ -16947,7 +16947,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "フランケル聖国",
+    "message": "【街】フランケル聖国",
     "description": "街の入口の近くの立て札（フランケル聖国。外のマップ用）"
   },
   "town_sign_c": {
@@ -16963,7 +16963,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "ミレニアム自由都市",
+    "message": "【街】ミレニアム自由都市",
     "description": "街の入口の近くの立て札（ミレニアム自由都市。外のマップ用）"
   },
   "town_sign_d": {
@@ -16979,7 +16979,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "グリーン王国",
+    "message": "【街】グリーン王国",
     "description": "街の入口の近くの立て札（グリーン王国。外のマップ用）"
   },
   "town_sign_e": {
@@ -16995,7 +16995,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "ガリレオ連盟",
+    "message": "【街】ガリレオ連盟",
     "description": "街の入口の近くの立て札（ガリレオ連盟。外のマップ用）"
   },
   "town_sign_f": {
@@ -17011,7 +17011,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "ライアン獣王国",
+    "message": "【街】ライアン獣王国",
     "description": "街の入口の近くの立て札（ライアン獣王国。外のマップ用）"
   },
   "town_sign_g": {
@@ -17027,7 +17027,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "デイラミ精霊国",
+    "message": "【街】デイラミ精霊国",
     "description": "街の入口の近くの立て札（デイラミ精霊国。外のマップ用）"
   },
   "town_sign_h": {
@@ -17043,7 +17043,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "ダマスカス自治領",
+    "message": "【町】ダマスカス自治領",
     "description": "街の入口の近くの立て札（ダマスカス自治領。外のマップ用）"
   },
   "town_sign_i": {
@@ -17059,7 +17059,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "カナロア公国",
+    "message": "【街】カナロア公国",
     "description": "街の入口の近くの立て札（カナロア公国。外のマップ用）"
   },
   "town_sign_j": {
@@ -17075,7 +17075,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "カラー魔導国",
+    "message": "【街】カラー魔導国",
     "description": "街の入口の近くの立て札（カラー魔導国。外のマップ用）"
   },
   "mideast_house": {
@@ -18850,7 +18850,7 @@
       1.0
     ],
     "radius": 0.5,
-    "message": "マカヒキ国（マカヒキ島）",
+    "message": "【街】マカヒキ国（マカヒキ島）",
     "description": "街の入口の近くの立て札（マカヒキ国。外のマップ用）"
   },
   "edo_gate": {
@@ -18858,11 +18858,22 @@
     "type": "door",
     "texture": "woodDoor",
     "frameTexture": "edoWood",
-    "gateRoof": {"texture": "edoRoof", "overhang": 0.8},
+    "gateRoof": {"texture": "edoRoof", "style": "gable", "overhang": 1.2, "rise": 2.2, "side": true},
     "solid": true,
     "interactionDistance": 2.2,
     "message": "マカヒキ国の大門",
-    "description": "マカヒキ国（K）の街の大きな木の門（太い板張りの柱と扉）"
+    "description": "マカヒキ国（K）の街の大きな木の門（太い板張りの柱と扉。切妻の大屋根・棟・両脇の袖屋根。箱根関所のような薬医門）"
+  },
+  "edo_gate_town": {
+    "lift": true,
+    "type": "door",
+    "texture": "woodDoor",
+    "frameTexture": "edoWood",
+    "gateRoof": {"texture": "edoRoof", "overhang": 0.4, "layers": 1},
+    "solid": true,
+    "interactionDistance": 2.2,
+    "message": "町の木戸",
+    "description": "K の町（コマチ港町など）の小さな木の門（低い 1 段の屋根）。街の大門（edo_gate）と、見た目で区別する"
   },
   "tatami": {
     "type": "floor_tile",
@@ -20721,22 +20732,22 @@
   "edo_tansu": {"type": "furniture", "floorTexture": "tatami", "ceilingTexture": "woodWall", "parts": [{"size": [1.8, 2.0, 0.9], "pos": [0, 1.0, 0], "color": "#7a5230"}, {"size": [0.8, 0.8, 0.04], "pos": [-0.45, 1.4, 0.47], "color": "#5a3a1e"}, {"size": [0.8, 0.8, 0.04], "pos": [0.45, 1.4, 0.47], "color": "#5a3a1e"}, {"size": [0.8, 0.3, 0.04], "pos": [-0.45, 0.5, 0.47], "color": "#5a3a1e"}, {"size": [0.8, 0.3, 0.04], "pos": [0.45, 0.5, 0.47], "color": "#5a3a1e"}, {"size": [0.1, 0.1, 0.05], "pos": [-0.1, 1.4, 0.5], "color": "#2a2a2a"}, {"size": [0.1, 0.1, 0.05], "pos": [0.1, 1.4, 0.5], "color": "#2a2a2a"}], "collider": [1.8, 0.9], "blocksProjectiles": true, "description": "箪笥（木の引き出しと金具。社務所）"},
   "edo_zabuton": {"type": "furniture", "floorTexture": "tatami", "ceilingTexture": "woodWall", "parts": [{"size": [0.8, 0.12, 0.8], "pos": [0, 0.06, 0], "color": "#6a3a8a"}, {"size": [0.6, 0.04, 0.6], "pos": [0, 0.13, 0], "color": "#8a5aaa"}], "collider": [0.3, 0.3], "blocksProjectiles": false, "description": "座布団（社務所）"},
   "edo_andon": {"type": "wall_deco", "wallTexture": "woodWall", "parts": [{"size": [0.55, 0.85, 0.25], "pos": [0, 2.4, 0.15], "color": "#5a3a1e"}, {"size": [0.4, 0.7, 0.27], "pos": [0, 2.4, 0.16], "color": "#ffe9b0", "basic": true}, {"size": [0.65, 0.1, 0.3], "pos": [0, 2.9, 0.15], "color": "#3a2214"}], "description": "行灯（壁掛け。和紙の明かり）"},
-  "town_sign_k1": {"lift": true, "groundShadow": true, "type": "signpost", "texture": "signpost", "solid": true, "blocksProjectiles": false, "scale": [1.9, 2.0, 1.0], "radius": 0.5, "message": "コマチ港町（マカヒキ島）", "description": "街の入口の近くの立て札（コマチ港町。外のマップ用）"},
-  "gate_marble": {"lift": true, "type": "door", "texture": "gateWhiteGold", "frameTexture": "marbleWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（白い扉に金の縁・大理石の枠。B の街の外観）", "gateRoof": {"texture": "holyRoof", "overhang": 0.8}},
-  "gate_adobe": {"lift": true, "type": "door", "texture": "gateCloth", "frameTexture": "adobeWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（日除け布の扉・日干し煉瓦の枠。C の街の外観）", "gateRoof": {"texture": "adobeRoof", "overhang": 0.8}},
-  "gate_wood": {"lift": true, "type": "door", "texture": "gateLog", "frameTexture": "woodWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（丸太の扉・木の枠。G の街の外観）", "gateRoof": {"texture": "woodWall", "overhang": 0.8}},
-  "gate_white": {"lift": true, "type": "door", "texture": "gateWhite", "frameTexture": "whiteWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（白い扉・白壁の枠。E の街の外観）", "gateRoof": {"texture": "domeTile", "overhang": 0.8}},
-  "gate_rock": {"lift": true, "type": "door", "texture": "gateIron", "frameTexture": "rock", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（鉄の扉・岩の枠。F の街の外観）", "gateRoof": {"texture": "cityRoof", "overhang": 0.8}},
+  "town_sign_k1": {"lift": true, "groundShadow": true, "type": "signpost", "texture": "signpost", "solid": true, "blocksProjectiles": false, "scale": [1.9, 2.0, 1.0], "radius": 0.5, "message": "【町】コマチ港町（マカヒキ島）", "description": "街の入口の近くの立て札（コマチ港町。外のマップ用）"},
+  "gate_marble": {"lift": true, "type": "door", "crest": "crestB", "texture": "gateWhiteGold", "frameTexture": "marbleWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（白い扉に金の縁・大理石の枠。B の街の外観）", "gateRoof": {"texture": "holyRoof", "overhang": 0.8}},
+  "gate_adobe": {"lift": true, "type": "door", "crest": "crestC", "texture": "gateCloth", "frameTexture": "adobeWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（日除け布の扉・日干し煉瓦の枠。C の街の外観）", "gateRoof": {"texture": "adobeRoof", "overhang": 0.8}},
+  "gate_wood": {"lift": true, "type": "door", "crest": "crestG", "texture": "gateLog", "frameTexture": "woodWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（丸太の扉・木の枠。G の街の外観）", "gateRoof": {"texture": "woodWall", "overhang": 0.8}},
+  "gate_white": {"lift": true, "type": "door", "crest": "crestE", "texture": "gateWhite", "frameTexture": "whiteWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（白い扉・白壁の枠。E の街の外観）", "gateRoof": {"texture": "domeTile", "overhang": 0.8}},
+  "gate_rock": {"lift": true, "type": "door", "crest": "crestF", "texture": "gateIron", "frameTexture": "rock", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（鉄の扉・岩の枠。F の街の外観）", "gateRoof": {"texture": "cityRoof", "overhang": 0.8}},
   "village_house": {"baseShadow": true, "type": "block", "texture": "brick", "roofTexture": "villageRoof", "hasRoof": true, "solid": true, "blocksProjectiles": true, "description": "赤い瓦の家（D の街の外観）", "faceParts": [{"size": [1.0, 1.1, 0.04], "pos": [0, 2.0, 0.03], "color": "#bcdcf0", "basic": true}, {"size": [1.2, 0.1, 0.07], "pos": [0, 2.6, 0.05], "color": "#d8d0c0"}, {"size": [1.2, 0.1, 0.07], "pos": [0, 1.4, 0.05], "color": "#d8d0c0"}, {"size": [0.1, 1.3, 0.07], "pos": [-0.55, 2.0, 0.05], "color": "#d8d0c0"}, {"size": [0.1, 1.3, 0.07], "pos": [0.55, 2.0, 0.05], "color": "#d8d0c0"}, {"size": [0.06, 1.1, 0.07], "pos": [0, 2.0, 0.06], "color": "#d8d0c0"}, {"size": [1.5, 0.12, 0.25], "pos": [0, 1.32, 0.12], "color": "#b8b0a0"}, {"size": [1.4, 0.12, 0.12], "pos": [0, 2.75, 0.07], "color": "#a8a090"}], "faceEvery": 2},
   "rock_house": {"baseShadow": true, "type": "block", "texture": "rock", "roofTexture": "cityRoof", "hasRoof": true, "solid": true, "blocksProjectiles": true, "description": "岩造りの家（F の街の外観）", "faceParts": [{"size": [1.0, 1.1, 0.04], "pos": [0, 2.0, 0.03], "color": "#bcdcf0", "basic": true}, {"size": [1.2, 0.1, 0.07], "pos": [0, 2.6, 0.05], "color": "#d8d0c0"}, {"size": [1.2, 0.1, 0.07], "pos": [0, 1.4, 0.05], "color": "#d8d0c0"}, {"size": [0.1, 1.3, 0.07], "pos": [-0.55, 2.0, 0.05], "color": "#d8d0c0"}, {"size": [0.1, 1.3, 0.07], "pos": [0.55, 2.0, 0.05], "color": "#d8d0c0"}, {"size": [0.06, 1.1, 0.07], "pos": [0, 2.0, 0.06], "color": "#d8d0c0"}, {"size": [1.5, 0.12, 0.25], "pos": [0, 1.32, 0.12], "color": "#b8b0a0"}, {"size": [1.4, 0.12, 0.12], "pos": [0, 2.75, 0.07], "color": "#a8a090"}], "faceEvery": 2},
   "lake_house": {"baseShadow": true, "type": "block", "texture": "lakeStone", "roofTexture": "cityRoof", "hasRoof": true, "solid": true, "blocksProjectiles": true, "description": "青みのある石の家（I カナロア公国の街の外観）", "faceParts": [{"size": [1.0, 1.1, 0.04], "pos": [0, 2.0, 0.03], "color": "#bcdcf0", "basic": true}, {"size": [1.2, 0.1, 0.07], "pos": [0, 2.6, 0.05], "color": "#d8d0c0"}, {"size": [1.2, 0.1, 0.07], "pos": [0, 1.4, 0.05], "color": "#d8d0c0"}, {"size": [0.1, 1.3, 0.07], "pos": [-0.55, 2.0, 0.05], "color": "#d8d0c0"}, {"size": [0.1, 1.3, 0.07], "pos": [0.55, 2.0, 0.05], "color": "#d8d0c0"}, {"size": [0.06, 1.1, 0.07], "pos": [0, 2.0, 0.06], "color": "#d8d0c0"}, {"size": [1.5, 0.12, 0.25], "pos": [0, 1.32, 0.12], "color": "#b8b0a0"}, {"size": [1.4, 0.12, 0.12], "pos": [0, 2.75, 0.07], "color": "#a8a090"}], "faceEvery": 2},
   "plank_house": {"baseShadow": true, "type": "block", "texture": "woodWall", "roofTexture": "villageRoof", "hasRoof": true, "solid": true, "blocksProjectiles": true, "description": "板張りの家（H の街の外観）"},
   "ochre_wall": {"baseShadow": true, "type": "block", "texture": "adobeWallOchre", "solid": true, "blocksProjectiles": true, "description": "黄土色の土壁（E の街の外観）"},
-  "gate_snow": {"lift": true, "type": "door", "texture": "gateIron", "frameTexture": "cityWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（鉄の扉・雪をかぶった屋根。A の街の外観）", "gateRoof": {"texture": "snowRoof", "overhang": 0.8}},
-  "gate_village": {"lift": true, "type": "door", "texture": "woodDoor", "frameTexture": "cityWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（木の扉・赤い瓦の屋根。D の街の外観）", "gateRoof": {"texture": "villageRoof", "overhang": 0.8}},
+  "gate_snow": {"lift": true, "type": "door", "crest": "crestA", "texture": "gateIron", "frameTexture": "cityWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（鉄の扉・雪をかぶった屋根。A の街の外観）", "gateRoof": {"texture": "snowRoof", "overhang": 0.8}},
+  "gate_village": {"lift": true, "type": "door", "crest": "crestD", "texture": "woodDoor", "frameTexture": "cityWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（木の扉・赤い瓦の屋根。D の街の外観）", "gateRoof": {"texture": "villageRoof", "overhang": 0.8}},
   "gate_plank": {"lift": true, "type": "door", "texture": "woodDoor", "frameTexture": "woodWall", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（板の扉・木の枠・茅葺き風の屋根。H の街の外観）", "gateRoof": {"texture": "villageRoof", "overhang": 0.8}},
-  "gate_lake": {"lift": true, "type": "door", "texture": "woodDoor", "frameTexture": "lakeStone", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（木の扉・青みのある石の枠。I の街の外観）", "gateRoof": {"texture": "cityRoof", "overhang": 0.8}},
-  "gate_mage": {"lift": true, "type": "door", "texture": "gateWhiteGold", "frameTexture": "mageStone", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（白い扉・灰色の石の枠・ドームの屋根。J の街の外観）", "gateRoof": {"texture": "domeTile", "overhang": 0.8}},
+  "gate_lake": {"lift": true, "type": "door", "crest": "crestI", "texture": "woodDoor", "frameTexture": "lakeStone", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（木の扉・青みのある石の枠。I の街の外観）", "gateRoof": {"texture": "cityRoof", "overhang": 0.8}},
+  "gate_mage": {"lift": true, "type": "door", "crest": "crestJ", "texture": "gateWhiteGold", "frameTexture": "mageStone", "solid": true, "interactionDistance": 2.2, "message": "区画の門", "description": "街の門（白い扉・灰色の石の枠・ドームの屋根。J の街の外観）", "gateRoof": {"texture": "domeTile", "overhang": 0.8}},
   "lake_wall": {"baseShadow": true, "type": "block", "texture": "lakeStone", "solid": true, "blocksProjectiles": true, "description": "青みのある石の壁（I カナロア公国の街の外観）"},
   "mage_wall": {"baseShadow": true, "type": "block", "texture": "mageStone", "solid": true, "blocksProjectiles": true, "description": "紫がかった灰色の石の壁（J カラー魔導国の街の外観）"},
   "mage_house": {"baseShadow": true, "type": "block", "texture": "mageStone", "roofTexture": "cityRoof", "hasRoof": true, "solid": true, "blocksProjectiles": true, "description": "紫がかった灰色の石の建物（J カラー魔導国の街の外観）", "faceParts": [{"size": [1.0, 1.1, 0.04], "pos": [0, 2.0, 0.03], "color": "#bcdcf0", "basic": true}, {"size": [1.2, 0.1, 0.07], "pos": [0, 2.6, 0.05], "color": "#d8d0c0"}, {"size": [1.2, 0.1, 0.07], "pos": [0, 1.4, 0.05], "color": "#d8d0c0"}, {"size": [0.1, 1.3, 0.07], "pos": [-0.55, 2.0, 0.05], "color": "#d8d0c0"}, {"size": [0.1, 1.3, 0.07], "pos": [0.55, 2.0, 0.05], "color": "#d8d0c0"}, {"size": [0.06, 1.1, 0.07], "pos": [0, 2.0, 0.06], "color": "#d8d0c0"}, {"size": [1.5, 0.12, 0.25], "pos": [0, 1.32, 0.12], "color": "#b8b0a0"}, {"size": [1.4, 0.12, 0.12], "pos": [0, 2.75, 0.07], "color": "#a8a090"}], "faceEvery": 2},

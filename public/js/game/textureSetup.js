@@ -174,6 +174,7 @@ export const textureSetupMethods = {
             edoPlaster: RetroTextureGenerator.createEdoPlasterTexture(),   // マカヒキ国（K。江戸風）: 白い漆喰の壁・黒い板張りの町家・灰黒の瓦屋根
             tatami: RetroTextureGenerator.createTatamiTexture(),   // 畳（K の部屋の床）
             edoWood: RetroTextureGenerator.createEdoWoodTexture(),
+            crestD: RetroTextureGenerator.createCrestTexture('d'), crestB: RetroTextureGenerator.createCrestTexture('b'), crestG: RetroTextureGenerator.createCrestTexture('g'), crestA: RetroTextureGenerator.createCrestTexture('a'), crestC: RetroTextureGenerator.createCrestTexture('c'), crestE: RetroTextureGenerator.createCrestTexture('e'), crestF: RetroTextureGenerator.createCrestTexture('f'), crestI: RetroTextureGenerator.createCrestTexture('i'), crestJ: RetroTextureGenerator.createCrestTexture('j'),   // 国の紋章の盾（街の門の真ん中。texturesCrests.js）
             edoMachiya: RetroTextureGenerator.createEdoMachiyaTexture(),
             edoShrine: RetroTextureGenerator.createEdoShrineTexture(),
             fusuma: RetroTextureGenerator.createFusumaTexture(),

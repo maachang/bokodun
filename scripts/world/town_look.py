@@ -12,7 +12,7 @@ LOOK = {
     'i': {'6': 'lake_wall', '7': 'gate_lake', '8': 'lake_house'},   # 湖の公国: 青みのある灰色の石（苔むした石は、洞窟の壁に見えるのでやめた）
     'j': {'6': 'mage_wall', '7': 'gate_mage', '8': 'mage_house'},   # 魔導国: 紫がかった灰色の石（真っ白な大理石は、暗い森の中で浮くのでやめた）
     'k': {'6': 'edo_wall', '7': 'edo_gate', '8': 'edo_house'},                                                # 島（江戸風）: 白い漆喰の壁・町家
-    'k1': {'6': 'edo_wall', '7': 'edo_gate', '8': 'edo_house'},
+    'k1': {'6': 'edo_wall', '7': 'edo_gate_town', '8': 'edo_house'},   # 町: 小さな木戸
 }
 
 INSIDE_KEEP = {'g'}   # G（精霊の森）: 中の囲いは、生け垣（森の国の作り）のまま。外の木の壁とは変えている

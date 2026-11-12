@@ -327,7 +327,7 @@ def _tiles_towns(g):
         obj[y0, x0:x1 + 1] = ord('6'); obj[y1, x0:x1 + 1] = ord('6'); obj[y0:y1 + 1, x0] = ord('6'); obj[y0:y1 + 1, x1] = ord('6')
         for gx, gy in town_gate_tiles(site): obj[gy, gx] = ord('7')
         obj[y1 + 1:y1 + 5, px - 3:px + 3] = ord('9')              # 門の前の石畳
-        obj[y1 + 2, px + 3] = ord(TOWN_SIGN_CH)                   # 門の前の石畳の東隣に、街の名前の立て札
+        obj[y1 + 2, px + 2] = ord(TOWN_SIGN_CH)                   # 門の前の石畳の東の端（門の正面から見て、画面の端に入る位置）に、街の名前の立て札
         if site['id'] == 'k1': _k1_pier(obj, px, py)
 
 

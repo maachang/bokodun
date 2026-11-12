@@ -225,24 +225,92 @@ export const mapVisualMethods = {
             doorGroup.add(lintel);
         }
 
-        // 門の屋根（街の門。objects.json の gateRoof: { texture, overhang }）: 壁より上に、通り抜ける方向へ広く出る屋根を 2 段に重ねる。遠くからも、門の位置と国の違いが分かる
-        const gateRoofTex = objDef.gateRoof && this.textures[objDef.gateRoof.texture];
-        if (gateRoofTex) {
-            const roofMat = this.makeLitMaterial(objDef.gateRoof.texture, gateRoofTex);
-            const depth = env.tileSize + (objDef.gateRoof.overhang ?? 0.8) * 2;
-            const layer = (len, dep, h, y) => {
-                const m = new THREE.Mesh(new THREE.BoxGeometry(isVertical ? dep : len, h, isVertical ? len : dep), roofMat);
-                m.position.set(0, y + h / 2, 0);
-                doorGroup.add(m);
-            };
-            layer(env.tileSize, depth, 0.35, env.wallH);
-            layer(env.tileSize, depth * 0.6, 0.4, env.wallH + 0.35);
-        }
+        this.visualGateRoof(objDef, doorGroup, env, { c, r, isVertical, doorThickness, frameMat, isWallChar });
+        this.visualGateCrest(objDef, doorGroup, env, { c, r, isVertical, doorThickness });
 
         doorGroup.position.set(wx, 0, wz);
         env.add(doorGroup);
 
         return { doorMesh, doorH, isVertical, doorThickness };
+    },
+
+    // 門の屋根（visualDoor から呼ぶ。元は visualDoor の一部）。q: 門の向き・位置・枠の材質・壁の判定
+    visualGateRoof(objDef, doorGroup, env, q) {
+        const { c, r, isVertical, doorThickness, frameMat, isWallChar } = q;
+        // 門の屋根（街の門。objects.json の gateRoof: { texture, overhang }）: 壁より上に、通り抜ける方向へ広く出る屋根を 2 段に重ねる。遠くからも、門の位置と国の違いが分かる
+        // style: 'gable'（街の大門）は、切妻の大屋根・棟・両端の袖屋根（壁の上の小屋根）。省略は、今までの平らな 2 段屋根（町の小さな門）。layers: 1 で 1 段だけ
+        const gateRoofTex = objDef.gateRoof && this.textures[objDef.gateRoof.texture];
+        if (gateRoofTex) {
+            const roofMat = this.makeLitMaterial(objDef.gateRoof.texture, gateRoofTex);
+            const gr = objDef.gateRoof;
+            const depth = env.tileSize + (gr.overhang ?? 0.8) * 2;
+            if (gr.style === 'gable') {
+                // 壁の向きを X・通り抜ける向きを Z とした局所座標で組み、縦向きの門は、まとめて回す（局所 +X = 壁の向き）
+                const roofGroup = new THREE.Group();
+                roofGroup.rotation.y = isVertical ? -Math.PI / 2 : 0;
+                const prism = (len, dep, rise, x, y) => {   // 棟が X 向きの切妻屋根（断面は三角形）。x, y は、底の中心
+                    const hd = dep / 2, hl = len / 2, pos = [], uv = [];
+                    const quad = (p0, p1, p2, p3) => { for (const q of [p0, p1, p2, p0, p2, p3]) pos.push(...q); uv.push(0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1); };
+                    quad([-hl, 0, -hd], [hl, 0, -hd], [hl, rise, 0], [-hl, rise, 0]);   // 手前の斜面
+                    quad([hl, 0, hd], [-hl, 0, hd], [-hl, rise, 0], [hl, rise, 0]);     // 奥の斜面
+                    for (const q of [[-hl, 0, hd], [-hl, 0, -hd], [-hl, rise, 0], [hl, 0, -hd], [hl, 0, hd], [hl, rise, 0]]) pos.push(...q);   // 両端の三角（切妻の妻）
+                    uv.push(0, 0, 1, 0, 0.5, 1, 0, 0, 1, 0, 0.5, 1);
+                    const geo = new THREE.BufferGeometry();
+                    geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+                    geo.setAttribute('uv', new THREE.Float32BufferAttribute(uv, 2));
+                    geo.computeVertexNormals();
+                    const m = new THREE.Mesh(geo, roofMat);
+                    m.position.set(x, y, 0);
+                    roofGroup.add(m);
+                };
+                const ts = env.tileSize, rise = gr.rise ?? 2.0;
+                const isDoorChar = (ch) => env.defOf(ch)?.type === 'door';
+                const endA = isVertical ? env.charAt(c, r - 1) : env.charAt(c - 1, r);   // 壁の向きの両隣
+                const endB = isVertical ? env.charAt(c, r + 1) : env.charAt(c + 1, r);
+                // 大屋根: 壁より上の、まぐさの上に、厚みのある台（冠木）をのせ、その上に切妻の屋根
+                const beam = new THREE.Mesh(new THREE.BoxGeometry(ts, 0.5, doorThickness + 0.5), frameMat);
+                beam.position.set(0, env.wallH + 0.25, 0);
+                roofGroup.add(beam);
+                prism(ts, depth, rise, 0, env.wallH + 0.5);
+                if (gr.ridge !== false) {   // 棟（屋根のてっぺんの黒い帯）
+                    const ridge = new THREE.Mesh(new THREE.BoxGeometry(ts, 0.3, 0.45), frameMat);
+                    ridge.position.set(0, env.wallH + 0.5 + rise + 0.1, 0);
+                    roofGroup.add(ridge);
+                }
+                if (gr.side) {   // 袖屋根: 門の両端の隣が、門ではない壁なら、その壁の上に、低い小屋根をかける
+                    const sideDep = ts + 0.8, sideRise = rise * 0.45;
+                    for (const [ch, dir] of [[endA, -1], [endB, 1]]) {
+                        if (!ch || isDoorChar(ch) || !isWallChar(ch)) continue;
+                        prism(ts, sideDep, sideRise, dir * ts, env.wallH - 0.4);
+                    }
+                }
+                doorGroup.add(roofGroup);
+            } else {
+                const layer = (len, dep, h, y) => {
+                    const m = new THREE.Mesh(new THREE.BoxGeometry(isVertical ? dep : len, h, isVertical ? len : dep), roofMat);
+                    m.position.set(0, y + h / 2, 0);
+                    doorGroup.add(m);
+                };
+                layer(env.tileSize, depth, 0.35, env.wallH);
+                if ((gr.layers ?? 2) >= 2) layer(env.tileSize, depth * 0.6, 0.4, env.wallH + 0.35);
+            }
+        }
+    },
+
+    // 国の紋章の盾（objects.json の crest: テクスチャ名）。門が 2 マスならんだ、その継ぎ目の真上（表と裏）に掲げる（visualDoor から呼ぶ）
+    visualGateCrest(objDef, doorGroup, env, q) {
+        const tex = objDef.crest && this.textures[objDef.crest];
+        if (!tex) return;
+        const { c, r, isVertical } = q;
+        if (env.defOf(isVertical ? env.charAt(c, r + 1) : env.charAt(c + 1, r)) !== objDef) return;   // 継ぎ目は、右（下）隣が同じ門のときだけ。門の端のマスは、付けない
+        const mat = new THREE.MeshLambertMaterial({ map: tex, emissive: 0xffffff, emissiveMap: tex, emissiveIntensity: 0.6, transparent: true, alphaTest: 0.5 });   // 盾は、少し自ら光る（G の森のような暗い所でも、紋章が読める）
+        const w = 2.4, h = w * 1.25, off = env.tileSize / 2 + 0.05;   // 柱の奥行きは、マスいっぱい。柱の手前の面から、少し出す
+        for (const side of [1, -1]) {
+            const plate = new THREE.Mesh(new THREE.PlaneGeometry(w, h), mat);
+            if (isVertical) { plate.position.set(side * off, 2.4, env.tileSize / 2); plate.rotation.y = side * Math.PI / 2; }
+            else { plate.position.set(env.tileSize / 2, 2.4, side * off); plate.rotation.y = side === 1 ? 0 : Math.PI; }
+            doorGroup.add(plate);
+        }
     },
 
     // 家具（furniture）の見た目。戻り値は、当たり判定の位置と大きさ

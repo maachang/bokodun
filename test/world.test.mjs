@@ -1349,8 +1349,8 @@ test('街（候補地 A〜H）: 外のマップに壁と門（扉＋衛兵）・
             const back = Object.values(outer.links).filter((x) => x.nextMap === `town_${id}`);
             assert.equal(back.length, 2, `${l.nextMap}: 街 ${id} へ入る門が 2 マス`);
             for (const b of back) assert.equal(objects[t.legend[t.layout[Math.floor(b.spawn.z)][Math.floor(b.spawn.x)]]]?.solid ?? false, false);
-            assert.ok(outer.npcs.length >= 2, '門の衛兵');
-            for (const [k2] of Object.entries(outer.links)) { const [c2, r2] = k2.split(',').map(Number); assert.match(outer.legend[outer.layout[r2][c2]], /^(district_gate|gate_[a-z]+|edo_gate)$/); }   // 外の門は、国ごとの素材（scripts/world/town_look.py）
+            assert.ok(outer.npcs.length >= (id === 'h' ? 1 : 2), '門の衛兵（街は両隣に 2 人・町は 1 人。町の区分は world_consts.py の TOWN_RANK）');
+            for (const [k2] of Object.entries(outer.links)) { const [c2, r2] = k2.split(',').map(Number); assert.match(outer.legend[outer.layout[r2][c2]], /^(district_gate|gate_[a-z]+|edo_gate|edo_gate_town)$/); }   // 外の門は、国ごとの素材（scripts/world/town_look.py）
         }
         // 中の歩ける所は、出現位置からすべてつながる（門のマスは通れない物として数える）
         const H = t.layout.length, W = t.layout[0].length;
@@ -1393,7 +1393,8 @@ test('街（候補地 A〜H）: 門の前の石畳の東隣に、街の名前の
         const ch = Object.entries(outer.legend).find(([, v]) => v === `town_sign_${id}`)?.[0];
         assert.ok(ch, `${outer.id}: 立て札の凡例がある`);
         assert.ok(outer.layout.some(r => r.includes(ch)), `${outer.id}: 立て札が置かれている`);
-        assert.equal(objects[`town_sign_${id}`].message, t.name, `town_${id}: 立て札の文字は街の名前`);
+        assert.match(objects[`town_sign_${id}`].message, /^【(街|町)】/, `town_${id}: 立て札の頭に区分（【街】【町】）`);
+        assert.ok(objects[`town_sign_${id}`].message.endsWith(t.name), `town_${id}: 立て札の文字は街の名前`);
     }
 });
 

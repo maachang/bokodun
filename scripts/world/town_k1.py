@@ -85,6 +85,7 @@ def _place(g, legend, city_legend, links, npcs):
         g[y][x] = c
     for k in ('S', 'I', 'd', 'N', 'M', 'Q', 'q', 'w', 'b'): legend[k] = city_legend[k]
     legend.update(SKIN_EDO)
+    legend['G'] = 'edo_gate_town'   # 町の門は、小さな木戸（街の大門 edo_gate と区別）
     legend.update({'U': 'edo_kura', 'Y': 'edo_nagaya', 'X': 'edo_chaya', 'e': 'edo_lantern', 'h': 'edo_chochin', 't': 'edo_tensui', 'R': 'crate_out', 'B': 'barrel_out', 'L': 'ship_large', 'l': 'ship_small', 'z': 'ferry_sign'})
     for nid, x, z in NPCS:
         assert g[z][x] in 'p=', f'K1 の NPC {nid} ({x},{z}): 歩ける空きマスではない'
