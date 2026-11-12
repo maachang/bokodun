@@ -291,11 +291,15 @@
    }
   },
   "22,17": {
-   "nextMap": "town_e",
-   "message": "渡し船に乗る（ガリレオ連盟の港へ）",
-   "spawn": {
-    "x": 27,
-    "z": 8,
+   "nextMap": "shop_k",
+   "params": {
+    "shopId": "ferry_k1"
+   },
+   "message": "渡し場に入る（ガリレオ連盟の港行きの船）",
+   "icon": "ferryIcon",
+   "back": {
+    "x": 22,
+    "z": 18,
     "angle": 3.14159
    }
   }

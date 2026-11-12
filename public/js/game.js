@@ -20,6 +20,7 @@ import { equipmentMethods } from '/js/game/equipment.js';
 import { combatMethods } from '/js/game/combat.js';
 import { hudMethods } from '/js/game/hud.js';
 import { interactMethods } from '/js/game/interact.js';
+import { travelMethods } from '/js/game/travel.js';
 import { controlsMethods } from '/js/game/controls.js';
 import { textureSetupMethods } from '/js/game/textureSetup.js';
 import { mapTerrainMethods } from '/js/game/mapTerrain.js';
@@ -209,7 +210,7 @@ export class GameEngine {
     }
 
     update(dt) {
-        if (this.shopMenu) return;   // 店のメニュー中はゲームの時間を止める
+        if (this.shopMenu || this.travelScene) return;   // 店のメニュー・移動の演出中はゲームの時間を止める
         // ヒットストップ中はゲームの時間を止める（描画は続く）
         if (this.hitStop > 0) {
             this.hitStop -= dt;
@@ -326,4 +327,4 @@ export class GameEngine {
 }
 
 // 部品（public/js/game/*.js）のメソッドを、GameEngine に組み込む
-Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, combatMethods, hudMethods, interactMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);
+Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);

@@ -417,5 +417,49 @@
         "price": 220
       }
     ]
+  },
+  "ferry_e": {
+    "name": "ガリレオ連盟の渡し場",
+    "keeper": "ferryman_e",
+    "routes": [
+      {
+        "name": "コマチ港町",
+        "price": 60,
+        "nextMap": "town_k1",
+        "message": "渡し船に乗る（マカヒキ島のコマチ港町へ）",
+        "spawn": {
+          "x": 22,
+          "z": 18,
+          "angle": 3.14159
+        },
+        "event": {
+          "image": "/images/events/ship_boarding.png",
+          "seconds": 3,
+          "caption": "ガリレオ連盟の港 → マカヒキ島 コマチ港町"
+        }
+      }
+    ]
+  },
+  "ferry_k1": {
+    "name": "コマチ港町の渡し場",
+    "keeper": "ferryman_k",
+    "routes": [
+      {
+        "name": "ガリレオ連盟の港",
+        "price": 60,
+        "nextMap": "town_e",
+        "message": "渡し船に乗る（ガリレオ連盟の港へ）",
+        "spawn": {
+          "x": 27,
+          "z": 8,
+          "angle": 3.14159
+        },
+        "event": {
+          "image": "/images/events/ship_boarding.png",
+          "seconds": 3,
+          "caption": "マカヒキ島 コマチ港町 → ガリレオ連盟の港"
+        }
+      }
+    ]
   }
 }

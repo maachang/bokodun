@@ -2802,11 +2802,26 @@
     "height": 2.4,
     "aspect": 0.485,
     "radius": 0.5,
+    "speechRadius": 9.5,
     "speed": 0,
     "wanderRadius": 0.0,
     "lines": [
       "ガリレオ連盟の港まで、渡し船が出ているよ。",
       "波は穏やかだ。乗っていくかい。"
+    ]
+  },
+  "ferryman_e": {
+    "name": "渡し船の船頭",
+    "texture": "/images/npcs/merchant_man.png",
+    "height": 2.4,
+    "aspect": 0.485,
+    "radius": 0.5,
+    "speechRadius": 9.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "マカヒキ島のコマチ港町まで、渡し船が出ているよ。",
+      "遠い島だが、波は穏やかだ。船賃は 60G。乗っていくかい。"
     ]
   },
   "daimyo_wife_k": {

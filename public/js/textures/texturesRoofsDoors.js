@@ -125,6 +125,17 @@ function drawMarkBar(ctx) {
     ctx.fillStyle = '#fcd34d'; ctx.fillRect(8, 14, 2, 11);
 }
 
+function drawMarkFerry(ctx) {
+    // 錨（渡し船: 上の輪・軸・横木・下の湾曲した爪）
+    ctx.strokeStyle = '#e5e7eb'; ctx.fillStyle = '#e5e7eb'; ctx.lineWidth = 2.6;
+    ctx.beginPath(); ctx.arc(16, 6, 3.2, 0, Math.PI * 2); ctx.stroke();                 // 輪
+    ctx.beginPath(); ctx.moveTo(16, 9.2); ctx.lineTo(16, 27); ctx.stroke();             // 軸
+    ctx.beginPath(); ctx.moveTo(10, 13); ctx.lineTo(22, 13); ctx.stroke();              // 横木
+    ctx.beginPath(); ctx.moveTo(5, 19); ctx.quadraticCurveTo(7, 28, 16, 28); ctx.quadraticCurveTo(25, 28, 27, 19); ctx.stroke();   // 爪の弧
+    ctx.beginPath(); ctx.moveTo(2.5, 20.5); ctx.lineTo(5, 15.5); ctx.lineTo(8.5, 20.5); ctx.closePath(); ctx.fill();               // 左の爪先
+    ctx.beginPath(); ctx.moveTo(29.5, 20.5); ctx.lineTo(27, 15.5); ctx.lineTo(23.5, 20.5); ctx.closePath(); ctx.fill();            // 右の爪先
+}
+
 function drawMarkItem(ctx) {
     // 薬びん（三角フラスコ: 細い首と栓、裾の広い瓶に緑の薬と泡。丸い赤だとグローブに見えるので、形と色を変えた）
     ctx.strokeStyle = '#374151';
@@ -155,7 +166,7 @@ function drawMarkItem(ctx) {
     ctx.strokeRect(12, 2, 8, 5);
 }
 
-const SHOP_MARK_DRAWERS = { weapon: drawMarkWeapon, temple: drawMarkTemple, adventurer: drawMarkAdventurer, mage: drawMarkMage, merchant: drawMarkMerchant, smith: drawMarkSmith, training: drawMarkTraining, thief: drawMarkThief, inn: drawMarkInn, bar: drawMarkBar, item: drawMarkItem };   // 店の種類 → 描く関数（ない種類は、item = 薬びん）
+const SHOP_MARK_DRAWERS = { weapon: drawMarkWeapon, temple: drawMarkTemple, adventurer: drawMarkAdventurer, mage: drawMarkMage, merchant: drawMarkMerchant, smith: drawMarkSmith, training: drawMarkTraining, thief: drawMarkThief, inn: drawMarkInn, bar: drawMarkBar, ferry: drawMarkFerry, item: drawMarkItem };   // 店の種類 → 描く関数（ない種類は、item = 薬びん）
 
 export const roofDoorTextures = {
     // 10. Heavy Dungeon Iron/Wood Door

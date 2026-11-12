@@ -18,6 +18,8 @@ export const controlsMethods = {
                 this.shopMenuKey(e);
                 return;
             }
+            // 移動の演出（渡し船など）の間は、飛ばす操作だけを受け付ける
+            if (this.travelScene) { if (['Enter', 'Space', 'KeyE', 'Escape'].includes(e.code)) this.travelScene.skip(); e.preventDefault(); return; }
             // カメラ操作: Ctrl+↑↓ で視点の上下、Ctrl+←→ で微調整の旋回（移動・旋回の矢印キーとは別）、Ctrl+0 で視点を水平に戻す
             if (e.ctrlKey) {
                 const camKey = { ArrowUp: 'camUp', ArrowDown: 'camDown', ArrowLeft: 'camLeft', ArrowRight: 'camRight' }[e.code];

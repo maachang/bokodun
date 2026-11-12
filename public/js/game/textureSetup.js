@@ -148,6 +148,7 @@ export const textureSetupMethods = {
             thiefGuildIcon: RetroTextureGenerator.createShopIconTexture('thief'),
             barIcon: RetroTextureGenerator.createShopIconTexture('bar'),
             innIcon: RetroTextureGenerator.createShopIconTexture('inn'),
+            ferryIcon: RetroTextureGenerator.createShopIconTexture('ferry'),
             woodWall: RetroTextureGenerator.createWoodWallTexture(),
             woodFloor: RetroTextureGenerator.createWoodFloorTexture(),
             marbleWall: RetroTextureGenerator.createMarbleWallTexture(),

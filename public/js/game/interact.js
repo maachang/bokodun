@@ -47,7 +47,7 @@ export const interactMethods = {
         let found = null;
         for (const n of this.npcs ?? []) {
             const s = n.speechFor(this.player);   // 離れた村人のセリフも、ここでリセットされる
-            if (s !== null && found === null) found = n.shopId ? `${s}\n【Eキー】取引メニューを表示` : s;   // 店主には、最下行に操作の案内を添える
+            if (s !== null && found === null) found = n.shopId ? `${s}\n${this.shops?.[n.shopId]?.routes ? '【Eキー】乗船の受付' : '【Eキー】取引メニューを表示'}` : s;   // 店主には、最下行に操作の案内を添える
         }
         return found;
     },
@@ -187,6 +187,11 @@ export const interactMethods = {
         if (m.screen === 'sell') {
             return [{ label: 'もどる', act: () => { m.screen = 'top'; m.index = 1; m.note = ''; } }];
         }
+        if (shop.routes) {   // 渡し場: 行き先と船賃の一覧（選ぶと、船賃を払って乗船）
+            const g = this.player.gold ?? 0;
+            return [...shop.routes.map(r => ({ label: `${r.name}　${r.price}G`, act: () => { m.note = this.boardFerry(r) ? '' : `お金が足りません（船賃 ${r.price}G・所持 ${g}G）`; } })),
+                { label: 'やめる', act: () => this.closeShopMenu() }];
+        }
         return [
             { label: '買う', act: () => { m.screen = 'buy'; m.page = 0; m.index = 0; m.note = ''; } },
             { label: '売る', act: () => { m.screen = 'sell'; m.index = 0; m.note = ''; } },
@@ -199,7 +204,7 @@ export const interactMethods = {
         if (!m) return;
         const shop = this.shops?.[m.shopId] ?? {};
         const esc = (t) => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-        const title = { top: `${shop.name ?? '店'}　いらっしゃい！`, buy: `販売一覧（${(m.page ?? 0) + 1}/${Math.max(1, Math.ceil((shop.goods ?? []).length / SHOP_PAGE_SIZE))}）`, sell: '売却（持ち物）' }[m.screen];
+        const title = { top: shop.routes ? 'どの船に乗船しますか？' : `${shop.name ?? '店'}　いらっしゃい！`, buy: `販売一覧（${(m.page ?? 0) + 1}/${Math.max(1, Math.ceil((shop.goods ?? []).length / SHOP_PAGE_SIZE))}）`, sell: '売却（持ち物）' }[m.screen];
         const choices = this.shopMenuChoices();
         const body = m.screen === 'sell' ? '<div style="margin:6px 0;color:#94a3b8">（ダミー）売れる持ち物の一覧は準備中です</div>' : '';
         this.shopMenuEl.innerHTML = `<div style="font-weight:bold;margin-bottom:8px;color:#7dd3fc">${esc(title)}</div>${body}` +
