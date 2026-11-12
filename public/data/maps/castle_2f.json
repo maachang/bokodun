@@ -24,81 +24,107 @@
     "skyColor": 2761760
   },
   "legend": {
-    "W": "brick_wall",
-    "d": "wooden_door",
-    "u": "castle_rug",
-    "k": "bookshelf_stone",
-    "t": "table_stone",
-    "h": "chair_stone",
-    "g": "cupboard_stone",
     "K": "chandelier_castle_rug",
     "L": "wall_sconce",
+    "N": "counter_stone",
     "R": "wall_banner_red",
-    "U": "stairs_stone_up",
     "S": "stairs_stone_down",
-    "a": "wall_window_stone"
+    "U": "stairs_stone_up",
+    "W": "brick_wall",
+    "X": "dais_rug_3",
+    "Y": "dais_rug_2",
+    "Z": "dais_rug_1",
+    "d": "wooden_door",
+    "g": "cupboard_stone",
+    "h": "chair_stone",
+    "k": "bookshelf_stone",
+    "n": "wall_window_stone",
+    "o": "barrel_stone",
+    "q": "crate_stone",
+    "s": "hearth_stone",
+    "t": "table_stone",
+    "u": "castle_rug",
+    "w": "water_barrel_stone",
+    "x": "dais_stone_3",
+    "y": "dais_stone_2",
+    "z": "dais_stone_1"
   },
   "enemies": {},
   "layout": [
-    "WaWWWaWWWWaWWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-    "a0k0k0k0kW0k0k0k0kW0k0k0k0kW0k000000k0a",
-    "W00000000W00000000W00000000W00hhhhhh00W",
-    "W0t00t00tW0t00t00tW0t00t00tW00tttttt00W",
-    "W0h00h00hW0h00h00hW0h00h00hW00hhhhhh00W",
-    "a00000000W00000000W00000000W0000000000a",
-    "W00000000W00000000W00000000W0000000000W",
-    "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
-    "WUuuuuuuKuuuuuuuuuuuuuuuuuKuuuuuuuuuuSW",
-    "a0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0a",
-    "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
-    "W00000000W00000000W00000000W0000000000W",
-    "W00000000W00000000W00000000W0g0g0g0g00W",
-    "W0t00t00tW0t00t00tW0t00t00tW0000000000W",
-    "W0h00h00hW0h00h00hW0h00h00hW0hth0hth00W",
-    "W00000000W00000000W00000000W0000000000W",
-    "W0g0g0g0gW0g0g0g0gW0g0g0g0gW0000000000W",
-    "WaWWWaWWWWaWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    "WWWWWWWWWWWWWWWRWWWRWWWRWWWWnWWWWnWWWWW",
+    "W0kkkkkkkkkk0WuuxxxXxxxuuW0q00g0g0g0q0W",
+    "W000000000000WuuyyyYyyyuuW00000000000qW",
+    "n00t00t00t000LuuzzzZzzzuuL000NNNNNN000n",
+    "W00h00h00h000WuKuuuuuuuKuW000000000000W",
+    "W000000000000WuuuuuuuuuuuW0o0000000000W",
+    "WWLWdWWLWdWLWWuuuhhhhhuuuWWWLdWWLWdWLWW",
+    "WuuuuuuuuuuuuWuuhttttthuuWuuuuuuuuuuuuW",
+    "WUuuuuKuuuuuuduuhttttthuuduuuuuuKuuuuSW",
+    "WuuuuuuuuuuuuWuuhttttthuuWuuuuuuuuuuuuW",
+    "WWLWdWWLWdWLWWuuhttttthuuWWWLdWWLWdWLWW",
+    "W000000000000WuuuhhhhhuuuW00000000000wW",
+    "W0k00k00k00k0WuuuuuuuuuuuW000000000000W",
+    "n0k00k00k00k0LuuuuuKuuuuuL0hth000hth00n",
+    "W0k00k00k00k0WuuuuuuuuuuuW000000000000W",
+    "W0k00k00k00k0WuuuuuKuuuuuW000000000000W",
+    "W000000000000WuuuuuuuuuuuWg0000s0000g0W",
+    "WWWnWWWWnWWWWWWWWWWWWWWWWWWWnWWWWnWWWWW"
   ],
   "npcs": [
     {
       "id": "adv_clerk_man",
       "x": 4,
-      "z": 3
+      "z": 2
     },
     {
       "id": "adv_clerk_woman",
-      "x": 12,
-      "z": 3
+      "x": 8,
+      "z": 2
+    },
+    {
+      "id": "adv_clerk_woman",
+      "x": 6,
+      "z": 14
     },
     {
       "id": "adv_clerk_man",
-      "x": 21,
-      "z": 3
-    },
-    {
-      "id": "adv_clerk_woman",
       "x": 4,
-      "z": 13
+      "z": 12
     },
     {
       "id": "adv_clerk_man",
-      "x": 13,
-      "z": 13
+      "x": 31,
+      "z": 2
     },
     {
       "id": "adv_clerk_woman",
-      "x": 22,
-      "z": 13
+      "x": 33,
+      "z": 2
     },
     {
-      "id": "maid",
-      "x": 32,
+      "id": "viscount_man",
+      "x": 35,
+      "z": 5
+    },
+    {
+      "id": "baron_woman",
+      "x": 19,
+      "z": 5
+    },
+    {
+      "id": "elder_man",
+      "x": 15,
       "z": 13
     },
     {
       "id": "maid_head",
-      "x": 20,
-      "z": 8
+      "x": 31,
+      "z": 14
+    },
+    {
+      "id": "maid",
+      "x": 29,
+      "z": 12
     },
     {
       "id": "servant_man",
@@ -106,23 +132,9 @@
       "z": 8
     },
     {
-      "id": "elder_man",
-      "x": 15,
-      "z": 4
-    },
-    {
-      "id": "viscount_man",
-      "x": 29,
-      "z": 3,
-      "speed": 0,
-      "wanderRadius": 0.5
-    },
-    {
-      "id": "baron_woman",
-      "x": 36,
-      "z": 3,
-      "speed": 0,
-      "wanderRadius": 0.5
+      "id": "maid",
+      "x": 8,
+      "z": 8
     }
   ],
   "links": {

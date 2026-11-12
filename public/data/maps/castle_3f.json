@@ -24,43 +24,64 @@
     "skyColor": 2761760
   },
   "legend": {
-    "W": "brick_wall",
-    "d": "wooden_door",
-    "u": "castle_rug",
-    "k": "bookshelf_stone",
-    "t": "table_stone",
-    "h": "chair_stone",
-    "g": "cupboard_stone",
-    "s": "hearth_stone",
     "K": "chandelier_castle_rug",
     "L": "wall_sconce",
     "R": "wall_banner_red",
     "S": "stairs_stone_down",
     "U": "stairs_stone_up",
-    "a": "wall_window_stone"
+    "W": "brick_wall",
+    "d": "wooden_door",
+    "g": "cupboard_stone",
+    "h": "chair_stone",
+    "k": "bookshelf_stone",
+    "n": "wall_window_stone",
+    "q": "crate_stone",
+    "s": "hearth_stone",
+    "t": "table_stone",
+    "u": "castle_rug"
   },
   "enemies": {},
   "layout": [
-    "WaWWWWWaWWWaWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-    "a000ksk00W000ksk00W000ksk00W000g000g00a",
-    "W000uuu00W000uuu00W000uuu00W0000uuu000W",
-    "W000uKu00W000uKu00W000uKu00W0000uKu000W",
-    "W000uuu00W000uuu00W000uuu00W0000uuu000W",
-    "a0000t000W0000t000W0000t000W00hth0hth0a",
-    "W0000h000W0000h000W0000h000W0000000000W",
-    "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
-    "WSuuuuuuKuuuuuuuuuuuuuuuuuKuuuuuuuuuuUW",
-    "d0uuuuuuuuuuuuuuuKuuuuuuuuuuuuuuuuKuu0a",
-    "WWLWdWLWWRWLWdWLWWRWLWdWLWWRWWLWdWWLWWW",
-    "a0kk0kkkkkkkk0kkkkkkkk0kkkkkkkkk0kkk00W",
-    "W0000000000000000000000000000000000000W",
-    "W00000tt0000tt0000tt0000tt0000tt000000W",
-    "W00000hh0000hh0000hh0000hh0000hh000000W",
-    "W0000000000000000000000000000000000000W",
-    "W0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0k0W",
-    "WaWWWaWWWaWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
+    "WWWWWWWWWWWWWWWWWWWWWWWnWWWnWWWWWWWWWWW",
+    "WukkusukkuWukkusukkuWguuusuuugWukkskkuW",
+    "WuuuuhuuuuRuuuuhuuuuRuuuuuuuuuRuuuhuuuW",
+    "nuuuutuuuuWuuuutuuuuWuuhutuhuuWuuutuuun",
+    "WuuuuKuuuuLuuuuKuuuuLuuhuKuhuuLuuuKuuuW",
+    "WuuuuuuuuuWuuuuuuuuuWuuuuuuuuuWuuuuuuuW",
+    "WWLWWdWWLWWWLWWdWWLWWWLWWdWWLWWWLWdWLWW",
+    "WuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuW",
+    "WSuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuUW",
+    "duuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuuW",
+    "WWLWdWWLWWWWLWWdWWLWWWWdWWLWWWWWLWdWLWW",
+    "W00000000W0kkk000kkkkk000kkk0W0q00000kW",
+    "W00h00h00W000h0h00000h0h00000W0000000kW",
+    "W00t00t00L000ttt00000ttt00000L000tt00kW",
+    "n00h00h00W000h0h00000h0h00000W000hh00kW",
+    "W00000000W0000000000000000000W0q00000kW",
+    "W0kkkkkk0W0kkkkkkkkkkkkkkkkk0W0kkkkkkkW",
+    "WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW"
   ],
   "npcs": [
+    {
+      "id": "baron_man",
+      "x": 7,
+      "z": 3
+    },
+    {
+      "id": "viscount_man",
+      "x": 17,
+      "z": 3
+    },
+    {
+      "id": "baron_woman",
+      "x": 36,
+      "z": 3
+    },
+    {
+      "id": "baron_woman",
+      "x": 22,
+      "z": 3
+    },
     {
       "id": "butler",
       "x": 5,
@@ -72,55 +93,44 @@
       "z": 8
     },
     {
-      "id": "mage_clerk_woman",
-      "x": 8,
-      "z": 13
-    },
-    {
-      "id": "mage_clerk_man",
-      "x": 20,
-      "z": 13
-    },
-    {
-      "id": "mage_clerk_woman",
-      "x": 29,
-      "z": 14
-    },
-    {
-      "id": "elder_man",
-      "x": 14,
-      "z": 15
-    },
-    {
       "id": "servant_man",
       "x": 33,
       "z": 8
     },
     {
       "id": "maid",
-      "x": 32,
-      "z": 4
+      "x": 22,
+      "z": 9
     },
     {
-      "id": "baron_man",
+      "id": "mage_clerk_woman",
+      "x": 12,
+      "z": 14
+    },
+    {
+      "id": "mage_clerk_man",
+      "x": 18,
+      "z": 13
+    },
+    {
+      "id": "mage_clerk_woman",
+      "x": 26,
+      "z": 13
+    },
+    {
+      "id": "elder_man",
+      "x": 19,
+      "z": 15
+    },
+    {
+      "id": "adv_clerk_woman",
       "x": 5,
-      "z": 4,
-      "speed": 0,
-      "wanderRadius": 0.5
+      "z": 15
     },
     {
-      "id": "viscount_man",
-      "x": 14,
-      "z": 4,
-      "speed": 0,
-      "wanderRadius": 0.5
-    },
-    {
-      "id": "baron_woman",
-      "x": 23,
-      "z": 4,
-      "speed": 0,
-      "wanderRadius": 0.5
+      "id": "guard_spear",
+      "x": 32,
+      "z": 12
     }
   ],
   "links": {
