@@ -420,7 +420,7 @@
   },
   "ferry_e": {
     "name": "ガリレオ連盟の渡し場",
-    "keeper": "ferryman_e",
+    "keeper": "ferryman_e_booth",
     "routes": [
       {
         "name": "コマチ港町",
@@ -442,7 +442,7 @@
   },
   "ferry_k1": {
     "name": "コマチ港町の渡し場",
-    "keeper": "ferryman_k",
+    "keeper": "ferryman_k_booth",
     "routes": [
       {
         "name": "ガリレオ連盟の港",

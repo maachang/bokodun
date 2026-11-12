@@ -597,7 +597,8 @@ test('渡し場: 店と同じ売り場。船頭に話しかけると行き先と
         const s = shops[shopId];
         assert.ok(npcsDef[s.keeper], `${shopId}: 船頭`);
         assert.ok(npcsDef[s.keeper].speechRadius >= 9, '船頭: カウンター越しに話せる');
-        assert.equal(s.routes.length, 1); assert.equal(s.routes[0].nextMap, dest); assert.equal(s.routes[0].price, 0);
+        assert.ok(s.keeper.endsWith('_booth'), '売り場の船頭は専用の定義（屋外の船頭の話しかける距離を、広げない）');
+        assert.equal(npcsDef.ferryman_k.speechRadius, undefined, '屋外の船頭は、通常の距離'); assert.equal(s.routes.length, 1); assert.equal(s.routes[0].nextMap, dest); assert.equal(s.routes[0].price, 0);
         assert.ok(s.routes[0].spawn && s.routes[0].event.image, '行き先の出現位置と、船の演出');
         assert.ok(fs.existsSync(path.join(root, 'public', s.routes[0].event.image)), '演出の画像');
     }

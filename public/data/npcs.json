@@ -2802,6 +2802,19 @@
     "height": 2.4,
     "aspect": 0.485,
     "radius": 0.5,
+    "speed": 0,
+    "wanderRadius": 0.0,
+    "lines": [
+      "ガリレオ連盟の港まで、渡し船が出ているよ。",
+      "波は穏やかだ。乗っていくかい。"
+    ]
+  },
+  "ferryman_k_booth": {
+    "name": "渡し船の船頭",
+    "texture": "/images/npcs/merchant_man.png",
+    "height": 2.4,
+    "aspect": 0.485,
+    "radius": 0.5,
     "speechRadius": 9.5,
     "speed": 0,
     "wanderRadius": 0.0,
@@ -2810,7 +2823,7 @@
       "波は穏やかだ。乗っていくかい。"
     ]
   },
-  "ferryman_e": {
+  "ferryman_e_booth": {
     "name": "渡し船の船頭",
     "texture": "/images/npcs/merchant_man.png",
     "height": 2.4,
