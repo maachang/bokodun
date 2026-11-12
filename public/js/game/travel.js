@@ -26,15 +26,19 @@ export const travelMethods = {
         cap.style.cssText = 'color:#f8fafc;font-size:20px;margin-top:16px;text-shadow:0 0 6px #000;';
         cap.textContent = ev.caption ?? '';
         const hint = document.createElement('div');
-        hint.style.cssText = 'color:#64748b;font-size:12px;margin-top:8px;';
-        hint.textContent = 'Enter / クリックで飛ばす';
+        hint.style.cssText = 'color:#cbd5e1;font-size:16px;margin-top:10px;text-shadow:0 0 6px #000;';
+        const total = (ev.seconds ?? 3) * 1000 + 600;
+        const t0 = performance.now();
+        const showRest = () => { hint.textContent = `あと ${Math.max(0, Math.ceil((total - (performance.now() - t0)) / 1000))} 秒　（Enter / クリックで飛ばす）`; };   // 終わるまでの残り秒数
+        showRest();
+        const ticker = setInterval(showRest, 200);
         el.append(img, cap, hint);
         document.body.appendChild(el);
         requestAnimationFrame(() => { el.style.opacity = '1'; });
         let timer = null;
         const finish = () => {
             if (!this.travelScene) return;
-            clearTimeout(timer);
+            clearTimeout(timer); clearInterval(ticker);
             this.travelScene = null;
             onDone();   // 移動（読み込み中は、画面を黒で隠したまま。終わってから明ける）
             const wait = () => { if (this.nav.busy || this.loadingMap) return setTimeout(wait, 100); el.style.opacity = '0'; setTimeout(() => el.remove(), 700); };
@@ -42,6 +46,6 @@ export const travelMethods = {
         };
         this.travelScene = { skip: finish };
         el.onclick = finish;
-        timer = setTimeout(finish, (ev.seconds ?? 3) * 1000 + 600);
+        timer = setTimeout(finish, total);
     },
 };
