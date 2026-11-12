@@ -57,6 +57,9 @@ def _rows():
     for x in range(9, 19):   # 上段の間の背後（大広間の北の壁）: ふすまではなく、金の壁画の壁。殿様（x13）の背後に床の間、その脇に違い棚（書院造り）
         assert g[10][x] == 'G'
         g[10][x] = 'N' if x == 13 else 'D' if x == 14 else 'P'
+    for y in range(5, 10):   # 中庭を囲む板の間（北の縁側・東西の廊下の中庭側）は、白砂より 0.3 高くする（段差で、砂地と板の通路を見分ける）
+        for x in range(W):
+            if g[y][x] == '=': g[y][x] = 'F'
     g[H - 1][13] = '2'
     return [''.join(r) for r in g]
 
@@ -65,11 +68,11 @@ def build(base):
     """base: 元の castle_k（出口などを引き継ぐ）。畳・ふすま・障子・渡り廊下・中庭の城に作り直す"""
     m = dict(base)
     m['layout'] = _rows()
-    m['legend'] = {'_': 'tatami', '=': 'wood_floor', 'y': 'garden_sand', 'S': 'fusuma_wall', 'G': 'fusuma_gold', 'H': 'shoji_wall', 'a': 'dais_tatami_3', 'b': 'dais_tatami_2', 'c': 'dais_tatami_1', '2': 'castle_exit', 'P': 'wall_gold', 'N': 'wall_tokonoma', 'D': 'wall_chigaidana',
+    m['legend'] = {'_': 'tatami', '=': 'wood_floor', 'y': 'garden_sand', 'F': 'wood_floor_raised', 'S': 'fusuma_wall', 'G': 'fusuma_gold', 'H': 'shoji_wall', 'a': 'dais_tatami_3', 'b': 'dais_tatami_2', 'c': 'dais_tatami_1', '2': 'castle_exit', 'P': 'wall_gold', 'N': 'wall_tokonoma', 'D': 'wall_chigaidana',
                    'T': 'pine_k', 'U': 'ume_k', 'w': 'water', 'e': 'edo_lantern'}
     m['decorFloor'] = 'whiteSand'   # 飾り（松・石灯籠）の下の地面
     m['environment'] = dict(base['environment'], hasCeiling=False, floorType='whiteSand', ambientLight=0xdcd0b4, directionalLight=0xfff4dc, fogColor=0xcfdceb, skyColor=0x8fb8e0, fogNear=22, fogFar=70)   # 全面の天井はやめる（中庭は空が見える。部屋と廊下は、床ごとに天井）
     m['npcs'] = [{'id': i, 'x': x, 'z': y} for i, x, y in NPCS]
-    for i, x, y in NPCS: assert m['layout'][y][x] in '_=abc', f'{i} ({x},{y}) が床ではない'
+    for i, x, y in NPCS: assert m['layout'][y][x] in '_=abcF', f'{i} ({x},{y}) が床ではない'
     m['spawn'] = {'x': 13, 'z': 22, 'angle': 0}
     return m

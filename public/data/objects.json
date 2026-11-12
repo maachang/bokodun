@@ -20469,6 +20469,14 @@
     "solid": false,
     "description": "上段の畳の段（高さ 0.9。K マカヒキ国の城）"
   },
+  "wood_floor_raised": {
+    "type": "floor_tile",
+    "texture": "woodFloor",
+    "ceilingTexture": "woodWall",
+    "elevation": 0.3,
+    "solid": false,
+    "description": "中庭を囲む板の間（白砂より 0.3 高い。K マカヒキ国の城）"
+  },
   "garden_sand": {
     "type": "floor_tile",
     "texture": "whiteSand",
