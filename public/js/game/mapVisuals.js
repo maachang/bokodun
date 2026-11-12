@@ -241,7 +241,8 @@ export const mapVisualMethods = {
         // style: 'gable'（街の大門）は、切妻の大屋根・棟・両端の袖屋根（壁の上の小屋根）。省略は、今までの平らな 2 段屋根（町の小さな門）。layers: 1 で 1 段だけ
         const gateRoofTex = objDef.gateRoof && this.textures[objDef.gateRoof.texture];
         if (gateRoofTex) {
-            const roofMat = this.makeLitMaterial(objDef.gateRoof.texture, gateRoofTex);
+            const roofMat = this.makeLitMaterial(objDef.gateRoof.texture, gateRoofTex).clone();
+            roofMat.side = THREE.DoubleSide;   // 上から見ても、屋根の裏が透けない
             const gr = objDef.gateRoof;
             const depth = env.tileSize + (gr.overhang ?? 0.8) * 2;
             if (gr.style === 'gable') {
@@ -262,6 +263,9 @@ export const mapVisualMethods = {
                     const m = new THREE.Mesh(geo, roofMat);
                     m.position.set(x, y, 0);
                     roofGroup.add(m);
+                    const soffit = new THREE.Mesh(new THREE.BoxGeometry(len, 0.15, dep), frameMat);   // 軒裏（屋根の裏の板。これがないと、裏が空いて、張りぼてに見える）
+                    soffit.position.set(x, y + 0.075, 0);
+                    roofGroup.add(soffit);
                 };
                 const ts = env.tileSize, rise = gr.rise ?? 2.0;
                 const isDoorChar = (ch) => env.defOf(ch)?.type === 'door';
