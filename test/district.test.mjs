@@ -588,7 +588,7 @@ test('全マップの扉: 壁にはさまれた向きと、人が通る向きが
     assert.deepEqual(bad, []);
 });
 
-test('渡し場: 店と同じ売り場。船頭に話しかけると行き先と船賃（60G）が出る。E の港とコマチ港町で、互いの行き先がある', () => {
+test('渡し場: 店と同じ売り場。船頭に話しかけると行き先と船賃（今は 0G）が出る。E の港とコマチ港町で、互いの行き先がある', () => {
     const shops = readJson('public/data/shops.json'), npcsDef = readJson('public/data/npcs.json');
     const pairs = [['town_e', '27,7', 'ferry_e', 'town_k1'], ['town_k1', '22,17', 'ferry_k1', 'town_e']];
     for (const [map, at, shopId, dest] of pairs) {
@@ -597,7 +597,7 @@ test('渡し場: 店と同じ売り場。船頭に話しかけると行き先と
         const s = shops[shopId];
         assert.ok(npcsDef[s.keeper], `${shopId}: 船頭`);
         assert.ok(npcsDef[s.keeper].speechRadius >= 9, '船頭: カウンター越しに話せる');
-        assert.equal(s.routes.length, 1); assert.equal(s.routes[0].nextMap, dest); assert.equal(s.routes[0].price, 60);
+        assert.equal(s.routes.length, 1); assert.equal(s.routes[0].nextMap, dest); assert.equal(s.routes[0].price, 0);
         assert.ok(s.routes[0].spawn && s.routes[0].event.image, '行き先の出現位置と、船の演出');
         assert.ok(fs.existsSync(path.join(root, 'public', s.routes[0].event.image)), '演出の画像');
     }
