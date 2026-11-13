@@ -163,6 +163,8 @@ def _angle(f):
     return {(-1, 0): 0, (0, 1): -1.570795, (1, 0): 3.14159, (0, -1): 1.570795}[tuple(f)]
 
 
+INN_POST_TRAVELERS = (('traveler_man', 4, 12), ('traveler_merchant', 12, 13), ('traveler_man', 16, 12))   # 宿場の旅人（道の行き交い。宿場の特徴: 村長の家・村の人より、旅人と宿・酒場が中心）
+
 # 国ごとの中の部屋（A 雪国は暖炉つきの店・宿。F 獣王国は獣人の道具屋・宿。書いていない国は、サンプルのまま）。town_a.py（_A_ROOM）・town_d.py（FACILITIES_F）と同じ
 ROOMS = {'a': {'shop': 'shop_a', 'village_pub': 'city_inn_a', 'town_pub': 'city_inn_a'}, 'f': {'village_pub': 'city_inn_f', 'town_pub': 'city_inn_f'}}
 SHOP_ID = {'f': 'item_shop_f'}   # 道具屋の品（F は獣人の道具屋）
@@ -209,6 +211,9 @@ def build_inner(p, envs, snow_env):
         for n in sm['npcs']:
             if n['x'] >= 5 and n['z'] < 17 and n['id'] != 'chief_attendant': npcs.append({'id': n['id'], 'x': n['x'] - 4, 'z': n['z']})
         spawn = {'x': 7, 'z': 17, 'angle': 0}
+        for nid, x, z in INN_POST_TRAVELERS:
+            assert layout[z][x] == 'D', f'宿場の旅人 ({x},{z}): 土の道ではない'
+            npcs.append({'id': nid, 'x': x, 'z': z})
     else:
         layout = list(sm['layout']); heights = list(sm['heights'])
         for k, v in sm['links'].items(): links[k] = json.loads(json.dumps(v))

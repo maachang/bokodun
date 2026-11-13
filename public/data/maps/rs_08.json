@@ -133,6 +133,21 @@
    "id": "cat_sleep",
    "x": 11,
    "z": 15
+  },
+  {
+   "id": "traveler_man",
+   "x": 4,
+   "z": 12
+  },
+  {
+   "id": "traveler_merchant",
+   "x": 12,
+   "z": 13
+  },
+  {
+   "id": "traveler_man",
+   "x": 16,
+   "z": 12
   }
  ],
  "links": {
