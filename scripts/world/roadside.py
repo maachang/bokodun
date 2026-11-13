@@ -40,10 +40,12 @@ _COUNTRIES = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k')
 _ELEMENTS = ('6', '7', '8', '9')
 _DEFAULT = {'6': 'city_wall', '7': 'district_gate', '8': 'brick_house', '9': 'plaza_stone'}
 FENCE_CH = chr(0x3b1)
+PORTAL_CH = chr(0x3b2 + 45)   # 村の入口（見えない移動のマス。最初の村と同じ portal）
+WOOD_HOUSE_CH = chr(0x3b2 + 44)   # 村の家（最初に作った村 village.json と同じ木の家）
 CHAR = {(c, e): chr(0x3b2 + i * 4 + j) for i, c in enumerate(_COUNTRIES) for j, e in enumerate(_ELEMENTS)}
-LEGEND_EXTRA = {FENCE_CH: 'wooden_fence', **{ch: LOOK.get(c, {}).get(e, _DEFAULT[e]) for (c, e), ch in CHAR.items()}}
+LEGEND_EXTRA = {FENCE_CH: 'wooden_fence', WOOD_HOUSE_CH: 'wooden_house', PORTAL_CH: 'portal', **{ch: LOOK.get(c, {}).get(e, _DEFAULT[e]) for (c, e), ch in CHAR.items()}}
 LEGEND_EXTRA = {ch: (plain_gate(n) if n.startswith('gate_') else n) for ch, n in LEGEND_EXTRA.items()}
-SOLID_EXTRA = {FENCE_CH} | {ch for (c, e), ch in CHAR.items() if e != '9'}
+SOLID_EXTRA = {FENCE_CH, WOOD_HOUSE_CH} | {ch for (c, e), ch in CHAR.items() if e != '9'}
 
 LEGEND.update(LEGEND_EXTRA); SOLID_CH.update(SOLID_EXTRA)   # 外のマップの凡例・通れない物体に、足す
 
@@ -101,12 +103,13 @@ def _paint(g, geo, kind, country, name):
     obj[region] = ord('0')
     elev[region] = base
     for y, x in geo['plaza']: elev[y, x] = base; obj[y, x] = ord(ch('9'))
-    wall = ch('6') if kind == '町' else ch('8')   # 村・宿場の外周は、家（壁として数える。扉は壁にはさまれる）
-    obj[y0:y1 + 1, x0:x1 + 1] = ord(ch('8'))
+    village = kind == '村'   # 村は、最初に作った村と同じ（木の柵・木の家・門なしの入口。国の素材は使わない。ユーザー指示 2026-11-14）
+    wall = ch('6') if kind == '町' else (FENCE_CH if village else ch('8'))   # 村・宿場の外周は、家（壁として数える。扉は壁にはさまれる）
+    obj[y0:y1 + 1, x0:x1 + 1] = ord(WOOD_HOUSE_CH if village else ch('8'))
     for y in range(y0, y1 + 1):
         for x in range(x0, x1 + 1):
             if y in (y0, y1) or x in (x0, x1): obj[y, x] = ord(wall)
-    for y, x in geo['gate']: obj[y, x] = ord(ch('7')); elev[y, x] = base
+    for y, x in geo['gate']: obj[y, x] = ord(PORTAL_CH) if village else ord(ch('7')); elev[y, x] = base
     sy, sx = geo['sign']; obj[sy, sx] = ord(roads.SIGN_CH); elev[sy, sx] = base
 
 
@@ -233,13 +236,13 @@ def build_inner(p, envs, snow_env):
         for k in [k for k, v in links.items() if v['nextMap'].startswith('temple')]:
             x, y = map(int, k.split(',')); lay[y][x] = 'J'; del links[k]
     for x in gx: lay[gy][x] = 'G'
-    if kind != '町':   # 扉（G）は、壁にはさまれる向き（柵は壁として数えないので、両隣を木の壁にする）
+    if kind == '宿場':   # 扉（G）は、壁にはさまれる向き（柵は壁として数えないので、両隣を木の壁にする）
         lay[gy][gx[0] - 1] = lay[gy][gx[1] + 1] = 'W'
     layout = [''.join(r) for r in lay]
     legend = dict(sm['legend'])
-    legend['G'] = plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))
+    legend['G'] = 'portal' if kind == '村' else plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))   # 村は門なしの入口（最初の村と同じ）
     look = LOOK.get(country, {})
-    if kind != '町' and '8' in look and country != 'd':   # 家の見た目（村・宿場）
+    if kind == '宿場' and '8' in look and country != 'd':   # 家の見た目（村・宿場）
         for ch in ('H', 'b'):
             if ch in legend: legend[ch] = look['8'] if ch == 'H' else legend[ch]
     if kind == '町' and '6' in look: legend['W'] = look['6']

@@ -22,7 +22,7 @@
  },
  "legend": {
   "#": "wooden_fence",
-  "H": "mideast_shop",
+  "H": "wooden_house",
   "D": "dirt_road",
   "C": "cobblestone_path",
   "T": "tree",
@@ -58,7 +58,7 @@
   "M": "pub_sign",
   "K": "inn_sign",
   "Z": "inn_guide_sign",
-  "G": "gate_white_plain"
+  "G": "portal"
  },
  "enemies": {},
  "layout": [
@@ -85,7 +85,7 @@
   "#~~~~~~~~~~==~~~~~~~~~~#",
   "#XXx0y00x00DD000y0x00xx#",
   "#0X00000000DD0000000XX0#",
-  "##########WGGW##########"
+  "###########GG###########"
  ],
  "npcs": [
   {
