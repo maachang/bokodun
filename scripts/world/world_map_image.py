@@ -1,6 +1,7 @@
 """世界全体を、1 枚の画像にする（広大なマップの、道の確認用）。
 使い方: python3 scripts/world/world_map_image.py [1 マスのピクセル数（既定 3）] [出力.png]
 読むもの: public/data/maps/w_行_列.json（生成済みの外のマップ）・objects.json・world_roads.json。書くもの: public/images/world_map.png（既定）
+道沿いの村・町・宿場: world_roadside.json の位置に、番号と名前（村=黄・町=水色・宿場=紫）。
 色: 地面の種類（高さで陰影）・木は暗く・水と海・石畳の道は明るく太く・石の橋はオレンジ・街の壁と家は赤茶。メッシュの境目の薄い線と「(行-列)」（ゲーム内のマップ名と同じ 1 始まり）・街の印と名前・道しるべ（点）"""
 import os, sys, json
 import numpy as np
@@ -86,6 +87,14 @@ def main():
             ey, ex = info['end']; d.ellipse([ex * px - 6, ey * px - 6, ex * px + 6, ey * px + 6], fill=(255, 0, 255, 255))
     for s in rd.get('signs', []):
         sy, sx = s['pos']; d.ellipse([sx * px - 3, sy * px - 3, sx * px + 3, sy * px + 3], fill=(60, 255, 60, 255))
+    rs_path = os.path.join(ROOT, 'public', 'data', 'world_roadside.json')
+    if os.path.exists(rs_path):   # 道沿いの村（黄）・町（水色）・宿場（紫）: 番号と名前
+        small_ft = font(max(14, px * 6))
+        for s in json.load(open(rs_path))['sites']:
+            y0, y1, x0, x1 = s['box']; cx, cy = (x0 + x1) // 2 * px, (y0 + y1) // 2 * px
+            col = {'村': (255, 220, 40, 255), '町': (80, 200, 255, 255), '宿場': (200, 90, 255, 255)}[s['kind']]
+            d.ellipse([cx - px * 4, cy - px * 4, cx + px * 4, cy + px * 4], fill=col, outline=(0, 0, 0, 255), width=2)
+            d.text((cx + px * 6, cy - px * 3), f"{int(s['id'])} {s['name']}", fill=(255, 255, 255, 255), font=small_ft, stroke_width=2, stroke_fill=(0, 0, 0, 255))
     os.makedirs(os.path.dirname(out), exist_ok=True)
     im.save(out, optimize=True)
     print(f'世界の地図: {out}（{im.size[0]}×{im.size[1]}・マップ {n} 枚・{os.path.getsize(out) // 1024}KB）')
