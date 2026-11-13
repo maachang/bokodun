@@ -1,0 +1,256 @@
+{
+ "id": "rs_07",
+ "name": "ジャジル村",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "spawn": {
+  "x": 11,
+  "z": 21,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "grass",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 12373460,
+  "fogNear": 22,
+  "fogFar": 80,
+  "visibility": 0.9,
+  "skyColor": 9683955
+ },
+ "legend": {
+  "#": "wooden_fence",
+  "H": "mideast_shop",
+  "D": "dirt_road",
+  "C": "cobblestone_path",
+  "T": "tree",
+  "O": "mossy_boulder",
+  "N": "wooden_signpost",
+  "~": "water_shallow",
+  "P": "water",
+  "=": "wood_bridge",
+  "2": "portal",
+  "W": "wooden_wall",
+  "F": "wood_floor",
+  "u": "rug",
+  "d": "wooden_door",
+  "t": "table",
+  "h": "chair",
+  "e": "bed",
+  "k": "bookshelf",
+  "g": "cupboard",
+  "s": "hearth",
+  "o": "stove",
+  "f": "flower_bed",
+  "v": "flower_bed_blue",
+  "x": "meadow_grass",
+  "X": "road_weed",
+  "y": "roadside_flowers",
+  "Q": "item_shop_sign",
+  "J": "temple_building",
+  "A": "temple_door",
+  "c": "church_sign",
+  "Y": "well",
+  "a": "outhouse",
+  "b": "wooden_house_window",
+  "M": "pub_sign",
+  "K": "inn_sign",
+  "Z": "inn_guide_sign",
+  "G": "gate_white"
+ },
+ "enemies": {},
+ "layout": [
+  "########################",
+  "#x000000000000000000XXx#",
+  "#xHH000T0000y000T00HHX0#",
+  "#0HH000000x00X00000HH0a#",
+  "#0fv0000fv0000vf000vf00#",
+  "#xy0T0000000000000000y0#",
+  "#0HH000x0HbHHbH0X0HHH00#",
+  "#0HH00000bHHHHba00HdH00#",
+  "#0vf00000HbddbH000K0M0a#",
+  "#T000000fv0CC0vf0000000#",
+  "#XXx0yx000NDD00000y0Tx0#",
+  "#0000T00x00DDZYx00T00x0#",
+  "#DDDDDDDDDDDDDDDDDDDDDD#",
+  "#DDDDDDDDDDDDDDDDDDDDDD#",
+  "#0XX0xQ0yy0DDN00x0c0000#",
+  "#0HH00HdH0xDD0xXX0JAJ00#",
+  "#0HH00HHH00DD0XXX0JJJ00#",
+  "#~~~~~~~~~~==~~~~~~~~~~#",
+  "#PPPPPPPPPP==PPPPPPPPPP#",
+  "#PPPPPPPPPP==PPPPPPPPPP#",
+  "#~~~~~~~~~~==~~~~~~~~~~#",
+  "#XXx0y00x00DD000y0x00xx#",
+  "#0X00000000DD0000000XX0#",
+  "##########WGGW##########"
+ ],
+ "npcs": [
+  {
+   "id": "merchant_man",
+   "x": 16,
+   "z": 11
+  },
+  {
+   "id": "merchant_woman",
+   "x": 10,
+   "z": 14
+  },
+  {
+   "id": "villager_man",
+   "x": 20,
+   "z": 14
+  },
+  {
+   "id": "villager_woman",
+   "x": 4,
+   "z": 10
+  },
+  {
+   "id": "child_boy",
+   "x": 5,
+   "z": 16
+  },
+  {
+   "id": "child_girl",
+   "x": 14,
+   "z": 10
+  },
+  {
+   "id": "elder_man",
+   "x": 3,
+   "z": 5
+  },
+  {
+   "id": "elder_woman",
+   "x": 21,
+   "z": 6
+  },
+  {
+   "id": "chief_attendant",
+   "x": 13,
+   "z": 9
+  },
+  {
+   "id": "cat_walk",
+   "x": 7,
+   "z": 6
+  },
+  {
+   "id": "cat_walk_tail",
+   "x": 17,
+   "z": 4
+  },
+  {
+   "id": "black_cat_walk",
+   "x": 12,
+   "z": 4
+  },
+  {
+   "id": "cat_sleep",
+   "x": 15,
+   "z": 15
+  }
+ ],
+ "links": {
+  "11,8": {
+   "nextMap": "village_chief_house",
+   "message": "村長の家に入る",
+   "back": {
+    "x": 11,
+    "z": 9,
+    "angle": 3.14159
+   }
+  },
+  "12,8": {
+   "nextMap": "village_chief_house",
+   "message": "村長の家に入る",
+   "back": {
+    "x": 12,
+    "z": 9,
+    "angle": 3.14159
+   }
+  },
+  "7,15": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop"
+   },
+   "message": "道具屋に入る",
+   "back": {
+    "x": 7,
+    "z": 14,
+    "angle": 0
+   },
+   "icon": "itemShopIcon"
+  },
+  "19,15": {
+   "nextMap": "temple_village",
+   "message": "神殿に入る",
+   "back": {
+    "x": 19,
+    "z": 14,
+    "angle": 0
+   },
+   "icon": "templeIcon"
+  },
+  "19,7": {
+   "nextMap": "village_pub",
+   "message": "宿屋・酒場に入る",
+   "icon": "barIcon",
+   "back": {
+    "x": 19,
+    "z": 8,
+    "angle": 3.14159
+   }
+  },
+  "11,23": {
+   "nextMap": "w_12_13",
+   "message": "ジャジル村の外へ",
+   "spawn": {
+    "x": 40,
+    "z": 10,
+    "angle": 0
+   }
+  },
+  "12,23": {
+   "nextMap": "w_12_13",
+   "message": "ジャジル村の外へ",
+   "spawn": {
+    "x": 41,
+    "z": 10,
+    "angle": 0
+   }
+  }
+ },
+ "heights": [
+  "000000000000000000000000",
+  "011111111111111111111110",
+  "012222222222222222222210",
+  "012233333333333333322210",
+  "012233333333333333333210",
+  "012222223222222332222210",
+  "012222222111111222111210",
+  "012222222111111222101210",
+  "012222222110011221010110",
+  "012222222211122222121210",
+  "012222222101212222222210",
+  "012222222212101222222210",
+  "011222222221111122222210",
+  "011122122211111112122210",
+  "011111011111101111011110",
+  "011111101111111111101110",
+  "011111111111111111111110",
+  "000000000000000000000000",
+  "000000000000000000000000",
+  "000000000000000000000000",
+  "000000000000000000000000",
+  "011111111111011111111000",
+  "001111111110001111111000",
+  "000000000000000000000000"
+ ],
+ "heightStep": 0.5,
+ "fallDamagePerLevel": 6
+}

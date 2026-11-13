@@ -1,0 +1,203 @@
+{
+ "id": "rs_03",
+ "name": "フレイズ町",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "spawn": {
+  "x": 13,
+  "z": 21,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 11713215,
+  "fogNear": 22,
+  "fogFar": 75,
+  "visibility": 0.9,
+  "skyColor": 9018045
+ },
+ "legend": {
+  "W": "city_wall",
+  "S": "shop_building",
+  "d": "shop_door",
+  "J": "temple_building",
+  "D": "temple_door",
+  "H": "brick_house",
+  "=": "paved_road",
+  "F": "plaza_fountain",
+  "T": "tree",
+  "f": "flower_bed",
+  "v": "flower_bed_blue",
+  "2": "portal",
+  "q": "item_shop_sign",
+  "c": "church_sign",
+  "p": "plaza_stone",
+  "a": "outhouse",
+  "w": "water",
+  "b": "wood_bridge",
+  "I": "inn_building",
+  "N": "inn_door",
+  "M": "pub_sign",
+  "G": "gate_village"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WTpppppppwppppppppppppppppTW",
+  "WppppppppwpppppppppppppppppW",
+  "WppSSSSppwppppppppppJJJJpppW",
+  "WppSSSSppwppppppppppJJJJpppW",
+  "WppSdSSppwppppppppppJDJJpppW",
+  "Wppp==q=fb=======vvc====pppW",
+  "Wppp=====b==============pppW",
+  "WppppppppwTp====pppppppppppW",
+  "Wppppppppwpp====pppppppppppW",
+  "Wppppppppwpp====pppppppppppW",
+  "Wppppppppwpp=F==pppppppppppW",
+  "Wppppppppbpp====pppppppppppW",
+  "Wppppppppbpp====pTpppppppppW",
+  "Wppppppppwpp====pppppppppppW",
+  "WppHHHHppwpp====ppppIIIIpppW",
+  "WpaHHHHppwpp====ppppIIIIappW",
+  "WppHHHHppwpp====ppppINIIpppW",
+  "Wppppppppwpp====ppppppMppppW",
+  "Wppppppppbpp====pppppppppppW",
+  "Wppppppppbpp====pppppppppppW",
+  "Wppppppppwpp====pppppppppppW",
+  "WTpppppppwpp====ppppppppppTW",
+  "WWWWWWWWWWWWWGGWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "town_man",
+   "x": 10,
+   "z": 12
+  },
+  {
+   "id": "town_woman",
+   "x": 17,
+   "z": 9
+  },
+  {
+   "id": "town_boy",
+   "x": 8,
+   "z": 18
+  },
+  {
+   "id": "town_old_woman",
+   "x": 22,
+   "z": 12
+  },
+  {
+   "id": "child_girl",
+   "x": 12,
+   "z": 15
+  },
+  {
+   "id": "cat_walk",
+   "x": 7,
+   "z": 8
+  },
+  {
+   "id": "cat_walk_tail",
+   "x": 20,
+   "z": 20
+  },
+  {
+   "id": "black_cat_walk",
+   "x": 11,
+   "z": 6
+  },
+  {
+   "id": "cat_sleep",
+   "x": 21,
+   "z": 7
+  }
+ ],
+ "links": {
+  "4,5": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop"
+   },
+   "message": "道具屋に入る",
+   "back": {
+    "x": 4,
+    "z": 6,
+    "angle": 3.14159
+   },
+   "icon": "itemShopIcon"
+  },
+  "21,5": {
+   "nextMap": "temple_town",
+   "message": "神殿に入る",
+   "back": {
+    "x": 21,
+    "z": 6,
+    "angle": 3.14159
+   },
+   "icon": "templeIcon"
+  },
+  "21,17": {
+   "nextMap": "town_pub",
+   "message": "パブに入る",
+   "icon": "barIcon",
+   "back": {
+    "x": 21,
+    "z": 18,
+    "angle": 3.14159
+   }
+  },
+  "13,23": {
+   "nextMap": "w_09_08",
+   "message": "フレイズ町の外へ",
+   "spawn": {
+    "x": 59,
+    "z": 9,
+    "angle": -1.570795
+   }
+  },
+  "14,23": {
+   "nextMap": "w_09_08",
+   "message": "フレイズ町の外へ",
+   "spawn": {
+    "x": 59,
+    "z": 10,
+    "angle": -1.570795
+   }
+  }
+ },
+ "heights": [
+  "0000000000000000000000000000",
+  "0111111110111111111111111110",
+  "0122222210122222222222222210",
+  "0121111210122222222211112210",
+  "0121111210122222222211112210",
+  "0121011210122222222110112210",
+  "0122110110122222221011223210",
+  "0122221210122222222122333210",
+  "0111112210122222222222233210",
+  "0111111110122222222222222210",
+  "0111111110122122222222222210",
+  "0111111110121012222222222210",
+  "0111111110122122222222222210",
+  "0111111110112222222222222210",
+  "0111111110112212222222222210",
+  "0111111110111111112211112210",
+  "0111111110111111111211112210",
+  "0111111110111111111110112210",
+  "0111111110111111111111012210",
+  "0111111110111111111111122210",
+  "0111111110111111111111222210",
+  "0111111110111111111111222210",
+  "0111111110111111111111111110",
+  "0000000000000110000000000000"
+ ],
+ "heightStep": 0.5,
+ "fallDamagePerLevel": 6,
+ "decorFloor": "cobblestone"
+}

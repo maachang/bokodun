@@ -32,6 +32,7 @@ import mansion_keep as MK
 import guild_g as GG
 import temple_b as TPB
 import roads
+import roadside as RS
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
 
 from world_consts import BIOME_FLOOR, BIOME_NAME, CH36, DARK_FOREST_ENV, ENV_FROM, FLOOR, HEIGHT_STEP, LEGEND, MAPS, ROAD_SIGNS, ROAD_TOWNS, ROOT, SOLID_CH, START_TOWN, TOWN_HH, TOWN_HW, TOWN_LEGEND_KEYS, TOWN_NAME, TOWN_RANK, TOWN_SIGN_CH, TOWN_SIZE, TROPICAL_ENV, town_gate_tiles   # noqa: F401（世界の生成の定数: パス・凡例・地面の文字・環境・街の名前と大きさ・街道の街（gen_world.py と world_tiles.py が使う））
@@ -230,12 +231,18 @@ def main():
             signs = {f'{x - i * MESH},{y - j * MESH}': msg for (y, x), msg in ROAD_SIGNS.items() if y // MESH == j and x // MESH == i}
             if signs: m['signs'] = signs   # 街道の道しるべ（マスごとの立て札の文章）
             tl, tn = town_outer_extras(t, j, i)
-            if tl: m['links'] = tl; m['npcs'] = tn
+            rl, rn = RS.outer_extras(j, i)   # 道沿いの村・町・宿場の門
+            tl, tn = {**tl, **rl}, tn + rn
+            if tl: m['links'] = tl
+            if tn: m['npcs'] = tn
             write_ids_map(m, os.path.join(MAPS, mid + '.json'))
             grid[j][i] = mid
             info[mid] = dict(row=j, col=i, dom=dom, sea=sea_frac, grass=counts[GRASS] / max(1, int(L.sum())), land=int(L.sum()))
     city = json.load(open(os.path.join(MAPS, 'city.json'), encoding='utf-8'))
     gen_towns(t, city['legend'], city['environment'], envs[SNOW], envs[DESERT])
+    for p in RS.PLACED:   # 道沿いの村・町・宿場の中（rs_番号）
+        rm = RS.build_inner(p, envs, envs[SNOW])
+        json.dump(rm, open(os.path.join(MAPS, rm['id'] + '.json'), 'w', encoding='utf-8'), ensure_ascii=False, indent=1)
     # 最初のマップ: 島の中心に近く、ほとんどが陸で、草原が多いメッシュ
     # ゲーム開始は、最初の街（START_TOWN）の門の前。その街の外のマップを start にする
     start = town_outer_id(next(site for site in t['towns'] if site['id'] == START_TOWN))

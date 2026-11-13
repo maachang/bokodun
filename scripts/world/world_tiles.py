@@ -2,6 +2,7 @@
 from types import SimpleNamespace
 import os
 import numpy as np
+import roadside
 import terrain as T
 import roads
 from terrain import W, H, GW, GH, MESH, SEA, SNOW, CONIFER, FOREST, GRASS, DESERT, ROCK, TROPICAL, MINES, MINE_R
@@ -567,6 +568,7 @@ def build_tiles(t):
     _tiles_mineEntrances(g)
     _tiles_towns(g)
     _tiles_roads(g)
+    roadside.place(g)   # 道沿いの村・町・宿場の外観（街道ができた後。roadside.py）
     _tiles_seams(g)
     _tiles_trails(g)
 

@@ -1,0 +1,215 @@
+{
+ "id": "rs_08",
+ "name": "シルヴァノ宿場",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "spawn": {
+  "x": 7,
+  "z": 17,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "grass",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 12373460,
+  "fogNear": 22,
+  "fogFar": 80,
+  "visibility": 0.9,
+  "skyColor": 9683955
+ },
+ "legend": {
+  "#": "wooden_fence",
+  "H": "rock_house",
+  "D": "dirt_road",
+  "C": "cobblestone_path",
+  "T": "tree",
+  "O": "mossy_boulder",
+  "N": "wooden_signpost",
+  "~": "water_shallow",
+  "P": "water",
+  "=": "wood_bridge",
+  "2": "portal",
+  "W": "wooden_wall",
+  "F": "wood_floor",
+  "u": "rug",
+  "d": "wooden_door",
+  "t": "table",
+  "h": "chair",
+  "e": "bed",
+  "k": "bookshelf",
+  "g": "cupboard",
+  "s": "hearth",
+  "o": "stove",
+  "f": "flower_bed",
+  "v": "flower_bed_blue",
+  "x": "meadow_grass",
+  "X": "road_weed",
+  "y": "roadside_flowers",
+  "Q": "item_shop_sign",
+  "J": "temple_building",
+  "A": "temple_door",
+  "c": "church_sign",
+  "Y": "well",
+  "a": "outhouse",
+  "b": "wooden_house_window",
+  "M": "pub_sign",
+  "K": "inn_sign",
+  "Z": "inn_guide_sign",
+  "G": "gate_rock"
+ },
+ "enemies": {},
+ "layout": [
+  "####################",
+  "#000000000000000XXx#",
+  "#00T0000y000T00HHX0#",
+  "#00000x00X00000HH0a#",
+  "#000fv0000vf000vf00#",
+  "#0000000000000000y0#",
+  "#00x0HbHHbH0X0HHH00#",
+  "#0000bHHHHba00HdH00#",
+  "#0000HbHHbH000K0M0a#",
+  "#000fv0CC0vf0000000#",
+  "#yx000NDD00000y0Tx0#",
+  "#T00x00DDZYx00T00x0#",
+  "#DDDDDDDDDDDDDDDDDD#",
+  "#DDDDDDDDDDDDDDDDDD#",
+  "#xQ0yy0DDN00x0c0000#",
+  "#0HdH0xDD0xXX0JAJ00#",
+  "#0HHH00DD0XXX0JJJ00#",
+  "#y00x00DD000y0x00xx#",
+  "#000000DD0000000XX0#",
+  "######WGGW##########"
+ ],
+ "npcs": [
+  {
+   "id": "beast_a",
+   "x": 12,
+   "z": 11
+  },
+  {
+   "id": "beast_f_c",
+   "x": 6,
+   "z": 14
+  },
+  {
+   "id": "dwarf_man",
+   "x": 16,
+   "z": 14
+  },
+  {
+   "id": "beast_c",
+   "x": 1,
+   "z": 16
+  },
+  {
+   "id": "beast_d",
+   "x": 10,
+   "z": 10
+  },
+  {
+   "id": "dwarf_woman",
+   "x": 17,
+   "z": 6
+  },
+  {
+   "id": "cat_walk",
+   "x": 3,
+   "z": 6
+  },
+  {
+   "id": "cat_walk_tail",
+   "x": 13,
+   "z": 4
+  },
+  {
+   "id": "black_cat_walk",
+   "x": 8,
+   "z": 4
+  },
+  {
+   "id": "cat_sleep",
+   "x": 11,
+   "z": 15
+  }
+ ],
+ "links": {
+  "3,15": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop"
+   },
+   "message": "道具屋に入る",
+   "back": {
+    "x": 3,
+    "z": 14,
+    "angle": 0
+   },
+   "icon": "itemShopIcon"
+  },
+  "15,15": {
+   "nextMap": "temple_village",
+   "message": "神殿に入る",
+   "back": {
+    "x": 15,
+    "z": 14,
+    "angle": 0
+   },
+   "icon": "templeIcon"
+  },
+  "15,7": {
+   "nextMap": "village_pub",
+   "message": "宿屋・酒場に入る",
+   "icon": "barIcon",
+   "back": {
+    "x": 15,
+    "z": 8,
+    "angle": 3.14159
+   }
+  },
+  "7,19": {
+   "nextMap": "w_09_15",
+   "message": "シルヴァノ宿場の外へ",
+   "spawn": {
+    "x": 4,
+    "z": 18,
+    "angle": 1.570795
+   }
+  },
+  "8,19": {
+   "nextMap": "w_09_15",
+   "message": "シルヴァノ宿場の外へ",
+   "spawn": {
+    "x": 4,
+    "z": 19,
+    "angle": 1.570795
+   }
+  }
+ },
+ "heights": [
+  "00000000000000000000",
+  "11111111111111111110",
+  "22222222222222222210",
+  "33333333333333322210",
+  "33333333333333333210",
+  "22223222222332222210",
+  "22222111111222111210",
+  "22222111111222101210",
+  "22222110011221010110",
+  "22222211122222121210",
+  "22222101212222222210",
+  "22222212101222222210",
+  "22222221111122222210",
+  "22122211111112122210",
+  "11011111101111011110",
+  "11101111111111101110",
+  "11111111111111111110",
+  "11111111011111111000",
+  "11111110001111111000",
+  "00000000000000000000"
+ ],
+ "heightStep": 0.5,
+ "fallDamagePerLevel": 6
+}
