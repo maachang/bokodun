@@ -163,6 +163,10 @@ def _angle(f):
     return {(-1, 0): 0, (0, 1): -1.570795, (1, 0): 3.14159, (0, -1): 1.570795}[tuple(f)]
 
 
+# 国ごとの中の部屋（A 雪国は暖炉つきの店・宿。F 獣王国は獣人の道具屋・宿。書いていない国は、サンプルのまま）。town_a.py（_A_ROOM）・town_d.py（FACILITIES_F）と同じ
+ROOMS = {'a': {'shop': 'shop_a', 'village_pub': 'city_inn_a', 'town_pub': 'city_inn_a'}, 'f': {'village_pub': 'city_inn_f', 'town_pub': 'city_inn_f'}}
+SHOP_ID = {'f': 'item_shop_f'}   # 道具屋の品（F は獣人の道具屋）
+
 NPC_SKIN = {
     'a': {'villager_man': 'snow_man', 'villager_woman': 'snow_woman', 'child_boy': 'snow_boy', 'child_girl': 'snow_girl', 'elder_man': 'snow_old_man', 'elder_woman': 'snow_old_woman', 'merchant_man': 'snow_man', 'merchant_woman': 'snow_woman',
           'town_man': 'snow_man', 'town_woman': 'snow_woman', 'town_boy': 'snow_boy', 'town_old_woman': 'snow_old_woman', 'town_old_man': 'snow_old_man', 'town_middle_man': 'snow_man', 'town_middle_woman': 'snow_woman', 'town_girl': 'snow_girl'},
@@ -220,6 +224,9 @@ def build_inner(p, envs, snow_env):
     for row in lay:
         for x, c in enumerate(row):
             if c == '2': row[x] = 'x' if kind != '町' else 'p'
+    if country == 'f':   # F は神殿を置かない（town_d.py と同じ方針。神殿の品は道具屋 item_shop_f が売る）: 神殿の扉を建物の壁にして、出入口を外す
+        for k in [k for k, v in links.items() if v['nextMap'].startswith('temple')]:
+            x, y = map(int, k.split(',')); lay[y][x] = 'J'; del links[k]
     for x in gx: lay[gy][x] = 'G'
     if kind != '町':   # 扉（G）は、壁にはさまれる向き（柵は壁として数えないので、両隣を木の壁にする）
         lay[gy][gx[0] - 1] = lay[gy][gx[1] + 1] = 'W'
@@ -232,6 +239,9 @@ def build_inner(p, envs, snow_env):
             if ch in legend: legend[ch] = look['8'] if ch == 'H' else legend[ch]
     if kind == '町' and '6' in look: legend['W'] = look['6']
     for n in npcs: n['id'] = NPC_SKIN.get(country, {}).get(n['id'], n['id'])
+    for v in links.values():   # 国ごとの中の部屋（店・宿）
+        v['nextMap'] = ROOMS.get(country, {}).get(v['nextMap'], v['nextMap'])
+        if v['nextMap'] in ('shop', 'shop_a') and country in SHOP_ID: v['params'] = dict(v['params'], shopId=SHOP_ID[country])
     for x in gx: links[f'{x},{gy}'] = {'nextMap': p['mesh'], 'message': f"{p['name']}の外へ"}
     m = {'id': p['inner'], 'name': f"{p['name']}", 'type': 'open', 'tileSize': 4, 'wallHeight': 4, 'spawn': spawn,
          'environment': dict(snow_env, floorType='snow', fogNear=24, fogFar=72) if country == 'a' else sm['environment'],

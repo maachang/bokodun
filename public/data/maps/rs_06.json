@@ -77,7 +77,7 @@
   "#DDDDDDDDDDDDDDDDDDDDDD#",
   "#DDDDDDDDDDDDDDDDDDDDDD#",
   "#0XX0xQ0yy0DDN00x0c0000#",
-  "#0HH00HdH0xDD0xXX0JAJ00#",
+  "#0HH00HdH0xDD0xXX0JJJ00#",
   "#0HH00HHH00DD0XXX0JJJ00#",
   "#~~~~~~~~~~==~~~~~~~~~~#",
   "#PPPPPPPPPP==PPPPPPPPPP#",
@@ -176,7 +176,7 @@
   "7,15": {
    "nextMap": "shop",
    "params": {
-    "shopId": "item_shop"
+    "shopId": "item_shop_f"
    },
    "message": "道具屋に入る",
    "back": {
@@ -186,18 +186,8 @@
    },
    "icon": "itemShopIcon"
   },
-  "19,15": {
-   "nextMap": "temple_village",
-   "message": "神殿に入る",
-   "back": {
-    "x": 19,
-    "z": 14,
-    "angle": 0
-   },
-   "icon": "templeIcon"
-  },
   "19,7": {
-   "nextMap": "village_pub",
+   "nextMap": "city_inn_f",
    "message": "宿屋・酒場に入る",
    "icon": "barIcon",
    "back": {
