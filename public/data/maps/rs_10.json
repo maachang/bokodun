@@ -42,7 +42,7 @@
   "I": "inn_building",
   "N": "inn_door",
   "M": "pub_sign",
-  "G": "gate_village"
+  "G": "gate_village_plain"
  },
  "enemies": {},
  "layout": [

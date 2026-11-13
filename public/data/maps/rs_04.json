@@ -58,7 +58,7 @@
   "M": "pub_sign",
   "K": "inn_sign",
   "Z": "inn_guide_sign",
-  "G": "gate_marble"
+  "G": "gate_marble_plain"
  },
  "enemies": {},
  "layout": [

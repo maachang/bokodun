@@ -27,6 +27,14 @@ GATE = {'村': ((11, 12), 23), '町': ((13, 14), 23), '宿場': ((7, 8), 19)}   
 GUARD = {'a': 'snow_gate_guard', 'b': 'guard_b', 'd': 'guard_spear', 'f': 'beast_soldier_kobold_gate'}   # 町の門の衛兵（書いていない国は guard_light）
 PLAZA = 2   # 道の端から門までの石畳の長さ
 
+CREST_GATES = {'gate_marble', 'gate_adobe', 'gate_wood', 'gate_white', 'gate_rock', 'gate_snow', 'gate_village', 'gate_lake', 'gate_mage'}   # 国の紋章の盾つきの門
+
+
+def plain_gate(name):
+    """道沿いの村・町・宿場の門: 国の紋章の盾は付けない（盾は主要な国 A〜J の街だけ。K は屋根。ユーザー指示 2026-11-13）→ 盾なしの門（<名前>_plain）"""
+    return name + '_plain' if name in CREST_GATES else name
+
+
 # 外のマップの文字（国ごとの素材）: 壁・門・家・石畳。ギリシャ文字（既存の文字と重ならない）
 _COUNTRIES = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k')
 _ELEMENTS = ('6', '7', '8', '9')
@@ -34,6 +42,7 @@ _DEFAULT = {'6': 'city_wall', '7': 'district_gate', '8': 'brick_house', '9': 'pl
 FENCE_CH = chr(0x3b1)
 CHAR = {(c, e): chr(0x3b2 + i * 4 + j) for i, c in enumerate(_COUNTRIES) for j, e in enumerate(_ELEMENTS)}
 LEGEND_EXTRA = {FENCE_CH: 'wooden_fence', **{ch: LOOK.get(c, {}).get(e, _DEFAULT[e]) for (c, e), ch in CHAR.items()}}
+LEGEND_EXTRA = {ch: (plain_gate(n) if n.startswith('gate_') else n) for ch, n in LEGEND_EXTRA.items()}
 SOLID_EXTRA = {FENCE_CH} | {ch for (c, e), ch in CHAR.items() if e != '9'}
 
 LEGEND.update(LEGEND_EXTRA); SOLID_CH.update(SOLID_EXTRA)   # 外のマップの凡例・通れない物体に、足す
@@ -216,7 +225,7 @@ def build_inner(p, envs, snow_env):
         lay[gy][gx[0] - 1] = lay[gy][gx[1] + 1] = 'W'
     layout = [''.join(r) for r in lay]
     legend = dict(sm['legend'])
-    legend['G'] = LOOK.get(country, {}).get('7', 'district_gate')
+    legend['G'] = plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))
     look = LOOK.get(country, {})
     if kind != '町' and '8' in look and country != 'd':   # 家の見た目（村・宿場）
         for ch in ('H', 'b'):
