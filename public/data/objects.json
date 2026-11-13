@@ -1115,6 +1115,12 @@
     "solid": false,
     "description": "次マップへのポータル"
   },
+  "village_entrance": {
+    "type": "gateway",
+    "lift": true,
+    "solid": false,
+    "description": "村の入口（柵の切れ目）。見えない移動のマス。歩いて入ると中のマップへ移る（青い枠の portal は使わない）"
+  },
   "wooden_fence": {
     "type": "wooden_fence",
     "texture": "woodenFence",

@@ -45,7 +45,7 @@
   "945": "wooden_fence",
   "965": "plaza_stone",
   "990": "wooden_house",
-  "991": "portal"
+  "991": "village_entrance"
  },
  "enemies": {},
  "heightStep": 0.5,

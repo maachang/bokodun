@@ -40,10 +40,10 @@ _COUNTRIES = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k')
 _ELEMENTS = ('6', '7', '8', '9')
 _DEFAULT = {'6': 'city_wall', '7': 'district_gate', '8': 'brick_house', '9': 'plaza_stone'}
 FENCE_CH = chr(0x3b1)
-PORTAL_CH = chr(0x3b2 + 45)   # 村の入口（見えない移動のマス。最初の村と同じ portal）
+PORTAL_CH = chr(0x3b2 + 45)   # 村の入口（見えない移動のマス gateway。青い枠の portal は外に出さない）
 WOOD_HOUSE_CH = chr(0x3b2 + 44)   # 村の家（最初に作った村 village.json と同じ木の家）
 CHAR = {(c, e): chr(0x3b2 + i * 4 + j) for i, c in enumerate(_COUNTRIES) for j, e in enumerate(_ELEMENTS)}
-LEGEND_EXTRA = {FENCE_CH: 'wooden_fence', WOOD_HOUSE_CH: 'wooden_house', PORTAL_CH: 'portal', **{ch: LOOK.get(c, {}).get(e, _DEFAULT[e]) for (c, e), ch in CHAR.items()}}
+LEGEND_EXTRA = {FENCE_CH: 'wooden_fence', WOOD_HOUSE_CH: 'wooden_house', PORTAL_CH: 'village_entrance', **{ch: LOOK.get(c, {}).get(e, _DEFAULT[e]) for (c, e), ch in CHAR.items()}}
 LEGEND_EXTRA = {ch: (plain_gate(n) if n.startswith('gate_') else n) for ch, n in LEGEND_EXTRA.items()}
 SOLID_EXTRA = {FENCE_CH, WOOD_HOUSE_CH} | {ch for (c, e), ch in CHAR.items() if e != '9'}
 
