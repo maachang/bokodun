@@ -93,6 +93,30 @@ def _region_ok(t, obj, geo, placed):
     return True
 
 
+def _village_houses(obj, geo):
+    """村の囲いの中に、木の家（2×2 マス）を、間を空けて並べる。門から奥へ通る道（門の 2 マス幅）をはさんで、左右に 3 軒ずつ（ユーザー提案 2026-11-14）"""
+    y0, y1, x0, x1 = geo['box']
+    (ay, ax), (by, bx) = geo['gate']
+    alongy = ay == by   # 門が行（横一列）に並ぶ＝奥行きは行方向
+    if alongy:
+        edge, inward = ay, (1 if ay == y0 else -1)
+        depth, lo, width = y1 - y0 + 1, x0, x1 - x0 + 1
+        lane = (min(ax, bx) - x0, max(ax, bx) - x0)
+    else:
+        edge, inward = ax, (1 if ax == x0 else -1)
+        depth, lo, width = x1 - x0 + 1, y0, y1 - y0 + 1
+        lane = (min(ay, by) - y0, max(ay, by) - y0)
+    lefts = (lane[0] - 2, lane[1] + 1)   # 道の左右の家の、幅方向の始まり（2 マス幅）
+    for d0 in range(1, depth - 2, 3):    # 奥行き 2 マスの家、間に 1 マス
+        if d0 + 1 > depth - 2: break
+        for w0 in lefts:
+            if w0 < 1 or w0 + 1 > width - 2: continue
+            for dd in (d0, d0 + 1):
+                for ww in (w0, w0 + 1):
+                    if alongy: obj[edge + inward * dd, lo + ww] = ord(WOOD_HOUSE_CH)
+                    else: obj[lo + ww, edge + inward * dd] = ord(WOOD_HOUSE_CH)
+
+
 def _paint(g, geo, kind, country, name):
     """外観を obj に置き、高さを道に合わせる"""
     obj, elev = g.obj, g.elev
@@ -105,10 +129,11 @@ def _paint(g, geo, kind, country, name):
     for y, x in geo['plaza']: elev[y, x] = base; obj[y, x] = ord(ch('9'))
     village = kind == '村'   # 村は、最初に作った村と同じ（木の柵・木の家・門なしの入口。国の素材は使わない。ユーザー指示 2026-11-14）
     wall = ch('6') if kind == '町' else (FENCE_CH if village else ch('8'))   # 村・宿場の外周は、家（壁として数える。扉は壁にはさまれる）
-    obj[y0:y1 + 1, x0:x1 + 1] = ord(WOOD_HOUSE_CH if village else ch('8'))
+    obj[y0:y1 + 1, x0:x1 + 1] = ord('0' if village else ch('8'))
     for y in range(y0, y1 + 1):
         for x in range(x0, x1 + 1):
             if y in (y0, y1) or x in (x0, x1): obj[y, x] = ord(wall)
+    if village: _village_houses(obj, geo)
     for y, x in geo['gate']: obj[y, x] = ord(PORTAL_CH) if village else ord(ch('7')); elev[y, x] = base
     sy, sx = geo['sign']; obj[sy, sx] = ord(roads.SIGN_CH); elev[sy, sx] = base
 
@@ -240,7 +265,7 @@ def build_inner(p, envs, snow_env):
         lay[gy][gx[0] - 1] = lay[gy][gx[1] + 1] = 'W'
     layout = [''.join(r) for r in lay]
     legend = dict(sm['legend'])
-    legend['G'] = 'portal' if kind == '村' else plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))   # 村は門なしの入口（最初の村と同じ）
+    legend['G'] = 'village_entrance' if kind == '村' else plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))   # 村は門なしの入口（最初の村と同じ）
     look = LOOK.get(country, {})
     if kind == '宿場' and '8' in look and country != 'd':   # 家の見た目（村・宿場）
         for ch in ('H', 'b'):

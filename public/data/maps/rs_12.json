@@ -58,7 +58,7 @@
   "M": "pub_sign",
   "K": "inn_sign",
   "Z": "inn_guide_sign",
-  "G": "portal"
+  "G": "village_entrance"
  },
  "enemies": {},
  "layout": [
