@@ -8,12 +8,13 @@ import json
 import os
 import numpy as np
 import roadside_layout as RL
+import roadside_more as RM
 import roadside_water as RW
 import town_stalls as TS
 import roads
 import terrain as T
 from town_look import LOOK
-from world_consts import LEGEND, MAPS, SOLID_CH, TOWN_NAME, TOWN_SIGN_CH
+from world_consts import BRIDGE_NEAR, LEGEND, MAPS, SOLID_CH, TOWN_NAME, TOWN_SIGN_CH
 
 MESH_SIZE = 64   # 外のマップ 1 枚のマス数
 
@@ -24,6 +25,7 @@ SITES = [
     ('07', '村', 'e', 'ジャジル村', (775, 873)), ('08', '宿場', 'f', 'シルヴァノ宿場', (595, 961)), ('09', '村', 'd', 'ラクティ村', (679, 641)),
     ('10', '町', 'd', 'デノン町', (748, 562)), ('11', '町', 'e', 'ドゥマーニ町', (807, 598)), ('12', '村', 'b', 'カイタノ村', (545, 961)),
 ]
+SITES += RM.NEW_SITES   # 道に面さない町・村（13〜28 番。roadside_more.py）
 OUTER = {'村': (10, 8), '宿場': (10, 8), '町': (14, 10)}   # 外観の大きさ（道に沿う幅, 道から奥への深さ）
 INNER_SIZE = {'村': (24, 24), '町': (28, 24), '宿場': (20, 20)}   # 中のマップの大きさ
 GATE = {'村': ((11, 12), 23), '町': ((13, 14), 23), '宿場': ((7, 8), 19)}   # 中の門のマス（x の 2 つ, y）。南の壁の真ん中
@@ -82,10 +84,10 @@ def _geometry(rc, s, L, kind):
     gate = [at(k0, -1), at(k0, 0)]
     plaza = [at(k, p) for k in range(2, k0) for p in (-1, 0)]
     sign = at(k0 - 1, 2)
-    return dict(box=(min(ys_), max(ys_), min(xs_), max(xs_)), plaza=plaza, gate=gate, sign=sign, center=c)
+    return dict(box=(min(ys_), max(ys_), min(xs_), max(xs_)), plaza=plaza, gate=gate, sign=sign, center=c, lead=at(1, -1))
 
 
-def _region_ok(t, obj, geo, placed):
+def _region_ok(t, obj, geo, placed, strict=False):
     y0, y1, x0, x1 = geo['box']
     ys_, xs_ = range(y0 - 1, y1 + 2), range(x0 - 1, x1 + 2)
     pts = geo['plaza'] + [geo['sign']]
@@ -93,6 +95,10 @@ def _region_ok(t, obj, geo, placed):
     if len({y // MESH_SIZE for y in ally}) != 1 or len({x // MESH_SIZE for x in allx}) != 1: return False   # 1 枚の外のマップに収める
     if min(ally) % MESH_SIZE < 2 or max(ally) % MESH_SIZE > MESH_SIZE - 3 or min(allx) % MESH_SIZE < 2 or max(allx) % MESH_SIZE > MESH_SIZE - 3: return False
     if not _free_land(t, obj, ys_, xs_): return False
+    if strict and not all(_free_land(t, obj, [y], [x]) for y, x in geo['plaza'] + [geo['sign'], geo['center'], geo['lead']]): return False   # 門前の石畳・立て札・道の端も、陸（水の上は不可）
+    if strict:   # 13 番以降: 水（海・川・湖）の近く（外観の 3 マス以内）は、地面の高さが 1 以下の所だけ（水面 0 との段差を 1 以内にして、崖を残さない）
+        water = t['deep'] | t['shallow'] | t['lagoon'] | t['bridge'] | (t['river'] > 0) | ~t['land']
+        if water[y0 - 3:y1 + 4, x0 - 3:x1 + 4].any() and int(t['elev'][tuple(geo['plaza'][0])]) > 1: return False
     for q in placed:
         qy0, qy1, qx0, qx1 = q['box']
         if not (y1 + 6 < qy0 or qy1 + 6 < y0 or x1 + 6 < qx0 or qx1 + 6 < x0): return False
@@ -124,7 +130,7 @@ def _village_houses(obj, geo, sid):
                     else: obj[lo + ww, edge + inward * dd] = ord(WOOD_HOUSE_CH)
 
 
-def _paint(g, geo, kind, country, name, sid):
+def _paint(g, geo, kind, country, name, sid, sign=True):
     """外観を obj に置き、高さを道に合わせる"""
     obj, elev = g.obj, g.elev
     y0, y1, x0, x1 = geo['box']
@@ -142,7 +148,103 @@ def _paint(g, geo, kind, country, name, sid):
             if y in (y0, y1) or x in (x0, x1): obj[y, x] = ord(wall)
     if village: _village_houses(obj, geo, sid)
     for y, x in geo['gate']: obj[y, x] = ord(PORTAL_CH) if village else ord(ch('7')); elev[y, x] = base
-    sy, sx = geo['sign']; obj[sy, sx] = ord(roads.SIGN_CH); elev[sy, sx] = base
+    if sign: sy, sx = geo['sign']; obj[sy, sx] = ord(roads.SIGN_CH); elev[sy, sx] = base   # 立て札は、道に面した場所だけ（国属なしの場所は、道がないので、置かない）
+
+
+def _place_free(t, obj, kind, pt, centers, port, ok=None):
+    """指定の点 pt の近くの、空いた平らな所に置く（道沿いではない 13〜28 番）。戻り値: (rc, 向き, geo) または None。
+    門は、最寄りの街道がある向き（道を通す場合）か、陸が広い向きへ向ける"""
+    offs = sorted(((dy, dx) for dy in range(-30, 31) for dx in range(-30, 31)), key=lambda d: d[0] ** 2 + d[1] ** 2)
+    ny, nx = centers[int(np.argmin((centers[:, 0] - pt[0]) ** 2 + (centers[:, 1] - pt[1]) ** 2))]
+    for dy, dx in offs:
+        rc = (pt[0] + dy, pt[1] + dx)
+        dirs = sorted(((1, 0), (-1, 0), (0, 1), (0, -1)), key=lambda s: s[0] * (ny - rc[0]) + s[1] * (nx - rc[1]))   # 街道から遠ざかる向きが先（外観は、道の端から、街道と反対側に作る。街道と外観の間に、道の端が来る）
+        for s in dirs:
+            geo = _geometry(rc, s, 0, kind)
+            if _region_ok(t, obj, geo, PLACED, strict=True) and (ok is None or ok(geo)): return rc, s, geo   # ok: 道を通せるか
+    return None
+
+
+def _smooth_site(g, geo):
+    """外観のまわりの地形を、外観の高さ（box±1 と石畳は動かさない）に合わせて、隣どうしの段差 1 以下になだらかにつなぐ（斜面や海岸に置いても、まわりに崖を残さない）"""
+    t = g.t
+    pinned = T.box_mean((t['deep'] | t['shallow'] | t['lagoon'] | t['bridge'] | t['mtn_bridge'] | (t['river'] > 0) | ~t['land']).astype(np.float32), 2) > 0
+    y0, y1, x0, x1 = geo['box']
+    pinned[y0 - 1:y1 + 2, x0 - 1:x1 + 2] = True
+    for y, x in geo['plaza'] + [geo['sign']]: pinned[y, x] = True
+    roads.flatten(g.elev, [tuple(p) for p in geo['plaza']], pinned)
+
+
+def _keep_chars():
+    """道を置くとき、上書きしない物体の文字（街の壁・門・石畳・立て札・柵・家・入口）"""
+    return set('6789') | {TOWN_SIGN_CH, roads.SIGN_CH, FENCE_CH, WOOD_HOUSE_CH, PORTAL_CH} | set(CHAR.values())
+
+
+_PASS = []
+
+
+def _passable(t):
+    """道を通せる地形（通常の道と、山・雪を通る道の、どちらかで通れるマス）。1 回だけ求める"""
+    if _PASS: return _PASS[0]
+    water = (t['deep'] | t['shallow'] | t['bridge'] | t['lagoon']) & ~(t['river'] > 0)
+    ok = np.zeros(t['land'].shape, bool)
+    for avoid, extra in ((roads.AVOID, t['trail'] | t['frozen']), (roads.AVOID_ROUGH, np.zeros_like(t['land']))):
+        ok |= ~(~t['land'] | t['lake'] | np.isin(t['biome'], avoid) | extra | t['mtn_bridge'] | water | t['oasis']['pond'])
+    _PASS.append(ok)
+    return ok
+
+
+def _reachable(t, centers, geo):
+    """外観（壁・家と、壁の 1 マス外）を通れない所にして、街道から、道の端（geo['lead']）まで、たどりつけるか（経路探索は、届かない場所だと、とても遅いので、候補を選ぶとき、これで確かめる）"""
+    y0, y1, x0, x1 = geo['box']
+    ok = _passable(t).copy()
+    ok[y0 - 1:y1 + 2, x0 - 1:x1 + 2] = False
+    goal = tuple(geo['lead'])
+    if not ok[goal]: return False
+    cur = np.zeros(ok.shape, bool)
+    for c in centers: cur[int(c[0]), int(c[1])] = True
+    cur &= ok
+    while not cur[goal]:
+        n = cur.copy(); n[1:] |= cur[:-1]; n[:-1] |= cur[1:]; n[:, 1:] |= cur[:, :-1]; n[:, :-1] |= cur[:, 1:]
+        n &= ok
+        if (n == cur).all(): return False
+        cur = n
+    return True
+
+
+_PATHS = {}   # 候補ごとの経路探索の結果（道の端 → (path, rough)）。候補を選ぶときと、道を通すときで、同じ探索を 2 回しない
+
+
+def _find_road(t, centers, geo):
+    """最寄りの街道から、道の端（geo['lead']）までの道の中心線。戻り値: (path, rough) または (None, False)。外観のまわり（壁から 1 マス）は通らない"""
+    goal = tuple(geo['lead'])   # 道の端（外観の石畳の 1 マス手前。道の幅 3 の石畳が、壁に触れない）
+    if goal in _PATHS: return _PATHS[goal]
+    cl = [tuple(map(int, c)) for c in centers]
+    y0, y1, x0, x1 = geo['box']
+    blk = (slice(y0 - 1, y1 + 2), slice(x0 - 1, x1 + 2))   # 外観（壁・家）と、壁の 1 マス外を、一時的に通れない所にする
+    saved = t['lake'][blk].copy(); t['lake'][blk] = True
+    try:
+        path = roads.find_path(t, cl, goal, margin=60, reuse=set(cl))
+        if path is None: path, rough = roads.find_path(t, cl, goal, margin=100, reuse=set(cl), rough=True), True   # 山・坂・雪を通ってでも（地形は、道に沿って少し直す）
+        else: rough = False
+        _PATHS[goal] = (path, rough)
+        return path, rough
+    finally:
+        t['lake'][blk] = saved
+
+
+def _connect_road(t, obj, g, centers, geo):
+    """最寄りの街道から、門前の石畳の端まで、街道を通す。戻り値: 中心線を足した centers（numpy 配列）"""
+    keep = _keep_chars()
+    cl = [tuple(map(int, c)) for c in centers]
+    path, rough = _find_road(t, centers, geo)
+    assert path, f'街道 {geo["plaza"][0]}: 経路がない'
+    pinned = T.box_mean((t['deep'] | t['shallow'] | t['lagoon'] | t['bridge'] | t['mtn_bridge'] | (t['river'] > 0) | ~t['land']).astype(np.float32), 2) > 0
+    roads.flatten(g.elev, path, pinned)   # 道の高さを、なだらかな坂にそろえる（外観の石畳の高さと、道の高さの段差を残さない）
+    n_road, n_bridge = roads.paint(t, obj, g.elev, path, keep)
+    new = [c for c in path if c not in set(cl)]
+    print(f'  街道を通す {path[0]}→{geo["plaza"][0]}{"（山・坂を通る）" if rough else ""}: 中心線 {len(path)} マス（新しく {len(new)}）・石畳 {n_road}・石の橋 {n_bridge}')
+    return np.array(cl + new)
 
 
 def place(g):
@@ -151,26 +253,39 @@ def place(g):
     t, obj = g.t, g.obj
     centers = np.array(json.load(open(os.path.join(MAPS, '..', 'world_roads.json'), encoding='utf-8'))['centers'])
     PLACED.clear()
-    for sid, kind, country, name, (r0, c0) in SITES:
-        order = np.argsort((centers[:, 0] - r0) ** 2 + (centers[:, 1] - c0) ** 2)[:80]
+    for row in SITES:
+        sid, label, country, name, (r0, c0) = row[:5]
+        opt = row[5] if len(row) > 5 else {}
+        has_sign = len(row) <= 5 or bool(opt.get('road'))   # 立て札は、街道に面した場所だけ（道のない場所は、置かない）
+        kind = '町' if label == '港町' else label   # 港町は、町と同じ大きさ・作り（中に、水路と船を足す）
         done = None
-        for idx in order:
-            rc = (int(centers[idx][0]), int(centers[idx][1]))
-            for s in ((1, 0), (-1, 0), (0, 1), (0, -1)):
-                for L in (0, 3, -3, 6, -6):
-                    geo = _geometry(rc, s, L, kind)
-                    if _region_ok(t, obj, geo, PLACED): done = (rc, s, geo); break
+        if len(row) > 5:   # 13〜28 番: 指定の点の近くの、空いた平らな所（道沿いではない）
+            done = _place_free(t, obj, kind, (r0, c0), centers, label == '港町', (lambda geo: _reachable(t, centers, geo) and _find_road(t, centers, geo)[0] is not None) if opt.get('road') else None)
+        else:
+            order = np.argsort((centers[:, 0] - r0) ** 2 + (centers[:, 1] - c0) ** 2)[:80]
+            for idx in order:
+                rc = (int(centers[idx][0]), int(centers[idx][1]))
+                for s in ((1, 0), (-1, 0), (0, 1), (0, -1)):
+                    for L in (0, 3, -3, 6, -6):
+                        geo = _geometry(rc, s, L, kind)
+                        if _region_ok(t, obj, geo, PLACED): done = (rc, s, geo); break
+                    if done: break
                 if done: break
-            if done: break
         assert done, f'道沿いの {sid} {name}: 置ける場所がない（{r0},{c0} の近く）'
         rc, s, geo = done
-        _paint(g, geo, kind, country, name, sid)
+        _paint(g, geo, kind, country, name, sid, sign=has_sign)
+        if len(row) > 5: _smooth_site(g, geo)   # 13 番以降は、斜面・海岸にも置くので、まわりの地形をなだらかに
         my, mx = geo['gate'][0][0] // MESH_SIZE, geo['gate'][0][1] // MESH_SIZE
-        msg = f"【{kind}】{name}（{TOWN_NAME[country]}）"
-        ROAD_SIGNS[geo['sign']] = msg
-        PLACED.append(dict(id=sid, kind=kind, country=country, name=name, at=[r0, c0], road=list(rc), facing=[-s[0], -s[1]], gate=[list(p) for p in geo['gate']],
+        msg = f"【{label}】{name}" + ('' if opt.get('none') else f"（{TOWN_NAME[country]}）")
+        if opt.get('road'): centers = _connect_road(t, obj, g, centers, geo)   # 国属がある場所は、最寄りの街道から道を通す
+        if has_sign: ROAD_SIGNS[geo['sign']] = msg
+        PLACED.append(dict(id=sid, kind=kind, label=label, none=bool(opt.get('none')), port=label == '港町', country=country, name=name, at=[r0, c0], road=list(rc), facing=[-s[0], -s[1]], gate=[list(p) for p in geo['gate']],
                            box=list(geo['box']), sign=list(geo['sign']), plaza=[list(p) for p in geo['plaza']], mesh=f'w_{my:02d}_{mx:02d}', inner=f'rs_{sid}'))
         print(f'道沿い {sid} {kind} {name}: 道 {rc}・向き {s}・{geo["box"]}')
+    roads.merge_parallel(t, obj, g.elev, _keep_chars())   # 13 番以降で通した道が、近くの道と並走する所は、1 本に統合する
+    near_stone = T.box_mean((obj == ord(roads.BRIDGE_CH)).astype(np.float32), BRIDGE_NEAR) > 0   # 新しい石の橋のそばの、もとからある木の橋は、無効（二重の橋にしない。world_tiles と同じ）
+    old = near_stone & (obj == ord('Z'))
+    obj[old] = ord('Q'); t['bridge'] = t['bridge'] & ~old
     roads.fix_steps(g.elev, obj, t)
     with open(os.path.join(MAPS, '..', 'world_roadside.json'), 'w', encoding='utf-8') as fp:
         json.dump({'note': '道沿いの村・町・宿場（世界のマス [行, 列]）。gate: 中への門 2 マス・facing: 門が向く向き（行, 列）・road: 面した道の中心・mesh: 外のマップ・inner: 中のマップ', 'sites': PLACED}, fp, ensure_ascii=False, indent=1)
@@ -213,6 +328,14 @@ NPC_SKIN = {
     'f': {'villager_man': 'dwarf_man', 'villager_woman': 'beast_f_b', 'child_boy': 'beast_c', 'child_girl': 'beast_d', 'elder_man': 'dwarf_man', 'elder_woman': 'dwarf_woman', 'merchant_man': 'beast_a', 'merchant_woman': 'beast_f_c',
           'town_man': 'dwarf_man', 'town_woman': 'dwarf_woman', 'town_boy': 'beast_c', 'town_old_woman': 'dwarf_woman', 'town_old_man': 'dwarf_man', 'town_middle_man': 'beast_a', 'town_middle_woman': 'beast_f_a', 'town_girl': 'beast_d'},
 }
+
+
+# 13〜28 番の、場所ごとの組み合わせ・国ごとの部屋・住民を、表に足す（roadside_more.py）
+HOUSE_PLAN.update(RM.HOUSE_PLAN)
+RL.VILLAGE_PLAN.update(RM.VILLAGE_PLAN); RL.TOWN_PLAN.update(RM.TOWN_PLAN)
+RL.WEAPON_SHOP_VILLAGES |= RM.WEAPON_SHOP_VILLAGES; RL.WEAPON_SHOP_TOWNS |= RM.WEAPON_SHOP_TOWNS
+RW.TOWN_RIVER.update(RM.TOWN_RIVER); RW.TOWN_PLAZA.update(RM.TOWN_PLAZA); RW.VILLAGE_WATER.update(RM.VILLAGE_WATER)
+ROOMS.update(RM.ROOMS); SHOP_ID.update(RM.SHOP_ID); GUARD.update(RM.GUARD); NPC_SKIN.update(RM.NPC_SKIN)
 
 
 def _sample(name):
@@ -280,6 +403,7 @@ def build_inner(p, envs, snow_env):
             links[f'{mx},{my}'] = {'nextMap': 'mansion_baron', 'message': '町長（男爵）の屋敷に入る', 'back': {'x': mx, 'z': my + 1, 'angle': 3.14159}}
         if kind == '村' and p['id'] in RL.WEAPON_SHOP_VILLAGES: RL.add_weapon_shop(lay, hts, links)   # 村の武器屋（村によって、ある・ない）
         if kind == '町' and p['id'] in RL.WEAPON_SHOP_TOWNS: RL.add_town_weapon_shop(lay, hts, links)   # 町の武器屋（町によって、ある・ない）
+        if p.get('port'): RM.port_decor(lay, extra_legend)   # 港町: 水路に船・岸に荷
         RL.nudge_npcs(lay, npcs)
         if plan[1]: RL.mirror(lay, hts, links, npcs, spawn)
     gx, gy = GATE[kind]
