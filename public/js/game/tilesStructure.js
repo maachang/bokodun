@@ -157,50 +157,8 @@ export const tilesStructure = {
     },
 
     wooden_fence(t) {
-        const { c, char, cols, mapData, objDef, r, rows, tileSize, wx, wz } = t;
-        // Wooden Picket Fence surrounding village & paths
-        // Check adjacent neighbors to see which sides need fence panels
-        const isNorthFence = (r > 0 && mapData.layout[r - 1][c] === char);
-        const isSouthFence = (r < rows - 1 && mapData.layout[r + 1][c] === char);
-        const isWestFence = (c > 0 && mapData.layout[r][c - 1] === char);
-        const isEastFence = (c < cols - 1 && mapData.layout[r][c + 1] === char);
-
-        const fenceMat = new THREE.MeshLambertMaterial({
-            map: this.textures.woodenFence,
-            transparent: true,
-            alphaTest: 0.15,
-            side: THREE.DoubleSide
-        });
-
-        const fenceH = objDef.height || 2.4;
-        const fenceW = tileSize * 1.05;
-
-        // Center square fence post
-        const postGeo = new THREE.BoxGeometry(0.35, fenceH * 1.08, 0.35);
-        const postMat = new THREE.MeshLambertMaterial({ map: this.textures.woodWall });
-        const postMesh = new THREE.Mesh(postGeo, postMat);
-        postMesh.position.set(wx, fenceH * 1.08 / 2, wz);
-        this.addStatic(postMesh);
-
-        // つながる方向ごとに、半分の板（中心から、そのマスのふちまで）だけを描く。角のマスは L 字・端は片側だけ（全幅の板を十字に交わらせると、角の先まで突き出して「#」に見える）。つながりのない 1 本は、従来どおり東西の板 1 枚
-        const halfW = tileSize / 2;
-        const addPanel = (dx, dz) => {
-            const fGeo = new THREE.PlaneGeometry(halfW, fenceH);
-            const fMesh = new THREE.Mesh(fGeo, fenceMat);
-            if (dz !== 0) fMesh.rotation.y = Math.PI / 2;   // 南北は、Z 方向に伸びる板
-            fMesh.position.set(wx + dx * halfW / 2, fenceH / 2, wz + dz * halfW / 2);
-            this.addStatic(fMesh);
-        };
-        if (!isNorthFence && !isSouthFence && !isWestFence && !isEastFence) {
-            const fGeo = new THREE.PlaneGeometry(fenceW, fenceH);
-            const fMesh = new THREE.Mesh(fGeo, fenceMat);
-            fMesh.position.set(wx, fenceH / 2, wz);
-            this.addStatic(fMesh);
-        }
-        if (isWestFence) addPanel(-1, 0);
-        if (isEastFence) addPanel(1, 0);
-        if (isNorthFence) addPanel(0, -1);
-        if (isSouthFence) addPanel(0, 1);
+        const { c, char, mapData, objDef, r, tileSize, visEnv, wx, wz } = t;
+        this.visualWoodenFence(objDef, wx, wz, r, c, char, visEnv);   // 見た目は共通の部品（隣のマップの先読みと同じ）
 
         if (objDef.solid) {
             // Full tile collision box to completely prevent slipping through between fence posts

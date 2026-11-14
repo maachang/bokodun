@@ -1864,7 +1864,7 @@ test('G: 世界樹のまわりを、柵で、「ロ」の形に隙間なく囲�
 
 test('木の柵の描画: つながる方向ごとに半分の板だけを描く（角が L 字・端が片側。全幅の板を十字に交わらせて、角の先が突き出す「#」にしない）', () => {
     const game = gameSource();
-    const i = game.indexOf('    wooden_fence(t) {');
+    const i = game.indexOf('    visualWoodenFence(objDef');   // 見た目は共通の部品（今のマップと隣の先読みで共通）
     const body = game.slice(i, game.indexOf('\n    },', i));
     assert.ok(body.includes('const addPanel = (dx, dz)') && body.includes('PlaneGeometry(halfW, fenceH)'), '半分の板');
     for (const dir of ['addPanel(-1, 0)', 'addPanel(1, 0)', 'addPanel(0, -1)', 'addPanel(0, 1)']) assert.ok(body.includes(dir), dir);

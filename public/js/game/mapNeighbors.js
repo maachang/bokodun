@@ -211,6 +211,7 @@ export const mapNeighborMethods = {
                 this.cullSprites.push(sprite);
             }
         } else if (def.type === 'block') { nEnv.y = y0; this.visualBlock(def, wx, wz, r, c, nEnv);   // 壁・家（街の外観など）: 今のマップと同じ見た目
+        } else if (def.type === 'wooden_fence') { nEnv.y = y0; this.visualWoodenFence(def, wx, wz, r, c, nEnv.charAt(c, r), nEnv);   // 木の柵: 今のマップと同じ見た目（当たり判定は今のマップだけ）
         } else if (def.type === 'signpost') { nEnv.y = y0; this.visualSignpost(def, wx, wz, nEnv);
         } else if (def.type === 'torch_stand') { nEnv.y = y0; this.visualTorch(def, wx, wz, r, c, nEnv);
         } else if (def.type === 'door') { nEnv.y = y0; this.visualDoor(def, wx, wz, r, c, nEnv);   // 扉・門: 閉じたまま（開閉・当たり判定は今のマップだけ）

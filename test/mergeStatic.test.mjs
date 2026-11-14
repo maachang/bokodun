@@ -48,7 +48,8 @@ test('描画の負荷: 動かない部品は、同じ材質ごとに1つのメ�
 test('描画の負荷: 床・天井・壁・家具などの追加は addStatic を通す（まとめる対象）。扉・罠・水・宝箱は通さない', () => {
     const src = gameSource();
     assert.match(src, /this\.mergeStaticMeshes\(\);/);
-    for (const name of ['cellMesh', 'tileMesh', 'stepMesh', 'postMesh']) assert.match(src, new RegExp(`this\\.addStatic\\(${name}\\)`), name);
+    for (const name of ['cellMesh', 'tileMesh', 'stepMesh']) assert.match(src, new RegExp(`this\\.addStatic\\(${name}\\)`), name);
+    assert.match(src, /env\.add\(postMesh, true\)/, 'postMesh（柵の支柱。共通の部品 visualWoodenFence が、静的として足す）');
     // 壁・家は、見た目の共通部品（visualBlock）の中で、env.add(..., true)（= addStatic と同じ）を通す
     for (const name of ['wall', 'house', 'roofMesh']) assert.match(src, new RegExp(`env\\.add\\(${name}, true\\)`), name);
     const doorBlock = src.slice(src.indexOf("visualDoor(objDef, wx, wz, r, c, env) {"), src.indexOf("visualDoor(objDef, wx, wz, r, c, env) {") + 4500);
