@@ -7,6 +7,7 @@
 import json
 import os
 import numpy as np
+import roadside_layout as RL
 import roads
 import terrain as T
 from town_look import LOOK
@@ -25,8 +26,9 @@ OUTER = {'村': (10, 8), '宿場': (10, 8), '町': (14, 10)}   # 外観の大き
 INNER_SIZE = {'村': (24, 24), '町': (28, 24), '宿場': (20, 20)}   # 中のマップの大きさ
 GATE = {'村': ((11, 12), 23), '町': ((13, 14), 23), '宿場': ((7, 8), 19)}   # 中の門のマス（x の 2 つ, y）。南の壁の真ん中
 GUARD = {'a': 'snow_gate_guard', 'b': 'guard_b', 'd': 'guard_spear', 'f': 'beast_soldier_kobold_gate'}   # 町の門の衛兵（書いていない国は guard_light）
-MAYOR_DOOR = (4, 17)   # 町長の家の扉（町のサンプル town.json の、西の家 H の南の壁）
 MAYOR_DOOR_CH = 'm'
+# 村・宿場の外の柵の中の家の並び: 場所 id → (左の列, 右の列)。two=小さな家 2 軒・long=細長い家 1 軒・front=手前だけ・back=奥だけ
+HOUSE_PLAN = {'01': ('two', 'two'), '04': ('long', 'two'), '06': ('two', 'back'), '07': ('front', 'two'), '09': ('two', 'long'), '12': ('long', 'back'), '08': ('two', 'front')}
 PLAZA = 2   # 道の端から門までの石畳の長さ
 
 CREST_GATES = {'gate_marble', 'gate_adobe', 'gate_wood', 'gate_white', 'gate_rock', 'gate_snow', 'gate_village', 'gate_lake', 'gate_mage'}   # 国の紋章の盾つきの門
@@ -95,8 +97,8 @@ def _region_ok(t, obj, geo, placed):
     return True
 
 
-def _village_houses(obj, geo):
-    """村の囲いの中に、木の家（2×2 マス）を、間を空けて並べる。門から奥へ通る道（門の 2 マス幅）をはさんで、左右に 3 軒ずつ（ユーザー提案 2026-11-14）"""
+def _village_houses(obj, geo, sid):
+    """村の囲いの中に、木の家（幅 2 マス）を、間を空けて並べる。門から奥へ通る道（門の 2 マス幅）をはさんで、左右の列に（ユーザー提案 2026-11-14）。家の数・並びは場所ごと（HOUSE_PLAN）"""
     y0, y1, x0, x1 = geo['box']
     (ay, ax), (by, bx) = geo['gate']
     alongy = ay == by   # 門が行（横一列）に並ぶ＝奥行きは行方向
@@ -109,17 +111,18 @@ def _village_houses(obj, geo):
         depth, lo, width = x1 - x0 + 1, y0, y1 - y0 + 1
         lane = (min(ay, by) - y0, max(ay, by) - y0)
     lefts = (lane[0] - 2, lane[1] + 1)   # 道の左右の家の、幅方向の始まり（2 マス幅）
-    for d0 in range(1, depth - 2, 3):    # 奥行き 2 マスの家、間に 1 マス
-        if d0 + 1 > depth - 2: break
-        for w0 in lefts:
-            if w0 < 1 or w0 + 1 > width - 2: continue
-            for dd in (d0, d0 + 1):
+    spans = {'two': [(1, 2), (4, 5)], 'long': [(1, 5)], 'front': [(1, 2)], 'back': [(4, 5)]}   # 奥行きの範囲（扉の側の壁から数える）。two=小さな家 2 軒・long=細長い家 1 軒・front=手前だけ・back=奥だけ
+    for w0, opt in zip(lefts, HOUSE_PLAN.get(sid, ('two', 'two'))):   # 左右の列ごとに、家の並びを変える
+        if w0 < 1 or w0 + 1 > width - 2: continue
+        for a, b in spans[opt]:
+            if b > depth - 2: continue
+            for dd in range(a, b + 1):
                 for ww in (w0, w0 + 1):
                     if alongy: obj[edge + inward * dd, lo + ww] = ord(WOOD_HOUSE_CH)
                     else: obj[lo + ww, edge + inward * dd] = ord(WOOD_HOUSE_CH)
 
 
-def _paint(g, geo, kind, country, name):
+def _paint(g, geo, kind, country, name, sid):
     """外観を obj に置き、高さを道に合わせる"""
     obj, elev = g.obj, g.elev
     y0, y1, x0, x1 = geo['box']
@@ -135,7 +138,7 @@ def _paint(g, geo, kind, country, name):
     for y in range(y0, y1 + 1):
         for x in range(x0, x1 + 1):
             if y in (y0, y1) or x in (x0, x1): obj[y, x] = ord(wall)
-    if village: _village_houses(obj, geo)
+    if village: _village_houses(obj, geo, sid)
     for y, x in geo['gate']: obj[y, x] = ord(PORTAL_CH) if village else ord(ch('7')); elev[y, x] = base
     sy, sx = geo['sign']; obj[sy, sx] = ord(roads.SIGN_CH); elev[sy, sx] = base
 
@@ -159,7 +162,7 @@ def place(g):
             if done: break
         assert done, f'道沿いの {sid} {name}: 置ける場所がない（{r0},{c0} の近く）'
         rc, s, geo = done
-        _paint(g, geo, kind, country, name)
+        _paint(g, geo, kind, country, name, sid)
         my, mx = geo['gate'][0][0] // MESH_SIZE, geo['gate'][0][1] // MESH_SIZE
         msg = f"【{kind}】{name}（{TOWN_NAME[country]}）"
         ROAD_SIGNS[geo['sign']] = msg
@@ -253,6 +256,16 @@ def build_inner(p, envs, snow_env):
         npcs = [dict(n) for n in sm['npcs']]
         spawn = {'x': GATE[kind][0][0], 'z': 21, 'angle': 0}
     lay = [list(r) for r in layout]; hts = [list(r) for r in heights]
+    if kind != '宿場':   # 建物の並びを、場所ごとに変える（roadside_layout.py。手本のまま使い、建物の入れ替えと左右反転だけ）
+        plan = (RL.VILLAGE_PLAN if kind == '村' else RL.TOWN_PLAN)[p['id']]
+        mayor = RL.arrange(lay, hts, links, npcs, kind, p['id'])
+        if mayor:   # 町長の家: 貴族クラスの男爵が町長（村に村長がいるように。ユーザー指示 2026-11-14）。町長の家の区画の扉を付けて、男爵の屋敷（mansion_baron）へ
+            mx, my = mayor[0] + 1, mayor[1] + 2
+            assert lay[my][mx] == 'H' and lay[my + 1][mx] in 'p=', '町長の家の扉の場所'
+            lay[my][mx] = MAYOR_DOOR_CH
+            links[f'{mx},{my}'] = {'nextMap': 'mansion_baron', 'message': '町長（男爵）の屋敷に入る', 'back': {'x': mx, 'z': my + 1, 'angle': 3.14159}}
+        RL.nudge_npcs(lay, npcs)
+        if plan[1]: RL.mirror(lay, hts, links, npcs, spawn)
     gx, gy = GATE[kind]
     w, h = len(lay[0]), len(lay)
     if kind == '町':   # 道を、門まで（portal の '2' を除き、石畳 '=' で南の壁へ）
@@ -262,11 +275,6 @@ def build_inner(p, envs, snow_env):
     for row in lay:
         for x, c in enumerate(row):
             if c == '2': row[x] = 'x' if kind != '町' else 'p'
-    if kind == '町':   # 町長の家: 貴族クラスの男爵が町長（村に村長がいるように。ユーザー指示 2026-11-14）。家 H（3〜6, 15〜17）の南の壁に扉を付けて、男爵の屋敷（mansion_baron）へ
-        mx, my = MAYOR_DOOR
-        assert lay[my][mx - 1] == 'H' and lay[my][mx + 1] == 'H' and lay[my][mx] == 'H' and lay[my + 1][mx] == 'p', '町長の家の扉の場所'
-        lay[my][mx] = MAYOR_DOOR_CH
-        links[f'{mx},{my}'] = {'nextMap': 'mansion_baron', 'message': '町長（男爵）の屋敷に入る', 'back': {'x': mx, 'z': my + 1, 'angle': 3.14159}}
     if country == 'f':   # F は神殿を置かない（town_d.py と同じ方針。神殿の品は道具屋 item_shop_f が売る）: 神殿の扉を建物の壁にして、出入口を外す
         for k in [k for k, v in links.items() if v['nextMap'].startswith('temple')]:
             x, y = map(int, k.split(',')); lay[y][x] = 'J'; del links[k]

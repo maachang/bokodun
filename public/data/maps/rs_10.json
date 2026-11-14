@@ -5,7 +5,7 @@
  "tileSize": 4,
  "wallHeight": 4,
  "spawn": {
-  "x": 13,
+  "x": 14,
   "z": 21,
   "angle": 0
  },
@@ -48,117 +48,117 @@
  "enemies": {},
  "layout": [
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
-  "WTpppppppwppppppppppppppppTW",
-  "WppppppppwpppppppppppppppppW",
-  "WppSSSSppwppppppppppJJJJpppW",
-  "WppSSSSppwppppppppppJJJJpppW",
-  "WppSdSSppwppppppppppJDJJpppW",
-  "Wppp==q=fb=======vvc====pppW",
-  "Wppp=====b==============pppW",
-  "WppppppppwTp====pppppppppppW",
-  "Wppppppppwpp====pppppppppppW",
-  "Wppppppppwpp====pppppppppppW",
-  "Wppppppppwpp=F==pppppppppppW",
-  "Wppppppppbpp====pppppppppppW",
-  "Wppppppppbpp====pTpppppppppW",
-  "Wppppppppwpp====pppppppppppW",
-  "WppHHHHppwpp====ppppIIIIpppW",
-  "WpaHHHHppwpp====ppppIIIIappW",
-  "WppHmHHppwpp====ppppINIIpppW",
-  "Wppppppppwpp====ppppppMppppW",
-  "Wppppppppbpp====pppppppppppW",
-  "Wppppppppbpp====pppppppppppW",
-  "Wppppppppwpp====pppppppppppW",
-  "WTpppppppwpp====ppppppppppTW",
+  "WTppppppppppppppppwpppppppTW",
+  "WpppppppppppppppppwppppppppW",
+  "WpppSSSSppppppppppwppHHHHppW",
+  "WpppSSSSppppppppppwppHHHHppW",
+  "WpppSSdSppppppppppwppHHmHppW",
+  "Wpppq====vv=======bf====pppW",
+  "Wppp==============b=====pppW",
+  "Wppppppppppp====pTwppppppppW",
+  "Wppppppppppp====ppwppppppppW",
+  "Wppppppppppp====ppwppppppppW",
+  "Wppppppppppp==F=ppwppppppppW",
+  "Wppppppppppp====ppbppppppppW",
+  "WpppppppppTp====ppbppppppppW",
+  "Wppppppppppp====ppwppppppppW",
+  "WpppJJJJpppp====ppwppIIIIppW",
+  "WppaJJJJpppp====ppwppIIIIapW",
+  "WpppJJDJpppp====ppwppIINIppW",
+  "Wpppppppcppp====ppwpppMppppW",
+  "Wppppppppppp====ppbppppppppW",
+  "Wppppppppppp====ppbppppppppW",
+  "Wppppppppppp====ppwppppppppW",
+  "WTpppppppppp====ppwpppppppTW",
   "WWWWWWWWWWWWWGGWWWWWWWWWWWWW"
  ],
  "npcs": [
   {
    "id": "town_man",
-   "x": 10,
+   "x": 17,
    "z": 12
   },
   {
    "id": "town_woman",
-   "x": 17,
+   "x": 10,
    "z": 9
   },
   {
    "id": "town_boy",
-   "x": 8,
+   "x": 19,
    "z": 18
   },
   {
    "id": "town_old_woman",
-   "x": 22,
+   "x": 5,
    "z": 12
   },
   {
    "id": "child_girl",
-   "x": 12,
+   "x": 15,
    "z": 15
   },
   {
    "id": "cat_walk",
-   "x": 7,
+   "x": 20,
    "z": 8
   },
   {
    "id": "cat_walk_tail",
-   "x": 20,
+   "x": 7,
    "z": 20
   },
   {
    "id": "black_cat_walk",
-   "x": 11,
+   "x": 16,
    "z": 6
   },
   {
    "id": "cat_sleep",
-   "x": 21,
+   "x": 6,
    "z": 7
   }
  ],
  "links": {
-  "4,5": {
+  "6,5": {
    "nextMap": "shop",
    "params": {
     "shopId": "item_shop"
    },
    "message": "道具屋に入る",
    "back": {
-    "x": 4,
+    "x": 6,
     "z": 6,
     "angle": 3.14159
    },
    "icon": "itemShopIcon"
   },
-  "21,5": {
-   "nextMap": "temple_town",
-   "message": "神殿に入る",
-   "back": {
-    "x": 21,
-    "z": 6,
-    "angle": 3.14159
-   },
-   "icon": "templeIcon"
-  },
-  "21,17": {
+  "23,17": {
    "nextMap": "town_pub",
    "message": "パブに入る",
    "icon": "barIcon",
    "back": {
-    "x": 21,
+    "x": 23,
     "z": 18,
     "angle": 3.14159
    }
   },
-  "4,17": {
+  "6,17": {
+   "nextMap": "temple_town",
+   "message": "神殿に入る",
+   "back": {
+    "x": 6,
+    "z": 18,
+    "angle": 3.14159
+   },
+   "icon": "templeIcon"
+  },
+  "23,5": {
    "nextMap": "mansion_baron",
    "message": "町長（男爵）の屋敷に入る",
    "back": {
-    "x": 4,
-    "z": 18,
+    "x": 23,
+    "z": 6,
     "angle": 3.14159
    }
   },
@@ -183,28 +183,28 @@
  },
  "heights": [
   "0000000000000000000000000000",
-  "0111111110111111111111111110",
-  "0122222210122222222222222210",
-  "0121111210122222222211112210",
-  "0121111210122222222211112210",
-  "0121011210122222222110112210",
-  "0122110110122222221011223210",
-  "0122221210122222222122333210",
-  "0111112210122222222222233210",
-  "0111111110122222222222222210",
-  "0111111110122122222222222210",
-  "0111111110121012222222222210",
-  "0111111110122122222222222210",
-  "0111111110112222222222222210",
-  "0111111110112212222222222210",
-  "0111111110111111112211112210",
-  "0111111110111111111211112210",
-  "0111111110111111111110112210",
-  "0111111110111111111111012210",
-  "0111111110111111111111122210",
-  "0111111110111111111111222210",
-  "0111111110111111111111222210",
-  "0111111110111111111111111110",
+  "0111111111111111110111111110",
+  "0122222222222222210122222210",
+  "0122111122222222210121111210",
+  "0122111122222222210121111210",
+  "0122110112222222210121111210",
+  "0121010111222222210111111110",
+  "0123332212222222210121222210",
+  "0123322222222222210122111110",
+  "0122222222222222210111111110",
+  "0122222222222212210111111110",
+  "0122222222222101210111111110",
+  "0122222222222212210111111110",
+  "0122222222222222110111111110",
+  "0122222222222122110111111110",
+  "0122111122111111110111111110",
+  "0122111121111111110111111110",
+  "0122110111111111110111101110",
+  "0121110101111111110111001110",
+  "0122211111111111110111111110",
+  "0122221111111111110111111110",
+  "0122221111111111110111111110",
+  "0111111111111111110111111110",
   "0000000000000110000000000000"
  ],
  "heightStep": 0.5,

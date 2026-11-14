@@ -50,10 +50,10 @@
   "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
   "WTpppppppwppppppppppppppppTW",
   "WppppppppwpppppppppppppppppW",
-  "WppSSSSppwppppppppppJJJJpppW",
-  "WppSSSSppwppppppppppJJJJpppW",
-  "WppSdSSppwppppppppppJDJJpppW",
-  "Wppp==q=fb=======vvc====pppW",
+  "WppJJJJppwppppppppppIIIIpppW",
+  "WppJJJJppwppppppppppIIIIpppW",
+  "WppJDJJppwppppppppppINIIpppW",
+  "Wpcp====fb=======vv===M=pppW",
   "Wppp=====b==============pppW",
   "WppppppppwTp====pppppppppppW",
   "Wppppppppwpp====pppppppppppW",
@@ -62,10 +62,10 @@
   "Wppppppppbpp====pppppppppppW",
   "Wppppppppbpp====pTpppppppppW",
   "Wppppppppwpp====pppppppppppW",
-  "WppHHHHppwpp====ppppIIIIpppW",
-  "WpaHHHHppwpp====ppppIIIIappW",
-  "WppHmHHppwpp====ppppINIIpppW",
-  "Wppppppppwpp====ppppppMppppW",
+  "WppHHHHppwpp====ppppSSSSpppW",
+  "WpaHHHHppwpp====ppppSSSSappW",
+  "WppHmHHppwpp====ppppSdSSpppW",
+  "Wppppppppwpp====pppppppqpppW",
   "Wppppppppbpp====pppppppppppW",
   "Wppppppppbpp====pppppppppppW",
   "Wppppppppwpp====pppppppppppW",
@@ -121,37 +121,37 @@
  ],
  "links": {
   "4,5": {
+   "nextMap": "temple_town",
+   "message": "神殿に入る",
+   "back": {
+    "x": 4,
+    "z": 6,
+    "angle": 3.14159
+   },
+   "icon": "templeIcon"
+  },
+  "21,5": {
+   "nextMap": "town_pub",
+   "message": "パブに入る",
+   "icon": "barIcon",
+   "back": {
+    "x": 21,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "21,17": {
    "nextMap": "shop",
    "params": {
     "shopId": "item_shop"
    },
    "message": "道具屋に入る",
    "back": {
-    "x": 4,
-    "z": 6,
-    "angle": 3.14159
-   },
-   "icon": "itemShopIcon"
-  },
-  "21,5": {
-   "nextMap": "temple_town",
-   "message": "神殿に入る",
-   "back": {
-    "x": 21,
-    "z": 6,
-    "angle": 3.14159
-   },
-   "icon": "templeIcon"
-  },
-  "21,17": {
-   "nextMap": "town_pub",
-   "message": "パブに入る",
-   "icon": "barIcon",
-   "back": {
     "x": 21,
     "z": 18,
     "angle": 3.14159
-   }
+   },
+   "icon": "itemShopIcon"
   },
   "4,17": {
    "nextMap": "mansion_baron",
@@ -188,7 +188,7 @@
   "0121111210122222222211112210",
   "0121111210122222222211112210",
   "0121011210122222222110112210",
-  "0122110110122222221011223210",
+  "0101011110122222221110011210",
   "0122221210122222222122333210",
   "0111112210122222222222233210",
   "0111111110122222222222222210",
@@ -200,7 +200,7 @@
   "0111111110111111112211112210",
   "0111111110111111111211112210",
   "0111111110111111111110112210",
-  "0111111110111111111111012210",
+  "0111111110111111111110101210",
   "0111111110111111111111122210",
   "0111111110111111111111222210",
   "0111111110111111111111222210",
