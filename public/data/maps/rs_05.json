@@ -42,6 +42,7 @@
   "N": "inn_door",
   "M": "pub_sign",
   "m": "mansion_door",
+  "R": "weapon_shop_sign",
   "G": "gate_village_plain",
   "1": "stall_euro_bread",
   "2": "stall_euro_sausage",
@@ -62,9 +63,9 @@
   "Wpppppppppp1====3ppppppppppW",
   "Wppppppppppp====pppppppppppW",
   "Wppppppppppp====pppppppppppW",
-  "Wppppppppppp====pppppppppppW",
-  "Wppppppppppp====pTpppppppppW",
-  "Wpppppppppp2====4ppppppppppW",
+  "Wppppppppppp====ppppSSSppppW",
+  "Wppppppppppp====pTppSdSppppW",
+  "Wpppppppppp2====4pppRppppppW",
   "WppHHHHppppp====ppppSSSSpppW",
   "WpaHHHHppppp====ppppSSSSappW",
   "WppHmHHppppp====ppppSdSSpppW",
@@ -93,7 +94,7 @@
   },
   {
    "id": "town_old_woman",
-   "x": 22,
+   "x": 23,
    "z": 12
   },
   {
@@ -215,6 +216,19 @@
     "angle": 3.14159
    }
   },
+  "21,13": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 21,
+    "z": 14,
+    "angle": 3.14159
+   }
+  },
   "13,23": {
    "nextMap": "w_09_10",
    "message": "ディクタット町の外へ",
@@ -247,9 +261,9 @@
   "0111111111122222222222222210",
   "0111111111122122222222222210",
   "0111111111121112222222222210",
-  "0111111111122122222222222210",
-  "0111111111112222222222222210",
-  "0111111111112212222222222210",
+  "0111111111122122222211122210",
+  "0111111111112222222210122210",
+  "0111111111112212222100112210",
   "0111111111111111112211112210",
   "0111111111111111111211112210",
   "0111111111111111111110112210",

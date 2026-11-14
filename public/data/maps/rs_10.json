@@ -43,6 +43,7 @@
   "N": "inn_door",
   "M": "pub_sign",
   "m": "mansion_door",
+  "R": "weapon_shop_sign",
   "G": "gate_village_plain"
  },
  "enemies": {},
@@ -59,9 +60,9 @@
   "Wppppppppppp====pppppppppppW",
   "WwwwwbbwwwwwbbbbwwwwwbbwwwwW",
   "WpppppppppppvTTfpppppppppppW",
-  "Wppppppppppp====pppppppppppW",
-  "WpppppppppTp====pppppppppppW",
-  "Wppppppppppp====pppppppppppW",
+  "WppppSSSpppp====pppppppppppW",
+  "WppppSdSppTp====pppppppppppW",
+  "WppppppRpppp====pppppppppppW",
   "WpppJJJJpppp====pppppIIIIppW",
   "WppaJJJJpppp====pppppIIIIapW",
   "WpppJJDJpppp====pppppIINIppW",
@@ -90,7 +91,7 @@
   },
   {
    "id": "town_old_woman",
-   "x": 5,
+   "x": 4,
    "z": 12
   },
   {
@@ -162,6 +163,19 @@
     "angle": 3.14159
    }
   },
+  "6,13": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 6,
+    "z": 14,
+    "angle": 3.14159
+   }
+  },
   "13,23": {
    "nextMap": "w_11_08",
    "message": "デノン町の外へ",
@@ -194,9 +208,9 @@
   "0111111111111111111111111110",
   "0000000000000000000000000000",
   "0111111111111111111111111110",
-  "0122222222222212211111111110",
-  "0122222222222222111111111110",
-  "0122222222222122111111111110",
+  "0122211122222212211111111110",
+  "0122210122222222111111111110",
+  "0122110012222122111111111110",
   "0122111122111111111111111110",
   "0122111121111111111111111110",
   "0122110111111111111111101110",

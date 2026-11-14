@@ -43,6 +43,7 @@
   "N": "inn_door",
   "M": "pub_sign",
   "m": "mansion_door",
+  "R": "weapon_shop_sign",
   "G": "gate_snow_plain"
  },
  "enemies": {},
@@ -59,9 +60,9 @@
   "Wppppppppwpp====pppppppppppW",
   "Wppppppppwpp====pppppppppppW",
   "Wppppppppwpp=F==pppppppppppW",
-  "Wppppppppbpp====pppppppppppW",
-  "Wppppppppbpp====pTpppppppppW",
-  "Wppppppppwpp====pppppppppppW",
+  "Wppppppppbpp====ppppSSSppppW",
+  "Wppppppppbpp====pTppSdSppppW",
+  "Wppppppppwpp====ppppRppppppW",
   "WppHHHHppwpp====ppppIIIIpppW",
   "WpaHHHHppwpp====ppppIIIIappW",
   "WppHmHHppwpp====ppppINIIpppW",
@@ -90,7 +91,7 @@
   },
   {
    "id": "snow_old_woman",
-   "x": 22,
+   "x": 23,
    "z": 12
   },
   {
@@ -162,6 +163,19 @@
     "angle": 3.14159
    }
   },
+  "21,13": {
+   "nextMap": "shop_a",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 21,
+    "z": 14,
+    "angle": 3.14159
+   }
+  },
   "13,23": {
    "nextMap": "w_05_13",
    "message": "ソレミア町の外へ",
@@ -194,9 +208,9 @@
   "0111111110122222222222222210",
   "0111111110122122222222222210",
   "0111111110121012222222222210",
-  "0111111110122122222222222210",
-  "0111111110112222222222222210",
-  "0111111110112212222222222210",
+  "0111111110122122222211122210",
+  "0111111110112222222210122210",
+  "0111111110112212222100112210",
   "0111111110111111112211112210",
   "0111111110111111111211112210",
   "0111111110111111111110112210",

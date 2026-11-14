@@ -148,6 +148,22 @@ def add_weapon_shop(lay, hts, links):
                                      'back': {'x': door[0], 'z': out, 'angle': 0}}
 
 
+# 町の武器屋: 町によって、あったり無かったりする（ユーザー指示 2026-11-14）。東の空き地（x 20〜22・y 12〜13）に、3×2 の武器屋を足す
+WEAPON_SHOP_TOWNS = {'02', '05', '10'}
+
+
+def add_town_weapon_shop(lay, hts, links):
+    """東の空き地に武器屋（3×2・扉は下の行＝南向き）。看板 R は扉の左外"""
+    x0, y0 = 20, 12
+    _put(lay, hts, x0, y0, ['SSS', 'SdS'])
+    door, out = (x0 + 1, y0 + 1), y0 + 2
+    for x in range(x0 - 1, x0 + 4): _flat(hts, [x], out)
+    lay[out][door[0] - 1] = 'R'
+    hts[door[1]][door[0]] = hts[out][door[0]] = hts[out][door[0] - 1] = '0'
+    links[f'{door[0]},{door[1]}'] = {'nextMap': 'shop', 'params': {'shopId': 'weapon_shop'}, 'message': '武器屋に入る', 'icon': 'weaponShopIcon',
+                                     'back': {'x': door[0], 'z': out, 'angle': 3.14159}}
+
+
 _DIGITS = '0123456789abcdefghijklmnopqrstuvwxyz'
 
 

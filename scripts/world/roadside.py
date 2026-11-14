@@ -279,6 +279,7 @@ def build_inner(p, envs, snow_env):
             lay[my][mx] = MAYOR_DOOR_CH
             links[f'{mx},{my}'] = {'nextMap': 'mansion_baron', 'message': '町長（男爵）の屋敷に入る', 'back': {'x': mx, 'z': my + 1, 'angle': 3.14159}}
         if kind == '村' and p['id'] in RL.WEAPON_SHOP_VILLAGES: RL.add_weapon_shop(lay, hts, links)   # 村の武器屋（村によって、ある・ない）
+        if kind == '町' and p['id'] in RL.WEAPON_SHOP_TOWNS: RL.add_town_weapon_shop(lay, hts, links)   # 町の武器屋（町によって、ある・ない）
         RL.nudge_npcs(lay, npcs)
         if plan[1]: RL.mirror(lay, hts, links, npcs, spawn)
     gx, gy = GATE[kind]
@@ -297,7 +298,7 @@ def build_inner(p, envs, snow_env):
     layout = [''.join(r) for r in lay]
     legend = dict(sm['legend']); legend.update(extra_legend)
     if kind == '町': legend[MAYOR_DOOR_CH] = 'mansion_door'
-    if kind == '村' and p['id'] in RL.WEAPON_SHOP_VILLAGES: legend['R'] = 'weapon_shop_sign'
+    if (kind == '村' and p['id'] in RL.WEAPON_SHOP_VILLAGES) or (kind == '町' and p['id'] in RL.WEAPON_SHOP_TOWNS): legend['R'] = 'weapon_shop_sign'
     legend['G'] = 'village_entrance' if kind in ('村', '宿場') else plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))   # 村は門なしの入口（最初の村と同じ）
     look = LOOK.get(country, {})
     if kind == '宿場' and '8' in look and country != 'd':   # 家の見た目（村・宿場）
