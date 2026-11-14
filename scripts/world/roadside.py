@@ -231,6 +231,15 @@ def _crop_inn_post(v):
     return [''.join(r) for r in lay], [''.join(r) for r in hts]
 
 
+_OBJECTS = []
+
+
+def _objects():
+    """objects.json（歩けるかの判定に使う。1 回だけ読む）"""
+    if not _OBJECTS: _OBJECTS.append(json.load(open(os.path.join(MAPS, '..', 'objects.json'), encoding='utf-8')))
+    return _OBJECTS[0]
+
+
 def build_inner(p, envs, snow_env):
     """道沿いの 1 か所の中のマップ（rs_番号）"""
     kind, country = p['kind'], p['country']
@@ -306,6 +315,7 @@ def build_inner(p, envs, snow_env):
          'heightStep': sm.get('heightStep', 0.5), 'fallDamagePerLevel': sm.get('fallDamagePerLevel', 6)}
     if kind == '町': m['decorFloor'] = sm.get('decorFloor', 'cobblestone')
     _fix_exit_links(m, p, gx, gy)
+    if kind != '宿場': RL.relax_heights(m, _objects())   # 歩ける隣のマスの高さの差を 1 以内に（落下ダメージを出さない）
     if kind == '町' and RW.TOWN_PLAZA[p['id']] == 'stalls':
         for ch in TS.STALL_CH:   # 使っていない凡例（サンプルの portal '2' など）は外す（屋台の文字と重ねない）
             if ch not in ''.join(m['layout']): legend.pop(ch, None)

@@ -146,3 +146,32 @@ def add_weapon_shop(lay, hts, links):
     hts[door[1]][door[0]] = hts[out][door[0]] = hts[out][door[0] - 1] = '0'
     links[f'{door[0]},{door[1]}'] = {'nextMap': 'shop', 'params': {'shopId': 'weapon_shop'}, 'message': '武器屋に入る', 'icon': 'weaponShopIcon',
                                      'back': {'x': door[0], 'z': out, 'angle': 0}}
+
+
+_DIGITS = '0123456789abcdefghijklmnopqrstuvwxyz'
+
+
+def relax_heights(m, objects):
+    """隣り合う歩けるマスの高さの差を、1 以内にする（2 段以上の落下ダメージを出さない）。差が 2 以上なら、高い側を、低い側 +1 まで下げる。
+    扉・看板・水のマスは低いまま（動かさない）。建物・壁など、歩けないマスは、対象外。戻り値: 下げたマスの数"""
+    lay, hts = m['layout'], [list(r) for r in m['heights']]
+    h, w = len(lay), len(lay[0])
+    def walk(c):
+        if c in '0 ': return True
+        d = objects.get(m['legend'].get(c, ''))
+        return not (d and d.get('solid'))
+    ok = [[walk(lay[y][x]) for x in range(w)] for y in range(h)]
+    n = 0
+    changed = True
+    while changed:
+        changed = False
+        for y in range(h):
+            for x in range(w):
+                if not ok[y][x]: continue
+                for dx, dy in ((1, 0), (0, 1), (-1, 0), (0, -1)):
+                    nx, ny = x + dx, y + dy
+                    if not (0 <= nx < w and 0 <= ny < h and ok[ny][nx]): continue
+                    a, b = int(hts[y][x], 36), int(hts[ny][nx], 36)
+                    if a - b >= 2: hts[y][x] = _DIGITS[b + 1]; n += 1; changed = True
+    m['heights'] = [''.join(r) for r in hts]
+    return n
