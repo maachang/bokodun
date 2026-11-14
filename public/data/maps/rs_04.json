@@ -89,22 +89,22 @@
  ],
  "npcs": [
   {
-   "id": "merchant_man",
+   "id": "traveler_man",
    "x": 16,
    "z": 11
   },
   {
-   "id": "merchant_woman",
+   "id": "priest_woman",
    "x": 10,
    "z": 14
   },
   {
-   "id": "villager_man",
+   "id": "priest_man",
    "x": 20,
    "z": 14
   },
   {
-   "id": "villager_woman",
+   "id": "priest_woman",
    "x": 4,
    "z": 10
   },
@@ -119,7 +119,7 @@
    "z": 10
   },
   {
-   "id": "elder_man",
+   "id": "priest_man",
    "x": 3,
    "z": 5
   },
