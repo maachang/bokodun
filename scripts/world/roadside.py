@@ -8,6 +8,7 @@ import json
 import os
 import numpy as np
 import roadside_layout as RL
+import roadside_water as RW
 import roads
 import terrain as T
 from town_look import LOOK
@@ -256,8 +257,11 @@ def build_inner(p, envs, snow_env):
         npcs = [dict(n) for n in sm['npcs']]
         spawn = {'x': GATE[kind][0][0], 'z': 21, 'angle': 0}
     lay = [list(r) for r in layout]; hts = [list(r) for r in heights]
+    extra_legend = {}   # 場所ごとの変更で足す凡例（井戸など）
     if kind != '宿場':   # 建物の並びを、場所ごとに変える（roadside_layout.py。手本のまま使い、建物の入れ替えと左右反転だけ）
         plan = (RL.VILLAGE_PLAN if kind == '村' else RL.TOWN_PLAN)[p['id']]
+        if kind == '町': RW.town_water(lay, hts, extra_legend, p['id'])   # 川と広場を、場所ごとに変える（roadside_water.py）
+        else: RW.village_water(lay, hts, p['id'])
         mayor = RL.arrange(lay, hts, links, npcs, kind, p['id'])
         if mayor:   # 町長の家: 貴族クラスの男爵が町長（村に村長がいるように。ユーザー指示 2026-11-14）。町長の家の区画の扉を付けて、男爵の屋敷（mansion_baron）へ
             mx, my = mayor[0] + 1, mayor[1] + 2
@@ -281,7 +285,7 @@ def build_inner(p, envs, snow_env):
             x, y = map(int, k.split(',')); lay[y][x] = 'J'; del links[k]
     for x in gx: lay[gy][x] = 'G'
     layout = [''.join(r) for r in lay]
-    legend = dict(sm['legend'])
+    legend = dict(sm['legend']); legend.update(extra_legend)
     if kind == '町': legend[MAYOR_DOOR_CH] = 'mansion_door'
     if kind == '村' and p['id'] in RL.WEAPON_SHOP_VILLAGES: legend['R'] = 'weapon_shop_sign'
     legend['G'] = 'village_entrance' if kind in ('村', '宿場') else plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))   # 村は門なしの入口（最初の村と同じ）
