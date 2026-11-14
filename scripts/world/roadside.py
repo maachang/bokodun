@@ -200,7 +200,7 @@ INN_POST_TRAVELERS = (('traveler_man', 4, 12), ('traveler_merchant', 12, 13), ('
 
 # 国ごとの中の部屋（A 雪国は暖炉つきの店・宿。F 獣王国は獣人の道具屋・宿。書いていない国は、サンプルのまま）。town_a.py（_A_ROOM）・town_d.py（FACILITIES_F）と同じ
 ROOMS = {'a': {'shop': 'shop_a', 'village_pub': 'city_inn_a', 'town_pub': 'city_inn_a'}, 'f': {'village_pub': 'city_inn_f', 'town_pub': 'city_inn_f'}}
-SHOP_ID = {'f': 'item_shop_f'}   # 道具屋の品（F は獣人の道具屋）
+SHOP_ID = {'f': {'item_shop': 'item_shop_f', 'weapon_shop': 'weapon_shop_f'}}   # 店の品（F は獣人の道具屋・武器屋）
 
 NPC_SKIN = {
     'a': {'villager_man': 'snow_man', 'villager_woman': 'snow_woman', 'child_boy': 'snow_boy', 'child_girl': 'snow_girl', 'elder_man': 'snow_old_man', 'elder_woman': 'snow_old_woman', 'merchant_man': 'snow_man', 'merchant_woman': 'snow_woman',
@@ -264,6 +264,7 @@ def build_inner(p, envs, snow_env):
             assert lay[my][mx] == 'H' and lay[my + 1][mx] in 'p=', '町長の家の扉の場所'
             lay[my][mx] = MAYOR_DOOR_CH
             links[f'{mx},{my}'] = {'nextMap': 'mansion_baron', 'message': '町長（男爵）の屋敷に入る', 'back': {'x': mx, 'z': my + 1, 'angle': 3.14159}}
+        if kind == '村' and p['id'] in RL.WEAPON_SHOP_VILLAGES: RL.add_weapon_shop(lay, hts, links)   # 村の武器屋（村によって、ある・ない）
         RL.nudge_npcs(lay, npcs)
         if plan[1]: RL.mirror(lay, hts, links, npcs, spawn)
     gx, gy = GATE[kind]
@@ -282,6 +283,7 @@ def build_inner(p, envs, snow_env):
     layout = [''.join(r) for r in lay]
     legend = dict(sm['legend'])
     if kind == '町': legend[MAYOR_DOOR_CH] = 'mansion_door'
+    if kind == '村' and p['id'] in RL.WEAPON_SHOP_VILLAGES: legend['R'] = 'weapon_shop_sign'
     legend['G'] = 'village_entrance' if kind in ('村', '宿場') else plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))   # 村は門なしの入口（最初の村と同じ）
     look = LOOK.get(country, {})
     if kind == '宿場' and '8' in look and country != 'd':   # 家の見た目（村・宿場）
@@ -291,7 +293,7 @@ def build_inner(p, envs, snow_env):
     for n in npcs: n['id'] = NPC_SKIN.get(country, {}).get(n['id'], n['id'])
     for v in links.values():   # 国ごとの中の部屋（店・宿）
         v['nextMap'] = ROOMS.get(country, {}).get(v['nextMap'], v['nextMap'])
-        if v['nextMap'] in ('shop', 'shop_a') and country in SHOP_ID: v['params'] = dict(v['params'], shopId=SHOP_ID[country])
+        if v['nextMap'] in ('shop', 'shop_a') and country in SHOP_ID: v['params'] = dict(v['params'], shopId=SHOP_ID[country].get(v['params']['shopId'], v['params']['shopId']))
     for x in gx: links[f'{x},{gy}'] = {'nextMap': p['mesh'], 'message': f"{p['name']}の外へ"}
     m = {'id': p['inner'], 'name': f"{p['name']}", 'type': 'open', 'tileSize': 4, 'wallHeight': 4, 'spawn': spawn,
          'environment': dict(snow_env, floorType='snow', fogNear=24, fogFar=72) if country == 'a' else sm['environment'],

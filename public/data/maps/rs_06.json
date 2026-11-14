@@ -58,6 +58,7 @@
   "M": "pub_sign",
   "K": "inn_sign",
   "Z": "inn_guide_sign",
+  "R": "weapon_shop_sign",
   "G": "village_entrance"
  },
  "enemies": {},
@@ -76,9 +77,9 @@
   "#0000T00x00DDZYx00T00x0#",
   "#DDDDDDDDDDDDDDDDDDDDDD#",
   "#DDDDDDDDDDDDDDDDDDDDDD#",
-  "#0XX0xQ0yy0DDN00x0K0M00#",
-  "#0HH00HdH0xDD0xXX0HdH00#",
-  "#0HH00HHH00DD0XXX0HHH00#",
+  "#0R00xQ0yy0DDN00x0K0M00#",
+  "#0HdH0HdH0xDD0xXX0HdH00#",
+  "#0HHH0HHH00DD0XXX0HHH00#",
   "#~~~~~~~~~~==~~~~~~~~~~#",
   "#PPPPPPPPPP==PPPPPPPPPP#",
   "#PPPPPPPPPP==PPPPPPPPPP#",
@@ -196,6 +197,19 @@
     "angle": 0
    }
   },
+  "3,15": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "weapon_shop_f"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 3,
+    "z": 14,
+    "angle": 0
+   }
+  },
   "11,23": {
    "nextMap": "w_11_14",
    "message": "コンドル村の外へ",
@@ -230,8 +244,8 @@
   "012222222212101222222210",
   "011222222221111122222210",
   "011122122211111112122210",
-  "011111001111101111000110",
-  "011111101111111111101110",
+  "010011001111101111000110",
+  "011011101111111111101110",
   "011111111111111111111110",
   "000000000000000000000000",
   "000000000000000000000000",

@@ -130,3 +130,19 @@ def mirror(lay, hts, links, npcs, spawn):
     links.clear(); links.update(new)
     for n in npcs: n['x'] = w - 1 - n['x']
     spawn['x'] = w - 1 - spawn['x']
+
+
+# 村の武器屋: 村によって、あったり無かったりする（ユーザー指示 2026-11-14）。南西の小さな家（2×2）を、3×2 の武器屋にする
+WEAPON_SHOP_VILLAGES = {'04', '06', '09'}
+
+
+def add_weapon_shop(lay, hts, links):
+    """南西の小さな家（x 2〜3・y 15〜16）を、武器屋（x 2〜4）に替える。扉は上の行（北向き）・看板 R は扉の左外"""
+    x0, y0 = 2, 15
+    _put(lay, hts, x0, y0, ['HdH', 'HHH'])
+    door, out = (x0 + 1, y0), y0 - 1
+    for x in range(x0 - 1, x0 + 4): _flat(hts, [x], out)
+    lay[out][door[0] - 1] = 'R'; lay[out][door[0]] = '0'
+    hts[door[1]][door[0]] = hts[out][door[0]] = hts[out][door[0] - 1] = '0'
+    links[f'{door[0]},{door[1]}'] = {'nextMap': 'shop', 'params': {'shopId': 'weapon_shop'}, 'message': '武器屋に入る', 'icon': 'weaponShopIcon',
+                                     'back': {'x': door[0], 'z': out, 'angle': 0}}

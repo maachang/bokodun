@@ -58,6 +58,7 @@
   "M": "pub_sign",
   "K": "inn_sign",
   "Z": "inn_guide_sign",
+  "R": "weapon_shop_sign",
   "G": "village_entrance"
  },
  "enemies": {},
@@ -76,9 +77,9 @@
   "#0x00T00xYZDD00x00T0000#",
   "#DDDDDDDDDDDDDDDDDDDDDD#",
   "#DDDDDDDDDDDDDDDDDDDDDD#",
-  "#0000c0x00NDD0yM0Kx0XX0#",
-  "#00JAJ0XXx0DDx0HdH00HH0#",
-  "#00JJJ0XXX0DD00HHH00HH0#",
+  "#0000c0x00NDD0yM0Kx00R0#",
+  "#00JAJ0XXx0DDx0HdH0HdH0#",
+  "#00JJJ0XXX0DD00HHH0HHH0#",
   "#~~~~~~~~~~==~~~~~~~~~~#",
   "#PPPPPPPPPP==PPPPPPPPPP#",
   "#PPPPPPPPPP==PPPPPPPPPP#",
@@ -206,6 +207,19 @@
    },
    "icon": "templeIcon"
   },
+  "20,15": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "weapon_shop"
+   },
+   "message": "武器屋に入る",
+   "icon": "weaponShopIcon",
+   "back": {
+    "x": 20,
+    "z": 14,
+    "angle": 0
+   }
+  },
   "11,23": {
    "nextMap": "w_09_11",
    "message": "サンドピット村の外へ",
@@ -240,8 +254,8 @@
   "012222222101212222222210",
   "012222221111122222222110",
   "012221211111112221221110",
-  "011100111101111000111110",
-  "011101111111111101111110",
+  "011100111101111000110010",
+  "011101111111111101110110",
   "011111111111111111111110",
   "000000000000000000000000",
   "000000000000000000000000",
