@@ -127,7 +127,7 @@ def _paint(g, geo, kind, country, name):
     obj[region] = ord('0')
     elev[region] = base
     for y, x in geo['plaza']: elev[y, x] = base; obj[y, x] = ord(ch('9'))
-    village = kind == '村'   # 村は、最初に作った村と同じ（木の柵・木の家・門なしの入口。国の素材は使わない。ユーザー指示 2026-11-14）
+    village = kind in ('村', '宿場')   # 村・宿場は、最初に作った村と同じ（木の柵・木の家・門なしの入口。国の素材は使わない。ユーザー指示 2026-11-14）
     wall = ch('6') if kind == '町' else (FENCE_CH if village else ch('8'))   # 村・宿場の外周は、家（壁として数える。扉は壁にはさまれる）
     obj[y0:y1 + 1, x0:x1 + 1] = ord('0' if village else ch('8'))
     for y in range(y0, y1 + 1):
