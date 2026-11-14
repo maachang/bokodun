@@ -58,7 +58,7 @@
   "M": "pub_sign",
   "K": "inn_sign",
   "Z": "inn_guide_sign",
-  "G": "gate_rock_plain"
+  "G": "village_entrance"
  },
  "enemies": {},
  "layout": [
@@ -81,7 +81,7 @@
   "#0HHH00DD0XXX0JJJ00#",
   "#y00x00DD000y0x00xx#",
   "#000000DD0000000XX0#",
-  "######WGGW##########"
+  "#######GG###########"
  ],
  "npcs": [
   {

@@ -261,11 +261,9 @@ def build_inner(p, envs, snow_env):
         for k in [k for k, v in links.items() if v['nextMap'].startswith('temple')]:
             x, y = map(int, k.split(',')); lay[y][x] = 'J'; del links[k]
     for x in gx: lay[gy][x] = 'G'
-    if kind == '宿場':   # 扉（G）は、壁にはさまれる向き（柵は壁として数えないので、両隣を木の壁にする）
-        lay[gy][gx[0] - 1] = lay[gy][gx[1] + 1] = 'W'
     layout = [''.join(r) for r in lay]
     legend = dict(sm['legend'])
-    legend['G'] = 'village_entrance' if kind == '村' else plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))   # 村は門なしの入口（最初の村と同じ）
+    legend['G'] = 'village_entrance' if kind in ('村', '宿場') else plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))   # 村は門なしの入口（最初の村と同じ）
     look = LOOK.get(country, {})
     if kind == '宿場' and '8' in look and country != 'd':   # 家の見た目（村・宿場）
         for ch in ('H', 'b'):
