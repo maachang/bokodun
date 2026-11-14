@@ -25,6 +25,8 @@ OUTER = {'村': (10, 8), '宿場': (10, 8), '町': (14, 10)}   # 外観の大き
 INNER_SIZE = {'村': (24, 24), '町': (28, 24), '宿場': (20, 20)}   # 中のマップの大きさ
 GATE = {'村': ((11, 12), 23), '町': ((13, 14), 23), '宿場': ((7, 8), 19)}   # 中の門のマス（x の 2 つ, y）。南の壁の真ん中
 GUARD = {'a': 'snow_gate_guard', 'b': 'guard_b', 'd': 'guard_spear', 'f': 'beast_soldier_kobold_gate'}   # 町の門の衛兵（書いていない国は guard_light）
+MAYOR_DOOR = (4, 17)   # 町長の家の扉（町のサンプル town.json の、西の家 H の南の壁）
+MAYOR_DOOR_CH = 'm'
 PLAZA = 2   # 道の端から門までの石畳の長さ
 
 CREST_GATES = {'gate_marble', 'gate_adobe', 'gate_wood', 'gate_white', 'gate_rock', 'gate_snow', 'gate_village', 'gate_lake', 'gate_mage'}   # 国の紋章の盾つきの門
@@ -257,12 +259,18 @@ def build_inner(p, envs, snow_env):
     for row in lay:
         for x, c in enumerate(row):
             if c == '2': row[x] = 'x' if kind != '町' else 'p'
+    if kind == '町':   # 町長の家: 貴族クラスの男爵が町長（村に村長がいるように。ユーザー指示 2026-11-14）。家 H（3〜6, 15〜17）の南の壁に扉を付けて、男爵の屋敷（mansion_baron）へ
+        mx, my = MAYOR_DOOR
+        assert lay[my][mx - 1] == 'H' and lay[my][mx + 1] == 'H' and lay[my][mx] == 'H' and lay[my + 1][mx] == 'p', '町長の家の扉の場所'
+        lay[my][mx] = MAYOR_DOOR_CH
+        links[f'{mx},{my}'] = {'nextMap': 'mansion_baron', 'message': '町長（男爵）の屋敷に入る', 'back': {'x': mx, 'z': my + 1, 'angle': 3.14159}}
     if country == 'f':   # F は神殿を置かない（town_d.py と同じ方針。神殿の品は道具屋 item_shop_f が売る）: 神殿の扉を建物の壁にして、出入口を外す
         for k in [k for k, v in links.items() if v['nextMap'].startswith('temple')]:
             x, y = map(int, k.split(',')); lay[y][x] = 'J'; del links[k]
     for x in gx: lay[gy][x] = 'G'
     layout = [''.join(r) for r in lay]
     legend = dict(sm['legend'])
+    if kind == '町': legend[MAYOR_DOOR_CH] = 'mansion_door'
     legend['G'] = 'village_entrance' if kind in ('村', '宿場') else plain_gate(LOOK.get(country, {}).get('7', 'district_gate'))   # 村は門なしの入口（最初の村と同じ）
     look = LOOK.get(country, {})
     if kind == '宿場' and '8' in look and country != 'd':   # 家の見た目（村・宿場）

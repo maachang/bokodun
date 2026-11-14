@@ -42,6 +42,7 @@
   "I": "inn_building",
   "N": "inn_door",
   "M": "pub_sign",
+  "m": "mansion_door",
   "G": "gate_white_plain"
  },
  "enemies": {},
@@ -63,7 +64,7 @@
   "Wppppppppwpp====pppppppppppW",
   "WppHHHHppwpp====ppppIIIIpppW",
   "WpaHHHHppwpp====ppppIIIIappW",
-  "WppHHHHppwpp====ppppINIIpppW",
+  "WppHmHHppwpp====ppppINIIpppW",
   "Wppppppppwpp====ppppppMppppW",
   "Wppppppppbpp====pppppppppppW",
   "Wppppppppbpp====pppppppppppW",
@@ -148,6 +149,15 @@
    "icon": "barIcon",
    "back": {
     "x": 21,
+    "z": 18,
+    "angle": 3.14159
+   }
+  },
+  "4,17": {
+   "nextMap": "mansion_baron",
+   "message": "町長（男爵）の屋敷に入る",
+   "back": {
+    "x": 4,
     "z": 18,
     "angle": 3.14159
    }
