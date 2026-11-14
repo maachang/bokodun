@@ -4,11 +4,12 @@
   水が近い → 川あり。町は、水が来る向き（その場所の内側の座標に直した向き）で、縦向き（サンプルの西の川。反転で東）か、横向き（町の真ん中を東西に流れる川）
   水が遠い → 川なし。村は、池か、かわいた村。町は、川の跡を石畳にする
 手本は village.json・town.json のまま使い、川・橋・起伏（高さ）はサンプルと同じ作り（水のマスは高さ 0・岸との差は 1 まで・橋は floor_tile）。
-広場は、町の真ん中の噴水を、井戸・木に替える。"""
+広場は、町の真ん中の噴水を、井戸・木・屋台の広場に替える。"""
 
-# 町: 川（'v' サンプルの縦向き / 'h' 真ん中の横向き / 'none' 川なし）と広場（fountain / well / trees）
+# 町: 川（'v' サンプルの縦向き / 'h' 真ん中の横向き / 'none' 川なし）と広場（fountain / well / trees / stalls=屋台の広場）
 TOWN_RIVER = {'02': 'v', '03': 'v', '05': 'none', '10': 'h', '11': 'v'}
-TOWN_PLAZA = {'02': 'fountain', '03': 'well', '05': 'trees', '10': 'fountain', '11': 'well'}
+TOWN_PLAZA = {'02': 'fountain', '03': 'well', '05': 'stalls', '10': 'trees', '11': 'stalls'}
+STALL_SPOTS = [(11, 9), (11, 14), (16, 9), (16, 14)]   # 屋台の広場: 真ん中の大通りをはさんで、左右に 2 軒ずつ向かい合う（town_stalls.add が、国ごとの見た目と売り子・客で置く）
 # 村: river（サンプルの南の川）/ pond（川なし・池）/ dry（川なし）
 VILLAGE_WATER = {'01': 'pond', '04': 'dry', '06': 'river', '07': 'river', '09': 'river', '12': 'pond'}
 
@@ -40,6 +41,7 @@ def town_water(lay, hts, legend, sid):
     x, y = T_PLAZA
     if plaza == 'well': lay[y][x] = 'Y'; legend['Y'] = 'well'
     elif plaza == 'trees': lay[y][x] = lay[y][x + 1] = 'T'; lay[y][x - 1] = 'f'; lay[y][x + 2] = 'v'
+    elif plaza == 'stalls': lay[y][x] = '='   # 噴水を外し、道の石畳に（屋台は、roadside.py が組み立ての最後に town_stalls.add で置く）
     if plaza != 'fountain': hts[y][x] = hts[y][x + 1] = '1'
 
 

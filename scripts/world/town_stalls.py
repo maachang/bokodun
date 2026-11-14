@@ -42,12 +42,12 @@ def _reach(g, w, h, starts):
     return seen
 
 
-def add(site_id, m, city_legend):
-    """街のマップ m（layout・npcs・legend）に、屋台と売り子・客を足す。対象外の街は、何もしない"""
+def add(site_id, m, city_legend, count=None, spots=None):
+    """街のマップ m（layout・npcs・legend）に、屋台と売り子・客を足す。対象外の街は、何もしない。count: 置く数（道沿いの町が、数を決めて呼ぶ。なければ COUNT）。spots: 置く位置 [(x, y)…]（道沿いの町の屋台の広場。通りをはさんで向かい合う。先にいた NPC は、ずらす）"""
     if site_id == 'c':   # C は、屋台が最初からある。見た目だけ、スークの屋台に替える
         for ch, name in zip(STALL_CH, KIND['c']): m['legend'][ch] = name
         return
-    n = COUNT.get(site_id, 0)
+    n = COUNT.get(site_id, 0) if count is None else count
     if not n: return
     g = [list(r) for r in m['layout']]; h, w = len(g), len(g[0])
     used = {c for r in g for c in r} | set(m['legend'])
@@ -63,20 +63,36 @@ def add(site_id, m, city_legend):
     if site_id in KEEPOUT:
         kx0, ky0, kx1, ky1 = KEEPOUT[site_id]
         blocked |= {(x, y) for x in range(kx0, kx1 + 1) for y in range(ky0, ky1 + 1)}
-    cx, cz = w / 2, h / 2
-    cand = sorted(((x, y) for y in range(2, h - 2) for x in range(2, w - 2) if g[y][x] in WALK), key=lambda p: (not (g[p[1]][p[0] - 1] not in WALK or g[p[1]][p[0] + 1] not in WALK), (p[0] - cx) ** 2 + 2 * (p[1] - cz) ** 2))   # 建物沿い（通りの端）を先に。通りの真ん中を塞がない
-    hs = m.get('heights')
-    lv = (lambda x, y: int(hs[y][x], 36)) if hs else (lambda x, y: 0)
-    placed = []
-    for x, y in cand:
-        if len(placed) >= n: break
-        col = [(x, y - 1), (x, y), (x, y + 1)]
-        if any(c in blocked for c in col) or any(g[cy][cx2] not in WALK for cx2, cy in col): continue
-        if any(abs(x - px) < 3 and abs(y - py) < 3 for px, py in placed): continue
-        if any(abs(lv(*a) - lv(*b)) > 1 for a, b in zip(col, col[1:])): continue   # 段差が 2 以上の所は避ける
-        old = g[y][x]; g[y][x] = STALL_CH[len(placed) % 4]
-        if _reach(g, w, h, starts) != base - {(x, y)}: g[y][x] = old; continue
-        base = base - {(x, y)}; placed.append((x, y))
+    if spots:   # 位置の指定: 屋台・売り子・客の列（x, y-1〜y+1）が歩ける所だけ。先にいた NPC は、置いたあとで、ずらす
+        n = len(spots)
+        blocked = {tuple(map(int, k.split(','))) for k in m['links']}
+        for bx, bz in list(blocked): blocked |= {(bx + dx, bz + dz) for dx in range(-1, 2) for dz in range(-1, 2)}
+        placed = []
+        for x, y in spots:
+            col = [(x, y - 1), (x, y), (x, y + 1)]
+            assert not any(c in blocked for c in col) and all(g[cy][cx2] in WALK for cx2, cy in col), f'{site_id}: 屋台の位置 {(x, y)} が空いていない'
+            g[y][x] = STALL_CH[len(placed) % 4]; placed.append((x, y))
+        assert _reach(g, w, h, starts) == base - set(placed), f'{site_id}: 屋台が通りを塞ぐ'
+        keep = {(x, y - 1) for x, y in placed} | {(x + j, y + 1) for x, y in placed for j in range(2)}
+        for q in m['npcs']:   # 屋台・売り子・客の場所にいる NPC を、近くの空きへ
+            if (q['x'], q['z']) in set(placed) | keep:
+                q['x'], q['z'] = next((q['x'] + dx, q['z'] + dz) for r in range(1, 6) for dx, dz in ((r, 0), (-r, 0), (0, r), (0, -r), (r, r), (-r, r), (r, -r), (-r, -r))
+                                      if g[q['z'] + dz][q['x'] + dx] in WALK and (q['x'] + dx, q['z'] + dz) not in set(placed) | keep)
+    else:
+        cx, cz = w / 2, h / 2
+        cand = sorted(((x, y) for y in range(2, h - 2) for x in range(2, w - 2) if g[y][x] in WALK), key=lambda p: (not (g[p[1]][p[0] - 1] not in WALK or g[p[1]][p[0] + 1] not in WALK), (p[0] - cx) ** 2 + 2 * (p[1] - cz) ** 2))   # 建物沿い（通りの端）を先に。通りの真ん中を塞がない
+        hs = m.get('heights')
+        lv = (lambda x, y: int(hs[y][x], 36)) if hs else (lambda x, y: 0)
+        placed = []
+        for x, y in cand:
+            if len(placed) >= n: break
+            col = [(x, y - 1), (x, y), (x, y + 1)]
+            if any(c in blocked for c in col) or any(g[cy][cx2] not in WALK for cx2, cy in col): continue
+            if any(abs(x - px) < 3 and abs(y - py) < 3 for px, py in placed): continue
+            if any(abs(lv(*a) - lv(*b)) > 1 for a, b in zip(col, col[1:])): continue   # 段差が 2 以上の所は避ける
+            old = g[y][x]; g[y][x] = STALL_CH[len(placed) % 4]
+            if _reach(g, w, h, starts) != base - {(x, y)}: g[y][x] = old; continue
+            base = base - {(x, y)}; placed.append((x, y))
     assert len(placed) == n, f'{site_id}: 屋台を {n} 軒置けない（{len(placed)} 軒）'
     for i, (x, y) in enumerate(placed):
         m['npcs'].append({'id': VENDORS[site_id][i % len(VENDORS[site_id])], 'x': x, 'z': y - 1})

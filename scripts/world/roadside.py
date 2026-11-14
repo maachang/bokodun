@@ -9,6 +9,7 @@ import os
 import numpy as np
 import roadside_layout as RL
 import roadside_water as RW
+import town_stalls as TS
 import roads
 import terrain as T
 from town_look import LOOK
@@ -305,6 +306,10 @@ def build_inner(p, envs, snow_env):
          'heightStep': sm.get('heightStep', 0.5), 'fallDamagePerLevel': sm.get('fallDamagePerLevel', 6)}
     if kind == '町': m['decorFloor'] = sm.get('decorFloor', 'cobblestone')
     _fix_exit_links(m, p, gx, gy)
+    if kind == '町' and RW.TOWN_PLAZA[p['id']] == 'stalls':
+        for ch in TS.STALL_CH:   # 使っていない凡例（サンプルの portal '2' など）は外す（屋台の文字と重ねない）
+            if ch not in ''.join(m['layout']): legend.pop(ch, None)
+        TS.add(country, m, legend, spots=RW.STALL_SPOTS)   # 屋台の広場（国ごとの屋台・売り子・客。town_stalls.py）
     return m
 
 

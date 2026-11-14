@@ -32,7 +32,6 @@
   "T": "tree",
   "f": "flower_bed",
   "v": "flower_bed_blue",
-  "2": "portal",
   "q": "item_shop_sign",
   "c": "church_sign",
   "p": "plaza_stone",
@@ -43,7 +42,11 @@
   "N": "inn_door",
   "M": "pub_sign",
   "m": "mansion_door",
-  "G": "gate_village_plain"
+  "G": "gate_village_plain",
+  "1": "stall_euro_bread",
+  "2": "stall_euro_sausage",
+  "3": "stall_euro_ale",
+  "4": "stall_euro_veg"
  },
  "enemies": {},
  "layout": [
@@ -56,12 +59,12 @@
   "Wpcp====f========vv===M=pppW",
   "Wppp====================pppW",
   "WpppppppppTp====pppppppppppW",
+  "Wpppppppppp1====3ppppppppppW",
   "Wppppppppppp====pppppppppppW",
   "Wppppppppppp====pppppppppppW",
-  "WpppppppppppfTTvpppppppppppW",
   "Wppppppppppp====pppppppppppW",
   "Wppppppppppp====pTpppppppppW",
-  "Wppppppppppp====pppppppppppW",
+  "Wpppppppppp2====4ppppppppppW",
   "WppHHHHppppp====ppppSSSSpppW",
   "WpaHHHHppppp====ppppSSSSappW",
   "WppHmHHppppp====ppppSdSSpppW",
@@ -95,7 +98,7 @@
   },
   {
    "id": "child_girl",
-   "x": 12,
+   "x": 13,
    "z": 15
   },
   {
@@ -117,6 +120,56 @@
    "id": "cat_sleep",
    "x": 21,
    "z": 7
+  },
+  {
+   "id": "merchant_woman",
+   "x": 11,
+   "z": 8
+  },
+  {
+   "id": "town_man",
+   "x": 11,
+   "z": 10
+  },
+  {
+   "id": "junior_merchant_man",
+   "x": 11,
+   "z": 13
+  },
+  {
+   "id": "town_boy",
+   "x": 11,
+   "z": 15
+  },
+  {
+   "id": "town_girl",
+   "x": 12,
+   "z": 15
+  },
+  {
+   "id": "town_middle_woman",
+   "x": 16,
+   "z": 8
+  },
+  {
+   "id": "child_boy",
+   "x": 16,
+   "z": 10
+  },
+  {
+   "id": "merchant_woman",
+   "x": 16,
+   "z": 13
+  },
+  {
+   "id": "town_man",
+   "x": 16,
+   "z": 15
+  },
+  {
+   "id": "town_woman",
+   "x": 17,
+   "z": 15
   }
  ],
  "links": {
