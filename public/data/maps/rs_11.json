@@ -74,12 +74,12 @@
  ],
  "npcs": [
   {
-   "id": "town_man",
+   "id": "merchant_man",
    "x": 10,
    "z": 12
   },
   {
-   "id": "town_woman",
+   "id": "merchant_woman",
    "x": 17,
    "z": 9
   },

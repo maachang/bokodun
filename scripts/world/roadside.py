@@ -204,6 +204,7 @@ NPC_SKIN = {
           'town_man': 'snow_man', 'town_woman': 'snow_woman', 'town_boy': 'snow_boy', 'town_old_woman': 'snow_old_woman', 'town_old_man': 'snow_old_man', 'town_middle_man': 'snow_man', 'town_middle_woman': 'snow_woman', 'town_girl': 'snow_girl'},
     'b': {'villager_man': 'priest_man', 'villager_woman': 'priest_woman', 'merchant_man': 'traveler_man', 'merchant_woman': 'priest_woman', 'elder_man': 'priest_man',   # 聖国: 一般人が少なく、下っ端・中間の聖職者（助祭・修道女）と巡礼が多い（設定メモ project_country_b_concept。priest_senior は神殿の中だけ）
           'town_man': 'priest_man', 'town_woman': 'priest_woman', 'town_middle_man': 'priest_man', 'town_middle_woman': 'priest_woman', 'town_old_man': 'priest_man', 'town_old_woman': 'priest_woman'},
+    'e': {'villager_man': 'traveler_merchant', 'town_man': 'merchant_man', 'town_woman': 'merchant_woman', 'town_middle_man': 'merchant_man', 'town_middle_woman': 'merchant_woman'},   # 連盟: 商人と旅の行商人が多い（town_e の街の人の構成に合わせる）
     'f': {'villager_man': 'dwarf_man', 'villager_woman': 'beast_f_b', 'child_boy': 'beast_c', 'child_girl': 'beast_d', 'elder_man': 'dwarf_man', 'elder_woman': 'dwarf_woman', 'merchant_man': 'beast_a', 'merchant_woman': 'beast_f_c',
           'town_man': 'dwarf_man', 'town_woman': 'dwarf_woman', 'town_boy': 'beast_c', 'town_old_woman': 'dwarf_woman', 'town_old_man': 'dwarf_man', 'town_middle_man': 'beast_a', 'town_middle_woman': 'beast_f_a', 'town_girl': 'beast_d'},
 }
