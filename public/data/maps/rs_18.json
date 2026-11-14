@@ -1,0 +1,216 @@
+{
+ "id": "rs_18",
+ "name": "キャロティーン港町",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "spawn": {
+  "x": 13,
+  "z": 21,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 11713215,
+  "fogNear": 22,
+  "fogFar": 75,
+  "visibility": 0.9,
+  "skyColor": 9018045
+ },
+ "legend": {
+  "W": "lake_wall",
+  "S": "shop_building",
+  "d": "shop_door",
+  "J": "temple_building",
+  "D": "temple_door",
+  "H": "brick_house",
+  "=": "paved_road",
+  "F": "plaza_fountain",
+  "T": "tree",
+  "f": "flower_bed",
+  "v": "flower_bed_blue",
+  "2": "portal",
+  "q": "item_shop_sign",
+  "c": "church_sign",
+  "p": "plaza_stone",
+  "a": "outhouse",
+  "w": "water",
+  "b": "wood_bridge",
+  "I": "inn_building",
+  "N": "inn_door",
+  "M": "pub_sign",
+  "5": "ship_small",
+  "6": "crate",
+  "7": "barrel",
+  "m": "mansion_door",
+  "G": "gate_lake_plain"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WTppppppppppppppppppppppppTW",
+  "WppppppppppppppppppppppppppW",
+  "WppJJJJpppppppppppppHHHHpppW",
+  "WppJJJJpppppppppppppHHHHpppW",
+  "WppJDJJpppppppppppppHmHHpppW",
+  "Wpcp====f========vv=====pppW",
+  "Wppp====================pppW",
+  "WpppppppppTp====pppppppppppW",
+  "Wppppppp67pp====p6p7pppppppW",
+  "Ww5wwbbww5wwbbbbww5wwbbww5wW",
+  "Wppppppp6ppp=F==ppp7pppppppW",
+  "Wppppppppppp====pppppppppppW",
+  "Wppppppppppp====pTpppppppppW",
+  "Wppppppppppp====pppppppppppW",
+  "WppIIIIppppp====ppppSSSSpppW",
+  "WpaIIIIppppp====ppppSSSSappW",
+  "WppINIIppppp====ppppSdSSpppW",
+  "WppppMpppppp====pppppppqpppW",
+  "Wppppppppppp====pppppppppppW",
+  "Wppppppppppp====pppppppppppW",
+  "Wppppppppppp====pppppppppppW",
+  "WTpppppppppp====ppppppppppTW",
+  "WWWWWWWWWWWWWGGWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "merchant_man",
+   "x": 10,
+   "z": 12
+  },
+  {
+   "id": "merchant_woman",
+   "x": 18,
+   "z": 9
+  },
+  {
+   "id": "town_boy",
+   "x": 8,
+   "z": 18
+  },
+  {
+   "id": "town_old_woman",
+   "x": 22,
+   "z": 12
+  },
+  {
+   "id": "child_girl",
+   "x": 12,
+   "z": 15
+  },
+  {
+   "id": "cat_walk",
+   "x": 7,
+   "z": 8
+  },
+  {
+   "id": "cat_walk_tail",
+   "x": 20,
+   "z": 20
+  },
+  {
+   "id": "black_cat_walk",
+   "x": 11,
+   "z": 6
+  },
+  {
+   "id": "cat_sleep",
+   "x": 21,
+   "z": 7
+  }
+ ],
+ "links": {
+  "4,5": {
+   "nextMap": "temple_town",
+   "message": "神殿に入る",
+   "back": {
+    "x": 4,
+    "z": 6,
+    "angle": 3.14159
+   },
+   "icon": "templeIcon"
+  },
+  "4,17": {
+   "nextMap": "town_pub",
+   "message": "パブに入る",
+   "icon": "barIcon",
+   "back": {
+    "x": 4,
+    "z": 18,
+    "angle": 3.14159
+   }
+  },
+  "21,17": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop"
+   },
+   "message": "道具屋に入る",
+   "back": {
+    "x": 21,
+    "z": 18,
+    "angle": 3.14159
+   },
+   "icon": "itemShopIcon"
+  },
+  "21,5": {
+   "nextMap": "mansion_baron",
+   "message": "町長（男爵）の屋敷に入る",
+   "back": {
+    "x": 21,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "13,23": {
+   "nextMap": "w_05_17",
+   "message": "キャロティーン港町の外へ",
+   "spawn": {
+    "x": 33,
+    "z": 21,
+    "angle": 3.14159
+   }
+  },
+  "14,23": {
+   "nextMap": "w_05_17",
+   "message": "キャロティーン港町の外へ",
+   "spawn": {
+    "x": 34,
+    "z": 21,
+    "angle": 3.14159
+   }
+  }
+ },
+ "heights": [
+  "0000000000000000000000000000",
+  "0111111111111111111111111110",
+  "0122222211122222222222222210",
+  "0121111211122222222211112210",
+  "0121111211122222222211112210",
+  "0121011211122222222111112210",
+  "0101011111122222221111111210",
+  "0122121211122222222122222210",
+  "0111112211122222222222222210",
+  "0111111111111111111111111110",
+  "0000000000000000000000000000",
+  "0111111111111111111111111110",
+  "0111111111122122222222222210",
+  "0111111111112222222222222210",
+  "0111111111112212222222222210",
+  "0111111111111111112211112210",
+  "0111111111111111111211112210",
+  "0111011111111111111110112210",
+  "0111001111111111111110101210",
+  "0111111111111111111111122210",
+  "0111111111111111111111222210",
+  "0111111111111111111111222210",
+  "0111111111111111111111111110",
+  "0000000000000110000000000000"
+ ],
+ "heightStep": 0.5,
+ "fallDamagePerLevel": 6,
+ "decorFloor": "cobblestone"
+}
