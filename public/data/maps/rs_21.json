@@ -1,0 +1,207 @@
+{
+ "id": "rs_21",
+ "name": "モンズ港町",
+ "type": "open",
+ "tileSize": 4,
+ "wallHeight": 4,
+ "spawn": {
+  "x": 13,
+  "z": 21,
+  "angle": 0
+ },
+ "environment": {
+  "floorType": "stone",
+  "hasCeiling": false,
+  "ambientLight": 9408660,
+  "directionalLight": 16774610,
+  "fogColor": 11713215,
+  "fogNear": 22,
+  "fogFar": 75,
+  "visibility": 0.9,
+  "skyColor": 9018045
+ },
+ "legend": {
+  "W": "rock_wall",
+  "S": "shop_building",
+  "d": "shop_door",
+  "J": "temple_building",
+  "D": "temple_door",
+  "H": "brick_house",
+  "=": "paved_road",
+  "F": "plaza_fountain",
+  "T": "tree",
+  "f": "flower_bed",
+  "v": "flower_bed_blue",
+  "2": "portal",
+  "q": "item_shop_sign",
+  "c": "church_sign",
+  "p": "plaza_stone",
+  "a": "outhouse",
+  "w": "water",
+  "b": "wood_bridge",
+  "I": "inn_building",
+  "N": "inn_door",
+  "M": "pub_sign",
+  "Y": "well",
+  "5": "ship_small",
+  "6": "crate",
+  "7": "barrel",
+  "m": "mansion_door",
+  "G": "gate_rock_plain"
+ },
+ "enemies": {},
+ "layout": [
+  "WWWWWWWWWWWWWWWWWWWWWWWWWWWW",
+  "WTppppppppppppppppppppppppTW",
+  "WppppppppppppppppppppppppppW",
+  "WppIIIIpppppppppppppJJJJpppW",
+  "WppIIIIpppppppppppppJJJJpppW",
+  "WppINIIpppppppppppppJJJJpppW",
+  "Wppp=M==f========vvc====pppW",
+  "Wppp====================pppW",
+  "WpppppppppTp====pppppppppppW",
+  "Wppppppp67pp====p6p7pppppppW",
+  "Ww5wwbbww5wwbbbbww5wwbbww5wW",
+  "Wppppppp6ppp=Y==ppp7pppppppW",
+  "Wppppppppppp====pppppppppppW",
+  "Wppppppppppp====pTpppppppppW",
+  "Wppppppppppp====pppppppppppW",
+  "WppHHHHppppp====ppppSSSSpppW",
+  "WpaHHHHppppp====ppppSSSSappW",
+  "WppHmHHppppp====ppppSdSSpppW",
+  "Wppppppppppp====pppppppqpppW",
+  "Wppppppppppp====pppppppppppW",
+  "Wppppppppppp====pppppppppppW",
+  "Wppppppppppp====pppppppppppW",
+  "WTpppppppppp====ppppppppppTW",
+  "WWWWWWWWWWWWWGGWWWWWWWWWWWWW"
+ ],
+ "npcs": [
+  {
+   "id": "dwarf_man",
+   "x": 10,
+   "z": 12
+  },
+  {
+   "id": "dwarf_woman",
+   "x": 18,
+   "z": 9
+  },
+  {
+   "id": "beast_c",
+   "x": 8,
+   "z": 18
+  },
+  {
+   "id": "dwarf_woman",
+   "x": 22,
+   "z": 12
+  },
+  {
+   "id": "beast_d",
+   "x": 12,
+   "z": 15
+  },
+  {
+   "id": "cat_walk",
+   "x": 7,
+   "z": 8
+  },
+  {
+   "id": "cat_walk_tail",
+   "x": 20,
+   "z": 20
+  },
+  {
+   "id": "black_cat_walk",
+   "x": 11,
+   "z": 6
+  },
+  {
+   "id": "cat_sleep",
+   "x": 21,
+   "z": 7
+  }
+ ],
+ "links": {
+  "4,5": {
+   "nextMap": "city_inn_f",
+   "message": "パブに入る",
+   "icon": "barIcon",
+   "back": {
+    "x": 4,
+    "z": 6,
+    "angle": 3.14159
+   }
+  },
+  "21,17": {
+   "nextMap": "shop",
+   "params": {
+    "shopId": "item_shop_f"
+   },
+   "message": "道具屋に入る",
+   "back": {
+    "x": 21,
+    "z": 18,
+    "angle": 3.14159
+   },
+   "icon": "itemShopIcon"
+  },
+  "4,17": {
+   "nextMap": "mansion_baron",
+   "message": "町長（男爵）の屋敷に入る",
+   "back": {
+    "x": 4,
+    "z": 18,
+    "angle": 3.14159
+   }
+  },
+  "13,23": {
+   "nextMap": "w_12_17",
+   "message": "モンズ港町の外へ",
+   "spawn": {
+    "x": 41,
+    "z": 18,
+    "angle": -1.570795
+   }
+  },
+  "14,23": {
+   "nextMap": "w_12_17",
+   "message": "モンズ港町の外へ",
+   "spawn": {
+    "x": 41,
+    "z": 19,
+    "angle": -1.570795
+   }
+  }
+ },
+ "heights": [
+  "0000000000000000000000000000",
+  "0111111111111111111111111110",
+  "0122222211122222222222222210",
+  "0121111211122222222211112210",
+  "0121111211122222222211112210",
+  "0121011211122222222110112210",
+  "0111001111122222221010111210",
+  "0122121211122222222121222210",
+  "0111112211122222222222222210",
+  "0111111111111111111111111110",
+  "0000000000000000000000000000",
+  "0111111111111111111111111110",
+  "0111111111122122222222222210",
+  "0111111111112222222222222210",
+  "0111111111112212222222222210",
+  "0111111111111111112211112210",
+  "0111111111111111111211112210",
+  "0111111111111111111110112210",
+  "0111111111111111111110101210",
+  "0111111111111111111111122210",
+  "0111111111111111111111222210",
+  "0111111111111111111111222210",
+  "0111111111111111111111111110",
+  "0000000000000110000000000000"
+ ],
+ "heightStep": 0.5,
+ "fallDamagePerLevel": 6,
+ "decorFloor": "cobblestone"
+}
