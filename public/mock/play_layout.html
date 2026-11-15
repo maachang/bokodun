@@ -30,7 +30,6 @@
   #bossBar .nm { flex: none; width: 150px; font-weight: bold; color: #fecaca; }
   #bossBar .bar { flex: 1; height: 14px; margin: 0; }
   #bossBar .num { flex: none; width: 110px; text-align: right; font-size: 12px; }
-  #demoBar { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: #9ca3af; }
   button { background: #1f2937; color: #e5e7eb; border: 1px solid #4b5563; border-radius: 3px; padding: 2px 8px; cursor: pointer; font: inherit; }
   button:hover { background: #374151; }
   /* 9 枠 */
@@ -102,8 +101,6 @@
       <div id="win"><button id="winClose">閉じる (Esc)</button><div id="winBody"></div></div>
     </div>
     <div id="below"><div id="bossBar"></div><div id="talk"></div></div>
-    <div id="demoBar">[モックの操作]
-      <button id="demoHit">敵を攻撃した</button><button id="demoHurt">敵に攻撃された</button><button id="demoEvent">受注の有無</button><button id="demoTalk">村人と話す</button><button id="demoGuild">ギルド（Eキー）</button><button id="demoDie">死亡</button><button id="demoBoss">ボス戦（開始／攻撃）</button><button id="demoBossEnd">ボス戦を終える</button><span>／ 1〜9: 枠の切替　K ストック　C ステータス　G 装備　I 道具　Esc 閉じる</span></div>
   </div>
 
   <!-- 右 -->
@@ -116,6 +113,7 @@
     <div class="panel"><div class="title">メニュー</div><div id="menu"></div></div>
   </div>
 </div>
+
 
 <script>
 const { $, refs, on, html, show, hide } = jhtml;
@@ -226,15 +224,11 @@ function closeTalk() { E.talk.style.display = 'none'; setPaused(); }
 function closeAll() { closeWin(); closeTalk(); }
 on(E.talk, 'click', '[data-ch]', (e, t) => { const c = E.talk._choices[Number(t.dataset.ch)]; if (c[1]) c[1](); else closeTalk(); });
 function guild() { talk('冒険者ギルド', 'いらっしゃいませ。ご用件は？', [['セーブする', () => talk('冒険者ギルド', 'セーブしました。（最後にセーブしたギルド：グリーン王国 城下町）', [['やめる']])], ['預ける・引き出す', () => talk('冒険者ギルド', '（預かりの画面は、あとで作ります）', [['戻る', guild]])], ['やめる']]); }
-on('#demoGuild', 'click', guild);
-on('#demoTalk', 'click', () => talk('村人', '今日はいい天気ですね。北の草原には、薬草がたくさん生えていますよ。'));
-on('#demoEvent', 'click', () => { hasEvent = !hasEvent; $('eventPanel').innerHTML = '<div class="title">現在の受注イベント</div>' + (hasEvent ? '<div>城下町の薬草集め <small style="color:#9ca3af">（薬草 3 / 5）</small></div>' : '<div style="color:#6b7280">なし</div>'); });
 
 // 死亡（ウィザードリィ風に、墓を出す。数秒か Enter で、最後にセーブしたギルドで復活。ペナルティなし）
 let deathTimer = null;
 function die() { closeAll(); E.deathMsg.textContent = '冒険者は 力尽きた…'; E.death.style.display = 'flex'; setPaused(); clearTimeout(deathTimer); deathTimer = setTimeout(revive, 5000); }
 function revive() { clearTimeout(deathTimer); E.death.style.display = 'none'; setPaused(); talk('冒険者ギルド', '冒険者は、ギルドで目を覚ました。（所持金・持ち物はそのまま）', [['はい']]); }
-on('#demoDie', 'click', die);
 
 // 敵の情報（現行の仕様と同じ: 攻撃した／された敵のカードを、新しい順に上から並べる。同じ敵なら、一番上へ移す。2.5 秒で消える。
 // 現行の「最大 3 枚」は、ここでは外し、パネルに入る限り出す）
@@ -262,10 +256,6 @@ function renderBoss() {
   el.classList.toggle('on', !!boss);
   el.innerHTML = boss ? html`<span class="nm">${boss.name}</span><div class="bar"><i style="width:${boss.hp / boss.maxHp * 100}%;background:#ef4444"></i></div><span class="num">${boss.hp} / ${boss.maxHp}</span>` : '';
 }
-on('#demoBoss', 'click', () => { if (!boss) boss = { name: 'ワイバーン', hp: 1200, maxHp: 1200 }; else boss.hp = Math.max(0, boss.hp - 150); renderBoss(); });
-on('#demoBossEnd', 'click', () => { boss = null; renderBoss(); });
-on('#demoHit', 'click', hitEnemy);
-on('#demoHurt', 'click', hitEnemy);
 renderSlots();
 setInterval(() => { if (!paused && cd > 0) { cd = Math.max(0, cd - 0.1); renderSlots(); } }, 100);   // 連射間隔（止まっている間は進まない）
 
@@ -282,11 +272,14 @@ function fit() {
   const app = $('app');
   app.style.transform = 'none';
   const w = app.offsetWidth, h = app.offsetHeight;
-  const k = Math.min(MAX_SCALE, innerWidth / w, innerHeight / h);
+  const availH = innerHeight;
+  const k = Math.min(MAX_SCALE, innerWidth / w, availH / h);
   app.style.transform = `scale(${k})`;
   app.style.left = `${Math.max(0, (innerWidth - w * k) / 2)}px`;
-  app.style.top = `${Math.max(0, (innerHeight - h * k) / 2)}px`;
+  app.style.top = `${Math.max(0, (availH - h * k) / 2)}px`;
 }
+// 動きの確認は、ブラウザのコンソールから（例: mock.die()、mock.bossHit()、mock.hitEnemy()、mock.talk('村人', '…')、mock.guild()）
+window.mock = { hitEnemy, die, guild, talk, bossHit: () => { if (!boss) boss = { name: 'ワイバーン', hp: 1200, maxHp: 1200 }; else boss.hp = Math.max(0, boss.hp - 150); renderBoss(); }, bossEnd: () => { boss = null; renderBoss(); } };
 on(window, 'resize', fit);
 fit();
 </script>
