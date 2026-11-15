@@ -504,6 +504,10 @@ def build_inner(p, envs, snow_env):
         for ch in ('H', 'b'):
             if ch in legend: legend[ch] = look['8'] if ch == 'H' else legend[ch]
     if kind == '町' and '6' in look: legend['W'] = look['6']
+    if kind == '村' and country == 'c':   # C の村（ソロウ村 25）: 建物は、C ミレニアム自由都市と同じ（中東風の家・神殿）
+        for ch in ('H', 'b'):
+            if ch in legend: legend[ch] = look['8']
+        if legend.get('J') == 'temple_building': legend['J'] = 'mideast_temple'
     for n in npcs: n['id'] = NPC_SKIN.get(country, {}).get(n['id'], n['id'])
     for v in links.values():   # 国ごとの中の部屋（店・宿）
         v['nextMap'] = ROOMS.get(country, {}).get(v['nextMap'], v['nextMap'])
