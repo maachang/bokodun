@@ -60,9 +60,9 @@
   "Wppp=M===vv========f====pppW",
   "Wppp====================pppW",
   "Wppppppppppp====pTpppppppppW",
-  "Wppppppp7p6p====pp76pppppppW",
-  "Ww5wwbbww5wwbbbbww5wwbbww5wW",
-  "Wppppppp7pppvTTfppp6pppppppW",
+  "Wppppppppppp====pp676ppp7ppW",
+  "Wwwwwbbwww5wbbbbwww5wbbww5wW",
+  "Wpppppppp6ppvTTfp67ppppppppW",
   "WppppSSSpppp====pppppppppppW",
   "WppppSdSppTp====pppppppppppW",
   "WppppppRpppp====pppppppppppW",
@@ -84,7 +84,7 @@
   },
   {
    "id": "elf_woman_a",
-   "x": 9,
+   "x": 10,
    "z": 9
   },
   {

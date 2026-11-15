@@ -60,9 +60,9 @@
   "Wppp=M==f========vvc====pppW",
   "Wppp====================pppW",
   "WpppppppppTp====pppppppppppW",
-  "Wppppppp67pp====p6p7pppppppW",
-  "Ww5wwbbww5wwbbbbww5wwbbww5wW",
-  "Wppppppp6ppp=Y==ppp7pppppppW",
+  "Wppppppppppp====pp676pp7pppW",
+  "Ww5wwbb5w5wwbbbbwww5wbbww5wW",
+  "Wp7ppppp6ppp=Y==pppppppp76pW",
   "Wppppppppppp====pppppppppppW",
   "Wppppppppppp====pTpppppppppW",
   "Wppppppppppp====pppppppppppW",
@@ -84,7 +84,7 @@
   },
   {
    "id": "dwarf_woman",
-   "x": 18,
+   "x": 17,
    "z": 9
   },
   {

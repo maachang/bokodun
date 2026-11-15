@@ -63,16 +63,22 @@ NPC_SKIN = {
           'town_old_woman': 'merchant_old_k', 'town_old_man': 'merchant_old_k', 'town_middle_man': 'machi_man_k', 'town_middle_woman': 'machi_woman_k'},
 }
 
-PORT_SHIPS = ((2, 10), (9, 10), (18, 10), (25, 10))        # 水路（行 10）の船の場所（x, y）。橋の列（5・6・12〜15・21・22）は避ける
-PORT_CRATES = (('6', 8, 9), ('7', 9, 9), ('6', 17, 9), ('7', 19, 9), ('6', 8, 11), ('7', 19, 11))   # 岸の荷（文字, x, y）
+# 港町ごとの水路の船（x。y は水路の行 10）と岸の荷（文字, x, y）。橋の列（5・6・12〜15・21・22）は避ける。4 か所を、同じ見た目にしない
+PORT_DECOR = {
+    '15': dict(ships=(2, 8, 17), crates=(('6', 7, 9), ('7', 8, 9), ('6', 9, 9), ('7', 9, 11), ('6', 10, 11), ('7', 3, 9), ('6', 18, 11))),
+    '18': dict(ships=(3, 11, 17, 24), crates=(('6', 8, 9), ('7', 9, 9), ('6', 17, 9), ('7', 19, 9), ('6', 8, 11), ('7', 19, 11))),
+    '21': dict(ships=(2, 7, 9, 19, 25), crates=(('6', 18, 9), ('7', 19, 9), ('6', 20, 9), ('7', 24, 11), ('6', 25, 11), ('7', 2, 11), ('6', 8, 11), ('7', 23, 9))),
+    '26': dict(ships=(9, 18), crates=(('6', 8, 9), ('7', 10, 9), ('6', 9, 11), ('7', 17, 9), ('6', 18, 11), ('7', 19, 11), ('6', 20, 9), ('7', 7, 11))),
+}
 
 
-def port_decor(lay, legend):
-    """港町: 水路（真ん中の横の川）に船、岸に荷（箱と樽）を置く（凡例は、使っていない文字で）"""
+def port_decor(lay, legend, sid):
+    """港町: 水路（真ん中の横の川）に船、岸に荷（箱と樽）を置く（場所ごとに違う。凡例は、使っていない文字で）"""
     for ch in '567':
         assert ch not in legend and not any(ch in r for r in lay), f'港町の飾りの文字 {ch} が使われている'
     legend.update({'5': 'ship_small', '6': 'crate', '7': 'barrel'})
-    for x, y in PORT_SHIPS:
-        if lay[y][x] == 'w': lay[y][x] = '5'
-    for ch, x, y in PORT_CRATES:
+    d = PORT_DECOR[sid]
+    for x in d['ships']:
+        if lay[10][x] == 'w': lay[10][x] = '5'
+    for ch, x, y in d['crates']:
         if lay[y][x] in 'p=': lay[y][x] = ch

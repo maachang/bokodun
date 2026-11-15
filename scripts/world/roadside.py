@@ -407,7 +407,7 @@ def build_inner(p, envs, snow_env):
             links[f'{mx},{my}'] = {'nextMap': 'mansion_baron', 'message': '町長（男爵）の屋敷に入る', 'back': {'x': mx, 'z': my + 1, 'angle': 3.14159}}
         if kind == '村' and p['id'] in RL.WEAPON_SHOP_VILLAGES: RL.add_weapon_shop(lay, hts, links)   # 村の武器屋（村によって、ある・ない）
         if kind == '町' and p['id'] in RL.WEAPON_SHOP_TOWNS: RL.add_town_weapon_shop(lay, hts, links)   # 町の武器屋（町によって、ある・ない）
-        if p.get('port'): RM.port_decor(lay, extra_legend)   # 港町: 水路に船・岸に荷
+        if p.get('port'): RM.port_decor(lay, extra_legend, p['id'])   # 港町: 水路に船・岸に荷
         RL.nudge_npcs(lay, npcs)
         if plan[1]: RL.mirror(lay, hts, links, npcs, spawn)
     gx, gy = GATE[kind]
