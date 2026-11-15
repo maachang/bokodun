@@ -10,8 +10,9 @@
   /* 全体を 1 つの固定サイズ（約 1300×700）として組み、ブラウザの大きさに合わせて、縮小・拡大する（拡大は MAX_SCALE まで）。計算は、下の fit() */
   #app { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: max-content; display: flex; gap: 8px; align-items: flex-start; padding: 8px; }
   .col { display: flex; flex-direction: column; gap: 8px; }
-  #left { width: 220px; } #right { width: 240px; }
+  #left { width: 220px; height: 602px; }   /* ゲーム画面（800×600＋枠）と同じ高さ。敵の情報が、残りを使う */ #right { width: 240px; }
   .panel { background: #111827; border: 1px solid #374151; border-radius: 4px; padding: 8px; }
+  .small { font-size: 12px; }   /* 左側の職業・ステータスは、少し小さめの文字 */
   .title { font-size: 11px; color: #9ca3af; letter-spacing: .08em; margin-bottom: 4px; }
   .row { display: flex; justify-content: space-between; gap: 6px; }
   .bar { height: 10px; background: #1f2937; border-radius: 2px; overflow: hidden; margin: 2px 0 6px; }
@@ -23,7 +24,8 @@
   #areaName { position: absolute; top: 8px; left: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
   #pauseBadge { position: absolute; bottom: 8px; left: 8px; background: #b91c1ccc; padding: 2px 10px; border-radius: 3px; display: none; font-weight: bold; }
   #compass { position: absolute; top: 8px; right: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
-  #demoBar { margin-top: 6px; display: flex; gap: 6px; align-items: center; color: #9ca3af; }
+  #center { width: 802px; flex: none; }   /* 下のモック操作の帯が長くても、中央の幅（ゲーム画面 800px＋枠）を広げない */
+  #demoBar { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: #9ca3af; }
   button { background: #1f2937; color: #e5e7eb; border: 1px solid #4b5563; border-radius: 3px; padding: 2px 8px; cursor: pointer; font: inherit; }
   button:hover { background: #374151; }
   /* 9 枠 */
@@ -50,7 +52,12 @@
   .cell.add { color: #9ca3af; text-align: center; padding-top: 20px; cursor: pointer; }
   .pick { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1f2937; cursor: pointer; }
   .pick:hover { background: #1d4ed8; } .pick.dis { color: #4b5563; cursor: default; background: none; }
-  .enemy { margin-top: 4px; }
+  #enemyPanel { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
+  #enemyInfo { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
+  .ecard { display: flex; gap: 6px; align-items: center; background: #0f172a; border: 1px solid #374151; border-radius: 3px; padding: 3px 5px; flex: none; }
+  .ecard .ic { width: 26px; height: 26px; border-radius: 3px; background: #475569; flex: none; }
+  .ecard .d { flex: 1; min-width: 0; } .ecard .h { display: flex; justify-content: space-between; font-size: 11px; }
+  .ecard .bar { margin: 1px 0 0; height: 6px; }
 </style>
 </head>
 <body>
@@ -60,32 +67,32 @@
     <div class="panel"><div class="title">現在位置</div><div id="pos">グリーン王国　城下町（x 32, z 29）</div></div>
     <div class="panel clickable" id="eventPanel"><div class="title">現在の受注イベント</div>
       <div>城下町の薬草集め <small style="color:#9ca3af">（薬草 3 / 5）</small></div></div>
-    <div class="panel"><div class="title">職業</div>
+    <div class="panel small"><div class="title">職業</div>
       <div class="row"><span>メイン：戦士</span><span>Lv.12</span></div>
       <div class="row"><span>サブ　：ウィザード</span><span>Lv.5</span></div></div>
-    <div class="panel"><div class="title">ステータス</div>
+    <div class="panel small"><div class="title">ステータス</div>
       <div class="row"><span>HP</span><span>96 / 127</span></div><div class="bar"><i style="width:76%;background:#4ade80"></i></div>
       <div class="row"><span>MP</span><span>40 / 78</span></div><div class="bar"><i style="width:51%;background:#60a5fa"></i></div>
       <div class="row"><span>スタミナ</span><span>70%</span></div><div class="bar"><i style="width:70%;background:#facc15"></i></div>
       <div class="row"><span>GOLD</span><span style="color:#facc15">1,240 G</span></div>
       <div class="row"><span>経験値</span><span>3,580</span></div></div>
-    <div class="panel"><div class="title">敵の情報（攻撃した／された）</div><div id="enemyInfo" style="color:#6b7280">（戦闘していません）</div></div>
+    <div class="panel" id="enemyPanel"><div class="title">敵の情報（攻撃した／された）</div><div id="enemyInfo"></div></div>
   </div>
 
   <!-- 中央 -->
-  <div>
+  <div id="center">
     <div id="gameWrap">
       <div class="ph">ゲーム画面 800 × 600</div>
       <div id="areaName">城下町 メインストリート</div><div id="compass">北</div><div id="pauseBadge">一時停止中</div>
       <div id="win"><button id="winClose">閉じる (Esc)</button><div id="winBody"></div></div>
     </div>
     <div id="demoBar">[モックの操作]
-      <button id="demoHit">敵を攻撃した</button><button id="demoHurt">敵に攻撃された</button><span>ゲーム内時間 <b id="tick">0.0</b> 秒</span><span>／ 1〜9: 枠の切替　K ストック　C ステータス　G 装備　I 道具　Esc 閉じる</span></div>
+      <button id="demoHit">敵を攻撃した</button><button id="demoHurt">敵に攻撃された</button><span>／ 1〜9: 枠の切替　K ストック　C ステータス　G 装備　I 道具　Esc 閉じる</span></div>
   </div>
 
   <!-- 右 -->
   <div id="right" class="col">
-    <div class="panel"><div class="title">ミニマップ</div>
+    <div class="panel"><div class="title" id="miniTitle">ミニマップ</div>
       <div style="height:140px;background:repeating-linear-gradient(45deg,#1e3a2a,#1e3a2a 8px,#234632 8px 16px);display:flex;align-items:center;justify-content:center;color:#ffffff80">140 × 140</div></div>
     <div class="panel"><div class="title">ストック（1〜9 / クリックで選択）</div><div id="slots"></div>
       <div class="legend"><span style="color:#f59e0b">■</span> 選択中の武器　<span style="color:#38bdf8">■</span> 選択中の魔法</div></div>
@@ -95,7 +102,7 @@
 
 <script>
 const { $, refs, on, html, show, hide } = jhtml;
-const E = refs('pauseBadge', 'tick', 'slots', 'menu', 'win', 'winBody', 'winClose', 'enemyInfo');
+const E = refs('pauseBadge', 'miniTitle', 'slots', 'menu', 'win', 'winBody', 'winClose', 'enemyInfo');
 
 // ダミーデータ（実データは items.json・magic.json）
 const WEAPONS = [['iron_sword', '鉄の剣', '攻撃 2d6+2 / 重さ 18'], ['iron_greatsword', '鉄の大剣', '攻撃 3d6+3 / 重さ 32'], ['dagger', '短剣', '攻撃 1d6+1 / 重さ 6'], ['short_bow', '短弓', '攻撃 1d8+2 / 重さ 10'], ['apprentice_staff', '見習いの杖', '魔法補正 +2 / 重さ 8']];
@@ -171,10 +178,34 @@ on(document, 'keydown', e => {
   if (KEYS[e.key.toLowerCase()]) openWin(KEYS[e.key.toLowerCase()]);
 });
 
-on('#demoHit', 'click', () => { E.enemyInfo.innerHTML = '<b>スライム</b>　Lv.3<div class="bar"><i style="width:55%;background:#f87171"></i></div><small>HP 11 / 20　ダメージ 9</small>'; });
-on('#demoHurt', 'click', () => { E.enemyInfo.innerHTML = '<b>ゴブリン</b>　Lv.6<div class="bar"><i style="width:90%;background:#f87171"></i></div><small>HP 36 / 40　こちらに 12 ダメージ</small>'; });
+// 敵の情報（現行の仕様と同じ: 攻撃した／された敵のカードを、新しい順に上から並べる。同じ敵なら、一番上へ移す。2.5 秒で消える。
+// 現行の「最大 3 枚」は、ここでは外し、パネルに入る限り出す）
+const ENEMIES = [['スライム', 20], ['ゴブリン', 40], ['コウモリ', 14], ['オーク', 70], ['スケルトン', 48], ['ウルフ', 36]];
+const cards = [];   // 先頭が最新
+let nextEnemy = 0;
+function hitEnemy() {
+  const [name, maxHp] = ENEMIES[nextEnemy++ % ENEMIES.length];
+  const i = cards.findIndex(c => c.name === name);
+  const c = i >= 0 ? cards.splice(i, 1)[0] : { name, maxHp, hp: maxHp };
+  c.hp = Math.max(0, c.hp - 6); c.timer = 2.5;
+  cards.unshift(c); renderEnemies();
+}
+function renderEnemies() {
+  E.enemyInfo.innerHTML = cards.map(c => html`<div class="ecard"><div class="ic"></div><div class="d"><div class="h"><span>${c.name}</span><span>${c.hp}/${c.maxHp}</span></div><div class="bar"><i style="width:${c.hp / c.maxHp * 100}%;background:#f87171"></i></div></div></div>`).join('');
+  // パネルに入りきらないカードは、下から隠す
+  const lim = E.enemyInfo.getBoundingClientRect().bottom;
+  [...E.enemyInfo.children].forEach(el => { el.style.display = el.getBoundingClientRect().bottom > lim + 0.5 ? 'none' : 'flex'; });
+}
+setInterval(() => { if (paused || !cards.length) return; cards.forEach(c => c.timer -= 0.1); const n = cards.length; for (let i = cards.length - 1; i >= 0; i--) if (cards[i].timer <= 0) cards.splice(i, 1); if (cards.length !== n) renderEnemies(); }, 100);
+on('#demoHit', 'click', hitEnemy);
+on('#demoHurt', 'click', hitEnemy);
 renderSlots();
-let t = 0; setInterval(() => { if (!paused) { t += 0.1; E.tick.textContent = t.toFixed(1); } }, 100);   // 停止の確認用（ゲーム内時間は、ダイアログ中は進まない）
+// ミニマップの見出しに、ゲーム内の日時を出す（ダイアログ中は止まる。進む速さは、実時間と同じ 1 倍の仮置き）
+let gameTime = new Date(2026, 10, 15, 14, 32, 0);
+const p2 = n => String(n).padStart(2, '0');
+const showTime = () => { const d = gameTime; E.miniTitle.textContent = `ミニマップ: ${d.getFullYear()}/${p2(d.getMonth() + 1)}/${p2(d.getDate())} ${p2(d.getHours())}:${p2(d.getMinutes())}:${p2(d.getSeconds())}`; };
+setInterval(() => { if (!paused) { gameTime = new Date(gameTime.getTime() + 100); showTime(); } }, 100);
+showTime();
 
 // ブラウザの大きさに合わせて、全体を縮小・拡大する（縦横の合う方に合わせ、上限は MAX_SCALE 倍。余白は中央に寄せる）
 const MAX_SCALE = 3;
