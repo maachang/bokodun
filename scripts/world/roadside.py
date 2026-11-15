@@ -433,7 +433,7 @@ ENV_FROM_OUTER = ('13', '25')
 SKY_KEYS = ('skyColor', 'fogColor', 'fogNear', 'fogFar', 'visibility', 'ambientLight', 'directionalLight')
 
 
-# 町・宿場は、国の街（town_<国>）と同じ見た目にする（ユーザー指示 2026-11-15: 建物・壁・門・地面・植物・空まで。村は今のまま）
+# 町・宿場は、国の街（town_<国>）と同じ見た目にする（ユーザー指示 2026-11-15: 建物・壁・門・地面・植物・空まで。村は今のまま。国属なし（none）は、住民だけ借りた国なので写さない）
 _TOWN_COUNTRIES = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j')
 _TOWN_CHARS_TOWN = ('H', 'S', 'I', 'J', 'W', 'p', '=', 'T', 'f', 'v')   # 家・店・宿・神殿・壁・広場・道・木・花（国の街の凡例の同じ文字から写す）
 _TOWN_CHARS_POST = ('p', '=', 'T', 'f', 'v')   # 宿場の家は、宿場の形（家の見た目の表）のまま
@@ -534,7 +534,7 @@ def build_inner(p, envs, snow_env):
          'legend': legend, 'enemies': {}, 'layout': layout, 'npcs': npcs, 'links': links, 'heights': [''.join(r) for r in hts],
          'heightStep': sm.get('heightStep', 0.5), 'fallDamagePerLevel': sm.get('fallDamagePerLevel', 6)}
     if kind == '町': m['decorFloor'] = sm.get('decorFloor', 'cobblestone')
-    if kind in ('町', '宿場') and country in _TOWN_COUNTRIES: _match_country_town(m, kind, country)
+    if kind in ('町', '宿場') and country in _TOWN_COUNTRIES and not p.get('none'): _match_country_town(m, kind, country)
     if p['id'] in ENV_FROM_OUTER: _match_outer_sky(m, p)
     _fix_exit_links(m, p, gx, gy)
     if kind != '宿場': RL.relax_heights(m, _objects())   # 歩ける隣のマスの高さの差を 1 以内に（落下ダメージを出さない）
