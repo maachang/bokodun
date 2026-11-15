@@ -6,8 +6,9 @@
 <script src="/jhtml.browser.js"></script>
 <style>
   * { box-sizing: border-box; }
-  body { margin: 0; background: #0b0f17; color: #e5e7eb; font: 13px/1.5 sans-serif; }
-  #app { display: flex; gap: 8px; justify-content: center; align-items: flex-start; padding: 8px; }
+  body { margin: 0; background: #0b0f17; color: #e5e7eb; font: 13px/1.5 sans-serif; overflow: hidden; height: 100vh; }
+  /* 全体を 1 つの固定サイズ（約 1300×700）として組み、ブラウザの大きさに合わせて、縮小・拡大する（拡大は MAX_SCALE まで）。計算は、下の fit() */
+  #app { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: max-content; display: flex; gap: 8px; align-items: flex-start; padding: 8px; }
   .col { display: flex; flex-direction: column; gap: 8px; }
   #left { width: 220px; } #right { width: 240px; }
   .panel { background: #111827; border: 1px solid #374151; border-radius: 4px; padding: 8px; }
@@ -154,6 +155,20 @@ on(document, 'keydown', e => {
 on('#demoHit', 'click', () => { E.enemyInfo.innerHTML = '<b>スライム</b>　Lv.3<div class="bar"><i style="width:55%;background:#f87171"></i></div><small>HP 11 / 20　ダメージ 9</small>'; });
 on('#demoHurt', 'click', () => { E.enemyInfo.innerHTML = '<b>ゴブリン</b>　Lv.6<div class="bar"><i style="width:90%;background:#f87171"></i></div><small>HP 36 / 40　こちらに 12 ダメージ</small>'; });
 renderSlots();
+
+// ブラウザの大きさに合わせて、全体を縮小・拡大する（縦横の合う方に合わせ、上限は MAX_SCALE 倍。余白は中央に寄せる）
+const MAX_SCALE = 2;
+function fit() {
+  const app = $('app');
+  app.style.transform = 'none';
+  const w = app.offsetWidth, h = app.offsetHeight;
+  const k = Math.min(MAX_SCALE, innerWidth / w, innerHeight / h);
+  app.style.transform = `scale(${k})`;
+  app.style.left = `${Math.max(0, (innerWidth - w * k) / 2)}px`;
+  app.style.top = `${Math.max(0, (innerHeight - h * k) / 2)}px`;
+}
+on(window, 'resize', fit);
+fit();
 </script>
 </body>
 </html>
