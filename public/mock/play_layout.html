@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>通常プレイ画面レイアウト モック</title>
+<script src="/jhtml.browser.js"></script>
+<style>
+  * { box-sizing: border-box; }
+  body { margin: 0; background: #0b0f17; color: #e5e7eb; font: 13px/1.5 sans-serif; }
+  #app { display: flex; gap: 8px; justify-content: center; align-items: flex-start; padding: 8px; }
+  .col { display: flex; flex-direction: column; gap: 8px; }
+  #left { width: 220px; } #right { width: 240px; }
+  .panel { background: #111827; border: 1px solid #374151; border-radius: 4px; padding: 8px; }
+  .title { font-size: 11px; color: #9ca3af; letter-spacing: .08em; margin-bottom: 4px; }
+  .row { display: flex; justify-content: space-between; gap: 6px; }
+  .bar { height: 10px; background: #1f2937; border-radius: 2px; overflow: hidden; margin: 2px 0 6px; }
+  .bar > i { display: block; height: 100%; }
+  /* ゲーム画面（800×600 の想定） */
+  #gameWrap { position: relative; width: 800px; height: 600px; border: 1px solid #374151; overflow: hidden;
+    background: linear-gradient(#5b7fb5 0 45%, #6b8e4e 45% 100%); }
+  #gameWrap .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #ffffff90; font-size: 22px; }
+  #areaName { position: absolute; top: 8px; left: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
+  #compass { position: absolute; top: 8px; right: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
+  #demoBar { margin-top: 6px; display: flex; gap: 6px; align-items: center; color: #9ca3af; }
+  button { background: #1f2937; color: #e5e7eb; border: 1px solid #4b5563; border-radius: 3px; padding: 2px 8px; cursor: pointer; font: inherit; }
+  button:hover { background: #374151; }
+  /* 9 枠 */
+  #slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+  .slot { position: relative; height: 56px; border: 1px solid #4b5563; border-radius: 3px; background: #0f172a; text-align: center; font-size: 11px; padding-top: 14px; cursor: pointer; }
+  .slot .no { position: absolute; top: 1px; left: 3px; color: #9ca3af; }
+  .slot.empty { color: #4b5563; cursor: default; }
+  .slot.selW { outline: 2px solid #f59e0b; } .slot.selM { outline: 2px solid #38bdf8; }
+  .slot .tag { position: absolute; top: 1px; right: 3px; font-size: 10px; }
+  .legend { font-size: 11px; color: #9ca3af; margin-top: 4px; }
+  /* メニュー */
+  .mi { display: flex; justify-content: space-between; padding: 4px 6px; border-radius: 3px; cursor: pointer; border-left: 4px solid transparent; }
+  .mi:hover { background: #374151; outline: 1px solid #9ca3af; }          /* カーソルが乗っている */
+  .mi.on { background: #1d4ed8; border-left-color: #facc15; font-weight: bold; }   /* いま開いている */
+  .mi.on:hover { background: #2563eb; } .mi kbd { color: #9ca3af; }
+  /* ウィンドウ */
+  #win { position: absolute; inset: 40px 60px; background: #0b1220f2; border: 2px solid #e5e7eb; border-radius: 6px; padding: 12px; display: none; overflow: auto; }
+  #win h3 { margin: 0 0 8px; } #winClose { position: absolute; top: 8px; right: 8px; }
+  .cell { display: inline-block; width: 150px; height: 64px; margin: 0 6px 6px 0; vertical-align: top; border: 1px solid #4b5563; border-radius: 3px; padding: 4px 6px; position: relative; }
+  .cell .x { position: absolute; top: 2px; right: 2px; padding: 0 5px; }
+  .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .grid3 .cell { width: auto; height: 84px; margin: 0; }
+  .cell.add { color: #9ca3af; text-align: center; padding-top: 20px; cursor: pointer; }
+  .pick { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1f2937; cursor: pointer; }
+  .pick:hover { background: #1d4ed8; } .pick.dis { color: #4b5563; cursor: default; background: none; }
+  .enemy { margin-top: 4px; }
+</style>
+</head>
+<body>
+<div id="app">
+  <!-- 左 -->
+  <div id="left" class="col">
+    <div class="panel"><div class="title">現在位置</div><div id="pos">グリーン王国　城下町（x 32, z 29）</div></div>
+    <div class="panel"><div class="title">職業</div>
+      <div class="row"><span>メイン：戦士</span><span>Lv.12</span></div>
+      <div class="row"><span>サブ　：ウィザード</span><span>Lv.5</span></div></div>
+    <div class="panel"><div class="title">ステータス</div>
+      <div class="row"><span>HP</span><span>96 / 127</span></div><div class="bar"><i style="width:76%;background:#4ade80"></i></div>
+      <div class="row"><span>MP</span><span>40 / 78</span></div><div class="bar"><i style="width:51%;background:#60a5fa"></i></div>
+      <div class="row"><span>スタミナ</span><span>70%</span></div><div class="bar"><i style="width:70%;background:#facc15"></i></div>
+      <div class="row"><span>GOLD</span><span style="color:#facc15">1,240 G</span></div>
+      <div class="row"><span>経験値</span><span>3,580</span></div></div>
+    <div class="panel"><div class="title">敵の情報（攻撃した／された）</div><div id="enemyInfo" style="color:#6b7280">（戦闘していません）</div></div>
+  </div>
+
+  <!-- 中央 -->
+  <div>
+    <div id="gameWrap">
+      <div class="ph">ゲーム画面 800 × 600</div>
+      <div id="areaName">城下町 メインストリート</div><div id="compass">北</div>
+      <div id="win"><button id="winClose">閉じる (Esc)</button><div id="winBody"></div></div>
+    </div>
+    <div id="demoBar">[モックの操作]
+      <button id="demoHit">敵を攻撃した</button><button id="demoHurt">敵に攻撃された</button><span>／ 1〜9: 枠の切替　K ストック　C ステータス　G 装備　I 道具　Esc 閉じる</span></div>
+  </div>
+
+  <!-- 右 -->
+  <div id="right" class="col">
+    <div class="panel"><div class="title">ミニマップ</div>
+      <div style="height:140px;background:repeating-linear-gradient(45deg,#1e3a2a,#1e3a2a 8px,#234632 8px 16px);display:flex;align-items:center;justify-content:center;color:#ffffff80">140 × 140</div></div>
+    <div class="panel"><div class="title">ストック（1〜9 / クリックで選択）</div><div id="slots"></div>
+      <div class="legend"><span style="color:#f59e0b">■</span> 選択中の武器　<span style="color:#38bdf8">■</span> 選択中の魔法</div></div>
+    <div class="panel"><div class="title">メニュー</div><div id="menu"></div></div>
+  </div>
+</div>
+
+<script>
+const { $, refs, on, html, show, hide } = jhtml;
+const E = refs('slots', 'menu', 'win', 'winBody', 'winClose', 'enemyInfo');
+
+// ダミーデータ（実データは items.json・magic.json）
+const WEAPONS = [['iron_sword', '鉄の剣', '攻撃 2d6+2 / 重さ 18'], ['iron_greatsword', '鉄の大剣', '攻撃 3d6+3 / 重さ 32'], ['dagger', '短剣', '攻撃 1d6+1 / 重さ 6'], ['short_bow', '短弓', '攻撃 1d8+2 / 重さ 10'], ['apprentice_staff', '見習いの杖', '魔法補正 +2 / 重さ 8']];
+const MAGICS = [['magic_bolt', 'マジックボルト', 'MP 5 / 威力 1d6+3 / 失敗 11%'], ['fire', 'ファイア', 'MP 14 / 威力 2d6+3 / 失敗 19%'], ['heal', 'ヒール', 'MP 9 / 回復 / 失敗 8%'], ['spread', '拡散弾', 'MP 12 / 範囲 / 失敗 15%']];
+const stock = Array(9).fill(null);
+stock[0] = { kind: 'weapon', id: 'iron_sword' }; stock[1] = { kind: 'weapon', id: 'dagger' };
+stock[3] = { kind: 'magic', id: 'magic_bolt' }; stock[4] = { kind: 'magic', id: 'fire' };
+let selW = 0, selM = 3;
+const find = it => (it.kind === 'weapon' ? WEAPONS : MAGICS).find(x => x[0] === it.id);
+
+function renderSlots() {
+  E.slots.innerHTML = stock.map((it, i) => it
+    ? html`<div class="slot ${i === selW ? 'selW' : ''} ${i === selM ? 'selM' : ''}" data-i="${i}"><span class="no">${i + 1}</span><span class="tag">${it.kind === 'weapon' ? '武' : '魔'}</span>${find(it)[1]}</div>`
+    : html`<div class="slot empty"><span class="no">${i + 1}</span>空き</div>`).join('');
+}
+function selectSlot(i) {
+  const it = stock[i]; if (!it) return;
+  if (it.kind === 'weapon') selW = i; else selM = i;
+  renderSlots();
+}
+on(E.slots, 'click', '.slot[data-i]', (e, t) => selectSlot(Number(t.dataset.i)));
+
+const MENU = [['stock', 'ストック', 'K'], ['status', 'ステータス', 'C'], ['equip', '装備', 'G'], ['item', '道具', 'I']];
+E.menu.innerHTML = MENU.map(([id, name, key]) => html`<div class="mi" data-id="${id}"><span>${name}</span><kbd>${key}</kbd></div>`).join('');
+
+function openWin(id) {
+  const m = MENU.find(x => x[0] === id); if (!m) return;
+  E.winBody.innerHTML = '<h3>' + m[1] + '</h3>' + ({ stock: stockBody, status: statusBody, equip: equipBody, item: itemBody }[id])();
+  show(E.win); document.querySelectorAll('.mi').forEach(el => el.classList.toggle('on', el.dataset.id === id));
+}
+function closeWin() { hide(E.win); document.querySelectorAll('.mi').forEach(el => el.classList.remove('on')); }
+on(E.menu, 'click', '.mi', (e, t) => openWin(t.dataset.id));
+on(E.winClose, 'click', closeWin);
+
+function stockBody() {
+  return '<p class="legend">最大 9 枠。✕ で外し、「＋追加」で武器・魔法を選んで入れます。</p><div class="grid3">' + stock.map((it, i) => it
+    ? html`<div class="cell"><button class="x" data-rm="${i}">✕</button><b>${i + 1}</b> ${find(it)[1]}<br><small>${it.kind === 'weapon' ? '武器' : '魔法'}　${find(it)[2]}</small></div>`
+    : html`<div class="cell add" data-add="${i}" style="padding-top:30px">＋ 追加（${i + 1}）</div>`).join('') + '</div>';
+}
+function pickBody(slotNo) {
+  const used = new Set(stock.filter(Boolean).map(x => x.id));
+  const row = (kind, [id, name, d]) => html`<div class="pick ${used.has(id) ? 'dis' : ''}" data-kind="${kind}" data-id="${id}" data-slot="${slotNo}"><span>${name}${used.has(id) ? '（入っています）' : ''}</span><small>${d}</small></div>`;
+  return '<p><button data-back="1">← 戻る</button> 枠 ' + (slotNo + 1) + ' に入れる武器・魔法</p><div class="title">武器</div>' + WEAPONS.map(w => row('weapon', w)).join('') + '<div class="title" style="margin-top:8px">魔法</div>' + MAGICS.map(m => row('magic', m)).join('');
+}
+on(E.winBody, 'click', '[data-rm]', (e, t) => { const i = Number(t.dataset.rm); stock[i] = null; if (selW === i) selW = stock.findIndex(x => x && x.kind === 'weapon'); if (selM === i) selM = stock.findIndex(x => x && x.kind === 'magic'); renderSlots(); openWin('stock'); });
+on(E.winBody, 'click', '[data-add]', (e, t) => { E.winBody.innerHTML = '<h3>ストック</h3>' + pickBody(Number(t.dataset.add)); });
+on(E.winBody, 'click', '[data-back]', () => openWin('stock'));
+on(E.winBody, 'click', '.pick:not(.dis)', (e, t) => { const i = Number(t.dataset.slot); stock[i] = { kind: t.dataset.kind, id: t.dataset.id }; if (stock[i].kind === 'weapon' && selW < 0) selW = i; if (stock[i].kind === 'magic' && selM < 0) selM = i; renderSlots(); openWin('stock'); });
+
+function statusBody() { return '<div class="row"><span>種族：人間</span><span>メイン職業：戦士 Lv.12</span></div><div class="row"><span>サブ職業：ウィザード Lv.5</span><span>（選んだサブ職業が一番有効）</span></div><hr><p>筋力 14　器用度 12　敏捷度 13　知力 11　精神力 10　生命力 15（ダミー）</p><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
+function equipBody() { return ['兜：鉄の兜', '鎧：革の鎧', '盾：木の盾', 'アクセサリ：（なし）'].map(s => html`<div class="cell" style="width:220px">${s}</div>`).join('') + '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>'; }
+function itemBody() { return ['薬草 ×5', '毒消し ×2', '麻痺治し ×1', '復活の薬 ×1', '〔防具〕革の鎧', '〔防具〕鉄の兜', '〔防具〕木の盾'].map(s => html`<div class="pick"><span>${s}</span></div>`).join('') + '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）</p>'; }
+
+const KEYS = { k: 'stock', c: 'status', g: 'equip', i: 'item' };
+on(document, 'keydown', e => {
+  if (e.key === 'Escape') return closeWin();
+  if (/^[1-9]$/.test(e.key)) return selectSlot(Number(e.key) - 1);
+  if (KEYS[e.key.toLowerCase()]) openWin(KEYS[e.key.toLowerCase()]);
+});
+
+on('#demoHit', 'click', () => { E.enemyInfo.innerHTML = '<b>スライム</b>　Lv.3<div class="bar"><i style="width:55%;background:#f87171"></i></div><small>HP 11 / 20　ダメージ 9</small>'; });
+on('#demoHurt', 'click', () => { E.enemyInfo.innerHTML = '<b>ゴブリン</b>　Lv.6<div class="bar"><i style="width:90%;background:#f87171"></i></div><small>HP 36 / 40　こちらに 12 ダメージ</small>'; });
+renderSlots();
+</script>
+</body>
+</html>
