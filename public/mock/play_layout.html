@@ -8,9 +8,9 @@
   * { box-sizing: border-box; }
   body { margin: 0; background: #0b0f17; color: #e5e7eb; font: 13px/1.5 sans-serif; overflow: hidden; height: 100vh; }
   /* 全体を 1 つの固定サイズ（約 1300×700）として組み、ブラウザの大きさに合わせて、縮小・拡大する（拡大は MAX_SCALE まで）。計算は、下の fit() */
-  #app { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: max-content; display: flex; gap: 8px; align-items: flex-start; padding: 8px; }
+  #app { position: absolute; top: 0; left: 0; transform-origin: 0 0; width: max-content; display: flex; gap: 8px; align-items: stretch; padding: 8px; }
   .col { display: flex; flex-direction: column; gap: 8px; }
-  #left { width: 220px; height: 602px; }   /* ゲーム画面（800×600＋枠）と同じ高さ。敵の情報が、残りを使う */ #right { width: 240px; }
+  #left { width: 220px; }   /* 高さは、全体（#app の align-items: stretch）にそろえる。敵の情報が、残りを使う */ #right { width: 240px; }
   .panel { background: #111827; border: 1px solid #374151; border-radius: 4px; padding: 8px; }
   .small { font-size: 12px; }   /* 左側の職業・ステータスは、少し小さめの文字 */
   .title { font-size: 11px; color: #9ca3af; letter-spacing: .08em; margin-bottom: 4px; }
@@ -22,11 +22,14 @@
     background: linear-gradient(#5b7fb5 0 45%, #6b8e4e 45% 100%); }
   #gameWrap .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #ffffff90; font-size: 22px; }
   #areaName { position: absolute; top: 8px; left: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
-  #pauseBadge { position: absolute; bottom: 8px; left: 8px; background: #b91c1ccc; padding: 2px 10px; border-radius: 3px; display: none; font-weight: bold; }
+  #pauseBadge { position: absolute; top: 40px; left: 8px; background: #b91c1ccc; padding: 2px 10px; border-radius: 3px; display: none; font-weight: bold; }
   #compass { position: absolute; top: 8px; right: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
   #center { width: 802px; flex: none; }   /* 下のモック操作の帯が長くても、中央の幅（ゲーム画面 800px＋枠）を広げない */
+  /* ゲーム画面の一番下に、ボスの HP（上）と会話（下）を、重ねて並べる */
+  #bottomStack { position: absolute; left: 12px; right: 12px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
+  #bossBar:empty { display: none; }
   #bossBar { height: 36px; padding: 4px 10px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; border-radius: 4px; }   /* 高さは常に確保（出入りで全体の倍率が変わらないように） */
-  #bossBar.on { background: #111827; border-color: #7f1d1d; }
+  #bossBar.on { background: #111827e6; border-color: #7f1d1d; }
   #bossBar .nm { flex: none; width: 150px; font-weight: bold; color: #fecaca; }
   #bossBar .bar { flex: 1; height: 14px; margin: 0; }
   #bossBar .num { flex: none; width: 110px; text-align: right; font-size: 12px; }
@@ -34,7 +37,7 @@
   button:hover { background: #374151; }
   /* 9 枠 */
   #slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-  .slot { position: relative; height: 56px; border: 1px solid #4b5563; border-radius: 3px; background: #0f172a; text-align: center; font-size: 11px; padding-top: 14px; cursor: pointer; }
+  .slot { position: relative; height: 44px; border: 1px solid #4b5563; border-radius: 3px; background: #0f172a; text-align: center; font-size: 11px; line-height: 1.2; padding-top: 12px; cursor: pointer; }
   .slot .no { position: absolute; top: 1px; left: 3px; color: #9ca3af; }
   .slot.empty { color: #4b5563; cursor: default; }
   .slot.selW { outline: 2px solid #f59e0b; } .slot.selM { outline: 2px solid #38bdf8; }
@@ -42,7 +45,7 @@
   .clickable { cursor: pointer; } .clickable:hover { border-color: #9ca3af; background: #1a2332; }
   .legend { font-size: 11px; color: #9ca3af; margin-top: 4px; }
   /* メニュー */
-  .mi { display: flex; justify-content: space-between; padding: 4px 6px; border-radius: 3px; cursor: pointer; border-left: 4px solid transparent; }
+  .mi { display: flex; justify-content: space-between; padding: 3px 6px; border-radius: 3px; cursor: pointer; border-left: 4px solid transparent; }
   .mi:hover { background: #374151; outline: 1px solid #9ca3af; }          /* カーソルが乗っている */
   .mi.on { background: #1d4ed8; border-left-color: #facc15; font-weight: bold; }   /* いま開いている */
   .mi.on:hover { background: #2563eb; } .mi kbd { color: #9ca3af; }
@@ -65,9 +68,7 @@
   .slot.lack { opacity: .45; }                         /* MP が足りない魔法 */
   .slot .cd { position: absolute; left: 0; bottom: 0; height: 4px; background: #38bdf8; }   /* 連射間隔（クールダウン） */
   .sel { cursor: pointer; font-size: 11px; padding: 1px 4px; border-radius: 3px; } .sel:hover { background: #374151; }
-  #below { position: relative; height: 84px; margin-top: 6px; }   /* ボスの HP と会話が、同じ場所を使う（高さは常に確保） */
-  #bossBar { margin-top: 0; }
-  #talk { position: absolute; inset: 0; display: none; flex-direction: column; gap: 4px; background: #0b1220; border: 2px solid #e5e7eb; border-radius: 4px; padding: 6px 12px; }
+  #talk { height: 96px; display: none; flex-direction: column; gap: 4px; background: #0b1220; border: 2px solid #e5e7eb; border-radius: 4px; padding: 6px 12px; }
   #talk .who { color: #facc15; font-weight: bold; } #talk .ch { display: flex; gap: 8px; margin-top: auto; }
   #death { position: absolute; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 5; text-align: center; }
   #death .tomb { width: 90px; height: 110px; border-radius: 45px 45px 0 0; background: #6b7280; border: 3px solid #9ca3af; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #111827; }
@@ -97,10 +98,10 @@
     <div id="gameWrap">
       <div class="ph">ゲーム画面 800 × 600</div>
       <div id="areaName">城下町 メインストリート</div><div id="compass">北</div><div id="pauseBadge">一時停止中</div>
+      <div id="bottomStack"><div id="bossBar"></div><div id="talk"></div></div>
       <div id="death"><div class="tomb">RIP</div><div id="deathMsg" style="font-size:18px"></div><div style="color:#9ca3af">Enter か、数秒で、最後にセーブしたギルドで復活します</div></div>
       <div id="win"><button id="winClose">閉じる (Esc)</button><div id="winBody"></div></div>
     </div>
-    <div id="below"><div id="bossBar"></div><div id="talk"></div></div>
   </div>
 
   <!-- 右 -->
@@ -280,6 +281,8 @@ function fit() {
 }
 // 動きの確認は、ブラウザのコンソールから（例: mock.die()、mock.bossHit()、mock.hitEnemy()、mock.talk('村人', '…')、mock.guild()）
 window.mock = { hitEnemy, die, guild, talk, bossHit: () => { if (!boss) boss = { name: 'ワイバーン', hp: 1200, maxHp: 1200 }; else boss.hp = Math.max(0, boss.hp - 150); renderBoss(); }, bossEnd: () => { boss = null; renderBoss(); } };
+// 開いた時点で、敵のカード・ボスの HP・会話（ギルド）を出した状態にする（動きの確認は mock.* から）
+mock.hitEnemy(); mock.hitEnemy(); mock.bossHit(); mock.guild();
 on(window, 'resize', fit);
 fit();
 </script>
