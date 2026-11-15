@@ -87,7 +87,7 @@ def _geometry(rc, s, L, kind):
     return dict(box=(min(ys_), max(ys_), min(xs_), max(xs_)), plaza=plaza, gate=gate, sign=sign, center=c, lead=at(1, -1))
 
 
-def _region_ok(t, obj, geo, placed, strict=False):
+def _region_ok(t, obj, geo, placed, strict=False, port=False):
     y0, y1, x0, x1 = geo['box']
     ys_, xs_ = range(y0 - 1, y1 + 2), range(x0 - 1, x1 + 2)
     pts = geo['plaza'] + [geo['sign']]
@@ -98,7 +98,10 @@ def _region_ok(t, obj, geo, placed, strict=False):
     if strict and not all(_free_land(t, obj, [y], [x]) for y, x in geo['plaza'] + [geo['sign'], geo['center'], geo['lead']]): return False   # 門前の石畳・立て札・道の端も、陸（水の上は不可）
     if strict:   # 13 番以降: 水（海・川・湖）の近く（外観の 3 マス以内）は、地面の高さが 1 以下の所だけ（水面 0 との段差を 1 以内にして、崖を残さない）
         water = t['deep'] | t['shallow'] | t['lagoon'] | t['bridge'] | (t['river'] > 0) | ~t['land']
-        if water[y0 - 3:y1 + 4, x0 - 3:x1 + 4].any() and int(t['elev'][tuple(geo['plaza'][0])]) > 1: return False
+        if port:   # 港町: 海に密接（外観の 2〜3 マス以内に海がある）。高さは _paint で 1 に下げる（水際の段差を 1 に収める）
+            sea = (~t['land'] | t['deep'] | t['shallow']) & ~t['lake'] & ~(t['river'] > 0)
+            if not sea[y0 - 3:y1 + 4, x0 - 3:x1 + 4].any(): return False
+        elif water[y0 - 3:y1 + 4, x0 - 3:x1 + 4].any() and int(t['elev'][tuple(geo['plaza'][0])]) > 1: return False
     for q in placed:
         qy0, qy1, qx0, qx1 = q['box']
         if not (y1 + 6 < qy0 or qy1 + 6 < y0 or x1 + 6 < qx0 or qx1 + 6 < x0): return False
@@ -130,12 +133,13 @@ def _village_houses(obj, geo, sid):
                     else: obj[lo + ww, edge + inward * dd] = ord(WOOD_HOUSE_CH)
 
 
-def _paint(g, geo, kind, country, name, sid, sign=True):
+def _paint(g, geo, kind, country, name, sid, sign=True, port=False):
     """外観を obj に置き、高さを道に合わせる"""
     obj, elev = g.obj, g.elev
     y0, y1, x0, x1 = geo['box']
     ch = lambda e: CHAR[(country, e)]
     base = int(elev[geo['plaza'][0]])
+    if port: base = min(base, 1)   # 港町は、海ぎわの高さ 1 まで下げる
     region = (slice(y0 - 1, y1 + 2), slice(x0 - 1, x1 + 2))
     obj[region] = ord('0')
     elev[region] = base
@@ -161,7 +165,7 @@ def _place_free(t, obj, kind, pt, centers, port, ok=None):
         dirs = sorted(((1, 0), (-1, 0), (0, 1), (0, -1)), key=lambda s: s[0] * (ny - rc[0]) + s[1] * (nx - rc[1]))   # 街道から遠ざかる向きが先（外観は、道の端から、街道と反対側に作る。街道と外観の間に、道の端が来る）
         for s in dirs:
             geo = _geometry(rc, s, 0, kind)
-            if _region_ok(t, obj, geo, PLACED, strict=True) and (ok is None or ok(geo)): return rc, s, geo   # ok: 道を通せるか
+            if _region_ok(t, obj, geo, PLACED, strict=True, port=port) and (ok is None or ok(geo)): return rc, s, geo   # ok: 道を通せるか
     return None
 
 
@@ -273,7 +277,7 @@ def place(g):
                 if done: break
         assert done, f'道沿いの {sid} {name}: 置ける場所がない（{r0},{c0} の近く）'
         rc, s, geo = done
-        _paint(g, geo, kind, country, name, sid, sign=has_sign)
+        _paint(g, geo, kind, country, name, sid, sign=has_sign, port=(label == '港町' and len(row) > 5))
         if len(row) > 5: _smooth_site(g, geo)   # 13 番以降は、斜面・海岸にも置くので、まわりの地形をなだらかに
         my, mx = geo['gate'][0][0] // MESH_SIZE, geo['gate'][0][1] // MESH_SIZE
         msg = f"【{label}】{name}" + ('' if opt.get('none') else f"（{TOWN_NAME[country]}）")
