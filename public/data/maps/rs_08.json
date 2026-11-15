@@ -10,27 +10,27 @@
   "angle": 0
  },
  "environment": {
-  "floorType": "grass",
+  "floorType": "stone",
   "hasCeiling": false,
   "ambientLight": 9408660,
   "directionalLight": 16774610,
-  "fogColor": 12373460,
+  "fogColor": 11713215,
   "fogNear": 22,
-  "fogFar": 80,
+  "fogFar": 75,
   "visibility": 0.9,
-  "skyColor": 9683955
+  "skyColor": 9018045
  },
  "legend": {
   "#": "wooden_fence",
   "H": "rock_house",
   "D": "dirt_road",
   "C": "cobblestone_path",
-  "T": "tree",
+  "T": "conifer_tree_a",
   "O": "mossy_boulder",
   "N": "wooden_signpost",
   "~": "water_shallow",
   "P": "water",
-  "=": "wood_bridge",
+  "=": "paved_road",
   "2": "portal",
   "W": "wooden_wall",
   "F": "wood_floor",
@@ -43,8 +43,8 @@
   "g": "cupboard",
   "s": "hearth",
   "o": "stove",
-  "f": "flower_bed",
-  "v": "flower_bed_blue",
+  "f": "conifer_tree_b",
+  "v": "conifer_tree_a",
   "x": "meadow_grass",
   "X": "road_weed",
   "y": "roadside_flowers",
@@ -216,5 +216,6 @@
   "00000000000000000000"
  ],
  "heightStep": 0.5,
- "fallDamagePerLevel": 6
+ "fallDamagePerLevel": 6,
+ "decorFloor": "cobblestone"
 }

@@ -428,9 +428,25 @@ def _objects():
     return _OBJECTS[0]
 
 
-# 外の景色が、国のサンプルの明るい青空と大きく違う場所は、中の空・霧・光を、外のマップに合わせる（ジョハー村 13・ソロウ村 25・シルヴァノ宿場 8）
-ENV_FROM_OUTER = ('8', '13', '25')
+# 外の景色が、国のサンプルの明るい青空と大きく違う場所は、中の空・霧・光を、外のマップに合わせる（村: ジョハー村 13・ソロウ村 25）
+ENV_FROM_OUTER = ('13', '25')
 SKY_KEYS = ('skyColor', 'fogColor', 'fogNear', 'fogFar', 'visibility', 'ambientLight', 'directionalLight')
+
+
+# 町・宿場は、国の街（town_<国>）と同じ見た目にする（ユーザー指示 2026-11-15: 建物・壁・門・地面・植物・空まで。村は今のまま）
+_TOWN_COUNTRIES = ('a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j')
+_TOWN_CHARS_TOWN = ('H', 'S', 'I', 'J', 'W', 'p', '=', 'T', 'f', 'v')   # 家・店・宿・神殿・壁・広場・道・木・花（国の街の凡例の同じ文字から写す）
+_TOWN_CHARS_POST = ('p', '=', 'T', 'f', 'v')   # 宿場の家は、宿場の形（家の見た目の表）のまま
+
+
+def _match_country_town(m, kind, country):
+    town = json.load(open(os.path.join(MAPS, f'town_{country}.json'), encoding='utf-8'))
+    for ch in (_TOWN_CHARS_TOWN if kind == '町' else _TOWN_CHARS_POST):
+        if ch not in m['legend'] or ch not in town['legend']: continue
+        if ch == 'W' and _objects().get(town['legend'][ch], {}).get('type') != 'block': continue   # 生け垣（G の街の外壁）などは、門の両脇の壁にできない（扉の向きが決まらない）ので、壁は今のまま
+        m['legend'][ch] = town['legend'][ch]
+    m['environment'] = dict(town['environment'])
+    if town.get('decorFloor'): m['decorFloor'] = town['decorFloor']
 
 
 def _match_outer_sky(m, p):
@@ -518,6 +534,7 @@ def build_inner(p, envs, snow_env):
          'legend': legend, 'enemies': {}, 'layout': layout, 'npcs': npcs, 'links': links, 'heights': [''.join(r) for r in hts],
          'heightStep': sm.get('heightStep', 0.5), 'fallDamagePerLevel': sm.get('fallDamagePerLevel', 6)}
     if kind == '町': m['decorFloor'] = sm.get('decorFloor', 'cobblestone')
+    if kind in ('町', '宿場') and country in _TOWN_COUNTRIES: _match_country_town(m, kind, country)
     if p['id'] in ENV_FROM_OUTER: _match_outer_sky(m, p)
     _fix_exit_links(m, p, gx, gy)
     if kind != '宿場': RL.relax_heights(m, _objects())   # 歩ける隣のマスの高さの差を 1 以内に（落下ダメージを出さない）
