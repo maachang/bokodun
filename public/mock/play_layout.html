@@ -25,6 +25,11 @@
   #pauseBadge { position: absolute; bottom: 8px; left: 8px; background: #b91c1ccc; padding: 2px 10px; border-radius: 3px; display: none; font-weight: bold; }
   #compass { position: absolute; top: 8px; right: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
   #center { width: 802px; flex: none; }   /* 下のモック操作の帯が長くても、中央の幅（ゲーム画面 800px＋枠）を広げない */
+  #bossBar { height: 36px; margin-top: 6px; padding: 4px 10px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; border-radius: 4px; }   /* 高さは常に確保（出入りで全体の倍率が変わらないように） */
+  #bossBar.on { background: #111827; border-color: #7f1d1d; }
+  #bossBar .nm { flex: none; width: 150px; font-weight: bold; color: #fecaca; }
+  #bossBar .bar { flex: 1; height: 14px; margin: 0; }
+  #bossBar .num { flex: none; width: 110px; text-align: right; font-size: 12px; }
   #demoBar { margin-top: 6px; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; color: #9ca3af; }
   button { background: #1f2937; color: #e5e7eb; border: 1px solid #4b5563; border-radius: 3px; padding: 2px 8px; cursor: pointer; font: inherit; }
   button:hover { background: #374151; }
@@ -86,8 +91,9 @@
       <div id="areaName">城下町 メインストリート</div><div id="compass">北</div><div id="pauseBadge">一時停止中</div>
       <div id="win"><button id="winClose">閉じる (Esc)</button><div id="winBody"></div></div>
     </div>
+    <div id="bossBar"></div>
     <div id="demoBar">[モックの操作]
-      <button id="demoHit">敵を攻撃した</button><button id="demoHurt">敵に攻撃された</button><span>／ 1〜9: 枠の切替　K ストック　C ステータス　G 装備　I 道具　Esc 閉じる</span></div>
+      <button id="demoHit">敵を攻撃した</button><button id="demoHurt">敵に攻撃された</button><button id="demoBoss">ボス戦（開始／攻撃）</button><button id="demoBossEnd">ボス戦を終える</button><span>／ 1〜9: 枠の切替　K ストック　C ステータス　G 装備　I 道具　Esc 閉じる</span></div>
   </div>
 
   <!-- 右 -->
@@ -197,6 +203,15 @@ function renderEnemies() {
   [...E.enemyInfo.children].forEach(el => { el.style.display = el.getBoundingClientRect().bottom > lim + 0.5 ? 'none' : 'flex'; });
 }
 setInterval(() => { if (paused || !cards.length) return; cards.forEach(c => c.timer -= 0.1); const n = cards.length; for (let i = cards.length - 1; i >= 0; i--) if (cards[i].timer <= 0) cards.splice(i, 1); if (cards.length !== n) renderEnemies(); }, 100);
+// ボスの HP（ゲーム画面の真下の帯。ボスは左の敵カードには出さない。戦闘中は出し続け、倒す・離れると消える）
+let boss = null;
+function renderBoss() {
+  const el = $('bossBar');
+  el.classList.toggle('on', !!boss);
+  el.innerHTML = boss ? html`<span class="nm">${boss.name}</span><div class="bar"><i style="width:${boss.hp / boss.maxHp * 100}%;background:#ef4444"></i></div><span class="num">${boss.hp} / ${boss.maxHp}</span>` : '';
+}
+on('#demoBoss', 'click', () => { if (!boss) boss = { name: 'ワイバーン', hp: 1200, maxHp: 1200 }; else boss.hp = Math.max(0, boss.hp - 150); renderBoss(); });
+on('#demoBossEnd', 'click', () => { boss = null; renderBoss(); });
 on('#demoHit', 'click', hitEnemy);
 on('#demoHurt', 'click', hitEnemy);
 renderSlots();
