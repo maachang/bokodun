@@ -1,9 +1,10 @@
 // 全種類のタイル（objects.json の type）を含むマップを、1 種類ずつ選び、ブラウザ（headless Chrome）で順に読み込んで、例外・console.error が出ないことを確かめる。
 // game.js などの描画コードを分割・整理したときの確認に使う（テストでは、描画の実行は確かめられないため）。
 // 各マップで、立っているだけでなく、前へ歩く（120 フレーム）・左へ回る（30 フレーム）の更新も実行して、操作のキー（装備・魔法・攻撃・調べる）・クリック・HUD・描画も動かして、毎フレームの処理（移動・罠・弾・戦闘・HUD など）の例外を拾う（歩いて、門などから別のマップへ移るのは、正常。読み込んだ直後に、そのマップであることを確かめる）。
-// 使い方: maachang -p 3012 を起動しておき、`PROF=$(mktemp -d) bun scripts/verify_maps.mjs [ポート 3012]`。追加で見たいマップは、引数の後ろに ID を並べる
+// 使い方: maachang -p 3012 を起動しておき、`bun scripts/verify_maps.mjs [ポート 3012]`。追加で見たいマップは、引数の後ろに ID を並べる
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';
+import os from 'node:os';
 import path from 'node:path';
 
 const root = path.join(path.dirname(new URL(import.meta.url).pathname), '..');
@@ -20,7 +21,10 @@ const ids = [...new Set([...Object.values(pick), ...extra])];
 console.log(`種類 ${Object.keys(pick).length} → マップ ${ids.length} 枚:`, ids.join(' '));
 
 const port = 9334;
-const chrome = spawn('google-chrome', ['--headless=new', '--no-sandbox', `--remote-debugging-port=${port}`, '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--window-size=900,600', `--user-data-dir=${process.env.PROF}`, 'about:blank'], { stdio: 'ignore' });
+// PROF 未指定のときは一時ディレクトリを作る（未指定のまま渡すと、プロジェクト直下に undefined/ ができるため）。終了時に、自分で作った分だけ削除する
+const ownProf = !process.env.PROF;
+const prof = process.env.PROF || fs.mkdtempSync(path.join(os.tmpdir(), 'verify_maps_'));
+const chrome = spawn('google-chrome', ['--headless=new', '--no-sandbox', `--remote-debugging-port=${port}`, '--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist', '--window-size=900,600', `--user-data-dir=${prof}`, 'about:blank'], { stdio: 'ignore' });
 const sleep = ms => new Promise(r => setTimeout(r, ms));
 let targets;
 for (let i = 0; i < 50; i++) { try { targets = await (await fetch(`http://127.0.0.1:${port}/json`)).json(); if (targets.length) break; } catch {} await sleep(200); }
@@ -37,4 +41,5 @@ const r = await send('Runtime.evaluate', { expression: expr, awaitPromise: true,
 const res = JSON.parse(r.result?.result?.value ?? '{"bad":["(評価に失敗)"],"errs":[]}');
 console.log(res.bad.length ? `NG: ${res.bad.join(', ')}\n${res.errs.join('\n')}` : `OK: ${res.checked} 枚、エラーなし`);
 ws.close(); chrome.kill();
+if (ownProf) { await sleep(500); fs.rmSync(prof, { recursive: true, force: true }); }
 process.exit(res.bad.length ? 1 : 0);
