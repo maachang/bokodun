@@ -12,13 +12,13 @@
  "environment": {
   "floorType": "grass",
   "hasCeiling": false,
-  "ambientLight": 9408660,
-  "directionalLight": 16774610,
-  "fogColor": 12373460,
-  "fogNear": 22,
-  "fogFar": 80,
+  "ambientLight": 16777215,
+  "directionalLight": 15790320,
+  "fogColor": 13159632,
+  "fogNear": 18,
+  "fogFar": 65,
   "visibility": 0.9,
-  "skyColor": 9683955
+  "skyColor": 12896460
  },
  "legend": {
   "#": "wooden_fence",

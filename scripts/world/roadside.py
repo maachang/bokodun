@@ -428,6 +428,16 @@ def _objects():
     return _OBJECTS[0]
 
 
+# 外の景色が、国のサンプルの明るい青空と大きく違う場所は、中の空・霧・光を、外のマップに合わせる（ジョハー村 13・ソロウ村 25・シルヴァノ宿場 8）
+ENV_FROM_OUTER = ('8', '13', '25')
+SKY_KEYS = ('skyColor', 'fogColor', 'fogNear', 'fogFar', 'visibility', 'ambientLight', 'directionalLight')
+
+
+def _match_outer_sky(m, p):
+    outer = json.load(open(os.path.join(MAPS, p['mesh'] + '.json'), encoding='utf-8'))['environment']
+    m['environment'] = dict(m['environment'], **{k: outer[k] for k in SKY_KEYS if k in outer})
+
+
 def build_inner(p, envs, snow_env):
     """道沿いの 1 か所の中のマップ（rs_番号）"""
     kind, country = p['kind'], p['country']
@@ -504,6 +514,7 @@ def build_inner(p, envs, snow_env):
          'legend': legend, 'enemies': {}, 'layout': layout, 'npcs': npcs, 'links': links, 'heights': [''.join(r) for r in hts],
          'heightStep': sm.get('heightStep', 0.5), 'fallDamagePerLevel': sm.get('fallDamagePerLevel', 6)}
     if kind == '町': m['decorFloor'] = sm.get('decorFloor', 'cobblestone')
+    if p['id'] in ENV_FROM_OUTER: _match_outer_sky(m, p)
     _fix_exit_links(m, p, gx, gy)
     if kind != '宿場': RL.relax_heights(m, _objects())   # 歩ける隣のマスの高さの差を 1 以内に（落下ダメージを出さない）
     if kind == '町' and RW.TOWN_PLAZA[p['id']] == 'stalls':
