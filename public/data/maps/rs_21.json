@@ -44,8 +44,8 @@
   "M": "pub_sign",
   "Y": "well",
   "5": "ship_small",
-  "6": "crate",
-  "7": "barrel",
+  "6": "crate_out",
+  "7": "barrel_out",
   "m": "mansion_door",
   "G": "gate_rock_plain"
  },

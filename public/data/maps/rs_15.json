@@ -43,8 +43,8 @@
   "N": "inn_door",
   "M": "pub_sign",
   "5": "ship_small",
-  "6": "crate",
-  "7": "barrel",
+  "6": "crate_out",
+  "7": "barrel_out",
   "m": "mansion_door",
   "R": "weapon_shop_sign",
   "G": "gate_wood_plain"

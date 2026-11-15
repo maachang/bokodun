@@ -76,7 +76,7 @@ def port_decor(lay, legend, sid):
     """港町: 水路（真ん中の横の川）に船、岸に荷（箱と樽）を置く（場所ごとに違う。凡例は、使っていない文字で）"""
     for ch in '567':
         assert ch not in legend and not any(ch in r for r in lay), f'港町の飾りの文字 {ch} が使われている'
-    legend.update({'5': 'ship_small', '6': 'crate', '7': 'barrel'})
+    legend.update({'5': 'ship_small', '6': 'crate_out', '7': 'barrel_out'})   # 屋外用（床・天井なし。屋内用だと天井の板が空に浮く）
     d = PORT_DECOR[sid]
     for x in d['ships']:
         if lay[10][x] == 'w': lay[10][x] = '5'

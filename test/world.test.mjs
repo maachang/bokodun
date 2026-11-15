@@ -1583,6 +1583,19 @@ test('屋外のマップ（外のマップ w_*・街の中 town_a〜h）に、�
     }
 });
 
+test('道沿いの町・村・港町の中（rs_*）に、屋内用の家具（床・天井つき）を置かない。港町の荷の天井が、空に浮く', () => {
+    const files = fs.readdirSync(path.join(root, 'public/data/maps')).filter(f => /^rs_\d+\.json$/.test(f));
+    assert.ok(files.length >= 28);
+    for (const f of files) {
+        const m = readJson(`public/data/maps/${f}`);
+        for (const [ch, name] of Object.entries(m.legend)) {
+            if (!m.layout.some(row => row.includes(ch))) continue;   // 凡例だけにある（置いていない）物は除く
+            const d = objects[name];
+            assert.ok(!(d?.type === 'furniture' && d.ceilingTexture), `${f}: ${name} は屋内用の家具（ceilingTexture）。屋外用（crate_out など）を使う`);
+        }
+    }
+});
+
 test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つの街）の文章。道のわきの空きマスに立つ', () => {
     const MESH = 64;
     const signs = [];   // { x, y（世界のマス）, msg }
