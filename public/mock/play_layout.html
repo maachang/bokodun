@@ -25,7 +25,7 @@
   #pauseBadge { position: absolute; bottom: 8px; left: 8px; background: #b91c1ccc; padding: 2px 10px; border-radius: 3px; display: none; font-weight: bold; }
   #compass { position: absolute; top: 8px; right: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
   #center { width: 802px; flex: none; }   /* 下のモック操作の帯が長くても、中央の幅（ゲーム画面 800px＋枠）を広げない */
-  #bossBar { height: 36px; margin-top: 6px; padding: 4px 10px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; border-radius: 4px; }   /* 高さは常に確保（出入りで全体の倍率が変わらないように） */
+  #bossBar { height: 36px; padding: 4px 10px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; border-radius: 4px; }   /* 高さは常に確保（出入りで全体の倍率が変わらないように） */
   #bossBar.on { background: #111827; border-color: #7f1d1d; }
   #bossBar .nm { flex: none; width: 150px; font-weight: bold; color: #fecaca; }
   #bossBar .bar { flex: 1; height: 14px; margin: 0; }
@@ -63,6 +63,15 @@
   .ecard .ic { width: 26px; height: 26px; border-radius: 3px; background: #475569; flex: none; }
   .ecard .d { flex: 1; min-width: 0; } .ecard .h { display: flex; justify-content: space-between; font-size: 11px; }
   .ecard .bar { margin: 1px 0 0; height: 6px; }
+  .slot.lack { opacity: .45; }                         /* MP が足りない魔法 */
+  .slot .cd { position: absolute; left: 0; bottom: 0; height: 4px; background: #38bdf8; }   /* 連射間隔（クールダウン） */
+  .sel { cursor: pointer; font-size: 11px; padding: 1px 4px; border-radius: 3px; } .sel:hover { background: #374151; }
+  #below { position: relative; height: 84px; margin-top: 6px; }   /* ボスの HP と会話が、同じ場所を使う（高さは常に確保） */
+  #bossBar { margin-top: 0; }
+  #talk { position: absolute; inset: 0; display: none; flex-direction: column; gap: 4px; background: #0b1220; border: 2px solid #e5e7eb; border-radius: 4px; padding: 6px 12px; }
+  #talk .who { color: #facc15; font-weight: bold; } #talk .ch { display: flex; gap: 8px; margin-top: auto; }
+  #death { position: absolute; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 5; text-align: center; }
+  #death .tomb { width: 90px; height: 110px; border-radius: 45px 45px 0 0; background: #6b7280; border: 3px solid #9ca3af; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #111827; }
 </style>
 </head>
 <body>
@@ -89,11 +98,12 @@
     <div id="gameWrap">
       <div class="ph">ゲーム画面 800 × 600</div>
       <div id="areaName">城下町 メインストリート</div><div id="compass">北</div><div id="pauseBadge">一時停止中</div>
+      <div id="death"><div class="tomb">RIP</div><div id="deathMsg" style="font-size:18px"></div><div style="color:#9ca3af">Enter か、数秒で、最後にセーブしたギルドで復活します</div></div>
       <div id="win"><button id="winClose">閉じる (Esc)</button><div id="winBody"></div></div>
     </div>
-    <div id="bossBar"></div>
+    <div id="below"><div id="bossBar"></div><div id="talk"></div></div>
     <div id="demoBar">[モックの操作]
-      <button id="demoHit">敵を攻撃した</button><button id="demoHurt">敵に攻撃された</button><button id="demoBoss">ボス戦（開始／攻撃）</button><button id="demoBossEnd">ボス戦を終える</button><span>／ 1〜9: 枠の切替　K ストック　C ステータス　G 装備　I 道具　Esc 閉じる</span></div>
+      <button id="demoHit">敵を攻撃した</button><button id="demoHurt">敵に攻撃された</button><button id="demoEvent">受注の有無</button><button id="demoTalk">村人と話す</button><button id="demoGuild">ギルド（Eキー）</button><button id="demoDie">死亡</button><button id="demoBoss">ボス戦（開始／攻撃）</button><button id="demoBossEnd">ボス戦を終える</button><span>／ 1〜9: 枠の切替　K ストック　C ステータス　G 装備　I 道具　Esc 閉じる</span></div>
   </div>
 
   <!-- 右 -->
@@ -101,29 +111,36 @@
     <div class="panel"><div class="title" id="miniTitle">ミニマップ</div>
       <div style="height:140px;background:repeating-linear-gradient(45deg,#1e3a2a,#1e3a2a 8px,#234632 8px 16px);display:flex;align-items:center;justify-content:center;color:#ffffff80">140 × 140</div></div>
     <div class="panel"><div class="title">ストック（1〜9 / クリックで選択）</div><div id="slots"></div>
-      <div class="legend"><span style="color:#f59e0b">■</span> 選択中の武器　<span style="color:#38bdf8">■</span> 選択中の魔法</div></div>
+      <div class="legend"><span style="color:#f59e0b">■</span> 選択中の武器　<span style="color:#38bdf8">■</span> 選択中の魔法</div>
+      <div id="selInfo"></div></div>
     <div class="panel"><div class="title">メニュー</div><div id="menu"></div></div>
   </div>
 </div>
 
 <script>
 const { $, refs, on, html, show, hide } = jhtml;
-const E = refs('pauseBadge', 'miniTitle', 'slots', 'menu', 'win', 'winBody', 'winClose', 'enemyInfo');
+const E = refs('talk', 'death', 'deathMsg', 'selInfo', 'pauseBadge', 'miniTitle', 'slots', 'menu', 'win', 'winBody', 'winClose', 'enemyInfo');
 
 // ダミーデータ（実データは items.json・magic.json）
-const WEAPONS = [['iron_sword', '鉄の剣', '攻撃 2d6+2 / 重さ 18'], ['iron_greatsword', '鉄の大剣', '攻撃 3d6+3 / 重さ 32'], ['dagger', '短剣', '攻撃 1d6+1 / 重さ 6'], ['short_bow', '短弓', '攻撃 1d8+2 / 重さ 10'], ['apprentice_staff', '見習いの杖', '魔法補正 +2 / 重さ 8']];
-const MAGICS = [['magic_bolt', 'マジックボルト', 'MP 5 / 威力 1d6+3 / 失敗 11%'], ['fire', 'ファイア', 'MP 14 / 威力 2d6+3 / 失敗 19%'], ['heal', 'ヒール', 'MP 9 / 回復 / 失敗 8%'], ['spread', '拡散弾', 'MP 12 / 範囲 / 失敗 15%']];
+const WEAPONS = [['fists', '素手', '攻撃 1d3 / 重さ 0'], ['iron_sword', '鉄の剣', '攻撃 2d6+2 / 重さ 18'], ['iron_greatsword', '鉄の大剣', '攻撃 3d6+3 / 重さ 32'], ['dagger', '短剣', '攻撃 1d6+1 / 重さ 6'], ['short_bow', '短弓', '攻撃 1d8+2 / 重さ 10'], ['apprentice_staff', '見習いの杖', '魔法補正 +2 / 重さ 8']];
+const MAGICS = [['magic_bolt', 'マジックボルト', 'MP 5 / 威力 1d6+3 / 失敗 11%'], ['explosion', '爆発火球', 'MP 45 / 威力 4d6+5 / 失敗 28%'], ['fire', 'ファイア', 'MP 14 / 威力 2d6+3 / 失敗 19%'], ['heal', 'ヒール', 'MP 9 / 回復 / 失敗 8%'], ['spread', '拡散弾', 'MP 12 / 範囲 / 失敗 15%']];
 const stock = Array(9).fill(null);
 stock[0] = { kind: 'weapon', id: 'iron_sword' }; stock[1] = { kind: 'weapon', id: 'dagger' };
-stock[3] = { kind: 'magic', id: 'magic_bolt' }; stock[4] = { kind: 'magic', id: 'fire' };
+stock[2] = { kind: 'weapon', id: 'fists' };   // 素手も、武器の 1 つ（素手の装備枠）
+stock[3] = { kind: 'magic', id: 'magic_bolt' }; stock[4] = { kind: 'magic', id: 'fire' }; stock[5] = { kind: 'magic', id: 'explosion' };
+const NOW_MP = 40; let cd = 0;   // 現在の MP、連射間隔の残り秒
+const mpOf = it => Number((/MP (\d+)/.exec(find(it)[2]) || [0, 0])[1]);
 let selW = 0, selM = 3;
 const find = it => (it.kind === 'weapon' ? WEAPONS : MAGICS).find(x => x[0] === it.id);
 
 function renderSlots() {
   E.slots.innerHTML = stock.map((it, i) => it
-    ? html`<div class="slot ${i === selW ? 'selW' : ''} ${i === selM ? 'selM' : ''}" data-i="${i}"><span class="no">${i + 1}</span><span class="tag">${it.kind === 'weapon' ? '武' : '魔'}</span>${find(it)[1]}</div>`
+    ? html`<div class="slot ${i === selW ? 'selW' : ''} ${i === selM ? 'selM' : ''} ${it.kind === 'magic' && mpOf(it) > NOW_MP ? 'lack' : ''}" data-i="${i}"><span class="no">${i + 1}</span><span class="tag">${it.kind === 'weapon' ? '武' : '魔'}</span>${find(it)[1]}${i === selM && cd > 0 ? jhtml.raw(`<span class="cd" style="width:${cd * 100}%"></span>`) : ''}</div>`
     : html`<div class="slot empty"><span class="no">${i + 1}</span>空き</div>`).join('');
+  const nm = i => (i >= 0 && stock[i] ? find(stock[i])[1] : 'なし');
+  E.selInfo.innerHTML = html`<div class="sel" data-sel="${selW}">武器　${nm(selW)}</div><div class="sel" data-sel="${selM}">魔法　${nm(selM)}</div>`;
 }
+on(E.selInfo, 'click', '.sel', (e, t) => { const i = Number(t.dataset.sel); if (i >= 0 && stock[i]) { const f = find(stock[i]); E.winBody.innerHTML = html`<h3>${f[1]}</h3><p>${stock[i].kind === 'weapon' ? '武器' : '魔法'}</p><p>${f[2]}</p>`; show(E.win); setPaused(); document.querySelectorAll('.mi').forEach(el => el.classList.remove('on')); } });
 function selectSlot(i) {
   const it = stock[i]; if (!it) return;
   if (it.kind === 'weapon') selW = i; else selM = i;
@@ -131,21 +148,24 @@ function selectSlot(i) {
 }
 on(E.slots, 'click', '.slot[data-i]', (e, t) => selectSlot(Number(t.dataset.i)));
 
-const MENU = [['stock', 'ストック', 'K'], ['status', 'ステータス', 'C'], ['equip', '装備', 'G'], ['item', '道具', 'I']];
-E.menu.innerHTML = MENU.map(([id, name, key]) => html`<div class="mi" data-id="${id}"><span>${name}</span><kbd>${key}</kbd></div>`).join('');
+const MENU = [['stock', 'ストック'], ['status', 'ステータス'], ['equip', '装備'], ['item', '道具'], ['setting', '設定']];
+const keymap = { stock: 'k', status: 'c', equip: 'g', item: 'i', setting: 'o' };   // 既定のショートカット（設定で変えられる）
+function renderMenu() { E.menu.innerHTML = MENU.map(([id, name]) => html`<div class="mi" data-id="${id}"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd></div>`).join(''); }
+renderMenu();
 
 function openWin(id) {
   const m = MENU.find(x => x[0] === id); if (!m) return;
-  E.winBody.innerHTML = '<h3>' + m[1] + '</h3>' + ({ stock: stockBody, status: statusBody, equip: equipBody, item: itemBody }[id])();
-  show(E.win); setPaused(true); document.querySelectorAll('.mi').forEach(el => el.classList.toggle('on', el.dataset.id === id));
+  E.winBody.innerHTML = '<h3>' + m[1] + '</h3>' + ({ stock: stockBody, status: statusBody, equip: equipBody, item: itemBody, setting: settingBody }[id])();
+  show(E.win); setPaused(); document.querySelectorAll('.mi').forEach(el => el.classList.toggle('on', el.dataset.id === id));
 }
 let paused = false;
-function setPaused(v) { paused = v; E.pauseBadge.style.display = v ? 'block' : 'none'; }   // ダイアログ表示中は、ゲームの進行（敵・時間・自分の操作）を止める
-function closeWin() { hide(E.win); setPaused(false); document.querySelectorAll('.mi').forEach(el => el.classList.remove('on')); }
+function setPaused() { paused = E.win.style.display === 'block' || E.talk.style.display === 'flex' || E.death.style.display === 'flex'; E.pauseBadge.style.display = paused ? 'block' : 'none'; }   // ダイアログ表示中は、ゲームの進行（敵・時間・自分の操作）を止める
+function closeWin() { hide(E.win); setPaused(); document.querySelectorAll('.mi').forEach(el => el.classList.remove('on')); }
 on(E.menu, 'click', '.mi', (e, t) => openWin(t.dataset.id));
 on(E.winClose, 'click', closeWin);
 
 // 受注イベントの詳細（ダミー）。受けた日時・場所・詳細内容
+let hasEvent = true;   // 受注イベントは、同時に 1 つだけ
 const EVENT = { name: '城下町の薬草集め', at: '2026/11/15 14:32', place: 'グリーン王国　城下町の宿屋（依頼主：宿屋の主人）', progress: '薬草 3 / 5', detail: '宿屋の主人に頼まれた。城下町の北の草原で薬草を 5 つ集めて、宿屋の主人に届ける。報酬は 200G。' };
 function openEvent() {
   document.querySelectorAll('.mi').forEach(el => el.classList.remove('on'));
@@ -154,9 +174,9 @@ function openEvent() {
     <div class="row" style="justify-content:flex-start;gap:16px"><span class="title">受けた場所</span><span>${EVENT.place}</span></div>
     <div class="row" style="justify-content:flex-start;gap:16px"><span class="title">進み具合</span><span>${EVENT.progress}</span></div>
     <div class="title" style="margin-top:8px">詳細内容</div><p>${EVENT.detail}</p>`;
-  show(E.win); setPaused(true);
+  show(E.win); setPaused();
 }
-on('#eventPanel', 'click', openEvent);
+on('#eventPanel', 'click', () => { if (hasEvent) openEvent(); });
 
 function stockBody() {
   return '<p class="legend">最大 9 枠。✕ で外し、「＋追加」で武器・魔法を選んで入れます。</p><div class="grid3">' + stock.map((it, i) => it
@@ -173,16 +193,48 @@ on(E.winBody, 'click', '[data-add]', (e, t) => { E.winBody.innerHTML = '<h3>ス�
 on(E.winBody, 'click', '[data-back]', () => openWin('stock'));
 on(E.winBody, 'click', '.pick:not(.dis)', (e, t) => { const i = Number(t.dataset.slot); stock[i] = { kind: t.dataset.kind, id: t.dataset.id }; if (stock[i].kind === 'weapon' && selW < 0) selW = i; if (stock[i].kind === 'magic' && selM < 0) selM = i; renderSlots(); openWin('stock'); });
 
+function settingBody() {
+  return '<p class="legend">ショートカットキーの割り当て（「変更」を押して、割り当てたいキーを押す。1〜9 と Esc は使えません）</p>' + MENU.map(([id, name]) => html`<div class="row" style="justify-content:flex-start;gap:16px;margin-bottom:4px"><span style="width:110px">${name}</span><kbd>${keymap[id].toUpperCase()}</kbd><button data-keyset="${id}">変更</button></div>`).join('') + '<div class="row" style="justify-content:flex-start;gap:16px;margin-top:10px"><span style="width:110px">音量</span><input type="range" min="0" max="100" value="60"></div>';
+}
+let keyCapture = null;
+on(E.winBody, 'click', '[data-keyset]', (e, t) => { keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
 function statusBody() { return '<div class="row"><span>種族：人間</span><span>メイン職業：戦士 Lv.12</span></div><div class="row"><span>サブ職業：ウィザード Lv.5</span><span>（選んだサブ職業が一番有効）</span></div><hr><p>筋力 14　器用度 12　敏捷度 13　知力 11　精神力 10　生命力 15（ダミー）</p><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
 function equipBody() { return ['兜：鉄の兜', '鎧：革の鎧', '盾：木の盾', 'アクセサリ：（なし）'].map(s => html`<div class="cell" style="width:220px">${s}</div>`).join('') + '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>'; }
 function itemBody() { return ['薬草 ×5', '毒消し ×2', '麻痺治し ×1', '復活の薬 ×1', '〔防具〕革の鎧', '〔防具〕鉄の兜', '〔防具〕木の盾'].map(s => html`<div class="pick"><span>${s}</span></div>`).join('') + '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）</p>'; }
 
-const KEYS = { k: 'stock', c: 'status', g: 'equip', i: 'item' };
 on(document, 'keydown', e => {
-  if (e.key === 'Escape') return closeWin();
+  if (keyCapture) {
+    if (e.key.length === 1 && !/^[1-9]$/.test(e.key) && e.key !== ' ') { const k = e.key.toLowerCase(); Object.keys(keymap).forEach(id => { if (keymap[id] === k && id !== keyCapture) keymap[id] = keymap[keyCapture]; }); keymap[keyCapture] = k; renderMenu(); }
+    keyCapture = null; return openWin('setting');
+  }
+  if (e.key === 'Enter' && E.death.style.display === 'flex') return revive();
+  if (e.key === 'Escape') return closeAll();
+  if (paused) return;   // 止まっている間は、ゲームの操作を受け付けない
   if (/^[1-9]$/.test(e.key)) return selectSlot(Number(e.key) - 1);
-  if (KEYS[e.key.toLowerCase()]) openWin(KEYS[e.key.toLowerCase()]);
+  if (e.key === ' ' || e.key.toLowerCase() === 'f') { e.preventDefault(); const it = stock[selM]; if (it && cd <= 0 && mpOf(it) <= NOW_MP) { cd = 1; renderSlots(); } return; }
+  if (e.key.toLowerCase() === 'e') return guild();
+  const id = Object.keys(keymap).find(k => keymap[k] === e.key.toLowerCase());
+  if (id) openWin(id);
 });
+
+// 会話・選択（ゲーム画面の真下。ボスの HP の帯と同じ場所。出ている間は、ゲームを止める）
+function talk(who, text, choices = []) {
+  E.talk.innerHTML = html`<div class="who">${who}</div><div>${text}</div><div class="ch">${choices.map((c, i) => html`<button data-ch="${i}">${c[0]}</button>`)}${choices.length ? '' : jhtml.raw('<small style="color:#9ca3af">Esc で閉じる</small>')}</div>`;
+  E.talk._choices = choices; E.talk.style.display = 'flex'; setPaused();
+}
+function closeTalk() { E.talk.style.display = 'none'; setPaused(); }
+function closeAll() { closeWin(); closeTalk(); }
+on(E.talk, 'click', '[data-ch]', (e, t) => { const c = E.talk._choices[Number(t.dataset.ch)]; if (c[1]) c[1](); else closeTalk(); });
+function guild() { talk('冒険者ギルド', 'いらっしゃいませ。ご用件は？', [['セーブする', () => talk('冒険者ギルド', 'セーブしました。（最後にセーブしたギルド：グリーン王国 城下町）', [['やめる']])], ['預ける・引き出す', () => talk('冒険者ギルド', '（預かりの画面は、あとで作ります）', [['戻る', guild]])], ['やめる']]); }
+on('#demoGuild', 'click', guild);
+on('#demoTalk', 'click', () => talk('村人', '今日はいい天気ですね。北の草原には、薬草がたくさん生えていますよ。'));
+on('#demoEvent', 'click', () => { hasEvent = !hasEvent; $('eventPanel').innerHTML = '<div class="title">現在の受注イベント</div>' + (hasEvent ? '<div>城下町の薬草集め <small style="color:#9ca3af">（薬草 3 / 5）</small></div>' : '<div style="color:#6b7280">なし</div>'); });
+
+// 死亡（ウィザードリィ風に、墓を出す。数秒か Enter で、最後にセーブしたギルドで復活。ペナルティなし）
+let deathTimer = null;
+function die() { closeAll(); E.deathMsg.textContent = '冒険者は 力尽きた…'; E.death.style.display = 'flex'; setPaused(); clearTimeout(deathTimer); deathTimer = setTimeout(revive, 5000); }
+function revive() { clearTimeout(deathTimer); E.death.style.display = 'none'; setPaused(); talk('冒険者ギルド', '冒険者は、ギルドで目を覚ました。（所持金・持ち物はそのまま）', [['はい']]); }
+on('#demoDie', 'click', die);
 
 // 敵の情報（現行の仕様と同じ: 攻撃した／された敵のカードを、新しい順に上から並べる。同じ敵なら、一番上へ移す。2.5 秒で消える。
 // 現行の「最大 3 枚」は、ここでは外し、パネルに入る限り出す）
@@ -215,6 +267,8 @@ on('#demoBossEnd', 'click', () => { boss = null; renderBoss(); });
 on('#demoHit', 'click', hitEnemy);
 on('#demoHurt', 'click', hitEnemy);
 renderSlots();
+setInterval(() => { if (!paused && cd > 0) { cd = Math.max(0, cd - 0.1); renderSlots(); } }, 100);   // 連射間隔（止まっている間は進まない）
+
 // ミニマップの見出しに、ゲーム内の日時を出す（ダイアログ中は止まる。進む速さは、実時間と同じ 1 倍の仮置き）
 let gameTime = new Date(2026, 10, 15, 14, 32, 0);
 const p2 = n => String(n).padStart(2, '0');
