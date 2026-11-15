@@ -6,6 +6,7 @@
    "kind": "村",
    "label": "村",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "b",
    "name": "アルマダ村",
@@ -67,6 +68,7 @@
    "kind": "町",
    "label": "町",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "a",
    "name": "ソレミア町",
@@ -128,6 +130,7 @@
    "kind": "町",
    "label": "町",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "d",
    "name": "フレイズ町",
@@ -189,6 +192,7 @@
    "kind": "村",
    "label": "村",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "b",
    "name": "サンドピット村",
@@ -250,6 +254,7 @@
    "kind": "町",
    "label": "町",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "d",
    "name": "ディクタット町",
@@ -311,6 +316,7 @@
    "kind": "村",
    "label": "村",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "f",
    "name": "コンドル村",
@@ -372,6 +378,7 @@
    "kind": "村",
    "label": "村",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "e",
    "name": "ジャジル村",
@@ -433,6 +440,7 @@
    "kind": "宿場",
    "label": "宿場",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "f",
    "name": "シルヴァノ宿場",
@@ -494,6 +502,7 @@
    "kind": "村",
    "label": "村",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "d",
    "name": "ラクティ村",
@@ -555,6 +564,7 @@
    "kind": "町",
    "label": "町",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "d",
    "name": "デノン町",
@@ -616,6 +626,7 @@
    "kind": "町",
    "label": "町",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "e",
    "name": "ドゥマーニ町",
@@ -677,6 +688,7 @@
    "kind": "村",
    "label": "村",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "b",
    "name": "カイタノ村",
@@ -738,6 +750,7 @@
    "kind": "村",
    "label": "村",
    "none": true,
+   "roadless": true,
    "port": false,
    "country": "g",
    "name": "ジョハー村",
@@ -799,6 +812,7 @@
    "kind": "町",
    "label": "町",
    "none": true,
+   "roadless": true,
    "port": false,
    "country": "g",
    "name": "ハーザンド町",
@@ -860,6 +874,7 @@
    "kind": "町",
    "label": "港町",
    "none": true,
+   "roadless": true,
    "port": true,
    "country": "g",
    "name": "トレヴ港町",
@@ -868,8 +883,8 @@
     102
    ],
    "road": [
-    615,
-    95
+    603,
+    88
    ],
    "facing": [
     1,
@@ -877,40 +892,40 @@
    ],
    "gate": [
     [
-     611,
-     94
+     599,
+     87
     ],
     [
-     611,
-     95
+     599,
+     88
     ]
    ],
    "box": [
-    602,
-    611,
-    88,
-    101
+    590,
+    599,
+    81,
+    94
    ],
    "sign": [
-    612,
-    97
+    600,
+    90
    ],
    "plaza": [
     [
-     613,
-     94
+     601,
+     87
     ],
     [
-     613,
-     95
+     601,
+     88
     ],
     [
-     612,
-     94
+     600,
+     87
     ],
     [
-     612,
-     95
+     600,
+     88
     ]
    ],
    "mesh": "w_09_01",
@@ -921,6 +936,7 @@
    "kind": "村",
    "label": "村",
    "none": true,
+   "roadless": true,
    "port": false,
    "country": "g",
    "name": "レッドサン村",
@@ -982,6 +998,7 @@
    "kind": "村",
    "label": "村",
    "none": true,
+   "roadless": true,
    "port": false,
    "country": "h",
    "name": "リレイズ村",
@@ -1043,6 +1060,7 @@
    "kind": "町",
    "label": "港町",
    "none": false,
+   "roadless": false,
    "port": true,
    "country": "i",
    "name": "キャロティーン港町",
@@ -1051,49 +1069,49 @@
     1122
    ],
    "road": [
-    355,
-    1120
+    344,
+    1130
    ],
    "facing": [
-    0,
-    -1
+    1,
+    0
    ],
    "gate": [
     [
-     354,
-     1124
+     340,
+     1129
     ],
     [
-     355,
-     1124
+     340,
+     1130
     ]
    ],
    "box": [
-    348,
-    361,
-    1124,
-    1133
+    331,
+    340,
+    1123,
+    1136
    ],
    "sign": [
-    357,
-    1123
+    341,
+    1132
    ],
    "plaza": [
     [
-     354,
-     1122
+     342,
+     1129
     ],
     [
-     355,
-     1122
+     342,
+     1130
     ],
     [
-     354,
-     1123
+     341,
+     1129
     ],
     [
-     355,
-     1123
+     341,
+     1130
     ]
    ],
    "mesh": "w_05_17",
@@ -1104,6 +1122,7 @@
    "kind": "町",
    "label": "町",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "f",
    "name": "ブライアン町",
@@ -1165,6 +1184,7 @@
    "kind": "村",
    "label": "村",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "f",
    "name": "マンダリン村",
@@ -1226,6 +1246,7 @@
    "kind": "町",
    "label": "港町",
    "none": false,
+   "roadless": false,
    "port": true,
    "country": "f",
    "name": "モンズ港町",
@@ -1234,7 +1255,7 @@
     1132
    ],
    "road": [
-    787,
+    793,
     1128
    ],
    "facing": [
@@ -1243,39 +1264,39 @@
    ],
    "gate": [
     [
-     783,
+     789,
      1127
     ],
     [
-     783,
+     789,
      1128
     ]
    ],
    "box": [
-    774,
-    783,
+    780,
+    789,
     1121,
     1134
    ],
    "sign": [
-    784,
+    790,
     1130
    ],
    "plaza": [
     [
-     785,
+     791,
      1127
     ],
     [
-     785,
+     791,
      1128
     ],
     [
-     784,
+     790,
      1127
     ],
     [
-     784,
+     790,
      1128
     ]
    ],
@@ -1287,6 +1308,7 @@
    "kind": "村",
    "label": "村",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "f",
    "name": "モーリス村",
@@ -1348,6 +1370,7 @@
    "kind": "村",
    "label": "村",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "h",
    "name": "ユリシーズ村",
@@ -1409,6 +1432,7 @@
    "kind": "町",
    "label": "町",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "d",
    "name": "ヴァーミリアン町",
@@ -1470,6 +1494,7 @@
    "kind": "村",
    "label": "村",
    "none": true,
+   "roadless": true,
    "port": false,
    "country": "c",
    "name": "ソロウ村",
@@ -1531,6 +1556,7 @@
    "kind": "町",
    "label": "港町",
    "none": false,
+   "roadless": false,
    "port": true,
    "country": "a",
    "name": "エネイブル港町",
@@ -1539,52 +1565,52 @@
     942
    ],
    "road": [
-    128,
-    942
+    117,
+    940
    ],
    "facing": [
-    -1,
+    1,
     0
    ],
    "gate": [
     [
-     132,
-     941
+     113,
+     939
     ],
     [
-     132,
-     942
+     113,
+     940
     ]
    ],
    "box": [
-    132,
-    141,
-    935,
-    948
+    104,
+    113,
+    933,
+    946
    ],
    "sign": [
-    131,
-    944
+    114,
+    942
    ],
    "plaza": [
     [
-     130,
-     941
+     115,
+     939
     ],
     [
-     130,
-     942
+     115,
+     940
     ],
     [
-     131,
-     941
+     114,
+     939
     ],
     [
-     131,
-     942
+     114,
+     940
     ]
    ],
-   "mesh": "w_02_14",
+   "mesh": "w_01_14",
    "inner": "rs_26"
   },
   {
@@ -1592,6 +1618,7 @@
    "kind": "町",
    "label": "町",
    "none": false,
+   "roadless": false,
    "port": false,
    "country": "i",
    "name": "ロックソング町",
@@ -1653,6 +1680,7 @@
    "kind": "村",
    "label": "村",
    "none": false,
+   "roadless": true,
    "port": false,
    "country": "k",
    "name": "カメハメハ村",

@@ -568,6 +568,9 @@ def build_tiles(t):
     _tiles_mineEntrances(g)
     _tiles_towns(g)
     _tiles_roads(g)
+    if os.environ.get('RS_SNAPSHOT'):   # 開発用: 外観を置く直前の地形を保存（置き方を、再生成なしで試すため。RS_SNAPSHOT=保存先）
+        import pickle
+        pickle.dump(dict(t=t, obj=obj, elev=elev, land=land, biome=biome), open(os.environ['RS_SNAPSHOT'], 'wb'))
     roadside.place(g)   # 道沿いの村・町・宿場の外観（街道ができた後。roadside.py）
     _tiles_seams(g)
     _tiles_trails(g)

@@ -84,7 +84,28 @@ def _geometry(rc, s, L, kind):
     gate = [at(k0, -1), at(k0, 0)]
     plaza = [at(k, p) for k in range(2, k0) for p in (-1, 0)]
     sign = at(k0 - 1, 2)
-    return dict(box=(min(ys_), max(ys_), min(xs_), max(xs_)), plaza=plaza, gate=gate, sign=sign, center=c, lead=at(1, -1))
+    return dict(box=(min(ys_), max(ys_), min(xs_), max(xs_)), plaza=plaza, gate=gate, sign=sign, center=c, lead=at(1, -1), s=s)
+
+
+_OCEAN = None   # 外海（陸でない所のうち、最大のつながり）の真偽
+
+
+def _sea_mask(t, obj):
+    """海のマス（外海につながる、陸でない所。池・湖・川の水は含まない。place の最初に _OCEAN を作る）"""
+    return _OCEAN & ~t['lake'] & ~(t['river'] > 0)   # obj は使わない（引数だけ残す）
+
+
+def _port_side(t, geo):
+    """港町: 門のない辺（道の側の辺以外）のうち、外観の外の 1 マスのさらに外（外観から 2 マス先）が外海である割合が、いちばん大きい辺。戻り値: (割合, 辺の向き (行, 列))"""
+    y0, y1, x0, x1 = geo['box']
+    sea = _sea_mask(t, None)
+    sy, sx = geo['s']
+    best = (0.0, None)
+    for n, arr in (((-1, 0), sea[y0 - 2, x0:x1 + 1]), ((1, 0), sea[y1 + 2, x0:x1 + 1]), ((0, -1), sea[y0:y1 + 1, x0 - 2]), ((0, 1), sea[y0:y1 + 1, x1 + 2])):
+        if n == (-sy, -sx): continue   # 門（道）の側は、海にしない
+        fr = float(arr.mean())
+        if fr > best[0]: best = (fr, n)
+    return best
 
 
 def _region_ok(t, obj, geo, placed, strict=False, port=False):
@@ -98,9 +119,8 @@ def _region_ok(t, obj, geo, placed, strict=False, port=False):
     if strict and not all(_free_land(t, obj, [y], [x]) for y, x in geo['plaza'] + [geo['sign'], geo['center'], geo['lead']]): return False   # 門前の石畳・立て札・道の端も、陸（水の上は不可）
     if strict:   # 13 番以降: 水（海・川・湖）の近く（外観の 3 マス以内）は、地面の高さが 1 以下の所だけ（水面 0 との段差を 1 以内にして、崖を残さない）
         water = t['deep'] | t['shallow'] | t['lagoon'] | t['bridge'] | (t['river'] > 0) | ~t['land']
-        if port:   # 港町: 海に密接（外観の 2〜3 マス以内に海がある）。高さは _paint で 1 に下げる（水際の段差を 1 に収める）
-            sea = (~t['land'] | t['deep'] | t['shallow']) & ~t['lake'] & ~(t['river'] > 0)
-            if not sea[y0 - 3:y1 + 4, x0 - 3:x1 + 4].any(): return False
+        if port:   # 港町: 門のない辺の 8 割以上が、すぐ外（外観から 2 マス先）で外海に面する場所だけ（高さは _paint で 1 に下げる。ユーザー指示 2026-11-15）
+            if _port_side(t, geo)[0] < 0.8: return False
         elif water[y0 - 3:y1 + 4, x0 - 3:x1 + 4].any() and int(t['elev'][tuple(geo['plaza'][0])]) > 1: return False
     for q in placed:
         qy0, qy1, qx0, qx1 = q['box']
@@ -167,6 +187,42 @@ def _place_free(t, obj, kind, pt, centers, port, ok=None):
             geo = _geometry(rc, s, 0, kind)
             if _region_ok(t, obj, geo, PLACED, strict=True, port=port) and (ok is None or ok(geo)): return rc, s, geo   # ok: 道を通せるか
     return None
+
+
+def _port_shore(g, geo):
+    """港町: 海側の辺（_port_side）の、外観のすぐ外の 1 マスと、その外の 1 マスを、海にして、壁を海に直接つける。外観のまわり（5 マス以内）の海は、浅瀬にせず、深い水（O）だけにする（座礁しない港。ユーザー指示 2026-11-15）"""
+    t, obj, elev = g.t, g.obj, g.elev
+    y0, y1, x0, x1 = geo['box']
+    fr, n = _port_side(t, geo)
+    cells = []
+    for k in (1, 2):
+        if n == (-1, 0): cells += [(y0 - k, x) for x in range(x0, x1 + 1)]
+        elif n == (1, 0): cells += [(y1 + k, x) for x in range(x0, x1 + 1)]
+        elif n == (0, -1): cells += [(y, x0 - k) for y in range(y0, y1 + 1)]
+        else: cells += [(y, x1 + k) for y in range(y0, y1 + 1)]
+    for y, x in cells:
+        t['land'][y, x] = False; g.land[y, x] = False; _OCEAN[y, x] = True; elev[y, x] = 0; obj[y, x] = ord('O')
+    sea = _sea_mask(t, obj)
+    near = np.zeros(sea.shape, bool); near[y0 - 5:y1 + 6, x0 - 5:x1 + 6] = True
+    deep = sea & near
+    obj[deep] = ord('O'); t['deep'] = t['deep'] | deep; t['shallow'] = t['shallow'] & ~deep; t['lagoon'] = t['lagoon'] & ~deep
+    if 'harbor' in t: t['harbor'] = t['harbor'] | deep
+    return fr, n
+
+
+def _clear_entrance(g, rc, s, geo):
+    """道のない町・村・港町: 門の前（道の端から門まで・両わき 3 マス・道の端の手前 3 マス）の、草・花・木などを取り除く（入口まわりを、すっきりさせる。ユーザー指示 2026-11-15）"""
+    t, obj = g.t, g.obj
+    sy, sx = s
+    py, px = (0, 1) if sy else (1, 0)
+    k_gate = 1 + PLAZA + 1
+    keep = _keep_chars() | {'0'}
+    water = t['deep'] | t['shallow'] | t['lagoon'] | t['bridge'] | t['mtn_bridge'] | (t['river'] > 0) | ~t['land']
+    for k in range(-3, k_gate + 1):
+        for p in range(-3, 4):
+            y, x = rc[0] + sy * k + py * p, rc[1] + sx * k + px * p
+            if water[y, x] or chr(obj[y, x]) in keep: continue
+            obj[y, x] = ord('0')
 
 
 def _smooth_site(g, geo):
@@ -257,10 +313,13 @@ def place(g):
     t, obj = g.t, g.obj
     centers = np.array(json.load(open(os.path.join(MAPS, '..', 'world_roads.json'), encoding='utf-8'))['centers'])
     PLACED.clear()
+    global _OCEAN
+    _OCEAN = T._largest(~t['land'])   # 外海（池・湖を、海にしない）
     for row in SITES:
         sid, label, country, name, (r0, c0) = row[:5]
         opt = row[5] if len(row) > 5 else {}
-        has_sign = len(row) <= 5 or bool(opt.get('road'))   # 立て札は、街道に面した場所だけ（道のない場所は、置かない）
+        has_sign = True   # 立て札は、道のない場所にも置く（門の前。ユーザー指示 2026-11-15）
+        roadless = len(row) > 5 and not opt.get('road')
         kind = '町' if label == '港町' else label   # 港町は、町と同じ大きさ・作り（中に、水路と船を足す）
         done = None
         if len(row) > 5:   # 13〜28 番: 指定の点の近くの、空いた平らな所（道沿いではない）
@@ -278,12 +337,14 @@ def place(g):
         assert done, f'道沿いの {sid} {name}: 置ける場所がない（{r0},{c0} の近く）'
         rc, s, geo = done
         _paint(g, geo, kind, country, name, sid, sign=has_sign, port=(label == '港町' and len(row) > 5))
+        if len(row) > 5 and label == '港町': _port_shore(g, geo)   # 港町は、壁を海に直接つけ、まわりを深い水に
         if len(row) > 5: _smooth_site(g, geo)   # 13 番以降は、斜面・海岸にも置くので、まわりの地形をなだらかに
+        if roadless: _clear_entrance(g, rc, s, geo)   # 道のない場所は、門の前の草・木などを取り除く
         my, mx = geo['gate'][0][0] // MESH_SIZE, geo['gate'][0][1] // MESH_SIZE
         msg = f"【{label}】{name}" + ('' if opt.get('none') else f"（{TOWN_NAME[country]}）")
         if opt.get('road'): centers = _connect_road(t, obj, g, centers, geo)   # 国属がある場所は、最寄りの街道から道を通す
         if has_sign: ROAD_SIGNS[geo['sign']] = msg
-        PLACED.append(dict(id=sid, kind=kind, label=label, none=bool(opt.get('none')), port=label == '港町', country=country, name=name, at=[r0, c0], road=list(rc), facing=[-s[0], -s[1]], gate=[list(p) for p in geo['gate']],
+        PLACED.append(dict(id=sid, kind=kind, label=label, none=bool(opt.get('none')), roadless=roadless, port=label == '港町', country=country, name=name, at=[r0, c0], road=list(rc), facing=[-s[0], -s[1]], gate=[list(p) for p in geo['gate']],
                            box=list(geo['box']), sign=list(geo['sign']), plaza=[list(p) for p in geo['plaza']], mesh=f'w_{my:02d}_{mx:02d}', inner=f'rs_{sid}'))
         print(f'道沿い {sid} {kind} {name}: 道 {rc}・向き {s}・{geo["box"]}')
     roads.merge_parallel(t, obj, g.elev, _keep_chars())   # 13 番以降で通した道が、近くの道と並走する所は、1 本に統合する

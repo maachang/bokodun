@@ -1609,8 +1609,11 @@ test('街道の道しるべ: 分かれ道に 1 本。方角と行き先（3 つ�
     // 最初の分かれ道（D の近く）: 方角と行き先（3 つの街）
     const first = signs.find(s => ['グリーン王国', 'ダマスカス自治領', 'ガリレオ連盟'].every(n => s.msg.includes(n)) && /北: .*西: .*東: /.test(s.msg));
     assert.ok(first, 'D・H・E の分かれ道の道しるべ（北・西・東）');
+    const roadless = new Set(JSON.parse(fs.readFileSync(path.join(root, 'public/data/world_roadside.json'), 'utf-8')).sites.filter(s => s.roadless).map(s => `${s.sign[1]},${s.sign[0]}`));   // 道のない町・村・港町の立て札（門の前。道のそばでなくてよい）
+    assert.ok(roadless.size >= 7, `道のない場所の立て札がある（${roadless.size}）`);
     for (const { x, y, msg } of signs) {
         assert.ok(!road.has(`${x},${y}`), `(${x},${y}) 道の上ではない`);
+        if (roadless.has(`${x},${y}`)) continue;
         assert.ok([...road].some(k => { const [rx, ry] = k.split(',').map(Number); return Math.abs(rx - x) <= 3 && Math.abs(ry - y) <= 3; }), `(${x},${y}) 道のそばにある: ${msg}`);
     }
     // 道の終わりの立て札: 大森林（G）の前で、石畳が終わる。ほかの国は、砂漠・山を通ってでも、門前まで道がつながる（ユーザー指定）
