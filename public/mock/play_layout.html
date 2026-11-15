@@ -205,7 +205,7 @@ on(E.winBody, 'click', '[data-detail]', (e, t) => {
   setBack(() => openWin('stock'));
 });
 on(E.winBody, 'click', '[data-add]', (e, t) => { E.winBody.innerHTML = '<h3>ストック</h3>' + pickBody(Number(t.dataset.add)); setBack(() => openWin('stock')); });
-on(E.winBody, 'click', '.pick:not(.dis)', (e, t) => { const i = Number(t.dataset.slot); stock[i] = { kind: t.dataset.kind, id: t.dataset.id }; if (stock[i].kind === 'weapon' && selW < 0) selW = i; if (stock[i].kind === 'magic' && selM < 0) selM = i; renderSlots(); openWin('stock'); });
+on(E.winBody, 'click', '.pick[data-slot]:not(.dis)', (e, t) => { const i = Number(t.dataset.slot); stock[i] = { kind: t.dataset.kind, id: t.dataset.id }; if (stock[i].kind === 'weapon' && selW < 0) selW = i; if (stock[i].kind === 'magic' && selM < 0) selM = i; renderSlots(); openWin('stock'); });
 
 function settingBody() {
   return '<p class="legend">ショートカットキーの割り当て（「変更」を押して、割り当てたいキーを押す。1〜9 と Esc は使えません）</p>' + MENU.map(([id, name]) => html`<div class="row" style="justify-content:flex-start;gap:16px;margin-bottom:4px"><span style="width:110px">${name}</span><kbd>${keymap[id].toUpperCase()}</kbd><button data-keyset="${id}">変更</button></div>`).join('') + '<div class="row" style="justify-content:flex-start;gap:16px;margin-top:10px"><span style="width:110px">音量</span><input type="range" min="0" max="100" value="60"></div>';
@@ -213,8 +213,23 @@ function settingBody() {
 let keyCapture = null;
 on(E.winBody, 'click', '[data-keyset]', (e, t) => { keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
 function statusBody() { return '<div class="row"><span>種族：人間</span><span>メイン職業：戦士 Lv.12</span></div><div class="row"><span>サブ職業：ウィザード Lv.5</span><span>（選んだサブ職業が一番有効）</span></div><hr><p>筋力 14　器用度 12　敏捷度 13　知力 11　精神力 10　生命力 15（ダミー）</p><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
-function equipBody() { return ['兜：鉄の兜', '鎧：革の鎧', '盾：木の盾', 'アクセサリ：（なし）'].map(s => html`<div class="cell" style="width:220px">${s}</div>`).join('') + '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>'; }
-function itemBody() { return ['薬草 ×5', '毒消し ×2', '麻痺治し ×1', '復活の薬 ×1', '〔防具〕革の鎧', '〔防具〕鉄の兜', '〔防具〕木の盾'].map(s => html`<div class="pick"><span>${s}</span></div>`).join('') + '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）</p>'; }
+// 装備（防具・アクセサリ。ダミー）。入っている枠は、クリックで詳細（「← 戻る」は一覧へ）
+const EQUIPS = [['兜', '鉄の兜', '防御 2d6+1 / 重さ 10', '頑丈な兜。重い装備（heavy）。'], ['鎧', '革の鎧', '防御 1d6+2 / 重さ 12', '軽い鎧。動きやすい。'], ['盾', '木の盾', '防御 1d6+1 / 重さ 6', '軽い盾。'], ['アクセサリ', null, '', '']];
+function equipBody() { return EQUIPS.map((q, i) => q[1] ? html`<div class="cell filled" style="width:220px" data-equip="${i}">${q[0]}：${q[1]}</div>` : html`<div class="cell" style="width:220px">${q[0]}：（なし）</div>`).join('') + '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>'; }
+on(E.winBody, 'click', '[data-equip]', (e, t) => {
+  const q = EQUIPS[Number(t.dataset.equip)];
+  E.winBody.innerHTML = html`<h3>装備</h3><h3>${q[1]}</h3><p>${q[0]}</p><p>${q[2]}</p><p>${q[3]}</p>`;
+  setBack(() => openWin('equip'));
+});
+// 道具・防具の一覧（ダミー。名前・種類・個数・説明）
+const ITEMS = [['薬草', '道具', 5, 'HP を少し回復する。'], ['毒消し', '道具', 2, '毒を治す。'], ['麻痺治し', '道具', 1, '麻痺を治す。'], ['復活の薬', '道具', 1, '戦闘不能から復活させる。'], ['革の鎧', '防具', 1, '軽い鎧。重さ 12。'], ['鉄の兜', '防具', 1, '頑丈な兜。重さ 10。'], ['木の盾', '防具', 1, '軽い盾。重さ 6。']];
+function itemBody() { return ITEMS.map((it, i) => html`<div class="pick" data-item="${i}"><span>${it[1] === '防具' ? '〔防具〕' : ''}${it[0]}${it[1] === '道具' ? ' ×' + it[2] : ''}</span></div>`).join('') + '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）。クリックで詳細</p>'; }
+// クリックで詳細（「← 戻る」は一覧へ）
+on(E.winBody, 'click', '.pick[data-item]', (e, t) => {
+  const it = ITEMS[Number(t.dataset.item)];
+  E.winBody.innerHTML = html`<h3>道具</h3><h3>${it[0]}</h3><p>${it[1]}${it[1] === '道具' ? '　所持 ' + it[2] + ' 個' : ''}</p><p>${it[3]}</p>`;
+  setBack(() => openWin('item'));
+});
 
 on(document, 'keydown', e => {
   if (keyCapture) {
