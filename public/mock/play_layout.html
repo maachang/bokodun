@@ -21,6 +21,7 @@
     background: linear-gradient(#5b7fb5 0 45%, #6b8e4e 45% 100%); }
   #gameWrap .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #ffffff90; font-size: 22px; }
   #areaName { position: absolute; top: 8px; left: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
+  #pauseBadge { position: absolute; bottom: 8px; left: 8px; background: #b91c1ccc; padding: 2px 10px; border-radius: 3px; display: none; font-weight: bold; }
   #compass { position: absolute; top: 8px; right: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
   #demoBar { margin-top: 6px; display: flex; gap: 6px; align-items: center; color: #9ca3af; }
   button { background: #1f2937; color: #e5e7eb; border: 1px solid #4b5563; border-radius: 3px; padding: 2px 8px; cursor: pointer; font: inherit; }
@@ -32,6 +33,7 @@
   .slot.empty { color: #4b5563; cursor: default; }
   .slot.selW { outline: 2px solid #f59e0b; } .slot.selM { outline: 2px solid #38bdf8; }
   .slot .tag { position: absolute; top: 1px; right: 3px; font-size: 10px; }
+  .clickable { cursor: pointer; } .clickable:hover { border-color: #9ca3af; background: #1a2332; }
   .legend { font-size: 11px; color: #9ca3af; margin-top: 4px; }
   /* メニュー */
   .mi { display: flex; justify-content: space-between; padding: 4px 6px; border-radius: 3px; cursor: pointer; border-left: 4px solid transparent; }
@@ -56,6 +58,8 @@
   <!-- 左 -->
   <div id="left" class="col">
     <div class="panel"><div class="title">現在位置</div><div id="pos">グリーン王国　城下町（x 32, z 29）</div></div>
+    <div class="panel clickable" id="eventPanel"><div class="title">現在の受注イベント</div>
+      <div>城下町の薬草集め <small style="color:#9ca3af">（薬草 3 / 5）</small></div></div>
     <div class="panel"><div class="title">職業</div>
       <div class="row"><span>メイン：戦士</span><span>Lv.12</span></div>
       <div class="row"><span>サブ　：ウィザード</span><span>Lv.5</span></div></div>
@@ -72,11 +76,11 @@
   <div>
     <div id="gameWrap">
       <div class="ph">ゲーム画面 800 × 600</div>
-      <div id="areaName">城下町 メインストリート</div><div id="compass">北</div>
+      <div id="areaName">城下町 メインストリート</div><div id="compass">北</div><div id="pauseBadge">一時停止中</div>
       <div id="win"><button id="winClose">閉じる (Esc)</button><div id="winBody"></div></div>
     </div>
     <div id="demoBar">[モックの操作]
-      <button id="demoHit">敵を攻撃した</button><button id="demoHurt">敵に攻撃された</button><span>／ 1〜9: 枠の切替　K ストック　C ステータス　G 装備　I 道具　Esc 閉じる</span></div>
+      <button id="demoHit">敵を攻撃した</button><button id="demoHurt">敵に攻撃された</button><span>ゲーム内時間 <b id="tick">0.0</b> 秒</span><span>／ 1〜9: 枠の切替　K ストック　C ステータス　G 装備　I 道具　Esc 閉じる</span></div>
   </div>
 
   <!-- 右 -->
@@ -91,7 +95,7 @@
 
 <script>
 const { $, refs, on, html, show, hide } = jhtml;
-const E = refs('slots', 'menu', 'win', 'winBody', 'winClose', 'enemyInfo');
+const E = refs('pauseBadge', 'tick', 'slots', 'menu', 'win', 'winBody', 'winClose', 'enemyInfo');
 
 // ダミーデータ（実データは items.json・magic.json）
 const WEAPONS = [['iron_sword', '鉄の剣', '攻撃 2d6+2 / 重さ 18'], ['iron_greatsword', '鉄の大剣', '攻撃 3d6+3 / 重さ 32'], ['dagger', '短剣', '攻撃 1d6+1 / 重さ 6'], ['short_bow', '短弓', '攻撃 1d8+2 / 重さ 10'], ['apprentice_staff', '見習いの杖', '魔法補正 +2 / 重さ 8']];
@@ -120,11 +124,26 @@ E.menu.innerHTML = MENU.map(([id, name, key]) => html`<div class="mi" data-id="$
 function openWin(id) {
   const m = MENU.find(x => x[0] === id); if (!m) return;
   E.winBody.innerHTML = '<h3>' + m[1] + '</h3>' + ({ stock: stockBody, status: statusBody, equip: equipBody, item: itemBody }[id])();
-  show(E.win); document.querySelectorAll('.mi').forEach(el => el.classList.toggle('on', el.dataset.id === id));
+  show(E.win); setPaused(true); document.querySelectorAll('.mi').forEach(el => el.classList.toggle('on', el.dataset.id === id));
 }
-function closeWin() { hide(E.win); document.querySelectorAll('.mi').forEach(el => el.classList.remove('on')); }
+let paused = false;
+function setPaused(v) { paused = v; E.pauseBadge.style.display = v ? 'block' : 'none'; }   // ダイアログ表示中は、ゲームの進行（敵・時間・自分の操作）を止める
+function closeWin() { hide(E.win); setPaused(false); document.querySelectorAll('.mi').forEach(el => el.classList.remove('on')); }
 on(E.menu, 'click', '.mi', (e, t) => openWin(t.dataset.id));
 on(E.winClose, 'click', closeWin);
+
+// 受注イベントの詳細（ダミー）。受けた日時・場所・詳細内容
+const EVENT = { name: '城下町の薬草集め', at: '2026/11/15 14:32', place: 'グリーン王国　城下町の宿屋（依頼主：宿屋の主人）', progress: '薬草 3 / 5', detail: '宿屋の主人に頼まれた。城下町の北の草原で薬草を 5 つ集めて、宿屋の主人に届ける。報酬は 200G。' };
+function openEvent() {
+  document.querySelectorAll('.mi').forEach(el => el.classList.remove('on'));
+  E.winBody.innerHTML = html`<h3>受注イベント：${EVENT.name}</h3>
+    <div class="row" style="justify-content:flex-start;gap:16px"><span class="title">受けた日時</span><span>${EVENT.at}</span></div>
+    <div class="row" style="justify-content:flex-start;gap:16px"><span class="title">受けた場所</span><span>${EVENT.place}</span></div>
+    <div class="row" style="justify-content:flex-start;gap:16px"><span class="title">進み具合</span><span>${EVENT.progress}</span></div>
+    <div class="title" style="margin-top:8px">詳細内容</div><p>${EVENT.detail}</p>`;
+  show(E.win); setPaused(true);
+}
+on('#eventPanel', 'click', openEvent);
 
 function stockBody() {
   return '<p class="legend">最大 9 枠。✕ で外し、「＋追加」で武器・魔法を選んで入れます。</p><div class="grid3">' + stock.map((it, i) => it
@@ -155,6 +174,7 @@ on(document, 'keydown', e => {
 on('#demoHit', 'click', () => { E.enemyInfo.innerHTML = '<b>スライム</b>　Lv.3<div class="bar"><i style="width:55%;background:#f87171"></i></div><small>HP 11 / 20　ダメージ 9</small>'; });
 on('#demoHurt', 'click', () => { E.enemyInfo.innerHTML = '<b>ゴブリン</b>　Lv.6<div class="bar"><i style="width:90%;background:#f87171"></i></div><small>HP 36 / 40　こちらに 12 ダメージ</small>'; });
 renderSlots();
+let t = 0; setInterval(() => { if (!paused) { t += 0.1; E.tick.textContent = t.toFixed(1); } }, 100);   // 停止の確認用（ゲーム内時間は、ダイアログ中は進まない）
 
 // ブラウザの大きさに合わせて、全体を縮小・拡大する（縦横の合う方に合わせ、上限は MAX_SCALE 倍。余白は中央に寄せる）
 const MAX_SCALE = 3;
