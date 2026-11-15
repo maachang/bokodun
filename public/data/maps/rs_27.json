@@ -12,13 +12,13 @@
  "environment": {
   "floorType": "stone",
   "hasCeiling": false,
-  "ambientLight": 9408660,
-  "directionalLight": 16774610,
-  "fogColor": 11713215,
-  "fogNear": 22,
+  "ambientLight": 7833719,
+  "directionalLight": 16773341,
+  "fogColor": 11064805,
+  "fogNear": 20,
   "fogFar": 75,
-  "visibility": 0.9,
-  "skyColor": 9018045
+  "visibility": 1.0,
+  "skyColor": 11064805
  },
  "legend": {
   "W": "lake_wall",

@@ -428,8 +428,8 @@ def _objects():
     return _OBJECTS[0]
 
 
-# 外の景色が、国のサンプルの明るい青空と大きく違う場所は、中の空・霧・光を、外のマップに合わせる（村: ジョハー村 13・ソロウ村 25）
-ENV_FROM_OUTER = ('13', '25')
+# 外の景色が、国のサンプルの明るい青空と大きく違う場所は、中の空・霧・光を、外のマップに合わせる（ジョハー村 13・ハーザンド町 14・トレヴ港町 15・ソロウ村 25）
+ENV_FROM_OUTER = ('13', '14', '15', '25')
 SKY_KEYS = ('skyColor', 'fogColor', 'fogNear', 'fogFar', 'visibility', 'ambientLight', 'directionalLight')
 
 
@@ -535,7 +535,7 @@ def build_inner(p, envs, snow_env):
          'heightStep': sm.get('heightStep', 0.5), 'fallDamagePerLevel': sm.get('fallDamagePerLevel', 6)}
     if kind == '町': m['decorFloor'] = sm.get('decorFloor', 'cobblestone')
     if kind in ('町', '宿場') and country in _TOWN_COUNTRIES and not p.get('none'): _match_country_town(m, kind, country)
-    if p['id'] in ENV_FROM_OUTER: _match_outer_sky(m, p)
+    if kind == '町' or p['id'] in ENV_FROM_OUTER: _match_outer_sky(m, p)   # 町はすべて・村は表の番号だけ
     _fix_exit_links(m, p, gx, gy)
     if kind != '宿場': RL.relax_heights(m, _objects())   # 歩ける隣のマスの高さの差を 1 以内に（落下ダメージを出さない）
     if kind == '町' and RW.TOWN_PLAZA[p['id']] == 'stalls':
