@@ -128,8 +128,8 @@ def _region_ok(t, obj, geo, placed, strict=False, port=False):
     return True
 
 
-def _village_houses(obj, geo, sid):
-    """村の囲いの中に、木の家（幅 2 マス）を、間を空けて並べる。門から奥へ通る道（門の 2 マス幅）をはさんで、左右の列に（ユーザー提案 2026-11-14）。家の数・並びは場所ごと（HOUSE_PLAN）"""
+def _village_houses(obj, geo, sid, house_ch=None):
+    """村の囲いの中に、家（既定は木の家。C の村は中東風の家 house_ch。幅 2 マス）を、間を空けて並べる。門から奥へ通る道（門の 2 マス幅）をはさんで、左右の列に（ユーザー提案 2026-11-14）。家の数・並びは場所ごと（HOUSE_PLAN）"""
     y0, y1, x0, x1 = geo['box']
     (ay, ax), (by, bx) = geo['gate']
     alongy = ay == by   # 門が行（横一列）に並ぶ＝奥行きは行方向
@@ -141,6 +141,7 @@ def _village_houses(obj, geo, sid):
         edge, inward = ax, (1 if ax == x0 else -1)
         depth, lo, width = x1 - x0 + 1, y0, y1 - y0 + 1
         lane = (min(ay, by) - y0, max(ay, by) - y0)
+    house = ord(house_ch or WOOD_HOUSE_CH)
     lefts = (lane[0] - 2, lane[1] + 1)   # 道の左右の家の、幅方向の始まり（2 マス幅）
     spans = {'two': [(1, 2), (4, 5)], 'long': [(1, 5)], 'front': [(1, 2)], 'back': [(4, 5)]}   # 奥行きの範囲（扉の側の壁から数える）。two=小さな家 2 軒・long=細長い家 1 軒・front=手前だけ・back=奥だけ
     for w0, opt in zip(lefts, HOUSE_PLAN.get(sid, ('two', 'two'))):   # 左右の列ごとに、家の並びを変える
@@ -149,8 +150,8 @@ def _village_houses(obj, geo, sid):
             if b > depth - 2: continue
             for dd in range(a, b + 1):
                 for ww in (w0, w0 + 1):
-                    if alongy: obj[edge + inward * dd, lo + ww] = ord(WOOD_HOUSE_CH)
-                    else: obj[lo + ww, edge + inward * dd] = ord(WOOD_HOUSE_CH)
+                    if alongy: obj[edge + inward * dd, lo + ww] = house
+                    else: obj[lo + ww, edge + inward * dd] = house
 
 
 def _paint(g, geo, kind, country, name, sid, sign=True, port=False):
@@ -170,7 +171,7 @@ def _paint(g, geo, kind, country, name, sid, sign=True, port=False):
     for y in range(y0, y1 + 1):
         for x in range(x0, x1 + 1):
             if y in (y0, y1) or x in (x0, x1): obj[y, x] = ord(wall)
-    if village: _village_houses(obj, geo, sid)
+    if village: _village_houses(obj, geo, sid, ch('8') if country == 'c' else None)   # C の村は、中の家と同じ中東風の家
     for y, x in geo['gate']: obj[y, x] = ord(PORTAL_CH) if village else ord(ch('7')); elev[y, x] = base
     if sign: sy, sx = geo['sign']; obj[sy, sx] = ord(roads.SIGN_CH); elev[sy, sx] = base   # 立て札は、道に面した場所だけ（国属なしの場所は、道がないので、置かない）
 
