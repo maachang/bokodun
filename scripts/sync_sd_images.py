@@ -104,7 +104,13 @@ def main():
         print('切り直し: %d 枚' % n)
         return
 
-    api = {int(i['id']): i for i in json.load(urllib.request.urlopen(a.sd + '/api/images?limit=1000'))['items']}
+    # sdServer の一覧は、1 回で返る件数に上限がある（limit を大きくしても 120 件ほど）。全件が取れるまで、offset でページ送りする
+    api, off = {}, 0
+    while True:
+        res = json.load(urllib.request.urlopen('%s/api/images?limit=100&offset=%d' % (a.sd, off)))
+        for i in res['items']: api[int(i['id'])] = i
+        off += len(res['items'])
+        if not res['items'] or off >= res.get('total', 0): break
     man = json.load(open(MANIFEST)) if os.path.exists(MANIFEST) else {}
     todo, seen = [], {}
     for path, key, sid, rel, kind in targets():
