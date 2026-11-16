@@ -348,11 +348,26 @@ export const tilesStructure = {
             return !t || !['block', 'door', 'wall_image'].includes(t.type);   // 像・家具の後ろの壁にも、画像を貼る
         };
         const imgMat = new THREE.MeshBasicMaterial({ map: this.getObjectImageTexture(objDef.imageFile), transparent: true, alphaTest: 0.05, side: THREE.DoubleSide });
-        const ih = objDef.height, iw = ih * (objDef.aspect || 0.5), off = tileSize / 2 + 0.02;
+        let ih = objDef.height, iw = ih * (objDef.aspect || 0.5), imgY = (objDef.bottom ?? 1.0) + ih / 2;
+        const off = tileSize / 2 + 0.02;
+        // paper: true（地図など）: 壁の面いっぱいに、白い紙の四角を貼り、その中に、画像を縦横比のまま収まる最大の大きさで置く（画像の透明な背景は、紙の色が透ける）
+        let paper = null;
+        if (objDef.paper) {
+            const m = 0.15, pw = tileSize - 2 * m, ph = wallH - 4 * m, pad = 0.15;
+            const fit = Math.min((pw - 2 * pad) / iw, (ph - 2 * pad) / ih);
+            iw *= fit; ih *= fit; imgY = wallH / 2;
+            paper = { geo: new THREE.PlaneGeometry(pw, ph), mat: new THREE.MeshBasicMaterial({ color: 0xfaf7ee, side: THREE.DoubleSide }) };
+        }
         for (const [dx, dz] of [[0, -1], [1, 0], [0, 1], [-1, 0]]) {
             if (!isOpen(c + dx, r + dz)) continue;
+            if (paper) {
+                const sheet = new THREE.Mesh(paper.geo, paper.mat);
+                sheet.position.set(wx + dx * (off - 0.01), wallH / 2, wz + dz * (off - 0.01));
+                sheet.rotation.y = Math.atan2(dx, dz);
+                this.scene.add(sheet);
+            }
             const plane = new THREE.Mesh(new THREE.PlaneGeometry(iw, ih), imgMat);
-            plane.position.set(wx + dx * off, (objDef.bottom ?? 1.0) + ih / 2, wz + dz * off);
+            plane.position.set(wx + dx * (paper ? off + 0.01 : off), imgY, wz + dz * (paper ? off + 0.01 : off));
             plane.rotation.y = Math.atan2(dx, dz);   // 面の向きを、開いた隣のマスのほうへ
             this.scene.add(plane);
         }

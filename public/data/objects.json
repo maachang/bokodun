@@ -16920,6 +16920,7 @@
     "height": 3.2,
     "bottom": 1.0,
     "wallTexture": "woodWall",
+    "paper": true,
     "solid": true,
     "blocksProjectiles": true,
     "description": "ボコスカ島の地図（冒険者ギルドの壁に飾る、壁の面に付ける画像。sdServer 画像 261）"
