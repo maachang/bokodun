@@ -53,8 +53,9 @@
   #win { position: absolute; inset: 40px 60px; background: #0b1220f2; border: 2px solid #e5e7eb; border-radius: 6px; padding: 12px; display: none; overflow: hidden; }
   #winBody { height: 100%; overflow-y: auto; padding-right: 6px; }   /* 中身だけスクロール（閉じる・戻るの位置は動かさない） */
   #winBody h3 { position: sticky; top: 0; background: #0b1220; margin: 0; padding-bottom: 8px; }
-  .abil { display: grid; grid-template-columns: 1fr; gap: 4px; max-width: 240px; margin: 8px 0; }   /* ドラクエ風：名前を左・数値を右にそろえた表を、職業の下に */
-  .abil span { display: flex; justify-content: space-between; border-bottom: 1px dotted #4b5563; }
+  .abil { display: grid; grid-template-columns: 1fr; gap: 4px; max-width: 200px; margin: 8px 0; }   /* ドラクエ風：名前を左・数値を右にそろえた表を、職業の下に */
+  .abil span { display: grid; grid-template-columns: 5em 2.5em 2.5em; gap: 6px; border-bottom: 1px dotted #4b5563; font-variant-numeric: tabular-nums; }   /* 名前・数値・ランクを、列にそろえる */
+  .abil b { text-align: right; font-weight: normal; } .abil i { text-align: right; font-style: normal; color: #9ca3af; }
    #winBtns { position: absolute; top: 8px; right: 8px; z-index: 2; display: flex; gap: 6px; }
   .cell { display: inline-block; width: 150px; height: 64px; margin: 0 6px 6px 0; vertical-align: top; border: 1px solid #4b5563; border-radius: 3px; padding: 4px 6px; position: relative; }
   .cell .x { position: absolute; top: 2px; right: 2px; padding: 0 5px; }
@@ -63,6 +64,8 @@
   .cell.filled { cursor: pointer; } .cell.filled:hover { border-color: #9ca3af; background: #1a2332; }
   .cell.add { color: #9ca3af; text-align: center; padding-top: 20px; cursor: pointer; }
   .pick { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1f2937; cursor: pointer; }
+  .pick.cols { display: grid; grid-template-columns: 4em 1fr 3em; gap: 8px; }   /* 種別・名前・個数を、列にそろえる（桁が変わってもずれない） */
+  .pick.cols .k { color: #9ca3af; font-size: 12px; } .n { text-align: right; font-variant-numeric: tabular-nums; }
   .pick:hover { background: #1d4ed8; } .pick.dis { color: #4b5563; cursor: default; background: none; }
   #enemyPanel { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
   #enemyInfo { display: flex; flex-direction: column; gap: 4px; overflow: hidden; }
@@ -218,7 +221,7 @@ function settingBody() {
 }
 let keyCapture = null;
 on(E.winBody, 'click', '[data-keyset]', (e, t) => { keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
-function statusBody() { return '<div class="row"><span>種族：人間</span><span>メイン職業：戦士 Lv.12</span></div><div class="row" style="justify-content:flex-end"><span>（サブ職業：ウィザード Lv.5）</span></div><hr><div class="abil"><span>筋力<b>14 (2)</b></span><span>器用度<b>12 (2)</b></span><span>敏捷度<b>13 (2)</b></span><span>知力<b>11 (2)</b></span><span>精神力<b>10 (2)</b></span><span>生命力<b>15 (3)</b></span></div><small>（数値はダミー。( ) は、数値 ÷ 5 の切り捨て）</small><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
+function statusBody() { return '<div class="row"><span>種族：人間</span><span>メイン職業：戦士 Lv.12</span></div><div class="row" style="justify-content:flex-end"><span>（サブ職業：ウィザード Lv.5）</span></div><hr><div class="abil"><span>筋力<b>14</b><i>(2)</i></span><span>器用度<b>12</b><i>(2)</i></span><span>敏捷度<b>13</b><i>(2)</i></span><span>知力<b>11</b><i>(2)</i></span><span>精神力<b>10</b><i>(2)</i></span><span>生命力<b>15</b><i>(3)</i></span></div><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
 // 装備（防具・アクセサリ。ダミー）。入っている枠は、クリックで詳細（「← 戻る」は一覧へ）
 const EQUIPS = [['兜', '鉄の兜', '防御 2d6+1 / 重さ 10', '頑丈な兜。重い装備（heavy）。'], ['鎧', '革の鎧', '防御 1d6+2 / 重さ 12', '軽い鎧。動きやすい。'], ['盾', '木の盾', '防御 1d6+1 / 重さ 6', '軽い盾。'], ['アクセサリ', null, '', '']];
 function equipBody() { return EQUIPS.map((q, i) => q[1] ? html`<div class="cell filled" style="width:220px" data-equip="${i}">${q[0]}：${q[1]}</div>` : html`<div class="cell" style="width:220px">${q[0]}：（なし）</div>`).join('') + '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>'; }
@@ -229,7 +232,7 @@ on(E.winBody, 'click', '[data-equip]', (e, t) => {
 });
 // 道具・防具の一覧（ダミー。名前・種類・個数・説明）
 const ITEMS = [['薬草', '道具', 5, 'HP を少し回復する。'], ['毒消し', '道具', 2, '毒を治す。'], ['麻痺治し', '道具', 1, '麻痺を治す。'], ['復活の薬', '道具', 1, '戦闘不能から復活させる。'], ['革の鎧', '防具', 1, '軽い鎧。重さ 12。'], ['鉄の兜', '防具', 1, '頑丈な兜。重さ 10。'], ['木の盾', '防具', 1, '軽い盾。重さ 6。']];
-function itemBody() { return ITEMS.map((it, i) => html`<div class="pick" data-item="${i}"><span>${it[1] === '防具' ? '〔防具〕' : ''}${it[0]}${it[1] === '道具' ? ' ×' + it[2] : ''}</span></div>`).join('') + '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）。クリックで詳細</p>'; }
+function itemBody() { return ITEMS.map((it, i) => html`<div class="pick cols" data-item="${i}"><span class="k">${it[1]}</span><span>${it[0]}</span><span class="n">${it[2]}</span></div>`).join('') + '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）。クリックで詳細</p>'; }
 // クリックで詳細（「← 戻る」は一覧へ）
 on(E.winBody, 'click', '.pick[data-item]', (e, t) => {
   const it = ITEMS[Number(t.dataset.item)];
