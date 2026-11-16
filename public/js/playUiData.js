@@ -6,7 +6,7 @@ export const stock = Array(9).fill(null);
 stock[0] = { kind: 'weapon', id: 'iron_sword' }; stock[1] = { kind: 'weapon', id: 'dagger' };
 stock[2] = { kind: 'weapon', id: 'fists' };   // 素手も、武器の 1 つ（素手の装備枠）
 stock[3] = { kind: 'magic', id: 'magic_bolt' }; stock[4] = { kind: 'magic', id: 'fire' }; stock[5] = { kind: 'magic', id: 'explosion' };
-export const MSG_SIZES = { s: ['小', '12px'], m: ['中', '13px'], l: ['大', '16px'] };   // メッセージ文字（会話・店のメニュー・立て札と住民のセリフの帯）の大きさ
+export const MSG_SIZES = { s: ['小', '12px'], m: ['中', '16px'], l: ['大', '20px'] };   // メッセージ文字（会話・店のメニュー・立て札と住民のセリフの帯）の大きさ
 export const prefs = { msg: 'm' };   // 設定（今は、画面を開いている間だけ有効。保存の仕組みは、あとで決める）
 export const sel = { w: 0, m: 3 };   // 選択中の武器・魔法の枠
 export const find = it => (it.kind === 'weapon' ? WEAPONS : MAGICS).find(x => x[0] === it.id);
