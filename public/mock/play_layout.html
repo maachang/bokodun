@@ -66,7 +66,8 @@
   .pick { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1f2937; cursor: pointer; }
   /* リスト表示は、原則「列そろえ」（.cols ＋ --c に列幅）。桁・文字数が変わってもずれない */
   .cols { display: grid; grid-template-columns: var(--c); gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
-  .pick.cols { --c: 4em 1fr 3em; }   /* 種別・名前・個数を、列にそろえる（桁が変わってもずれない） */
+  .pick.cols { --c: 4em 1fr 3em; }
+  .lv { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }   /* 「Lv.」は左、数字は右に詰める（桁が変わっても数字の位置がそろう） */   /* 種別・名前・個数を、列にそろえる（桁が変わってもずれない） */
   .pick.cols .k { color: #9ca3af; font-size: 12px; } .n { text-align: right; font-variant-numeric: tabular-nums; }
   .pick:hover { background: #1d4ed8; } .pick.dis { color: #4b5563; cursor: default; background: none; }
   #enemyPanel { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
@@ -94,8 +95,8 @@
     <div class="panel clickable" id="eventPanel"><div class="title">現在の受注イベント</div>
       <div>城下町の薬草集め <small style="color:#9ca3af">（薬草 3 / 5）</small></div></div>
     <div class="panel small"><div class="title">職業</div>
-      <div class="cols" style="--c:3.2em 1fr 3.4em"><span>メイン</span><span>：戦士</span><span class="n">Lv.12</span></div>
-      <div class="cols" style="--c:3.2em 1fr 3.4em"><span>サブ</span><span>：ウィザード</span><span class="n">Lv.5</span></div></div>
+      <div class="cols" style="--c:3.2em 1fr 4.2em"><span>メイン</span><span>戦士</span><span class="lv"><span>Lv.</span><span>12</span></span></div>
+      <div class="cols" style="--c:3.2em 1fr 4.2em"><span>サブ</span><span>ウィザード</span><span class="lv"><span>Lv.</span><span>5</span></span></div></div>
     <div class="panel small"><div class="title">ステータス</div>
       <div class="row"><span>HP</span><span>96 / 127</span></div><div class="bar"><i style="width:76%;background:#4ade80"></i></div>
       <div class="row"><span>MP</span><span>40 / 78</span></div><div class="bar"><i style="width:51%;background:#60a5fa"></i></div>
@@ -223,10 +224,10 @@ function settingBody() {
 }
 let keyCapture = null;
 on(E.winBody, 'click', '[data-keyset]', (e, t) => { keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
-function statusBody() { return '<div class="cols" style="--c:5em 1fr"><span class="k">種族</span><span>人間</span></div><div class="title" style="margin-top:8px">職業</div><div class="cols" style="--c:5em 1fr 4em"><span>メイン</span><span>：戦士</span><span class="n">Lv.12</span></div><div class="cols" style="--c:5em 1fr 4em"><span>サブ</span><span>：ウィザード</span><span class="n">Lv.5</span></div><hr><div class="abil"><span>筋力<b>14</b><i>(2)</i></span><span>器用度<b>12</b><i>(2)</i></span><span>敏捷度<b>13</b><i>(2)</i></span><span>知力<b>11</b><i>(2)</i></span><span>精神力<b>10</b><i>(2)</i></span><span>生命力<b>15</b><i>(3)</i></span></div><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
+function statusBody() { return '<div class="cols" style="--c:5em 1fr"><span class="k">種族</span><span>人間</span></div><div class="title" style="margin-top:8px">職業</div><div class="cols" style="--c:5em 1fr 4.2em"><span>メイン</span><span>戦士</span><span class="lv"><span>Lv.</span><span>12</span></span></div><div class="cols" style="--c:5em 1fr 4.2em"><span>サブ</span><span>ウィザード</span><span class="lv"><span>Lv.</span><span>5</span></span></div><hr><div class="abil"><span>筋力<b>14</b><i>(2)</i></span><span>器用度<b>12</b><i>(2)</i></span><span>敏捷度<b>13</b><i>(2)</i></span><span>知力<b>11</b><i>(2)</i></span><span>精神力<b>10</b><i>(2)</i></span><span>生命力<b>15</b><i>(3)</i></span></div><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
 // 装備（防具・アクセサリ。ダミー）。入っている枠は、クリックで詳細（「← 戻る」は一覧へ）
 const EQUIPS = [['兜', '鉄の兜', '防御 2d6+1 / 重さ 10', '頑丈な兜。重い装備（heavy）。'], ['鎧', '革の鎧', '防御 1d6+2 / 重さ 12', '軽い鎧。動きやすい。'], ['盾', '木の盾', '防御 1d6+1 / 重さ 6', '軽い盾。'], ['アクセサリ', null, '', '']];
-function equipBody() { return EQUIPS.map((q, i) => q[1] ? html`<div class="pick cols" style="--c:6em 1fr 14em" data-equip="${i}"><span class="k">${q[0]}</span><span>${q[1]}</span><small>${q[2]}</small></div>` : html`<div class="pick cols dis" style="--c:6em 1fr 14em"><span class="k">${q[0]}</span><span>（なし）</span><small></small></div>`).join('') + '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>'; }
+function equipBody() { return '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>' + EQUIPS.map((q, i) => q[1] ? html`<div class="pick cols" style="--c:6em 1fr 14em" data-equip="${i}"><span class="k">${q[0]}</span><span>${q[1]}</span><small>${q[2]}</small></div>` : html`<div class="pick cols dis" style="--c:6em 1fr 14em"><span class="k">${q[0]}</span><span>（なし）</span><small></small></div>`).join(''); }
 on(E.winBody, 'click', '[data-equip]', (e, t) => {
   const q = EQUIPS[Number(t.dataset.equip)];
   E.winBody.innerHTML = html`<h3>装備</h3><h3>${q[1]}</h3><p>${q[0]}</p><p>${q[2]}</p><p>${q[3]}</p>`;
@@ -234,7 +235,7 @@ on(E.winBody, 'click', '[data-equip]', (e, t) => {
 });
 // 道具・防具の一覧（ダミー。名前・種類・個数・説明）
 const ITEMS = [['薬草', '道具', 5, 'HP を少し回復する。'], ['毒消し', '道具', 2, '毒を治す。'], ['麻痺治し', '道具', 1, '麻痺を治す。'], ['復活の薬', '道具', 1, '戦闘不能から復活させる。'], ['革の鎧', '防具', 1, '軽い鎧。重さ 12。'], ['鉄の兜', '防具', 1, '頑丈な兜。重さ 10。'], ['木の盾', '防具', 1, '軽い盾。重さ 6。']];
-function itemBody() { return ITEMS.map((it, i) => html`<div class="pick cols" data-item="${i}"><span class="k">${it[1]}</span><span>${it[0]}</span><span class="n">${it[2]}</span></div>`).join('') + '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）。クリックで詳細</p>'; }
+function itemBody() { return '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）。クリックで詳細</p>' + ITEMS.map((it, i) => html`<div class="pick cols" data-item="${i}"><span class="k">${it[1]}</span><span>${it[0]}</span><span class="n">${it[2]}</span></div>`).join(''); }
 // クリックで詳細（「← 戻る」は一覧へ）
 on(E.winBody, 'click', '.pick[data-item]', (e, t) => {
   const it = ITEMS[Number(t.dataset.item)];
