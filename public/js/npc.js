@@ -32,7 +32,8 @@ export class Npc {
         this.currentLine = null;   // 近づいたときに選んだセリフ（離れるまで同じ）
 
         const height = def.height ?? 2.2;
-        this.sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture }));
+        // alphaTest: 透明な画素を捨てる。捨てないと、板の四角全体が深度に残り、後ろにある半透明の物（地面の影の帯など）が、四角の範囲だけ隠れて描かれない
+        this.sprite = new THREE.Sprite(new THREE.SpriteMaterial({ map: texture, alphaTest: 0.05 }));
         this.sprite.center.set(0.5, 0.0);   // 足元を地面に合わせる
         this.sprite.scale.set(height * (def.aspect ?? 0.4), height, 1);
         this.sprite.position.set(x, 0, z);
