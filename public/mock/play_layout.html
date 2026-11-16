@@ -50,8 +50,12 @@
   .mi.on { background: #1d4ed8; border-left-color: #facc15; font-weight: bold; }   /* いま開いている */
   .mi.on:hover { background: #2563eb; } .mi kbd { color: #9ca3af; }
   /* ウィンドウ */
-  #win { position: absolute; inset: 40px 60px; background: #0b1220f2; border: 2px solid #e5e7eb; border-radius: 6px; padding: 12px; display: none; overflow: auto; }
-  #win h3 { margin: 0 0 8px; } #winBtns { position: absolute; top: 8px; right: 8px; display: flex; gap: 6px; }
+  #win { position: absolute; inset: 40px 60px; background: #0b1220f2; border: 2px solid #e5e7eb; border-radius: 6px; padding: 12px; display: none; overflow: hidden; }
+  #winBody { height: 100%; overflow-y: auto; padding-right: 6px; }   /* 中身だけスクロール（閉じる・戻るの位置は動かさない） */
+  #winBody h3 { position: sticky; top: 0; background: #0b1220; margin: 0; padding-bottom: 8px; }
+  .abil { display: grid; grid-template-columns: 1fr; gap: 4px; max-width: 240px; margin: 8px 0; }   /* ドラクエ風：名前を左・数値を右にそろえた表を、職業の下に */
+  .abil span { display: flex; justify-content: space-between; border-bottom: 1px dotted #4b5563; }
+   #winBtns { position: absolute; top: 8px; right: 8px; z-index: 2; display: flex; gap: 6px; }
   .cell { display: inline-block; width: 150px; height: 64px; margin: 0 6px 6px 0; vertical-align: top; border: 1px solid #4b5563; border-radius: 3px; padding: 4px 6px; position: relative; }
   .cell .x { position: absolute; top: 2px; right: 2px; padding: 0 5px; }
   .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
@@ -69,7 +73,9 @@
   .slot.lack { opacity: .45; }                         /* MP が足りない魔法 */
   .slot .cd { position: absolute; left: 0; bottom: 0; height: 4px; background: #38bdf8; }   /* 連射間隔（クールダウン） */
   .sel { cursor: pointer; font-size: 11px; padding: 1px 4px; border-radius: 3px; } .sel:hover { background: #374151; }
-  #talk { height: 96px; display: none; flex-direction: column; gap: 4px; background: #0b1220; border: 2px solid #e5e7eb; border-radius: 4px; padding: 6px 12px; }
+  #talk { height: 96px; overflow-y: auto; display: none; flex-direction: column; gap: 4px; background: #0b1220; border: 2px solid #e5e7eb; border-radius: 4px; padding: 6px 12px; }
+  #bottomStack.nb #talk { height: 138px; }   /* ボスがいない間は、ボスの帯の分まで、文字の枠に使う（店の品物など、行が多いとき） */
+  #bottomStack.nb.talking #bossBar { display: none; }
   #talk .who { color: #facc15; font-weight: bold; } #talk .ch { display: flex; gap: 8px; margin-top: auto; }
   #death { position: absolute; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 5; text-align: center; }
   #death .tomb { width: 90px; height: 110px; border-radius: 45px 45px 0 0; background: #6b7280; border: 3px solid #9ca3af; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #111827; }
@@ -212,7 +218,7 @@ function settingBody() {
 }
 let keyCapture = null;
 on(E.winBody, 'click', '[data-keyset]', (e, t) => { keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
-function statusBody() { return '<div class="row"><span>種族：人間</span><span>メイン職業：戦士 Lv.12</span></div><div class="row"><span>サブ職業：ウィザード Lv.5</span><span>（選んだサブ職業が一番有効）</span></div><hr><p>筋力 14　器用度 12　敏捷度 13　知力 11　精神力 10　生命力 15（ダミー）</p><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
+function statusBody() { return '<div class="row"><span>種族：人間</span><span>メイン職業：戦士 Lv.12</span></div><div class="row" style="justify-content:flex-end"><span>（サブ職業：ウィザード Lv.5）</span></div><hr><div class="abil"><span>筋力<b>14 (2)</b></span><span>器用度<b>12 (2)</b></span><span>敏捷度<b>13 (2)</b></span><span>知力<b>11 (2)</b></span><span>精神力<b>10 (2)</b></span><span>生命力<b>15 (3)</b></span></div><small>（数値はダミー。( ) は、数値 ÷ 5 の切り捨て）</small><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
 // 装備（防具・アクセサリ。ダミー）。入っている枠は、クリックで詳細（「← 戻る」は一覧へ）
 const EQUIPS = [['兜', '鉄の兜', '防御 2d6+1 / 重さ 10', '頑丈な兜。重い装備（heavy）。'], ['鎧', '革の鎧', '防御 1d6+2 / 重さ 12', '軽い鎧。動きやすい。'], ['盾', '木の盾', '防御 1d6+1 / 重さ 6', '軽い盾。'], ['アクセサリ', null, '', '']];
 function equipBody() { return EQUIPS.map((q, i) => q[1] ? html`<div class="cell filled" style="width:220px" data-equip="${i}">${q[0]}：${q[1]}</div>` : html`<div class="cell" style="width:220px">${q[0]}：（なし）</div>`).join('') + '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>'; }
@@ -249,9 +255,9 @@ on(document, 'keydown', e => {
 // 会話・選択（ゲーム画面の真下。ボスの HP の帯と同じ場所。出ている間は、ゲームを止める）
 function talk(who, text, choices = []) {
   E.talk.innerHTML = html`<div class="who">${who}</div><div>${text}</div><div class="ch">${choices.map((c, i) => html`<button data-ch="${i}">${c[0]}</button>`)}${choices.length ? '' : jhtml.raw('<small style="color:#9ca3af">Esc で閉じる</small>')}</div>`;
-  E.talk._choices = choices; E.talk.style.display = 'flex'; setPaused();
+  E.talk._choices = choices; E.talk.style.display = 'flex'; $('bottomStack').classList.add('talking'); setPaused();
 }
-function closeTalk() { E.talk.style.display = 'none'; setPaused(); }
+function closeTalk() { E.talk.style.display = 'none'; $('bottomStack').classList.remove('talking'); setPaused(); }
 function closeAll() { closeWin(); closeTalk(); }
 on(E.talk, 'click', '[data-ch]', (e, t) => { const c = E.talk._choices[Number(t.dataset.ch)]; if (c[1]) c[1](); else closeTalk(); });
 function guild() { talk('冒険者ギルド', 'いらっしゃいませ。ご用件は？', [['セーブする', () => talk('冒険者ギルド', 'セーブしました。（最後にセーブしたギルド：グリーン王国 城下町）', [['やめる']])], ['預ける・引き出す', () => talk('冒険者ギルド', '（預かりの画面は、あとで作ります）', [['戻る', guild]])], ['やめる']]); }
@@ -285,6 +291,7 @@ let boss = null;
 function renderBoss() {
   const el = $('bossBar');
   el.classList.toggle('on', !!boss);
+  $('bottomStack').classList.toggle('nb', !boss);
   el.innerHTML = boss ? html`<span class="nm">${boss.name}</span><div class="bar"><i style="width:${boss.hp / boss.maxHp * 100}%;background:#ef4444"></i></div><span class="num">${boss.hp} / ${boss.maxHp}</span>` : '';
 }
 renderSlots();
