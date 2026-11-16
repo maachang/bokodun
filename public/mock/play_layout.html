@@ -14,7 +14,7 @@
   .panel { background: #111827; border: 1px solid #374151; border-radius: 4px; padding: 8px; }
   .small { font-size: 12px; }   /* 左側の職業・ステータスは、少し小さめの文字 */
   .title { font-size: 11px; color: #9ca3af; letter-spacing: .08em; margin-bottom: 4px; }
-  .row { display: flex; justify-content: space-between; gap: 6px; }
+  .row { display: flex; justify-content: space-between; gap: 6px; font-variant-numeric: tabular-nums; }
   .bar { height: 10px; background: #1f2937; border-radius: 2px; overflow: hidden; margin: 2px 0 6px; }
   .bar > i { display: block; height: 100%; }
   /* ゲーム画面（800×600 の想定） */
@@ -64,7 +64,9 @@
   .cell.filled { cursor: pointer; } .cell.filled:hover { border-color: #9ca3af; background: #1a2332; }
   .cell.add { color: #9ca3af; text-align: center; padding-top: 20px; cursor: pointer; }
   .pick { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1f2937; cursor: pointer; }
-  .pick.cols { display: grid; grid-template-columns: 4em 1fr 3em; gap: 8px; }   /* 種別・名前・個数を、列にそろえる（桁が変わってもずれない） */
+  /* リスト表示は、原則「列そろえ」（.cols ＋ --c に列幅）。桁・文字数が変わってもずれない */
+  .cols { display: grid; grid-template-columns: var(--c); gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+  .pick.cols { --c: 4em 1fr 3em; }   /* 種別・名前・個数を、列にそろえる（桁が変わってもずれない） */
   .pick.cols .k { color: #9ca3af; font-size: 12px; } .n { text-align: right; font-variant-numeric: tabular-nums; }
   .pick:hover { background: #1d4ed8; } .pick.dis { color: #4b5563; cursor: default; background: none; }
   #enemyPanel { flex: 1 1 auto; min-height: 0; overflow: hidden; display: flex; flex-direction: column; }
@@ -186,9 +188,9 @@ function openEvent() {
   setBack(null);
   document.querySelectorAll('.mi').forEach(el => el.classList.remove('on'));
   E.winBody.innerHTML = html`<h3>受注イベント：${EVENT.name}</h3>
-    <div class="row" style="justify-content:flex-start;gap:16px"><span class="title">受けた日時</span><span>${EVENT.at}</span></div>
-    <div class="row" style="justify-content:flex-start;gap:16px"><span class="title">受けた場所</span><span>${EVENT.place}</span></div>
-    <div class="row" style="justify-content:flex-start;gap:16px"><span class="title">進み具合</span><span>${EVENT.progress}</span></div>
+    <div class="cols" style="--c:7em 1fr"><span class="title">受けた日時</span><span>${EVENT.at}</span></div>
+    <div class="cols" style="--c:7em 1fr"><span class="title">受けた場所</span><span>${EVENT.place}</span></div>
+    <div class="cols" style="--c:7em 1fr"><span class="title">進み具合</span><span>${EVENT.progress}</span></div>
     <div class="title" style="margin-top:8px">詳細内容</div><p>${EVENT.detail}</p>`;
   show(E.win); setPaused();
 }
@@ -201,7 +203,7 @@ function stockBody() {
 }
 function pickBody(slotNo) {
   const used = new Set(stock.filter(Boolean).map(x => x.id));
-  const row = (kind, [id, name, d]) => html`<div class="pick ${used.has(id) ? 'dis' : ''}" data-kind="${kind}" data-id="${id}" data-slot="${slotNo}"><span>${name}${used.has(id) ? '（入っています）' : ''}</span><small>${d}</small></div>`;
+  const row = (kind, [id, name, d]) => html`<div class="pick cols ${used.has(id) ? 'dis' : ''}" style="--c:1fr 7em 12em" data-kind="${kind}" data-id="${id}" data-slot="${slotNo}"><span>${name}</span><small>${used.has(id) ? '入っています' : ''}</small><small>${d}</small></div>`;
   return '<p>枠 ' + (slotNo + 1) + ' に入れる武器・魔法</p><div class="title">武器</div>' + WEAPONS.map(w => row('weapon', w)).join('') + '<div class="title" style="margin-top:8px">魔法</div>' + MAGICS.map(m => row('magic', m)).join('');
 }
 on(E.winBody, 'click', '[data-rm]', (e, t) => { const i = Number(t.dataset.rm); stock[i] = null; if (selW === i) selW = stock.findIndex(x => x && x.kind === 'weapon'); if (selM === i) selM = stock.findIndex(x => x && x.kind === 'magic'); renderSlots(); openWin('stock'); });
@@ -217,14 +219,14 @@ on(E.winBody, 'click', '[data-add]', (e, t) => { E.winBody.innerHTML = '<h3>ス�
 on(E.winBody, 'click', '.pick[data-slot]:not(.dis)', (e, t) => { const i = Number(t.dataset.slot); stock[i] = { kind: t.dataset.kind, id: t.dataset.id }; if (stock[i].kind === 'weapon' && selW < 0) selW = i; if (stock[i].kind === 'magic' && selM < 0) selM = i; renderSlots(); openWin('stock'); });
 
 function settingBody() {
-  return '<p class="legend">ショートカットキーの割り当て（「変更」を押して、割り当てたいキーを押す。1〜9 と Esc は使えません）</p>' + MENU.map(([id, name]) => html`<div class="row" style="justify-content:flex-start;gap:16px;margin-bottom:4px"><span style="width:110px">${name}</span><kbd>${keymap[id].toUpperCase()}</kbd><button data-keyset="${id}">変更</button></div>`).join('') + '<div class="row" style="justify-content:flex-start;gap:16px;margin-top:10px"><span style="width:110px">音量</span><input type="range" min="0" max="100" value="60"></div>';
+  return '<p class="legend">ショートカットキーの割り当て（「変更」を押して、割り当てたいキーを押す。1〜9 と Esc は使えません）</p>' + MENU.map(([id, name]) => html`<div class="cols" style="--c:110px 3em 9em;margin-bottom:4px"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd><button data-keyset="${id}">変更</button></div>`).join('') + '<div class="cols" style="--c:110px 200px;margin-top:10px"><span>音量</span><input type="range" min="0" max="100" value="60"></div>';
 }
 let keyCapture = null;
 on(E.winBody, 'click', '[data-keyset]', (e, t) => { keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
 function statusBody() { return '<div class="row"><span>種族：人間</span><span>メイン職業：戦士 Lv.12</span></div><div class="row" style="justify-content:flex-end"><span>（サブ職業：ウィザード Lv.5）</span></div><hr><div class="abil"><span>筋力<b>14</b><i>(2)</i></span><span>器用度<b>12</b><i>(2)</i></span><span>敏捷度<b>13</b><i>(2)</i></span><span>知力<b>11</b><i>(2)</i></span><span>精神力<b>10</b><i>(2)</i></span><span>生命力<b>15</b><i>(3)</i></span></div><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
 // 装備（防具・アクセサリ。ダミー）。入っている枠は、クリックで詳細（「← 戻る」は一覧へ）
 const EQUIPS = [['兜', '鉄の兜', '防御 2d6+1 / 重さ 10', '頑丈な兜。重い装備（heavy）。'], ['鎧', '革の鎧', '防御 1d6+2 / 重さ 12', '軽い鎧。動きやすい。'], ['盾', '木の盾', '防御 1d6+1 / 重さ 6', '軽い盾。'], ['アクセサリ', null, '', '']];
-function equipBody() { return EQUIPS.map((q, i) => q[1] ? html`<div class="cell filled" style="width:220px" data-equip="${i}">${q[0]}：${q[1]}</div>` : html`<div class="cell" style="width:220px">${q[0]}：（なし）</div>`).join('') + '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>'; }
+function equipBody() { return EQUIPS.map((q, i) => q[1] ? html`<div class="pick cols" style="--c:6em 1fr 14em" data-equip="${i}"><span class="k">${q[0]}</span><span>${q[1]}</span><small>${q[2]}</small></div>` : html`<div class="pick cols dis" style="--c:6em 1fr 14em"><span class="k">${q[0]}</span><span>（なし）</span><small></small></div>`).join('') + '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>'; }
 on(E.winBody, 'click', '[data-equip]', (e, t) => {
   const q = EQUIPS[Number(t.dataset.equip)];
   E.winBody.innerHTML = html`<h3>装備</h3><h3>${q[1]}</h3><p>${q[0]}</p><p>${q[2]}</p><p>${q[3]}</p>`;
