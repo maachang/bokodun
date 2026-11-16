@@ -94,8 +94,8 @@
     <div class="panel clickable" id="eventPanel"><div class="title">現在の受注イベント</div>
       <div>城下町の薬草集め <small style="color:#9ca3af">（薬草 3 / 5）</small></div></div>
     <div class="panel small"><div class="title">職業</div>
-      <div class="row"><span>メイン：戦士</span><span>Lv.12</span></div>
-      <div class="row"><span>サブ　：ウィザード</span><span>Lv.5</span></div></div>
+      <div class="cols" style="--c:3.2em 1fr 3.4em"><span>メイン</span><span>：戦士</span><span class="n">Lv.12</span></div>
+      <div class="cols" style="--c:3.2em 1fr 3.4em"><span>サブ</span><span>：ウィザード</span><span class="n">Lv.5</span></div></div>
     <div class="panel small"><div class="title">ステータス</div>
       <div class="row"><span>HP</span><span>96 / 127</span></div><div class="bar"><i style="width:76%;background:#4ade80"></i></div>
       <div class="row"><span>MP</span><span>40 / 78</span></div><div class="bar"><i style="width:51%;background:#60a5fa"></i></div>
@@ -223,7 +223,7 @@ function settingBody() {
 }
 let keyCapture = null;
 on(E.winBody, 'click', '[data-keyset]', (e, t) => { keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
-function statusBody() { return '<div class="row"><span>種族：人間</span><span>メイン職業：戦士 Lv.12</span></div><div class="row" style="justify-content:flex-end"><span>（サブ職業：ウィザード Lv.5）</span></div><hr><div class="abil"><span>筋力<b>14</b><i>(2)</i></span><span>器用度<b>12</b><i>(2)</i></span><span>敏捷度<b>13</b><i>(2)</i></span><span>知力<b>11</b><i>(2)</i></span><span>精神力<b>10</b><i>(2)</i></span><span>生命力<b>15</b><i>(3)</i></span></div><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
+function statusBody() { return '<div class="cols" style="--c:5em 1fr"><span class="k">種族</span><span>人間</span></div><div class="title" style="margin-top:8px">職業</div><div class="cols" style="--c:5em 1fr 4em"><span>メイン</span><span>：戦士</span><span class="n">Lv.12</span></div><div class="cols" style="--c:5em 1fr 4em"><span>サブ</span><span>：ウィザード</span><span class="n">Lv.5</span></div><hr><div class="abil"><span>筋力<b>14</b><i>(2)</i></span><span>器用度<b>12</b><i>(2)</i></span><span>敏捷度<b>13</b><i>(2)</i></span><span>知力<b>11</b><i>(2)</i></span><span>精神力<b>10</b><i>(2)</i></span><span>生命力<b>15</b><i>(3)</i></span></div><p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>'; }
 // 装備（防具・アクセサリ。ダミー）。入っている枠は、クリックで詳細（「← 戻る」は一覧へ）
 const EQUIPS = [['兜', '鉄の兜', '防御 2d6+1 / 重さ 10', '頑丈な兜。重い装備（heavy）。'], ['鎧', '革の鎧', '防御 1d6+2 / 重さ 12', '軽い鎧。動きやすい。'], ['盾', '木の盾', '防御 1d6+1 / 重さ 6', '軽い盾。'], ['アクセサリ', null, '', '']];
 function equipBody() { return EQUIPS.map((q, i) => q[1] ? html`<div class="pick cols" style="--c:6em 1fr 14em" data-equip="${i}"><span class="k">${q[0]}</span><span>${q[1]}</span><small>${q[2]}</small></div>` : html`<div class="pick cols dis" style="--c:6em 1fr 14em"><span class="k">${q[0]}</span><span>（なし）</span><small></small></div>`).join('') + '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>'; }
