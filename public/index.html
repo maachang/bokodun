@@ -12,49 +12,26 @@
         }
         body {
             margin: 0;
-            padding: 0;
-            background: #090a0f;
-            color: #f1f5f9;
-            font-family: 'Courier New', Courier, monospace, sans-serif;
-            overflow: auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-            padding: 12px;
+            background: #0b0f17;
+            color: #e5e7eb;
+            font: 13px/1.5 'Courier New', Courier, monospace, sans-serif;
+            overflow: hidden;
+            height: 100vh;
         }
 
-        /* 画面レイアウト: ゲーム画面の周囲に、枠外パネルの領域（top / left / right / bottom）を置く。
+        /* 画面全体は、1 つの固定サイズ（左 220 ＋ ゲーム画面 800 ＋ 右 240）として組み、ブラウザの大きさに合わせて縮小・拡大する（js/playUi.js の fit。拡大は 3 倍まで）。
            どのパネルをどの領域に置くかは public/data/layout.json で決める（js/layout.js が起動時に組み立てる） */
         #app {
-            display: grid;
-            grid-template-columns: auto auto auto;
-            grid-template-areas:
-                "top top top"
-                "left game right"
-                "bottom bottom bottom";
-            gap: 10px;
-            justify-content: center;
-            align-items: start;
-            margin: auto;
+            position: absolute; top: 0; left: 0;
+            transform-origin: 0 0;
+            width: max-content;
+            display: flex; gap: 8px; align-items: stretch; padding: 8px;
         }
-        #region-top { grid-area: top; }
-        #region-left { grid-area: left; }
-        #region-right { grid-area: right; }
-        #region-bottom { grid-area: bottom; }
-        #gameWrapper { grid-area: game; }
-        .region { display: flex; gap: 8px; }
+        #region-left { width: 220px; }
+        #region-right { width: 240px; }
+        .region { display: flex; flex-direction: column; gap: 8px; }
         .region:empty { display: none; }
-        #region-left, #region-right { flex-direction: column; align-items: stretch; }
-        #region-top, #region-bottom { flex-direction: row; flex-wrap: wrap; justify-content: center; align-items: flex-start; }
-        /* ウィンドウ幅が足りないときは、左右のパネルを下へ折り返す */
-        @media (max-width: 1300px) {
-            #app {
-                grid-template-columns: auto;
-                grid-template-areas: "top" "game" "left" "right" "bottom";
-            }
-            #region-left, #region-right { flex-direction: row; flex-wrap: wrap; justify-content: center; }
-        }
+        #unusedRegions { display: none; }   /* 上・下の領域は、今の画面構成では使わない（layout.json で指定された場合の置き場） */
 
         /* 画面内（ゲーム画面に重ねる）の領域 */
         .overlay-region {
@@ -76,12 +53,12 @@
 
         #gameWrapper {
             position: relative;
+            flex: none;
             width: var(--game-width, 800px);
             height: calc(var(--game-width, 800px) * 3 / 4);
+            box-sizing: content-box;
             background: #000;
-            border: 4px solid #334155;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8), inset 0 0 15px rgba(0,0,0,0.9);
-            border-radius: 8px;
+            border: 1px solid #374151;
             overflow: hidden;
         }
 
@@ -137,13 +114,12 @@
             display: block;
         }
 
-        /* パネル（ステータス・魔法スロット・武器スロットなど）。panel-bare は枠なし（中身がそれぞれ枠を持つもの） */
+        /* パネル（現在位置・職業・ステータス・ミニマップ・メニューなど）。panel-bare は枠なし（中身がそれぞれ枠を持つもの） */
         .panel {
-            background: rgba(15, 23, 42, 0.88);
-            border: 1px solid #475569;
-            border-radius: 6px;
-            padding: 8px 14px;
-            min-width: 220px;
+            background: #111827;
+            border: 1px solid #374151;
+            border-radius: 4px;
+            padding: 8px;
         }
         .panel-bare {
             display: flex;
@@ -151,11 +127,21 @@
             align-items: flex-start;
         }
         .panel-title {
-            font-size: 10px;
-            color: #64748b;
-            letter-spacing: 1px;
-            margin-bottom: 2px;
+            font-size: 11px;
+            color: #9ca3af;
+            letter-spacing: .08em;
+            margin-bottom: 4px;
         }
+        .small { font-size: 12px; }
+        .row { display: flex; justify-content: space-between; gap: 6px; font-variant-numeric: tabular-nums; }
+        .bar { height: 10px; background: #1f2937; border-radius: 2px; overflow: hidden; margin: 2px 0 6px; }
+        .bar > i { display: block; height: 100%; }
+        .clickable { cursor: pointer; } .clickable:hover { border-color: #9ca3af; background: #1a2332; }
+        /* リスト表示は、原則「列そろえ」（.cols ＋ --c に列幅）。桁・文字数が変わってもずれない */
+        .cols { display: grid; grid-template-columns: var(--c); gap: 8px; align-items: center; font-variant-numeric: tabular-nums; }
+        .lv { display: flex; justify-content: space-between; font-variant-numeric: tabular-nums; }
+        .n { text-align: right; font-variant-numeric: tabular-nums; }
+        .legend { font-size: 11px; color: #9ca3af; margin-top: 4px; }
 
         /* Enemy Info HUD Panel (Ys-style Target Info) */
         /* 武器スロット（クリックで選択）と魔法スロット（数字キー 1〜4・セレクトボックス）。HUD 全体は pointer-events:none なので個別に有効化する */
@@ -235,31 +221,30 @@
         }
         #enemyHudList {
             display: flex;
-            flex-direction: column-reverse; /* Stacks new ones from bottom up */
-            gap: 6px;
-            margin-bottom: 8px;
+            flex-direction: column; /* 新しいものが一番上（パネルに入る限り出す。入りきらない分は、下から隠れる） */
+            gap: 4px;
+            overflow: hidden;
             pointer-events: none;
-            width: 250px;
-            z-index: 20;
+            width: 100%;
         }
 
         .enemy-hud-card {
             display: flex;
             align-items: center;
             gap: 8px;
-            background: #0f172a; /* 完全な不透明の濃紺ソリッド背景 */
-            border: 2px solid #ef4444;
-            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.95);
-            border-radius: 6px;
-            padding: 6px 10px;
+            flex: none;
+            background: #0f172a;
+            border: 1px solid #374151;
+            border-radius: 3px;
+            padding: 3px 5px;
             width: 100%;
             box-sizing: border-box;
         }
 
         .enemy-hud-icon {
-            width: 32px;
-            height: 32px;
-            border-radius: 4px;
+            width: 26px;
+            height: 26px;
+            border-radius: 3px;
             background: #1e1b4b;
             border: 1px solid #6366f1;
             object-fit: contain;
@@ -293,6 +278,60 @@
             transition: width 0.2s ease-out;
         }
 
+
+        /* 敵の情報のパネルは、左の列の残りを使う */
+        #panel-enemies { flex: 1 1 auto; min-height: 0; overflow: hidden; align-items: stretch; }
+        /* 9 枠のストック（今は見た目だけ。中身は、組み立てが決まってから） */
+        #slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
+        .slot { position: relative; height: 44px; border: 1px solid #4b5563; border-radius: 3px; background: #0f172a; text-align: center; font-size: 11px; line-height: 1.2; padding-top: 12px; cursor: pointer; }
+        .slot .no { position: absolute; top: 1px; left: 3px; color: #9ca3af; }
+        .slot.empty { color: #4b5563; cursor: default; }
+        .slot.selW { outline: 2px solid #f59e0b; } .slot.selM { outline: 2px solid #38bdf8; }
+        .slot .tag { position: absolute; top: 1px; right: 3px; font-size: 10px; }
+        .sel { cursor: pointer; font-size: 11px; padding: 1px 4px; border-radius: 3px; } .sel:hover { background: #374151; }
+        /* メニュー */
+        .mi { display: flex; justify-content: space-between; padding: 3px 6px; border-radius: 3px; cursor: pointer; border-left: 4px solid transparent; }
+        .mi:hover { background: #374151; outline: 1px solid #9ca3af; }
+        .mi.on { background: #1d4ed8; border-left-color: #facc15; font-weight: bold; }
+        .mi.on:hover { background: #2563eb; } .mi kbd { color: #9ca3af; }
+        /* ダイアログ（ゲーム画面の上。開いている間は、ゲームを止める） */
+        #pauseBadge { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); background: #b91c1ccc; padding: 2px 10px; border-radius: 3px; display: none; font-weight: bold; z-index: 6; }
+        #win { position: absolute; inset: 40px 60px; background: #0b1220f2; border: 2px solid #e5e7eb; border-radius: 6px; padding: 12px; display: none; overflow: hidden; z-index: 30; }
+        #winBody { height: 100%; overflow-y: auto; padding-right: 6px; }
+        #winBody h3 { position: sticky; top: 0; background: #0b1220; margin: 0; padding-bottom: 8px; z-index: 1; }
+        #winBtns { position: absolute; top: 8px; right: 8px; z-index: 2; display: flex; gap: 6px; }
+        #win button, #talk button, .menu-btn { background: #1f2937; color: #e5e7eb; border: 1px solid #4b5563; border-radius: 3px; padding: 2px 8px; cursor: pointer; font: inherit; }
+        #win button.on { background: #1d4ed8; border-color: #facc15; }
+        #win button:hover, #talk button:hover { background: #374151; }
+        .abil { display: grid; grid-template-columns: 1fr; gap: 4px; max-width: 200px; margin: 8px 0; }
+        .abil span { display: grid; grid-template-columns: 5em 2.5em 2.5em; gap: 6px; border-bottom: 1px dotted #4b5563; font-variant-numeric: tabular-nums; }
+        .abil b { text-align: right; font-weight: normal; } .abil i { text-align: right; font-style: normal; color: #9ca3af; }
+        .cell { display: inline-block; width: 150px; height: 64px; margin: 0 6px 6px 0; vertical-align: top; border: 1px solid #4b5563; border-radius: 3px; padding: 4px 6px; position: relative; }
+        .cell .x { position: absolute; top: 2px; right: 2px; padding: 0 5px; }
+        .grid3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+        .grid3 .cell { width: auto; height: 84px; margin: 0; }
+        .cell.filled { cursor: pointer; } .cell.filled:hover { border-color: #9ca3af; background: #1a2332; }
+        .cell.add { color: #9ca3af; text-align: center; padding-top: 30px; cursor: pointer; }
+        .pick { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1f2937; cursor: pointer; }
+        .pick.cols { --c: 4em 1fr 3em; }
+        .pick.cols .k { color: #9ca3af; font-size: 12px; }
+        .pick:hover { background: #1d4ed8; } .pick.dis { color: #4b5563; cursor: default; background: none; }
+        #winBody .title { font-size: 11px; color: #9ca3af; letter-spacing: .08em; margin-bottom: 4px; }
+        #region-debug { gap: 10px; }
+        /* ゲーム画面の一番下に、ボスの HP（上）と会話（下）を重ねる（今は見た目だけ） */
+        #bottomStack { position: absolute; left: 12px; right: 12px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; z-index: 8; }
+        /* ボスの HP は、ゲーム画面の上（エリア名・方角の下）。会話の枠は、ボスの有無に関わらず、高さ一定 */
+        #bossBar { position: absolute; left: 12px; right: 12px; top: 46px; z-index: 8; height: 36px; padding: 4px 10px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; border-radius: 4px; }
+        #bossBar:empty { display: none; }
+        #bossBar.on { background: #111827e6; border-color: #7f1d1d; }
+        #bossBar .nm { flex: none; width: 150px; font-weight: bold; color: #fecaca; }
+        #bossBar .bar { flex: 1; height: 14px; margin: 0; }
+        #bossBar .num { flex: none; width: 110px; text-align: right; font-size: 12px; }
+        #talk { font-size: var(--msg-size, 13px); height: 138px; overflow-y: auto; display: none; flex-direction: column; gap: 4px; background: #0b1220d9; border: 2px solid #e5e7eb; border-radius: 4px; padding: 6px 12px; }
+        #talk .who { color: #facc15; font-weight: bold; } #talk .ch { display: flex; gap: 8px; margin-top: auto; }
+        #death { position: absolute; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 40; text-align: center; }
+        #death .tomb { width: 90px; height: 110px; border-radius: 45px 45px 0 0; background: #6b7280; border: 3px solid #9ca3af; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #111827; }
+
         .hp-bar-bg {
             width: 100%;
             height: 14px;
@@ -322,31 +361,19 @@
         /* Signpost Dialogue / Notice Banner Overlay */
         #signpostBanner {
             display: none;
-            position: absolute;
-            top: 24%;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(15, 23, 42, 0.92);
-            border: 2px solid #facc15;
-            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.85), inset 0 0 12px rgba(250, 204, 21, 0.2);
+            flex: none;
+            height: 138px;
+            font-size: var(--msg-size, 13px);
+            overflow-y: auto;
+            background: #0b1220d9;
+            border: 2px solid #e5e7eb;
+            border-radius: 4px;
             color: #fef08a;
-            padding: 10px 22px;
-            border-radius: 8px;
-            font-size: 15px;
-            font-weight: bold;
-            text-shadow: 1px 1px 2px #000;
-            pointer-events: none;
-            z-index: 10;
+            padding: 6px 12px;
             white-space: pre-line;
-            text-align: center;
-            letter-spacing: 0.5px;
-            animation: bannerPop 0.22s ease-out;
+            text-align: left;
         }
-
-        @keyframes bannerPop {
-            0% { transform: translateX(-50%) scale(0.85); opacity: 0; }
-            100% { transform: translateX(-50%) scale(1.0); opacity: 1; }
-        }
+        #bottomStack.talking #signpostBanner { display: none !important; }   /* 会話・店のメニューが出ている間は、立て札・住民のセリフの帯は隠す */
 
         @keyframes floatUp {
             0% { transform: translate(-50%, 0) scale(0.8); opacity: 0; }
@@ -355,9 +382,9 @@
         }
 
         #instructions {
-            margin-top: 12px;
             display: flex;
-            gap: 20px;
+            flex-direction: column;
+            gap: 4px;
             font-size: 13px;
             color: #94a3b8;
         }
@@ -534,7 +561,6 @@
 
     <!-- 画面レイアウト: パネルは最初「パネル置き場」にあり、起動時に layout.js が layout.json の指定どおり各領域へ移す -->
     <div id="app">
-        <div id="region-top" class="region"></div>
         <div id="region-left" class="region"></div>
 
         <div id="gameWrapper">
@@ -544,52 +570,97 @@
 
             <!-- HUD Layer（画面内の領域） -->
             <div id="hudOverlay">
-                <!-- Active Signpost / Notice Guidance Banner -->
-                <div id="signpostBanner"></div>
-
                 <div id="overlay-top" class="overlay-region"></div>
                 <div id="overlay-top-right" class="overlay-region"></div>
                 <div id="overlay-bottom-left" class="overlay-region"></div>
                 <div id="overlay-bottom-right" class="overlay-region"></div>
             </div>
+
+            <!-- 一時停止中の表示・ボスの HP と会話（見た目だけ）・死亡・ダイアログ（js/playUi.js が動かす） -->
+            <div id="pauseBadge">一時停止中</div>
+            <div id="bossBar"></div>
+            <div id="bottomStack"><div id="signpostBanner"></div><div id="talk"></div></div>
+            <div id="death"><div class="tomb">RIP</div><div id="deathMsg" style="font-size:18px"></div><div style="color:#9ca3af">Enter か、数秒で、最後にセーブしたギルドで復活します</div></div>
+            <div id="win"><div id="winBtns"><button id="winBack" style="display:none">← 戻る</button><button id="winClose">閉じる (Esc)</button></div><div id="winBody"></div></div>
         </div>
 
         <div id="region-right" class="region"></div>
-        <div id="region-bottom" class="region"></div>
     </div>
+    <div id="unusedRegions"><div id="region-top" class="region"></div><div id="region-bottom" class="region"></div></div>
 
-    <!-- パネル置き場（layout.json で "hidden" を指定したパネルはここに残り、表示されない） -->
+    <!-- パネル置き場（layout.json で "hidden" を指定したパネルはここに残り、表示されない。"debug" の領域は、現在位置をクリックして開くダイアログの中に出る） -->
     <div id="panelStore" style="display: none;">
+        <div id="region-debug" class="region"></div>
+
+
+        <!-- 現在位置（クリックで、開発用の機能のダイアログ） -->
+        <section class="panel clickable" id="panel-location">
+            <div class="panel-title">現在位置</div>
+            <div id="locationText">―</div>
+        </section>
+
+        <!-- 現在の受注イベント（今は見た目だけ。クリックで詳細） -->
+        <section class="panel clickable" id="panel-event">
+            <div class="panel-title">現在の受注イベント</div>
+            <div>城下町の薬草集め <small style="color:#9ca3af">（薬草 3 / 5）</small></div>
+        </section>
+
+        <!-- 職業（職業の仕組みは、まだゲームに入っていないため、職業名とサブ職業は見た目だけ。レベルは、ゲームの値） -->
+        <section class="panel small" id="panel-job">
+            <div class="panel-title">職業</div>
+            <div class="cols" style="--c:3.2em 1fr 4.2em"><span>メイン</span><span>戦士</span><span class="lv"><span>Lv.</span><span id="levelText">1</span></span></div>
+            <div class="cols" style="--c:3.2em 1fr 4.2em"><span>サブ</span><span>ウィザード</span><span class="lv"><span>Lv.</span><span>5</span></span></div>
+        </section>
+
         <!-- ステータス -->
-        <section class="panel" id="panel-status">
-            <div class="panel-title">STATUS</div>
-            <div style="display: flex; justify-content: space-between; font-size: 13px;">
-                <span id="levelText">Lv.1</span>
-                <span id="hpText" style="color: #4ade80;">100/100</span>
+        <section class="panel small" id="panel-status">
+            <div class="panel-title">ステータス</div>
+            <div class="row"><span>HP</span><span id="hpText">100/100</span></div>
+            <div class="bar"><i id="hpBar" style="width:100%;background:#4ade80"></i></div>
+            <div class="row"><span>MP</span><span id="mpText">60/60</span></div>
+            <div class="bar"><i id="mpBar" style="width:100%;background:#60a5fa"></i></div>
+            <div class="row"><span>スタミナ</span><span></span></div>
+            <div class="bar"><i id="staminaBar" style="width:100%;background:#facc15"></i></div>
+            <div class="row"><span>GOLD</span><span id="goldText" style="color:#facc15">0 G</span></div>
+            <div class="row"><span>経験値</span><span id="expText">0</span></div>
+            <div class="row" style="color:#64748b;font-size:11px"><span id="playerStatus" style="color:#fbbf24"></span><span id="monsterCount">敵残数: 0</span></div>
+        </section>
+
+        <!-- ストック（9 枠。今は見た目だけ。武器・魔法の切り替えは、現在の仕組みのまま、現在位置のダイアログから） -->
+        <section class="panel" id="panel-stock">
+            <div class="panel-title">ストック（1〜9 / クリックで選択）</div>
+            <div id="slots"></div>
+            <div class="legend"><span style="color:#f59e0b">■</span> 選択中の武器　<span style="color:#38bdf8">■</span> 選択中の魔法</div>
+            <div id="selInfo"></div>
+        </section>
+
+        <!-- メニュー -->
+        <section class="panel" id="panel-menu">
+            <div class="panel-title">メニュー</div>
+            <div id="menu"></div>
+        </section>
+
+        <!-- 敵の情報（攻撃した／された敵。新しいものが一番上） -->
+        <section class="panel" id="panel-enemies">
+            <div class="panel-title">敵の情報（攻撃した／された）</div>
+            <div id="enemyHudList"></div>
+        </section>
+
+        <!-- ミニマップ（見出しに、ゲーム内の日時を出す。日時は今は仮） -->
+        <section class="panel" id="panel-minimap">
+            <div class="panel-title" id="miniTitle">ミニマップ</div>
+            <div id="minimapBox">
+                <canvas id="minimapCanvas" width="140" height="140"></canvas>
             </div>
-            <div class="hp-bar-bg">
-                <div id="hpBar"></div>
-            </div>
-            <!-- MP Bar -->
-            <div style="display: flex; justify-content: space-between; font-size: 11px; margin-top: 4px;">
-                <span style="color: #60a5fa;">MP</span>
-                <span id="mpText" style="color: #60a5fa;">60/60</span>
-            </div>
-            <div class="hp-bar-bg" style="height: 8px;">
-                <div id="mpBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #3b82f6, #60a5fa); transition: width 0.15s;"></div>
-            </div>
-            <!-- スタミナ Bar -->
-            <div class="hp-bar-bg" style="height: 6px; margin-top: 4px;">
-                <div id="staminaBar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #ca8a04, #facc15); transition: width 0.1s;"></div>
-            </div>
-            <div style="margin-top: 4px; display: flex; justify-content: space-between; font-size: 12px; color: #94a3b8;">
-                <span id="expText">EXP: 0</span>
-                <span id="goldText" style="color: #facc15; font-weight: bold;">0 G</span>
-            </div>
-            <div style="margin-top: 2px; font-size: 11px; color: #64748b; text-align: right;">
-                <span id="playerStatus" style="color: #fbbf24; font-size: 12px;"></span>
-                <span id="monsterCount">敵残数: 0</span>
-            </div>
+        </section>
+
+        <!-- エリア名（既定は、ゲーム画面の左上に重ねる） -->
+        <section class="panel-bare" id="panel-areaName">
+            <div class="badge" id="currentAreaName">エリア名</div>
+        </section>
+        <!-- 方角（現在向いている、大体の方向。既定は、ゲーム画面の右上に重ねる） -->
+        <section class="panel-bare" id="panel-compass">
+            <div class="badge" id="compassText">北</div>
         </section>
 
         <!-- 魔法スロット（数字キー 1〜4 で切り替え。中身はセレクトボックスで選ぶ） -->
@@ -610,26 +681,6 @@
             <div id="effectTestHud"></div>
         </section>
 
-        <!-- Ys-style 戦闘中の敵のステータスカード -->
-        <section class="panel-bare" id="panel-enemies">
-            <div id="enemyHudList"></div>
-        </section>
-
-        <!-- ミニマップ -->
-        <section class="panel-bare" id="panel-minimap">
-            <div id="minimapBox">
-                <canvas id="minimapCanvas" width="140" height="140"></canvas>
-            </div>
-        </section>
-
-        <!-- エリア名（既定は、ゲーム画面の左上に重ねる） -->
-        <section class="panel-bare" id="panel-areaName">
-            <div class="badge" id="currentAreaName">エリア名</div>
-        </section>
-        <!-- 方角（現在向いている、大体の方向。既定は、ゲーム画面の右上に重ねる） -->
-        <section class="panel-bare" id="panel-compass">
-            <div class="badge" id="compassText">北</div>
-        </section>
         <!-- マップ切り替え（開発用のボタン） -->
         <section id="panel-areaNav" style="display: flex; justify-content: flex-end; align-items: center; gap: 12px; flex-wrap: wrap;">
             <div style="pointer-events: auto; display: flex; gap: 6px; align-items: center; flex-wrap: wrap;">
@@ -704,12 +755,14 @@
             <div style="color: #60a5fa;">🔥 魔法: [Space] / [F] で発射　魔法切替: [1]〜[4] / [Tab]　武器: 武器パネルをクリック</div>
             <div style="color: #60a5fa;">🎥 カメラ: [Ctrl]+[↑][↓] 視点の上下　[Ctrl]+[←][→] ゆっくり旋回　[Ctrl]+[0] 視点リセット</div>
         </section>
-    </div>
-
+        <!-- 操作の説明（デバッグのダイアログの中） -->
+        <section class="panel" id="panel-instructions">
     <div id="instructions">
         <div>移動: <span class="key">↑</span><span class="key">↓</span> または <span class="key">W</span><span class="key">S</span> / ダッシュ: <span class="key">Shift</span> / 旋回: <span class="key">←</span><span class="key">→</span> または <span class="key">Q</span><span class="key">E</span> / 調べる・開ける: <span class="key">E</span> / カニ歩き: <span class="key">A</span><span class="key">D</span></div>
         <div>魔法: <span class="key">Space</span> または <span class="key">F</span> でファイアボール</div>
         <div>近接: 敵に体当たり（中心を少し外す「半ずらし」で無傷クリティカル）</div>
+    </div>
+        </section>
     </div>
 
     <!-- sdServer Workshop Modal -->
@@ -794,12 +847,14 @@
     <script type="module">
         import { GameEngine } from '/js/game.js?v=npc_1';
         import { applyLayout } from '/js/layout.js';
+        import { initPlayUi } from '/js/playUi.js';
 
         let gameInstance = null;
         window.addEventListener('DOMContentLoaded', async () => {
             await applyLayout(); // 画面レイアウト（public/data/layout.json）を組み立ててから、ゲームを始める
             gameInstance = new GameEngine();
             window.game = gameInstance;
+            initPlayUi(gameInstance);   // メニュー・ダイアログ・一時停止・画面の拡大縮小
             await gameInstance.init();
             gameInstance.start();
         });

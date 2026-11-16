@@ -18,11 +18,12 @@ export const hudMethods = {
         put('mpBar', 'width', `${(this.player.mp / this.player.maxMp) * 100}%`);
         put('mpText', 'text', `${Math.floor(this.player.mp)}/${this.player.maxMp}`);
         put('staminaBar', 'width', `${(this.player.stamina / this.player.maxStamina) * 100}%`);
-        put('levelText', 'text', `Lv.${this.player.level}`);
-        put('expText', 'text', `EXP: ${this.player.exp}`);
+        put('levelText', 'text', `${this.player.level}`);
+        put('expText', 'text', `${this.player.exp}`);
         put('goldText', 'text', `${this.player.gold || 0} G`);
         const names = { poison: '毒', burn: '火傷', slow: '鈍足', paralysis: '麻痺', silence: '沈黙', curse: '呪い' };
         put('playerStatus', 'text', Object.keys(this.player.status ?? {}).map(k => `${names[k] ?? k}${Math.ceil(this.player.status[k].t)}`).join(' '));
+        put('locationText', 'text', `${this.currentMapData?.name ?? ''}（x ${Math.floor(this.player.x)}, z ${Math.floor(this.player.z)}）`);
         put('monsterCount', 'text', `敵残数: ${this.monsters.filter(m => m.active).length}`);
 
         // Update active enemy status cards stacked above player HP/MP (Ys-style Target Info)

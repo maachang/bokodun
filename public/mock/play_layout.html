@@ -22,13 +22,13 @@
     background: linear-gradient(#5b7fb5 0 45%, #6b8e4e 45% 100%); }
   #gameWrap .ph { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; color: #ffffff90; font-size: 22px; }
   #areaName { position: absolute; top: 8px; left: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
-  #pauseBadge { position: absolute; top: 40px; left: 8px; background: #b91c1ccc; padding: 2px 10px; border-radius: 3px; display: none; font-weight: bold; }
+  #pauseBadge { position: absolute; top: 8px; left: 50%; transform: translateX(-50%); background: #b91c1ccc; padding: 2px 10px; border-radius: 3px; display: none; font-weight: bold; }
   #compass { position: absolute; top: 8px; right: 8px; background: #000a; padding: 2px 8px; border-radius: 3px; }
   #center { width: 802px; flex: none; }   /* 下のモック操作の帯が長くても、中央の幅（ゲーム画面 800px＋枠）を広げない */
-  /* ゲーム画面の一番下に、ボスの HP（上）と会話（下）を、重ねて並べる */
+  /* ゲーム画面の一番下に会話の枠（高さ一定）。ボスの HP は、ゲーム画面の上（エリア名・方角の下） */
   #bottomStack { position: absolute; left: 12px; right: 12px; bottom: 10px; display: flex; flex-direction: column; gap: 6px; }
   #bossBar:empty { display: none; }
-  #bossBar { height: 36px; padding: 4px 10px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; border-radius: 4px; }   /* 高さは常に確保（出入りで全体の倍率が変わらないように） */
+  #bossBar { position: absolute; left: 12px; right: 12px; top: 46px; z-index: 3; height: 36px; padding: 4px 10px; display: flex; align-items: center; gap: 10px; border: 1px solid transparent; border-radius: 4px; }   /* 高さは常に確保（出入りで全体の倍率が変わらないように） */
   #bossBar.on { background: #111827e6; border-color: #7f1d1d; }
   #bossBar .nm { flex: none; width: 150px; font-weight: bold; color: #fecaca; }
   #bossBar .bar { flex: 1; height: 14px; margin: 0; }
@@ -79,9 +79,7 @@
   .slot.lack { opacity: .45; }                         /* MP が足りない魔法 */
   .slot .cd { position: absolute; left: 0; bottom: 0; height: 4px; background: #38bdf8; }   /* 連射間隔（クールダウン） */
   .sel { cursor: pointer; font-size: 11px; padding: 1px 4px; border-radius: 3px; } .sel:hover { background: #374151; }
-  #talk { height: 96px; overflow-y: auto; display: none; flex-direction: column; gap: 4px; background: #0b1220; border: 2px solid #e5e7eb; border-radius: 4px; padding: 6px 12px; }
-  #bottomStack.nb #talk { height: 138px; }   /* ボスがいない間は、ボスの帯の分まで、文字の枠に使う（店の品物など、行が多いとき） */
-  #bottomStack.nb.talking #bossBar { display: none; }
+  #talk { height: 138px; overflow-y: auto; display: none; flex-direction: column; gap: 4px; background: #0b1220d9; border: 2px solid #e5e7eb; border-radius: 4px; padding: 6px 12px; }
   #talk .who { color: #facc15; font-weight: bold; } #talk .ch { display: flex; gap: 8px; margin-top: auto; }
   #death { position: absolute; inset: 0; background: #000; display: none; flex-direction: column; align-items: center; justify-content: center; gap: 10px; z-index: 5; text-align: center; }
   #death .tomb { width: 90px; height: 110px; border-radius: 45px 45px 0 0; background: #6b7280; border: 3px solid #9ca3af; display: flex; align-items: center; justify-content: center; font-weight: bold; color: #111827; }
@@ -111,7 +109,7 @@
     <div id="gameWrap">
       <div class="ph">ゲーム画面 800 × 600</div>
       <div id="areaName">城下町 メインストリート</div><div id="compass">北</div><div id="pauseBadge">一時停止中</div>
-      <div id="bottomStack"><div id="bossBar"></div><div id="talk"></div></div>
+      <div id="bossBar"></div><div id="bottomStack"><div id="talk"></div></div>
       <div id="death"><div class="tomb">RIP</div><div id="deathMsg" style="font-size:18px"></div><div style="color:#9ca3af">Enter か、数秒で、最後にセーブしたギルドで復活します</div></div>
       <div id="win"><div id="winBtns"><button id="winBack" style="display:none">← 戻る</button><button id="winClose">閉じる (Esc)</button></div><div id="winBody"></div></div>
     </div>
@@ -181,6 +179,8 @@ function setPaused() { paused = E.win.style.display === 'block' || E.talk.style.
 function closeWin() { setBack(null); hide(E.win); setPaused(); document.querySelectorAll('.mi').forEach(el => el.classList.remove('on')); }
 on(E.menu, 'click', '.mi', (e, t) => openWin(t.dataset.id));
 on(E.winClose, 'click', closeWin);
+// ダイアログの枠の外をクリックしたら、閉じる（開く操作そのもの＝メニュー・イベント・選択中の武器/魔法は除く）。中身の再描画で要素が消えても誤って閉じないよう、キャプチャ段階で判定する
+document.addEventListener('click', e => { if (E.win.style.display === 'block' && !keyCapture && !e.target.closest('#win, .mi, #eventPanel, #selInfo')) closeWin(); }, true);
 
 // 受注イベントの詳細（ダミー）。受けた日時・場所・詳細内容
 let hasEvent = true;   // 受注イベントは、同時に 1 つだけ
@@ -297,7 +297,6 @@ let boss = null;
 function renderBoss() {
   const el = $('bossBar');
   el.classList.toggle('on', !!boss);
-  $('bottomStack').classList.toggle('nb', !boss);
   el.innerHTML = boss ? html`<span class="nm">${boss.name}</span><div class="bar"><i style="width:${boss.hp / boss.maxHp * 100}%;background:#ef4444"></i></div><span class="num">${boss.hp} / ${boss.maxHp}</span>` : '';
 }
 renderSlots();

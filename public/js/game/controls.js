@@ -18,6 +18,7 @@ export const controlsMethods = {
                 this.shopMenuKey(e);
                 return;
             }
+            if (this.uiPaused) return;   // ダイアログ（メニュー・会話・死亡）を開いている間は、ゲームの操作を受け付けない（js/playUi.js。店のメニューは、上で先に処理する）
             // 移動の演出（渡し船など）の間は、飛ばす操作だけを受け付ける
             if (this.travelScene) { if (['Enter', 'Space', 'KeyE', 'Escape'].includes(e.code)) this.travelScene.skip(); e.preventDefault(); return; }
             // カメラ操作: Ctrl+↑↓ で視点の上下、Ctrl+←→ で微調整の旋回（移動・旋回の矢印キーとは別）、Ctrl+0 で視点を水平に戻す

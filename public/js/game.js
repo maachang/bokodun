@@ -210,7 +210,7 @@ export class GameEngine {
     }
 
     update(dt) {
-        if (this.shopMenu || this.travelScene) return;   // 店のメニュー・移動の演出中はゲームの時間を止める
+        if (this.shopMenu || this.travelScene || this.uiPaused) return;   // 店のメニュー・移動の演出中はゲームの時間を止める
         // ヒットストップ中はゲームの時間を止める（描画は続く）
         if (this.hitStop > 0) {
             this.hitStop -= dt;

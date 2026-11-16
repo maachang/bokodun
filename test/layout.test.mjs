@@ -75,10 +75,12 @@ test('layout.json と index.html の整合', async (t) => {
         }
     });
 
-    await t.test('既定のプリセット: 右の領域は「ミニマップ → 敵の情報」の順（敵の情報はミニマップの下）', () => {
+    await t.test('既定のプリセット（通常プレイ）: 右は「ミニマップ → ストック → メニュー」、左は「現在位置 → イベント → 職業 → ステータス → 敵の情報」の順', () => {
         const r = resolveLayout(layoutConfig);
-        const right = r.placements.filter(p => p.region === 'right').map(p => p.panel);
-        assert.deepEqual(right.slice(0, 2), ['minimap', 'enemies']);
+        const of = (region) => r.placements.filter(p => p.region === region).map(p => p.panel);
+        assert.deepEqual(of('right'), ['minimap', 'stock', 'menu']);
+        assert.deepEqual(of('left'), ['location', 'event', 'job', 'status', 'enemies']);
+        assert.ok(of('debug').includes('areaNav') && of('debug').includes('effectTest'), '開発用の機能は、デバッグのダイアログの領域へ');
     });
 
     await t.test('index.html に、全パネル・全領域の要素と、パネルの中身の id がある', () => {
@@ -88,7 +90,7 @@ test('layout.json と index.html の整合', async (t) => {
         assert.ok(has('panelStore') && has('gameWrapper'));
         // game.js が参照する中身の id（パネルを動かしても残っていること）
         for (const id of ['levelText', 'hpText', 'hpBar', 'mpText', 'mpBar', 'expText', 'goldText', 'monsterCount',
-            'magicHud', 'weaponHud', 'enemyHudList', 'minimapCanvas', 'currentAreaName', 'signpostBanner', 'damageFlash', 'hudOverlay']) {
+            'magicHud', 'weaponHud', 'enemyHudList', 'locationText', 'minimapCanvas', 'currentAreaName', 'signpostBanner', 'damageFlash', 'hudOverlay']) {
             assert.ok(has(id), `id=${id}`);
         }
     });

@@ -154,20 +154,19 @@ export const interactMethods = {
     openShopMenu(shopId) {
         this.shopMenu = { shopId, screen: 'top', index: 0, note: '' };
         for (const k of Object.keys(this.keys)) this.keys[k] = false;   // 押しっぱなしの移動キーを止める
-        if (!this.shopMenuEl) {
-            const el = document.createElement('div');
-            el.style.cssText = 'position:fixed;left:50%;bottom:8%;transform:translateX(-50%);min-width:340px;max-width:90vw;' +
-                'background:rgba(15,23,42,0.95);border:2px solid #38bdf8;border-radius:10px;color:#f8fafc;padding:14px 18px;z-index:200;font-size:16px;';
-            document.body.appendChild(el);
-            this.shopMenuEl = el;
-        }
-        this.shopMenuEl.style.display = 'block';
+        // 店のメニューは、ゲーム画面の一番下の、会話の枠（#talk）に出す（js/playUi.js と同じ場所）
+        this.shopMenuEl = document.getElementById('talk');
+        this.shopMenuEl.style.display = 'flex';
+        document.getElementById('bottomStack')?.classList.add('talking');
+        this.ui?.setPaused();
         this.renderShopMenu();
     },
 
     closeShopMenu() {
         this.shopMenu = null;
-        if (this.shopMenuEl) this.shopMenuEl.style.display = 'none';
+        if (this.shopMenuEl) { this.shopMenuEl.style.display = 'none'; this.shopMenuEl.innerHTML = ''; }
+        document.getElementById('bottomStack')?.classList.remove('talking');
+        this.ui?.setPaused();
     },
 
     // 画面ごとの選択肢（label, 選んだときの動き）
@@ -207,10 +206,10 @@ export const interactMethods = {
         const title = { top: shop.routes ? 'どの船に乗船しますか？' : `${shop.name ?? '店'}　いらっしゃい！`, buy: `販売一覧（${(m.page ?? 0) + 1}/${Math.max(1, Math.ceil((shop.goods ?? []).length / SHOP_PAGE_SIZE))}）`, sell: '売却（持ち物）' }[m.screen];
         const choices = this.shopMenuChoices();
         const body = m.screen === 'sell' ? '<div style="margin:6px 0;color:#94a3b8">（ダミー）売れる持ち物の一覧は準備中です</div>' : '';
-        this.shopMenuEl.innerHTML = `<div style="font-weight:bold;margin-bottom:8px;color:#7dd3fc">${esc(title)}</div>${body}` +
-            choices.map((c, i) => `<div data-i="${i}" style="padding:3px 10px;cursor:pointer;${i === m.index ? 'background:#1e3a5f;border-radius:4px' : ''}">${i === m.index ? '▶ ' : '　'}${esc(c.label)}</div>`).join('') +
-            `<div style="margin-top:8px;color:#fbbf24;min-height:1.2em">${esc(m.note)}</div>` +
-            '<div style="margin-top:4px;color:#64748b;font-size:12px">↑↓ 選ぶ　Enter/E 決定　Esc 閉じる</div>';
+        this.shopMenuEl.innerHTML = `<div class="who" style="flex:none">${esc(title)}　<span style="color:#64748b;font-size:11px;font-weight:normal">↑↓ 選ぶ　Enter/E 決定　Esc 閉じる</span></div>${body}` +
+            choices.map((c, i) => `<div data-i="${i}" style="padding:1px 10px;cursor:pointer;flex:none;${i === m.index ? 'background:#1e3a5f;border-radius:4px' : ''}">${i === m.index ? '▶ ' : '　'}${esc(c.label)}</div>`).join('') +
+            (m.note ? `<div style="color:#fbbf24;flex:none">${esc(m.note)}</div>` : '');
+        this.shopMenuEl.querySelector(`[data-i="${m.index}"]`)?.scrollIntoView({ block: 'nearest' });
         this.shopMenuEl.querySelectorAll('[data-i]').forEach(d => {
             d.onclick = () => { m.index = Number(d.dataset.i); this.shopMenuChoices()[m.index].act(); this.renderShopMenu(); };
         });

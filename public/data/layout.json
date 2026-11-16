@@ -1,6 +1,30 @@
 {
-  "active": "sidebars",
+  "active": "play",
   "presets": {
+    "play": {
+      "label": "通常プレイ（左: 現在位置・イベント・職業・ステータス・敵、右: ミニマップ・ストック・メニュー。開発用の機能は、現在位置をクリックして開くダイアログ）",
+      "game": {
+        "width": 800
+      },
+      "panels": {
+        "location": "left",
+        "event": "left",
+        "job": "left",
+        "status": "left",
+        "enemies": "left",
+        "minimap": "right",
+        "stock": "right",
+        "menu": "right",
+        "areaName": "overlay-top",
+        "compass": "overlay-top",
+        "magic": "debug",
+        "weapon": "debug",
+        "effectTest": "debug",
+        "areaNav": "debug",
+        "hints": "debug",
+        "instructions": "debug"
+      }
+    },
     "sidebars": {
       "label": "枠外パネル（左: ステータス・魔法・武器、右: ミニマップ・敵の情報、上: エリア、下: ヒント）",
       "game": {
@@ -16,7 +40,13 @@
         "areaNav": "top",
         "compass": "overlay-top",
         "hints": "bottom",
-        "effectTest": "right"
+        "effectTest": "right",
+        "location": "hidden",
+        "event": "hidden",
+        "job": "hidden",
+        "stock": "hidden",
+        "menu": "hidden",
+        "instructions": "hidden"
       }
     },
     "classic": {
@@ -34,7 +64,13 @@
         "areaNav": "overlay-top",
         "compass": "overlay-top",
         "hints": "overlay-bottom-right",
-        "effectTest": "hidden"
+        "effectTest": "hidden",
+        "location": "hidden",
+        "event": "hidden",
+        "job": "hidden",
+        "stock": "hidden",
+        "menu": "hidden",
+        "instructions": "hidden"
       }
     },
     "minimal": {
@@ -52,7 +88,13 @@
         "areaNav": "top",
         "compass": "overlay-top",
         "hints": "hidden",
-        "effectTest": "hidden"
+        "effectTest": "hidden",
+        "location": "hidden",
+        "event": "hidden",
+        "job": "hidden",
+        "stock": "hidden",
+        "menu": "hidden",
+        "instructions": "hidden"
       }
     }
   }

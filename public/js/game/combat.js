@@ -554,10 +554,7 @@ export const combatMethods = {
         // Add to the front of the array (bottom of the flex-direction: column-reverse stack)
         this.activeEnemyCards.unshift(cardData);
 
-        // Limit stack to maximum 3 cards
-        if (this.activeEnemyCards.length > 3) {
-            this.activeEnemyCards.pop();
-        }
+        // 枚数の上限は設けない（パネルに入る限り出す。入りきらない分は、CSS の overflow で隠れる）
     },
 
     gainExp(amount) {
