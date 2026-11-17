@@ -562,9 +562,8 @@ export const combatMethods = {
         const nextLvExp = this.player.level * 40;
         if (this.player.exp >= nextLvExp) {
             this.player.level++;
-            this.player.attackPower += 5;
-            this.player.maxHp += 20;
-            this.player.hp = this.player.maxHp;
+            this.player.attackPower += 5;   // 仮: 武器のダイスがつながるまで、攻撃力は従来のまま
+            this.recomputeStats(true);   // 最大 HP・MP などは、レベルから式で決める（HP・MP は満タン）
             this.sound.playLevelClear();
             this.addPopup(`LEVEL UP! Lv.${this.player.level}`, '#34d399');
         }

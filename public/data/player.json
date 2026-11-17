@@ -1,4 +1,16 @@
 {
+  "race": "human",
+  "job": "fighter",
+  "level": 1,
+  "abilities": {
+    "dex": 14,
+    "agi": 14,
+    "str": 14,
+    "vit": 14,
+    "intel": 14,
+    "mnd": 14,
+    "end": 14
+  },
   "stock": [
     "dagger",
     "iron_sword",

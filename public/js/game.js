@@ -18,6 +18,7 @@ import { updateFlowMethods } from '/js/game/updateFlow.js';
 import { updatePlayerMethods } from '/js/game/updatePlayer.js';
 import { equipmentMethods } from '/js/game/equipment.js';
 import { saveLoadMethods } from '/js/game/saveLoad.js';
+import { characterMethods } from '/js/game/character.js';
 import { combatMethods } from '/js/game/combat.js';
 import { hudMethods } from '/js/game/hud.js';
 import { interactMethods } from '/js/game/interact.js';
@@ -80,7 +81,10 @@ export class GameEngine {
                 fetch('/data/player.json'),
                 fetch('/data/npcs.json')
             ]);
-            this.staminaDef = (await (await fetch('/data/combat.json')).json()).stamina;
+            const combat = await (await fetch('/data/combat.json')).json();
+            this.staminaDef = combat.stamina;
+            const [table, jobs, races] = await Promise.all(['damageTable', 'jobs', 'races'].map(async (n) => (await fetch(`/data/${n}.json`)).json()));
+            this.setRules(combat, table.table, jobs.jobs, races.races);   // 戦闘・能力値の式（rules.js）に渡す定義
             this.objectDefinitions = await objRes.json();
             this.enemyDefinitions = await enemyRes.json();
             this.items = await itemRes.json();
@@ -93,6 +97,8 @@ export class GameEngine {
             this.player.selMelee = playerDef.selMelee ?? null;
             this.player.selFocus = playerDef.selFocus ?? null;
             this.player.selMagic = playerDef.selMagic ?? null;
+            this.applyCharacterDef(playerDef);   // 冒険者（種族・能力値・職業・レベル）。最大 HP・MP などは、ここから決まる
+            this.recomputeStats(true);
             await this.loadCharacter();   // 保存済みの冒険者があれば、ストックを上書きする
         } catch (e) {
             console.error('Failed to load definitions:', e);
@@ -327,4 +333,4 @@ export class GameEngine {
 }
 
 // 部品（public/js/game/*.js）のメソッドを、GameEngine に組み込む
-Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, saveLoadMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);
+Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, saveLoadMethods, characterMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);

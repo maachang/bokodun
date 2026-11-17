@@ -9,13 +9,13 @@ export const interactMethods = {
     // 崖（ちょうど 2 段高い所）をよじ登る: 崖に向かって前を押し続けて CLIMB_HOLD_SEC 秒で始まり、CLIMB_SEC 秒かかる。
     //   ①ジャンプして崖の縁に手をかける ②手で体を引き上げる ③足をひっかけて、よっこいしょと上がる ④縁の上に立つ。
     //   登っている間は歩けない。敵の攻撃で、ダメージを受けると、中断して下に落ちる（落下のダメージは、なし）。3 段以上の崖は、登れない
-    // ---- スタミナ（character-spec 8.2e）。能力値・重量がまだないので、重量比 0.8・持久力 14・Lv1 の仮の値で計算する ----
-    staminaMul() { const r = 0.8, d = this.staminaDef; return r <= 1 ? d.loadMulUnder.base + d.loadMulUnder.slope * r : Math.min(d.loadMulOver.max, 1 + (r - 1) * d.loadMulOver.slope); },
+    // ---- スタミナ（character-spec 8.2e）。持久力・レベルは冒険者の値。重量比は、重さがつながるまで仮の固定値（loadRatio） ----
+    staminaMul() { const r = this.loadRatio(), d = this.staminaDef; return r <= 1 ? d.loadMulUnder.base + d.loadMulUnder.slope * r : Math.min(d.loadMulOver.max, 1 + (r - 1) * d.loadMulOver.slope); },
 
     staminaCost(kind, weaponWeight = 0) {
         const d = this.staminaDef; if (!d) return 0;
         const base = kind === 'dash' ? d.dashCost : weaponWeight * d.attackCoef;
-        return base * this.staminaMul() / (1 + 14 * d.enduranceDivisor);
+        return base * this.staminaMul() / (1 + (this.player.abilities?.end ?? 14) * d.enduranceDivisor);
     },
 
     // 消費する。足りないとき（切れている・0 になる）は、false（ダッシュなどを止める）
@@ -31,7 +31,8 @@ export const interactMethods = {
     updateStamina(dt) {
         const p = this.player, d = this.staminaDef; if (!d) return;
         if (p.staminaPause > 0) { p.staminaPause -= dt; return; }
-        p.stamina = Math.min(p.maxStamina, p.stamina + (14 * d.regenEnd + 1 * d.regenLevel) * dt);
+        const ratio = this.loadRatio(), regen = ((p.abilities?.end ?? 14) * d.regenEnd + (p.level ?? 1) * d.regenLevel) / (ratio > 1 ? this.staminaMul() : 1);   // 重量比が 1 を超えるときは、倍率 m で割る
+        p.stamina = Math.min(p.maxStamina, p.stamina + regen * dt);
         if (p.staminaExhausted && p.stamina >= p.maxStamina * d.resumeRatio) p.staminaExhausted = false;
     },
 

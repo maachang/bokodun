@@ -660,6 +660,7 @@ test('呪文の個性（見た目・状態異常・貫通・効果音）', async
     await t.test('ファイア: 命中した敵が燃え、毎秒3の継続ダメージを3秒受ける（再命中は延長のみ）', () => {
         const { g, calls, p } = cast(0);
         const m = spawn(M, 'skeleton', 0, -3);
+        m.maxHp = m.hp = 100;   // 敵のデータの HP に頼らない（2 発当てても、燃焼で倒れないように）
         g.monsters.push(m);
         assert.equal(g.hitMonsterWithProjectile(p, m), true, '弾は消える');
         assert.equal(m.maxHp - m.hp, 25);

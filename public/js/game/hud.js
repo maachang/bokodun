@@ -16,7 +16,7 @@ export const hudMethods = {
         put('hpBar', 'width', `${(this.player.hp / this.player.maxHp) * 100}%`);
         put('hpText', 'text', `${Math.ceil(this.player.hp)}/${this.player.maxHp}`);
         put('mpBar', 'width', `${(this.player.mp / this.player.maxMp) * 100}%`);
-        put('mpText', 'text', `${Math.floor(this.player.mp)}/${this.player.maxMp}`);
+        put('mpText', 'text', `${Math.floor(this.player.mp)}/${Math.floor(this.player.maxMp)}`);   // 最大 MP は、端数がありうる（Lv × 0.5）ので、切り捨てて出す
         put('staminaBar', 'width', `${(this.player.stamina / this.player.maxStamina) * 100}%`);
         put('levelText', 'text', `${this.player.level}`);
         put('expText', 'text', `${this.player.exp}`);

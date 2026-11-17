@@ -46,11 +46,11 @@ export class Monster {
         if (enemyDef.stealth in STEALTH_DRAW_MULT) this.stealth = enemyDef.stealth;
         if (enemyDef.deathColor) this.deathColor = new THREE.Color(enemyDef.deathColor).getHex();
         this.name = enemyDef.name || 'モンスター';
-        this.maxHp = enemyDef.maxHp || 30;
+        this.maxHp = enemyDef.stats?.hp ?? enemyDef.maxHp ?? 30;   // 敵の仕様書（enemy-spec）の新しい桁の値（stats）があれば、それを使う
         this.hp = this.maxHp;
         this.speed = enemyDef.speed ?? 1.5; // 0 を指定した場合は 0（動かない）として扱う
         this.baseSpeed = this.speed;
-        this.attackPower = enemyDef.attackPower || 10;
+        this.attackPower = enemyDef.stats?.attack?.expected ?? enemyDef.attackPower ?? 10;   // 攻撃のダイスの期待値（ダイスで振る形は、防御をつなぐとき）
         this.exp = enemyDef.exp || 20;
         this.canShoot = !!enemyDef.canShoot;
         this.shootType = enemyDef.shootType || 'magic';
