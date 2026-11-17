@@ -146,7 +146,7 @@ function initBodies(S) {
         : html`<div class="cell add" data-add="${i}">＋ 追加（${i + 1}）</div>`).join('') + '</div>';
     const pickBody = (slotNo) => {
         const used = new Set(game.player.stock.filter(Boolean));
-        const all = Object.values(game.items).filter(it => game.isStockable(it) && (it.kind !== 'spell' || game.isSpellLearned(it.id)));   // 魔法は、覚えたものだけ
+        const all = Object.values(game.items).filter(it => game.isStockable(it) && (it.kind === 'spell' ? game.isSpellLearned(it.id) : it.id !== 'fists' && game.isOwned(it.id)));   // 魔法は覚えたもの、武器は持っているものだけ（武器は、武器屋で買う）
         const row = (it) => html`<div class="pick cols ${used.has(it.id) ? 'dis' : ''}" style="--c:1fr 7em 12em" data-id="${it.id}" data-slot="${slotNo}"><span>${it.name}</span><small>${used.has(it.id) ? '入っています' : ''}</small><small>${kindLabel(game, it)}　${itemDetail(game, it)}</small></div>`;
         return '<p>枠 ' + (slotNo + 1) + ' に入れる武器・魔法</p><div class="title">武器・杖</div>' + all.filter(it => !game.isMagicItem(it)).map(row).join('') + '<div class="title" style="margin-top:8px">魔法・弓</div>' + all.filter(it => game.isMagicItem(it)).map(row).join('');
     };
@@ -173,7 +173,7 @@ function initBodies(S) {
     const gearPickBody = (kind) => {
         const cur = game.player.equip?.[kind];
         const row = (def) => html`<div class="pick cols ${game.canWear(def) ? '' : 'dis'}" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid="${def.id}"><span style="text-align:left">${def.name}</span><small>${def.id === cur ? '着けています' : ''}</small><small>${gearInfo(def)}</small></div>`;
-        return html`<p>${GEAR_NAMES[kind]}を選びます</p><div class="pick cols" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid=""><span>外す</span><small>${cur ? '' : '外しています'}</small><small></small></div>` + game.gearList(kind).map(row).join('');
+        return html`<p>${GEAR_NAMES[kind]}を選びます</p><div class="pick cols" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid=""><span>外す</span><small>${cur ? '' : '外しています'}</small><small></small></div>` + game.gearList(kind).filter(def => game.isOwned(def.id)).map(row).join('');   // 持っている防具だけ（武器屋で買う）
     };
     const helpBody = () => '<p class="legend">操作の説明</p>' + jhtml.$('instructions').innerHTML + (jhtml.$('panel-hints') ? '<div style="margin-top:10px">' + jhtml.$('panel-hints').innerHTML + '</div>' : '');
     S.bodies = { stock: stockBody, status: statusBody, equip: equipBody, setting: settingBody, help: helpBody };

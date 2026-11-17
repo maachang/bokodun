@@ -18,6 +18,7 @@ export const characterMethods = {
         p.jobs = { primary: def.jobs.primary, sub: def.jobs.sub ?? null, levels: { ...def.jobs.levels }, expStock: def.jobs.expStock ?? 0 };   // 職業（第一・サブ・レベル・経験値のストック）
         this.syncJob();   // 戦闘の式が見る player.job・player.level
         p.equip = { armor: null, helm: null, shield: null, ...def.equip };   // 防具（鎧・兜・盾）
+        p.owned = { ...(def.owned ?? {}) };   // 持っている武器・防具: ID → 購入時に決めた重さ（gear.js）
         p.inventory = { ...(def.inventory ?? {}) };   // 所持品（道具）: ID → 個数（inventory.js）
         p.magics = [...(def.magics ?? [])];   // 覚えている魔法（呪文の ID）。ストックに入れられるのは、覚えた呪文だけ
     },
@@ -41,17 +42,21 @@ export const characterMethods = {
 
     // ---- 武器・魔法（式は rules.js）----
 
-    // 武器の重さ。購入時に選べる範囲（weightRange）のうち、筋力で持てる最大（鈍器は 1.5 倍）。重さの選択（購入）ができるまでの仮の決め方
+    // 武器の重さ。持っている武器は、購入時に選んだ重さ。持っていないもの（素手など）は、購入で選べる範囲（weightRange）のうち、筋力で持てる最大（鈍器は 1.5 倍）
     weaponWeight(item) {
+        const own = this.player.owned?.[item.id];
+        if (own !== undefined) return own;
         const [lo, hi] = item.weightRange ?? [1, 1];
         const limit = R.equipWeightLimit(this.rules, this.player.abilities.str, item.blunt);
         return Math.max(lo, Math.min(hi, Math.floor(limit)));
     },
 
-    // 筋力で持てるか（最小の重さが、持てる上限以下）
+    // 筋力で持てるか。持っている武器は、選んだ重さで判定する。持っていないものは、最小の重さが、持てる上限以下か
     canCarry(item) {
         if (!this.rules || !item?.weightRange) return true;
-        return item.weightRange[0] <= R.equipWeightLimit(this.rules, this.player.abilities.str, item.blunt);
+        const limit = R.equipWeightLimit(this.rules, this.player.abilities.str, item.blunt);
+        const own = this.player.owned?.[item.id];
+        return (own !== undefined ? own : item.weightRange[0]) <= limit;
     },
 
     // 攻撃 1 回の結果。{ kind, damage }。呪いの間は、ダメージが下がる（curse の scale）

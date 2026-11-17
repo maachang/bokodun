@@ -23,6 +23,7 @@ import { gearMethods } from '/js/game/gear.js';
 import { jobMethods } from '/js/game/jobs.js';
 import { inventoryMethods } from '/js/game/inventory.js';
 import { trainingMethods } from '/js/game/training.js';
+import { equipShopMethods } from '/js/game/equipShop.js';
 import { buildItems } from '/js/game/itemDefs.js';
 import { combatMethods } from '/js/game/combat.js';
 import { hudMethods } from '/js/game/hud.js';
@@ -340,4 +341,4 @@ export class GameEngine {
 }
 
 // 部品（public/js/game/*.js）のメソッドを、GameEngine に組み込む
-Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, saveLoadMethods, characterMethods, gearMethods, jobMethods, inventoryMethods, trainingMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);
+Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, saveLoadMethods, characterMethods, gearMethods, jobMethods, inventoryMethods, trainingMethods, equipShopMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);

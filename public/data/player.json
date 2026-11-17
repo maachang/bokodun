@@ -42,5 +42,14 @@
     "explosion",
     "spread"
   ],
-  "inventory": {}
+  "inventory": {},
+  "owned": {
+    "dagger": 8,
+    "long_sword": 14,
+    "short_sword": 14,
+    "mace": 21,
+    "magic_staff": 14,
+    "leather_armor": 14,
+    "leather_cap": 8
+  }
 }

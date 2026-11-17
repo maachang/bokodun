@@ -28,6 +28,7 @@ async function engine() {
     g.setGearDefs(D('equipment.json'));
     g.applyCharacterDef(playerDef);
     g.recomputeStats(true);
+    g.giveAllEquipment();   // 定義済みの武器・防具を、全部持っている状態（買う仕組みは、test/equip_shop.test.mjs）
     return g;
 }
 

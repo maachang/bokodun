@@ -1,44 +1,68 @@
 {
-  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。goods は販売一覧のダミー（買う処理は未実装）。道具屋は itemId で items.json と対応（名前・価格は items.json と同じ）。 魔法ギルドで買える魔法は、店ごとの goods で決まる（場所で違う）。上級（magic.json の tier が high）は、店では売らず、取得する（宝箱の spell など）。",
+  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。goods は販売一覧のダミー（買う処理は未実装）。道具屋は itemId で items.json と対応（名前・価格は items.json と同じ）。 魔法ギルドで買える魔法は、店ごとの goods で決まる（場所で違う）。上級（magic.json の tier が high）は、店では売らず、取得する（宝箱の spell など）。 武器屋の goods は equipId と kind（weapon・armor・helm・shield）。価格は、買うときに選ぶ重さで決まる（重さ² × 係数 × ダイスの平均 ÷ 7。combat.json の equipmentPrice）。品揃え（防具・弓を含む）は、仮。",
   "weapon_shop": {
     "name": "武器屋",
     "keeper": "weapon_keeper",
     "goods": [
       {
-        "name": "ショートソード",
-        "price": 120
+        "equipId": "short_sword",
+        "kind": "weapon"
       },
       {
-        "name": "ハンドアックス",
-        "price": 150
+        "equipId": "hand_axe",
+        "kind": "weapon"
       },
       {
-        "name": "バックラー",
-        "price": 80
+        "equipId": "long_sword",
+        "kind": "weapon"
       },
       {
-        "name": "ロングソード",
-        "price": 300
+        "equipId": "rapier",
+        "kind": "weapon"
       },
       {
-        "name": "レイピア",
-        "price": 280
+        "equipId": "battle_axe",
+        "kind": "weapon"
       },
       {
-        "name": "バトルアックス",
-        "price": 350
+        "equipId": "mace",
+        "kind": "weapon"
       },
       {
-        "name": "メイス",
-        "price": 200
+        "equipId": "spear",
+        "kind": "weapon"
       },
       {
-        "name": "ショートスピア",
-        "price": 160
+        "equipId": "short_bow",
+        "kind": "weapon"
       },
       {
-        "name": "ラウンドシールド",
-        "price": 220
+        "equipId": "leather_armor",
+        "kind": "armor"
+      },
+      {
+        "equipId": "studded_leather",
+        "kind": "armor"
+      },
+      {
+        "equipId": "chain_mail",
+        "kind": "armor"
+      },
+      {
+        "equipId": "leather_cap",
+        "kind": "helm"
+      },
+      {
+        "equipId": "iron_helm",
+        "kind": "helm"
+      },
+      {
+        "equipId": "buckler",
+        "kind": "shield"
+      },
+      {
+        "equipId": "round_shield",
+        "kind": "shield"
       }
     ]
   },
@@ -324,40 +348,64 @@
     "keeper": "weapon_keeper_f",
     "goods": [
       {
-        "name": "ショートソード",
-        "price": 120
+        "equipId": "short_sword",
+        "kind": "weapon"
       },
       {
-        "name": "ハンドアックス",
-        "price": 150
+        "equipId": "hand_axe",
+        "kind": "weapon"
       },
       {
-        "name": "バックラー",
-        "price": 80
+        "equipId": "long_sword",
+        "kind": "weapon"
       },
       {
-        "name": "ロングソード",
-        "price": 300
+        "equipId": "rapier",
+        "kind": "weapon"
       },
       {
-        "name": "レイピア",
-        "price": 280
+        "equipId": "battle_axe",
+        "kind": "weapon"
       },
       {
-        "name": "バトルアックス",
-        "price": 350
+        "equipId": "mace",
+        "kind": "weapon"
       },
       {
-        "name": "メイス",
-        "price": 200
+        "equipId": "spear",
+        "kind": "weapon"
       },
       {
-        "name": "ショートスピア",
-        "price": 160
+        "equipId": "short_bow",
+        "kind": "weapon"
       },
       {
-        "name": "ラウンドシールド",
-        "price": 220
+        "equipId": "leather_armor",
+        "kind": "armor"
+      },
+      {
+        "equipId": "studded_leather",
+        "kind": "armor"
+      },
+      {
+        "equipId": "chain_mail",
+        "kind": "armor"
+      },
+      {
+        "equipId": "leather_cap",
+        "kind": "helm"
+      },
+      {
+        "equipId": "iron_helm",
+        "kind": "helm"
+      },
+      {
+        "equipId": "buckler",
+        "kind": "shield"
+      },
+      {
+        "equipId": "round_shield",
+        "kind": "shield"
       }
     ]
   },
@@ -366,40 +414,64 @@
     "keeper": "weapon_keeper_g",
     "goods": [
       {
-        "name": "ショートソード",
-        "price": 120
+        "equipId": "short_sword",
+        "kind": "weapon"
       },
       {
-        "name": "ハンドアックス",
-        "price": 150
+        "equipId": "hand_axe",
+        "kind": "weapon"
       },
       {
-        "name": "バックラー",
-        "price": 80
+        "equipId": "long_sword",
+        "kind": "weapon"
       },
       {
-        "name": "ロングソード",
-        "price": 300
+        "equipId": "rapier",
+        "kind": "weapon"
       },
       {
-        "name": "レイピア",
-        "price": 280
+        "equipId": "battle_axe",
+        "kind": "weapon"
       },
       {
-        "name": "バトルアックス",
-        "price": 350
+        "equipId": "mace",
+        "kind": "weapon"
       },
       {
-        "name": "メイス",
-        "price": 200
+        "equipId": "spear",
+        "kind": "weapon"
       },
       {
-        "name": "ショートスピア",
-        "price": 160
+        "equipId": "short_bow",
+        "kind": "weapon"
       },
       {
-        "name": "ラウンドシールド",
-        "price": 220
+        "equipId": "leather_armor",
+        "kind": "armor"
+      },
+      {
+        "equipId": "studded_leather",
+        "kind": "armor"
+      },
+      {
+        "equipId": "chain_mail",
+        "kind": "armor"
+      },
+      {
+        "equipId": "leather_cap",
+        "kind": "helm"
+      },
+      {
+        "equipId": "iron_helm",
+        "kind": "helm"
+      },
+      {
+        "equipId": "buckler",
+        "kind": "shield"
+      },
+      {
+        "equipId": "round_shield",
+        "kind": "shield"
       }
     ]
   },

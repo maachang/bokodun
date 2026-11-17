@@ -92,6 +92,10 @@ export const equipmentMethods = {
             console.warn(`まだ覚えていない魔法です: ${itemId}`);
             return false;
         }
+        if (itemId !== null && this.items[itemId].kind === 'weapon' && itemId !== 'fists' && !this.isOwned(itemId)) {   // 持っている武器だけ（素手は、いつでも）
+            console.warn(`まだ持っていない武器です: ${itemId}`);
+            return false;
+        }
         if (itemId !== null && !this.isStockable(this.items[itemId])) {
             console.warn(`ストックに入れられません（武器・杖・魔法・弓のみ）: ${itemId}`);
             return false;

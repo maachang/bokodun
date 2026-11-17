@@ -5,6 +5,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { copyGameModules } from './helpers/game.mjs';
 import * as R from '../public/js/game/rules.js';
+import { buildItems } from '../public/js/game/itemDefs.js';
 
 const D = (f) => JSON.parse(fs.readFileSync(path.join(process.cwd(), 'public/data', f), 'utf-8'));
 const playerDef = D('player.json'), equipment = D('equipment.json');
@@ -18,6 +19,7 @@ async function engine(over = {}) {
     const g = Object.create(GameEngine.prototype);
     const popups = [];
     g.player = { hp: 1, mp: 1, stamina: 1, exp: 0, level: 1, status: {}, isInvincible: false, ...over };
+    g.items = buildItems(D('items.json'), equipment, D('magic.json'));
     g.sound = { playHurt() {}, playLevelClear() {} };
     g.particles = { spawnBurst() {} };
     g.addPopup = (m) => popups.push(m);
@@ -28,6 +30,7 @@ async function engine(over = {}) {
     g.applyCharacterDef({ ...playerDef, ...over.def });
     g.getMeleeItem = () => ({ id: 'dagger', weightRange: [1, 8], dice: { n: 1, m: 6, k: 2 }, blunt: false, twoHanded: over.twoHanded ?? false });
     g.recomputeStats(true);
+    g.giveAllEquipment();   // 定義済みの武器・防具を、全部持っている状態（買う仕組みは、test/equip_shop.test.mjs）
     return { g, popups };
 }
 

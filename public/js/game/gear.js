@@ -24,15 +24,69 @@ export const gearMethods = {
         return (id && this.gearDefs?.[kind]?.[id]) || null;
     },
 
-    // 防具の重さ（筋力で持てる最大。範囲内）
+    // 防具の重さ。持っている防具は、購入時に選んだ重さ。それ以外は、筋力で持てる最大（範囲内）
     gearWeight(def) {
+        const own = this.player.owned?.[def.id];
+        if (own !== undefined) return own;
         const limit = Math.floor(R.equipWeightLimit(this.rules, this.player.abilities.str, false));
         return Math.max(def.weight[0], Math.min(def.weight[1], limit));
     },
 
-    // 筋力で持てるか（最小の重さが、持てる上限以下）
+    // 筋力で持てるか。持っている防具は、選んだ重さで判定する
     canWear(def) {
-        return def.weight[0] <= R.equipWeightLimit(this.rules, this.player.abilities.str, false);
+        const own = this.player.owned?.[def.id];
+        return (own !== undefined ? own : def.weight[0]) <= R.equipWeightLimit(this.rules, this.player.abilities.str, false);
+    },
+
+    // ---- 武器・防具の所持と購入（武器屋）----
+    isOwned(id) {
+        return this.player.owned?.[id] !== undefined;
+    },
+
+    // 武器・防具の定義（武器は items、防具は gearDefs）。種類（weapon / armor / helm / shield）と、定義
+    equipDefOf(id) {
+        if (this.items[id]?.kind === 'weapon') return { kind: 'weapon', def: this.items[id], range: this.items[id].weightRange };
+        for (const k of GEAR_KINDS) if (this.gearDefs?.[k]?.[id]) return { kind: k, def: this.gearDefs[k][id], range: this.gearDefs[k][id].weight };
+        return null;
+    },
+
+    // 購入価格 ＝ 重さ² × 係数 × (ダイスの平均 ÷ 7)（10 単位）。重い装備ほど高い
+    equipPrice(id, weight) {
+        const e = this.equipDefOf(id);
+        return R.equipmentPrice(this.rules, e.kind, weight, e.def.dice);
+    },
+
+    // 買うときの重さの初期値（購入で選べる範囲のうち、筋力で持てる最大。持てなければ、最小）
+    defaultBuyWeight(id) {
+        const [lo, hi] = this.equipDefOf(id).range;
+        const limit = Math.floor(R.equipWeightLimit(this.rules, this.player.abilities.str, !!this.equipDefOf(id).def.blunt));
+        return Math.max(lo, Math.min(hi, limit));
+    },
+
+    // 武器屋で買う（重さを選ぶ）。店は、重さの制限なく売る（筋力で持てない重さも買えるが、装備はできない）。同じものを買い直すと、重さが入れ替わる。{ ok, message }
+    buyEquipment(id, weight) {
+        const e = this.equipDefOf(id), p = this.player;
+        if (!e) return { ok: false, message: '買えません' };
+        if (!Number.isInteger(weight) || weight < e.range[0] || weight > e.range[1]) return { ok: false, message: `重さは ${e.range[0]}〜${e.range[1]} から選びます` };
+        if (p.owned[id] === weight) return { ok: false, message: `${e.def.name}（重さ ${weight}）は、すでに持っています` };
+        const price = this.equipPrice(id, weight);
+        if ((p.gold ?? 0) < price) return { ok: false, message: `お金が足りません（${price}G・所持 ${p.gold ?? 0}G）` };
+        p.gold -= price;
+        const replaced = p.owned[id] !== undefined;
+        p.owned[id] = weight;
+        // 買い直しで、筋力で持てない重さになった装備は、外れる（選んでいる武器・着けている防具）
+        for (const k of ['selMelee', 'selFocus']) if (p[k] !== null && p.stock[p[k]] === id && !this.canCarry(this.items[id])) p[k] = null;
+        for (const k of GEAR_KINDS) if (p.equip?.[k] === id && !this.canWear(this.gearDef(k, id))) p.equip = { ...p.equip, [k]: null };
+        this.updateEquipHud();
+        this.updateUI?.();
+        return { ok: true, message: `${e.def.name}（重さ ${weight}）を${replaced ? '買い直しました' : '買いました'}（${price}G）` };
+    },
+
+    // デバッグ・テスト用: 定義済みの武器・防具を、全部持っている状態にする（重さは、筋力で持てる最大）
+    giveAllEquipment() {
+        const ids = [...Object.values(this.items).filter((i) => i.kind === 'weapon' && i.id !== 'fists').map((i) => i.id), ...GEAR_KINDS.flatMap((k) => Object.keys(this.gearDefs[k]))];
+        for (const id of ids) delete this.player.owned[id];   // いったん持っていない扱いにして、既定の重さを決める
+        for (const id of ids) this.player.owned[id] = this.defaultBuyWeight(id);
     },
 
     // 防具を着ける・外す（id が null なら外す）。着けられなければ false（理由は、ポップアップに出す）
@@ -42,6 +96,7 @@ export const gearMethods = {
         if (id !== null) {
             const def = this.gearDef(kind, id);
             if (!def) { console.warn(`未定義の${GEAR_NAMES[kind]}です: ${id}`); return false; }
+            if (!this.isOwned(id)) { this.addPopup('まだ持っていません', '#f87171'); return false; }   // 持っている防具だけ着けられる
             if (!this.canWear(def)) { this.addPopup('重すぎて装備できない', '#f87171'); return false; }
             if (kind === 'shield' && this.getMeleeItem()?.twoHanded) { this.addPopup('両手武器は、盾と同時に装備できない', '#f87171'); return false; }
         }

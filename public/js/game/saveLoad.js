@@ -1,5 +1,5 @@
 // 冒険者の保存・読み込み（サーバーの /api/character とのやりとり）。GameEngine のメソッド（this は GameEngine）。
-// 保存するのは、冒険者の名前・種族、能力値、職業（第一・サブ・レベル・経験値のストック）、HP・MP、所持金、所持品（道具）、防具、ストック（9 枠と選択）、覚えた魔法（買う・取得で増える）。
+// 保存するのは、冒険者の名前・種族、能力値、職業（第一・サブ・レベル・経験値のストック）、HP・MP、所持金、所持品（道具）、持っている武器・防具（重さつき）、着けている防具、ストック（9 枠と選択）、覚えた魔法（買う・取得で増える）。
 //   データの形は、保存データの仕様（docs/character-spec.md 9-3。検証は validates/character.js）。位置は保存しない（再開はギルド）。
 //   まだ保存しない項目: 宝箱・ボス・ゲーム内時間・クエスト・ギルドの預かり・プレイ時間（つながっていない仕組み）。
 // 保存の場所は、冒険者ギルド（セーブ）。起動時に、保存済みなら読み込む（なければ player.json の初期値のまま）。
@@ -19,7 +19,7 @@ export const saveLoadMethods = {
         const p = this.player;
         p.stock = Array.from({ length: STOCK_SIZE }, (_, i) => {
             const id = st.slots[i];
-            return (id && this.isStockable(this.items[id]) && (this.items[id].kind !== 'spell' || this.isSpellLearned(id))) ? id : null;
+            return (id && this.isStockable(this.items[id]) && (this.items[id].kind === 'spell' ? this.isSpellLearned(id) : (id === 'fists' || this.isOwned(id)))) ? id : null;   // 呪文は覚えたもの、武器は持っているものだけ
         });
         const pick = (idx, ok) => (Number.isInteger(idx) && p.stock[idx] && ok(this.items[p.stock[idx]])) ? idx : null;
         const attackOf = (it) => this.weaponClasses[it.weaponClass]?.attack;
@@ -40,6 +40,7 @@ export const saveLoadMethods = {
             vitals: { hp: Math.floor(p.hp), mp: Math.floor(p.mp) },
             gold: Math.floor(p.gold ?? 0),
             inventory: { ...p.inventory },
+            owned: { ...p.owned },
             equipment: { armor: p.equip?.armor ?? null, helm: p.equip?.helm ?? null, shield: p.equip?.shield ?? null, accessory: null },
             stock: this.buildStockSave(),
             magics: [...p.magics]
@@ -66,9 +67,13 @@ export const saveLoadMethods = {
             for (const [id, n] of Object.entries(data.inventory)) if (['consumable', 'key'].includes(this.items[id]?.kind) && isInt(n, 1, 99) && Object.keys(p.inventory).length < 99) p.inventory[id] = n;
         }
         if (Array.isArray(data.magics)) p.magics = [...new Set(data.magics)].filter((id) => this.items[id]?.kind === 'spell');   // 覚えた魔法（定義にあるものだけ）
+        if (data.owned && typeof data.owned === 'object') {   // 持っている武器・防具（定義にあり、重さが購入で選べる範囲内のもの）
+            p.owned = {};
+            for (const [id, w] of Object.entries(data.owned)) { const e = this.equipDefOf(id); if (e && id !== 'fists' && isInt(w, e.range[0], e.range[1])) p.owned[id] = w; }
+        }
         this.applyStockSave(data.stock);
         const eq = data.equipment ?? {};
-        p.equip = Object.fromEntries(['armor', 'helm', 'shield'].map((k) => [k, (eq[k] && this.gearDef(k, eq[k]) && this.canWear(this.gearDef(k, eq[k]))) ? eq[k] : null]));
+        p.equip = Object.fromEntries(['armor', 'helm', 'shield'].map((k) => [k, (eq[k] && this.gearDef(k, eq[k]) && this.isOwned(eq[k]) && this.canWear(this.gearDef(k, eq[k]))) ? eq[k] : null]));
         if (p.equip.shield && this.getMeleeItem()?.twoHanded) p.equip.shield = null;   // 両手武器と盾は、同時に装備できない
         this.recomputeStats(true);   // 能力値・職業・装備から、最大値を決め直す
         const v = data.vitals;

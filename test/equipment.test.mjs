@@ -71,6 +71,7 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
     g.applyCharacterDef(playerDef);   // 人間・平均・ファイター Lv1
     g.player.magics = Object.values(items).filter(i => i.kind === 'spell').map(i => i.id);   // テストでは、定義済みの呪文を全部覚えた状態（覚える仕組みは、test/magic_learn.test.mjs）
     g.player.abilities.str = 50;   // 重い武器（大剣など）も、筋力で持てるように（持てる重さの確認は、別のテスト）
+    g.giveAllEquipment();          // 定義済みの武器・防具を、全部持っている状態（持つ・買う仕組みは、test/equip_shop.test.mjs）
     g.recomputeStats(true);
     g.player.mp = mp;
     return { g, calls };

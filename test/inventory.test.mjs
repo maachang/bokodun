@@ -73,8 +73,7 @@ test('道具屋・神殿で買う: お金が足りなければ断り、買うと
     assert.match(m.note, /ポーションを買いました/);
     assert.match(g.shopMenuChoices()[i].label, /所持 1/);
     g.shopMenu = { shopId: 'weapon_shop', screen: 'buy', page: 0, index: 0, note: '' };
-    g.shopMenuChoices()[0].act();
-    assert.match(g.shopMenu.note, /準備中/);
+    assert.ok(g.shopMenuChoices()[0].label.includes('重さ'), '武器屋の品は、重さを選んで買う（test/equip_shop.test.mjs）');
 });
 
 test('回復道具: 重さ＋ダイスをダメージ表に通した分だけ回復。満タンなら使わない（減らない）', async () => {

@@ -36,6 +36,7 @@ function loadDefs() {
         jobs: new Set(Object.keys(readJson('jobs.json').jobs)),
         maxLevel: readJson('jobs.json').maxLevel || 99,
         items: new Set(Object.keys(items)),
+        gearRanges: Object.fromEntries([...(equipment.weapons || []), ...(equipment.armors || []), ...(equipment.helms || []), ...(equipment.shields || [])].map(x => [x.id, x.weight])),   // 持てる武器・防具と、購入時に選べる重さの範囲
         weaponDefs: { ...Object.fromEntries(Object.values(items).filter(x => x.kind === 'weapon').map(x => [x.id, x])), ...Object.fromEntries((equipment.weapons || []).map(x => [x.id, x])) },
         classes: readJson('weaponClasses.json'),
         spells: new Set(Object.keys(readJson('magic.json').spells)),
@@ -147,6 +148,18 @@ const sections = {
                 if (val.weight !== undefined && !isInt(val.weight, 1, 50)) return `equipment.${slot}.weight: 重さは 1〜50 です`;
             }
             if (slot !== 'accessory' && !d.equip[slot].has(id)) return `equipment.${slot}: 定義にない ID です（${id}）`;   // アクセサリの一覧は未定義（item-spec.md 8 章）
+        }
+        return null;
+    },
+    owned(v) {
+        // 持っている武器・防具: ID → 購入時に決めた重さ（定義の範囲内）
+        if (!isObj(v)) return 'owned: オブジェクトで指定してください';
+        const keys = Object.keys(v), d = loadDefs();
+        if (keys.length > MAX_ENTRIES) return 'owned: 件数が多すぎます';
+        for (const id of keys) {
+            const range = d.gearRanges[id];
+            if (!range) return `owned: 定義にない武器・防具です（${id}）`;
+            if (!isInt(v[id], range[0], range[1])) return `owned: 重さが範囲外です（${id}は ${range[0]}〜${range[1]}）`;
         }
         return null;
     },

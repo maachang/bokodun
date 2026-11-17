@@ -181,12 +181,15 @@ export const interactMethods = {
     shopMenuChoices() {
         const m = this.shopMenu, shop = this.shops?.[m.shopId] ?? {};
         if (shop.training) return this.trainingChoices(m);   // 職業訓練所（js/game/training.js）
+        if (m.screen === 'weight') return this.equipShopChoices(m);   // 武器・防具の、重さを選ぶ画面（js/game/equipShop.js）
         if (m.screen === 'buy') {
             // 販売一覧は 1 画面に SHOP_PAGE_SIZE 件ずつ。多いときはページ送り（←→ か「次のページ」）
             const all = shop.goods ?? [], pages = Math.max(1, Math.ceil(all.length / SHOP_PAGE_SIZE));
             m.page = Math.min(m.page ?? 0, pages - 1);
             const goods = all.slice(m.page * SHOP_PAGE_SIZE, (m.page + 1) * SHOP_PAGE_SIZE)
-                .map(g => g.spellId
+                .map(g => g.equipId
+                    ? { label: `${this.equipDefOf(g.equipId).def.name}　重さ ${this.equipDefOf(g.equipId).range[0]}〜${this.equipDefOf(g.equipId).range[1]}${this.isOwned(g.equipId) ? '（持っている）' : ''}`, act: () => { m.screen = 'weight'; m.good = g; m.weight = this.defaultBuyWeight(g.equipId); m.index = 0; m.note = ''; } }   // 武器・防具は、重さを選んで買う（equipShop.js）
+                    : g.spellId
                     ? { label: `${g.name}　${g.price}G${this.isSpellLearned(g.spellId) ? '（覚えた）' : ''}`, act: () => { m.note = this.buySpell(g).message; } }   // 魔法は、買って覚える
                     : g.itemId
                         ? { label: `${g.name}　${g.price}G（所持 ${this.itemCount(g.itemId)}）`, act: () => { m.note = this.buyItem(g).message; } }   // 道具は、買って持ち物に入れる
@@ -216,9 +219,9 @@ export const interactMethods = {
         if (!m) return;
         const shop = this.shops?.[m.shopId] ?? {};
         const esc = (t) => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-        const title = shop.training ? this.trainingTitle(m) : { top: shop.routes ? 'どの船に乗船しますか？' : `${shop.name ?? '店'}　いらっしゃい！`, buy: `販売一覧（${(m.page ?? 0) + 1}/${Math.max(1, Math.ceil((shop.goods ?? []).length / SHOP_PAGE_SIZE))}）`, sell: '売却（持ち物）' }[m.screen];
+        const title = shop.training ? this.trainingTitle(m) : { top: shop.routes ? 'どの船に乗船しますか？' : `${shop.name ?? '店'}　いらっしゃい！`, weight: '重さを選ぶ', buy: `販売一覧（${(m.page ?? 0) + 1}/${Math.max(1, Math.ceil((shop.goods ?? []).length / SHOP_PAGE_SIZE))}）`, sell: '売却（持ち物）' }[m.screen];
         const choices = this.shopMenuChoices();
-        const body = m.screen === 'sell' ? '<div style="margin:6px 0;color:#94a3b8">（ダミー）売れる持ち物の一覧は準備中です</div>' : '';
+        const body = m.screen === 'sell' ? '<div style="margin:6px 0;color:#94a3b8">（ダミー）売れる持ち物の一覧は準備中です</div>' : m.screen === 'weight' ? this.equipShopInfo(m) : '';
         this.shopMenuEl.innerHTML = `<div class="who" style="flex:none">${esc(title)}　<span style="color:#64748b;font-size:11px;font-weight:normal">↑↓ 選ぶ　Enter/E 決定　Esc 閉じる</span></div>${body}` +
             choices.map((c, i) => `<div data-i="${i}" style="padding:1px 10px;cursor:pointer;flex:none;${i === m.index ? 'background:#1e3a5f;border-radius:4px' : ''}">${i === m.index ? '▶ ' : '　'}${esc(c.label)}</div>`).join('') +
             (m.note ? `<div style="color:#fbbf24;flex:none">${esc(m.note)}</div>` : '');
@@ -232,6 +235,10 @@ export const interactMethods = {
         const m = this.shopMenu, n = this.shopMenuChoices().length;
         if (e.code === 'ArrowUp' || e.code === 'KeyW') m.index = (m.index + n - 1) % n;
         else if (e.code === 'ArrowDown' || e.code === 'KeyS') m.index = (m.index + 1) % n;
+        else if ((e.code === 'ArrowLeft' || e.code === 'ArrowRight') && m.screen === 'weight') {   // 重さを 1 ずつ変える
+            const [lo, hi] = this.equipDefOf(m.good.equipId).range;
+            m.weight = Math.max(lo, Math.min(hi, m.weight + (e.code === 'ArrowLeft' ? -1 : 1))); m.note = '';
+        }
         else if ((e.code === 'ArrowLeft' || e.code === 'ArrowRight') && m.screen === 'buy') {
             const all = this.shops?.[m.shopId]?.goods ?? [], pages = Math.ceil(all.length / SHOP_PAGE_SIZE);
             m.page = Math.max(0, Math.min(pages - 1, (m.page ?? 0) + (e.code === 'ArrowLeft' ? -1 : 1)));
