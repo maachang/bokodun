@@ -24,8 +24,7 @@ export const stateInitMethods = {
             staminaExhausted: false,   // 0 になって、最大値の resumeRatio まで回復するまで、ダッシュ・攻撃・登りができない
             gold: 0,
             status: {},         // 状態異常（poison・burn: 継続ダメージ / slow / paralysis / silence / curse）。{ 種類: { t: 残り秒, dps / scale } }
-            exp: 0,
-            level: 1,
+            level: 1,           // 第一職業のレベル（jobs.js の syncJob が、冒険者の職業から決める）
             isInvincible: false,
             invincibleTimer: 0,
             attackCooldown: 0,

@@ -50,7 +50,7 @@ export const interactMethods = {
         let found = null;
         for (const n of this.npcs ?? []) {
             const s = n.speechFor(this.player);   // 離れた村人のセリフも、ここでリセットされる
-            if (s !== null && found === null) found = n.shopId ? `${s}\n${this.shops?.[n.shopId]?.routes ? '【Eキー】乗船の受付' : '【Eキー】取引メニューを表示'}` : s;   // 店主には、最下行に操作の案内を添える
+            if (s !== null && found === null) found = n.shopId ? `${s}\n${this.shops?.[n.shopId]?.routes ? '【Eキー】乗船の受付' : this.shops?.[n.shopId]?.training ? '【Eキー】訓練所のメニュー' : '【Eキー】取引メニューを表示'}` : s;   // 店主には、最下行に操作の案内を添える
         }
         return found;
     },
@@ -175,6 +175,7 @@ export const interactMethods = {
     // 画面ごとの選択肢（label, 選んだときの動き）
     shopMenuChoices() {
         const m = this.shopMenu, shop = this.shops?.[m.shopId] ?? {};
+        if (shop.training) return this.trainingChoices(m);   // 職業訓練所（js/game/training.js）
         if (m.screen === 'buy') {
             // 販売一覧は 1 画面に SHOP_PAGE_SIZE 件ずつ。多いときはページ送り（←→ か「次のページ」）
             const all = shop.goods ?? [], pages = Math.max(1, Math.ceil(all.length / SHOP_PAGE_SIZE));
@@ -206,7 +207,7 @@ export const interactMethods = {
         if (!m) return;
         const shop = this.shops?.[m.shopId] ?? {};
         const esc = (t) => String(t).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-        const title = { top: shop.routes ? 'どの船に乗船しますか？' : `${shop.name ?? '店'}　いらっしゃい！`, buy: `販売一覧（${(m.page ?? 0) + 1}/${Math.max(1, Math.ceil((shop.goods ?? []).length / SHOP_PAGE_SIZE))}）`, sell: '売却（持ち物）' }[m.screen];
+        const title = shop.training ? this.trainingTitle(m) : { top: shop.routes ? 'どの船に乗船しますか？' : `${shop.name ?? '店'}　いらっしゃい！`, buy: `販売一覧（${(m.page ?? 0) + 1}/${Math.max(1, Math.ceil((shop.goods ?? []).length / SHOP_PAGE_SIZE))}）`, sell: '売却（持ち物）' }[m.screen];
         const choices = this.shopMenuChoices();
         const body = m.screen === 'sell' ? '<div style="margin:6px 0;color:#94a3b8">（ダミー）売れる持ち物の一覧は準備中です</div>' : '';
         this.shopMenuEl.innerHTML = `<div class="who" style="flex:none">${esc(title)}　<span style="color:#64748b;font-size:11px;font-weight:normal">↑↓ 選ぶ　Enter/E 決定　Esc 閉じる</span></div>${body}` +

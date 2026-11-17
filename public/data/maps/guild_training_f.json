@@ -53,6 +53,7 @@
  "npcs": [
   {
    "id": "bear_trainer",
+      "shopId": "training_f",
    "x": 5,
    "z": 3,
    "speed": 0,

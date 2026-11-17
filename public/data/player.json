@@ -1,7 +1,13 @@
 {
   "race": "human",
-  "job": "fighter",
-  "level": 1,
+  "jobs": {
+    "primary": "fighter",
+    "sub": null,
+    "levels": {
+      "fighter": 1
+    },
+    "expStock": 0
+  },
   "abilities": {
     "dex": 14,
     "agi": 14,

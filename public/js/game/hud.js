@@ -19,7 +19,7 @@ export const hudMethods = {
         put('mpText', 'text', `${Math.floor(this.player.mp)}/${Math.floor(this.player.maxMp)}`);   // 最大 MP は、端数がありうる（Lv × 0.5）ので、切り捨てて出す
         put('staminaBar', 'width', `${(this.player.stamina / this.player.maxStamina) * 100}%`);
         put('levelText', 'text', `${this.player.level}`);
-        put('expText', 'text', `${this.player.exp}`);
+        put('expText', 'text', `${this.player.jobs?.expStock ?? 0}`);   // 経験値のストック（レベルは、訓練所で上げる）
         put('goldText', 'text', `${this.player.gold || 0} G`);
         const names = { poison: '毒', burn: '火傷', slow: '鈍足', paralysis: '麻痺', silence: '沈黙', curse: '呪い' };
         put('playerStatus', 'text', Object.keys(this.player.status ?? {}).map(k => `${names[k] ?? k}${Math.ceil(this.player.status[k].t)}`).join(' '));

@@ -229,3 +229,15 @@ export function equipmentPrice(defs, kind, weight, dice) {
     const p = defs.combat.equipmentPrice, avg = dice.n * (dice.m + 1) / 2 + dice.k;
     return Math.round(weight * weight * p[kind] * (avg / p.diceDivisor) / p.round) * p.round;
 }
+
+// ---- 職業のレベルと経験値 ----
+
+/** 職業のレベル n → n+1 に必要な経験値 ＝ round(expBase × n^1.5)（character-spec 6 章） */
+export function expToNextLevel(defs, jobId, lv) {
+    return Math.round(defs.jobs[jobId].expBase * Math.pow(lv, 1.5));
+}
+
+/** 職業を覚える条件を、満たしているか。levels は { 職業 ID: レベル }（requires の職業が、すべて必要なレベル以上） */
+export function jobRequirementsMet(defs, jobId, levels) {
+    return defs.jobs[jobId].requires.every((r) => (levels[r.job] ?? 0) >= r.level);
+}

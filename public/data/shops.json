@@ -461,5 +461,15 @@
         }
       }
     ]
+  },
+  "training": {
+    "name": "職業訓練所",
+    "keeper": "trainer",
+    "training": true
+  },
+  "training_f": {
+    "name": "職業訓練所",
+    "keeper": "bear_trainer",
+    "training": true
   }
 }

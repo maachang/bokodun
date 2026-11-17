@@ -559,15 +559,4 @@ export const combatMethods = {
 
         // 枚数の上限は設けない（パネルに入る限り出す。入りきらない分は、CSS の overflow で隠れる）
     },
-
-    gainExp(amount) {
-        this.player.exp += amount;
-        const nextLvExp = this.player.level * 40;
-        if (this.player.exp >= nextLvExp) {
-            this.player.level++;
-            this.recomputeStats(true);   // 最大 HP・MP などは、レベルから式で決める（HP・MP は満タン）
-            this.sound.playLevelClear();
-            this.addPopup(`LEVEL UP! Lv.${this.player.level}`, '#34d399');
-        }
-    },
 };

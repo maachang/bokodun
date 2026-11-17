@@ -20,7 +20,7 @@ export function initPlayUi(game) {
         paused: false,          // ダイアログ・会話・死亡の画面が出ている間は true（ゲームを止める）
         winBackTo: null,        // 「← 戻る」の戻り先
         keyCapture: null,       // ショートカットの割り当て中の、メニューの項目
-        E: refs('talk', 'death', 'deathMsg', 'pauseBadge', 'miniTitle', 'slots', 'menu', 'win', 'winBody', 'winBack', 'winClose', 'bottomStack', 'bossBar', 'panel-location', 'panel-event', 'panelStore', 'region-debug')
+        E: refs('talk', 'death', 'deathMsg', 'pauseBadge', 'miniTitle', 'slots', 'menu', 'jobMain', 'jobSub', 'subLvText', 'levelText', 'expText', 'win', 'winBody', 'winBack', 'winClose', 'bottomStack', 'bossBar', 'panel-location', 'panel-event', 'panelStore', 'region-debug')
     };
     initStock(S);
     initWindow(S);
@@ -71,6 +71,17 @@ function initStock(S) {
     };
     game.onStockChange = () => { lastSig = ''; S.renderSlots(); };
     setInterval(S.renderSlots, 200);   // MP の増減で、足りない魔法の薄い表示が変わる
+    // 職業パネル（左）: 第一職業・サブ職業とレベル。訓練所での変更を、映す（レベルのメインは、hud.js の levelText）
+    S.renderJob = () => {
+        const j = game.player?.jobs;
+        if (!j || !game.rules) return;
+        E.jobMain.textContent = game.jobName(j.primary);
+        E.levelText.textContent = game.player.level;   // 一時停止中（訓練所のメニューなど）も、変更を映す
+        E.expText.textContent = j.expStock;
+        E.jobSub.textContent = j.sub ? game.jobName(j.sub) : 'なし';
+        E.subLvText.textContent = j.sub ? j.levels[j.sub] : '-';
+    };
+    setInterval(S.renderJob, 200);
     on(E.slots, 'click', '.slot[data-i]', (e, t) => game.selectSlot(Number(t.dataset.i)));
     S.renderMenu = () => { E.menu.innerHTML = MENU.map(([id, name]) => html`<div class="mi" data-id="${id}"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd></div>`).join(''); };
     on(E.menu, 'click', '.mi', (e, t) => S.openWin(t.dataset.id));
@@ -142,12 +153,13 @@ function initBodies(S) {
     const settingBody = () => '<p class="legend">ショートカットキーの割り当て（「変更」を押して、割り当てたいキーを押す。1〜9 と Esc は使えません）</p>' + MENU.map(([id, name]) => html`<div class="cols" style="--c:110px 3em 9em;margin-bottom:4px"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd><button data-keyset="${id}">変更</button></div>`).join('') + '<div class="cols" style="--c:110px 200px;margin-top:10px"><span>音量</span><input type="range" min="0" max="100" value="60"></div>'
         + html`<div class="cols" style="--c:110px auto;margin-top:10px"><span>メッセージ文字</span><span>${jhtml.raw(Object.entries(MSG_SIZES).map(([k, v]) => html`<button data-msg="${k}" class="${prefs.msg === k ? 'on' : ''}">${v[0]}</button>`).join(' '))}</span></div>`;
     const statusBody = () => {
-        const lv = game.player ? game.player.level : 1;
-        return '<div class="cols" style="--c:5em 1fr"><span class="k">種族</span><span>人間</span></div><div class="title" style="margin-top:8px">職業</div>'
-            + `<div class="cols" style="--c:5em 1fr 4.2em"><span>メイン</span><span>戦士</span><span class="lv"><span>Lv.</span><span>${lv}</span></span></div>`
-            + '<div class="cols" style="--c:5em 1fr 4.2em"><span>サブ</span><span>ウィザード</span><span class="lv"><span>Lv.</span><span>5</span></span></div><hr>'
-            + '<div class="abil"><span>筋力<b>14</b><i>(2)</i></span><span>器用度<b>12</b><i>(2)</i></span><span>敏捷度<b>13</b><i>(2)</i></span><span>知力<b>11</b><i>(2)</i></span><span>精神力<b>10</b><i>(2)</i></span><span>生命力<b>15</b><i>(3)</i></span></div>'
-            + '<p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>';
+        const p = game.player, j = p.jobs, ab = p.abilities, r = game.rules;
+        const lvRow = (label, id) => id ? `<div class="cols" style="--c:5em 1fr 4.2em"><span>${label}</span><span>${game.jobName(id)}</span><span class="lv"><span>Lv.</span><span>${j.levels[id]}</span></span></div>` : `<div class="cols" style="--c:5em 1fr 4.2em"><span>${label}</span><span>なし</span><span></span></div>`;
+        const abil = [['筋力', 'str'], ['器用度', 'dex'], ['敏捷度', 'agi'], ['知力', 'intel'], ['精神力', 'mnd'], ['生命力', 'vit'], ['持久力', 'end']];
+        return `<div class="cols" style="--c:5em 1fr"><span class="k">種族</span><span>${r.races[p.race].name}</span></div><div class="title" style="margin-top:8px">職業</div>`
+            + lvRow('メイン', j.primary) + lvRow('サブ', j.sub) + `<div class="cols" style="--c:5em 1fr"><span class="k">経験値</span><span>${j.expStock}（職業訓練所で、レベルに割り振る）</span></div><hr>`
+            + '<div class="abil">' + abil.map(([n, k]) => `<span>${n}<b>${ab[k]}</b><i>(${Math.floor(ab[k] / 5)})</i></span>`).join('') + '</div>'
+            + `<p>最大HP ${p.maxHp}　最大MP ${Math.floor(p.maxMp)}　最大スタミナ ${p.maxStamina}　歩く速さ ${p.speed.toFixed(1)}　重量比 ${game.loadRatio().toFixed(2)}</p>`;
     };
     // 防具（鎧・兜・盾）。いま着けているものと、重量（積載）を出す。クリックで、選ぶ画面
     const gearInfo = (def) => `防御 ${def.dice.n}d${def.dice.m}${def.dice.k ? '+' + def.dice.k : ''}　重さ ${game.gearWeight(def)}${def.heavy ? '　重装備' : ''}${game.canWear(def) ? '' : '　（筋力が足りず、装備できない）'}`;

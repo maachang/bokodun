@@ -38,18 +38,15 @@ test('初期の冒険者（人間・平均・ファイター Lv1）の、最大 
     assert.equal(p.stamina, 43);
 });
 
-test('レベルを上げると、最大値が式どおりに増え、満タンになる', async () => {
+test('レベルを上げると、最大値が式どおりに増える（訓練所でのレベルアップ）', async () => {
     const g = await engine();
     g.recomputeStats(true);
-    g.player.level = 10;
+    g.player.jobs.expStock = 100000;
     g.player.hp = 3;
-    g.recomputeStats(false);   // 満タンにしない（最大値を超えないように丸めるだけ）
+    for (let i = 0; i < 9; i++) assert.equal(g.levelUpJob('fighter').ok, true);
+    assert.equal(g.player.level, 10);
     assert.equal(g.player.maxHp, 28 + 10);
-    assert.equal(g.player.hp, 3);
-    g.gainExp(100000);         // レベルアップ → 満タン
-    assert.equal(g.player.level, 11);
-    assert.equal(g.player.maxHp, 28 + 11);
-    assert.equal(g.player.hp, g.player.maxHp);
+    assert.equal(g.player.hp, 3, 'HP は、満タンにならない');
 });
 
 test('敏捷度・種族・上位職で、値が変わる', async () => {

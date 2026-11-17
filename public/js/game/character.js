@@ -1,13 +1,13 @@
 // 冒険者の能力値から、最大 HP・最大 MP・移動速度・スタミナを決める。GameEngine のメソッド（this は GameEngine）。
-//   元になるのは、player の race（種族）・abilities（能力値）・job（第一職業）・level（第一職業のレベル）。式は rules.js（仕様: character-spec 2〜8 章）。
+//   元になるのは、player の race（種族）・abilities（能力値）・jobs（第一職業とそのレベル。jobs.js）。式は rules.js（仕様: character-spec 2〜8 章）。
 //   冒険者の作成画面ができるまでは、初期値は public/data/player.json（人間・平均・ファイター Lv1）。
 import * as R from '/js/game/rules.js';
 import { TEST_RUN_SPEED_SCALE } from '/js/game/constants.js';
 
 export const characterMethods = {
     // 定義（combat・damageTable・jobs・races）を、式に渡す形にまとめる（読み込み後に 1 回）
-    setRules(combat, table, jobs, races) {
-        this.rules = { combat, table, jobs, races };
+    setRules(combat, table, jobs, races, maxLevel = 99) {
+        this.rules = { combat, table, jobs, races, maxLevel };
     },
 
     // 初期の冒険者（player.json の race・abilities・job・level）を反映する
@@ -15,8 +15,8 @@ export const characterMethods = {
         const p = this.player;
         p.race = def.race;
         p.abilities = { ...def.abilities };
-        p.job = def.job;
-        p.level = def.level ?? 1;
+        p.jobs = { primary: def.jobs.primary, sub: def.jobs.sub ?? null, levels: { ...def.jobs.levels }, expStock: def.jobs.expStock ?? 0 };   // 職業（第一・サブ・レベル・経験値のストック）
+        this.syncJob();   // 戦闘の式が見る player.job・player.level
         p.equip = { armor: null, helm: null, shield: null, ...def.equip };   // 防具（鎧・兜・盾）
     },
 
