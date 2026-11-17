@@ -1,0 +1,127 @@
+// 戦闘・能力値の式（public/js/game/rules.js）のテスト。仕様書（character-spec.md 8 章）の数値例と、同じ結果になるかを確かめる
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import * as R from '../public/js/game/rules.js';
+
+const D = (f) => JSON.parse(fs.readFileSync(path.join(process.cwd(), 'public', 'data', f), 'utf8'));
+const defs = { combat: D('combat.json'), table: D('damageTable.json').table, jobs: D('jobs.json').jobs, races: D('races.json').races };
+const spells = D('magic.json').spells, eq = D('equipment.json');
+const avg = R.makeAbilities(defs, 'human', 6.75, 6.75, 6.75, 6.75);   // 人間・平均
+const near = (a, b, eps = 0.05) => assert.ok(Math.abs(a - b) <= eps, `${a} ≠ ${b}`);
+const seq = (...v) => { let i = 0; return () => v[i++ % v.length]; };   // 決まった乱数
+
+test('能力値・HP・MP・移動速度', () => {
+    assert.equal(avg.dex, 14);
+    assert.equal(avg.str, 14);
+    near(R.moveSpeed(defs, 14).walk, 8.5, 0.01);
+    near(R.moveSpeed(defs, 14).run, 13.0, 0.01);
+    near(R.moveSpeed(defs, 35).walk, 10.6, 0.01);
+    const hm = R.maxHpMp(defs, 'human', avg, 1, defs.jobs.fighter);
+    assert.equal(hm.hp, (avg.str + avg.vit) + 1);
+});
+
+test('ミス率（仕様 8.2 の例）', () => {
+    assert.equal(R.missRate(defs, 14, 1), 0.16);
+    assert.equal(R.missRate(defs, 14, 99), 0.07);
+    assert.equal(R.missRate(defs, 2, 1), 0.28);
+    assert.equal(R.missRate(defs, 35, 99), 0.01);
+});
+
+test('魔法の失敗率（仕様 8.2c の例。人間・平均、基本職 / 魔法系上位職）', () => {
+    const f = (id, lv, job) => R.magicFailRate(defs, spells[id], avg.intel, lv, defs.jobs[job]);
+    assert.equal(f('fire', 1, 'fighter'), 19);
+    assert.equal(f('explosion', 1, 'fighter'), 28);
+    assert.equal(f('fire', 50, 'fighter'), 1);
+    assert.equal(f('explosion', 50, 'fighter'), 3);
+    assert.equal(f('fire', 1, 'wizard'), 11);
+    assert.equal(R.magicFailRate(defs, { weight: 50 }, avg.intel, 1, defs.jobs.fighter), 50);
+    assert.equal(R.magicFailRate(defs, { weight: 50 }, avg.intel, 50, defs.jobs.wizard), 3);
+});
+
+test('魔法の期待ダメージ（仕様 8.2c の例: ファイア）', () => {
+    const e = (lv, job) => R.expectedMagicPower(defs, spells.fire, lv, defs.jobs[job]);
+    near(e(1, 'fighter'), 12.4); near(e(50, 'fighter'), 21.0); near(e(99, 'fighter'), 30.9);
+    near(e(1, 'wizard'), 12.4); near(e(50, 'wizard'), 33.4); near(e(99, 'wizard'), 55.6);
+});
+
+test('魔法の消費 MP・威力のダイス', () => {
+    const c = R.magicCost(defs, spells.fire, avg.intel, 1, defs.jobs.fighter);
+    assert.ok(c >= 1 && c <= defs.combat.magic.costCeil * Math.round(28 * 0.36));
+    assert.equal(R.magicCost(defs, { weight: 1, costType: 'rapid' }, 50, 99, defs.jobs.fighter), 1);   // 最低 1
+    // 乱数が 0 → 全部 1 の目（1 ゾロではなく、ダイス 2 個以上でも最小値）、0.99 → 最大の目
+    const lo = R.rollMagicPower(defs, spells.fire, 1, defs.jobs.fighter, 0, () => 0);
+    const hi = R.rollMagicPower(defs, spells.fire, 1, defs.jobs.fighter, 0, () => 0.99);
+    assert.ok(hi > lo);
+    assert.equal(R.rollMagicPower(defs, { weight: 24 }, 1, null), 0);   // ダイスのない補助魔法
+    const rod = R.rollMagicPower(defs, spells.fire, 1, defs.jobs.fighter, 10, () => 0.5);
+    assert.ok(rod > R.rollMagicPower(defs, spells.fire, 1, defs.jobs.fighter, 0, () => 0.5));   // 杖の結果が加算される
+});
+
+test('ダイスと 1 ゾロ', () => {
+    assert.deepEqual(R.rollDice(2, 6, () => 0), { total: 2, fumble: true });
+    assert.equal(R.rollDice(2, 6, seq(0, 0.5)).fumble, false);
+    assert.equal(R.rollDice(1, 6, () => 0).fumble, true);   // 1 個のダイスで 1 が出ても 1 ゾロ
+    const dist = R.diceDistribution(2, 6, 1);
+    near(dist.reduce((s, [, p]) => s + p, 0), 1, 1e-9);
+    near(R.diceExpected({ n: 2, m: 6, k: 1 }, (v) => v), 8, 1e-9);
+});
+
+test('攻撃（ダメージ表・1 ゾロ・レベルの加算・クリティカル率）', () => {
+    const w = eq.weapons.find((x) => x.id === 'long_sword');
+    const hit = R.rollAttack(defs, w, 14, 1, defs.jobs.fighter, () => 0.5);
+    assert.equal(hit.damage, R.tableValue(defs, 14, 8 + w.dice.k + 0));   // 2d6 で、乱数 0.5 ならどちらも 4 の目
+    assert.deepEqual(R.rollAttack(defs, w, 14, 1, defs.jobs.fighter, () => 0), { damage: 1, fumble: true });
+    assert.equal(R.levelBonus(defs, 99, defs.jobs.fighter), 15);
+    assert.equal(R.levelBonus(defs, 99, defs.jobs.knight), 25);
+    const dag = eq.weapons.find((x) => x.id === 'dagger'), mace = eq.weapons.find((x) => x.id === 'mace');
+    assert.equal(R.critRate(defs, defs.jobs.fighter, w, 14, 14), 10);
+    assert.equal(R.critRate(defs, defs.jobs.thief, dag, 6, 14), 20);   // シーフ系 × 軽い武器
+    assert.equal(R.critRate(defs, defs.jobs.thief, w, 14, 14), 5);     // シーフ系 × 重い武器
+    assert.equal(R.critRate(defs, defs.jobs.fighter, mace, 14, 14), 1);   // 鈍器
+});
+
+test('装備できる重さ・価格（仕様 8.1・8.2d の例）', () => {
+    assert.equal(R.equipWeightLimit(defs, 14, false), 14);
+    assert.equal(R.equipWeightLimit(defs, 14, true), 21);
+    assert.equal(R.equipWeightLimit(defs, 40, true), 50);
+    const price = (list, id, kind, wt) => R.equipmentPrice(defs, kind, wt, eq[list].find((x) => x.id === id).dice);
+    assert.equal(price('weapons', 'dagger', 'weapon', 8), 60);
+    assert.equal(price('weapons', 'short_sword', 'weapon', 14), 240);
+    assert.equal(price('weapons', 'mace', 'weapon', 21), 530);
+    assert.equal(price('armors', 'leather_armor', 'armor', 14), 180);
+    assert.equal(price('helms', 'iron_helm', 'helm', 14), 90);   // 仕様書 8.2d の例（旧: 180）は、式（係数 0.4）に合わせて 90 に直した
+});
+
+test('防御・回避・被ダメージ（仕様 8.3）', () => {
+    const parts = [{ kind: 'armor', weight: 14, dice: { n: 1, m: 6, k: 2 } }, { kind: 'helm', weight: 8, dice: { n: 1, m: 6, k: 1 } }];
+    const d = R.rollDefense(defs, parts, defs.jobs.fighter, () => 0.5);
+    const want = 0.6 * R.tableValue(defs, 14, 4 + 2) + 0.2 * R.tableValue(defs, 8, 4 + 1);
+    near(d.defense, want, 1e-9);
+    assert.equal(R.rollDefense(defs, parts, defs.jobs.paladin, () => 0.5).defense, want * 1.1);
+    assert.equal(R.rollDefense(defs, parts, defs.jobs.fighter, () => 0).fumble, true);
+    // 被ダメージ ＝ 攻撃 − 防御 − 生命力 ÷ 5 − 回避。最低 1
+    const base = { defense: 10, vit: 15, dodge: 8, heavy: false, heavyDodge: false, fumble: false };
+    assert.equal(R.damageTaken(defs, 30, base, () => 0.5), 30 - 10 - 3 - 4);
+    assert.equal(R.damageTaken(defs, 5, base, () => 0.5), 1);
+    assert.equal(R.damageTaken(defs, 30, { ...base, heavy: true }, () => 0.5), 30 - 10 - 3);   // 重装備は、回避が無効
+    assert.equal(R.damageTaken(defs, 30, { ...base, heavy: true, heavyDodge: true }, () => 0.5), 30 - 10 - 3 - 4);   // ナイトは有効
+    assert.equal(R.damageTaken(defs, 30, { ...base, fumble: true }, () => 0.5), 30 - 10 - 3);   // 防御の 1 ゾロは、回避 0
+    near(R.dodgeValue(defs, 14, 1, defs.jobs.fighter), 7.1, 1e-9);
+    near(R.dodgeValue(defs, 14, 1, defs.jobs.ninja), 14 * 0.7 + 0.1, 1e-9);
+});
+
+test('積載・スタミナ（仕様 8.2e の例）', () => {
+    const lim = R.loadLimit(defs, 14, 1);
+    near(lim, 56.5, 1e-9);
+    assert.equal(R.loadSlowRatio(defs, 0.8), 1);
+    near(R.loadSlowRatio(defs, 1.2), 0.9, 1e-9);
+    assert.equal(R.loadSlowRatio(defs, 5), 0.6);
+    near(R.loadMultiplier(defs, 0.8), 0.92, 1e-9);
+    near(R.loadMultiplier(defs, 1.3), 1.6, 1e-9);
+    assert.equal(R.loadMultiplier(defs, 9), 3);
+    const s = R.staminaStats(defs, avg, 1, 10, 0.8);
+    assert.equal(s.max, Math.round((avg.str + avg.end) * 1.5) + 1);
+    assert.ok(s.dashCost > 0 && s.attackCost > 0 && s.regen > 0);
+});
