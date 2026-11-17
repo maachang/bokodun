@@ -13,7 +13,7 @@ exports.handler = async function() {
     if (!result.valid) { $response.status(400); return { errors: result.errors }; }
 
     const email = web.userAuth.normalizeEmail(result.data.email);
-    const lock = web.userAuth.lockout();
+    const lock = web.userAuth.lockout(web.DB_PATH);
     const targets = [[email, 'login'], [$request.ip, 'login-ip']];
     let locked = null;
     for (const [id, scope] of targets) {

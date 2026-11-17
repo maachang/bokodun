@@ -14,7 +14,7 @@ exports.handler = async function() {
     if (!result.valid) { $response.status(400); return { errors: result.errors }; }
 
     const email = web.userAuth.normalizeEmail(result.data.email);
-    const lock = web.userAuth.lockout();
+    const lock = web.userAuth.lockout(web.DB_PATH);
     for (const [id, scope] of [[email, 'reset'], [$request.ip, 'reset-ip']]) {
         const st = await lock.check(id, scope);
         if (st.isLocked) return web.fail($response, 423, `失敗した回数が多すぎます。${Math.ceil(st.waitSeconds / 60)} 分ほど待ってください`, { waitSeconds: st.waitSeconds });

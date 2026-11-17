@@ -18,7 +18,7 @@ exports.handler = async function() {
     const result = validate.check($request.body, { password: schemas.changePassword, keyword: schemas.changeKeyword, delete: schemas.deleteAccount }[action]);
     if (!result.valid) { $response.status(400); return { errors: result.errors }; }
 
-    const lock = web.userAuth.lockout();
+    const lock = web.userAuth.lockout(web.DB_PATH);
     const st = await lock.check(u.userId, 'account');
     if (st.isLocked) return web.fail($response, 423, `失敗した回数が多すぎます。${Math.ceil(st.waitSeconds / 60)} 分ほど待ってください`, { waitSeconds: st.waitSeconds });
 
