@@ -36,7 +36,7 @@ function loadDefs() {
         jobs: new Set(Object.keys(readJson('jobs.json').jobs)),
         maxLevel: readJson('jobs.json').maxLevel || 99,
         items: new Set(Object.keys(items)),
-        itemDefs: items,
+        weaponDefs: { ...Object.fromEntries(Object.values(items).filter(x => x.kind === 'weapon').map(x => [x.id, x])), ...Object.fromEntries((equipment.weapons || []).map(x => [x.id, x])) },
         classes: readJson('weaponClasses.json'),
         spells: new Set(Object.keys(readJson('magic.json').spells)),
         equip: {
@@ -83,8 +83,8 @@ const timeMap = (obj, where) => {
 // ストックに入れる ID の種類。呪文・弓（shoot）は magic、杖・ロッド（cast）は focus、近接武器は melee。入れられないものは null
 function stockKind(id, d) {
     if (d.spells.has(id)) return 'magic';
-    const it = d.itemDefs[id];
-    if (!it || it.kind !== 'weapon') return null;
+    const it = d.weaponDefs[id];   // 武器は equipment.json（ダイス・重さ）。素手などの特別なものは items.json
+    if (!it) return null;
     const attack = d.classes[it.weaponClass] && d.classes[it.weaponClass].attack;
     return attack === 'shoot' ? 'magic' : attack === 'cast' ? 'focus' : attack === 'melee' ? 'melee' : null;
 }

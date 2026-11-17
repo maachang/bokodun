@@ -4,62 +4,17 @@
     "name": "素手",
     "kind": "weapon",
     "weaponClass": "bare_hands",
-    "powerScale": 1.0,
-    "randomBonus": 2
-  },
-  "dagger": {
-    "id": "dagger",
-    "name": "ダガー",
-    "kind": "weapon",
-    "weaponClass": "dagger",
-    "powerScale": 1.0,
-    "randomBonus": 3
-  },
-  "iron_sword": {
-    "id": "iron_sword",
-    "name": "鉄の剣",
-    "kind": "weapon",
-    "weaponClass": "sword",
-    "powerScale": 1.0,
-    "randomBonus": 3
-  },
-  "iron_greatsword": {
-    "id": "iron_greatsword",
-    "name": "鉄の大剣",
-    "kind": "weapon",
-    "weaponClass": "greatsword",
-    "powerScale": 1.0,
-    "randomBonus": 4
-  },
-  "iron_mace": {
-    "id": "iron_mace",
-    "name": "鉄のメイス",
-    "kind": "weapon",
-    "weaponClass": "mace",
-    "powerScale": 1.0,
-    "randomBonus": 3
-  },
-  "short_bow": {
-    "id": "short_bow",
-    "name": "短弓",
-    "kind": "weapon",
-    "weaponClass": "bow",
-    "powerScale": 1.0,
-    "randomBonus": 3
-  },
-  "apprentice_staff": {
-    "id": "apprentice_staff",
-    "name": "見習いの杖",
-    "kind": "weapon",
-    "weaponClass": "staff",
-    "powerScale": 1.0
-  },
-  "magic_rod": {
-    "id": "magic_rod",
-    "name": "マジックロッド",
-    "kind": "weapon",
-    "weaponClass": "magic_rod",
-    "powerScale": 1.0
+    "dice": {
+      "n": 1,
+      "m": 3,
+      "k": 0
+    },
+    "weightRange": [
+      1,
+      1
+    ],
+    "blunt": false,
+    "twoHanded": false
   },
   "fire": {
     "id": "fire",
@@ -67,9 +22,7 @@
     "name": "ファイア",
     "kind": "spell",
     "type": "fireball",
-    "mp": 10,
     "cooldown": 0.35,
-    "damage": 25,
     "speed": 14,
     "sound": "fire",
     "visual": {
@@ -93,9 +46,7 @@
     "name": "爆発火球",
     "kind": "spell",
     "type": "strike",
-    "mp": 20,
     "cooldown": 0.9,
-    "damage": 35,
     "blastRadius": 3.0,
     "targetDistance": 6,
     "warnTime": 0.3,
@@ -108,9 +59,7 @@
     "name": "拡散弾",
     "kind": "spell",
     "type": "spread",
-    "mp": 20,
     "cooldown": 0.9,
-    "damage": 15,
     "speed": 14,
     "count": 3,
     "spreadDeg": 12,
@@ -136,9 +85,7 @@
     "name": "マジックボルト",
     "kind": "spell",
     "type": "fireball",
-    "mp": 4,
     "cooldown": 0.2,
-    "damage": 8,
     "speed": 16,
     "sound": "bolt",
     "visual": {
@@ -158,7 +105,13 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_hp",
-      "tier": "small", "weight": 10, "dice": { "n": 1, "m": 4, "k": 20 }
+      "tier": "small",
+      "weight": 10,
+      "dice": {
+        "n": 1,
+        "m": 4,
+        "k": 20
+      }
     },
     "price": 20,
     "autoUsable": true
@@ -169,7 +122,13 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_hp",
-      "tier": "medium", "weight": 25, "dice": { "n": 1, "m": 4, "k": 25 }
+      "tier": "medium",
+      "weight": 25,
+      "dice": {
+        "n": 1,
+        "m": 4,
+        "k": 25
+      }
     },
     "price": 60,
     "autoUsable": true
@@ -180,7 +139,13 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_hp",
-      "tier": "large", "weight": 40, "dice": { "n": 1, "m": 4, "k": 35 }
+      "tier": "large",
+      "weight": 40,
+      "dice": {
+        "n": 1,
+        "m": 4,
+        "k": 35
+      }
     },
     "price": 200,
     "autoUsable": true
@@ -191,7 +156,13 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_mp",
-      "tier": "small", "weight": 10, "dice": { "n": 1, "m": 4, "k": 16 }
+      "tier": "small",
+      "weight": 10,
+      "dice": {
+        "n": 1,
+        "m": 4,
+        "k": 16
+      }
     },
     "price": 25,
     "autoUsable": true
@@ -202,7 +173,13 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_mp",
-      "tier": "medium", "weight": 25, "dice": { "n": 1, "m": 4, "k": 16 }
+      "tier": "medium",
+      "weight": 25,
+      "dice": {
+        "n": 1,
+        "m": 4,
+        "k": 16
+      }
     },
     "price": 75,
     "autoUsable": true
@@ -213,7 +190,13 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_mp",
-      "tier": "large", "weight": 40, "dice": { "n": 1, "m": 4, "k": 30 }
+      "tier": "large",
+      "weight": 40,
+      "dice": {
+        "n": 1,
+        "m": 4,
+        "k": 30
+      }
     },
     "price": 250,
     "autoUsable": true
@@ -224,7 +207,13 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_stamina",
-      "tier": "small", "weight": 10, "dice": { "n": 1, "m": 4, "k": 20 }
+      "tier": "small",
+      "weight": 10,
+      "dice": {
+        "n": 1,
+        "m": 4,
+        "k": 20
+      }
     },
     "price": 25,
     "autoUsable": true
@@ -235,7 +224,13 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_stamina",
-      "tier": "medium", "weight": 25, "dice": { "n": 1, "m": 4, "k": 22 }
+      "tier": "medium",
+      "weight": 25,
+      "dice": {
+        "n": 1,
+        "m": 4,
+        "k": 22
+      }
     },
     "price": 75,
     "autoUsable": true
@@ -246,7 +241,13 @@
     "kind": "consumable",
     "effect": {
       "type": "heal_stamina",
-      "tier": "large", "weight": 40, "dice": { "n": 1, "m": 4, "k": 30 }
+      "tier": "large",
+      "weight": 40,
+      "dice": {
+        "n": 1,
+        "m": 4,
+        "k": 30
+      }
     },
     "price": 220,
     "autoUsable": true
@@ -257,7 +258,9 @@
     "kind": "consumable",
     "effect": {
       "type": "regen_boost",
-      "rate": 2, "duration": 20, "cureRegenDelay": true
+      "rate": 2,
+      "duration": 20,
+      "cureRegenDelay": true
     },
     "price": 120,
     "autoUsable": true
@@ -268,7 +271,16 @@
     "kind": "consumable",
     "effect": {
       "type": "cure_poison",
-      "venomRequires": [{ "job": "apothecary", "level": 20 }, { "job": "physician", "level": 1 }]
+      "venomRequires": [
+        {
+          "job": "apothecary",
+          "level": 20
+        },
+        {
+          "job": "physician",
+          "level": 1
+        }
+      ]
     },
     "price": 30,
     "autoUsable": true
@@ -298,7 +310,13 @@
     "name": "蘇生の薬",
     "kind": "consumable",
     "effect": {
-      "type": "revive", "weight": 20, "dice": { "n": 1, "m": 4, "k": 14 }
+      "type": "revive",
+      "weight": 20,
+      "dice": {
+        "n": 1,
+        "m": 4,
+        "k": 14
+      }
     },
     "price": 500,
     "autoUsable": true

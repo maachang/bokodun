@@ -40,8 +40,11 @@ function kindLabel(game, it) {
     return { melee: '近接', cast: '杖', shoot: '弓' }[a] ?? '武器';
 }
 function itemDetail(game, it) {
-    if (it.kind === 'spell') return `MP ${it.mp}`;
-    return game.weaponClasses?.[it.weaponClass]?.name ?? '';
+    const dice = it.dice ? `${it.dice.n}d${it.dice.m}${it.dice.k ? '+' + it.dice.k : ''}` : '';
+    if (it.kind === 'spell') return `${dice}　重さ ${it.weight}　消費MP ${game.spellCost(it)}　失敗 ${game.spellFailRate(it)}%`;
+    const cls = game.weaponClasses?.[it.weaponClass]?.name ?? '';
+    if (!it.dice) return cls;
+    return `${cls}　${dice}　重さ ${game.weaponWeight(it)}${game.canCarry(it) ? '' : '　（筋力が足りず、装備できない）'}`;
 }
 
 // ストック（右の列の 9 枠。ゲームの player.stock を映す）とメニュー

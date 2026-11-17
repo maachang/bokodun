@@ -19,6 +19,7 @@ import { updatePlayerMethods } from '/js/game/updatePlayer.js';
 import { equipmentMethods } from '/js/game/equipment.js';
 import { saveLoadMethods } from '/js/game/saveLoad.js';
 import { characterMethods } from '/js/game/character.js';
+import { buildItems } from '/js/game/itemDefs.js';
 import { combatMethods } from '/js/game/combat.js';
 import { hudMethods } from '/js/game/hud.js';
 import { interactMethods } from '/js/game/interact.js';
@@ -87,7 +88,8 @@ export class GameEngine {
             this.setRules(combat, table.table, jobs.jobs, races.races);   // 戦闘・能力値の式（rules.js）に渡す定義
             this.objectDefinitions = await objRes.json();
             this.enemyDefinitions = await enemyRes.json();
-            this.items = await itemRes.json();
+            const [equipment, magic] = await Promise.all(['equipment', 'magic'].map(async (n) => (await fetch(`/data/${n}.json`)).json()));
+            this.items = buildItems(await itemRes.json(), equipment, magic);   // 武器（equipment.json）・魔法（magic.json）を重ねる
             this.weaponClasses = await classRes.json();
             this.npcDefinitions = await npcRes.json();
             this.shops = await (await fetch('/data/shops.json')).json();   // 店の種類（店名・店主）。汎用の店マップが、入った店に応じて切り替える

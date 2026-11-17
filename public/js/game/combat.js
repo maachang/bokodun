@@ -21,16 +21,20 @@ export const combatMethods = {
         if (item.kind === 'spell') {
             const focus = this.getFocusItem();
             const fcls = focus && this.weaponClasses[focus.weaponClass];
-            const powerScale = (fcls?.spellPowerScale ?? 1) * (focus?.powerScale ?? 1);
-            const mp = Math.ceil(item.mp * (fcls?.mpScale ?? 1));
-            if (mp > 0 && this.player.mp < mp) {
+            const mp = this.spellCost(item);   // 消費 MP は、重さ・魔法力（知力・レベル）から式で決まる
+            if (this.player.mp < mp) {
                 this.addPopup('MP不足!', '#38bdf8');
                 return;
             }
             this.player.mp -= mp;
             this.player.magicCooldown = item.cooldown * (fcls?.cooldownScale ?? 1);
-            if (item.type === 'strike') this.castStrike(item, powerScale);
-            else this.shootProjectiles(item, powerScale);
+            if (Math.random() * 100 < this.spellFailRate(item)) {   // 発動の失敗（MP は全額消費し、連射の間隔も成功時と同じ）
+                this.addPopup('魔法が失敗!', '#94a3b8');
+                return;
+            }
+            const power = this.rollSpellPower(item);   // 威力（ダイス ＋ 杖のダイス）
+            if (item.type === 'strike') this.castStrike(item, power);
+            else this.shootProjectiles(item, power);
         } else {
             const cls = this.weaponClasses[item.weaponClass];
             if (cls?.attack !== 'shoot') return;
@@ -66,7 +70,8 @@ export const combatMethods = {
     shootArrow(item, cls) {
         const dirX = -Math.sin(this.player.angle);
         const dirZ = -Math.cos(this.player.angle);
-        const damage = Math.floor(this.playerAttackPower() * cls.damageScale * (item.powerScale ?? 1) + Math.random() * (item.randomBonus ?? 0));
+        const atk = this.rollWeaponAttack(item, { noMiss: true });   // 矢は、クリティカル・1 ゾロはあるが、ミスの判定はしない
+        const damage = atk.damage;
         const arrow = new Projectile(this.player.x + dirX * 0.8, this.player.z + dirZ * 0.8, dirX, dirZ, true, cls.projectileSpeed, damage, {
             type: 'arrow',
             maxDistance: cls.range
@@ -79,7 +84,7 @@ export const combatMethods = {
     },
 
     // 飛び道具（ファイア・拡散弾・マジックボルト）: count 発を spreadDeg 間隔の扇状に発射
-    shootProjectiles(w, powerScale = 1.0) {
+    shootProjectiles(w, power) {   // power: この 1 回の魔法の威力（拡散弾は、1 発ごとに同じ値）
         this.sound.playSpellShoot(w.sound);
 
         const count = w.count || 1;
@@ -96,7 +101,7 @@ export const combatMethods = {
             spawnX = this.player.x + dirX * 0.8;
             spawnZ = this.player.z + dirZ * 0.8;
 
-            const fireball = new Projectile(spawnX, spawnZ, dirX, dirZ, true, w.speed, Math.floor(w.damage * powerScale), {
+            const fireball = new Projectile(spawnX, spawnZ, dirX, dirZ, true, w.speed, power, {
                 visual: w.visual,
                 status: w.status,
                 pierce: w.pierce,
@@ -153,7 +158,7 @@ export const combatMethods = {
     },
 
     // 落下系の魔法（爆発火球）: 前方 targetDistance の地面を狙い（手前に壁があればその直前）、予告の輪 → 着弾の範囲ダメージ → 火柱
-    castStrike(spell, powerScale = 1.0) {
+    castStrike(spell, power) {
         const dirX = -Math.sin(this.player.angle);
         const dirZ = -Math.cos(this.player.angle);
 
@@ -169,7 +174,7 @@ export const combatMethods = {
         }
         const tx = this.player.x + dirX * dist;
         const tz = this.player.z + dirZ * dist;
-        const damage = Math.floor(spell.damage * powerScale);
+        const damage = power;
 
         this.sound.playStrikeWhistle(spell.warnTime); // 「ぴゅーーーん」（予告の間に鳴る）→ 着弾で「ばーーん」
         this.strikeEffects.schedule(tx, tz, {

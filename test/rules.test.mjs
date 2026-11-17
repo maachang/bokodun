@@ -125,3 +125,22 @@ test('積載・スタミナ（仕様 8.2e の例）', () => {
     assert.equal(s.max, Math.round((avg.str + avg.end) * 1.5) + 1);
     assert.ok(s.dashCost > 0 && s.attackCost > 0 && s.regen > 0);
 });
+
+test('攻撃 1 回の結果（ミス・1 ゾロ・クリティカル・リトライ）', () => {
+    const w = eq.weapons.find((x) => x.id === 'long_sword');   // 2d6+1
+    const ctx = (job) => ({ weapon: w, weight: 14, lv: 1, job: defs.jobs[job], str: 14, dex: 14 });
+    const normal = R.tableValue(defs, 14, 8 + w.dice.k);      // ダイスが 4 + 4 のとき
+    // 乱数の順: ミス判定（noMiss・forceCrit のときは無し）→ ダイス（2 個）→ クリティカル判定（forceCrit のときは無し）
+    assert.deepEqual(R.resolveAttack(defs, ctx('fighter'), {}, seq(0.1)), { kind: 'miss', damage: 0 });
+    assert.deepEqual(R.resolveAttack(defs, ctx('fighter'), { noMiss: true }, seq(0.5, 0.5, 0.9)), { kind: 'normal', damage: normal });
+    assert.deepEqual(R.resolveAttack(defs, ctx('fighter'), {}, seq(0.9, 0, 0, 0.9)), { kind: 'fumble', damage: 1 });
+    assert.deepEqual(R.resolveAttack(defs, ctx('fighter'), {}, seq(0.9, 0.5, 0.5, 0.05)), { kind: 'crit', damage: Math.floor(normal * 1.5) });
+    assert.equal(R.resolveAttack(defs, ctx('fighter'), { forceCrit: true }, seq(0.5, 0.5)).kind, 'crit', '必ずクリティカル（ミスもしない）');
+    // リトライ（アサシン 2 回。クリティカル率 5%＝重い武器）: 最初のクリティカル → リトライでもクリティカル → 次は外れて通常ダメージ
+    const asn = R.resolveAttack(defs, ctx('assassin'), { noMiss: true }, seq(0.5, 0.5, 0.04, 0.5, 0.5, 0.04, 0.5, 0.5, 0.9));
+    assert.equal(asn.kind, 'crit');
+    assert.equal(asn.damage, Math.floor(normal * 1.5) * 2 + normal, 'クリティカル + クリティカル + 通常');
+    // リトライの回数を使い切ったら終わり（ニンジャ 3 回でも、すぐ外れれば 1 回で終わる）
+    const ninja = R.resolveAttack(defs, ctx('ninja'), { noMiss: true }, seq(0.5, 0.5, 0.04, 0.5, 0.5, 0.9));
+    assert.equal(ninja.damage, Math.floor(normal * 1.5) + normal);
+});

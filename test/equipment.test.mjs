@@ -4,13 +4,25 @@ import fs from 'node:fs';
 import os from 'node:os';
 import path from 'node:path';
 import { copyGameModules } from './helpers/game.mjs';
+import { buildItems } from '../public/js/game/itemDefs.js';
+import * as R from '../public/js/game/rules.js';
 
 const projectRoot = process.cwd();
 const readJson = (f) => JSON.parse(fs.readFileSync(path.join(projectRoot, 'public/data', f), 'utf-8'));
-const items = readJson('items.json');
+const items = buildItems(readJson('items.json'), readJson('equipment.json'), readJson('magic.json'));   // 武器（equipment.json）・魔法（magic.json）を重ねた、ゲームと同じ形
 const weaponClasses = readJson('weaponClasses.json');
 const playerDef = readJson('player.json');
 const enemyDefs = readJson('enemies.json');
+const rulesDefs = { combat: readJson('combat.json'), table: readJson('damageTable.json').table, jobs: readJson('jobs.json').jobs, races: readJson('races.json').races };
+// 乱数を決まった値にして、f を実行する（ミス・クリティカルが出ない 0.5 など）
+const withRandom = (fn, f) => { const orig = Math.random; Math.random = fn; try { return f(); } finally { Math.random = orig; } };
+const fixed = (v) => () => v;
+// 乱数 0.5 のときの魔法の威力（ダイスはどれも 1 + floor(0.5 × 面数)）と消費 MP。rod は、杖のダイスの合計
+const J = rulesDefs.jobs.fighter;
+const half = (dice) => dice.n * (1 + Math.floor(0.5 * dice.m));
+const spellPower = (id, rod = 0) => R.tableValue(rulesDefs, items[id].weight, half(items[id].dice) + items[id].dice.k + rod + R.magicBonus(rulesDefs, 1, J));
+const spellMp = (id) => R.magicCost(rulesDefs, items[id], 14, 1, J);
+const seq = (...vals) => { let i = 0; return () => (i < vals.length ? vals[i++] : 0.5); };
 
 // ブラウザ向けの絶対パス import ('/js/xxx.js') を相対パスに読み替えた一時コピーを作ってロードする
 async function loadModules() {
@@ -53,6 +65,11 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
         gainExp: (n) => { calls.exp += n; },
         updateEquipHud() {},
     });
+    g.setRules(readJson('combat.json'), readJson('damageTable.json').table, readJson('jobs.json').jobs, readJson('races.json').races);
+    g.applyCharacterDef(playerDef);   // 人間・平均・ファイター Lv1
+    g.player.abilities.str = 50;   // 重い武器（大剣など）も、筋力で持てるように（持てる重さの確認は、別のテスト）
+    g.recomputeStats(true);
+    g.player.mp = mp;
     return { g, calls };
 }
 
@@ -97,14 +114,14 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
             assert.ok(c.name && ['melee', 'shoot', 'cast'].includes(c.attack), `${id}: attack`);
             if (c.attack === 'melee') {
                 // range / arcDeg は突進の判定範囲ではなく、斬撃エフェクトの大きさ・広がりの目安
-                assert.ok(c.range > 0 && c.arcDeg > 0 && c.cooldown > 0 && c.damageScale > 0 && c.knockback > 0 && c.stun >= 0, `${id}: 近接の項目`);
+                assert.ok(c.range > 0 && c.arcDeg > 0 && c.cooldown > 0 && c.knockback > 0 && c.stun >= 0, `${id}: 近接の項目`);
                 assert.ok(['light', 'heavy'].includes(c.sound), `${id}: sound`);
                 assert.ok(['slash', 'thrust', 'smash', 'punch'].includes(c.effect?.shape) && /^#[0-9a-f]{6}$/i.test(c.effect.color) && c.effect.duration > 0, `${id}: effect`);
             } else if (c.attack === 'shoot') {
-                assert.ok(c.range > 0 && c.cooldown > 0 && c.damageScale > 0 && c.projectileSpeed > 0, `${id}: 弓の項目`);
+                assert.ok(c.range > 0 && c.cooldown > 0 && c.projectileSpeed > 0, `${id}: 弓の項目`);
             } else {
-                // 杖・ロッド: 魔法の補正（威力・消費MP・間隔の倍率）
-                assert.ok(c.spellPowerScale > 0 && c.mpScale > 0 && c.cooldownScale > 0, `${id}: 魔法の補正`);
+                // 杖・ロッド: 魔法の間隔の倍率（威力は杖のダイス、消費 MP は式で決まる）
+                assert.ok(c.cooldownScale > 0, `${id}: 魔法の補正`);
             }
         }
     });
@@ -120,9 +137,10 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
                 assert.ok(it.price === null ? it.kind === 'key' : Number.isInteger(it.price) && it.price > 0, `${id}: price`);
             } else if (it.kind === 'weapon') {
                 assert.ok(weaponClasses[it.weaponClass], `${id}: 未定義の weaponClass ${it.weaponClass}`);
+                assert.ok(it.dice.n >= 1 && it.dice.m >= 2 && Number.isInteger(it.dice.k) && it.weightRange[0] >= 1 && it.weightRange[1] <= 50 && it.weightRange[0] <= it.weightRange[1], `${id}: ダイス・重さ`);
             } else {
                 assert.ok(['fireball', 'strike', 'spread'].includes(it.type), `${id}: type`);
-                assert.ok(it.mp >= 0 && it.cooldown > 0 && it.damage > 0, `${id}: 呪文の項目`);
+                assert.ok(it.cooldown > 0 && it.weight >= 1 && it.weight <= 50 && it.dice.n >= 1 && it.costType, `${id}: 呪文の項目（重さ・ダイスは magic.json）`);
                 if (it.type !== 'strike') {
                     const v = it.visual;
                     assert.ok(['orb', 'crystal', 'bolt'].includes(v?.shape) && v.size > 0, `${id}: visual`);
@@ -163,16 +181,16 @@ test('ストック（9 枠: 数字キー 1〜9・クリック）', async (t) => 
         const { g } = makeGame(M);
         assert.equal(g.getMeleeItem().id, 'dagger');
         assert.equal(g.getFocusItem(), null);
-        g.selectSlot(bySlot('iron_sword'));
-        assert.equal(g.getMeleeItem().id, 'iron_sword');
-        g.selectSlot(bySlot('apprentice_staff'));
-        assert.equal(g.getFocusItem().id, 'apprentice_staff');
-        assert.equal(g.getMeleeItem().id, 'iron_sword', '補正を付けても突進用は変わらない');
-        g.selectSlot(bySlot('apprentice_staff'));
+        g.selectSlot(bySlot('long_sword'));
+        assert.equal(g.getMeleeItem().id, 'long_sword');
+        g.selectSlot(bySlot('magic_staff'));
+        assert.equal(g.getFocusItem().id, 'magic_staff');
+        assert.equal(g.getMeleeItem().id, 'long_sword', '補正を付けても突進用は変わらない');
+        g.selectSlot(bySlot('magic_staff'));
         assert.equal(g.getFocusItem(), null, 'もう一度選ぶと外れる');
         g.selectSlot(bySlot('explosion'));
         assert.equal(g.getMagicItem().id, 'explosion', '呪文の枠を選ぶと、魔法が切り替わる');
-        assert.equal(g.getMeleeItem().id, 'iron_sword', '魔法を選んでも、突進用は変わらない');
+        assert.equal(g.getMeleeItem().id, 'long_sword', '魔法を選んでも、突進用は変わらない');
     });
 
     await t.test('空きの枠や範囲外のクリックは何も変わらない', () => {
@@ -214,7 +232,7 @@ test('ストック（9 枠: 数字キー 1〜9・クリック）', async (t) => 
             assert.equal(g.setStockSlot(1, 'no_such_item'), false);
             assert.equal(g.setStockSlot(9, 'fire'), false);
             assert.equal(g.setStockSlot(-1, 'fire'), false);
-            assert.equal(g.getSlotItem(1).id, 'iron_sword', '失敗した指定で中身は変わらない');
+            assert.equal(g.getSlotItem(1).id, 'long_sword', '失敗した指定で中身は変わらない');
         } finally { console.warn = warn; }
     });
 
@@ -223,12 +241,12 @@ test('ストック（9 枠: 数字キー 1〜9・クリック）', async (t) => 
         assert.equal(g.setStockSlot(0, null), true);   // 突進用の枠を空にする
         assert.equal(g.player.selMelee, null);
         assert.equal(g.getMeleeItem().id, 'fists', '未選択は素手');
-        assert.equal(g.setStockSlot(0, 'iron_mace'), true);
+        assert.equal(g.setStockSlot(0, 'mace'), true);
         assert.equal(g.player.selMelee, 0, '近接の選択がなかったので、入れたものを選ぶ');
         assert.equal(g.setStockSlot(1, 'dagger'), true);
         assert.equal(g.player.selMelee, 0, 'すでに選んでいるときは、変わらない');
-        g.selectSlot(bySlot('apprentice_staff'));
-        assert.equal(g.setStockSlot(bySlot('apprentice_staff'), 'magic_rod'), true);
+        g.selectSlot(bySlot('magic_staff'));
+        assert.equal(g.setStockSlot(bySlot('magic_staff'), 'wand'), true);
         assert.equal(g.getFocusItem(), null, '補正の枠を差し替えると、外れる（杖は自動では選ばない）');
     });
 });
@@ -236,51 +254,71 @@ test('ストック（9 枠: 数字キー 1〜9・クリック）', async (t) => 
 test('近接武器は突進攻撃に効く', async (t) => {
     const M = await loadModules();
     // 突進で敵（スケルトン HP60・半径 0.8）に当てて、与えたダメージを返す
-    const charge = (weaponId, { x = 0, z = -1.2 } = {}) => {
+    const charge = (weaponId, { x = 0, z = -1.2, rand = fixed(0.5) } = {}) => {   // 既定は、ミス・クリティカルが出ない乱数
         const { g, calls } = makeGame(M);
         if (weaponId) equip(g, weaponId);
         const m = spawn(M, 'skeleton', x, z);
         g.monsters.push(m);
-        bump(g, m);
+        if (rand) withRandom(rand, () => bump(g, m)); else bump(g, m);   // rand: 攻撃の判定だけ、乱数を決める（敵の生成などには使わない）
         return { g, calls, m, damage: m.maxHp - m.hp };
     };
     const samples = (id) => Array.from({ length: 30 }, () => charge(id).damage);
 
-    await t.test('クラスごとのダメージ倍率: 素手 < ダガー < 剣 < メイス < 大剣', () => {
-        const [fists, dagger, sword, mace, great] = ['fists', 'dagger', 'iron_sword', 'iron_mace', 'iron_greatsword'].map(samples);
-        assert.ok(Math.max(...fists) < Math.min(...dagger));
-        assert.ok(Math.max(...dagger) < Math.min(...sword));
-        assert.ok(Math.max(...sword) < Math.min(...mace));
-        assert.ok(Math.max(...mace) < Math.min(...great));
+    await t.test('ダメージは、武器のダイス＋職業レベルの加算を、ダメージ表（武器の重さ）に通した値になる', () => {
+        for (const id of ['fists', 'dagger', 'long_sword', 'mace', 'claymore']) {
+            const w = items[id];
+            const { g, damage } = withRandom(fixed(0.5), () => charge(id));   // 乱数 0.5: ミスもクリティカルも出ない。ダイスは、どれも 1 + floor(0.5 × 面数)
+            const total = w.dice.n * (1 + Math.floor(0.5 * w.dice.m)) + w.dice.k + R.levelBonus(rulesDefs, 1, rulesDefs.jobs.fighter);
+            assert.equal(damage, R.tableValue(rulesDefs, g.weaponWeight(w), total), `${id}: ダイスとダメージ表の値`);
+            assert.ok(damage >= 1);
+        }
+        const heavy = withRandom(fixed(0.5), () => charge('claymore').damage), light = withRandom(fixed(0.5), () => charge('dagger').damage);
+        assert.ok(heavy > light, '重い武器ほど、大きい');
+    });
+
+    await t.test('ミス: ダメージもエフェクトもなく、反撃は受ける。1 ゾロは 1 ダメージ。クリティカルは 1.5 倍', () => {
+        const miss = charge('long_sword', { rand: fixed(0) });   // 乱数 0 は、ミス（16%）の範囲
+        assert.equal(miss.damage, 0);
+        assert.ok(miss.calls.popups.includes('ミス!'));
+        assert.equal(miss.calls.slashes.length, 0);
+        assert.equal(miss.calls.playerDamage.length, 1, '反撃は受ける');
+        const d = items.dagger.dice;   // ミス判定 0.9（外れる）→ ダイスがすべて 1 の目（乱数 0）→ 1 ゾロ
+        const fumble = charge('dagger', { rand: seq(0.9, ...Array(d.n).fill(0)) });
+        assert.equal(fumble.damage, 1);
+        const crit = charge('long_sword', { rand: seq(0.9, ...Array(items.long_sword.dice.n).fill(0.5), 0.01) });   // ミスなし → ダイス 0.5 → クリティカル率 10% の範囲（0.01 × 100 = 1）
+        const w = items.long_sword, total = w.dice.n * (1 + Math.floor(0.5 * w.dice.m)) + w.dice.k;
+        assert.equal(crit.damage, Math.floor(R.tableValue(rulesDefs, crit.g.weaponWeight(w), total) * 1.5));
+        assert.ok(crit.calls.popups.some(p => p.startsWith('クリティカル!')));
     });
 
     await t.test('突進の連続ヒット間隔は、クラスの cooldown になる（大剣は遅く、ダガーは速い）', () => {
         assert.equal(charge('dagger').g.player.attackCooldown, weaponClasses.dagger.cooldown);
-        assert.equal(charge('iron_greatsword').g.player.attackCooldown, weaponClasses.greatsword.cooldown);
+        assert.equal(charge('claymore').g.player.attackCooldown, weaponClasses.greatsword.cooldown);
         assert.ok(weaponClasses.greatsword.cooldown > weaponClasses.dagger.cooldown);
     });
 
     await t.test('突進が当たるとクラスの斬撃エフェクトが出る（ダガー=突き、剣=弧、メイス=衝撃波、素手=閃光）', () => {
-        for (const [id, shape] of [['dagger', 'thrust'], ['iron_sword', 'slash'], ['iron_mace', 'smash'], ['fists', 'punch']]) {
-            const { calls } = charge(id);
+        for (const [id, shape] of [['dagger', 'thrust'], ['long_sword', 'slash'], ['mace', 'smash'], ['fists', 'punch']]) {
+            const { calls } = charge(id, { rand: fixed(0.5) });   // ミスが出ないように、乱数を固定
             assert.equal(calls.slashes.length, 1, `${id}: エフェクトが 1 回出る`);
             assert.equal(calls.slashes[0][2].shape, shape);
         }
     });
 
     await t.test('メイスは強いノックバックと一定時間のスタン、剣はスタンしない', () => {
-        const mace = charge('iron_mace').m;
-        const sword = charge('iron_sword').m;
+        const mace = charge('mace').m;
+        const sword = charge('long_sword').m;
         assert.ok(mace.stunTimer > 0 && mace.stunTimer <= weaponClasses.mace.stun);
         assert.equal(sword.stunTimer, 0);
         assert.ok(mace.knockback.length() > sword.knockback.length());
     });
 
-    await t.test('半ずらし会心にも武器が効く（プレイヤーは無傷・ダメージは倍率つき）', () => {
-        const { calls, damage } = charge('iron_greatsword', { x: 0.5, z: -1.2 });
+    await t.test('半ずらし会心にも武器が効く（プレイヤーは無傷・必ずクリティカル）', () => {
+        const { g, calls, damage } = withRandom(fixed(0.5), () => charge('claymore', { x: 0.5, z: -1.2 }));
         assert.equal(calls.playerDamage.length, 0, '会心ではプレイヤーは被弾しない');
         assert.ok(calls.popups.some(p => p.includes('半ずらし会心')));
-        assert.ok(damage >= Math.floor(15 * 1.5 * weaponClasses.greatsword.damageScale));
+        const w = items.claymore, total = w.dice.n * (1 + Math.floor(0.5 * w.dice.m)) + w.dice.k;
+        assert.equal(damage, Math.floor(R.tableValue(rulesDefs, g.weaponWeight(w), total) * 1.5), '必ずクリティカル（1.5 倍）。ミスもしない');
         assert.equal(calls.slashes.length, 1);
     });
 
@@ -309,7 +347,7 @@ test('近接武器は突進攻撃に効く', async (t) => {
         assert.deepEqual(crit.calls.sounds.find(([n]) => n === 'playEnemyHit'), ['playEnemyHit', true]);
 
         // 重い武器（大剣）: ヒットストップが 0.03 長く、揺れる
-        const heavy = charge('iron_greatsword');
+        const heavy = charge('claymore');
         assert.ok(Math.abs(heavy.g.hitStop - 0.08) < 1e-9, `0.05 + 0.03 (${heavy.g.hitStop})`);
         assert.ok(heavy.g.cameraShake.time > 0);
 
@@ -318,7 +356,7 @@ test('近接武器は突進攻撃に効く', async (t) => {
         const weak = spawn(M, 'slime', 0, -1.2);
         weak.hp = 1;
         g.monsters.push(weak);
-        bump(g, weak);
+        withRandom(fixed(0.5), () => bump(g, weak));   // ミスが出ないように、乱数を固定
         assert.equal(weak.active, false);
         assert.equal(g.hitStop, 0.1);
         assert.ok(g.cameraShake.time > 0);
@@ -382,69 +420,80 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         assert.equal(g.player.magicCooldown, 0);
     });
 
-    await t.test('ファイア: 単発・MP10・ダメージ25・間隔0.35秒。クールダウン中は撃てない', () => {
+    await t.test('ファイア: 単発・消費 MP は式（重さ・魔法力）・威力はダイス・間隔 0.35 秒。クールダウン中は撃てない', () => {
         const { g } = makeGame(M);
-        g.useMagic();
+        withRandom(fixed(0.5), () => g.useMagic());
         assert.equal(g.projectiles.length, 1);
-        assert.equal(g.projectiles[0].damage, 25);
-        assert.equal(g.player.mp, 50);
+        assert.equal(g.projectiles[0].damage, spellPower('fire'));
+        assert.equal(g.player.mp, 60 - spellMp('fire'));
         assert.equal(g.player.magicCooldown, 0.35);
-        g.useMagic();
+        withRandom(fixed(0.5), () => g.useMagic());
         assert.equal(g.projectiles.length, 1);
+    });
+
+    await t.test('魔法の失敗: MP は全額消費し、間隔も成功時と同じ。弾は出ない（失敗率は、重さと魔法力から）', () => {
+        const { g, calls } = makeGame(M);
+        assert.equal(g.spellFailRate(items.fire), 19, '仕様 8.2c の例（人間・平均・基本職 Lv1）');
+        withRandom(fixed(0), () => g.useMagic());   // 乱数 0 は、失敗の範囲
+        assert.equal(g.projectiles.length, 0);
+        assert.equal(g.player.mp, 60 - spellMp('fire'));
+        assert.equal(g.player.magicCooldown, 0.35);
+        assert.ok(calls.popups.includes('魔法が失敗!'));
     });
 
     await t.test('魔法の切り替え: スロットごとに別の呪文を撃てる（拡散弾・マジックボルト）', () => {
         const spread = makeGame(M);
         spread.g.selectMagic(MAGIC_BASE + 2);
-        spread.g.useMagic();
+        withRandom(fixed(0.5), () => spread.g.useMagic());
         assert.equal(spread.g.projectiles.length, 3);
-        assert.equal(spread.g.player.mp, 40);
+        assert.equal(spread.g.player.mp, 60 - spellMp('spread'));
         const angles = spread.g.projectiles.map(p => Math.atan2(-p.dirX, -p.dirZ) * 180 / Math.PI).sort((a, b) => a - b);
         assert.ok(Math.abs(angles[0] + 12) < 1e-6 && Math.abs(angles[1]) < 1e-6 && Math.abs(angles[2] - 12) < 1e-6, angles.join(','));
-        assert.ok(spread.g.projectiles.every(p => p.damage === 15 && !p.explosive));
+        assert.ok(spread.g.projectiles.every(p => p.damage === spellPower('spread') && !p.explosive), '拡散弾は、1 発ごとに同じ威力');
 
         const bolt = makeGame(M);
         bolt.g.selectMagic(MAGIC_BASE + 3);
-        bolt.g.useMagic();
-        assert.equal(bolt.g.projectiles[0].damage, 8);
-        assert.equal(bolt.g.player.mp, 56);
+        withRandom(fixed(0.5), () => bolt.g.useMagic());
+        assert.equal(bolt.g.projectiles[0].damage, spellPower('magic_bolt'));
+        assert.equal(bolt.g.player.mp, 60 - spellMp('magic_bolt'));
         assert.equal(bolt.g.player.magicCooldown, 0.2);
     });
 
-    await t.test('杖は魔法の威力を上げ、ロッドは消費MPと間隔を半分にする（補正なしはそのまま）', () => {
+    await t.test('杖・ロッドは、杖のダイスの結果を、魔法の攻撃値に足す（消費 MP は変えない）。ロッドは間隔が半分', () => {
         const staff = makeGame(M);
-        equip(staff.g, 'apprentice_staff');
-        staff.g.useMagic();
-        assert.equal(staff.g.projectiles[0].damage, 30, '25 × 1.2');
-        assert.equal(staff.g.player.mp, 50);
+        equip(staff.g, 'magic_staff');
+        withRandom(fixed(0.5), () => staff.g.useMagic());
+        assert.equal(staff.g.projectiles[0].damage, spellPower('fire', half(items.magic_staff.dice)), '杖のダイス（1d6）の結果が加わる');
+        assert.ok(staff.g.projectiles[0].damage > spellPower('fire'));
+        assert.equal(staff.g.player.mp, 60 - spellMp('fire'), '消費 MP は変わらない');
 
         const rod = makeGame(M);
-        equip(rod.g, 'magic_rod');
-        rod.g.useMagic();
-        assert.equal(rod.g.projectiles[0].damage, 25);
-        assert.equal(rod.g.player.mp, 55, '消費 10 → 5');
+        equip(rod.g, 'wand');
+        withRandom(fixed(0.5), () => rod.g.useMagic());
+        assert.equal(rod.g.projectiles[0].damage, spellPower('fire', half(items.wand.dice)));
+        assert.equal(rod.g.player.mp, 60 - spellMp('fire'));
         assert.equal(rod.g.player.magicCooldown, 0.175, '間隔 0.35 → 0.175');
     });
 
-    await t.test('MP不足なら撃てない（消費MPは補正後の値で判定する）', () => {
+    await t.test('MP不足なら撃てない。消費の少ない呪文なら撃てる', () => {
         const { g, calls } = makeGame(M, { mp: 5 });
-        g.useMagic();
+        withRandom(fixed(0.5), () => g.useMagic());
         assert.equal(g.projectiles.length, 0);
         assert.equal(g.player.mp, 5);
         assert.ok(calls.popups.includes('MP不足!'));
 
-        equip(g, 'magic_rod'); // ロッドなら消費 5 で撃てる
-        g.useMagic();
+        g.selectMagic(MAGIC_BASE + 3); // マジックボルト
+        withRandom(fixed(0.5), () => g.useMagic());
         assert.equal(g.projectiles.length, 1);
-        assert.equal(g.player.mp, 0);
+        assert.equal(g.player.mp, 5 - spellMp('magic_bolt'));
     });
 
-    await t.test('爆発火球: 弾を飛ばさず、前方 6m の地面に予告→着弾する（MP20・間隔0.9秒）', () => {
+    await t.test('爆発火球: 弾を飛ばさず、前方 6m の地面に予告→着弾する（間隔0.9秒）', () => {
         const { g, calls } = makeGame(M);
         g.selectMagic(MAGIC_BASE + 1);
-        g.useMagic();
+        withRandom(fixed(0.5), () => g.useMagic());
         assert.equal(g.projectiles.length, 0, '弾は飛ばない');
-        assert.equal(g.player.mp, 40);
+        assert.equal(g.player.mp, 60 - spellMp('explosion'));
         assert.equal(g.player.magicCooldown, 0.9);
         assert.equal(calls.strikes.length, 1);
         const [x, z, opts] = calls.strikes[0];
@@ -456,16 +505,16 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
     await t.test('爆発火球: 手前に壁があれば、その直前に着弾する。杖の補正で威力が上がる', () => {
         const { g, calls } = makeGame(M);
         g.colliders = [{ minX: -2, maxX: 2, minZ: -4.5, maxZ: -3.5 }]; // z=-3.5 に壁
-        equip(g, 'apprentice_staff');
+        equip(g, 'magic_staff');
         g.selectMagic(MAGIC_BASE + 1);
-        g.useMagic();
+        withRandom(fixed(0.5), () => g.useMagic());
         const [, z, opts] = calls.strikes[0];
         assert.ok(z > -3.5 && z < -2.5, `壁の手前 (z=${z})`);
 
         const near = spawn(M, 'slime', 0, z - 0.5);
         g.monsters.push(near);
         opts.onImpact(); // 着弾
-        assert.equal(near.maxHp - near.hp, 42, '35 × 1.2');
+        assert.equal(near.maxHp - near.hp, spellPower('explosion', half(items.magic_staff.dice)), '爆発のダイス ＋ 杖のダイス');
     });
 
     await t.test('着弾の範囲ダメージ: 半径内の敵すべてに当たり（外向きにノックバック）、範囲外は無傷。倒すと経験値', () => {
@@ -488,12 +537,13 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
     await t.test('弓: 魔法スロットに入れると Space で矢を放つ（MP不要・重力で落ちる矢・射程はクラスの range）', () => {
         const { g, calls } = makeGame(M, { mp: 0 });
         magic(g, 'short_bow');
-        g.useMagic();
+        withRandom(fixed(0.5), () => g.useMagic());
         assert.equal(g.projectiles.length, 1);
         const a = g.projectiles[0];
         assert.equal(a.type, 'arrow');
         assert.equal(a.maxDistance, weaponClasses.bow.range);
-        assert.ok(a.damage >= 21 && a.damage <= 23, `攻撃力15×1.4＋乱数0〜2 (${a.damage})`);
+        const w = items.short_bow;
+        assert.equal(a.damage, R.tableValue(rulesDefs, g.weaponWeight(w), half(w.dice) + w.dice.k), '弓のダイス＋ダメージ表。ミスの判定はない');
         assert.equal(g.player.mp, 0);
         assert.equal(g.player.magicCooldown, weaponClasses.bow.cooldown);
         assert.ok(calls.sounds.some(([n]) => n === 'playBowShoot'));
@@ -633,7 +683,7 @@ test('呪文の個性（見た目・状態異常・貫通・効果音）', async
     const cast = (slot) => {
         const { g, calls } = makeGame(M);
         g.selectMagic(MAGIC_BASE + slot);
-        g.useMagic();
+        withRandom(fixed(0.5), () => g.useMagic());   // 失敗（確率）が出ないように、乱数を固定
         return { g, calls, p: g.projectiles[0] };
     };
     const geoTypes = (p) => p.mesh.children.map(c => c.geometry.type);
@@ -663,7 +713,7 @@ test('呪文の個性（見た目・状態異常・貫通・効果音）', async
         m.maxHp = m.hp = 100;   // 敵のデータの HP に頼らない（2 発当てても、燃焼で倒れないように）
         g.monsters.push(m);
         assert.equal(g.hitMonsterWithProjectile(p, m), true, '弾は消える');
-        assert.equal(m.maxHp - m.hp, 25);
+        assert.equal(m.maxHp - m.hp, spellPower('fire'), 'ファイアの威力（cast は、乱数 0.5 で撃つ）');
         assert.ok(calls.popups.includes('燃焼!'));
         assert.ok(m.spriteMat.color !== undefined);
 
@@ -684,8 +734,8 @@ test('呪文の個性（見た目・状態異常・貫通・効果音）', async
         const { g, calls, p } = cast(0);
         const m = spawn(M, 'slime', 0, -3);
         g.monsters.push(m);
-        m.hp = 30;
-        g.hitMonsterWithProjectile(p, m); // 25 ダメージ → HP 5、燃焼
+        m.hp = spellPower('fire') + 5;
+        g.hitMonsterWithProjectile(p, m); // 威力 → HP 5、燃焼（3 秒で 9 ダメージ）
         for (let i = 0; i < 70 && m.active; i++) { m.update(0.05, { x: 0, z: 0, radius: 0.4 }, [], [], null, null, 1.0); g.processBurn(m); }
         assert.equal(m.active, false);
         assert.ok(calls.exp > 0);
@@ -736,8 +786,8 @@ test('呪文の個性（見た目・状態異常・貫通・効果音）', async
         assert.equal(p.active, true);
         assert.equal(g.hitMonsterWithProjectile(p, b), true, '2 体目: 弾が消える');
         assert.equal(p.active, false);
-        assert.equal(a.maxHp - a.hp, 8);
-        assert.equal(b.maxHp - b.hp, 8);
+        assert.equal(a.maxHp - a.hp, spellPower('magic_bolt'), 'マジックボルトの威力');
+        assert.equal(b.maxHp - b.hp, spellPower('magic_bolt'));
         assert.equal(c.hp, c.maxHp);
         assert.ok(p.hitMonsters.has(a) && p.hitMonsters.has(b) && !p.hitMonsters.has(c));
 
@@ -1138,7 +1188,7 @@ test('エフェクトテストボタン（武器エフェクトの確認用）',
             const m = spawn(M, 'slime', x, -1.2);
             if (hp) m.hp = hp;
             g.monsters.push(m);
-            bump(g, m);
+            withRandom(fixed(0.5), () => bump(g, m));   // ミス・クリティカルが出ないように、乱数を固定
             return calls.slashes[0][3];
         };
         assert.equal(run(0), 1.0);
@@ -1166,13 +1216,13 @@ test('HUD の描画（ストックの再描画の通知・エフェクトテス�
         const { g } = makeGame(M);
         // makeGame の updateEquipHud は空にしてあるため、本物のメソッドを呼ぶ
         g.updateEquipHud = M.GameEngine.prototype.updateEquipHud;
-        g.selectSlot(bySlot('apprentice_staff')); // 補正に装備（この間は空の updateEquipHud 差し替えの影響を受けない）
+        g.selectSlot(bySlot('magic_staff')); // 補正に装備（この間は空の updateEquipHud 差し替えの影響を受けない）
         g.updateEquipHud();
 
         // ストックの表示は、画面側（js/playUi.js）が onStockChange に登録した関数で描く。選択・変更のたびに呼ばれる
         let drawn = 0;
         g.onStockChange = () => { drawn++; };
-        g.selectSlot(bySlot('iron_sword'));
+        g.selectSlot(bySlot('long_sword'));
         g.setStockSlot(8, null);
         assert.equal(drawn, 2, '選択・変更のたびに、描き直しが呼ばれる');
         g.updateEquipHud();

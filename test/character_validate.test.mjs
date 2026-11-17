@@ -23,7 +23,7 @@ const good = () => ({
         vitals: { hp: 96, mp: 40 }, gold: 1240, exp: 3580,
         inventory: { fists: 1 },
         equipment: { weapon: { id: 'dagger', weight: 5 }, armor: 'leather_armor', helm: null, shield: null, accessory: null },
-        stock: { slots: ['dagger', null, null, 'fire', 'apprentice_staff', null, null, null, null], melee: 0, focus: 4, magic: 3 },
+        stock: { slots: ['dagger', null, null, 'fire', 'magic_staff', null, null, null, null], melee: 0, focus: 4, magic: 3 },
         magics: ['fire', 'magic_bolt'], autoUse: {},
         quest: { current: { id: 'herb_01', acceptedAt: 100, place: '城下町の宿屋', progress: 3 }, done: [] },
         world: { gameTime: 5000, chests: { 'city:chest_1': 4000 }, bosses: {} },

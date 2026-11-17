@@ -48,6 +48,7 @@ export const equipmentMethods = {
             this.player.selMagic = slot;
         } else {
             const cls = this.weaponClasses[item.weaponClass];
+            if (!this.canCarry(item)) { this.addPopup('重すぎて装備できない', '#f87171'); return; }   // 筋力で持てる重さを超える（8.1）
             if (cls?.attack === 'melee') this.player.selMelee = slot;
             else if (cls?.attack === 'cast') this.player.selFocus = (this.player.selFocus === slot) ? null : slot;
             else return;
@@ -95,7 +96,7 @@ export const equipmentMethods = {
         const item = itemId && this.items[itemId];
         if (item) {
             if (this.isMagicItem(item)) { if (p.selMagic === null) p.selMagic = slot; }
-            else if (this.weaponClasses[item.weaponClass]?.attack === 'melee') { if (p.selMelee === null) p.selMelee = slot; }
+            else if (this.weaponClasses[item.weaponClass]?.attack === 'melee') { if (p.selMelee === null && this.canCarry(item)) p.selMelee = slot; }
         }
         this.updateEquipHud();
         return true;

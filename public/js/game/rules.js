@@ -133,6 +133,28 @@ export function critRate(defs, job, weapon, weight, str) {
     return weight <= str * defs.combat.lightWeaponMaxRatio ? c.thiefFamily : c.normal * c.heavyThiefPenaltyFactor;
 }
 
+/**
+ * 攻撃 1 回の結果（ミス → 1 ゾロ → クリティカル → リトライクリティカル の順）。{ kind: 'miss' | 'fumble' | 'normal' | 'crit', damage }
+ *   ctx = { weapon, weight, lv, job, str, dex }。forceCrit は、必ずクリティカル（ミスもしない。「半ずらし」の無傷クリティカル）。noMiss は、ミスの判定をしない（弓など）。
+ *   クリティカルのダメージは、ダメージ判定の 1.5 倍。リトライ（職業ごとの回数）は、その都度ダメージ判定をして合算する。出なければ、通常ダメージを加えて終わる。
+ */
+export function resolveAttack(defs, ctx, { forceCrit = false, noMiss = false } = {}, rng = Math.random) {
+    const { weapon, weight, lv, job, str, dex } = ctx;
+    if (!forceCrit && !noMiss && rng() < missRate(defs, dex, lv)) return { kind: 'miss', damage: 0 };
+    const first = rollAttack(defs, weapon, weight, lv, job, rng);
+    if (first.fumble) return { kind: 'fumble', damage: first.damage };
+    const p = critRate(defs, job, weapon, weight, str);
+    if (!forceCrit && rng() * 100 >= p) return { kind: 'normal', damage: first.damage };
+    const mult = defs.combat.critDamageMultiplier;
+    let total = Math.floor(first.damage * mult);
+    for (let i = 0; i < (job?.retryCrit || 0); i++) {
+        const r = rollAttack(defs, weapon, weight, lv, job, rng);
+        if (!r.fumble && rng() * 100 < p) total += Math.floor(r.damage * mult);
+        else { total += r.damage; break; }
+    }
+    return { kind: 'crit', damage: total };
+}
+
 // ---- 防御・回避 ----
 
 /** 防具 1 回の被弾分の防御。parts = [{ kind: 'armor'|'helm'|'shield', weight, dice }]。部位ごとにダイスを振り、係数で合算する。{ defense, fumble（どれかが 1 ゾロ）} */

@@ -249,8 +249,6 @@ export const movementMethods = {
         // 装備中の近接武器（未装備なら素手）のクラスが、突進攻撃のダメージ・間隔・ノックバック・スタン・エフェクトを決める
         const weapon = this.getMeleeItem();
         const cls = (weapon && this.weaponClasses[weapon.weaponClass]) || null;
-        const damageScale = (cls ? cls.damageScale : 1.0) * (weapon?.powerScale ?? 1);
-        const randomBonus = weapon?.randomBonus ?? 3;
         this.player.attackCooldown = cls ? cls.cooldown : 0.22; // Quick hit intervals for "bokosuka"
 
         // Player forward vector
@@ -285,11 +283,11 @@ export const movementMethods = {
         const knockScale = cls ? cls.knockback : 1.0;
         const heavySound = cls ? cls.sound === 'heavy' : false;
 
-        if ((isHalfOffset || isCharging)) this.useStamina(this.staminaCost('attack', weapon?.weight ?? 10));   // 攻撃 1 回の消費（当たっても外れても）
+        if ((isHalfOffset || isCharging)) this.useStamina(this.staminaCost('attack', this.weaponWeight(weapon)));   // 攻撃 1 回の消費（当たっても外れても）
 
         if (isHalfOffset) {
             // CRITICAL HALF-OFFSET HIT: Player takes 0 damage, monster takes full + bonus damage!
-            const damage = Math.floor(this.playerAttackPower() * 1.5 * damageScale + Math.random() * 5);
+            const damage = this.rollWeaponAttack(weapon, { forceCrit: true }).damage;   // 半ずらしは、必ずクリティカル（ミスもしない）
             this.sound.playAttack(true);
             const isDead = monster.takeDamage(damage, { x: nx, z: nz }, knockScale);
             applyWeaponEffects(isDead, true);
@@ -301,16 +299,23 @@ export const movementMethods = {
             if (isDead) this.gainExp(monster.exp);
         } else if (isCharging) {
             // Normal charge: Mutual damage (player takes half, enemy takes standard)
-            const pDmg = Math.floor(this.playerAttackPower() * damageScale + Math.random() * randomBonus);
+            const atk = this.rollWeaponAttack(weapon);   // ミス・1 ゾロ・クリティカルは、式（rules.js）で決まる
+            const pDmg = atk.damage;
             if (monster.isDashing) monster.dashHit = true;   // 突進が当たった（よけられていない）
             const mDmg = Math.floor(monster.attackPower * 0.5 * (monster.isDashing ? 1.5 : 1) * (monster.hitScale ?? 1));
+            const crit = atk.kind === 'crit';
 
             this.sound.playAttack(heavySound);
-            const isDead = monster.takeDamage(pDmg, { x: nx, z: nz }, knockScale);
-            applyWeaponEffects(isDead, false);
-            this.playerHitFeedback({ crit: false, killed: isDead, heavy: heavySound });
+            let isDead = false;
+            if (atk.kind !== 'miss') {   // ミスは、ダメージもクリティカルもない（相手の反撃は受ける）
+                isDead = monster.takeDamage(pDmg, { x: nx, z: nz }, knockScale);
+                applyWeaponEffects(isDead, crit);
+                this.playerHitFeedback({ crit, killed: isDead, heavy: heavySound });
+            }
             this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz), 1.0, monster);
-            this.addPopup(monster.lastBlocked ? 'ガード!' : `ボコッ! -${pDmg}`, monster.lastBlocked ? '#94a3b8' : '#ffffff', monster.x, monster.z);
+            const label = atk.kind === 'miss' ? 'ミス!' : atk.kind === 'fumble' ? `ファンブル -${pDmg}` : crit ? `クリティカル! -${pDmg}` : `ボコッ! -${pDmg}`;
+            const guarded = atk.kind !== 'miss' && monster.lastBlocked;
+            this.addPopup(guarded ? 'ガード!' : label, guarded || atk.kind === 'miss' ? '#94a3b8' : crit ? '#fbbf24' : '#ffffff', monster.x, monster.z);
             this.notifyEnemyEngaged(monster);
 
             if (isDead) this.gainExp(monster.exp);

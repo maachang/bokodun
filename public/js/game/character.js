@@ -40,5 +40,44 @@ export const characterMethods = {
         p.runSpeed = sp.run * TEST_RUN_SPEED_SCALE;   // テスト用の倍率を掛けてある
         if (fill) { p.hp = p.maxHp; p.mp = p.maxMp; p.stamina = p.maxStamina; }
         else { p.hp = Math.min(p.hp, p.maxHp); p.mp = Math.min(p.mp, p.maxMp); p.stamina = Math.min(p.stamina, p.maxStamina); }
+    },
+
+    // ---- 武器・魔法（式は rules.js）----
+
+    // 武器の重さ。購入時に選べる範囲（weightRange）のうち、筋力で持てる最大（鈍器は 1.5 倍）。重さの選択（購入）ができるまでの仮の決め方
+    weaponWeight(item) {
+        const [lo, hi] = item.weightRange ?? [1, 1];
+        const limit = R.equipWeightLimit(this.rules, this.player.abilities.str, item.blunt);
+        return Math.max(lo, Math.min(hi, Math.floor(limit)));
+    },
+
+    // 筋力で持てるか（最小の重さが、持てる上限以下）
+    canCarry(item) {
+        if (!this.rules || !item?.weightRange) return true;
+        return item.weightRange[0] <= R.equipWeightLimit(this.rules, this.player.abilities.str, item.blunt);
+    },
+
+    // 攻撃 1 回の結果。{ kind, damage }。呪いの間は、ダメージが下がる（curse の scale）
+    rollWeaponAttack(weapon, opt = {}) {
+        const p = this.player, d = this.rules, ab = p.abilities;
+        const r = R.resolveAttack(d, { weapon, weight: this.weaponWeight(weapon), lv: p.level, job: d.jobs[p.job], str: ab.str, dex: ab.dex }, opt);
+        const c = p.status?.curse;
+        if (c?.t > 0) r.damage = Math.floor(r.damage * (c.scale ?? 0.7));
+        return r;
+    },
+
+    // 魔法の消費 MP・失敗率・威力（杖・ロッドを持っていれば、杖のダイスの結果を攻撃値に足す）
+    spellCost(spell) {
+        const p = this.player;
+        return R.magicCost(this.rules, spell, p.abilities.intel, p.level, this.rules.jobs[p.job]);
+    },
+    spellFailRate(spell) {
+        const p = this.player;
+        return R.magicFailRate(this.rules, spell, p.abilities.intel, p.level, this.rules.jobs[p.job]);
+    },
+    rollSpellPower(spell) {
+        const p = this.player, focus = this.getFocusItem();
+        const rod = focus?.dice ? R.rollDice(focus.dice.n, focus.dice.m).total : 0;
+        return R.rollMagicPower(this.rules, spell, p.level, this.rules.jobs[p.job], rod);
     }
 };
