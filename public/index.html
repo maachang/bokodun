@@ -781,9 +781,13 @@
 
         let gameInstance = null;
         window.addEventListener('DOMContentLoaded', async () => {
+            // ログインしていなければ、ログイン画面へ（匿名ユーザーはなし。原則ユーザー登録）
+            const me = await jhtml.api.get('/api/me').catch(() => ({ authenticated: false }));
+            if (!me.authenticated) { location.replace('/login.html'); return; }
             await applyLayout(); // 画面レイアウト（public/data/layout.json）を組み立ててから、ゲームを始める
             gameInstance = new GameEngine();
             window.game = gameInstance;
+            gameInstance.account = { email: me.email, csrfToken: me.csrfToken };   // ログイン中のユーザー。保存などの状態を変える API に、CSRF トークンを付ける
             initPlayUi(gameInstance);   // メニュー・ダイアログ・一時停止・画面の拡大縮小
             await gameInstance.init();
             gameInstance.start();

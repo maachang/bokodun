@@ -1,7 +1,7 @@
 -- RPG キャラクター関連テーブル（仕様: docs/character-spec.md 9 章）
 -- 保存先: SQLite3（data/rpg.db を想定）
 -- 全テーブルに user_id を持たせ、$db.forUser でスコープ強制してアクセスする（BOLA/IDOR対策）。
--- user_id は当面、匿名セッション（session.js）で発行した ID を使う。
+-- user_id は、ログインしたユーザーの users.id（schema/users.sql）。匿名ユーザーはなし。原則ユーザー登録。
 --
 -- 方針: 冒険者の中身は JSON（data 列）で持つ。仕様（武器・魔法・敵・数値）が暫定の間は、項目を足しても表を変えずに済むため。
 --       検索・管理に要るものだけ、別の列に出す（level・guild_id）。JSON の中身は validates/character.js で検証する。

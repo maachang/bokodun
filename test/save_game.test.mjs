@@ -50,6 +50,7 @@ test('保存して読み込むと、冒険者が元に戻る（能力値・職�
     a.player.jobs = { primary: 'sorcerer', sub: 'fighter', levels: { fighter: 12, sorcerer: 8, apothecary: 4 }, expStock: 123 };
     a.syncJob();
     a.player.equip = { armor: 'chain_mail', helm: 'iron_helm', shield: null };
+    a.player.magics.push('high_heal');
     a.setStockSlot(1, 'high_heal');
     a.recomputeStats(true);
     a.player.hp = 9; a.player.mp = 11.7; a.player.gold = 500;

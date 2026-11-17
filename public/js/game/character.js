@@ -18,6 +18,7 @@ export const characterMethods = {
         p.jobs = { primary: def.jobs.primary, sub: def.jobs.sub ?? null, levels: { ...def.jobs.levels }, expStock: def.jobs.expStock ?? 0 };   // 職業（第一・サブ・レベル・経験値のストック）
         this.syncJob();   // 戦闘の式が見る player.job・player.level
         p.equip = { armor: null, helm: null, shield: null, ...def.equip };   // 防具（鎧・兜・盾）
+        p.magics = [...(def.magics ?? [])];   // 覚えている魔法（呪文の ID）。ストックに入れられるのは、覚えた呪文だけ
     },
 
     // 最大 HP・MP・移動速度・最大スタミナを、能力値・職業・レベルから決め直す。fill が true なら、HP・MP・スタミナを満タンにする（そうでなければ、最大値を超えないように丸める）
@@ -107,5 +108,30 @@ export const characterMethods = {
         }
         this.particles.spawnBurst(p.x, 1.0, p.z, parseInt(spell.color.slice(1), 16), 14, 3.0);
         this.sound.playHeal?.();
+    },
+
+    // ---- 魔法を覚える（魔法ギルドで買う／宝箱などで取得する）----
+    isSpellLearned(id) {
+        return this.player.magics.includes(id);
+    },
+
+    // 魔法を覚える。{ ok, message }
+    learnSpell(id) {
+        const it = this.items[id];
+        if (!it || it.kind !== 'spell') return { ok: false, message: '覚えられません' };
+        if (this.isSpellLearned(id)) return { ok: false, message: `${it.name}は、すでに覚えています` };
+        this.player.magics.push(id);
+        this.updateEquipHud();
+        return { ok: true, message: `${it.name}を覚えました` };
+    },
+
+    // 魔法ギルドで買う（good = shops.json の goods の 1 件。spellId と price）。買い切りで、売れない
+    buySpell(good) {
+        const p = this.player;
+        if (this.isSpellLearned(good.spellId)) return { ok: false, message: `${good.name}は、すでに覚えています` };
+        if ((p.gold ?? 0) < good.price) return { ok: false, message: `お金が足りません（${good.price}G・所持 ${p.gold ?? 0}G）` };
+        const r = this.learnSpell(good.spellId);
+        if (r.ok) p.gold -= good.price;
+        return r.ok ? { ok: true, message: `${good.name}を買って、覚えました（${good.price}G）` } : r;
     }
 };

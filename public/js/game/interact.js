@@ -144,6 +144,10 @@ export const interactMethods = {
                 this.player.hp = Math.min(this.player.maxHp, this.player.hp + healAmt);
                 this.particles.spawnBurst(this.player.x, 1.0, this.player.z, 0x22c55e, 14, 3.0);
                 this.addPopup(`宝箱発見！ HP薬で+${healAmt}回復！`, '#22c55e');
+            } else if (lootItem.type === 'spell') {   // 魔法の取得（lootTable の { type: 'spell', spellId }）。すでに覚えていれば、何も起きない
+                const r = this.learnSpell(lootItem.spellId);
+                this.particles.spawnBurst(this.player.x, 1.0, this.player.z, 0xa78bfa, 14, 3.0);
+                this.addPopup(r.ok ? `宝箱発見！ ${r.message}！` : `宝箱発見！ ${r.message}`, '#a78bfa');
             } else if (lootItem.type === 'mp_potion') {
                 const healAmt = lootItem.heal || 30;
                 this.player.mp = Math.min(this.player.maxMp, this.player.mp + healAmt);
@@ -181,7 +185,9 @@ export const interactMethods = {
             const all = shop.goods ?? [], pages = Math.max(1, Math.ceil(all.length / SHOP_PAGE_SIZE));
             m.page = Math.min(m.page ?? 0, pages - 1);
             const goods = all.slice(m.page * SHOP_PAGE_SIZE, (m.page + 1) * SHOP_PAGE_SIZE)
-                .map(g => ({ label: `${g.name}　${g.price}G`, act: () => { m.note = `（ダミー）${g.name}の購入は準備中です`; } }));
+                .map(g => g.spellId
+                    ? { label: `${g.name}　${g.price}G${this.isSpellLearned(g.spellId) ? '（覚えた）' : ''}`, act: () => { m.note = this.buySpell(g).message; } }   // 魔法は、買って覚える
+                    : { label: `${g.name}　${g.price}G`, act: () => { m.note = `（ダミー）${g.name}の購入は準備中です`; } });
             const turn = (d) => () => { m.page += d; m.index = 0; m.note = ''; };
             if (m.page > 0) goods.push({ label: '◀ 前のページ', act: turn(-1) });
             if (m.page < pages - 1) goods.push({ label: '次のページ ▶', act: turn(1) });

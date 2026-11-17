@@ -202,7 +202,9 @@ export const monsterStageMethods = {
 
                 const isArrow = (this.shootType === 'arrow');
                 const projSpeed = this.shootSpeed ?? (isArrow ? 12 : 8); // Arrows fly fast
-                const projDmg = this.shootDamage ?? (isArrow ? 10 : 8);
+                // 威力: 近接と同じ攻撃（敵のダイス）を撃つたびに振って、倍率を掛ける。ダイスも倍率もなければ、固定の威力
+                const rolled = (this.shootMult != null && this.attackRollHook) ? this.attackRollHook(this) : null;
+                const projDmg = rolled !== null ? Math.max(1, Math.floor(rolled * this.shootMult)) : (this.shootDamage ?? (isArrow ? 10 : 8));
                 const maxDist = isArrow ? (this.maxArrowDistance || 13) : 0;
 
                 const proj = new Projectile(this.x, this.z, dirX, dirZ, false, projSpeed, projDmg, {

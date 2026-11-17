@@ -35,5 +35,11 @@
     "armor": "leather_armor",
     "helm": "leather_cap",
     "shield": null
-  }
+  },
+  "magics": [
+    "magic_bolt",
+    "fire",
+    "explosion",
+    "spread"
+  ]
 }

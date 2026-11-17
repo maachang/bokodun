@@ -88,8 +88,16 @@ export const equipmentMethods = {
             console.warn(`未定義のアイテムです: ${itemId} （game.listItems() で一覧）`);
             return false;
         }
+        if (itemId !== null && this.items[itemId].kind === 'spell' && !this.isSpellLearned(itemId)) {
+            console.warn(`まだ覚えていない魔法です: ${itemId}`);
+            return false;
+        }
         if (itemId !== null && !this.isStockable(this.items[itemId])) {
             console.warn(`ストックに入れられません（武器・杖・魔法・弓のみ）: ${itemId}`);
+            return false;
+        }
+        if (itemId !== null && p.stock.some((id, i) => i !== slot && id === itemId)) {   // 同じものは、2 枠に入れない（保存データの規則と同じ）
+            console.warn(`すでにストックに入っています: ${itemId}`);
             return false;
         }
         p.stock[slot] = itemId;

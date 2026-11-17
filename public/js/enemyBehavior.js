@@ -13,7 +13,7 @@
 //     cat           { range, height, rest, flurry, flurryScale, away, cool } 猫系: 隠密・低く長く跳ぶ・近くで連続攻撃・ヒットアンドアウェイ
 //     relentless    { speed, joinRadius } 一定の速さで追跡をやめない・仲間が合流する（狼）
 //     territory     { radius, mode, leash } 縄張り（guard=縄張りに入ると攻撃 / patrol=範囲を巡回、入ると攻撃 / roam=住民のようにうろつき、攻撃されたときだけ追う）
-//     shoot         { type, range, cooldown, speed, damage, mult } 遠距離攻撃（mult: 攻撃力に対する威力の倍率。damage を省いたとき、attackPower × mult）
+//     shoot         { type, range, cooldown, speed, damage, mult } 遠距離攻撃（mult: 近接の攻撃（敵の攻撃のダイス）に対する威力の倍率。撃つたびに、攻撃を振って mult を掛ける。damage だけを指定すると、固定の威力。ダイスのない敵は、damage（attackPower × mult）を使う）
 //     turret        true で固定砲台（動かない・待ち伏せしない・ノックバックしない。向きだけプレイヤーへ回り、射程に入ると撃ち続ける）。能力 turret でも同じ
 //     immune        魔法（弾・爆発）の、効かない属性の配列（fire / ice / holy / ... と、全属性を表す 'elemental'）。無属性（none）の魔法と、物理攻撃（剣・矢など）は、効く
 
@@ -39,13 +39,13 @@ function deriveShoot(def, p, ab) {
         p.shoot = { type: 'magic', range: 14, cooldown: 3, speed: 8, damage: null, ...def.shoot };
         if (p.shoot.damage == null && def.shoot.mult != null) p.shoot.damage = Math.max(2, Math.round((def.attackPower ?? 10) * def.shoot.mult));
     }
-    else if (def.canShoot) p.shoot = { type: def.shootType || 'magic', range: def.shootRange ?? 15, cooldown: def.shootCooldown ?? 3, speed: null, damage: null };
+    else if (def.canShoot) p.shoot = { type: def.shootType || 'magic', range: def.shootRange ?? 15, cooldown: def.shootCooldown ?? 3, speed: null, damage: null, mult: 1 };   // 威力は、近接と同じ攻撃（ダイス）の 1 倍
     else {
         for (const [a, type, range, cooldown, speed, mult] of SHOOT_BY_ABILITY) {
-            if (ab.has(a)) { p.shoot = { type, range, cooldown, speed, damage: Math.max(4, Math.round((def.attackPower ?? 10) * mult)) }; break; }
+            if (ab.has(a)) { p.shoot = { type, range, cooldown, speed, damage: Math.max(4, Math.round((def.attackPower ?? 10) * mult)), mult }; break; }
         }
         // 飛びながら燃やす敵（ドラゴンフライなど）は、火の粉を吐く
-        if (!p.shoot && p.flying && ab.has('burn')) p.shoot = { type: 'breath_fire', range: 10, cooldown: 3.2, speed: 8, damage: Math.max(4, Math.round((def.attackPower ?? 10) * 0.7)) };
+        if (!p.shoot && p.flying && ab.has('burn')) p.shoot = { type: 'breath_fire', range: 10, cooldown: 3.2, speed: 8, damage: Math.max(4, Math.round((def.attackPower ?? 10) * 0.7)), mult: 0.7 };
     }
 }
 

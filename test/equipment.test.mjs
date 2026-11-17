@@ -69,6 +69,7 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
     g.setGearDefs(readJson('equipment.json'));
     g.staminaDef = readJson('combat.json').stamina;
     g.applyCharacterDef(playerDef);   // 人間・平均・ファイター Lv1
+    g.player.magics = Object.values(items).filter(i => i.kind === 'spell').map(i => i.id);   // テストでは、定義済みの呪文を全部覚えた状態（覚える仕組みは、test/magic_learn.test.mjs）
     g.player.abilities.str = 50;   // 重い武器（大剣など）も、筋力で持てるように（持てる重さの確認は、別のテスト）
     g.recomputeStats(true);
     g.player.mp = mp;
@@ -79,13 +80,20 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
 const spawn = (M, type, x, z) => new M.Monster(type, x, z, tex, enemyDefs[type]);
 // ストックの枠に入れて選択する（近接=突進用、杖・ロッド=魔法の補正。枠 0〜3 は近接武器、4 は杖。ここでは近接は 3 番、杖は 4 番を差し替える）
 const equip = (g, id) => {
+    const have = g.player.stock.indexOf(id);   // すでに入っているものは、その枠を選ぶ（同じものは 2 枠に入れられない）
+    if (have >= 0) { g.selectSlot(have); return; }
     const slot = weaponClasses[items[id].weaponClass].attack === 'melee' ? 3 : 4;
     g.setStockSlot(slot, id);
     g.selectSlot(slot);
 };
 // 魔法・弓は、ストックの 6〜9 番（枠 5〜8。既定は呪文 4 つ）の、slot 番目（0〜3）を差し替えて選択する
 const MAGIC_BASE = 5;
-const magic = (g, id, slot = 0) => { g.setStockSlot(MAGIC_BASE + slot, id); g.selectMagic(MAGIC_BASE + slot); };
+const magic = (g, id, slot = 0) => {
+    const have = g.player.stock.indexOf(id);
+    if (have >= 0) { g.selectMagic(have); return; }
+    g.setStockSlot(MAGIC_BASE + slot, id);
+    g.selectMagic(MAGIC_BASE + slot);
+};
 // 前進入力で敵に突進した 1 回分の判定を実行する
 const bump = (g, m) => {
     const dx = m.x - g.player.x, dz = m.z - g.player.z;
@@ -232,8 +240,11 @@ test('ストック（9 枠: 数字キー 1〜9・クリック）', async (t) => 
         const { g } = makeGame(M);
         const warn = console.warn; console.warn = () => {};
         try {
-            assert.equal(g.setStockSlot(5, 'magic_bolt'), true);
-            assert.equal(g.getMagicItem(5).id, 'magic_bolt');
+            assert.equal(g.setStockSlot(5, 'magic_bolt'), false, '同じものは、2 枠に入れられない（すでに枠 9 にある）');
+            assert.equal(g.getMagicItem(5).id, 'fire', '断られたときは、中身は変わらない');
+            assert.equal(g.setStockSlot(8, 'magic_bolt'), true, '同じ枠に同じものを入れ直すのは、よい');
+            assert.equal(g.setStockSlot(5, 'heal'), true);
+            assert.equal(g.getMagicItem(5).id, 'heal');
             assert.equal(g.setStockSlot(8, 'short_bow'), true);
             assert.equal(g.getMagicItem(8).id, 'short_bow', '弓は、魔法の側');
             assert.equal(g.setStockSlot(0, 'fire'), true, '武器の枠にも、呪文を入れられる（枠の種類はない）');
@@ -250,7 +261,7 @@ test('ストック（9 枠: 数字キー 1〜9・クリック）', async (t) => 
         assert.equal(g.setStockSlot(0, null), true);   // 突進用の枠を空にする
         assert.equal(g.player.selMelee, null);
         assert.equal(g.getMeleeItem().id, 'fists', '未選択は素手');
-        assert.equal(g.setStockSlot(0, 'mace'), true);
+        assert.equal(g.setStockSlot(0, 'club'), true);
         assert.equal(g.player.selMelee, 0, '近接の選択がなかったので、入れたものを選ぶ');
         assert.equal(g.setStockSlot(1, 'dagger'), true);
         assert.equal(g.player.selMelee, 0, 'すでに選んでいるときは、変わらない');

@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ユーザー登録</title>
+<link rel="stylesheet" href="/auth.css">
+</head>
+<body>
+<main class="card">
+    <h1>ユーザー登録</h1>
+    <p class="lead">メールアドレスとパスワードで登録します。冒険者のデータは、このアカウントに保存されます。</p>
+    <form id="form" novalidate>
+        <label for="email">メールアドレス</label>
+        <input id="email" name="email" type="email" autocomplete="username" required>
+        <label for="password">パスワード</label>
+        <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required>
+        <p class="hint">8 文字以上、128 文字以内</p>
+        <label for="password2">パスワード（もう一度）</label>
+        <input id="password2" name="password2" type="password" autocomplete="new-password" required>
+        <button id="submit" type="submit">登録して、はじめる</button>
+        <p id="err" class="err" role="alert"></p>
+    </form>
+    <p class="alt">登録済みの方は <a href="/login.html">ログイン</a></p>
+</main>
+<script src="/jhtml.browser.js"></script>
+<script>
+    const { $, on, api, form } = jhtml;
+    on($('form'), 'submit', async (e) => {
+        e.preventDefault();
+        const btn = $('submit'), err = $('err'), v = form($('form'));
+        err.textContent = '';
+        if (v.password !== v.password2) { err.textContent = 'パスワードが、一致しません'; return; }
+        btn.disabled = true;
+        try {
+            await api.post('/api/register', { email: v.email, password: v.password });
+            location.replace('/');
+        } catch (ex) {
+            err.textContent = ex.data?.errors?.map((x) => x.message).join('\n') || ex.message;
+            btn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>

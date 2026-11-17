@@ -77,6 +77,7 @@ export class Monster {
             this.shootCooldown = sh.cooldown;
             this.shootSpeed = sh.speed;
             this.shootDamage = sh.damage;
+            this.shootMult = sh.mult ?? null;   // 威力の倍率（撃つたびに、近接と同じ攻撃のダイスを振って掛ける）
             if (!enemyDef.canShoot) this.shootTimer = Math.random() * 2;
         }
         

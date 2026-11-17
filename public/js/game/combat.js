@@ -234,6 +234,7 @@ export const combatMethods = {
         m.terrainBlock = (mm, x, z) => this.monsterTerrainBlocked(mm, x, z);   // 地上の敵は、崖・毒沼へ進まない
         m.summonHook = (owner, type, max) => this.summonMinion(owner, type, max);
         m.slamHook = (owner, pos, radius, mult) => this.slamAttack(owner, pos, radius, mult);
+        m.attackRollHook = (owner) => this.monsterAttackValue(owner);   // 遠距離攻撃の威力（攻撃のダイスを振る）
     },
 
     // 召喚: 敵（owner）が、仲間（type）を 1 体、近くに呼ぶ。呼んだ数（生きている手下）が max 以上なら、呼ばない

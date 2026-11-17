@@ -1,0 +1,96 @@
+// 魔法を覚える（魔法ギルドで買う・宝箱などで取得する）・覚えた魔法だけがストックに入る・保存
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import fs from 'node:fs';
+import path from 'node:path';
+import { copyGameModules } from './helpers/game.mjs';
+import { buildItems } from '../public/js/game/itemDefs.js';
+
+const D = (f) => JSON.parse(fs.readFileSync(path.join(process.cwd(), 'public/data', f), 'utf-8'));
+const playerDef = D('player.json'), shops = D('shops.json');
+const defs = { combat: D('combat.json'), table: D('damageTable.json').table, jobs: D('jobs.json').jobs, races: D('races.json').races };
+
+async function engine() {
+    const dir = copyGameModules('learn-');
+    const { GameEngine } = await import(path.join(dir, 'game.js'));
+    const g = Object.create(GameEngine.prototype);
+    g.player = { hp: 1, mp: 1, stamina: 1, status: {}, gold: 0, stock: [...playerDef.stock], selMelee: playerDef.selMelee, selFocus: playerDef.selFocus, selMagic: playerDef.selMagic };
+    g.items = buildItems(D('items.json'), D('equipment.json'), D('magic.json'));
+    g.weaponClasses = D('weaponClasses.json');
+    g.shops = shops;
+    g.addPopup = () => {};
+    g.updateEquipHud = () => {};
+    g.closeShopMenu = () => { g.shopMenu = null; };
+    g.setRules(defs.combat, defs.table, defs.jobs, defs.races, 99);
+    g.setGearDefs(D('equipment.json'));
+    g.applyCharacterDef(playerDef);
+    g.recomputeStats(true);
+    return g;
+}
+
+test('初期に覚えている魔法と、ストックに入れられる魔法', async () => {
+    const g = await engine();
+    assert.deepEqual(g.player.magics, ['magic_bolt', 'fire', 'explosion', 'spread']);
+    assert.equal(g.isSpellLearned('fire'), true);
+    assert.equal(g.isSpellLearned('heal'), false);
+    const warn = console.warn; console.warn = () => {};
+    try {
+        assert.equal(g.setStockSlot(1, 'heal'), false, '覚えていない魔法は、ストックに入れられない');
+        assert.equal(g.getSlotItem(1).id, 'long_sword', '中身は変わらない');
+        assert.equal(g.setStockSlot(1, 'club'), true, '武器は、覚える必要がない');
+    } finally { console.warn = warn; }
+    assert.equal(g.learnSpell('heal').ok, true);
+    assert.equal(g.setStockSlot(1, 'heal'), true);
+    assert.equal(g.learnSpell('heal').ok, false, 'すでに覚えている');
+    assert.equal(g.learnSpell('club').ok, false, '呪文ではない');
+});
+
+test('魔法ギルドで買う: お金が足りなければ断り、足りれば払って覚える（買い切り）', async () => {
+    const g = await engine();
+    const heal = shops.magic_guild.goods.find((x) => x.spellId === 'heal');
+    assert.equal(g.buySpell(heal).ok, false);
+    assert.match(g.buySpell(heal).message, /お金が足りません/);
+    assert.equal(g.isSpellLearned('heal'), false);
+    g.player.gold = 300;
+    const r = g.buySpell(heal);
+    assert.equal(r.ok, true);
+    assert.equal(g.player.gold, 300 - heal.price);
+    assert.equal(g.isSpellLearned('heal'), true);
+    assert.equal(g.buySpell(heal).ok, false, '2 回は買えない');
+    assert.equal(g.player.gold, 300 - heal.price, 'お金は減らない');
+});
+
+test('店のメニューで、魔法を買える。品揃えは店ごとの goods で決まり、上級は店で売らない', async () => {
+    const g = await engine();
+    const m = g.shopMenu = { shopId: 'magic_guild', screen: 'buy', page: 0, index: 0, note: '' };
+    g.player.gold = 1000;
+    const labels = () => g.shopMenuChoices().map((c) => c.label);
+    assert.ok(labels().some((l) => l.startsWith('ヒール')));
+    assert.ok(!labels().some((l) => l.startsWith('爆発火球') || l.startsWith('ハイヒール') || l.startsWith('ハイ・リフレッシュ')), '上級（tier high）は、店で売らない');
+    const i = labels().findIndex((l) => l.startsWith('ヒール'));
+    g.shopMenuChoices()[i].act();
+    assert.match(m.note, /買って、覚えました/);
+    assert.ok(labels().find((l) => l.startsWith('ヒール')).includes('（覚えた）'));
+    const magic = D('magic.json').spells;
+    for (const gd of shops.magic_guild.goods) assert.notEqual(magic[gd.spellId].tier, 'high', `${gd.spellId}: 店の品は、上級ではない`);
+});
+
+test('宝箱などで取得する（lootTable の spell）。保存・読み込みで、覚えた魔法が戻る', async () => {
+    const a = await engine();
+    const r = a.learnSpell('high_heal');
+    assert.equal(r.ok, true);
+    a.setStockSlot(1, 'high_heal');
+    const saved = JSON.parse(JSON.stringify(a.buildSaveData()));
+    assert.ok(saved.magics.includes('high_heal'));
+    const b = await engine();
+    assert.equal(b.isSpellLearned('high_heal'), false);
+    b.applySaveData(saved);
+    assert.equal(b.isSpellLearned('high_heal'), true);
+    assert.equal(b.player.stock[1], 'high_heal');
+    // 覚えていない魔法がストックにある保存データは、その枠を空きにする
+    const c = await engine();
+    c.applySaveData({ magics: ['fire'], stock: { slots: [null, 'heal', 'fire', null, null, null, null, null, null], magic: 2 } });
+    assert.deepEqual(c.player.magics, ['fire']);
+    assert.equal(c.player.stock[1], null);
+    assert.equal(c.player.stock[2], 'fire');
+});

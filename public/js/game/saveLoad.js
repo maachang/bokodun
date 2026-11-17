@@ -1,5 +1,5 @@
 // 冒険者の保存・読み込み（サーバーの /api/character とのやりとり）。GameEngine のメソッド（this は GameEngine）。
-// 保存するのは、冒険者の名前・種族、能力値、職業（第一・サブ・レベル・経験値のストック）、HP・MP、所持金、防具、ストック（9 枠と選択）、覚えた魔法。
+// 保存するのは、冒険者の名前・種族、能力値、職業（第一・サブ・レベル・経験値のストック）、HP・MP、所持金、防具、ストック（9 枠と選択）、覚えた魔法（買う・取得で増える）。
 //   データの形は、保存データの仕様（docs/character-spec.md 9-3。検証は validates/character.js）。位置は保存しない（再開はギルド）。
 //   まだ保存しない項目: 宝箱・ボス・ゲーム内時間・クエスト・ギルドの預かり・プレイ時間（つながっていない仕組み）。
 // 保存の場所は、冒険者ギルド（セーブ）。起動時に、保存済みなら読み込む（なければ player.json の初期値のまま）。
@@ -19,7 +19,7 @@ export const saveLoadMethods = {
         const p = this.player;
         p.stock = Array.from({ length: STOCK_SIZE }, (_, i) => {
             const id = st.slots[i];
-            return (id && this.isStockable(this.items[id])) ? id : null;
+            return (id && this.isStockable(this.items[id]) && (this.items[id].kind !== 'spell' || this.isSpellLearned(id))) ? id : null;
         });
         const pick = (idx, ok) => (Number.isInteger(idx) && p.stock[idx] && ok(this.items[p.stock[idx]])) ? idx : null;
         const attackOf = (it) => this.weaponClasses[it.weaponClass]?.attack;
@@ -32,7 +32,6 @@ export const saveLoadMethods = {
     // 保存データ（data）をつくる。HP・MP は、整数にして保存する（MP には端数がありうる）
     buildSaveData() {
         const p = this.player;
-        const spells = Object.values(this.items).filter((i) => i.kind === 'spell').map((i) => i.id);   // 仮: 覚える仕組みができるまで、定義済みの呪文は全部「覚えた」扱い
         this.characterCreatedAt ??= new Date().toISOString();
         return {
             profile: { name: this.characterName || DEFAULT_NAME, race: p.race, createdAt: this.characterCreatedAt },
@@ -42,7 +41,7 @@ export const saveLoadMethods = {
             gold: Math.floor(p.gold ?? 0),
             equipment: { armor: p.equip?.armor ?? null, helm: p.equip?.helm ?? null, shield: p.equip?.shield ?? null, accessory: null },
             stock: this.buildStockSave(),
-            magics: spells
+            magics: [...p.magics]
         };
     },
 
@@ -61,6 +60,7 @@ export const saveLoadMethods = {
             this.syncJob();
         }
         if (isInt(data.gold, 0, Number.MAX_SAFE_INTEGER)) p.gold = data.gold;
+        if (Array.isArray(data.magics)) p.magics = [...new Set(data.magics)].filter((id) => this.items[id]?.kind === 'spell');   // 覚えた魔法（定義にあるものだけ）
         this.applyStockSave(data.stock);
         const eq = data.equipment ?? {};
         p.equip = Object.fromEntries(['armor', 'helm', 'shield'].map((k) => [k, (eq[k] && this.gearDef(k, eq[k]) && this.canWear(this.gearDef(k, eq[k]))) ? eq[k] : null]));
@@ -84,8 +84,23 @@ export const saveLoadMethods = {
             this.characterName = res.character.name;
             return this.applySaveData(res.character.data);
         } catch (e) {
+            if (e.status === 401) { location.replace('/login.html'); return false; }   // ログインが切れている
             console.warn('冒険者の読み込みに失敗しました（初期値で始めます）:', e.message);
             return false;
+        }
+    },
+
+    // ログイン中のユーザーへの、状態を変える API（POST）。CSRF トークンを付ける。トークンが合わなければ（別のタブでログインし直したなど）、取り直して 1 回だけやり直す
+    async postAuthed(url, body) {
+        const send = () => window.jhtml.api.post(url, body, { headers: { 'X-CSRF-Token': this.account?.csrfToken ?? '' } });
+        try {
+            return await send();
+        } catch (e) {
+            if (e.status !== 403 || !e.data?.csrf) throw e;   // CSRF の失敗だけ、取り直す（パスワード違いなどは、そのまま）
+            const me = await window.jhtml.api.get('/api/me');
+            if (!me.authenticated) { const err = new Error('ログインが切れています'); err.status = 401; throw err; }
+            this.account = { email: me.email, csrfToken: me.csrfToken };
+            return send();
         }
     },
 
@@ -93,11 +108,12 @@ export const saveLoadMethods = {
     async saveCharacter() {
         const body = { name: this.characterName || DEFAULT_NAME, status: 'creating', rev: this.saveRev ?? 1, data: this.buildSaveData() };
         try {
-            const res = await window.jhtml.api.post('/api/character', body);
+            const res = await this.postAuthed('/api/character', body);
             this.saveRev = res.rev;
             return { ok: true };
         } catch (e) {
             if (e.status === 409) return { ok: false, message: '別の画面で保存されています。読み込み直してください。' };
+            if (e.status === 401) return { ok: false, message: 'ログインの有効期限が切れました。別のタブでログインし直してから、もう一度セーブしてください（この画面のまま、続けられます）。' };
             const detail = e.data?.errors?.[0]?.message;   // 検証エラー（400）の、最初のメッセージ
             return { ok: false, message: detail || e.message || '保存に失敗しました。' };
         }

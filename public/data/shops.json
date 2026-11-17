@@ -1,5 +1,5 @@
 {
-  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。goods は販売一覧のダミー（買う処理は未実装）。道具屋は itemId で items.json と対応（名前・価格は items.json と同じ）。",
+  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。goods は販売一覧のダミー（買う処理は未実装）。道具屋は itemId で items.json と対応（名前・価格は items.json と同じ）。 魔法ギルドで買える魔法は、店ごとの goods で決まる（場所で違う）。上級（magic.json の tier が high）は、店では売らず、取得する（宝箱の spell など）。",
   "weapon_shop": {
     "name": "武器屋",
     "keeper": "weapon_keeper",
@@ -128,16 +128,6 @@
         "price": 470
       },
       {
-        "spellId": "explosion",
-        "name": "爆発火球",
-        "price": 900
-      },
-      {
-        "spellId": "high_heal",
-        "name": "ハイヒール",
-        "price": 960
-      },
-      {
         "spellId": "refresh",
         "name": "リフレッシュ",
         "price": 190
@@ -146,11 +136,6 @@
         "spellId": "energy_veil",
         "name": "エナジーヴェール",
         "price": 350
-      },
-      {
-        "spellId": "high_refresh",
-        "name": "ハイ・リフレッシュ",
-        "price": 780
       }
     ]
   },

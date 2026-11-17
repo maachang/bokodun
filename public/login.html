@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ログイン</title>
+<link rel="stylesheet" href="/auth.css">
+</head>
+<body>
+<main class="card">
+    <h1>ログイン</h1>
+    <p class="lead">メールアドレスとパスワードで、冒険を続けます。</p>
+    <form id="form" novalidate>
+        <label for="email">メールアドレス</label>
+        <input id="email" name="email" type="email" autocomplete="username" required>
+        <label for="password">パスワード</label>
+        <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <button id="submit" type="submit">ログイン</button>
+        <p id="err" class="err" role="alert"></p>
+    </form>
+    <p class="alt">はじめての方は <a href="/register.html">ユーザー登録</a></p>
+</main>
+<script src="/jhtml.browser.js"></script>
+<script>
+    const { $, on, api, form } = jhtml;
+    // すでにログインしていれば、ゲームへ
+    api.get('/api/me').then((me) => { if (me.authenticated) location.replace('/'); }).catch(() => {});
+    on($('form'), 'submit', async (e) => {
+        e.preventDefault();
+        const btn = $('submit'), err = $('err');
+        err.textContent = '';
+        btn.disabled = true;
+        try {
+            await api.post('/api/login', form($('form')));
+            location.replace('/');
+        } catch (ex) {
+            err.textContent = ex.data?.errors?.map((x) => x.message).join('\n') || ex.message;
+            btn.disabled = false;
+        }
+    });
+</script>
+</body>
+</html>

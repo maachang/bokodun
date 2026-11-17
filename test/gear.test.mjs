@@ -143,3 +143,25 @@ test('敵の攻撃は、攻撃のダイス（stats.attack）を振ってダメ�
     assert.equal(v, R.tableValue(defs, a.weight, a.dice.n * (1 + Math.floor(0.5 * a.dice.m)) + a.dice.k + R.levelBonus(defs, slime.stats.level, null)));
     assert.equal(g.monsterAttackValue({ stats: null, attackPower: 7 }), 7, 'stats がなければ、固定値');
 });
+
+test('敵の遠距離攻撃は、撃つたびに攻撃のダイスを振って、倍率を掛ける（ダイスがなければ固定の威力）', async () => {
+    const dir = copyGameModules('shoot-');
+    const { Monster } = await import(path.join(dir, 'entities.js'));
+    const tex = new Proxy({}, { get: () => ({}) });
+    const enemies = D('enemies.json');
+    const shootOnce = (id, hook) => {
+        const m = new Monster(id, 0, 0, tex, enemies[id]);
+        assert.equal(m.canShoot, true, `${id}: 撃つ敵`);
+        if (hook) m.attackRollHook = hook;
+        m.shootTimer = 0;
+        const projectiles = [];
+        m.updateShooting(6, 0.1, 6, 0, { floorY: 0 }, projectiles, null, null);
+        return { m, damage: projectiles[0]?.damage };
+    };
+    const archer = shootOnce('goblin_archer', () => 20);
+    assert.ok(archer.m.shootMult > 0);
+    assert.equal(archer.damage, Math.max(1, Math.floor(20 * archer.m.shootMult)));
+    assert.notEqual(shootOnce('goblin_archer', () => 40).damage, archer.damage, '振った攻撃が大きいほど、威力が大きい');
+    const fixedShot = shootOnce('goblin_archer', null);   // フックがない（ダイスなし）: 固定の威力
+    assert.equal(fixedShot.damage, fixedShot.m.shootDamage ?? 10);
+});

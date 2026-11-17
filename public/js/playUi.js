@@ -146,7 +146,7 @@ function initBodies(S) {
         : html`<div class="cell add" data-add="${i}">＋ 追加（${i + 1}）</div>`).join('') + '</div>';
     const pickBody = (slotNo) => {
         const used = new Set(game.player.stock.filter(Boolean));
-        const all = Object.values(game.items).filter(it => game.isStockable(it));
+        const all = Object.values(game.items).filter(it => game.isStockable(it) && (it.kind !== 'spell' || game.isSpellLearned(it.id)));   // 魔法は、覚えたものだけ
         const row = (it) => html`<div class="pick cols ${used.has(it.id) ? 'dis' : ''}" style="--c:1fr 7em 12em" data-id="${it.id}" data-slot="${slotNo}"><span>${it.name}</span><small>${used.has(it.id) ? '入っています' : ''}</small><small>${kindLabel(game, it)}　${itemDetail(game, it)}</small></div>`;
         return '<p>枠 ' + (slotNo + 1) + ' に入れる武器・魔法</p><div class="title">武器・杖</div>' + all.filter(it => !game.isMagicItem(it)).map(row).join('') + '<div class="title" style="margin-top:8px">魔法・弓</div>' + all.filter(it => game.isMagicItem(it)).map(row).join('');
     };
@@ -177,7 +177,20 @@ function initBodies(S) {
     };
     const itemBody = () => '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）。クリックで詳細</p>' + ITEMS.map((it, i) => html`<div class="pick cols" data-item="${i}"><span class="k">${it[1]}</span><span>${it[0]}</span><span class="n">${it[2]}</span></div>`).join('');
     const helpBody = () => '<p class="legend">操作の説明</p>' + jhtml.$('instructions').innerHTML + (jhtml.$('panel-hints') ? '<div style="margin-top:10px">' + jhtml.$('panel-hints').innerHTML + '</div>' : '');
-    S.bodies = { stock: stockBody, status: statusBody, equip: equipBody, item: itemBody, setting: settingBody, help: helpBody };
+    // アカウント: ログイン中のメールアドレス、ログアウト、パスワード変更、アカウント削除（匿名ユーザーはなし。原則ユーザー登録）
+    const accountBody = () => html`<p class="legend">ログイン中のアカウントの操作です。冒険者のデータは、このアカウントに保存されています。</p>
+        <div class="cols" style="--c:7em 1fr"><span class="k">メール</span><span>${game.account?.email ?? ''}</span></div>
+        <div style="margin:8px 0"><button data-acct="logout">ログアウト</button></div>
+        <div class="title" style="margin-top:12px">パスワードの変更</div>
+        <div class="cols" style="--c:9em 1fr"><span>現在のパスワード</span><input id="acctCur" type="password" autocomplete="current-password"></div>
+        <div class="cols" style="--c:9em 1fr"><span>新しいパスワード</span><input id="acctNew" type="password" autocomplete="new-password"></div>
+        <div style="margin:6px 0"><button data-acct="password">変更する</button>　<small>8 文字以上</small></div>
+        <div class="title" style="margin-top:12px">アカウントの削除</div>
+        <p class="legend">冒険者のデータも、すべて消えます（元に戻せません）。</p>
+        <div class="cols" style="--c:9em 1fr"><span>パスワード</span><input id="acctDel" type="password" autocomplete="current-password"></div>
+        <div style="margin:6px 0"><button data-acct="delete" style="color:#f87171">アカウントを削除する</button></div>
+        <p id="acctMsg" style="min-height:1.4em;color:#fbbf24"></p>`;
+    S.bodies = { stock: stockBody, status: statusBody, equip: equipBody, item: itemBody, setting: settingBody, account: accountBody, help: helpBody };
 
     on(E.winBody, 'click', '[data-rm]', (e, t) => { game.setStockSlot(Number(t.dataset.rm), null); S.openWin('stock'); });
     on(E.winBody, 'click', '[data-detail]', (e, t) => {
@@ -189,6 +202,26 @@ function initBodies(S) {
     on(E.winBody, 'click', '[data-add]', (e, t) => { S.setBody('<h3>ストック</h3>' + pickBody(Number(t.dataset.add))); S.setBack(() => S.openWin('stock')); });
     on(E.winBody, 'click', '.pick[data-slot]:not(.dis)', (e, t) => { game.setStockSlot(Number(t.dataset.slot), t.dataset.id); S.openWin('stock'); });
     on(E.winBody, 'click', '[data-keyset]', (e, t) => { S.keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
+    on(E.winBody, 'click', '[data-acct]', async (e, t) => {
+        const msg = (text) => { const m = jhtml.$('acctMsg'); if (m) m.textContent = text; };
+        const val = (id) => jhtml.$(id)?.value ?? '';
+        const errText = (ex) => ex.data?.errors?.map(x => x.message).join(' / ') || ex.message;
+        try {
+            if (t.dataset.acct === 'logout') {
+                await game.postAuthed('/api/logout', {});
+                location.replace('/login.html');
+            } else if (t.dataset.acct === 'password') {
+                const r = await game.postAuthed('/api/account', { action: 'password', current: val('acctCur'), next: val('acctNew') });
+                game.account.csrfToken = r.csrfToken;   // パスワードを変えると、セッション ID が変わる（トークンも変わる）
+                ['acctCur', 'acctNew'].forEach(id => { jhtml.$(id).value = ''; });
+                msg('パスワードを変更しました');
+            } else if (t.dataset.acct === 'delete') {
+                if (!window.confirm('アカウントと冒険者のデータを、すべて削除します。よろしいですか？')) return;
+                await game.postAuthed('/api/account', { action: 'delete', password: val('acctDel') });
+                location.replace('/login.html');
+            }
+        } catch (ex) { msg(errText(ex)); }
+    });
     on(E.winBody, 'click', '.pick[data-gk]:not(.dis)', (e, t) => { S.setBody('<h3>装備</h3>' + gearPickBody(t.dataset.gk)); S.setBack(() => S.openWin('equip')); });
     on(E.winBody, 'click', '.pick[data-gset]:not(.dis)', (e, t) => { game.equipGear(t.dataset.gset, t.dataset.gid || null); S.openWin('equip'); });
     on(E.winBody, 'click', '.pick[data-item]', (e, t) => { const it = ITEMS[Number(t.dataset.item)]; S.setBody(html`<h3>道具</h3><h3>${it[0]}</h3><p>${it[1]}${it[1] === '道具' ? '　所持 ' + it[2] + ' 個' : ''}</p><p>${it[3]}</p>`); S.setBack(() => S.openWin('item')); });
