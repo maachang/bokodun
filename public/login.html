@@ -15,10 +15,16 @@
         <input id="email" name="email" type="email" autocomplete="username" required>
         <label for="password">パスワード</label>
         <input id="password" name="password" type="password" autocomplete="current-password" required>
+        <div id="kwBox" hidden>
+            <label for="keyword">キーワード（ロックの解除）</label>
+            <input id="keyword" name="keyword" type="text" autocomplete="off">
+            <p class="hint">パスワードを続けて間違えて、ログインがロックされました。登録のときのキーワードを入れて、もう一度ログインすると、ロックを解除できます（待つだけでも、解除されます）。</p>
+        </div>
         <button id="submit" type="submit">ログイン</button>
         <p id="err" class="err" role="alert"></p>
     </form>
     <p class="alt">はじめての方は <a href="/register.html">ユーザー登録</a></p>
+    <p class="alt"><a href="/reset.html">パスワードを忘れたとき</a>（登録のときのキーワードで、再設定できます）</p>
 </main>
 <script src="/jhtml.browser.js"></script>
 <script>
@@ -35,6 +41,7 @@
             location.replace('/');
         } catch (ex) {
             err.textContent = ex.data?.errors?.map((x) => x.message).join('\n') || ex.message;
+            if (ex.data?.keywordUnlock) $('kwBox').hidden = false;   // ロック中: キーワードの欄を出す
             btn.disabled = false;
         }
     });

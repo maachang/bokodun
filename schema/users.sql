@@ -7,6 +7,12 @@ CREATE TABLE IF NOT EXISTS users (
   pw_salt    TEXT NOT NULL,
   pw_hash    TEXT NOT NULL,
   pw_iter    INTEGER NOT NULL,
+  -- パスワードの再設定に使う「キーワード」（登録のときに、必須で決める）。パスワードと同じく、ハッシュ化して持つ。メールを送らないため、これで本人を確かめる。
+  kw_salt    TEXT,
+  kw_hash    TEXT,
+  kw_iter    INTEGER,
+  kw_fails   INTEGER NOT NULL DEFAULT 0,        -- キーワードを、連続して間違えた回数（3 回で、再設定を凍結。正しければ 0 に戻る）
+  reset_frozen_until INTEGER NOT NULL DEFAULT 0, -- 再設定の凍結が解ける時刻（エポックミリ秒。凍結中でも、パスワードでのログインはできる）
   created_at TEXT NOT NULL,
   updated_at TEXT NOT NULL
 );

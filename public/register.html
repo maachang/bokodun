@@ -18,6 +18,9 @@
         <p class="hint">8 文字以上、128 文字以内</p>
         <label for="password2">パスワード（もう一度）</label>
         <input id="password2" name="password2" type="password" autocomplete="new-password" required>
+        <label for="keyword">キーワード（パスワードを忘れたときの再設定に使います）</label>
+        <input id="keyword" name="keyword" type="text" autocomplete="off" minlength="4" required>
+        <p class="hint">4 文字以上、64 文字以内。パスワードとは別のものにしてください。忘れると、パスワードを再設定できません。</p>
         <button id="submit" type="submit">登録して、はじめる</button>
         <p id="err" class="err" role="alert"></p>
     </form>
@@ -33,7 +36,7 @@
         if (v.password !== v.password2) { err.textContent = 'パスワードが、一致しません'; return; }
         btn.disabled = true;
         try {
-            await api.post('/api/register', { email: v.email, password: v.password });
+            await api.post('/api/register', { email: v.email, password: v.password, keyword: v.keyword });
             location.replace('/');
         } catch (ex) {
             err.textContent = ex.data?.errors?.map((x) => x.message).join('\n') || ex.message;

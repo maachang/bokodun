@@ -185,6 +185,10 @@ function initBodies(S) {
         <div class="cols" style="--c:9em 1fr"><span>現在のパスワード</span><input id="acctCur" type="password" autocomplete="current-password"></div>
         <div class="cols" style="--c:9em 1fr"><span>新しいパスワード</span><input id="acctNew" type="password" autocomplete="new-password"></div>
         <div style="margin:6px 0"><button data-acct="password">変更する</button>　<small>8 文字以上</small></div>
+        <div class="title" style="margin-top:12px">再設定用キーワードの変更</div>
+        <div class="cols" style="--c:9em 1fr"><span>現在のパスワード</span><input id="acctKwPw" type="password" autocomplete="current-password"></div>
+        <div class="cols" style="--c:9em 1fr"><span>新しいキーワード</span><input id="acctKw" type="text" autocomplete="off"></div>
+        <div style="margin:6px 0"><button data-acct="keyword">変更する</button>　<small>4 文字以上。パスワードを忘れたときの再設定に使います</small></div>
         <div class="title" style="margin-top:12px">アカウントの削除</div>
         <p class="legend">冒険者のデータも、すべて消えます（元に戻せません）。</p>
         <div class="cols" style="--c:9em 1fr"><span>パスワード</span><input id="acctDel" type="password" autocomplete="current-password"></div>
@@ -215,6 +219,10 @@ function initBodies(S) {
                 game.account.csrfToken = r.csrfToken;   // パスワードを変えると、セッション ID が変わる（トークンも変わる）
                 ['acctCur', 'acctNew'].forEach(id => { jhtml.$(id).value = ''; });
                 msg('パスワードを変更しました');
+            } else if (t.dataset.acct === 'keyword') {
+                await game.postAuthed('/api/account', { action: 'keyword', password: val('acctKwPw'), keyword: val('acctKw') });
+                ['acctKwPw', 'acctKw'].forEach(id => { jhtml.$(id).value = ''; });
+                msg('キーワードを変更しました');
             } else if (t.dataset.acct === 'delete') {
                 if (!window.confirm('アカウントと冒険者のデータを、すべて削除します。よろしいですか？')) return;
                 await game.postAuthed('/api/account', { action: 'delete', password: val('acctDel') });
