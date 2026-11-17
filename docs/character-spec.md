@@ -324,7 +324,7 @@
 | `gold` `exp` | 所持金、経験値 |
 | `inventory` | アイテム ID → 個数（種類 99・各 99 まで。`item-spec.md` 1 章） |
 | `equipment` | 武器・鎧・兜・盾・アクセサリ（ID。購入時に決める重さは `{ id, weight }` で持てる。そのほかの個別情報は未決。`item-spec.md` 2 章） |
-| `stock` | ストック 9 枠（`kind`: weapon / magic、`id`、または空き）と、選択中の武器・魔法の枠番号 |
+| `stock` | ストック 9 枠（`slots`: アイテム ID または null＝空き）と、選択中の枠番号（`melee`: 近接武器、`focus`: 杖・ロッド、`magic`: 呪文・弓。いずれも null 可）。同じ ID の重複は不可。呪文は `magics` にあるもの |
 | `magics` | 覚えた魔法の ID |
 | `autoUse` | アイテム ID → 自動使用の ON/OFF（`item-spec.md` 4 章） |
 | `quest` | 受注中の 1 件（ID、受けたゲーム内日時、場所、進み具合）と、達成済みの ID。複数同時には受けられない |

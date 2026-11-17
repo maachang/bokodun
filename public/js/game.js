@@ -17,6 +17,7 @@ import { updateObjectMethods } from '/js/game/updateObjects.js';
 import { updateFlowMethods } from '/js/game/updateFlow.js';
 import { updatePlayerMethods } from '/js/game/updatePlayer.js';
 import { equipmentMethods } from '/js/game/equipment.js';
+import { saveLoadMethods } from '/js/game/saveLoad.js';
 import { combatMethods } from '/js/game/combat.js';
 import { hudMethods } from '/js/game/hud.js';
 import { interactMethods } from '/js/game/interact.js';
@@ -92,6 +93,7 @@ export class GameEngine {
             this.player.selMelee = playerDef.selMelee ?? null;
             this.player.selFocus = playerDef.selFocus ?? null;
             this.player.selMagic = playerDef.selMagic ?? null;
+            await this.loadCharacter();   // 保存済みの冒険者があれば、ストックを上書きする
         } catch (e) {
             console.error('Failed to load definitions:', e);
             this.objectDefinitions = this.objectDefinitions || {};
@@ -325,4 +327,4 @@ export class GameEngine {
 }
 
 // 部品（public/js/game/*.js）のメソッドを、GameEngine に組み込む
-Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);
+Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, saveLoadMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);

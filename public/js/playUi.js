@@ -176,7 +176,7 @@ function initTalk(S) {
     };
     S.closeTalk = () => { E.talk.style.display = 'none'; E.bottomStack.classList.remove('talking'); S.setPaused(); };
     on(E.talk, 'click', '[data-ch]', (e, t) => { const c = E.talk._choices[Number(t.dataset.ch)]; if (c[1]) c[1](); else S.closeTalk(); });
-    S.guild = () => S.talk('冒険者ギルド', 'いらっしゃいませ。ご用件は？', [['セーブする', () => S.talk('冒険者ギルド', 'セーブしました。（最後にセーブしたギルド：グリーン王国 城下町）', [['やめる']])], ['預ける・引き出す', () => S.talk('冒険者ギルド', '（預かりの画面は、あとで作ります）', [['戻る', S.guild]])], ['やめる']]);
+    S.guild = () => S.talk('冒険者ギルド', 'いらっしゃいませ。ご用件は？', [['セーブする', async () => { const r = await S.game.saveCharacter(); S.talk('冒険者ギルド', r.ok ? 'セーブしました。（保存したのは、ストックだけ。ほかは、あとでつなぎます）' : `セーブできませんでした。（${r.message}）`, [['やめる']]); }], ['預ける・引き出す', () => S.talk('冒険者ギルド', '（預かりの画面は、あとで作ります）', [['戻る', S.guild]])], ['やめる']]);
     let deathTimer = null;
     S.revive = () => { clearTimeout(deathTimer); E.death.style.display = 'none'; S.setPaused(); S.talk('冒険者ギルド', '冒険者は、ギルドで目を覚ました。（所持金・持ち物はそのまま）', [['はい']]); };
     S.die = () => { S.closeAll(); E.deathMsg.textContent = '冒険者は 力尽きた…'; E.death.style.display = 'flex'; S.setPaused(); clearTimeout(deathTimer); deathTimer = setTimeout(S.revive, 5000); };

@@ -36,6 +36,8 @@ function loadDefs() {
         jobs: new Set(Object.keys(readJson('jobs.json').jobs)),
         maxLevel: readJson('jobs.json').maxLevel || 99,
         items: new Set(Object.keys(items)),
+        itemDefs: items,
+        classes: readJson('weaponClasses.json'),
         spells: new Set(Object.keys(readJson('magic.json').spells)),
         equip: {
             weapon: new Set([...ids(equipment.weapons), ...Object.keys(items).filter(k => items[k].kind === 'weapon')]),
@@ -77,6 +79,15 @@ const timeMap = (obj, where) => {
     }
     return null;
 };
+
+// ストックに入れる ID の種類。呪文・弓（shoot）は magic、杖・ロッド（cast）は focus、近接武器は melee。入れられないものは null
+function stockKind(id, d) {
+    if (d.spells.has(id)) return 'magic';
+    const it = d.itemDefs[id];
+    if (!it || it.kind !== 'weapon') return null;
+    const attack = d.classes[it.weaponClass] && d.classes[it.weaponClass].attack;
+    return attack === 'shoot' ? 'magic' : attack === 'cast' ? 'focus' : attack === 'melee' ? 'melee' : null;
+}
 
 const sections = {
     profile(v, all) {
@@ -140,24 +151,27 @@ const sections = {
         return null;
     },
     stock(v, all) {
+        // ゲームの形: slots（アイテム ID または null の 9 枠）と、選択中の枠番号 melee（近接武器）・focus（杖）・magic（呪文・弓）
         if (!isObj(v)) return 'stock: オブジェクトで指定してください';
-        const e = only(v, ['slots', 'weapon', 'magic'], 'stock'); if (e) return e;
+        const e = only(v, ['slots', 'melee', 'focus', 'magic'], 'stock'); if (e) return e;
         if (!Array.isArray(v.slots) || v.slots.length !== STOCK_SIZE) return `stock.slots: ${STOCK_SIZE} 枠の配列で指定してください`;
         const d = loadDefs(), seen = new Set(), owned = new Set((all.magics) || []);
+        const kinds = [];   // 枠ごとの種類（melee / focus / magic）
         for (let i = 0; i < v.slots.length; i++) {
-            const s = v.slots[i];
-            if (s === null) continue;
-            if (!isObj(s) || only(s, ['kind', 'id'], `stock.slots[${i}]`)) return `stock.slots[${i}]: 形式が不正です`;
-            if (s.kind !== 'weapon' && s.kind !== 'magic') return `stock.slots[${i}].kind: weapon か magic です`;
-            if (!(s.kind === 'weapon' ? d.items.has(s.id) || d.equip.weapon.has(s.id) : d.spells.has(s.id))) return `stock.slots[${i}]: 定義にない ID です（${s.id}）`;
-            if (s.kind === 'magic' && !owned.has(s.id)) return `stock.slots[${i}]: 覚えていない魔法です（${s.id}）`;
-            if (seen.has(s.kind + ':' + s.id)) return `stock.slots[${i}]: 同じものが重複しています`;
-            seen.add(s.kind + ':' + s.id);
+            const id = v.slots[i];
+            if (id === null) { kinds.push(null); continue; }
+            if (typeof id !== 'string' || !ID_PATTERN.test(id)) return `stock.slots[${i}]: ID が不正です`;
+            const kind = stockKind(id, d);
+            if (!kind) return `stock.slots[${i}]: 定義にない、またはストックに入れられない ID です（${id}）`;
+            if (kind === 'magic' && d.spells.has(id) && !owned.has(id)) return `stock.slots[${i}]: 覚えていない魔法です（${id}）`;
+            if (seen.has(id)) return `stock.slots[${i}]: 同じものが重複しています`;
+            seen.add(id);
+            kinds.push(kind);
         }
-        for (const k of ['weapon', 'magic']) {
+        for (const k of ['melee', 'focus', 'magic']) {
             const idx = v[k];
             if (idx === null || idx === undefined) continue;
-            if (!isInt(idx, 0, STOCK_SIZE - 1) || !v.slots[idx] || v.slots[idx].kind !== k) return `stock.${k}: 選択中の枠が不正です`;
+            if (!isInt(idx, 0, STOCK_SIZE - 1) || kinds[idx] !== k) return `stock.${k}: 選択中の枠が不正です`;
         }
         return null;
     },
