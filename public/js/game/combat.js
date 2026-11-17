@@ -264,17 +264,11 @@ export const combatMethods = {
         this.sound.playBigExplosion?.();
         const d = Math.hypot(this.player.x - pos.x, this.player.z - pos.z);
         if (d <= radius && !this.player.isFalling) {
-            const dmg = Math.max(1, Math.floor(owner.attackPower * mult));
+            const dmg = Math.max(1, Math.floor(this.monsterAttackValue(owner) * mult));
             const k = d > 0.01 ? new THREE.Vector3((this.player.x - pos.x) / d, 0, (this.player.z - pos.z) / d) : new THREE.Vector3(0, 0, 0);
             this.addPopup(`範囲攻撃! -${dmg}`, '#ef4444');
             this.playerTakeDamage(dmg, k, 1.2, owner);
         }
-    },
-
-    // 攻撃力（呪いの間は、下がる）
-    playerAttackPower() {
-        const c = this.player.status?.curse;
-        return this.player.attackPower * (c?.t > 0 ? (c.scale ?? 0.7) : 1);
     },
 
     // プレイヤーを状態異常にする。type: poison / burn / slow / paralysis / silence / curse。すでに同じ状態なら、長いほうの時間にする
@@ -409,6 +403,7 @@ export const combatMethods = {
 
     playerTakeDamage(amount, knockDir, knockScale = 1.0, source = null) {
         if (this.player.isInvincible) return;
+        if (source) amount = this.reduceByDefense(amount);   // 敵の攻撃は、防具・生命力・回避で軽減する（罠・落下は、そのまま）
         if (source) this.onPlayerHitBy(source, amount);   // 状態異常・生命力吸収
         if (this.player.climb) { this.player.climb = null; this.addPopup('手が離れた！', '#fbbf24'); }   // 登っている間に攻撃を受けたら、中断して、下に落ちる（目線の高さは、なめらかに下がる。落下のダメージはなし）
 
@@ -567,7 +562,6 @@ export const combatMethods = {
         const nextLvExp = this.player.level * 40;
         if (this.player.exp >= nextLvExp) {
             this.player.level++;
-            this.player.attackPower += 5;   // 仮: 武器のダイスがつながるまで、攻撃力は従来のまま
             this.recomputeStats(true);   // 最大 HP・MP などは、レベルから式で決める（HP・MP は満タン）
             this.sound.playLevelClear();
             this.addPopup(`LEVEL UP! Lv.${this.player.level}`, '#34d399');

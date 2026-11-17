@@ -51,6 +51,7 @@ export class Monster {
         this.speed = enemyDef.speed ?? 1.5; // 0 を指定した場合は 0（動かない）として扱う
         this.baseSpeed = this.speed;
         this.attackPower = enemyDef.stats?.attack?.expected ?? enemyDef.attackPower ?? 10;   // 攻撃のダイスの期待値（ダイスで振る形は、防御をつなぐとき）
+        this.stats = enemyDef.stats ?? null;   // 敵の仕様書の数値（level・hp・攻撃のダイス）
         this.exp = enemyDef.exp || 20;
         this.canShoot = !!enemyDef.canShoot;
         this.shootType = enemyDef.shootType || 'magic';

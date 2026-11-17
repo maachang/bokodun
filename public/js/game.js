@@ -19,6 +19,7 @@ import { updatePlayerMethods } from '/js/game/updatePlayer.js';
 import { equipmentMethods } from '/js/game/equipment.js';
 import { saveLoadMethods } from '/js/game/saveLoad.js';
 import { characterMethods } from '/js/game/character.js';
+import { gearMethods } from '/js/game/gear.js';
 import { buildItems } from '/js/game/itemDefs.js';
 import { combatMethods } from '/js/game/combat.js';
 import { hudMethods } from '/js/game/hud.js';
@@ -89,6 +90,7 @@ export class GameEngine {
             this.objectDefinitions = await objRes.json();
             this.enemyDefinitions = await enemyRes.json();
             const [equipment, magic] = await Promise.all(['equipment', 'magic'].map(async (n) => (await fetch(`/data/${n}.json`)).json()));
+            this.setGearDefs(equipment);   // 防具（鎧・兜・盾）の定義
             this.items = buildItems(await itemRes.json(), equipment, magic);   // 武器（equipment.json）・魔法（magic.json）を重ねる
             this.weaponClasses = await classRes.json();
             this.npcDefinitions = await npcRes.json();
@@ -335,4 +337,4 @@ export class GameEngine {
 }
 
 // 部品（public/js/game/*.js）のメソッドを、GameEngine に組み込む
-Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, saveLoadMethods, characterMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);
+Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, saveLoadMethods, characterMethods, gearMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);

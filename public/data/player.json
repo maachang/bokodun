@@ -24,5 +24,10 @@
   ],
   "selMelee": 0,
   "selFocus": null,
-  "selMagic": 5
+  "selMagic": 5,
+  "equip": {
+    "armor": "leather_armor",
+    "helm": "leather_cap",
+    "shield": null
+  }
 }

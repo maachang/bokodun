@@ -183,9 +183,9 @@ test('ゲーム: プレイヤーの状態異常（毒・火傷は継続ダメー
     assert.ok(g.player.hp <= 94 && g.player.hp >= 90, `毒のダメージ: ${100 - g.player.hp}`);
     for (let i = 0; i < 40; i++) g.updatePlayerStatus(0.05);   // 合計 4 秒（3 秒で治る）
     assert.equal(g.player.status.poison, undefined, '3 秒で治る');
-    // 呪い: 攻撃力が下がる
+    // 呪い: 攻撃のダメージが下がる（rollWeaponAttack で、scale を掛ける。test/character.test.mjs で確認）
     g.applyPlayerStatus('curse', { t: 5, scale: 0.7 });
-    assert.equal(Math.round(g.playerAttackPower()), 14);
+    assert.equal(g.player.status.curse.scale, 0.7);
     // 敵の攻撃: 毒・麻痺・沈黙・鈍足・呪いが、確率でかかる（確率 1 にして確認）。生命力吸収
     g.player.status = {};
     const monster = { hp: 50, maxHp: 100, profile: { inflict: [{ type: 'poison', chance: 1, t: 5, dps: 3 }, { type: 'paralysis', chance: 1, t: 1 }, { type: 'silence', chance: 1, t: 5 }, { type: 'slow', chance: 1, t: 4, scale: 0.5 }], lifesteal: 0.5 }, fleeing: false, stolenGold: 0 };

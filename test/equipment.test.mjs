@@ -45,7 +45,7 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
     const calls = { popups: [], exp: 0, sounds: [], slashes: [], strikes: [], playerDamage: [] };
     Object.assign(g, {
         player: {
-            x: 0, z: 0, angle: 0, radius: 0.6, attackPower: 15, mp, magicCooldown: 0, attackCooldown: 0,
+            x: 0, z: 0, angle: 0, radius: 0.6, mp, magicCooldown: 0, attackCooldown: 0,
             stock: [...playerDef.stock], selMelee: playerDef.selMelee, selFocus: playerDef.selFocus, selMagic: playerDef.selMagic,
             isFalling: false
         },
@@ -66,6 +66,7 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
         updateEquipHud() {},
     });
     g.setRules(readJson('combat.json'), readJson('damageTable.json').table, readJson('jobs.json').jobs, readJson('races.json').races);
+    g.setGearDefs(readJson('equipment.json'));
     g.applyCharacterDef(playerDef);   // 人間・平均・ファイター Lv1
     g.player.abilities.str = 50;   // 重い武器（大剣など）も、筋力で持てるように（持てる重さの確認は、別のテスト）
     g.recomputeStats(true);

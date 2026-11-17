@@ -9,7 +9,8 @@
  */
 const { $, refs, on, html, show, hide } = jhtml;
 
-import { MENU, keymap, EVENT, EQUIPS, ITEMS, MSG_SIZES, prefs } from '/js/playUiData.js';
+import { MENU, keymap, EVENT, ITEMS, MSG_SIZES, prefs } from '/js/playUiData.js';
+import { GEAR_KINDS, GEAR_NAMES } from '/js/game/gear.js';
 
 // 本体は、ここから先
 // 状態と、部品どうしの受け渡し（S）を作って、部品ごとの初期化を呼ぶ
@@ -145,7 +146,20 @@ function initBodies(S) {
             + '<div class="abil"><span>筋力<b>14</b><i>(2)</i></span><span>器用度<b>12</b><i>(2)</i></span><span>敏捷度<b>13</b><i>(2)</i></span><span>知力<b>11</b><i>(2)</i></span><span>精神力<b>10</b><i>(2)</i></span><span>生命力<b>15</b><i>(3)</i></span></div>'
             + '<p>攻撃力 / 防御 / 回避 / クリティカル など（ダミー）</p>';
     };
-    const equipBody = () => '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>' + EQUIPS.map((q, i) => q[1] ? html`<div class="pick cols" style="--c:6em 1fr 14em" data-equip="${i}"><span class="k">${q[0]}</span><span>${q[1]}</span><small>${q[2]}</small></div>` : html`<div class="pick cols dis" style="--c:6em 1fr 14em"><span class="k">${q[0]}</span><span>（なし）</span><small></small></div>`).join('');
+    // 防具（鎧・兜・盾）。いま着けているものと、重量（積載）を出す。クリックで、選ぶ画面
+    const gearInfo = (def) => `防御 ${def.dice.n}d${def.dice.m}${def.dice.k ? '+' + def.dice.k : ''}　重さ ${game.gearWeight(def)}${def.heavy ? '　重装備' : ''}${game.canWear(def) ? '' : '　（筋力が足りず、装備できない）'}`;
+    const equipBody = () => {
+        const p = game.player, limit = Math.round(game.rules ? game.totalWeight() / (game.loadRatio() || 1) : 0);
+        return '<p class="legend">鎧・兜・盾を選びます（武器・魔法は「ストック」）。積載の限界を超えると、動きが遅くなります。</p>'
+            + GEAR_KINDS.map(k => { const def = game.gearDef(k, p.equip?.[k]); return html`<div class="pick cols" style="--c:4em 1fr 19em" data-gk="${k}"><span class="k">${GEAR_NAMES[k]}</span><span style="text-align:left">${def ? def.name : '（なし）'}</span><small>${def ? gearInfo(def) : ''}</small></div>`; }).join('')
+            + html`<div class="pick cols dis" style="--c:4em 1fr 19em"><span class="k">アクセサリ</span><span>（なし）</span><small></small></div>`
+            + html`<div class="cols" style="--c:4em 1fr 19em;margin-top:8px"><span class="k">重量</span><span>${game.totalWeight()} / ${limit}（武器・鎧・兜・盾の合計 / 積載の限界）</span><small></small></div>`;
+    };
+    const gearPickBody = (kind) => {
+        const cur = game.player.equip?.[kind];
+        const row = (def) => html`<div class="pick cols ${game.canWear(def) ? '' : 'dis'}" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid="${def.id}"><span style="text-align:left">${def.name}</span><small>${def.id === cur ? '着けています' : ''}</small><small>${gearInfo(def)}</small></div>`;
+        return html`<p>${GEAR_NAMES[kind]}を選びます</p><div class="pick cols" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid=""><span>外す</span><small>${cur ? '' : '外しています'}</small><small></small></div>` + game.gearList(kind).map(row).join('');
+    };
     const itemBody = () => '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）。クリックで詳細</p>' + ITEMS.map((it, i) => html`<div class="pick cols" data-item="${i}"><span class="k">${it[1]}</span><span>${it[0]}</span><span class="n">${it[2]}</span></div>`).join('');
     const helpBody = () => '<p class="legend">操作の説明</p>' + jhtml.$('instructions').innerHTML + (jhtml.$('panel-hints') ? '<div style="margin-top:10px">' + jhtml.$('panel-hints').innerHTML + '</div>' : '');
     S.bodies = { stock: stockBody, status: statusBody, equip: equipBody, item: itemBody, setting: settingBody, help: helpBody };
@@ -160,7 +174,8 @@ function initBodies(S) {
     on(E.winBody, 'click', '[data-add]', (e, t) => { S.setBody('<h3>ストック</h3>' + pickBody(Number(t.dataset.add))); S.setBack(() => S.openWin('stock')); });
     on(E.winBody, 'click', '.pick[data-slot]:not(.dis)', (e, t) => { game.setStockSlot(Number(t.dataset.slot), t.dataset.id); S.openWin('stock'); });
     on(E.winBody, 'click', '[data-keyset]', (e, t) => { S.keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
-    on(E.winBody, 'click', '[data-equip]', (e, t) => { const q = EQUIPS[Number(t.dataset.equip)]; S.setBody(html`<h3>装備</h3><h3>${q[1]}</h3><p>${q[0]}</p><p>${q[2]}</p><p>${q[3]}</p>`); S.setBack(() => S.openWin('equip')); });
+    on(E.winBody, 'click', '.pick[data-gk]:not(.dis)', (e, t) => { S.setBody('<h3>装備</h3>' + gearPickBody(t.dataset.gk)); S.setBack(() => S.openWin('equip')); });
+    on(E.winBody, 'click', '.pick[data-gset]:not(.dis)', (e, t) => { game.equipGear(t.dataset.gset, t.dataset.gid || null); S.openWin('equip'); });
     on(E.winBody, 'click', '.pick[data-item]', (e, t) => { const it = ITEMS[Number(t.dataset.item)]; S.setBody(html`<h3>道具</h3><h3>${it[0]}</h3><p>${it[1]}${it[1] === '道具' ? '　所持 ' + it[2] + ' 個' : ''}</p><p>${it[3]}</p>`); S.setBack(() => S.openWin('item')); });
 }
 

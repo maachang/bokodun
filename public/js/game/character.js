@@ -4,8 +4,6 @@
 import * as R from '/js/game/rules.js';
 import { TEST_RUN_SPEED_SCALE } from '/js/game/constants.js';
 
-const TEMP_LOAD_RATIO = 0.8;   // 仮: 重量比。武器・防具の重さがゲームにつながるまで、「適正な装備」（0.8）で計算する
-
 export const characterMethods = {
     // 定義（combat・damageTable・jobs・races）を、式に渡す形にまとめる（読み込み後に 1 回）
     setRules(combat, table, jobs, races) {
@@ -19,11 +17,7 @@ export const characterMethods = {
         p.abilities = { ...def.abilities };
         p.job = def.job;
         p.level = def.level ?? 1;
-    },
-
-    // いまの重量比（仮の固定値）
-    loadRatio() {
-        return TEMP_LOAD_RATIO;
+        p.equip = { armor: null, helm: null, shield: null, ...def.equip };   // 防具（鎧・兜・盾）
     },
 
     // 最大 HP・MP・移動速度・最大スタミナを、能力値・職業・レベルから決め直す。fill が true なら、HP・MP・スタミナを満タンにする（そうでなければ、最大値を超えないように丸める）
@@ -36,8 +30,9 @@ export const characterMethods = {
         p.maxHp = hm.hp;
         p.maxMp = hm.mp;
         p.maxStamina = R.staminaStats(d, p.abilities, p.level, 0, this.loadRatio()).max;
-        p.speed = sp.walk;
-        p.runSpeed = sp.run * TEST_RUN_SPEED_SCALE;   // テスト用の倍率を掛けてある
+        const slow = R.loadSlowRatio(d, this.loadRatio());   // 積載の限界を超えると、歩く速さ・ダッシュが下がる
+        p.speed = sp.walk * slow;
+        p.runSpeed = sp.run * slow * TEST_RUN_SPEED_SCALE;   // テスト用の倍率を掛けてある
         if (fill) { p.hp = p.maxHp; p.mp = p.maxMp; p.stamina = p.maxStamina; }
         else { p.hp = Math.min(p.hp, p.maxHp); p.mp = Math.min(p.mp, p.maxMp); p.stamina = Math.min(p.stamina, p.maxStamina); }
     },

@@ -49,6 +49,7 @@ export const equipmentMethods = {
         } else {
             const cls = this.weaponClasses[item.weaponClass];
             if (!this.canCarry(item)) { this.addPopup('重すぎて装備できない', '#f87171'); return; }   // 筋力で持てる重さを超える（8.1）
+            if (cls?.attack === 'melee' && item.twoHanded && this.player.equip?.shield) { this.addPopup('両手武器は、盾と同時に装備できない', '#f87171'); return; }
             if (cls?.attack === 'melee') this.player.selMelee = slot;
             else if (cls?.attack === 'cast') this.player.selFocus = (this.player.selFocus === slot) ? null : slot;
             else return;
@@ -110,6 +111,7 @@ export const equipmentMethods = {
 
     // ストックの表示（右の列の 9 枠）の更新。画面側（js/playUi.js）が onStockChange に、描き直す関数を入れる
     updateEquipHud() {
+        this.recomputeStats?.(false);   // 装備の重さが変わると、積載（歩く速さ）が変わる
         if (this.onStockChange) this.onStockChange();
     },
 

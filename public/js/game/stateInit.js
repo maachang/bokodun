@@ -26,7 +26,6 @@ export const stateInitMethods = {
             status: {},         // 状態異常（poison・burn: 継続ダメージ / slow / paralysis / silence / curse）。{ 種類: { t: 残り秒, dps / scale } }
             exp: 0,
             level: 1,
-            attackPower: 15,
             isInvincible: false,
             invincibleTimer: 0,
             attackCooldown: 0,

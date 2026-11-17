@@ -16,6 +16,8 @@ async function engine() {
     g.sound = { playLevelClear() {} };
     g.addPopup = () => {};
     g.setRules(D('combat.json'), D('damageTable.json').table, D('jobs.json').jobs, D('races.json').races);
+    g.setGearDefs(D('equipment.json'));
+    g.getMeleeItem = () => ({ id: 'dagger', weightRange: [1, 8], dice: { n: 1, m: 6, k: 2 }, blunt: false });   // 初期の近接武器（ダガー）
     g.applyCharacterDef(playerDef);
     return g;
 }
@@ -72,4 +74,16 @@ test('スタミナの消費・回復は、冒険者の持久力とレベルか�
     g.player.stamina = 10; g.player.staminaPause = 0; g.player.staminaExhausted = false;
     g.updateStamina(1);
     assert.ok(Math.abs(g.player.stamina - (10 + 30 * 0.3 + 1 * 0.05)) < 1e-9);
+});
+
+test('呪いの間は、攻撃のダメージが下がる（scale）', async () => {
+    const g = await engine();
+    g.recomputeStats(true);
+    const w = { id: 'long_sword', weightRange: [10, 25], dice: { n: 2, m: 6, k: 1 }, blunt: false };
+    const orig = Math.random; Math.random = () => 0.5;
+    try {
+        const normal = g.rollWeaponAttack(w).damage;
+        g.player.status = { curse: { t: 5, scale: 0.5 } };
+        assert.equal(g.rollWeaponAttack(w).damage, Math.floor(normal * 0.5));
+    } finally { Math.random = orig; }
 });
