@@ -1,5 +1,5 @@
 // 冒険者の保存・読み込み（サーバーの /api/character とのやりとり）。GameEngine のメソッド（this は GameEngine）。
-// 保存するのは、冒険者の名前・種族、能力値、職業（第一・サブ・レベル・経験値のストック）、HP・MP、所持金、防具、ストック（9 枠と選択）、覚えた魔法（買う・取得で増える）。
+// 保存するのは、冒険者の名前・種族、能力値、職業（第一・サブ・レベル・経験値のストック）、HP・MP、所持金、所持品（道具）、防具、ストック（9 枠と選択）、覚えた魔法（買う・取得で増える）。
 //   データの形は、保存データの仕様（docs/character-spec.md 9-3。検証は validates/character.js）。位置は保存しない（再開はギルド）。
 //   まだ保存しない項目: 宝箱・ボス・ゲーム内時間・クエスト・ギルドの預かり・プレイ時間（つながっていない仕組み）。
 // 保存の場所は、冒険者ギルド（セーブ）。起動時に、保存済みなら読み込む（なければ player.json の初期値のまま）。
@@ -39,6 +39,7 @@ export const saveLoadMethods = {
             jobs: { primary: p.jobs.primary, sub: p.jobs.sub, levels: { ...p.jobs.levels }, expStock: p.jobs.expStock },
             vitals: { hp: Math.floor(p.hp), mp: Math.floor(p.mp) },
             gold: Math.floor(p.gold ?? 0),
+            inventory: { ...p.inventory },
             equipment: { armor: p.equip?.armor ?? null, helm: p.equip?.helm ?? null, shield: p.equip?.shield ?? null, accessory: null },
             stock: this.buildStockSave(),
             magics: [...p.magics]
@@ -60,6 +61,10 @@ export const saveLoadMethods = {
             this.syncJob();
         }
         if (isInt(data.gold, 0, Number.MAX_SAFE_INTEGER)) p.gold = data.gold;
+        if (data.inventory && typeof data.inventory === 'object') {   // 所持品（定義にある道具だけ。個数は 1〜99）
+            p.inventory = {};
+            for (const [id, n] of Object.entries(data.inventory)) if (['consumable', 'key'].includes(this.items[id]?.kind) && isInt(n, 1, 99) && Object.keys(p.inventory).length < 99) p.inventory[id] = n;
+        }
         if (Array.isArray(data.magics)) p.magics = [...new Set(data.magics)].filter((id) => this.items[id]?.kind === 'spell');   // 覚えた魔法（定義にあるものだけ）
         this.applyStockSave(data.stock);
         const eq = data.equipment ?? {};

@@ -20,6 +20,7 @@ async function engine() {
     g.shops = shops;
     g.addPopup = () => {};
     g.updateEquipHud = () => {};
+    g.updateUI = () => {};   // 画面の表示（DOM）は、テストでは使わない
     g.closeShopMenu = () => { g.shopMenu = null; };
     g.setRules(defs.combat, defs.table, defs.jobs, defs.races, 99);
     g.setGearDefs(D('equipment.json'));

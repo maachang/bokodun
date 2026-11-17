@@ -9,7 +9,7 @@
  */
 const { $, refs, on, html, show, hide } = jhtml;
 
-import { MENU, keymap, EVENT, ITEMS, MSG_SIZES, prefs } from '/js/playUiData.js';
+import { MENU, keymap, EVENT, MSG_SIZES, prefs } from '/js/playUiData.js';
 import { GEAR_KINDS, GEAR_NAMES } from '/js/game/gear.js';
 
 // 本体は、ここから先
@@ -175,10 +175,57 @@ function initBodies(S) {
         const row = (def) => html`<div class="pick cols ${game.canWear(def) ? '' : 'dis'}" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid="${def.id}"><span style="text-align:left">${def.name}</span><small>${def.id === cur ? '着けています' : ''}</small><small>${gearInfo(def)}</small></div>`;
         return html`<p>${GEAR_NAMES[kind]}を選びます</p><div class="pick cols" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid=""><span>外す</span><small>${cur ? '' : '外しています'}</small><small></small></div>` + game.gearList(kind).map(row).join('');
     };
-    const itemBody = () => '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）。クリックで詳細</p>' + ITEMS.map((it, i) => html`<div class="pick cols" data-item="${i}"><span class="k">${it[1]}</span><span>${it[0]}</span><span class="n">${it[2]}</span></div>`).join('');
     const helpBody = () => '<p class="legend">操作の説明</p>' + jhtml.$('instructions').innerHTML + (jhtml.$('panel-hints') ? '<div style="margin-top:10px">' + jhtml.$('panel-hints').innerHTML + '</div>' : '');
+    S.bodies = { stock: stockBody, status: statusBody, equip: equipBody, setting: settingBody, help: helpBody };
+    initItems(S);     // 道具（持ち物・使う）
+    initAccount(S);   // アカウント（ログアウト・パスワードとキーワードの変更・削除）
+
+    on(E.winBody, 'click', '[data-rm]', (e, t) => { game.setStockSlot(Number(t.dataset.rm), null); S.openWin('stock'); });
+    on(E.winBody, 'click', '[data-detail]', (e, t) => {
+        if (e.target.closest('[data-rm]')) return;
+        const i = Number(t.dataset.detail), it = slotItem(i);
+        S.setBody(html`<h3>ストック</h3><p>枠 ${i + 1}</p><h3>${it.name}</h3><p>${kindLabel(game, it)}</p><p>${itemDetail(game, it)}</p>`);
+        S.setBack(() => S.openWin('stock'));
+    });
+    on(E.winBody, 'click', '[data-add]', (e, t) => { S.setBody('<h3>ストック</h3>' + pickBody(Number(t.dataset.add))); S.setBack(() => S.openWin('stock')); });
+    on(E.winBody, 'click', '.pick[data-slot]:not(.dis)', (e, t) => { game.setStockSlot(Number(t.dataset.slot), t.dataset.id); S.openWin('stock'); });
+    on(E.winBody, 'click', '[data-keyset]', (e, t) => { S.keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
+    on(E.winBody, 'click', '.pick[data-gk]:not(.dis)', (e, t) => { S.setBody('<h3>装備</h3>' + gearPickBody(t.dataset.gk)); S.setBack(() => S.openWin('equip')); });
+    on(E.winBody, 'click', '.pick[data-gset]:not(.dis)', (e, t) => { game.equipGear(t.dataset.gset, t.dataset.gid || null); S.openWin('equip'); });
+}
+
+// 道具（持ち物・詳細・使う）のダイアログ
+function initItems(S) {
+    const { E, game } = S;
+    // 道具: 持ち物（個数つき）。クリックで詳細と「使う」。使うのは、いつでも（失敗しない）。買うのは、道具屋・神殿
+    const effectText = (it) => {
+        const e = it.effect, dice = e.dice ? `${e.dice.n}d${e.dice.m}+${e.dice.k}` : '';
+        return { heal_hp: `HP を回復する（${dice}）`, heal_mp: `MP を回復する（${dice}）`, heal_stamina: `スタミナを回復する（${dice}）。回復停止も打ち消す`, regen_boost: `${e.duration}秒間、スタミナの自然回復が ${e.rate} 倍`, cure_poison: '毒を治す', cure_venom: '毒と猛毒を治す', cure_paralysis: '麻痺を治す', revive: '戦闘不能から復帰する（HP を少し回復）', return_town: '街へ戻る（まだ使えません）', unlock_chest_lock: '宝箱の鍵を開ける' }[e.type] ?? '';
+    };
+    S.bodies.item = () => {
+        const ids = Object.keys(game.player.inventory);
+        return '<p class="legend">持ち物です。クリックで詳細と「使う」。道具は、道具屋・神殿で買えます。</p>'
+            + (ids.length ? ids.map(id => html`<div class="pick cols" data-item="${id}" style="--c:1fr 4em"><span>${game.items[id].name}</span><span class="n">× ${game.itemCount(id)}</span></div>`).join('') : '<p style="color:#94a3b8">（持っている道具は、ありません）</p>')
+            + html`<div class="cols" style="--c:6em 1fr;margin-top:8px"><span class="k">所持金</span><span>${game.player.gold ?? 0} G</span></div>`;
+    };
+    const itemDetailBody = (id, note = '') => {
+        const it = game.items[id];
+        return html`<h3>${it.name}</h3><p>所持 ${game.itemCount(id)} 個</p><p>${effectText(it)}</p><p>価格 ${it.price ?? '—'}${it.price ? ' G' : ''}</p>`
+            + (game.itemCount(id) > 0 ? html`<div style="margin:8px 0"><button data-use="${id}">使う</button></div>` : '') + html`<p style="color:#fbbf24;min-height:1.4em">${note}</p>`;
+    };
+    on(E.winBody, 'click', '.pick[data-item]', (e, t) => { S.setBody('<h3>道具</h3>' + itemDetailBody(t.dataset.item)); S.setBack(() => S.openWin('item')); });
+    on(E.winBody, 'click', '[data-use]', (e, t) => {
+        const r = game.useItem(t.dataset.use);
+        S.setBody('<h3>道具</h3>' + itemDetailBody(t.dataset.use, r.message));
+        S.setBack(() => S.openWin('item'));
+    });
+}
+
+// アカウントのダイアログ
+function initAccount(S) {
+    const { E, game } = S;
     // アカウント: ログイン中のメールアドレス、ログアウト、パスワード変更、アカウント削除（匿名ユーザーはなし。原則ユーザー登録）
-    const accountBody = () => html`<p class="legend">ログイン中のアカウントの操作です。冒険者のデータは、このアカウントに保存されています。</p>
+    S.bodies.account = () => html`<p class="legend">ログイン中のアカウントの操作です。冒険者のデータは、このアカウントに保存されています。</p>
         <div class="cols" style="--c:7em 1fr"><span class="k">メール</span><span>${game.account?.email ?? ''}</span></div>
         <div style="margin:8px 0"><button data-acct="logout">ログアウト</button></div>
         <div class="title" style="margin-top:12px">パスワードの変更</div>
@@ -194,18 +241,6 @@ function initBodies(S) {
         <div class="cols" style="--c:9em 1fr"><span>パスワード</span><input id="acctDel" type="password" autocomplete="current-password"></div>
         <div style="margin:6px 0"><button data-acct="delete" style="color:#f87171">アカウントを削除する</button></div>
         <p id="acctMsg" style="min-height:1.4em;color:#fbbf24"></p>`;
-    S.bodies = { stock: stockBody, status: statusBody, equip: equipBody, item: itemBody, setting: settingBody, account: accountBody, help: helpBody };
-
-    on(E.winBody, 'click', '[data-rm]', (e, t) => { game.setStockSlot(Number(t.dataset.rm), null); S.openWin('stock'); });
-    on(E.winBody, 'click', '[data-detail]', (e, t) => {
-        if (e.target.closest('[data-rm]')) return;
-        const i = Number(t.dataset.detail), it = slotItem(i);
-        S.setBody(html`<h3>ストック</h3><p>枠 ${i + 1}</p><h3>${it.name}</h3><p>${kindLabel(game, it)}</p><p>${itemDetail(game, it)}</p>`);
-        S.setBack(() => S.openWin('stock'));
-    });
-    on(E.winBody, 'click', '[data-add]', (e, t) => { S.setBody('<h3>ストック</h3>' + pickBody(Number(t.dataset.add))); S.setBack(() => S.openWin('stock')); });
-    on(E.winBody, 'click', '.pick[data-slot]:not(.dis)', (e, t) => { game.setStockSlot(Number(t.dataset.slot), t.dataset.id); S.openWin('stock'); });
-    on(E.winBody, 'click', '[data-keyset]', (e, t) => { S.keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
     on(E.winBody, 'click', '[data-acct]', async (e, t) => {
         const msg = (text) => { const m = jhtml.$('acctMsg'); if (m) m.textContent = text; };
         const val = (id) => jhtml.$(id)?.value ?? '';
@@ -230,9 +265,6 @@ function initBodies(S) {
             }
         } catch (ex) { msg(errText(ex)); }
     });
-    on(E.winBody, 'click', '.pick[data-gk]:not(.dis)', (e, t) => { S.setBody('<h3>装備</h3>' + gearPickBody(t.dataset.gk)); S.setBack(() => S.openWin('equip')); });
-    on(E.winBody, 'click', '.pick[data-gset]:not(.dis)', (e, t) => { game.equipGear(t.dataset.gset, t.dataset.gid || null); S.openWin('equip'); });
-    on(E.winBody, 'click', '.pick[data-item]', (e, t) => { const it = ITEMS[Number(t.dataset.item)]; S.setBody(html`<h3>道具</h3><h3>${it[0]}</h3><p>${it[1]}${it[1] === '道具' ? '　所持 ' + it[2] + ' 個' : ''}</p><p>${it[3]}</p>`); S.setBack(() => S.openWin('item')); });
 }
 
 // 会話・ボスの帯・死亡（見た目だけ。コンソールの window.mock から確認できる）

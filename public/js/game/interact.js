@@ -34,7 +34,8 @@ export const interactMethods = {
         for (const b of Object.values(p.buffs ?? {})) if (b.t > 0) b.t -= dt;   // 補助魔法の効果の残り時間
         if (p.staminaPause > 0) { p.staminaPause -= dt; return; }
         const ratio = this.loadRatio(), regen = ((p.abilities?.end ?? 14) * d.regenEnd + (p.level ?? 1) * d.regenLevel) / (ratio > 1 ? this.staminaMul() : 1);   // 重量比が 1 を超えるときは、倍率 m で割る
-        p.stamina = Math.min(p.maxStamina, p.stamina + regen * dt);
+        const boost = p.buffs?.staminaRegenRate;   // 疲労回復の香: 自然回復が増える
+        p.stamina = Math.min(p.maxStamina, p.stamina + regen * (boost?.t > 0 ? boost.rate : 1) * dt);
         if (p.staminaExhausted && p.stamina >= p.maxStamina * d.resumeRatio) p.staminaExhausted = false;
     },
 
@@ -187,7 +188,9 @@ export const interactMethods = {
             const goods = all.slice(m.page * SHOP_PAGE_SIZE, (m.page + 1) * SHOP_PAGE_SIZE)
                 .map(g => g.spellId
                     ? { label: `${g.name}　${g.price}G${this.isSpellLearned(g.spellId) ? '（覚えた）' : ''}`, act: () => { m.note = this.buySpell(g).message; } }   // 魔法は、買って覚える
-                    : { label: `${g.name}　${g.price}G`, act: () => { m.note = `（ダミー）${g.name}の購入は準備中です`; } });
+                    : g.itemId
+                        ? { label: `${g.name}　${g.price}G（所持 ${this.itemCount(g.itemId)}）`, act: () => { m.note = this.buyItem(g).message; } }   // 道具は、買って持ち物に入れる
+                        : { label: `${g.name}　${g.price}G`, act: () => { m.note = `（ダミー）${g.name}の購入は準備中です`; } });
             const turn = (d) => () => { m.page += d; m.index = 0; m.note = ''; };
             if (m.page > 0) goods.push({ label: '◀ 前のページ', act: turn(-1) });
             if (m.page < pages - 1) goods.push({ label: '次のページ ▶', act: turn(1) });

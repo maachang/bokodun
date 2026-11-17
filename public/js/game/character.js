@@ -18,6 +18,7 @@ export const characterMethods = {
         p.jobs = { primary: def.jobs.primary, sub: def.jobs.sub ?? null, levels: { ...def.jobs.levels }, expStock: def.jobs.expStock ?? 0 };   // 職業（第一・サブ・レベル・経験値のストック）
         this.syncJob();   // 戦闘の式が見る player.job・player.level
         p.equip = { armor: null, helm: null, shield: null, ...def.equip };   // 防具（鎧・兜・盾）
+        p.inventory = { ...(def.inventory ?? {}) };   // 所持品（道具）: ID → 個数（inventory.js）
         p.magics = [...(def.magics ?? [])];   // 覚えている魔法（呪文の ID）。ストックに入れられるのは、覚えた呪文だけ
     },
 
@@ -131,7 +132,7 @@ export const characterMethods = {
         if (this.isSpellLearned(good.spellId)) return { ok: false, message: `${good.name}は、すでに覚えています` };
         if ((p.gold ?? 0) < good.price) return { ok: false, message: `お金が足りません（${good.price}G・所持 ${p.gold ?? 0}G）` };
         const r = this.learnSpell(good.spellId);
-        if (r.ok) p.gold -= good.price;
+        if (r.ok) { p.gold -= good.price; this.updateUI?.(); }
         return r.ok ? { ok: true, message: `${good.name}を買って、覚えました（${good.price}G）` } : r;
     }
 };
