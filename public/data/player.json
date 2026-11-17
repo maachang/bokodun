@@ -1,7 +1,16 @@
 {
-  "equipSlots": ["dagger", "iron_sword", "iron_greatsword", "iron_mace", "apprentice_staff", "magic_rod", null, null],
-  "meleeSlot": 0,
-  "focusSlot": null,
-  "magicSlots": ["fire", "explosion", "spread", "magic_bolt"],
-  "selectedMagic": 0
+  "stock": [
+    "dagger",
+    "iron_sword",
+    "iron_greatsword",
+    "iron_mace",
+    "apprentice_staff",
+    "fire",
+    "explosion",
+    "spread",
+    "magic_bolt"
+  ],
+  "selMelee": 0,
+  "selFocus": null,
+  "selMagic": 5
 }

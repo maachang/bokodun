@@ -144,41 +144,6 @@
         .legend { font-size: 11px; color: #9ca3af; margin-top: 4px; }
 
         /* Enemy Info HUD Panel (Ys-style Target Info) */
-        /* 武器スロット（クリックで選択）と魔法スロット（数字キー 1〜4・セレクトボックス）。HUD 全体は pointer-events:none なので個別に有効化する */
-        #weaponHud, #magicHud {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 4px;
-            margin-top: 6px;
-            font-size: 11px;
-            pointer-events: auto;
-        }
-        .weapon-slot {
-            padding: 2px 6px;
-            border: 1px solid #475569;
-            border-radius: 3px;
-            color: #94a3b8;
-            background: rgba(15, 23, 42, 0.6);
-            white-space: nowrap;
-            cursor: pointer;
-        }
-        .weapon-slot.empty {
-            color: #475569;
-            border-style: dashed;
-            cursor: default;
-        }
-        .weapon-slot.active-melee {
-            color: #fef08a;
-            border-color: #facc15;
-            background: rgba(120, 53, 15, 0.7);
-            font-weight: bold;
-        }
-        .weapon-slot.active-focus {
-            color: #bbf7d0;
-            border-color: #4ade80;
-            background: rgba(20, 83, 45, 0.7);
-            font-weight: bold;
-        }
         #effectTestHud {
             display: flex;
             flex-wrap: wrap;
@@ -196,29 +161,6 @@
             cursor: pointer;
         }
         .test-btn:hover { border-color: #facc15; color: #fef08a; }
-        .magic-slot {
-            display: flex;
-            align-items: center;
-            gap: 3px;
-            padding: 1px 4px;
-            border: 1px solid #475569;
-            border-radius: 3px;
-            color: #94a3b8;
-            background: rgba(15, 23, 42, 0.6);
-        }
-        .magic-slot.active-magic {
-            color: #bae6fd;
-            border-color: #38bdf8;
-            background: rgba(12, 74, 110, 0.7);
-            font-weight: bold;
-        }
-        .magic-slot select {
-            font-size: 11px;
-            max-width: 96px;
-            color: inherit;
-            background: rgba(15, 23, 42, 0.9);
-            border: none;
-        }
         #enemyHudList {
             display: flex;
             flex-direction: column; /* 新しいものが一番上（パネルに入る限り出す。入りきらない分は、下から隠れる） */
@@ -286,7 +228,8 @@
         .slot { position: relative; height: 44px; border: 1px solid #4b5563; border-radius: 3px; background: #0f172a; text-align: center; font-size: 11px; line-height: 1.2; padding-top: 12px; cursor: pointer; }
         .slot .no { position: absolute; top: 1px; left: 3px; color: #9ca3af; }
         .slot.empty { color: #4b5563; cursor: default; }
-        .slot.selW { outline: 2px solid #f59e0b; } .slot.selM { outline: 2px solid #38bdf8; }
+        .slot.selW { outline: 2px solid #f59e0b; } .slot.selM { outline: 2px solid #38bdf8; } .slot.selF { outline: 2px solid #4ade80; }
+        .slot.lack { opacity: .45; }   /* MP が足りない魔法 */
         .slot .tag { position: absolute; top: 1px; right: 3px; font-size: 10px; }
         .sel { cursor: pointer; font-size: 11px; padding: 1px 4px; border-radius: 3px; } .sel:hover { background: #374151; }
         /* メニュー */
@@ -630,7 +573,7 @@
         <section class="panel" id="panel-stock">
             <div class="panel-title">ストック（1〜9 / クリックで選択）</div>
             <div id="slots"></div>
-            <div class="legend"><span style="color:#f59e0b">■</span> 選択中の武器　<span style="color:#38bdf8">■</span> 選択中の魔法</div>
+            <div class="legend"><span style="color:#f59e0b">■</span> 武器　<span style="color:#4ade80">■</span> 杖　<span style="color:#38bdf8">■</span> 魔法</div>
             <div id="selInfo"></div>
         </section>
 
@@ -661,18 +604,6 @@
         <!-- 方角（現在向いている、大体の方向。既定は、ゲーム画面の右上に重ねる） -->
         <section class="panel-bare" id="panel-compass">
             <div class="badge" id="compassText">北</div>
-        </section>
-
-        <!-- 魔法スロット（数字キー 1〜4 で切り替え。中身はセレクトボックスで選ぶ） -->
-        <section class="panel" id="panel-magic">
-            <div class="panel-title">MAGIC [1]-[4] / [Tab]</div>
-            <div id="magicHud"></div>
-        </section>
-
-        <!-- 武器スロット（クリックで選択。空きは破線） -->
-        <section class="panel" id="panel-weapon">
-            <div class="panel-title">WEAPON（クリックで選択）</div>
-            <div id="weaponHud"></div>
         </section>
 
         <!-- 武器エフェクトのテスト（突進を当てなくても、各武器クラスの斬撃エフェクトを表示して確認できる） -->
@@ -752,14 +683,14 @@
         <!-- 操作ヒント -->
         <section class="badge" id="panel-hints" style="color: #facc15; font-size: 12px; display: flex; flex-direction: column; gap: 2px;">
             <div>💡 秘技: 体を半分ずらして突撃 (半ずらし会心!)</div>
-            <div style="color: #60a5fa;">🔥 魔法: [Space] / [F] で発射　魔法切替: [1]〜[4] / [Tab]　武器: 武器パネルをクリック</div>
+            <div style="color: #60a5fa;">🔥 魔法: [Space] / [F] で発射　ストック: [1]〜[9]（クリックでも選べる）　魔法の順送り: [Tab]</div>
             <div style="color: #60a5fa;">🎥 カメラ: [Ctrl]+[↑][↓] 視点の上下　[Ctrl]+[←][→] ゆっくり旋回　[Ctrl]+[0] 視点リセット</div>
         </section>
         <!-- 操作の説明（デバッグのダイアログの中） -->
         <section class="panel" id="panel-instructions">
     <div id="instructions">
         <div>移動: <span class="key">↑</span><span class="key">↓</span> または <span class="key">W</span><span class="key">S</span> / ダッシュ: <span class="key">Shift</span> / 旋回: <span class="key">←</span><span class="key">→</span> または <span class="key">Q</span><span class="key">E</span> / 調べる・開ける: <span class="key">E</span> / カニ歩き: <span class="key">A</span><span class="key">D</span></div>
-        <div>魔法: <span class="key">Space</span> または <span class="key">F</span> でファイアボール</div>
+        <div>ストック: <span class="key">1</span>〜<span class="key">9</span> で武器・魔法を選ぶ / 魔法: <span class="key">Space</span> または <span class="key">F</span> で発射 / <span class="key">Tab</span> で次の魔法</div>
         <div>近接: 敵に体当たり（中心を少し外す「半ずらし」で無傷クリティカル）</div>
     </div>
         </section>

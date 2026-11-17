@@ -3,55 +3,70 @@
 import { effectPower } from '/js/game/constants.js';
 
 export const equipmentMethods = {
-    // ---- 武器スロットと魔法スロット（アイテム定義は items.json、初期値は player.json）----
-    //   武器スロット（player.equipSlots・8 枠）: 近接武器は「突進攻撃」に、杖・ロッドは魔法の補正に使う。HUD のクリックで選ぶ
-    //   魔法スロット（player.magicSlots・4 枠）: 呪文または弓。数字キー 1〜4 で切り替え、中身は HUD のセレクトボックスで自由に選ぶ。Space / F / クリックで使う
+    // ---- ストック（9 枠）: 武器・杖・魔法・弓を、好きに入れる。切り替えは数字キー 1〜9 かクリック ----
+    //   player.stock（9 枠・アイテム ID または null＝空き）。初期値は player.json
+    //   選択は、種類ごとに 1 つ: 近接武器（selMelee・突進に使う）／杖・ロッド（selFocus・魔法の補正。なくてもよい）／呪文か弓（selMagic・Space / F / クリックで使う）
+    //   枠の番号を選ぶと、その枠の中身の種類で、選ぶ先が決まる（selectSlot）
     getSlotItem(slot) {
-        const id = (slot === null || slot === undefined) ? null : this.player.equipSlots[slot];
+        const id = (slot === null || slot === undefined) ? null : this.player.stock[slot];
         return (id && this.items[id]) || null;
     },
 
-    // 突進攻撃に使う近接武器（未装備なら素手）
+    // 突進攻撃に使う近接武器（未選択なら素手）
     getMeleeItem() {
-        return this.getSlotItem(this.player.meleeSlot) || this.items.fists || null;
+        return this.getSlotItem(this.player.selMelee) || this.items.fists || null;
     },
 
-    // 魔法を補正する杖・ロッド（未装備なら null）
+    // 魔法を補正する杖・ロッド（未選択なら null）
     getFocusItem() {
-        return this.getSlotItem(this.player.focusSlot);
+        return this.getSlotItem(this.player.selFocus);
     },
 
-    // 選択中の魔法スロットのアイテム（空きなら null）
-    getMagicItem(slot = this.player.selectedMagic) {
-        const id = this.player.magicSlots[slot];
-        return (id && this.items[id]) || null;
+    // 選択中の呪文・弓（なければ null）
+    getMagicItem(slot = this.player.selMagic) {
+        const item = this.getSlotItem(slot);
+        return this.isMagicItem(item) ? item : null;
     },
 
-    // 武器スロットのクリック選択: 近接武器は突進用に装備、杖・ロッドは補正として装備（もう一度選ぶと外れる）。空きは何も変わらない
+    // 呪文または弓（shoot クラスの武器）は、魔法の側
+    isMagicItem(item) {
+        if (!item) return false;
+        if (item.kind === 'spell') return true;
+        return this.weaponClasses[item.weaponClass]?.attack === 'shoot';
+    },
+
+    // ストックに入れられるのは、武器・杖・ロッド・弓と、呪文（消耗品・鍵は入れられない）
+    isStockable(item) {
+        return !!item && (item.kind === 'spell' || item.kind === 'weapon');
+    },
+
+    // 枠の選択（数字キー 1〜9 / クリック）: 近接武器は突進用、杖・ロッドは補正（もう一度選ぶと外れる）、呪文・弓は魔法として選ぶ。空きは何も変わらない
     selectSlot(slot) {
         const item = this.getSlotItem(slot);
-        const cls = item && this.weaponClasses[item.weaponClass];
-        if (!cls) return;
-        if (cls.attack === 'melee') {
-            this.player.meleeSlot = slot;
-        } else if (cls.attack === 'cast') {
-            this.player.focusSlot = (this.player.focusSlot === slot) ? null : slot;
+        if (!item) return;
+        if (this.isMagicItem(item)) {
+            this.player.selMagic = slot;
+        } else {
+            const cls = this.weaponClasses[item.weaponClass];
+            if (cls?.attack === 'melee') this.player.selMelee = slot;
+            else if (cls?.attack === 'cast') this.player.selFocus = (this.player.selFocus === slot) ? null : slot;
+            else return;
         }
         this.updateEquipHud();
     },
 
-    // 数字キー 1〜4: 魔法スロットを選ぶ（範囲外は無視。空きスロットも選べる）
+    // 呪文・弓の枠を選ぶ（それ以外の枠・範囲外は無視）
     selectMagic(slot) {
-        if (slot < 0 || slot >= this.player.magicSlots.length) return;
-        this.player.selectedMagic = slot;
+        if (!this.getMagicItem(slot)) return;
+        this.player.selMagic = slot;
         this.updateEquipHud();
     },
 
-    // Tab: 次の「空きでない」魔法スロットへ順送り
+    // Tab: 次の、呪文・弓の枠へ順送り
     cycleMagic() {
-        const slots = this.player.magicSlots;
-        for (let step = 1; step <= slots.length; step++) {
-            const next = (this.player.selectedMagic + step) % slots.length;
+        const n = this.player.stock.length, cur = this.player.selMagic ?? -1;
+        for (let step = 1; step <= n; step++) {
+            const next = (cur + step + n) % n;
             if (this.getMagicItem(next)) {
                 this.selectMagic(next);
                 return;
@@ -59,93 +74,42 @@ export const equipmentMethods = {
         }
     },
 
-    // 魔法スロットに入れられるのは、呪文または弓（shoot クラスの武器）
-    isMagicItem(item) {
-        if (!item) return false;
-        if (item.kind === 'spell') return true;
-        return this.weaponClasses[item.weaponClass]?.attack === 'shoot';
-    },
-
-    // 魔法スロットの中身を変える（HUD のセレクトボックス / デバッグ: game.setMagicSlot(2, 'magic_bolt')）
-    setMagicSlot(slot, itemId) {
-        if (slot < 0 || slot >= this.player.magicSlots.length) {
-            console.warn(`魔法スロット番号が範囲外です (0〜${this.player.magicSlots.length - 1})`);
-            return false;
-        }
-        if (itemId !== null && !this.isMagicItem(this.items[itemId])) {
-            console.warn(`魔法スロットに入れられません（呪文または弓のみ）: ${itemId}`);
-            return false;
-        }
-        this.player.magicSlots[slot] = itemId;
-        this.updateEquipHud();
-        return true;
-    },
-
-    // デバッグ用: 武器スロットの中身を差し替える（コンソールから game.equipItem(6, 'iron_mace') / game.equipItem(6, null)）
-    //   入れられるのは近接武器と杖・ロッド。呪文と弓は魔法スロットへ（setMagicSlot）
-    equipItem(slot, itemId) {
-        if (slot < 0 || slot >= this.player.equipSlots.length) {
-            console.warn(`スロット番号が範囲外です (0〜${this.player.equipSlots.length - 1})`);
+    // ストックの枠の中身を変える（ダイアログの「追加」「✕」 / デバッグ: game.setStockSlot(2, 'magic_bolt')）。null で空きに戻す
+    //   変えた枠が、いま選んでいる枠なら、選択を外す。その種類の選択が 1 つもなくなったときは、入れたものを選ぶ（近接武器・呪文・弓。杖は、自動では選ばない）
+    setStockSlot(slot, itemId) {
+        const p = this.player;
+        if (!Number.isInteger(slot) || slot < 0 || slot >= p.stock.length) {
+            console.warn(`ストックの枠の番号が範囲外です (0〜${p.stock.length - 1})`);
             return false;
         }
         if (itemId !== null && !this.items[itemId]) {
             console.warn(`未定義のアイテムです: ${itemId} （game.listItems() で一覧）`);
             return false;
         }
-        if (itemId !== null && this.isMagicItem(this.items[itemId])) {
-            console.warn(`武器スロットには入れられません（呪文・弓は魔法スロットへ: game.setMagicSlot）: ${itemId}`);
+        if (itemId !== null && !this.isStockable(this.items[itemId])) {
+            console.warn(`ストックに入れられません（武器・杖・魔法・弓のみ）: ${itemId}`);
             return false;
         }
-        this.player.equipSlots[slot] = itemId;
-        // 装備中だったスロットを差し替えた場合は、装備を外す
-        if (this.player.meleeSlot === slot) this.player.meleeSlot = null;
-        if (this.player.focusSlot === slot) this.player.focusSlot = null;
+        p.stock[slot] = itemId;
+        for (const k of ['selMelee', 'selFocus', 'selMagic']) if (p[k] === slot) p[k] = null;
+        const item = itemId && this.items[itemId];
+        if (item) {
+            if (this.isMagicItem(item)) { if (p.selMagic === null) p.selMagic = slot; }
+            else if (this.weaponClasses[item.weaponClass]?.attack === 'melee') { if (p.selMelee === null) p.selMelee = slot; }
+        }
         this.updateEquipHud();
         return true;
     },
 
-    // デバッグ用: アイテム定義の一覧と、現在の武器・魔法スロットの中身をコンソールに表示
+    // デバッグ用: アイテム定義の一覧と、現在のストックの中身をコンソールに表示
     listItems() {
         console.table(Object.values(this.items).map(i => ({ id: i.id, name: i.name, kind: i.kind, class: i.weaponClass ?? i.type })));
-        console.log('武器スロット:', this.player.equipSlots.map((id, i) => `${i + 1}:${id ?? '(空き)'}`).join('  '));
-        console.log('魔法スロット:', this.player.magicSlots.map((id, i) => `${i + 1}:${id ?? '(空き)'}`).join('  '));
+        console.log('ストック:', this.player.stock.map((id, i) => `${i + 1}:${id ?? '(空き)'}`).join('  '));
     },
 
-    // 武器・魔法スロット HUD
-    //   武器: クリックで選択（突進用=金、補正の杖・ロッド=緑。空きは破線）
-    //   魔法: 数字キー 1〜4 で切り替え（選択中=青）、中身はセレクトボックスで自由に選ぶ
+    // ストックの表示（右の列の 9 枠）の更新。画面側（js/playUi.js）が onStockChange に、描き直す関数を入れる
     updateEquipHud() {
-        const weaponEl = jhtml.$('weaponHud');
-        if (weaponEl) {
-            weaponEl.innerHTML = this.player.equipSlots.map((id, i) => {
-                const item = (id && this.items[id]) || null;
-                const cls = (i === this.player.meleeSlot ? 'active-melee ' : '') + (i === this.player.focusSlot ? 'active-focus ' : '') + (item ? '' : 'empty');
-                return jhtml.html`<span class="weapon-slot ${cls}" data-slot="${i}">${item ? item.name : '―'}</span>`;
-            }).join('');
-        }
-
-        const magicEl = jhtml.$('magicHud');
-        if (magicEl) {
-            const options = Object.values(this.items).filter(it => this.isMagicItem(it));
-            magicEl.innerHTML = this.player.magicSlots.map((id, i) => jhtml.html`<label class="magic-slot ${i === this.player.selectedMagic ? 'active-magic' : ''}">${i + 1}<select data-slot="${i}"><option value="">（なし）</option>${options.map(o => jhtml.html`<option value="${o.id}" ${o.id === id ? 'selected' : ''}>${o.name}</option>`)}</select></label>`).join('');
-        }
-    },
-
-    // HUD の操作（武器スロットのクリック、魔法スロットのセレクトボックス）。コンストラクタから一度だけ呼ぶ
-    initEquipHudEvents() {
-        jhtml.on('weaponHud', 'click', '.weapon-slot', (e, el) => {
-            this.selectSlot(Number(el.dataset.slot));
-        });
-        jhtml.on('magicHud', 'change', 'select', (e, el) => {
-            this.setMagicSlot(Number(el.dataset.slot), el.value || null);
-            el.blur(); // ゲームのキー操作（数字キーなど）をセレクトボックスが奪わないようにする
-        });
-        jhtml.on('magicHud', 'click', '.magic-slot', (e, el) => {
-            // 枠のラベルをクリックしたとき（セレクトボックス以外）はその枠を選ぶ
-            if (e.target.tagName !== 'SELECT' && e.target.tagName !== 'OPTION') {
-                this.selectMagic(Number(el.querySelector('select').dataset.slot));
-            }
-        });
+        if (this.onStockChange) this.onStockChange();
     },
 
     // 武器エフェクトのテスト表示（HUD の「エフェクトテスト」パネル）。突進を当てなくても、各武器クラスの斬撃エフェクトを確認できる

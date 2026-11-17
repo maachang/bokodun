@@ -25,7 +25,7 @@ async function loadModules() {
 
 const tex = new Proxy({}, { get: () => ({}) });
 // 初期装備でアイテム ID が入っているスロット番号
-const bySlot = (id) => playerDef.equipSlots.indexOf(id);
+const bySlot = (id) => playerDef.stock.indexOf(id);
 
 // DOM・描画に依存しない、戦闘ロジックだけを検証するための模擬ゲーム
 function makeGame({ GameEngine }, { mp = 60 } = {}) {
@@ -34,8 +34,7 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
     Object.assign(g, {
         player: {
             x: 0, z: 0, angle: 0, radius: 0.6, attackPower: 15, mp, magicCooldown: 0, attackCooldown: 0,
-            equipSlots: [...playerDef.equipSlots], meleeSlot: playerDef.meleeSlot, focusSlot: playerDef.focusSlot,
-            magicSlots: [...playerDef.magicSlots], selectedMagic: playerDef.selectedMagic,
+            stock: [...playerDef.stock], selMelee: playerDef.selMelee, selFocus: playerDef.selFocus, selMagic: playerDef.selMagic,
             isFalling: false
         },
         keys: { forward: true },
@@ -59,14 +58,15 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
 
 // angle = 0 のプレイヤーは -z 方向（z が負の側）を向く
 const spawn = (M, type, x, z) => new M.Monster(type, x, z, tex, enemyDefs[type]);
-// 武器スロット（空きの 7・8 番）に入れてクリック選択する（近接=突進用、杖・ロッド=魔法の補正）
+// ストックの枠に入れて選択する（近接=突進用、杖・ロッド=魔法の補正。枠 0〜3 は近接武器、4 は杖。ここでは近接は 3 番、杖は 4 番を差し替える）
 const equip = (g, id) => {
-    const slot = weaponClasses[items[id].weaponClass].attack === 'melee' ? 6 : 7;
-    g.equipItem(slot, id);
+    const slot = weaponClasses[items[id].weaponClass].attack === 'melee' ? 3 : 4;
+    g.setStockSlot(slot, id);
     g.selectSlot(slot);
 };
-// 魔法スロットの中身を差し替えて選択する
-const magic = (g, id, slot = 0) => { g.setMagicSlot(slot, id); g.selectMagic(slot); };
+// 魔法・弓は、ストックの 6〜9 番（枠 5〜8。既定は呪文 4 つ）の、slot 番目（0〜3）を差し替えて選択する
+const MAGIC_BASE = 5;
+const magic = (g, id, slot = 0) => { g.setStockSlot(MAGIC_BASE + slot, id); g.selectMagic(MAGIC_BASE + slot); };
 // 前進入力で敵に突進した 1 回分の判定を実行する
 const bump = (g, m) => {
     const dx = m.x - g.player.x, dz = m.z - g.player.z;
@@ -143,26 +143,23 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
         }
     });
 
-    await t.test('初期装備: 武器スロット 8 枠（近接武器・杖・ロッド・空き）と、魔法スロット 4 枠（呪文または弓）', () => {
-        assert.equal(playerDef.equipSlots.length, 8);
-        for (const id of playerDef.equipSlots) {
-            assert.ok(id === null || (items[id]?.kind === 'weapon' && weaponClasses[items[id].weaponClass].attack !== 'shoot'), `武器スロットに入れられない: ${id}`);
+    await t.test('初期装備: ストック 9 枠（近接武器・杖・ロッド・呪文・弓・空き）と、選択中の枠', () => {
+        assert.equal(playerDef.stock.length, 9);
+        for (const id of playerDef.stock) {
+            assert.ok(id === null || items[id]?.kind === 'spell' || items[id]?.kind === 'weapon', `ストックに入れられない: ${id}`);
         }
-        assert.equal(weaponClasses[items[playerDef.equipSlots[playerDef.meleeSlot]].weaponClass].attack, 'melee');
-        assert.ok(playerDef.focusSlot === null || weaponClasses[items[playerDef.equipSlots[playerDef.focusSlot]].weaponClass].attack === 'cast');
-
-        assert.equal(playerDef.magicSlots.length, 4);
-        for (const id of playerDef.magicSlots) {
-            assert.ok(id === null || items[id]?.kind === 'spell' || weaponClasses[items[id].weaponClass]?.attack === 'shoot', `魔法スロットに入れられない: ${id}`);
-        }
-        assert.ok(playerDef.selectedMagic >= 0 && playerDef.selectedMagic < playerDef.magicSlots.length);
+        const attackOf = (slot) => weaponClasses[items[playerDef.stock[slot]].weaponClass]?.attack;
+        assert.equal(attackOf(playerDef.selMelee), 'melee');
+        assert.ok(playerDef.selFocus === null || attackOf(playerDef.selFocus) === 'cast');
+        const mg = items[playerDef.stock[playerDef.selMagic]];
+        assert.ok(mg.kind === 'spell' || weaponClasses[mg.weaponClass].attack === 'shoot', '選択中の魔法の枠は、呪文か弓');
     });
 });
 
-test('武器スロット（クリック）と魔法スロット（数字キー・セレクトボックス）', async (t) => {
+test('ストック（9 枠: 数字キー 1〜9・クリック）', async (t) => {
     const M = await loadModules();
 
-    await t.test('武器スロットのクリック: 近接は突進用、杖・ロッドは魔法の補正に装備され、両方が同時に有効。補正はもう一度選ぶと外れる', () => {
+    await t.test('枠の選択: 近接は突進用、杖・ロッドは魔法の補正（両方が同時に有効）、呪文・弓は魔法。補正はもう一度選ぶと外れる', () => {
         const { g } = makeGame(M);
         assert.equal(g.getMeleeItem().id, 'dagger');
         assert.equal(g.getFocusItem(), null);
@@ -171,67 +168,68 @@ test('武器スロット（クリック）と魔法スロット（数字キー�
         g.selectSlot(bySlot('apprentice_staff'));
         assert.equal(g.getFocusItem().id, 'apprentice_staff');
         assert.equal(g.getMeleeItem().id, 'iron_sword', '補正を付けても突進用は変わらない');
-        g.selectSlot(bySlot('magic_rod'));
-        assert.equal(g.getFocusItem().id, 'magic_rod', '補正は 1 つだけ');
-        g.selectSlot(bySlot('magic_rod'));
+        g.selectSlot(bySlot('apprentice_staff'));
         assert.equal(g.getFocusItem(), null, 'もう一度選ぶと外れる');
+        g.selectSlot(bySlot('explosion'));
+        assert.equal(g.getMagicItem().id, 'explosion', '呪文の枠を選ぶと、魔法が切り替わる');
+        assert.equal(g.getMeleeItem().id, 'iron_sword', '魔法を選んでも、突進用は変わらない');
     });
 
-    await t.test('空きスロットや範囲外のクリックは何も変わらない', () => {
+    await t.test('空きの枠や範囲外のクリックは何も変わらない', () => {
         const { g } = makeGame(M);
-        g.selectSlot(6);
+        g.setStockSlot(8, null);
+        g.selectSlot(8);
         g.selectSlot(99);
-        assert.equal(g.player.meleeSlot, playerDef.meleeSlot);
-        assert.equal(g.player.focusSlot, null);
+        assert.equal(g.player.selMelee, playerDef.selMelee);
+        assert.equal(g.player.selFocus, null);
+        assert.equal(g.player.selMagic, playerDef.selMagic, '空きの枠・範囲外を選んでも、選択は変わらない');
+        g.setStockSlot(playerDef.selMagic, null);
+        assert.equal(g.player.selMagic, null, '選んでいた魔法の枠を空にすると、魔法の選択が外れる');
     });
 
-    await t.test('数字キー: 魔法スロットを選ぶ（範囲外は無視）。Tab は空きを飛ばして順送り', () => {
+    await t.test('魔法の枠を選ぶ（呪文・弓以外の枠・範囲外は無視）。Tab は、呪文・弓の枠を、空きや武器を飛ばして順送り', () => {
         const { g } = makeGame(M);
-        g.selectMagic(2);
-        assert.equal(g.player.selectedMagic, 2);
-        g.selectMagic(9);
-        assert.equal(g.player.selectedMagic, 2);
+        g.selectMagic(7);
+        assert.equal(g.player.selMagic, 7);
+        g.selectMagic(0);
+        assert.equal(g.player.selMagic, 7, '武器の枠は、魔法として選べない');
+        g.selectMagic(99);
+        assert.equal(g.player.selMagic, 7);
         g.cycleMagic();
-        assert.equal(g.player.selectedMagic, 3);
-        g.setMagicSlot(0, null); // 先頭を空きにする
-        g.cycleMagic();          // 4 の次は空きの 1 を飛ばして 2
-        assert.equal(g.player.selectedMagic, 1);
+        assert.equal(g.player.selMagic, 8);
+        g.cycleMagic();
+        assert.equal(g.player.selMagic, 5, '最後の次は、武器の枠を飛ばして、先頭の呪文へ');
     });
 
-    await t.test('セレクトボックス: 魔法スロットに呪文・弓を自由に入れられる。近接武器や未定義は入れられない', () => {
+    await t.test('ストックの枠に、武器・杖・呪文・弓を自由に入れられる。消耗品・未定義・範囲外は入れられない', () => {
         const { g } = makeGame(M);
         const warn = console.warn; console.warn = () => {};
         try {
-            assert.equal(g.setMagicSlot(0, 'magic_bolt'), true);
-            assert.equal(g.getMagicItem(0).id, 'magic_bolt');
-            assert.equal(g.setMagicSlot(3, 'short_bow'), true);
-            assert.equal(g.getMagicItem(3).id, 'short_bow');
-            assert.equal(g.setMagicSlot(1, null), true);
-            assert.equal(g.getMagicItem(1), null);
-            assert.equal(g.setMagicSlot(0, 'iron_sword'), false, '近接武器は入れられない');
-            assert.equal(g.setMagicSlot(0, 'no_such_item'), false);
-            assert.equal(g.setMagicSlot(9, 'fire'), false);
-            assert.equal(g.getMagicItem(0).id, 'magic_bolt', '失敗した指定で中身は変わらない');
+            assert.equal(g.setStockSlot(5, 'magic_bolt'), true);
+            assert.equal(g.getMagicItem(5).id, 'magic_bolt');
+            assert.equal(g.setStockSlot(8, 'short_bow'), true);
+            assert.equal(g.getMagicItem(8).id, 'short_bow', '弓は、魔法の側');
+            assert.equal(g.setStockSlot(0, 'fire'), true, '武器の枠にも、呪文を入れられる（枠の種類はない）');
+            assert.equal(g.setStockSlot(1, 'herb'), false, '消耗品は入れられない');
+            assert.equal(g.setStockSlot(1, 'no_such_item'), false);
+            assert.equal(g.setStockSlot(9, 'fire'), false);
+            assert.equal(g.setStockSlot(-1, 'fire'), false);
+            assert.equal(g.getSlotItem(1).id, 'iron_sword', '失敗した指定で中身は変わらない');
         } finally { console.warn = warn; }
     });
 
-    await t.test('デバッグ用の装備変更: equipItem は近接武器・杖・ロッドのみ。呪文・弓は入れられず、装備中のスロットを差し替えると外れる', () => {
+    await t.test('選んでいる枠を差し替える・空にすると、選択が外れる。その種類の選択がなくなったときは、入れたものを選ぶ（杖は自動では選ばない）', () => {
         const { g } = makeGame(M);
-        const warn = console.warn; console.warn = () => {};
-        try {
-            assert.equal(g.equipItem(6, 'iron_mace'), true);
-            assert.equal(g.getSlotItem(6).id, 'iron_mace');
-            assert.equal(g.equipItem(6, null), true);
-            assert.equal(g.equipItem(99, 'iron_mace'), false);
-            assert.equal(g.equipItem(0, 'no_such_item'), false);
-            assert.equal(g.equipItem(0, 'fire'), false, '呪文は武器スロットに入れられない');
-            assert.equal(g.equipItem(0, 'short_bow'), false, '弓は魔法スロットへ');
-            assert.equal(g.getSlotItem(0).id, 'dagger', '失敗した指定でスロットは変わらない');
-
-            assert.equal(g.equipItem(0, null), true); // 突進用に装備中のスロットを空にする
-            assert.equal(g.player.meleeSlot, null);
-            assert.equal(g.getMeleeItem().id, 'fists', '未装備は素手');
-        } finally { console.warn = warn; }
+        assert.equal(g.setStockSlot(0, null), true);   // 突進用の枠を空にする
+        assert.equal(g.player.selMelee, null);
+        assert.equal(g.getMeleeItem().id, 'fists', '未選択は素手');
+        assert.equal(g.setStockSlot(0, 'iron_mace'), true);
+        assert.equal(g.player.selMelee, 0, '近接の選択がなかったので、入れたものを選ぶ');
+        assert.equal(g.setStockSlot(1, 'dagger'), true);
+        assert.equal(g.player.selMelee, 0, 'すでに選んでいるときは、変わらない');
+        g.selectSlot(bySlot('apprentice_staff'));
+        assert.equal(g.setStockSlot(bySlot('apprentice_staff'), 'magic_rod'), true);
+        assert.equal(g.getFocusItem(), null, '補正の枠を差し替えると、外れる（杖は自動では選ばない）');
     });
 });
 
@@ -377,7 +375,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
 
     await t.test('空きの魔法スロットでは何も起きない', () => {
         const { g } = makeGame(M);
-        g.setMagicSlot(0, null);
+        g.setStockSlot(MAGIC_BASE, null);
         g.useMagic();
         assert.equal(g.projectiles.length, 0);
         assert.equal(g.player.mp, 60);
@@ -397,7 +395,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
 
     await t.test('魔法の切り替え: スロットごとに別の呪文を撃てる（拡散弾・マジックボルト）', () => {
         const spread = makeGame(M);
-        spread.g.selectMagic(2);
+        spread.g.selectMagic(MAGIC_BASE + 2);
         spread.g.useMagic();
         assert.equal(spread.g.projectiles.length, 3);
         assert.equal(spread.g.player.mp, 40);
@@ -406,7 +404,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         assert.ok(spread.g.projectiles.every(p => p.damage === 15 && !p.explosive));
 
         const bolt = makeGame(M);
-        bolt.g.selectMagic(3);
+        bolt.g.selectMagic(MAGIC_BASE + 3);
         bolt.g.useMagic();
         assert.equal(bolt.g.projectiles[0].damage, 8);
         assert.equal(bolt.g.player.mp, 56);
@@ -443,7 +441,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
 
     await t.test('爆発火球: 弾を飛ばさず、前方 6m の地面に予告→着弾する（MP20・間隔0.9秒）', () => {
         const { g, calls } = makeGame(M);
-        g.selectMagic(1);
+        g.selectMagic(MAGIC_BASE + 1);
         g.useMagic();
         assert.equal(g.projectiles.length, 0, '弾は飛ばない');
         assert.equal(g.player.mp, 40);
@@ -459,7 +457,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         const { g, calls } = makeGame(M);
         g.colliders = [{ minX: -2, maxX: 2, minZ: -4.5, maxZ: -3.5 }]; // z=-3.5 に壁
         equip(g, 'apprentice_staff');
-        g.selectMagic(1);
+        g.selectMagic(MAGIC_BASE + 1);
         g.useMagic();
         const [, z, opts] = calls.strikes[0];
         assert.ok(z > -3.5 && z < -2.5, `壁の手前 (z=${z})`);
@@ -634,7 +632,7 @@ test('呪文の個性（見た目・状態異常・貫通・効果音）', async
     // 魔法スロット 1〜4 に入っている呪文を、スロット番号で撃って、できた弾を返す
     const cast = (slot) => {
         const { g, calls } = makeGame(M);
-        g.selectMagic(slot);
+        g.selectMagic(MAGIC_BASE + slot);
         g.useMagic();
         return { g, calls, p: g.projectiles[0] };
     };
@@ -1149,7 +1147,7 @@ test('エフェクトテストボタン（武器エフェクトの確認用）',
     });
 });
 
-test('HUD の描画（武器スロット・魔法スロット）', async (t) => {
+test('HUD の描画（ストックの再描画の通知・エフェクトテスト）', async (t) => {
     // jhtml.browser.js は maachang フレームワーク（MAACHANG_HOME/public/）にある。見つからない環境ではスキップする
     const jhtmlPath = path.join(process.env.MAACHANG_HOME || '/home/maachang/project/maachang', 'public/jhtml.browser.js');
     if (!fs.existsSync(jhtmlPath)) {
@@ -1159,7 +1157,7 @@ test('HUD の描画（武器スロット・魔法スロット）', async (t) => 
     const M = await loadModules();
     // jhtml.browser.js をそのまま読み込み、DOM 取得（$）だけ仮の要素に差し替える
     await import(jhtmlPath);
-    const els = { weaponHud: { innerHTML: '' }, magicHud: { innerHTML: '' }, effectTestHud: { innerHTML: '' } };
+    const els = { effectTestHud: { innerHTML: '' } };
     const realDollar = globalThis.jhtml.$;
     globalThis.jhtml.$ = (id) => els[id] ?? null;
 
@@ -1170,18 +1168,14 @@ test('HUD の描画（武器スロット・魔法スロット）', async (t) => 
         g.selectSlot(bySlot('apprentice_staff')); // 補正に装備（この間は空の updateEquipHud 差し替えの影響を受けない）
         g.updateEquipHud();
 
-        const weapon = els.weaponHud.innerHTML;
-        assert.equal((weapon.match(/class="weapon-slot/g) || []).length, 8, '武器スロット 8 枠');
-        assert.match(weapon, /class="weapon-slot active-melee "[^>]*data-slot="0">ダガー</, '突進用はダガー');
-        assert.match(weapon, /class="weapon-slot active-focus "[^>]*data-slot="4">見習いの杖</, '補正は見習いの杖');
-        assert.match(weapon, /class="weapon-slot empty"[^>]*data-slot="6">―</, '空きは破線');
-
-        const magicHtml = els.magicHud.innerHTML;
-        assert.equal((magicHtml.match(/<select /g) || []).length, 4, '魔法スロット 4 枠');
-        assert.match(magicHtml, /class="magic-slot active-magic">1<select data-slot="0">/, '選択中は 1 番');
-        assert.match(magicHtml, /<option value="fire" selected>ファイア<\/option>/, '1 番の中身はファイア');
-        assert.match(magicHtml, /<option value="short_bow"\s*>短弓<\/option>/, '選択肢に弓がある');
-        assert.doesNotMatch(magicHtml, /iron_sword/, '近接武器は選択肢にない');
+        // ストックの表示は、画面側（js/playUi.js）が onStockChange に登録した関数で描く。選択・変更のたびに呼ばれる
+        let drawn = 0;
+        g.onStockChange = () => { drawn++; };
+        g.selectSlot(bySlot('iron_sword'));
+        g.setStockSlot(8, null);
+        assert.equal(drawn, 2, '選択・変更のたびに、描き直しが呼ばれる');
+        g.updateEquipHud();
+        assert.equal(drawn, 3);
 
         // エフェクトテストのパネル: 強さの選択と、近接クラスごとのボタン
         g.updateEffectTestHud = M.GameEngine.prototype.updateEffectTestHud;
@@ -1192,10 +1186,6 @@ test('HUD の描画（武器スロット・魔法スロット）', async (t) => 
         const buttons = [...testHtml.matchAll(/<button class="test-btn" data-class="([^"]+)">([^<]+)<\/button>/g)].map(m => [m[1], m[2]]);
         assert.deepEqual(buttons, [['bare_hands', '素手'], ['dagger', 'ダガー'], ['sword', '剣'], ['greatsword', '大剣'], ['mace', 'メイス']], '近接クラスだけ');
 
-        g.selectMagic(2);
-        g.setMagicSlot(2, 'magic_bolt');
-        assert.match(els.magicHud.innerHTML, /class="magic-slot active-magic">3<select data-slot="2">/);
-        assert.match(els.magicHud.innerHTML, /<option value="magic_bolt" selected>マジックボルト<\/option>/);
     } finally {
         globalThis.jhtml.$ = realDollar;
     }

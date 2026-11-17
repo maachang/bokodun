@@ -202,7 +202,7 @@ test('ゲーム: プレイヤーの状態異常（毒・火傷は継続ダメー
     g.getMagicItem = () => ({ kind: 'spell', cooldown: 1 });
     let cast = false;
     g.castStrike = () => { cast = true; }; g.shootProjectiles = () => { cast = true; };
-    g.player.mp = 100; g.player.selectedMagic = 0;
+    g.player.mp = 100; g.player.selMagic = 5;
     g.player.status = { paralysis: { t: 1 } }; g.useMagic();
     assert.equal(cast, false, '麻痺: 使えない');
     g.player.status = { silence: { t: 3 } }; g.useMagic();

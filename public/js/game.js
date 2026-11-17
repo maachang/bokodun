@@ -56,7 +56,6 @@ export class GameEngine {
         this.initTextures();
         this.strikeEffects = new StrikeEffectSystem(this.scene, this.textures.firePillar, this.camera);
         this.initControls();
-        this.initEquipHudEvents();
         this.initEffectTestEvents();
     }
 
@@ -89,11 +88,10 @@ export class GameEngine {
             this.shops = await (await fetch('/data/shops.json')).json();   // 店の種類（店名・店主）。汎用の店マップが、入った店に応じて切り替える
             // 初期装備（装備スロットの中身と選択中のスロット）
             const playerDef = await playerRes.json();
-            this.player.equipSlots = [...playerDef.equipSlots];
-            this.player.meleeSlot = playerDef.meleeSlot ?? null;
-            this.player.focusSlot = playerDef.focusSlot ?? null;
-            this.player.magicSlots = [...playerDef.magicSlots];
-            this.player.selectedMagic = playerDef.selectedMagic ?? 0;
+            this.player.stock = [...playerDef.stock];
+            this.player.selMelee = playerDef.selMelee ?? null;
+            this.player.selFocus = playerDef.selFocus ?? null;
+            this.player.selMagic = playerDef.selMagic ?? null;
         } catch (e) {
             console.error('Failed to load definitions:', e);
             this.objectDefinitions = this.objectDefinitions || {};

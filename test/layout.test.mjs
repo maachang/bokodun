@@ -13,7 +13,7 @@ test('レイアウトの解決（resolveLayout）', async (t) => {
     const config = {
         active: 'a',
         presets: {
-            a: { game: { width: 900 }, panels: { status: 'left', magic: 'overlay-top', hints: 'hidden' } },
+            a: { game: { width: 900 }, panels: { status: 'left', stock: 'overlay-top', hints: 'hidden' } },
             b: { panels: { status: 'bottom' } }
         }
     };
@@ -23,8 +23,8 @@ test('レイアウトの解決（resolveLayout）', async (t) => {
         const r = resolveLayout(config);
         assert.equal(r.preset, 'a');
         assert.equal(r.gameWidth, 900);
-        assert.deepEqual(r.placements.slice(0, 3).map(p => p.panel), ['status', 'magic', 'hints']);
-        assert.equal(regionOf(r, 'magic'), 'overlay-top');
+        assert.deepEqual(r.placements.slice(0, 3).map(p => p.panel), ['status', 'stock', 'hints']);
+        assert.equal(regionOf(r, 'stock'), 'overlay-top');
         assert.equal(regionOf(r, 'hints'), 'hidden');
         assert.equal(regionOf(r, 'minimap'), 'right', '未指定は既定の領域');
         assert.equal(r.placements.length, PANELS.length, '全パネルが 1 回ずつ');
@@ -90,7 +90,7 @@ test('layout.json と index.html の整合', async (t) => {
         assert.ok(has('panelStore') && has('gameWrapper'));
         // game.js が参照する中身の id（パネルを動かしても残っていること）
         for (const id of ['levelText', 'hpText', 'hpBar', 'mpText', 'mpBar', 'expText', 'goldText', 'monsterCount',
-            'magicHud', 'weaponHud', 'enemyHudList', 'locationText', 'minimapCanvas', 'currentAreaName', 'signpostBanner', 'damageFlash', 'hudOverlay']) {
+            'enemyHudList', 'locationText', 'minimapCanvas', 'currentAreaName', 'signpostBanner', 'damageFlash', 'hudOverlay']) {
             assert.ok(has(id), `id=${id}`);
         }
     });
@@ -112,10 +112,10 @@ test('DOM への反映（applyLayoutToDom）', async (t) => {
     await t.test('パネルが指定の領域へ、書いた順に移る。hidden は動かない。ゲーム画面の幅が設定される', () => {
         const { els, get } = build();
         const wrapper = { style: { props: {}, setProperty(k, v) { this.props[k] = v; } } };
-        const resolved = resolveLayout({ presets: { p: { game: { width: 1000 }, panels: { magic: 'left', status: 'left', hints: 'hidden', minimap: 'overlay-top-right' } } } }, 'p');
+        const resolved = resolveLayout({ presets: { p: { game: { width: 1000 }, panels: { stock: 'left', status: 'left', hints: 'hidden', minimap: 'overlay-top-right' } } } }, 'p');
         applyLayoutToDom(resolved, get, wrapper);
 
-        assert.deepEqual(els['region-left'].children.slice(0, 2), ['panel-magic', 'panel-status'], '書いた順');
+        assert.deepEqual(els['region-left'].children.slice(0, 2), ['panel-stock', 'panel-status'], '書いた順');
         assert.deepEqual(els['overlay-top-right'].children, ['panel-minimap']);
         assert.equal(els['panel-hints'].parent, undefined, 'hidden は動かさない');
         assert.equal(wrapper.style.props['--game-width'], '1000px');

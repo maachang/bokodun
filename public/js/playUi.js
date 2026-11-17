@@ -9,7 +9,7 @@
  */
 const { $, refs, on, html, show, hide } = jhtml;
 
-import { WEAPONS, MAGICS, stock, sel, find, MENU, keymap, EVENT, EQUIPS, ITEMS, MSG_SIZES, prefs } from '/js/playUiData.js';
+import { MENU, keymap, EVENT, EQUIPS, ITEMS, MSG_SIZES, prefs } from '/js/playUiData.js';
 
 // 本体は、ここから先
 // 状態と、部品どうしの受け渡し（S）を作って、部品ごとの初期化を呼ぶ
@@ -33,21 +33,45 @@ export function initPlayUi(game) {
     window.mock = { die: S.die, guild: S.guild, talk: S.talk, openDebug: S.openDebug, bossHit: S.bossHit, bossEnd: S.bossEnd };
 }
 
-// ストック（見た目だけ）とメニュー
+// ストックの種類の表示名・詳細（ゲームのアイテム定義から作る）
+function kindLabel(game, it) {
+    if (it.kind === 'spell') return '魔法';
+    const a = game.weaponClasses?.[it.weaponClass]?.attack;
+    return { melee: '近接', cast: '杖', shoot: '弓' }[a] ?? '武器';
+}
+function itemDetail(game, it) {
+    if (it.kind === 'spell') return `MP ${it.mp}`;
+    return game.weaponClasses?.[it.weaponClass]?.name ?? '';
+}
+
+// ストック（右の列の 9 枠。ゲームの player.stock を映す）とメニュー
 function initStock(S) {
-    const { E } = S;
+    const { E, game } = S;
+    let lastSig = '';
     S.renderSlots = () => {
-        E.slots.innerHTML = stock.map((it, i) => it
-            ? html`<div class="slot ${i === sel.w ? 'selW' : ''} ${i === sel.m ? 'selM' : ''}" data-i="${i}"><span class="no">${i + 1}</span><span class="tag">${it.kind === 'weapon' ? '武' : '魔'}</span>${find(it)[1]}</div>`
-            : html`<div class="slot empty"><span class="no">${i + 1}</span>空き</div>`).join('');
-        const nm = i => (i >= 0 && stock[i] ? find(stock[i])[1] : 'なし');
-        E.selInfo.innerHTML = html`<div class="sel" data-sel="${sel.w}">武器　${nm(sel.w)}</div><div class="sel" data-sel="${sel.m}">魔法　${nm(sel.m)}</div>`;
+        const p = game.player, items = game.items;
+        if (!p || !items) return;
+        const sig = JSON.stringify([p.stock, p.selMelee, p.selFocus, p.selMagic, Math.floor(p.mp)]);
+        if (sig === lastSig) return;   // 変わっていないときは、描き直さない
+        lastSig = sig;
+        E.slots.innerHTML = p.stock.map((id, i) => {
+            const it = id && items[id];
+            if (!it) return html`<div class="slot empty"><span class="no">${i + 1}</span>空き</div>`;
+            const lack = it.kind === 'spell' && p.mp < it.mp;   // MP が足りない魔法
+            const cls = [i === p.selMelee ? 'selW' : '', i === p.selFocus ? 'selF' : '', i === p.selMagic ? 'selM' : '', lack ? 'lack' : ''].join(' ');
+            return html`<div class="slot ${cls}" data-i="${i}"><span class="no">${i + 1}</span><span class="tag">${kindLabel(game, it)}</span>${it.name}</div>`;
+        }).join('');
+        const nm = i => { const it = i !== null && i !== undefined && p.stock[i] && items[p.stock[i]]; return it ? it.name : 'なし'; };
+        E.selInfo.innerHTML = html`<div class="sel" data-sel="${p.selMelee}">武器　${p.selMelee === null ? '素手' : nm(p.selMelee)}</div><div class="sel" data-sel="${p.selFocus}">杖　　${nm(p.selFocus)}</div><div class="sel" data-sel="${p.selMagic}">魔法　${nm(p.selMagic)}</div>`;
     };
+    game.onStockChange = () => { lastSig = ''; S.renderSlots(); };
+    setInterval(S.renderSlots, 200);   // MP の増減で、足りない魔法の薄い表示が変わる
     on(E.selInfo, 'click', '.sel', (e, t) => {
-        const i = Number(t.dataset.sel);
-        if (i >= 0 && stock[i]) { const f = find(stock[i]); S.setBody(html`<h3>${f[1]}</h3><p>${stock[i].kind === 'weapon' ? '武器' : '魔法'}</p><p>${f[2]}</p>`); S.openWindow(null); S.setBack(() => S.openWin('stock')); }
+        const i = t.dataset.sel === 'null' ? -1 : Number(t.dataset.sel);
+        const it = i >= 0 && game.items[game.player.stock[i]];
+        if (it) { S.setBody(html`<h3>${it.name}</h3><p>${kindLabel(game, it)}</p><p>${itemDetail(game, it)}</p>`); S.openWindow(null); S.setBack(() => S.openWin('stock')); }
     });
-    on(E.slots, 'click', '.slot[data-i]', (e, t) => { const i = Number(t.dataset.i), it = stock[i]; if (it) { if (it.kind === 'weapon') sel.w = i; else sel.m = i; S.renderSlots(); } });
+    on(E.slots, 'click', '.slot[data-i]', (e, t) => game.selectSlot(Number(t.dataset.i)));
     S.renderMenu = () => { E.menu.innerHTML = MENU.map(([id, name]) => html`<div class="mi" data-id="${id}"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd></div>`).join(''); };
     on(E.menu, 'click', '.mi', (e, t) => S.openWin(t.dataset.id));
 }
@@ -105,13 +129,15 @@ function initWindow(S) {
 // 各ダイアログの中身（見た目だけ）。ストック・設定・ステータス・装備・道具
 function initBodies(S) {
     const { E, game } = S;
-    const stockBody = () => '<p class="legend">最大 9 枠。✕ で外し、「＋追加」で武器・魔法を選んで入れます。</p><div class="grid3">' + stock.map((it, i) => it
-        ? html`<div class="cell filled" data-detail="${i}"><button class="x" data-rm="${i}">✕</button><b>${i + 1}</b> ${find(it)[1]}<br><small>${it.kind === 'weapon' ? '武器' : '魔法'}　${find(it)[2]}</small></div>`
+    const slotItem = (i) => { const id = game.player.stock[i]; return id ? game.items[id] : null; };
+    const stockBody = () => '<p class="legend">最大 9 枠。✕ で外し、「＋追加」で武器・魔法を選んで入れます。</p><div class="grid3">' + game.player.stock.map((id, i) => id
+        ? html`<div class="cell filled" data-detail="${i}"><button class="x" data-rm="${i}">✕</button><b>${i + 1}</b> ${game.items[id].name}<br><small>${kindLabel(game, game.items[id])}　${itemDetail(game, game.items[id])}</small></div>`
         : html`<div class="cell add" data-add="${i}">＋ 追加（${i + 1}）</div>`).join('') + '</div>';
     const pickBody = (slotNo) => {
-        const used = new Set(stock.filter(Boolean).map(x => x.id));
-        const row = (kind, [id, name, d]) => html`<div class="pick cols ${used.has(id) ? 'dis' : ''}" style="--c:1fr 7em 12em" data-kind="${kind}" data-id="${id}" data-slot="${slotNo}"><span>${name}</span><small>${used.has(id) ? '入っています' : ''}</small><small>${d}</small></div>`;
-        return '<p>枠 ' + (slotNo + 1) + ' に入れる武器・魔法</p><div class="title">武器</div>' + WEAPONS.map(w => row('weapon', w)).join('') + '<div class="title" style="margin-top:8px">魔法</div>' + MAGICS.map(m => row('magic', m)).join('');
+        const used = new Set(game.player.stock.filter(Boolean));
+        const all = Object.values(game.items).filter(it => game.isStockable(it));
+        const row = (it) => html`<div class="pick cols ${used.has(it.id) ? 'dis' : ''}" style="--c:1fr 7em 12em" data-id="${it.id}" data-slot="${slotNo}"><span>${it.name}</span><small>${used.has(it.id) ? '入っています' : ''}</small><small>${kindLabel(game, it)}　${itemDetail(game, it)}</small></div>`;
+        return '<p>枠 ' + (slotNo + 1) + ' に入れる武器・魔法</p><div class="title">武器・杖</div>' + all.filter(it => !game.isMagicItem(it)).map(row).join('') + '<div class="title" style="margin-top:8px">魔法・弓</div>' + all.filter(it => game.isMagicItem(it)).map(row).join('');
     };
     const settingBody = () => '<p class="legend">ショートカットキーの割り当て（「変更」を押して、割り当てたいキーを押す。1〜9 と Esc は使えません）</p>' + MENU.map(([id, name]) => html`<div class="cols" style="--c:110px 3em 9em;margin-bottom:4px"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd><button data-keyset="${id}">変更</button></div>`).join('') + '<div class="cols" style="--c:110px 200px;margin-top:10px"><span>音量</span><input type="range" min="0" max="100" value="60"></div>'
         + html`<div class="cols" style="--c:110px auto;margin-top:10px"><span>メッセージ文字</span><span>${jhtml.raw(Object.entries(MSG_SIZES).map(([k, v]) => html`<button data-msg="${k}" class="${prefs.msg === k ? 'on' : ''}">${v[0]}</button>`).join(' '))}</span></div>`;
@@ -127,16 +153,15 @@ function initBodies(S) {
     const itemBody = () => '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）。クリックで詳細</p>' + ITEMS.map((it, i) => html`<div class="pick cols" data-item="${i}"><span class="k">${it[1]}</span><span>${it[0]}</span><span class="n">${it[2]}</span></div>`).join('');
     S.bodies = { stock: stockBody, status: statusBody, equip: equipBody, item: itemBody, setting: settingBody };
 
-    on(E.winBody, 'click', '[data-rm]', (e, t) => { const i = Number(t.dataset.rm); stock[i] = null; if (sel.w === i) sel.w = stock.findIndex(x => x && x.kind === 'weapon'); if (sel.m === i) sel.m = stock.findIndex(x => x && x.kind === 'magic'); S.renderSlots(); S.openWin('stock'); });
+    on(E.winBody, 'click', '[data-rm]', (e, t) => { game.setStockSlot(Number(t.dataset.rm), null); S.openWin('stock'); });
     on(E.winBody, 'click', '[data-detail]', (e, t) => {
         if (e.target.closest('[data-rm]')) return;
-        const i = Number(t.dataset.detail), it = stock[i], f = find(it);
-        S.setBody(html`<h3>ストック</h3><p>枠 ${i + 1}</p><h3>${f[1]}</h3><p>${it.kind === 'weapon' ? '武器' : '魔法'}</p><p>${f[2]}</p>`);
+        const i = Number(t.dataset.detail), it = slotItem(i);
+        S.setBody(html`<h3>ストック</h3><p>枠 ${i + 1}</p><h3>${it.name}</h3><p>${kindLabel(game, it)}</p><p>${itemDetail(game, it)}</p>`);
         S.setBack(() => S.openWin('stock'));
     });
     on(E.winBody, 'click', '[data-add]', (e, t) => { S.setBody('<h3>ストック</h3>' + pickBody(Number(t.dataset.add))); S.setBack(() => S.openWin('stock')); });
-    on(E.winBody, 'click', '.pick[data-slot]:not(.dis)', (e, t) => { const i = Number(t.dataset.slot); stock[i] = { kind: t.dataset.kind, id: t.dataset.id }; if (stock[i].kind === 'weapon' && sel.w < 0) sel.w = i; if (stock[i].kind === 'magic' && sel.m < 0) sel.m = i; S.renderSlots(); S.openWin('stock'); });
-    on(E.winBody, 'click', '[data-msg]', (e, t) => { prefs.msg = t.dataset.msg; $('app').style.setProperty('--msg-size', MSG_SIZES[prefs.msg][1]); S.openWin('setting'); });
+    on(E.winBody, 'click', '.pick[data-slot]:not(.dis)', (e, t) => { game.setStockSlot(Number(t.dataset.slot), t.dataset.id); S.openWin('stock'); });
     on(E.winBody, 'click', '[data-keyset]', (e, t) => { S.keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
     on(E.winBody, 'click', '[data-equip]', (e, t) => { const q = EQUIPS[Number(t.dataset.equip)]; S.setBody(html`<h3>装備</h3><h3>${q[1]}</h3><p>${q[0]}</p><p>${q[2]}</p><p>${q[3]}</p>`); S.setBack(() => S.openWin('equip')); });
     on(E.winBody, 'click', '.pick[data-item]', (e, t) => { const it = ITEMS[Number(t.dataset.item)]; S.setBody(html`<h3>道具</h3><h3>${it[0]}</h3><p>${it[1]}${it[1] === '道具' ? '　所持 ' + it[2] + ' 個' : ''}</p><p>${it[3]}</p>`); S.setBack(() => S.openWin('item')); });

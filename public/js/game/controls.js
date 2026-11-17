@@ -89,9 +89,9 @@ export const controlsMethods = {
                     this.keys.sprint = true;
                     break;
             }
-            // 数字キー 1〜4: 魔法スロットの直接選択
-            const magicKey = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
-            if (magicKey) this.selectMagic(Number(magicKey[1]) - 1);
+            // 数字キー 1〜9: ストックの枠の選択（武器・杖・魔法は、枠の中身で決まる）
+            const slotKey = /^(?:Digit|Numpad)([1-9])$/.exec(e.code);
+            if (slotKey) this.selectSlot(Number(slotKey[1]) - 1);
         });
     },
 

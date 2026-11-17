@@ -31,11 +31,10 @@ export const stateInitMethods = {
             invincibleTimer: 0,
             attackCooldown: 0,
             magicCooldown: 0,
-            equipSlots: [],     // 装備スロット（アイテム ID または null＝空き）。初期値は player.json
-            meleeSlot: null,    // 突進攻撃に使う近接武器のスロット番号（null=素手）
-            focusSlot: null,    // 魔法を補正する杖・ロッドのスロット番号（null=補正なし）
-            magicSlots: [],     // 魔法スロット（数字キー 1〜4）。呪文または弓のアイテム ID（null=空き）。中身はセレクトボックスで自由に選べる
-            selectedMagic: 0,   // 選択中の魔法スロット番号（Space / F / クリックで使う）
+            stock: [],          // ストック（9 枠。アイテム ID または null＝空き。数字キー 1〜9 で選ぶ）。初期値は player.json
+            selMelee: null,     // 選択中の近接武器の枠（突進に使う。null=素手）
+            selFocus: null,     // 選択中の杖・ロッドの枠（魔法の補正。null=補正なし）
+            selMagic: null,     // 選択中の呪文・弓の枠（Space / F / クリックで使う）
             knockback: new THREE.Vector3(),
             isFalling: false,
             fallDepth: 0,

@@ -17,8 +17,6 @@
         "menu": "right",
         "areaName": "overlay-top",
         "compass": "overlay-top",
-        "magic": "debug",
-        "weapon": "debug",
         "effectTest": "debug",
         "areaNav": "debug",
         "hints": "debug",
@@ -32,8 +30,6 @@
       },
       "panels": {
         "status": "left",
-        "magic": "left",
-        "weapon": "left",
         "minimap": "right",
         "enemies": "right",
         "areaName": "overlay-top",
@@ -57,8 +53,6 @@
       "panels": {
         "enemies": "overlay-bottom-left",
         "status": "overlay-bottom-left",
-        "magic": "overlay-bottom-left",
-        "weapon": "overlay-bottom-left",
         "minimap": "overlay-top-right",
         "areaName": "overlay-top",
         "areaNav": "overlay-top",
@@ -80,8 +74,6 @@
       },
       "panels": {
         "status": "bottom",
-        "magic": "bottom",
-        "weapon": "bottom",
         "enemies": "overlay-bottom-left",
         "minimap": "overlay-top-right",
         "areaName": "overlay-top",
