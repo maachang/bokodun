@@ -1,5 +1,7 @@
 // 冒険者の保存・読み込み（サーバーの /api/character とのやりとり）。GameEngine のメソッド（this は GameEngine）。
-// 保存するのは、いまのところストック（9 枠と、選択中の近接武器・杖・魔法）だけ。ほかの項目は、つながったものから足していく。
+// 保存するのは、冒険者の名前・種族、能力値、職業（第一・サブ・レベル・経験値のストック）、HP・MP、所持金、防具、ストック（9 枠と選択）、覚えた魔法。
+//   データの形は、保存データの仕様（docs/character-spec.md 9-3。検証は validates/character.js）。位置は保存しない（再開はギルド）。
+//   まだ保存しない項目: 宝箱・ボス・ゲーム内時間・クエスト・ギルドの預かり・プレイ時間（つながっていない仕組み）。
 // 保存の場所は、冒険者ギルド（セーブ）。起動時に、保存済みなら読み込む（なければ player.json の初期値のまま）。
 const STOCK_SIZE = 9;
 const DEFAULT_NAME = '冒険者';   // 仮: 名前を決める画面（冒険者の作成）ができるまで
@@ -27,6 +29,51 @@ export const saveLoadMethods = {
         return true;
     },
 
+    // 保存データ（data）をつくる。HP・MP は、整数にして保存する（MP には端数がありうる）
+    buildSaveData() {
+        const p = this.player;
+        const spells = Object.values(this.items).filter((i) => i.kind === 'spell').map((i) => i.id);   // 仮: 覚える仕組みができるまで、定義済みの呪文は全部「覚えた」扱い
+        this.characterCreatedAt ??= new Date().toISOString();
+        return {
+            profile: { name: this.characterName || DEFAULT_NAME, race: p.race, createdAt: this.characterCreatedAt },
+            abilities: { ...p.abilities },
+            jobs: { primary: p.jobs.primary, sub: p.jobs.sub, levels: { ...p.jobs.levels }, expStock: p.jobs.expStock },
+            vitals: { hp: Math.floor(p.hp), mp: Math.floor(p.mp) },
+            gold: Math.floor(p.gold ?? 0),
+            equipment: { armor: p.equip?.armor ?? null, helm: p.equip?.helm ?? null, shield: p.equip?.shield ?? null, accessory: null },
+            stock: this.buildStockSave(),
+            magics: spells
+        };
+    },
+
+    // 保存データを、ゲームに反映する。形の合わない項目・定義にない ID は、捨てて初期値のままにする（保存後に定義が変わっても、起動できるように）
+    applySaveData(data) {
+        if (!data) return false;
+        const p = this.player, d = this.rules;
+        const isInt = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+        if (d.races[data.profile?.race]) p.race = data.profile.race;
+        if (data.profile?.name) this.characterName = data.profile.name;
+        if (data.profile?.createdAt) this.characterCreatedAt = data.profile.createdAt;
+        for (const k of Object.keys(p.abilities)) if (isInt(data.abilities?.[k], 1, 50)) p.abilities[k] = data.abilities[k];
+        const j = data.jobs;
+        if (j && d.jobs[j.primary] && d.jobs[j.primary].type === 'combat' && j.levels && Object.entries(j.levels).every(([id, lv]) => d.jobs[id] && isInt(lv, 1, d.maxLevel ?? 99)) && j.primary in j.levels) {
+            p.jobs = { primary: j.primary, sub: (j.sub in j.levels && j.sub !== j.primary) ? j.sub : null, levels: { ...j.levels }, expStock: isInt(j.expStock, 0, Number.MAX_SAFE_INTEGER) ? j.expStock : 0 };
+            this.syncJob();
+        }
+        if (isInt(data.gold, 0, Number.MAX_SAFE_INTEGER)) p.gold = data.gold;
+        this.applyStockSave(data.stock);
+        const eq = data.equipment ?? {};
+        p.equip = Object.fromEntries(['armor', 'helm', 'shield'].map((k) => [k, (eq[k] && this.gearDef(k, eq[k]) && this.canWear(this.gearDef(k, eq[k]))) ? eq[k] : null]));
+        if (p.equip.shield && this.getMeleeItem()?.twoHanded) p.equip.shield = null;   // 両手武器と盾は、同時に装備できない
+        this.recomputeStats(true);   // 能力値・職業・装備から、最大値を決め直す
+        const v = data.vitals;
+        if (v && isInt(v.hp, 0, Number.MAX_SAFE_INTEGER) && isInt(v.mp, 0, Number.MAX_SAFE_INTEGER)) {   // つづきから: セーブ時点の HP・MP から始める
+            p.hp = Math.max(1, Math.min(v.hp, p.maxHp));
+            p.mp = Math.min(v.mp, p.maxMp);
+        }
+        return true;
+    },
+
     // 起動時: サーバーに保存済みの冒険者がいれば、反映する。失敗（サーバーなし・未保存）は、初期値のまま進める
     async loadCharacter() {
         this.saveRev = null;
@@ -35,7 +82,7 @@ export const saveLoadMethods = {
             if (!res.character) return false;
             this.saveRev = res.character.rev;
             this.characterName = res.character.name;
-            return this.applyStockSave(res.character.data?.stock);
+            return this.applySaveData(res.character.data);
         } catch (e) {
             console.warn('冒険者の読み込みに失敗しました（初期値で始めます）:', e.message);
             return false;
@@ -44,11 +91,7 @@ export const saveLoadMethods = {
 
     // セーブ（冒険者ギルド）。戻り値: { ok: true } / { ok: false, message }
     async saveCharacter() {
-        const spells = Object.values(this.items).filter((i) => i.kind === 'spell').map((i) => i.id);   // 仮: 覚える仕組みができるまで、定義済みの呪文は全部「覚えた」扱い
-        const body = {
-            name: this.characterName || DEFAULT_NAME, status: 'creating', rev: this.saveRev ?? 1,
-            data: { stock: this.buildStockSave(), magics: spells }
-        };
+        const body = { name: this.characterName || DEFAULT_NAME, status: 'creating', rev: this.saveRev ?? 1, data: this.buildSaveData() };
         try {
             const res = await window.jhtml.api.post('/api/character', body);
             this.saveRev = res.rev;
