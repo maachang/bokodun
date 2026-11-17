@@ -19,8 +19,8 @@
         "compass": "overlay-top",
         "effectTest": "debug",
         "areaNav": "debug",
-        "hints": "debug",
-        "instructions": "debug"
+        "hints": "hidden",
+        "instructions": "hidden"
       }
     },
     "sidebars": {

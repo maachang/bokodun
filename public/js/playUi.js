@@ -19,7 +19,7 @@ export function initPlayUi(game) {
         paused: false,          // ダイアログ・会話・死亡の画面が出ている間は true（ゲームを止める）
         winBackTo: null,        // 「← 戻る」の戻り先
         keyCapture: null,       // ショートカットの割り当て中の、メニューの項目
-        E: refs('talk', 'death', 'deathMsg', 'selInfo', 'pauseBadge', 'miniTitle', 'slots', 'menu', 'win', 'winBody', 'winBack', 'winClose', 'bottomStack', 'bossBar', 'panel-location', 'panel-event', 'panelStore', 'region-debug')
+        E: refs('talk', 'death', 'deathMsg', 'pauseBadge', 'miniTitle', 'slots', 'menu', 'win', 'winBody', 'winBack', 'winClose', 'bottomStack', 'bossBar', 'panel-location', 'panel-event', 'panelStore', 'region-debug')
     };
     initStock(S);
     initWindow(S);
@@ -61,16 +61,9 @@ function initStock(S) {
             const cls = [i === p.selMelee ? 'selW' : '', i === p.selFocus ? 'selF' : '', i === p.selMagic ? 'selM' : '', lack ? 'lack' : ''].join(' ');
             return html`<div class="slot ${cls}" data-i="${i}"><span class="no">${i + 1}</span><span class="tag">${kindLabel(game, it)}</span>${it.name}</div>`;
         }).join('');
-        const nm = i => { const it = i !== null && i !== undefined && p.stock[i] && items[p.stock[i]]; return it ? it.name : 'なし'; };
-        E.selInfo.innerHTML = html`<div class="sel" data-sel="${p.selMelee}">武器　${p.selMelee === null ? '素手' : nm(p.selMelee)}</div><div class="sel" data-sel="${p.selFocus}">杖　　${nm(p.selFocus)}</div><div class="sel" data-sel="${p.selMagic}">魔法　${nm(p.selMagic)}</div>`;
     };
     game.onStockChange = () => { lastSig = ''; S.renderSlots(); };
     setInterval(S.renderSlots, 200);   // MP の増減で、足りない魔法の薄い表示が変わる
-    on(E.selInfo, 'click', '.sel', (e, t) => {
-        const i = t.dataset.sel === 'null' ? -1 : Number(t.dataset.sel);
-        const it = i >= 0 && game.items[game.player.stock[i]];
-        if (it) { S.setBody(html`<h3>${it.name}</h3><p>${kindLabel(game, it)}</p><p>${itemDetail(game, it)}</p>`); S.openWindow(null); S.setBack(() => S.openWin('stock')); }
-    });
     on(E.slots, 'click', '.slot[data-i]', (e, t) => game.selectSlot(Number(t.dataset.i)));
     S.renderMenu = () => { E.menu.innerHTML = MENU.map(([id, name]) => html`<div class="mi" data-id="${id}"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd></div>`).join(''); };
     on(E.menu, 'click', '.mi', (e, t) => S.openWin(t.dataset.id));
@@ -97,7 +90,7 @@ function initWindow(S) {
     // 中身を作り直す操作で、クリックされた要素が消えても誤って閉じないよう、中身の処理より先（キャプチャ段階）で判定する
     document.addEventListener('click', (e) => {
         if (E.win.style.display !== 'block' || S.keyCapture) return;
-        if (e.target.closest('#win, #workshopModal, .mi, #panel-location, #panel-event, #selInfo')) return;
+        if (e.target.closest('#win, #workshopModal, .mi, #panel-location, #panel-event')) return;
         S.closeWin();
     }, true);
     S.openWin = (id) => {
@@ -106,10 +99,10 @@ function initWindow(S) {
         S.setBody('<h3>' + m[1] + '</h3>' + S.bodies[id]());
         S.openWindow(id);
     };
-    // 現在位置をクリックすると、開発用の機能（マップ切り替え・AI工房・魔法/武器・エフェクトテスト・操作の説明）のダイアログ
+    // 現在位置をクリックすると、開発用の機能（マップ切り替え・AI工房・エフェクトテスト）のダイアログ
     S.openDebug = () => {
         S.setBack(null);
-        S.setBody('<h3>開発用（マップ切り替え・魔法/武器・エフェクトテストなど）</h3>');
+        S.setBody('<h3>開発用（マップ切り替え・AI工房・エフェクトテストなど）</h3>');
         E.winBody.appendChild(E['region-debug']);
         S.openWindow(null);
     };
@@ -151,7 +144,8 @@ function initBodies(S) {
     };
     const equipBody = () => '<p class="legend">防具・アクセサリの設定（武器・魔法は「ストック」）</p>' + EQUIPS.map((q, i) => q[1] ? html`<div class="pick cols" style="--c:6em 1fr 14em" data-equip="${i}"><span class="k">${q[0]}</span><span>${q[1]}</span><small>${q[2]}</small></div>` : html`<div class="pick cols dis" style="--c:6em 1fr 14em"><span class="k">${q[0]}</span><span>（なし）</span><small></small></div>`).join('');
     const itemBody = () => '<p class="legend">道具と防具を見る画面（身につけるのは「装備」）。クリックで詳細</p>' + ITEMS.map((it, i) => html`<div class="pick cols" data-item="${i}"><span class="k">${it[1]}</span><span>${it[0]}</span><span class="n">${it[2]}</span></div>`).join('');
-    S.bodies = { stock: stockBody, status: statusBody, equip: equipBody, item: itemBody, setting: settingBody };
+    const helpBody = () => '<p class="legend">操作の説明</p>' + jhtml.$('instructions').innerHTML + (jhtml.$('panel-hints') ? '<div style="margin-top:10px">' + jhtml.$('panel-hints').innerHTML + '</div>' : '');
+    S.bodies = { stock: stockBody, status: statusBody, equip: equipBody, item: itemBody, setting: settingBody, help: helpBody };
 
     on(E.winBody, 'click', '[data-rm]', (e, t) => { game.setStockSlot(Number(t.dataset.rm), null); S.openWin('stock'); });
     on(E.winBody, 'click', '[data-detail]', (e, t) => {
