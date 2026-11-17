@@ -61,18 +61,51 @@ export const characterMethods = {
         return r;
     },
 
-    // 魔法の消費 MP・失敗率・威力（杖・ロッドを持っていれば、杖のダイスの結果を攻撃値に足す）
+    // 魔法の消費 MP・失敗率・威力。魔法力の元は、攻撃魔法は知力、回復・補助魔法は精神力（補助は、仕様に定めがないので、回復と同じ）
+    spellStat(spell) {
+        const ab = this.player.abilities;
+        return spell.magicKind === 'attack' ? ab.intel : ab.mnd;
+    },
     spellCost(spell) {
         const p = this.player;
-        return R.magicCost(this.rules, spell, p.abilities.intel, p.level, this.rules.jobs[p.job]);
+        return R.magicCost(this.rules, spell, this.spellStat(spell), p.level, this.rules.jobs[p.job]);
     },
     spellFailRate(spell) {
         const p = this.player;
-        return R.magicFailRate(this.rules, spell, p.abilities.intel, p.level, this.rules.jobs[p.job]);
+        return R.magicFailRate(this.rules, spell, this.spellStat(spell), p.level, this.rules.jobs[p.job]);
     },
+    // 威力（攻撃魔法は、杖のダイスの結果を足す。回復魔法は、足さない）
     rollSpellPower(spell) {
-        const p = this.player, focus = this.getFocusItem();
+        const p = this.player, focus = spell.magicKind === 'attack' ? this.getFocusItem() : null;
         const rod = focus?.dice ? R.rollDice(focus.dice.n, focus.dice.m).total : 0;
         return R.rollMagicPower(this.rules, spell, p.level, this.rules.jobs[p.job], rod);
+    },
+
+    // 回復魔法が、使う意味のない状態（満タン）なら、その理由。使えるなら null
+    selfSpellUseless(spell) {
+        const p = this.player;
+        if (spell.type !== 'heal') return null;
+        if (spell.target === 'stamina') return (p.stamina >= p.maxStamina && !p.staminaExhausted) ? 'スタミナは満タンです' : null;
+        return p.hp >= p.maxHp ? 'HPは満タンです' : null;
+    },
+
+    // 自分に使う魔法（回復: HP またはスタミナを power だけ回復。補助: 効果を、決まった時間つける）
+    castSelfSpell(spell, power) {
+        const p = this.player;
+        if (spell.type === 'heal' && spell.target === 'stamina') {
+            const before = p.stamina;
+            p.stamina = Math.min(p.maxStamina, p.stamina + power);
+            if (p.staminaExhausted && p.stamina >= p.maxStamina * this.staminaDef.resumeRatio) p.staminaExhausted = false;
+            this.addPopup(`スタミナ +${Math.round(p.stamina - before)}`, '#facc15');
+        } else if (spell.type === 'heal') {
+            const before = p.hp;
+            p.hp = Math.min(p.maxHp, p.hp + power);
+            this.addPopup(`HP +${Math.round(p.hp - before)}`, '#4ade80');
+        } else if (spell.effect) {
+            p.buffs = { ...p.buffs, [spell.effect.type]: { t: spell.effect.duration, rate: spell.effect.rate } };   // 同じ効果は、時間をつけ直す
+            this.addPopup(`${spell.name}！ ${spell.effect.duration}秒`, '#60a5fa');
+        }
+        this.particles.spawnBurst(p.x, 1.0, p.z, parseInt(spell.color.slice(1), 16), 14, 3.0);
+        this.sound.playHeal?.();
     }
 };

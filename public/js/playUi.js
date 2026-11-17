@@ -42,7 +42,10 @@ function kindLabel(game, it) {
 }
 function itemDetail(game, it) {
     const dice = it.dice ? `${it.dice.n}d${it.dice.m}${it.dice.k ? '+' + it.dice.k : ''}` : '';
-    if (it.kind === 'spell') return `${dice}　重さ ${it.weight}　消費MP ${game.spellCost(it)}　失敗 ${game.spellFailRate(it)}%`;
+    if (it.kind === 'spell') {
+        const what = it.magicKind === 'attack' ? dice : it.type === 'support' ? `${it.effect.duration}秒間 スタミナ消費 ×${it.effect.rate}` : `${it.target === 'stamina' ? 'スタミナ' : 'HP'}回復 ${dice}`;
+        return `${what}　重さ ${it.weight}　消費MP ${game.spellCost(it)}　失敗 ${game.spellFailRate(it)}%`;
+    }
     const cls = game.weaponClasses?.[it.weaponClass]?.name ?? '';
     if (!it.dice) return cls;
     return `${cls}　${dice}　重さ ${game.weaponWeight(it)}${game.canCarry(it) ? '' : '　（筋力が足りず、装備できない）'}`;

@@ -22,7 +22,8 @@ export const interactMethods = {
     useStamina(amount) {
         const p = this.player;
         if (!this.staminaDef || p.staminaExhausted) return !this.staminaDef;
-        p.stamina = Math.max(0, p.stamina - amount);
+        const veil = p.buffs?.staminaCostRate;   // エナジーヴェール: 消費が減る
+        p.stamina = Math.max(0, p.stamina - amount * (veil?.t > 0 ? veil.rate : 1));
         p.staminaPause = this.staminaDef.regenPause;
         if (p.stamina <= 0) p.staminaExhausted = true;
         return true;
@@ -30,6 +31,7 @@ export const interactMethods = {
 
     updateStamina(dt) {
         const p = this.player, d = this.staminaDef; if (!d) return;
+        for (const b of Object.values(p.buffs ?? {})) if (b.t > 0) b.t -= dt;   // 補助魔法の効果の残り時間
         if (p.staminaPause > 0) { p.staminaPause -= dt; return; }
         const ratio = this.loadRatio(), regen = ((p.abilities?.end ?? 14) * d.regenEnd + (p.level ?? 1) * d.regenLevel) / (ratio > 1 ? this.staminaMul() : 1);   // 重量比が 1 を超えるときは、倍率 m で割る
         p.stamina = Math.min(p.maxStamina, p.stamina + regen * dt);

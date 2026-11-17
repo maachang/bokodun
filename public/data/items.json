@@ -99,6 +99,58 @@
     },
     "pierce": 2
   },
+  "heal": {
+    "id": "heal",
+    "element": "holy",
+    "name": "ヒール",
+    "kind": "spell",
+    "type": "heal",
+    "cooldown": 0.9,
+    "sound": "heal",
+    "color": "#4ade80"
+  },
+  "high_heal": {
+    "id": "high_heal",
+    "element": "holy",
+    "name": "ハイヒール",
+    "kind": "spell",
+    "type": "heal",
+    "cooldown": 0.9,
+    "sound": "heal",
+    "color": "#4ade80"
+  },
+  "refresh": {
+    "id": "refresh",
+    "element": "holy",
+    "name": "リフレッシュ",
+    "kind": "spell",
+    "type": "heal",
+    "cooldown": 0.9,
+    "sound": "heal",
+    "color": "#facc15",
+    "target": "stamina"
+  },
+  "high_refresh": {
+    "id": "high_refresh",
+    "element": "holy",
+    "name": "ハイ・リフレッシュ",
+    "kind": "spell",
+    "type": "heal",
+    "cooldown": 0.9,
+    "sound": "heal",
+    "color": "#facc15",
+    "target": "stamina"
+  },
+  "energy_veil": {
+    "id": "energy_veil",
+    "element": "none",
+    "name": "エナジーヴェール",
+    "kind": "spell",
+    "type": "support",
+    "cooldown": 0.9,
+    "sound": "heal",
+    "color": "#60a5fa"
+  },
   "herb": {
     "id": "herb",
     "name": "薬草",

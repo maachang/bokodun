@@ -21,7 +21,9 @@ export const combatMethods = {
         if (item.kind === 'spell') {
             const focus = this.getFocusItem();
             const fcls = focus && this.weaponClasses[focus.weaponClass];
-            const mp = this.spellCost(item);   // 消費 MP は、重さ・魔法力（知力・レベル）から式で決まる
+            const useless = this.selfSpellUseless(item);   // すでに満タンの回復魔法は、MP を使わずに断る
+            if (useless) { this.addPopup(useless, '#94a3b8'); return; }
+            const mp = this.spellCost(item);   // 消費 MP は、重さ・魔法力（攻撃は知力、回復・補助は精神力・レベル）から式で決まる
             if (this.player.mp < mp) {
                 this.addPopup('MP不足!', '#38bdf8');
                 return;
@@ -33,7 +35,8 @@ export const combatMethods = {
                 return;
             }
             const power = this.rollSpellPower(item);   // 威力（ダイス ＋ 杖のダイス）
-            if (item.type === 'strike') this.castStrike(item, power);
+            if (item.type === 'heal' || item.type === 'support') this.castSelfSpell(item, power);   // 自分に使う（回復・補助）
+            else if (item.type === 'strike') this.castStrike(item, power);
             else this.shootProjectiles(item, power);
         } else {
             const cls = this.weaponClasses[item.weaponClass];

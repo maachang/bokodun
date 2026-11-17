@@ -67,6 +67,7 @@ function makeGame({ GameEngine }, { mp = 60 } = {}) {
     });
     g.setRules(readJson('combat.json'), readJson('damageTable.json').table, readJson('jobs.json').jobs, readJson('races.json').races);
     g.setGearDefs(readJson('equipment.json'));
+    g.staminaDef = readJson('combat.json').stamina;
     g.applyCharacterDef(playerDef);   // 人間・平均・ファイター Lv1
     g.player.abilities.str = 50;   // 重い武器（大剣など）も、筋力で持てるように（持てる重さの確認は、別のテスト）
     g.recomputeStats(true);
@@ -140,8 +141,15 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
                 assert.ok(weaponClasses[it.weaponClass], `${id}: 未定義の weaponClass ${it.weaponClass}`);
                 assert.ok(it.dice.n >= 1 && it.dice.m >= 2 && Number.isInteger(it.dice.k) && it.weightRange[0] >= 1 && it.weightRange[1] <= 50 && it.weightRange[0] <= it.weightRange[1], `${id}: ダイス・重さ`);
             } else {
-                assert.ok(['fireball', 'strike', 'spread'].includes(it.type), `${id}: type`);
-                assert.ok(it.cooldown > 0 && it.weight >= 1 && it.weight <= 50 && it.dice.n >= 1 && it.costType, `${id}: 呪文の項目（重さ・ダイスは magic.json）`);
+                assert.ok(['fireball', 'strike', 'spread', 'heal', 'support'].includes(it.type), `${id}: type`);
+                if (it.type === 'heal' || it.type === 'support') {   // 自分に使う魔法: 弾の項目は要らない。粒の色と、magic.json の種類がある
+                    assert.match(it.color, /^#[0-9a-f]{6}$/i, `${id}: color`);
+                    assert.equal(it.magicKind, it.type, `${id}: magic.json の kind と同じ`);
+                    if (it.type === 'support') assert.ok(it.effect.duration > 0 && it.effect.rate > 0 && it.effect.rate < 1, `${id}: effect`);
+                    else assert.ok(it.dice && (it.target === undefined || it.target === 'stamina'), `${id}: 回復のダイス`);
+                    continue;
+                }
+                assert.ok(it.cooldown > 0 && it.weight >= 1 && it.weight <= 50 && (it.dice?.n >= 1 || it.type === 'support') && it.costType, `${id}: 呪文の項目（重さ・ダイスは magic.json）`);
                 if (it.type !== 'strike') {
                     const v = it.visual;
                     assert.ok(['orb', 'crystal', 'bolt'].includes(v?.shape) && v.size > 0, `${id}: visual`);
@@ -533,6 +541,80 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         assert.equal(outside.hp, outside.maxHp);
         assert.ok(edge.knockback.x > 0, '中心から外向きに飛ぶ');
         assert.ok(calls.sounds.some(([n]) => n === 'playBigExplosion'), '着弾で「ばーーん」');
+    });
+
+    await t.test('回復魔法（ヒール）: HP をダイスの分だけ回復し、満タンを超えない。精神力を魔法力にする。間隔 0.9 秒', () => {
+        const { g, calls } = makeGame(M);
+        magic(g, 'heal');
+        g.player.hp = 5;
+        withRandom(fixed(0.5), () => g.useMagic());
+        assert.equal(g.player.hp, Math.min(g.player.maxHp, 5 + spellPower('heal')));
+        assert.equal(g.player.mp, 60 - g.spellCost(items.heal));
+        assert.equal(g.player.magicCooldown, 0.9);
+        assert.equal(g.projectiles.length, 0, '弾は出ない');
+        assert.ok(calls.popups.some(p => p.startsWith('HP +')));
+        g.player.abilities.mnd = 30;
+        assert.ok(g.spellCost(items.heal) < R.magicCost(rulesDefs, items.heal, 14, 1, J), '精神力が高いほど、消費 MP が少ない（知力ではない）');
+    });
+
+    await t.test('回復魔法: 満タンなら、MP も間隔も使わずに断る。杖の補正は、回復には効かない', () => {
+        const { g, calls } = makeGame(M);
+        magic(g, 'heal');
+        withRandom(fixed(0.5), () => g.useMagic());
+        assert.equal(g.player.mp, 60);
+        assert.equal(g.player.magicCooldown, 0);
+        assert.ok(calls.popups.includes('HPは満タンです'));
+        equip(g, 'magic_staff');
+        g.player.hp = 1;
+        withRandom(fixed(0.5), () => g.useMagic());
+        assert.equal(g.player.hp, 1 + spellPower('heal'), '杖のダイスは足されない');
+    });
+
+    await t.test('回復魔法は、失敗することがある（MP は消費し、回復しない）。沈黙では使えない', () => {
+        const { g, calls } = makeGame(M);
+        magic(g, 'high_heal');
+        g.player.hp = 1;
+        withRandom(fixed(0), () => g.useMagic());
+        assert.equal(g.player.hp, 1);
+        assert.equal(g.player.mp, 60 - g.spellCost(items.high_heal));
+        assert.ok(calls.popups.includes('魔法が失敗!'));
+        const s = makeGame(M);
+        magic(s.g, 'heal');
+        s.g.player.hp = 1;
+        s.g.player.status = { silence: { t: 5 } };
+        withRandom(fixed(0.5), () => s.g.useMagic());
+        assert.equal(s.g.player.hp, 1);
+    });
+
+    await t.test('スタミナ回復（リフレッシュ）: スタミナを回復し、切れて動けない状態も、一定まで戻れば解ける', () => {
+        const { g, calls } = makeGame(M);
+        magic(g, 'refresh');
+        g.player.stamina = 0; g.player.staminaExhausted = true;
+        withRandom(fixed(0.5), () => g.useMagic());
+        assert.equal(g.player.stamina, Math.min(g.player.maxStamina, spellPower('refresh')));
+        assert.equal(g.player.staminaExhausted, g.player.stamina < g.player.maxStamina * g.staminaDef.resumeRatio, '最大値の 20% まで戻れば、動ける');
+        assert.ok(calls.popups.some(p => p.startsWith('スタミナ +')));
+        g.player.magicCooldown = 0;
+        withRandom(fixed(0.5), () => g.useMagic());
+        assert.equal(g.player.staminaExhausted, false, '2 回かければ、動ける');
+        g.player.stamina = g.player.maxStamina; g.player.magicCooldown = 0;
+        withRandom(fixed(0.5), () => g.useMagic());
+        assert.ok(calls.popups.includes('スタミナは満タンです'));
+    });
+
+    await t.test('エナジーヴェール（補助）: 30 秒間、スタミナの消費が半分。時間が来ると切れる', () => {
+        const { g } = makeGame(M);
+        magic(g, 'energy_veil');
+        withRandom(fixed(0.5), () => g.useMagic());
+        assert.equal(g.player.buffs.staminaCostRate.t, 30);
+        const s0 = g.player.stamina;
+        g.useStamina(10);
+        assert.equal(g.player.stamina, s0 - 5, '消費が半分');
+        g.updateStamina(31);
+        assert.ok(!(g.player.buffs.staminaCostRate.t > 0), '30 秒で切れる');
+        const s1 = g.player.stamina;
+        g.useStamina(10);
+        assert.equal(g.player.stamina, s1 - 10, '切れたら、もとの消費');
     });
 
     await t.test('弓: 魔法スロットに入れると Space で矢を放つ（MP不要・重力で落ちる矢・射程はクラスの range）', () => {
