@@ -241,3 +241,43 @@ export function expToNextLevel(defs, jobId, lv) {
 export function jobRequirementsMet(defs, jobId, levels) {
     return defs.jobs[jobId].requires.every((r) => (levels[r.job] ?? 0) >= r.level);
 }
+
+// ---- 冒険者の作成（character-spec 4 章）----
+
+export const CREATION_JOBS = ['fighter', 'thief', 'sorcerer', 'priest'];   // 作成のときに選べる第一職業（基本の戦闘職。仕様に定めがないので、基本職の 4 つ）
+export const MEASURE_MIN = 1, MEASURE_MAX = 12.5, MEASURE_STEP = 0.5;      // 計測値 A〜D の範囲と、止めたときの刻み（刻みは仮）
+
+/** 種族ごとの、能力値の最大値 ＝ 25 × 係数（切り捨て） */
+export function maxAbility(defs, raceId, key) {
+    return Math.floor(25 * defs.races[raceId].coef[key] + 1e-9);
+}
+
+/**
+ * 作成の入力の検証。エラーなら、メッセージ（文字列）。問題なければ null。
+ *   input = { race, a, b, c, d（計測値）, bonus（1〜9）, abilities（割り振り後の能力値）, job }
+ *   能力値 ＝ 計測値から決まる基礎値（2 つの計測値の合計 × 種族係数、切り捨て、最小 1）＋ 割り振ったボーナス。
+ *   割り振りの合計は、ボーナス値以内。各能力値は、種族の最大値を超えない。サーバー（作成 API）でも、同じ検証をする（計測値の止め操作は、クライアントの値を信用する）。
+ */
+export function validateCreation(defs, input) {
+    const { race, a, b, c, d, bonus, abilities, job } = input;
+    if (!defs.races[race]) return '種族が不正です';
+    for (const [k, v] of Object.entries({ a, b, c, d })) {
+        if (typeof v !== 'number' || !(v >= MEASURE_MIN && v <= MEASURE_MAX)) return `計測値 ${k.toUpperCase()} は ${MEASURE_MIN}〜${MEASURE_MAX} です`;
+    }
+    if (!Number.isInteger(bonus) || bonus < 1 || bonus > 9) return 'ボーナス値は 1〜9 です';
+    if (!CREATION_JOBS.includes(job) || !defs.jobs[job]) return '第一職業が不正です';
+    if (!abilities || typeof abilities !== 'object') return '能力値が不正です';
+    const base = makeAbilities(defs, race, a, b, c, d, 0);
+    let used = 0;
+    for (const k of ABILITY_KEYS) {
+        const v = abilities[k];
+        if (!Number.isInteger(v)) return `能力値 ${k} が不正です`;
+        const add = v - base[k];
+        if (add < 0) return `能力値 ${k} が、基礎値より小さいです`;
+        if (v > maxAbility(defs, race, k)) return `能力値 ${k} が、種族の最大値を超えています`;
+        used += add;
+    }
+    if (Object.keys(abilities).some((k) => !ABILITY_KEYS.includes(k))) return '能力値に、未知の項目があります';
+    if (used > bonus) return `ボーナス値（${bonus}）を超えて割り振っています`;
+    return null;
+}

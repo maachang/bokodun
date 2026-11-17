@@ -144,3 +144,32 @@ test('攻撃 1 回の結果（ミス・1 ゾロ・クリティカル・リトラ
     const ninja = R.resolveAttack(defs, ctx('ninja'), { noMiss: true }, seq(0.5, 0.5, 0.04, 0.5, 0.5, 0.9));
     assert.equal(ninja.damage, Math.floor(normal * 1.5) + normal);
 });
+
+test('冒険者の作成: 能力値の生成・ボーナスの割り振り・検証（仕様 4 章）', () => {
+    const base = R.makeAbilities(defs, 'human', 6, 7, 8, 9, 0);   // 器用度 A+B=13、敏捷度 A+C=14、筋力 B+D=16、生命力 B+C=15、知力 C+D=17、精神力 A+D=15、持久力 B+C=15
+    assert.deepEqual(base, { dex: 13, agi: 14, str: 16, vit: 15, intel: 17, mnd: 15, end: 15 });
+    const elf = R.makeAbilities(defs, 'elf', 12.5, 12.5, 12.5, 12.5, 0);
+    assert.equal(elf.str, 15, '25 × 0.6');
+    assert.equal(elf.dex, 30, '25 × 1.2');
+    assert.equal(R.maxAbility(defs, 'elf', 'str'), 15);
+    assert.equal(R.maxAbility(defs, 'human', 'dex'), 25);
+    assert.equal(R.maxAbility(defs, 'dwarf', 'str'), 35);
+    assert.equal(R.makeAbilities(defs, 'fairy', 1, 1, 1, 1, 0).str, 1, '最小 1（2 × 0.4 = 0.8 → 1）');
+    const ok = (o) => ({ race: 'human', a: 6, b: 7, c: 8, d: 9, bonus: 5, abilities: { ...base }, job: 'fighter', ...o });
+    assert.equal(R.validateCreation(defs, ok({})), null, '割り振りなしでも通る');
+    assert.equal(R.validateCreation(defs, ok({ abilities: { ...base, str: 18, dex: 16 } })), null, '+2 +3 = 5（ボーナス内）');
+    assert.match(R.validateCreation(defs, ok({ abilities: { ...base, str: 19, dex: 16 } })), /ボーナス値.*超えて/);
+    assert.match(R.validateCreation(defs, ok({ abilities: { ...base, str: 15 } })), /基礎値より小さい/);
+    const m = { a: 12.5, b: 12.5, c: 12.5, d: 12.5 }, elfAll = R.makeAbilities(defs, 'elf', 12.5, 12.5, 12.5, 12.5, 0);
+    assert.equal(R.validateCreation(defs, ok({ race: 'elf', bonus: 9, ...m, abilities: elfAll })), null, '計測値が最大なら、基礎値が最大値（エルフの筋力 15）');
+    assert.match(R.validateCreation(defs, ok({ race: 'elf', bonus: 9, ...m, abilities: { ...elfAll, str: 16 } })), /最大値を超えて/, '種族の最大値は、ボーナスでも超えられない');
+    assert.match(R.validateCreation(defs, ok({ race: 'robot' })), /種族/);
+    assert.match(R.validateCreation(defs, ok({ a: 0.5 })), /計測値 A/);
+    assert.match(R.validateCreation(defs, ok({ d: 13 })), /計測値 D/);
+    assert.match(R.validateCreation(defs, ok({ bonus: 0 })), /ボーナス値/);
+    assert.match(R.validateCreation(defs, ok({ bonus: 10 })), /ボーナス値/);
+    assert.match(R.validateCreation(defs, ok({ job: 'knight' })), /第一職業/, '上位職は、作成では選べない');
+    assert.match(R.validateCreation(defs, ok({ abilities: { ...base, cheat: 1 } })), /未知/);
+    assert.match(R.validateCreation(defs, ok({ abilities: { ...base, str: 16.5 } })), /不正/);
+    assert.match(R.validateCreation(defs, ok({ abilities: null })), /能力値/);
+});

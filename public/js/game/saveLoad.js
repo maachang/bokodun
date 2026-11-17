@@ -4,7 +4,7 @@
 //   まだ保存しない項目: 宝箱・ボス・ゲーム内時間・クエスト・ギルドの預かり・プレイ時間（つながっていない仕組み）。
 // 保存の場所は、冒険者ギルド（セーブ）。起動時に、保存済みなら読み込む（なければ player.json の初期値のまま）。
 const STOCK_SIZE = 9;
-const DEFAULT_NAME = '冒険者';   // 仮: 名前を決める画面（冒険者の作成）ができるまで
+const DEFAULT_NAME = '冒険者';   // 名前は、作成の画面（create.html）で決める。保存データに名前がないときの、念のための既定値
 
 export const saveLoadMethods = {
     // 保存データの stock（ゲームの player.stock・selMelee・selFocus・selMagic を、保存の形にする）
@@ -23,8 +23,8 @@ export const saveLoadMethods = {
         });
         const pick = (idx, ok) => (Number.isInteger(idx) && p.stock[idx] && ok(this.items[p.stock[idx]])) ? idx : null;
         const attackOf = (it) => this.weaponClasses[it.weaponClass]?.attack;
-        p.selMelee = pick(st.melee, (it) => attackOf(it) === 'melee');
-        p.selFocus = pick(st.focus, (it) => attackOf(it) === 'cast');
+        p.selMelee = pick(st.melee, (it) => attackOf(it) === 'melee' && this.canCarry(it));   // 筋力で持てない武器は、選べない
+        p.selFocus = pick(st.focus, (it) => attackOf(it) === 'cast' && this.canCarry(it));
         p.selMagic = pick(st.magic, (it) => this.isMagicItem(it));
         return true;
     },
@@ -116,7 +116,7 @@ export const saveLoadMethods = {
 
     // セーブ（冒険者ギルド）。戻り値: { ok: true } / { ok: false, message }
     async saveCharacter() {
-        const body = { name: this.characterName || DEFAULT_NAME, status: 'creating', rev: this.saveRev ?? 1, data: this.buildSaveData() };
+        const body = { name: this.characterName || DEFAULT_NAME, status: 'confirmed', rev: this.saveRev ?? 1, data: this.buildSaveData() };
         try {
             const res = await this.postAuthed('/api/character', body);
             this.saveRev = res.rev;

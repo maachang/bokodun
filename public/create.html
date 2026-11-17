@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>冒険者の作成</title>
+<link rel="stylesheet" href="/auth.css">
+</head>
+<body>
+<main class="card wide">
+    <h1>冒険者の作成</h1>
+    <p class="lead">名前と種族を決めて、計測値をボタンで止め、ボーナスを割り振って、確定します。確定すると、やり直せません（確定するまでは、何度でも振り直せます）。</p>
+
+    <label for="name">名前</label>
+    <input id="name" maxlength="50" autocomplete="off">
+    <label for="race">種族（能力値の上限が変わります）</label>
+    <select id="race"></select>
+    <label for="job">第一職業（あとから、職業訓練所で変えられます）</label>
+    <select id="job"></select>
+
+    <h2>1. 計測値を止める</h2>
+    <p class="dim" style="margin:0 0 6px;font-size:13px">数値が変わり続けます。「止める」で、1 つずつ決めます（1〜12.5）。</p>
+    <div id="measures"></div>
+
+    <h2>2. ボーナスを割り振る</h2>
+    <p id="bonusLine" class="dim" style="margin:0 0 6px;font-size:13px">4 つの計測値を止めると、ボーナス値（1〜9。止められません）が決まります。</p>
+    <div id="abilities"></div>
+
+    <div class="acts">
+        <button id="reroll" class="sub" type="button">振り直す</button>
+        <button id="confirm" type="button" disabled>この冒険者で確定する</button>
+    </div>
+    <p id="err" class="err" role="alert"></p>
+</main>
+<script src="/jhtml.browser.js"></script>
+<script type="module">
+    import * as R from '/js/game/rules.js';
+    const { $, on, api } = jhtml;
+
+    const ABIL = [['dex', '器用度', 'A', 'B'], ['agi', '敏捷度', 'A', 'C'], ['str', '筋力', 'B', 'D'], ['vit', '生命力', 'B', 'C'], ['intel', '知力', 'C', 'D'], ['mnd', '精神力', 'A', 'D'], ['end', '持久力', 'B', 'C']];
+    const KEYS = ['A', 'B', 'C', 'D'];
+    const steps = Math.round((R.MEASURE_MAX - R.MEASURE_MIN) / R.MEASURE_STEP) + 1;
+    const randomMeasure = () => R.MEASURE_MIN + Math.floor(Math.random() * steps) * R.MEASURE_STEP;
+
+    let races, jobs, defs;
+    const st = { value: {}, stopped: {}, bonus: 0, alloc: {} };   // value: 計測値、stopped: 止めたか、alloc: 割り振り（能力値ごとの加算）
+    let csrf = '';
+
+    const race = () => $('race').value;
+    const base = () => R.makeAbilities(defs, race(), st.value.A, st.value.B, st.value.C, st.value.D, 0);
+    const allStopped = () => KEYS.every((k) => st.stopped[k]);
+    const used = () => Object.values(st.alloc).reduce((s, n) => s + n, 0);
+
+    function reroll() {
+        st.value = {}; st.stopped = {}; st.bonus = 0; st.alloc = {};
+        KEYS.forEach((k) => { st.value[k] = randomMeasure(); });
+        render();
+    }
+
+    function render() {
+        $('measures').innerHTML = KEYS.map((k) => `<div class="row m"><span>計測値 ${k}</span><span class="big num">${st.value[k].toFixed(1)}</span><button type="button" data-stop="${k}" ${st.stopped[k] ? 'disabled' : ''}>${st.stopped[k] ? '決定' : '止める'}</button></div>`).join('');
+        const ready = allStopped(), b = ready ? base() : null;
+        $('bonusLine').textContent = ready ? `ボーナス値: ${st.bonus}（残り ${st.bonus - used()}）。能力値は、種族の最大値を超えません。` : '4 つの計測値を止めると、ボーナス値（1〜9。止められません）が決まります。';
+        $('abilities').innerHTML = ABIL.map(([k, label, x, y]) => {
+            const v = ready ? b[k] + (st.alloc[k] ?? 0) : null, max = R.maxAbility(defs, race(), k);
+            return `<div class="row a"><span>${label}</span><span class="dim">${x}+${y}</span><span class="dim">最大 ${max}</span>` +
+                (ready ? `<button type="button" data-sub="${k}" ${(st.alloc[k] ?? 0) <= 0 ? 'disabled' : ''}>−</button><span class="big num">${v}</span><button type="button" data-add="${k}" ${(used() >= st.bonus || v >= max) ? 'disabled' : ''}>＋</button>` : '<span></span><span class="big num dim">—</span><span></span>') + '</div>';
+        }).join('');
+        $('confirm').disabled = !ready || !$('name').value.trim();
+    }
+
+    // 計測値のちらちら（止めるまで、変わり続ける）
+    setInterval(() => { let changed = false; for (const k of KEYS) if (!st.stopped[k]) { st.value[k] = randomMeasure(); changed = true; } if (changed) { const el = $('measures'); KEYS.forEach((k) => { if (!st.stopped[k]) el.querySelector(`[data-stop="${k}"]`).parentElement.children[1].textContent = st.value[k].toFixed(1); }); } }, 70);
+
+    on(document, 'click', '[data-stop]', (e, t) => {
+        st.stopped[t.dataset.stop] = true;
+        if (allStopped()) st.bonus = 1 + Math.floor(Math.random() * 9);   // ボーナス値は、プレイヤーが止められない（1〜9）
+        render();
+    });
+    on(document, 'click', '[data-add]', (e, t) => { if (used() < st.bonus) { st.alloc[t.dataset.add] = (st.alloc[t.dataset.add] ?? 0) + 1; render(); } });
+    on(document, 'click', '[data-sub]', (e, t) => { if ((st.alloc[t.dataset.sub] ?? 0) > 0) { st.alloc[t.dataset.sub]--; render(); } });
+    on($('reroll'), 'click', () => { $('err').textContent = ''; reroll(); });
+    on($('race'), 'change', () => { st.alloc = {}; render(); });   // 種族が変わると、上限が変わるので、割り振りは、やり直し
+    on($('name'), 'input', render);
+
+    on($('confirm'), 'click', async () => {
+        const err = $('err'); err.textContent = '';
+        $('confirm').disabled = true;
+        const b = base(), abilities = Object.fromEntries(ABIL.map(([k]) => [k, b[k] + (st.alloc[k] ?? 0)]));
+        const body = { name: $('name').value.trim(), race: race(), job: $('job').value, a: st.value.A, b: st.value.B, c: st.value.C, d: st.value.D, bonus: st.bonus, abilities };
+        const msg = R.validateCreation(defs, body);
+        if (msg) { err.textContent = msg; render(); return; }
+        try {
+            await api.post('/api/create', body, { headers: { 'X-CSRF-Token': csrf } });
+            location.replace('/');
+        } catch (ex) {
+            err.textContent = ex.data?.errors?.map((x) => x.message).join('\n') || ex.message;
+            render();
+        }
+    });
+
+    (async () => {
+        const me = await api.get('/api/me');
+        if (!me.authenticated) { location.replace('/login.html'); return; }
+        csrf = me.csrfToken;
+        const ch = await api.get('/api/character');
+        if (ch.character && ch.character.status === 'confirmed') { location.replace('/'); return; }   // 作成済み
+        const [r, j] = await Promise.all([fetch('/data/races.json').then((x) => x.json()), fetch('/data/jobs.json').then((x) => x.json())]);
+        races = r.races; jobs = j.jobs;
+        defs = { combat: {}, table: [], jobs, races };
+        $('race').innerHTML = Object.entries(races).map(([id, v]) => `<option value="${id}">${v.name}</option>`).join('');
+        $('job').innerHTML = R.CREATION_JOBS.map((id) => `<option value="${id}">${jobs[id].name}</option>`).join('');
+        reroll();
+    })();
+</script>
+</body>
+</html>

@@ -15,3 +15,18 @@ button:disabled { opacity: .5; cursor: default; }
 .alt { margin: 16px 0 0; text-align: center; font-size: 13px; color: var(--sub); }
 .alt a { color: var(--accent); }
 .hint { margin: 4px 0 0; font-size: 12px; color: var(--sub); }
+
+/* 冒険者の作成の画面 */
+.card.wide { max-width: 560px; }
+h2 { margin: 22px 0 8px; font-size: 15px; color: var(--accent); }
+select { width: 100%; padding: 10px 12px; border-radius: 6px; border: 1px solid var(--line); background: #0f172a; color: var(--text); font-size: 15px; }
+.row { display: grid; align-items: center; gap: 8px; padding: 6px 0; border-bottom: 1px solid #1f2937; font-size: 14px; }
+.row.m { grid-template-columns: 5em 1fr 6em; }
+.row.a { grid-template-columns: 4.5em 3.5em 1fr 2.5em 3em 4em; }
+.row button, .acts button { margin: 0; padding: 6px 8px; font-size: 13px; width: auto; }
+.row .num { text-align: right; font-variant-numeric: tabular-nums; }
+.big { font-size: 20px; font-variant-numeric: tabular-nums; }
+.dim { color: var(--sub); }
+.acts { display: flex; gap: 10px; margin-top: 18px; }
+.acts button { flex: 1; padding: 11px; font-size: 15px; }
+.acts .sub { background: transparent; color: var(--text); border: 1px solid var(--line); }

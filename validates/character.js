@@ -232,9 +232,9 @@ function checkData(data, all) {
     if (JSON.stringify(data).length > MAX_DATA_BYTES) return 'data: 大きすぎます';
     const unknown = Object.keys(data).find(k => !(k in sections));
     if (unknown) return `data.${unknown}: 未知のキーです`;
-    // 確定済みの冒険者は、中身が一通りそろっている
+    // 確定済みの冒険者は、作成で決まる項目がそろっている
     if (all.status === 'confirmed') {
-        const need = ['profile', 'abilities', 'jobs', 'vitals', 'gold', 'exp', 'inventory', 'equipment', 'stock', 'magics', 'world', 'guild'];
+        const need = ['profile', 'abilities', 'jobs'];   // 作成の確定（/api/create）で決まる項目。ほかは、ゲームが読み込むときに、初期値で補う（保存のたびに、全部そろう）。exp は、jobs.expStock に一本化している
         const missing = need.find(k => data[k] === undefined);
         if (missing) return `data.${missing}: 確定済みの冒険者には必要です`;
     }

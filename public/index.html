@@ -784,6 +784,8 @@
             // ログインしていなければ、ログイン画面へ（匿名ユーザーはなし。原則ユーザー登録）
             const me = await jhtml.api.get('/api/me').catch(() => ({ authenticated: false }));
             if (!me.authenticated) { location.replace('/login.html'); return; }
+            const mine = await jhtml.api.get('/api/character').catch(() => ({ character: null }));
+            if (!mine.character || mine.character.status !== 'confirmed') { location.replace('/create.html'); return; }   // 冒険者が未作成なら、作成の画面へ
             await applyLayout(); // 画面レイアウト（public/data/layout.json）を組み立ててから、ゲームを始める
             gameInstance = new GameEngine();
             window.game = gameInstance;
