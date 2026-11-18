@@ -16674,7 +16674,7 @@
     "sdId": 246,
     "texture": "fCattailCluster",
     "count": 3,
-    "scale": [1.31, 1.9],
+    "scale": [1.64, 1.9],
     "spread": 3.0,
     "description": "池のガマの穂（群生）（見た目だけで、当たり判定なし。sdServer 画像。湿地帯（field_swamp・swamp）を中心に、水辺（湖畔・川辺）に置く）"
   },
@@ -16684,7 +16684,7 @@
     "sdId": 247,
     "texture": "fCattailSingle",
     "count": 3,
-    "scale": [0.61, 2.0],
+    "scale": [0.82, 2.0],
     "spread": 3.0,
     "description": "池のガマの穂（1 株）（見た目だけで、当たり判定なし。sdServer 画像。湿地帯（field_swamp・swamp）を中心に、水辺（湖畔・川辺）に置く）"
   },
