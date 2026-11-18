@@ -3,7 +3,7 @@
 sync_sd_images.py
 
 sdServer の画像を、画像ID（sdId）で問い合わせて、更新のあった画像だけを取り込み直すツール。
- - 対象: public/data/enemies.json / npcs.json / objects.json の、sdId を持つエントリ（objects.json は imageFile も持つもの）
+ - 対象: public/data/enemies.json / npcs.json / objects.json / icons.json（アイコン。キー = アイテム ID）の、sdId を持つエントリ（objects.json は imageFile も持つもの）
  - 判定: sdServer の image_updated_at が、scripts/sdImages.manifest.json に保存した値と違えば更新
  - 取り込み: 透明部分を自動クロップして（エントリに flip: true があれば、左右反転も）、エントリの画像ファイルに上書き（エントリに cropBottom があれば、さらに画像の下をその割合だけ切り取る。fullHeight があれば、高さ = fullHeight × (1 - cropBottom)）
  - 反映: 敵は scale の幅（高さは維持）、NPC・オブジェクトは aspect を、新しい画像の縦横比で更新
@@ -36,6 +36,19 @@ def trim(im, margin=2):
     return im.crop((max(0, bb[0] - margin), max(0, bb[1] - margin), min(im.width, bb[2] + margin), min(im.height, bb[3] + margin)))
 
 
+ICON_SIZE = 128
+
+
+def icon_fit(im):
+    """アイコン: 透明な余白は切らず、128×128 の正方形に収める（縦横比を保つ。ちがう大きさなら、縮小・拡大して、中央に置く）"""
+    if im.size == (ICON_SIZE, ICON_SIZE): return im
+    r = min(ICON_SIZE / im.width, ICON_SIZE / im.height)
+    sm = im.resize((max(1, round(im.width * r)), max(1, round(im.height * r))), Image.LANCZOS)
+    out = Image.new('RGBA', (ICON_SIZE, ICON_SIZE), (0, 0, 0, 0))
+    out.paste(sm, ((ICON_SIZE - sm.width) // 2, (ICON_SIZE - sm.height) // 2))
+    return out
+
+
 def apply_size(path, key, kind, d0, im):
     """画像の縦横比を、エントリへ反映（aspect、または scale の幅。高さは維持）"""
     ratio = im.width / im.height
@@ -64,6 +77,10 @@ def targets():
     for k, v in json.load(open(p, encoding='utf-8')).items():
         if 'sdId' in v and v.get('imageFile'):
             out.append((p, k, int(v['sdId']), 'objects/' + v['imageFile'], 'object'))
+    p = os.path.join(ROOT, 'public/data/icons.json')   # 武器・防具・魔法・道具のアイコン（キー = アイテム ID。128×128・透過。余白は切らず、正方形のまま取り込む）
+    for k, v in json.load(open(p, encoding='utf-8')).items():
+        if isinstance(v, dict) and 'sdId' in v:
+            out.append((p, k, int(v['sdId']), 'icons/%s.png' % k, 'icon'))
     return out
 
 
@@ -132,7 +149,7 @@ def main():
     for path, key, sid, rel, kind in todo:
         if sid not in done:
             src = Image.open(io.BytesIO(urllib.request.urlopen(a.sd + api[sid]['image_path']).read())).convert('RGBA')
-            seen[sid] = trim(src)
+            seen[sid] = icon_fit(src) if kind == 'icon' else trim(src)
             done.add(sid)
         im = seen[sid]
         d0 = json.load(open(path, encoding='utf-8'))[key]
