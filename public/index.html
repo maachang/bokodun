@@ -14,7 +14,7 @@
             margin: 0;
             background: #0b0f17;
             color: #e5e7eb;
-            font: 13px/1.5 'Courier New', Courier, monospace, sans-serif;
+            font: 13px/1.5 'Hiragino Kaku Gothic ProN', 'Hiragino Sans', 'Noto Sans JP', 'Yu Gothic UI', 'BIZ UDPGothic', Meiryo, 'IPAexGothic', 'IPAPGothic', sans-serif;
             overflow: hidden;
             height: 100vh;
         }
@@ -550,7 +550,7 @@
 
         <!-- 職業（職業の仕組みは、まだゲームに入っていないため、職業名とサブ職業は見た目だけ。レベルは、ゲームの値） -->
         <section class="panel small" id="panel-job">
-            <div class="panel-title">職業</div>
+            <div class="cols" style="--c:3.2em 1fr"><span>名前</span><span id="charName"></span></div>
             <div class="cols" style="--c:3.2em 1fr 4.2em"><span>メイン</span><span id="jobMain">戦士</span><span class="lv"><span>Lv.</span><span id="levelText">1</span></span></div>
             <div class="cols" style="--c:3.2em 1fr 4.2em"><span>サブ</span><span id="jobSub">なし</span><span class="lv"><span>Lv.</span><span id="subLvText">-</span></span></div>
         </section>

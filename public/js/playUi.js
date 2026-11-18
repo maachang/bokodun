@@ -20,7 +20,7 @@ export function initPlayUi(game) {
         paused: false,          // ダイアログ・会話・死亡の画面が出ている間は true（ゲームを止める）
         winBackTo: null,        // 「← 戻る」の戻り先
         keyCapture: null,       // ショートカットの割り当て中の、メニューの項目
-        E: refs('talk', 'death', 'deathMsg', 'pauseBadge', 'miniTitle', 'slots', 'menu', 'jobMain', 'jobSub', 'subLvText', 'levelText', 'expText', 'win', 'winBody', 'winBack', 'winClose', 'bottomStack', 'bossBar', 'panel-location', 'panel-event', 'panelStore', 'region-debug')
+        E: refs('talk', 'death', 'deathMsg', 'pauseBadge', 'miniTitle', 'slots', 'menu', 'charName', 'jobMain', 'jobSub', 'subLvText', 'levelText', 'expText', 'win', 'winBody', 'winBack', 'winClose', 'bottomStack', 'bossBar', 'panel-location', 'panel-event', 'panelStore', 'region-debug')
     };
     initStock(S);
     initWindow(S);
@@ -75,6 +75,7 @@ function initStock(S) {
     S.renderJob = () => {
         const j = game.player?.jobs;
         if (!j || !game.rules) return;
+        E.charName.textContent = game.characterName || '';
         E.jobMain.textContent = game.jobName(j.primary);
         E.levelText.textContent = game.player.level;   // 一時停止中（訓練所のメニューなど）も、変更を映す
         E.expText.textContent = j.expStock;
