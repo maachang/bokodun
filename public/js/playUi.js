@@ -144,7 +144,7 @@ function initBodies(S) {
     const { E, game } = S;
     const slotItem = (i) => { const id = game.player.stock[i]; return id ? game.items[id] : null; };
     const stockBody = () => '<p class="legend">最大 9 枠。✕ で外し、「＋追加」で武器・魔法を選んで入れます。</p><div class="grid3">' + game.player.stock.map((id, i) => id
-        ? html`<div class="cell filled" data-detail="${i}"><button class="x" data-rm="${i}">✕</button><b>${i + 1}</b> ${game.items[id].name}<br><small>${kindLabel(game, game.items[id])}　${itemDetail(game, game.items[id])}</small></div>`
+        ? html`<div class="cell filled" data-detail="${i}"><button class="x" data-rm="${i}">✕</button><b>${i + 1}</b> ${raw(iconTag(game, id, 32))}${game.items[id].name}<br><small>${kindLabel(game, game.items[id])}　${itemDetail(game, game.items[id])}</small></div>`
         : html`<div class="cell add" data-add="${i}">＋ 追加（${i + 1}）</div>`).join('') + '</div>';
     const pickBody = (slotNo) => {
         const used = new Set(game.player.stock.filter(Boolean));
@@ -186,7 +186,7 @@ function initBodies(S) {
     on(E.winBody, 'click', '[data-detail]', (e, t) => {
         if (e.target.closest('[data-rm]')) return;
         const i = Number(t.dataset.detail), it = slotItem(i);
-        S.setBody(html`<h3>ストック</h3><p>枠 ${i + 1}</p><h3>${it.name}</h3><p>${kindLabel(game, it)}</p><p>${itemDetail(game, it)}</p>`);
+        S.setBody(html`<h3>ストック</h3><p>枠 ${i + 1}</p><h3>${raw(iconTag(game, it.id, 48))}${it.name}</h3><p>${kindLabel(game, it)}</p><p>${itemDetail(game, it)}</p>`);
         S.setBack(() => S.openWin('stock'));
     });
     on(E.winBody, 'click', '[data-add]', (e, t) => { S.setBody('<h3>ストック</h3>' + pickBody(Number(t.dataset.add))); S.setBack(() => S.openWin('stock')); });
