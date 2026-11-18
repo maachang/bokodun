@@ -68,7 +68,7 @@ test('店のメニューで、魔法を買える。品揃えは店ごとの good
     g.player.gold = 1000;
     const labels = () => g.shopMenuChoices().map((c) => c.label);
     assert.ok(labels().some((l) => l.startsWith('ヒール')));
-    assert.ok(!labels().some((l) => l.startsWith('爆発火球') || l.startsWith('ハイヒール') || l.startsWith('ハイ・リフレッシュ')), '上級（tier high）は、店で売らない');
+    assert.ok(!labels().some((l) => l.startsWith('ファイアーボム') || l.startsWith('ハイヒール') || l.startsWith('ハイ・リフレッシュ')), '上級（tier high）は、店で売らない');
     const i = labels().findIndex((l) => l.startsWith('ヒール'));
     g.shopMenuChoices()[i].act();
     assert.match(m.note, /買って、覚えました/);

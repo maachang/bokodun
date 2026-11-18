@@ -55,7 +55,7 @@
 - magic_bolt マジックボルト → sdId 422
 - fire ファイア → sdId 423
 - spread 拡散弾 → sdId 424
-- explosion 爆発火球 → sdId 425
+- explosion ファイアーボム → sdId 425
 - heal ヒール → sdId 426
 - refresh リフレッシュ → sdId 427
 - energy_veil エナジーヴェール → sdId 428

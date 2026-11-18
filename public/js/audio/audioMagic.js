@@ -122,7 +122,7 @@ export const magicSounds = {
         noise.start(now);
     },
 
-    // 落下の笛「ぴゅーーーん」: 高い音から低い音へ滑り落ちる（爆発火球の予告の長さ duration に合わせて鳴らす）
+    // 落下の笛「ぴゅーーーん」: 高い音から低い音へ滑り落ちる（ファイアーボムの予告の長さ duration に合わせて鳴らす）
     playStrikeWhistle(duration = 0.3) {
         if (!this.ctx) return;
         const now = this.ctx.currentTime;

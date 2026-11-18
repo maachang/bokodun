@@ -43,7 +43,7 @@
   "explosion": {
     "id": "explosion",
     "element": "fire",
-    "name": "爆発火球",
+    "name": "ファイアーボム",
     "kind": "spell",
     "type": "strike",
     "cooldown": 0.9,
@@ -55,7 +55,7 @@
   },
   "spread": {
     "id": "spread",
-    "element": "ice",
+    "element": "none",
     "name": "拡散弾",
     "kind": "spell",
     "type": "spread",

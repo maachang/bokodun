@@ -160,7 +160,7 @@ export const combatMethods = {
         if (isDead) this.gainExp(m.exp);
     },
 
-    // 落下系の魔法（爆発火球）: 前方 targetDistance の地面を狙い（手前に壁があればその直前）、予告の輪 → 着弾の範囲ダメージ → 火柱
+    // 落下系の魔法（ファイアーボム）: 前方 targetDistance の地面を狙い（手前に壁があればその直前）、予告の輪 → 着弾の範囲ダメージ → 火柱
     castStrike(spell, power) {
         const dirX = -Math.sin(this.player.angle);
         const dirZ = -Math.cos(this.player.angle);

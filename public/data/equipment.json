@@ -1,5 +1,5 @@
 {
-  "_comment": "武器・防具の一覧（草案）。西洋の一般的な装備。weight は購入時に指定できる重さの範囲[最小,最大]（1〜50）、dice は基本値（n個のm面ダイス＋固定値k）。weaponClass は既存の public/data/weaponClasses.json の最も近い攻撃モーションで、斧・槍・クロスボウなどの専用クラスは今後追加する。twoHanded の武器は盾と同時に装備できない想定（仮）。heavy は金属製の重装備（盾は全種）で、シーフ系のクリティカル率ペナルティと回避無効の対象。価格・入手方法・魔法の+値は別途。",
+  "_comment": "武器・防具の一覧（草案）。西洋の一般的な装備。weight は購入時に指定できる重さの範囲[最小,最大]（1〜50）、dice は基本値（n個のm面ダイス＋固定値k）。weaponClass は既存の public/data/weaponClasses.json の最も近い攻撃モーションで、斧・槍・クロスボウなどの専用クラスは今後追加する。twoHanded の武器は盾と同時に装備できない想定（仮）。heavy は金属製の重装備（盾は全種）で、シーフ系のクリティカル率ペナルティと回避無効の対象。価格・入手方法・魔法の+値は別途。 【2026-11-18 追記】ユーザーの候補（2026-10-28）に合わせて、エストック・ブロードソード・カトラス・ファルシオン・グレートソード・ショートスピア・ロングスピア・トマホーク・ジャベリン、リングメイル・プレートメイル・プレートアーマー・ローブ・クロースアーマー（cloth_padded）、帽子・ターバン・ウッドヘルム・スチールヘルム（スチームヘルムは誤字）を足した。名前・区分は、ユーザーの決定。重さの範囲・ダイスは、AI の草案（仮。docs/draft-numbers-proposal.md）。ジャベリン（手槍）は、弓と同じ使い方（weaponClass: bow）。ロットは、ワンドと統合（別の装備にしない）。元の草案のうち、ユーザーの候補にない装備（スピア・グレートアックス・クラブ・クォータースタッフ、スケイルメイル・ブレストプレート・ハーフプレート・フルプレート・スタデッドレザー、フード・レザーキャップ・コイフ・アイアンヘルム・バシネット・グレートヘルム、ヒーターシールドなど）は、ユーザーの指示で残してある。",
   "weapons": [
     { "id": "dagger", "name": "ダガー", "category": "短剣", "weaponClass": "dagger", "blunt": false, "twoHanded": false, "weight": [1, 8], "dice": { "n": 1, "m": 6, "k": 2 } },
     { "id": "rapier", "name": "レイピア", "category": "細剣", "weaponClass": "sword", "blunt": false, "twoHanded": false, "weight": [4, 12], "dice": { "n": 1, "m": 6, "k": 3 } },
@@ -23,7 +23,16 @@
     { "id": "crossbow", "name": "クロスボウ", "category": "弓", "weaponClass": "bow", "blunt": false, "twoHanded": true, "weight": [12, 35], "dice": { "n": 2, "m": 6, "k": 2 } },
     { "id": "quarter_staff", "name": "クォータースタッフ", "category": "杖", "weaponClass": "staff", "blunt": true, "twoHanded": true, "weight": [5, 20], "dice": { "n": 1, "m": 6, "k": 2 } },
     { "id": "wand", "name": "ワンド", "category": "魔法の杖", "weaponClass": "magic_rod", "blunt": false, "twoHanded": false, "weight": [1, 4], "dice": { "n": 1, "m": 6, "k": 0 } },
-    { "id": "magic_staff", "name": "スタッフ", "category": "魔法の杖", "weaponClass": "staff", "blunt": false, "twoHanded": true, "weight": [4, 15], "dice": { "n": 1, "m": 6, "k": 1 } }
+    { "id": "magic_staff", "name": "スタッフ", "category": "魔法の杖", "weaponClass": "staff", "blunt": false, "twoHanded": true, "weight": [4, 15], "dice": { "n": 1, "m": 6, "k": 1 } },
+    { "id": "estoc", "name": "エストック", "category": "細剣", "weaponClass": "sword", "blunt": false, "twoHanded": false, "weight": [6, 18], "dice": { "n": 1, "m": 6, "k": 4 } },
+    { "id": "broadsword", "name": "ブロードソード", "category": "剣", "weaponClass": "sword", "blunt": false, "twoHanded": false, "weight": [8, 22], "dice": { "n": 2, "m": 6, "k": 1 } },
+    { "id": "cutlass", "name": "カトラス", "category": "剣", "weaponClass": "sword", "blunt": false, "twoHanded": false, "weight": [4, 14], "dice": { "n": 2, "m": 6, "k": 0 } },
+    { "id": "falchion", "name": "ファルシオン", "category": "剣", "weaponClass": "sword", "blunt": false, "twoHanded": false, "weight": [10, 28], "dice": { "n": 2, "m": 6, "k": 1 } },
+    { "id": "great_sword", "name": "グレートソード", "category": "大剣", "weaponClass": "greatsword", "blunt": false, "twoHanded": true, "weight": [20, 45], "dice": { "n": 2, "m": 6, "k": 3 } },
+    { "id": "short_spear", "name": "ショートスピア", "category": "槍", "weaponClass": "sword", "blunt": false, "twoHanded": false, "weight": [5, 15], "dice": { "n": 2, "m": 6, "k": 0 } },
+    { "id": "long_spear", "name": "ロングスピア", "category": "槍", "weaponClass": "greatsword", "blunt": false, "twoHanded": true, "weight": [12, 30], "dice": { "n": 2, "m": 6, "k": 2 } },
+    { "id": "tomahawk", "name": "トマホーク", "category": "斧", "weaponClass": "sword", "blunt": false, "twoHanded": false, "weight": [4, 14], "dice": { "n": 1, "m": 6, "k": 3 } },
+    { "id": "javelin", "name": "ジャベリン", "category": "槍（投げ）", "weaponClass": "bow", "blunt": false, "twoHanded": false, "weight": [3, 12], "dice": { "n": 1, "m": 6, "k": 3 } }
   ],
   "armors": [
     { "id": "cloth_armor", "name": "布の服", "category": "布", "weight": [1, 8], "dice": { "n": 1, "m": 6, "k": 0 } },
@@ -33,7 +42,12 @@
     { "id": "scale_mail", "name": "スケイルメイル", "category": "鱗", "heavy": true, "weight": [18, 38], "dice": { "n": 2, "m": 6, "k": 3 } },
     { "id": "breastplate", "name": "ブレストプレート", "category": "板金", "heavy": true, "weight": [20, 40], "dice": { "n": 2, "m": 6, "k": 4 } },
     { "id": "half_plate", "name": "ハーフプレート", "category": "板金", "heavy": true, "weight": [28, 45], "dice": { "n": 3, "m": 6, "k": 2 } },
-    { "id": "full_plate", "name": "フルプレート", "category": "板金", "heavy": true, "weight": [35, 50], "dice": { "n": 3, "m": 6, "k": 4 } }
+    { "id": "full_plate", "name": "フルプレート", "category": "板金", "heavy": true, "weight": [35, 50], "dice": { "n": 3, "m": 6, "k": 4 } },
+    { "id": "ring_mail", "name": "リングメイル", "category": "鎖", "heavy": true, "weight": [12, 30], "dice": { "n": 2, "m": 6, "k": 1 } },
+    { "id": "plate_mail", "name": "プレートメイル", "category": "板金", "heavy": true, "weight": [25, 45], "dice": { "n": 3, "m": 6, "k": 1 } },
+    { "id": "plate_armor", "name": "プレートアーマー", "category": "板金", "heavy": true, "weight": [32, 50], "dice": { "n": 3, "m": 6, "k": 3 } },
+    { "id": "robe", "name": "ローブ", "category": "布", "weight": [1, 6], "dice": { "n": 1, "m": 6, "k": 0 } },
+    { "id": "cloth_padded", "name": "クロースアーマー", "category": "布", "weight": [2, 10], "dice": { "n": 1, "m": 6, "k": 1 } }
   ],
   "helms": [
     { "id": "hood", "name": "フード", "category": "布", "weight": [1, 4], "dice": { "n": 1, "m": 6, "k": 0 } },
@@ -41,7 +55,11 @@
     { "id": "coif", "name": "コイフ", "category": "鎖", "heavy": true, "weight": [4, 12], "dice": { "n": 2, "m": 6, "k": 0 } },
     { "id": "iron_helm", "name": "アイアンヘルム", "category": "鉄", "heavy": true, "weight": [8, 20], "dice": { "n": 2, "m": 6, "k": 1 } },
     { "id": "bascinet", "name": "バシネット", "category": "鉄", "heavy": true, "weight": [10, 25], "dice": { "n": 2, "m": 6, "k": 2 } },
-    { "id": "great_helm", "name": "グレートヘルム", "category": "鉄", "heavy": true, "weight": [18, 35], "dice": { "n": 2, "m": 6, "k": 3 } }
+    { "id": "great_helm", "name": "グレートヘルム", "category": "鉄", "heavy": true, "weight": [18, 35], "dice": { "n": 2, "m": 6, "k": 3 } },
+    { "id": "hat", "name": "帽子", "category": "布", "weight": [1, 3], "dice": { "n": 1, "m": 6, "k": 0 } },
+    { "id": "turban", "name": "ターバン", "category": "布", "weight": [1, 4], "dice": { "n": 1, "m": 6, "k": 0 } },
+    { "id": "wood_helm", "name": "ウッドヘルム", "category": "木", "weight": [3, 10], "dice": { "n": 1, "m": 6, "k": 1 } },
+    { "id": "steel_helm", "name": "スチールヘルム", "category": "鉄", "heavy": true, "weight": [10, 25], "dice": { "n": 2, "m": 6, "k": 1 } }
   ],
   "shields": [
     { "id": "buckler", "name": "バックラー", "category": "小型", "heavy": true, "weight": [2, 10], "dice": { "n": 1, "m": 6, "k": 1 } },

@@ -1,6 +1,6 @@
 /**
  * sdServer プロキシ API
- * sdServer (http://localhost:3000) への画像取得・ギャラリー取得・画像生成リクエストを中継
+ * sdServer (http://localhost:3010) への画像取得・ギャラリー取得・画像生成リクエストを中継
  */
 exports.handler = async function() {
     const action = $request.getQuery('action', '') || '';
@@ -13,7 +13,7 @@ exports.handler = async function() {
             return { error: 'Invalid path' };
         }
         try {
-            const resp = await fetch(`http://127.0.0.1:3000${imagePath}`);
+            const resp = await fetch(`http://127.0.0.1:3010${imagePath}`);
             if (!resp.ok) {
                 $response.status(resp.status);
                 return { error: 'Failed to fetch image from sdServer' };
@@ -34,7 +34,7 @@ exports.handler = async function() {
         const limit = $request.getQuery('limit', '30');
         const offset = $request.getQuery('offset', '0');
         try {
-            const url = `http://127.0.0.1:3000/api/images?limit=${limit}&offset=${offset}&groupTag=${encodeURIComponent(groupTag)}`;
+            const url = `http://127.0.0.1:3010/api/images?limit=${limit}&offset=${offset}&groupTag=${encodeURIComponent(groupTag)}`;
             const resp = await fetch(url);
             const data = await resp.json();
             return data;
@@ -47,7 +47,7 @@ exports.handler = async function() {
     // 3. サーバー情報 & テーマ取得: /api/sdProxy?action=config
     if (action === 'config') {
         try {
-            const resp = await fetch('http://127.0.0.1:3000/api/config');
+            const resp = await fetch('http://127.0.0.1:3010/api/config');
             const data = await resp.json();
             return data;
         } catch (e) {
@@ -60,7 +60,7 @@ exports.handler = async function() {
     if (action === 'generate' && $request.method === 'POST') {
         try {
             const body = $request.body || {};
-            const resp = await fetch('http://127.0.0.1:3000/api/generate', {
+            const resp = await fetch('http://127.0.0.1:3010/api/generate', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: typeof body === 'string' ? body : JSON.stringify(body)
@@ -77,7 +77,7 @@ exports.handler = async function() {
     if (action === 'status') {
         const taskId = $request.getQuery('taskId', '');
         try {
-            const resp = await fetch(`http://127.0.0.1:3000/api/generate?taskId=${encodeURIComponent(taskId)}`);
+            const resp = await fetch(`http://127.0.0.1:3010/api/generate?taskId=${encodeURIComponent(taskId)}`);
             const data = await resp.json();
             return data;
         } catch (e) {

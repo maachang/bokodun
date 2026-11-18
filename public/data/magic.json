@@ -3,12 +3,37 @@
   "spells": {
     "magic_bolt": { "name": "マジックボルト", "element": "none",  "kind": "attack", "costType": "rapid",  "weight": 14, "price": 120, "tier": "basic", "dice": { "n": 1, "m": 6, "k": 3 } },
     "fire":       { "name": "ファイア",       "element": "fire",  "kind": "attack", "costType": "single", "weight": 28, "price": 470, "tier": "mid", "dice": { "n": 2, "m": 6, "k": 3 } },
-    "spread":     { "name": "拡散弾",         "element": "ice",   "kind": "attack", "costType": "spread", "weight": 20, "price": 290, "tier": "basic", "dice": { "n": 2, "m": 6, "k": 2 }, "count": 3 },
-    "explosion":  { "name": "爆発火球",       "element": "fire",  "kind": "attack", "costType": "area",   "weight": 34, "price": 900, "tier": "high", "dice": { "n": 3, "m": 6, "k": 4 } },
+    "spread":     { "name": "拡散弾",         "element": "none",   "kind": "attack", "costType": "spread", "weight": 20, "price": 290, "tier": "basic", "dice": { "n": 2, "m": 6, "k": 2 }, "count": 3 },
+    "explosion":  { "name": "ファイアーボム",       "element": "fire",  "kind": "attack", "costType": "area",   "weight": 34, "price": 900, "tier": "high", "dice": { "n": 3, "m": 6, "k": 4 } },
     "heal":       { "name": "ヒール",         "element": "holy",  "kind": "heal",   "costType": "heal",   "weight": 20, "price": 240, "tier": "basic", "dice": { "n": 2, "m": 6, "k": 3 } },
     "refresh":      { "name": "リフレッシュ",       "element": "holy", "kind": "heal",    "target": "stamina", "costType": "heal",    "weight": 18, "price": 190, "tier": "basic", "dice": { "n": 2, "m": 6, "k": 12 } },
     "energy_veil":  { "name": "エナジーヴェール",   "element": "none", "kind": "support", "costType": "support", "weight": 24, "price": 350, "tier": "mid", "effect": { "type": "staminaCostRate", "rate": 0.5, "duration": 30 } },
     "high_refresh": { "name": "ハイ・リフレッシュ", "element": "holy", "kind": "heal",    "target": "stamina", "costType": "heal",    "weight": 36, "price": 780, "tier": "high", "dice": { "n": 3, "m": 6, "k": 16 } },
-    "high_heal":  { "name": "ハイヒール",     "element": "holy",  "kind": "heal",   "costType": "heal",   "weight": 40, "price": 960, "tier": "high", "dice": { "n": 3, "m": 6, "k": 5 } }
+    "high_heal":  { "name": "ハイヒール",     "element": "holy",  "kind": "heal",   "costType": "heal",   "weight": 40, "price": 960, "tier": "high", "dice": { "n": 3, "m": 6, "k": 5 } },
+    "flare": { "name": "フレア", "element": "fire", "kind": "attack", "costType": "area", "weight": 44, "price": 1510, "tier": "high", "dice": { "n": 4, "m": 6, "k": 4 }, "source": "AI草案（数値は仮）" },
+    "ice_javelin": { "name": "アイスジャベリン", "element": "ice", "kind": "attack", "costType": "single", "weight": 26, "price": 410, "tier": "mid", "dice": { "n": 2, "m": 6, "k": 3 }, "source": "AI草案（数値は仮）" },
+    "ice_storm": { "name": "アイスストーム", "element": "ice", "kind": "attack", "costType": "area", "weight": 36, "price": 1010, "tier": "high", "dice": { "n": 3, "m": 6, "k": 4 }, "source": "AI草案（数値は仮）" },
+    "air_cutter": { "name": "エアカッター", "element": "none", "kind": "attack", "costType": "single", "weight": 22, "price": 290, "tier": "basic", "dice": { "n": 2, "m": 6, "k": 1 }, "source": "AI草案（数値は仮）" },
+    "air_storm": { "name": "エアストーム", "element": "none", "kind": "attack", "costType": "area", "weight": 34, "price": 900, "tier": "high", "dice": { "n": 3, "m": 6, "k": 3 }, "source": "AI草案（数値は仮）" },
+    "earthquake": { "name": "アースクエイク", "element": "none", "kind": "attack", "costType": "area", "weight": 40, "price": 1250, "tier": "high", "dice": { "n": 3, "m": 6, "k": 5 }, "source": "AI草案（数値は仮）" },
+    "meteor_strike": { "name": "メテオストライク", "element": "none", "kind": "attack", "costType": "area", "weight": 50, "price": 1950, "tier": "high", "dice": { "n": 4, "m": 6, "k": 6 }, "source": "AI草案（数値は仮）" },
+    "thunder_bolt": { "name": "サンダーボルト", "element": "thunder", "kind": "attack", "costType": "single", "weight": 30, "price": 540, "tier": "mid", "dice": { "n": 2, "m": 6, "k": 4 }, "source": "AI草案（数値は仮）" },
+    "thunderfall": { "name": "落雷", "element": "thunder", "kind": "attack", "costType": "area", "weight": 38, "price": 1130, "tier": "high", "dice": { "n": 3, "m": 6, "k": 4 }, "source": "AI草案（数値は仮）" },
+    "turn_undead": { "name": "ターンアンデット", "element": "holy", "kind": "attack", "costType": "single", "weight": 18, "price": 190, "tier": "basic", "dice": { "n": 2, "m": 6, "k": 2 }, "source": "AI草案（数値は仮）" },
+    "purification": { "name": "ピュリフィケーション", "element": "holy", "kind": "attack", "costType": "area", "weight": 30, "price": 700, "tier": "mid", "dice": { "n": 3, "m": 6, "k": 2 }, "source": "AI草案（数値は仮）" },
+    "holy": { "name": "ホーリー", "element": "holy", "kind": "attack", "costType": "area", "weight": 36, "price": 1010, "tier": "high", "dice": { "n": 3, "m": 6, "k": 3 }, "source": "AI草案（数値は仮）" },
+    "cure": { "name": "キュアー", "element": "holy", "kind": "heal", "costType": "heal", "weight": 12, "price": 90, "tier": "basic", "dice": { "n": 1, "m": 6, "k": 2 }, "source": "AI草案（数値は仮）" },
+    "recovery": { "name": "リカバリー", "element": "holy", "kind": "heal", "costType": "heal", "weight": 36, "price": 780, "tier": "high", "dice": { "n": 2, "m": 6, "k": 6 }, "source": "AI草案（数値は仮）" }
+  },
+  "_userCandidates": "ユーザー（2026-10-28）が出した魔法の候補。名前・区分・効果だけを入れた。重さ・ダイス・価格・段階・消費は、ユーザーが決めていないので、持たない（未決）。ゲームは、items.json に見た目のない魔法を読まないので、ここに足しても動作は変わらない。id は仮。数値の草案を足した魔法は、上の spells に移した（source: AI草案）。",
+  "_aiDrafts": "上の spells のうち、ユーザーの候補にない魔法（AI の草案）: heal・refresh・energy_veil・high_refresh・high_heal。数値（重さ・ダイス・価格・段階）は、すべて AI の草案で、ユーザーが決めたものではない。",
+  "userCandidates": {
+    "enchant": {"name": "エンチャント", "element": "none", "kind": "support", "note": "攻撃力アップ。重ね掛けなし（ユーザーの決定）。上がる量・時間は未決"},
+    "protection": {"name": "プロテクション", "element": "none", "kind": "support", "note": "防御力アップ。重ね掛けなし（ユーザーの決定）。上がる量・時間は未決"},
+    "speedy": {"name": "スピーディー", "element": "none", "kind": "support", "note": "移動速度アップ。重ね掛けなし（ユーザーの決定）。上がる量・時間は未決"},
+    "cure_poison": {"name": "キュアーポイズン", "element": "holy", "kind": "heal", "note": "毒と猛毒を回復する（ユーザーの決定）。猛毒の状態は、ゲームに未実装"},
+    "unlock": {"name": "アンロック", "element": "none", "kind": "utility", "note": "鍵の代わりに、宝箱の鍵を開ける（ユーザーの決定）。特殊な鍵は開かない。宝箱の仕組みが未実装"},
+    "trap": {"name": "トラップ", "element": "none", "kind": "utility", "note": "宝箱の罠を解除する魔法（ユーザーの決定）。属性はアンロックと同じ。宝箱の仕組みが未実装"},
+    "fly": {"name": "フライ", "element": "none", "kind": "utility", "note": "空中に浮く。バリア・段差移動などで、ダメージを受けない（ユーザーの決定）。基本 30 秒で、魔法使いのレベル・能力で持続時間が伸びる（式は未決）"}
   }
 }

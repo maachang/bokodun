@@ -509,7 +509,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         assert.equal(g.player.mp, 5 - spellMp('magic_bolt'));
     });
 
-    await t.test('爆発火球: 弾を飛ばさず、前方 6m の地面に予告→着弾する（間隔0.9秒）', () => {
+    await t.test('ファイアーボム: 弾を飛ばさず、前方 6m の地面に予告→着弾する（間隔0.9秒）', () => {
         const { g, calls } = makeGame(M);
         g.selectMagic(MAGIC_BASE + 1);
         withRandom(fixed(0.5), () => g.useMagic());
@@ -523,7 +523,7 @@ test('Space / F / クリックは選択中の魔法スロットを使う', async
         assert.deepEqual(calls.sounds.find(([n]) => n === 'playStrikeWhistle'), ['playStrikeWhistle', 0.3], '予告の長さに合わせて「ぴゅーーーん」');
     });
 
-    await t.test('爆発火球: 手前に壁があれば、その直前に着弾する。杖の補正で威力が上がる', () => {
+    await t.test('ファイアーボム: 手前に壁があれば、その直前に着弾する。杖の補正で威力が上がる', () => {
         const { g, calls } = makeGame(M);
         g.colliders = [{ minX: -2, maxX: 2, minZ: -4.5, maxZ: -3.5 }]; // z=-3.5 に壁
         equip(g, 'magic_staff');
@@ -746,7 +746,7 @@ test('生きている敵は障害物（プレイヤーは突き抜けられな�
     });
 });
 
-test('爆発火球の効果音（SoundFX）', async (t) => {
+test('ファイアーボムの効果音（SoundFX）', async (t) => {
     const M = await loadModules();
 
     await t.test('落下の笛: 予告の長さに合わせて、高い音から低い音へ滑り落ちる', () => {
