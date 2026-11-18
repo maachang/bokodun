@@ -15,3 +15,9 @@ export function buildItems(items, equipment, magic) {
     }
     return out;
 }
+
+// アイコンの画像タグ（HTML 文字列）。アイコンのないアイテム（素手など）は、空き（同じ幅）にして、名前の位置をそろえる。id は、アイテム・武器・防具の ID（英数字と _ のみ）
+export function iconTag(game, id, px = 24) {
+    if (!id || !game.iconIds?.has(id)) return `<span class="ic" style="width:${px}px;height:${px}px"></span>`;
+    return `<img class="ic" src="/images/icons/${id}.png" alt="" width="${px}" height="${px}" style="width:${px}px;height:${px}px">`;
+}

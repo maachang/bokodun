@@ -7,10 +7,11 @@
  *
  * ダイアログ・会話・死亡の画面を開いている間は、game.uiPaused を立てて、ゲームの進行と操作を止める（game.js の update と controls.js）。
  */
-const { $, refs, on, html, show, hide } = jhtml;
+const { $, refs, on, html, show, hide, raw } = jhtml;
 
 import { MENU, keymap, EVENT, MSG_SIZES, prefs } from '/js/playUiData.js';
 import { GEAR_KINDS, GEAR_NAMES } from '/js/game/gear.js';
+import { iconTag } from '/js/game/itemDefs.js';
 
 // 本体は、ここから先
 // 状態と、部品どうしの受け渡し（S）を作って、部品ごとの初期化を呼ぶ
@@ -66,7 +67,7 @@ function initStock(S) {
             if (!it) return html`<div class="slot empty"><span class="no">${i + 1}</span>空き</div>`;
             const lack = it.kind === 'spell' && p.mp < it.mp;   // MP が足りない魔法
             const cls = [i === p.selMelee ? 'selW' : '', i === p.selFocus ? 'selF' : '', i === p.selMagic ? 'selM' : '', lack ? 'lack' : ''].join(' ');
-            return html`<div class="slot ${cls}" data-i="${i}"><span class="no">${i + 1}</span><span class="tag">${kindLabel(game, it)}</span>${it.name}</div>`;
+            return html`<div class="slot ${cls}" data-i="${i}" title="${it.name}"><span class="no">${i + 1}</span><span class="tag">${kindLabel(game, it)}</span>${game.iconIds?.has(id) ? raw(iconTag(game, id, 28)) : it.name}</div>`;
         }).join('');
     };
     game.onStockChange = () => { lastSig = ''; S.renderSlots(); };
@@ -148,7 +149,7 @@ function initBodies(S) {
     const pickBody = (slotNo) => {
         const used = new Set(game.player.stock.filter(Boolean));
         const all = Object.values(game.items).filter(it => game.isStockable(it) && (it.kind === 'spell' ? game.isSpellLearned(it.id) : it.id !== 'fists' && game.isOwned(it.id)));   // 魔法は覚えたもの、武器は持っているものだけ（武器は、武器屋で買う）
-        const row = (it) => html`<div class="pick cols ${used.has(it.id) ? 'dis' : ''}" style="--c:1fr 7em 12em" data-id="${it.id}" data-slot="${slotNo}"><span>${it.name}</span><small>${used.has(it.id) ? '入っています' : ''}</small><small>${kindLabel(game, it)}　${itemDetail(game, it)}</small></div>`;
+        const row = (it) => html`<div class="pick cols ${used.has(it.id) ? 'dis' : ''}" style="--c:1fr 7em 12em" data-id="${it.id}" data-slot="${slotNo}"><span>${raw(iconTag(game, it.id))}${it.name}</span><small>${used.has(it.id) ? '入っています' : ''}</small><small>${kindLabel(game, it)}　${itemDetail(game, it)}</small></div>`;
         return '<p>枠 ' + (slotNo + 1) + ' に入れる武器・魔法</p><div class="title">武器・杖</div>' + all.filter(it => !game.isMagicItem(it)).map(row).join('') + '<div class="title" style="margin-top:8px">魔法・弓</div>' + all.filter(it => game.isMagicItem(it)).map(row).join('');
     };
     const settingBody = () => '<p class="legend">ショートカットキーの割り当て（「変更」を押して、割り当てたいキーを押す。1〜9 と Esc は使えません）</p>' + MENU.map(([id, name]) => html`<div class="cols" style="--c:110px 3em 9em;margin-bottom:4px"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd><button data-keyset="${id}">変更</button></div>`).join('') + '<div class="cols" style="--c:110px 200px;margin-top:10px"><span>音量</span><input type="range" min="0" max="100" value="60"></div>'
@@ -167,13 +168,13 @@ function initBodies(S) {
     const equipBody = () => {
         const p = game.player, limit = Math.round(game.rules ? game.totalWeight() / (game.loadRatio() || 1) : 0);
         return '<p class="legend">鎧・兜・盾を選びます（武器・魔法は「ストック」）。積載の限界を超えると、動きが遅くなります。</p>'
-            + GEAR_KINDS.map(k => { const def = game.gearDef(k, p.equip?.[k]); return html`<div class="pick cols" style="--c:4em 1fr 19em" data-gk="${k}"><span class="k">${GEAR_NAMES[k]}</span><span style="text-align:left">${def ? def.name : '（なし）'}</span><small>${def ? gearInfo(def) : ''}</small></div>`; }).join('')
+            + GEAR_KINDS.map(k => { const def = game.gearDef(k, p.equip?.[k]); return html`<div class="pick cols" style="--c:4em 1fr 19em" data-gk="${k}"><span class="k">${GEAR_NAMES[k]}</span><span style="text-align:left">${def ? raw(iconTag(game, def.id, 40)) : raw(iconTag(game, null, 40))}${def ? def.name : '（なし）'}</span><small>${def ? gearInfo(def) : ''}</small></div>`; }).join('')
             + html`<div class="pick cols dis" style="--c:4em 1fr 19em"><span class="k">アクセサリ</span><span>（なし）</span><small></small></div>`
             + html`<div class="cols" style="--c:4em 1fr 19em;margin-top:8px"><span class="k">重量</span><span>${game.totalWeight()} / ${limit}（武器・鎧・兜・盾の合計 / 積載の限界）</span><small></small></div>`;
     };
     const gearPickBody = (kind) => {
         const cur = game.player.equip?.[kind];
-        const row = (def) => html`<div class="pick cols ${game.canWear(def) ? '' : 'dis'}" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid="${def.id}"><span style="text-align:left">${def.name}</span><small>${def.id === cur ? '着けています' : ''}</small><small>${gearInfo(def)}</small></div>`;
+        const row = (def) => html`<div class="pick cols ${game.canWear(def) ? '' : 'dis'}" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid="${def.id}"><span style="text-align:left">${raw(iconTag(game, def.id, 32))}${def.name}</span><small>${def.id === cur ? '着けています' : ''}</small><small>${gearInfo(def)}</small></div>`;
         return html`<p>${GEAR_NAMES[kind]}を選びます</p><div class="pick cols" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid=""><span>外す</span><small>${cur ? '' : '外しています'}</small><small></small></div>` + game.gearList(kind).filter(def => game.isOwned(def.id)).map(row).join('');   // 持っている防具だけ（武器屋で買う）
     };
     const helpBody = () => '<p class="legend">操作の説明</p>' + jhtml.$('instructions').innerHTML + (jhtml.$('panel-hints') ? '<div style="margin-top:10px">' + jhtml.$('panel-hints').innerHTML + '</div>' : '');
@@ -206,7 +207,7 @@ function initItems(S) {
     S.bodies.item = () => {
         const ids = Object.keys(game.player.inventory);
         return '<p class="legend">持ち物です。クリックで詳細と「使う」。道具は、道具屋・神殿で買えます。</p>'
-            + (ids.length ? ids.map(id => html`<div class="pick cols" data-item="${id}" style="--c:1fr 4em"><span>${game.items[id].name}</span><span class="n">× ${game.itemCount(id)}</span></div>`).join('') : '<p style="color:#94a3b8">（持っている道具は、ありません）</p>')
+            + (ids.length ? ids.map(id => html`<div class="pick cols" data-item="${id}" style="--c:1fr 4em"><span>${raw(iconTag(game, id))}${game.items[id].name}</span><span class="n">× ${game.itemCount(id)}</span></div>`).join('') : '<p style="color:#94a3b8">（持っている道具は、ありません）</p>')
             + html`<div class="cols" style="--c:6em 1fr;margin-top:8px"><span class="k">所持金</span><span>${game.player.gold ?? 0} G</span></div>`;
     };
     const itemDetailBody = (id, note = '') => {

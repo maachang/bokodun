@@ -1,6 +1,7 @@
 # アイコンを作る一覧（ID 名前）
 
 ## 武器
+- fists 素手 → sdId 447
 - dagger ダガー → sdId 381
 - rapier レイピア → sdId 382
 - short_sword ショートソード → sdId 380

@@ -225,7 +225,7 @@
         #panel-enemies { flex: 1 1 auto; min-height: 0; overflow: hidden; align-items: stretch; }
         /* 9 枠のストック（今は見た目だけ。中身は、組み立てが決まってから） */
         #slots { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
-        .slot { position: relative; height: 44px; border: 1px solid #4b5563; border-radius: 3px; background: #0f172a; text-align: center; font-size: 11px; line-height: 1.2; padding-top: 12px; cursor: pointer; }
+        .slot { position: relative; height: 44px; border: 1px solid #4b5563; border-radius: 3px; background: #0f172a; text-align: center; font-size: 11px; line-height: 1.2; padding-top: 12px; cursor: pointer; overflow: hidden; }
         .slot .no { position: absolute; top: 1px; left: 3px; color: #9ca3af; }
         .slot.empty { color: #4b5563; cursor: default; }
         .slot.selW { outline: 2px solid #f59e0b; } .slot.selM { outline: 2px solid #38bdf8; } .slot.selF { outline: 2px solid #4ade80; }
@@ -255,6 +255,8 @@
         .grid3 .cell { width: auto; height: 84px; margin: 0; }
         .cell.filled { cursor: pointer; } .cell.filled:hover { border-color: #9ca3af; background: #1a2332; }
         .cell.add { color: #9ca3af; text-align: center; padding-top: 30px; cursor: pointer; }
+        .ic { display: inline-block; vertical-align: middle; margin-right: 6px; image-rendering: pixelated; flex: none; }
+        .slot .ic { margin: 0; display: block; margin: 0 auto; }   /* ストックの枠は、アイコンだけ（名前は、マウスを載せると出る） */
         .pick { display: flex; justify-content: space-between; padding: 3px 6px; border-bottom: 1px solid #1f2937; cursor: pointer; }
         .pick.cols { --c: 4em 1fr 3em; }
         .pick.cols .k { color: #9ca3af; font-size: 12px; }

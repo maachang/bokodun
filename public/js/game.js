@@ -98,6 +98,7 @@ export class GameEngine {
             this.items = buildItems(await itemRes.json(), equipment, magic);   // 武器（equipment.json）・魔法（magic.json）を重ねる
             this.weaponClasses = await classRes.json();
             this.npcDefinitions = await npcRes.json();
+            this.iconIds = new Set(Object.keys(await (await fetch('/data/icons.json')).json()).filter(k => !k.startsWith('_')));   // アイコンのあるアイテム ID（画像は /images/icons/<ID>.png）
             this.shops = await (await fetch('/data/shops.json')).json();   // 店の種類（店名・店主）。汎用の店マップが、入った店に応じて切り替える
             // 初期装備（装備スロットの中身と選択中のスロット）
             const playerDef = await playerRes.json();

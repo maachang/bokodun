@@ -3,6 +3,7 @@
 import * as THREE from '/js/three.module.js';
 import { Monster } from '/js/entities.js';
 import { SHOP_PAGE_SIZE } from '/js/game/constants.js';
+import { iconTag } from '/js/game/itemDefs.js';
 
 export const interactMethods = {
     // 壁（colliders）の判定範囲（プレイヤーの半径ぶん外側へ広げた矩形）の中に (x, z) があるか
@@ -188,11 +189,11 @@ export const interactMethods = {
             m.page = Math.min(m.page ?? 0, pages - 1);
             const goods = all.slice(m.page * SHOP_PAGE_SIZE, (m.page + 1) * SHOP_PAGE_SIZE)
                 .map(g => g.equipId
-                    ? { label: `${this.equipDefOf(g.equipId).def.name}　重さ ${this.equipDefOf(g.equipId).range[0]}〜${this.equipDefOf(g.equipId).range[1]}${this.isOwned(g.equipId) ? '（持っている）' : ''}`, act: () => { m.screen = 'weight'; m.good = g; m.weight = this.defaultBuyWeight(g.equipId); m.index = 0; m.note = ''; } }   // 武器・防具は、重さを選んで買う（equipShop.js）
+                    ? { icon: g.equipId, label: `${this.equipDefOf(g.equipId).def.name}　重さ ${this.equipDefOf(g.equipId).range[0]}〜${this.equipDefOf(g.equipId).range[1]}${this.isOwned(g.equipId) ? '（持っている）' : ''}`, act: () => { m.screen = 'weight'; m.good = g; m.weight = this.defaultBuyWeight(g.equipId); m.index = 0; m.note = ''; } }   // 武器・防具は、重さを選んで買う（equipShop.js）
                     : g.spellId
-                    ? { label: `${g.name}　${g.price}G${this.isSpellLearned(g.spellId) ? '（覚えた）' : ''}`, act: () => { m.note = this.buySpell(g).message; } }   // 魔法は、買って覚える
+                    ? { icon: g.spellId, label: `${g.name}　${g.price}G${this.isSpellLearned(g.spellId) ? '（覚えた）' : ''}`, act: () => { m.note = this.buySpell(g).message; } }   // 魔法は、買って覚える
                     : g.itemId
-                        ? { label: `${g.name}　${g.price}G（所持 ${this.itemCount(g.itemId)}）`, act: () => { m.note = this.buyItem(g).message; } }   // 道具は、買って持ち物に入れる
+                        ? { icon: g.itemId, label: `${g.name}　${g.price}G（所持 ${this.itemCount(g.itemId)}）`, act: () => { m.note = this.buyItem(g).message; } }   // 道具は、買って持ち物に入れる
                         : { label: `${g.name}　${g.price}G`, act: () => { m.note = `（ダミー）${g.name}の購入は準備中です`; } });
             const turn = (d) => () => { m.page += d; m.index = 0; m.note = ''; };
             if (m.page > 0) goods.push({ label: '◀ 前のページ', act: turn(-1) });
@@ -223,7 +224,7 @@ export const interactMethods = {
         const choices = this.shopMenuChoices();
         const body = m.screen === 'sell' ? '<div style="margin:6px 0;color:#94a3b8">（ダミー）売れる持ち物の一覧は準備中です</div>' : m.screen === 'weight' ? this.equipShopInfo(m) : '';
         this.shopMenuEl.innerHTML = `<div class="who" style="flex:none">${esc(title)}　<span style="color:#64748b;font-size:11px;font-weight:normal">↑↓ 選ぶ　Enter/E 決定　Esc 閉じる</span></div>${body}` +
-            choices.map((c, i) => `<div data-i="${i}" style="padding:1px 10px;cursor:pointer;flex:none;${i === m.index ? 'background:#1e3a5f;border-radius:4px' : ''}">${i === m.index ? '▶ ' : '　'}${esc(c.label)}</div>`).join('') +
+            choices.map((c, i) => `<div data-i="${i}" style="padding:1px 10px;cursor:pointer;flex:none;${i === m.index ? 'background:#1e3a5f;border-radius:4px' : ''}">${i === m.index ? '▶ ' : '　'}${c.icon ? iconTag(this, c.icon, 20) : ''}${esc(c.label)}</div>`).join('') +
             (m.note ? `<div style="color:#fbbf24;flex:none">${esc(m.note)}</div>` : '');
         this.shopMenuEl.querySelector(`[data-i="${m.index}"]`)?.scrollIntoView({ block: 'nearest' });
         this.shopMenuEl.querySelectorAll('[data-i]').forEach(d => {
