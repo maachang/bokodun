@@ -79,3 +79,26 @@
 - revive_potion 蘇生の薬 → sdId 444
 - return_stone 帰還の石 → sdId 445
 - key 鍵 → sdId 446
+
+## 魔法（実装前・登録のみ。2026-11-18）
+- flare → sdId 448
+- ice_javelin → sdId 449
+- ice_storm → sdId 450
+- air_cutter → sdId 451
+- air_storm → sdId 452
+- earthquake → sdId 453
+- meteor_strike → sdId 454
+- thunder_bolt → sdId 455
+- thunderfall → sdId 456
+- turn_undead → sdId 457
+- purification → sdId 458
+- holy → sdId 459
+- cure → sdId 460
+- recovery → sdId 461
+- cure_poison → sdId 462
+- enchant → sdId 463
+- protection → sdId 464
+- speedy → sdId 465
+- unlock → sdId 466
+- trap → sdId 467
+- fly → sdId 468

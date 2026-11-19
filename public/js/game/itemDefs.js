@@ -11,6 +11,7 @@ export function buildItems(items, equipment, magic) {
     }
     for (const [id, sp] of Object.entries(magic.spells)) {
         if (!out[id] || out[id].kind !== 'spell') continue;   // items.json に見た目のない魔法は入れない
+        if (sp.usable === false) continue;   // 登録だけの魔法（効果が未決）は、ゲームで使えるものにしない（magic.json の usable）
         out[id] = { ...out[id], magicKind: sp.kind, weight: sp.weight, costType: sp.costType, dice: sp.dice, price: sp.price, tier: sp.tier, target: sp.target, effect: sp.effect };   // magicKind: attack / heal / support（item.kind は、呪文なら spell）
     }
     return out;
