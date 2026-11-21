@@ -25,6 +25,15 @@
 - quarter_staff クォータースタッフ → sdId 400
 - wand ワンド → sdId 401
 - magic_staff スタッフ → sdId 402
+- estoc エストック → sdId 486（2026-11-21 追加）
+- broadsword ブロードソード → sdId 469（2026-11-21 追加）
+- cutlass カトラス → sdId 470（2026-11-21 追加）
+- falchion ファルシオン → sdId 471（2026-11-21 追加）
+- great_sword グレートソード → sdId 472（2026-11-21 追加）
+- short_spear ショートスピア → sdId 473（2026-11-21 追加）
+- long_spear ロングスピア → sdId 474（2026-11-21 追加）
+- tomahawk トマホーク → sdId 475（2026-11-21 追加）
+- javelin ジャベリン → sdId 476（2026-11-21 追加）
 
 ## 鎧
 - cloth_armor 布の服 → sdId 403
@@ -35,6 +44,11 @@
 - breastplate ブレストプレート → sdId 408
 - half_plate ハーフプレート → sdId 409
 - full_plate フルプレート → sdId 410
+- ring_mail リングメイル → sdId 477（2026-11-21 追加）
+- plate_mail プレートメイル → sdId 478（2026-11-21 追加）
+- plate_armor プレートアーマー → sdId 479（2026-11-21 追加）
+- robe ローブ → sdId 480（2026-11-21 追加）
+- cloth_padded クロースアーマー → sdId 481（2026-11-21 追加）
 
 ## 兜
 - hood フード → sdId 411
@@ -43,6 +57,10 @@
 - iron_helm アイアンヘルム → sdId 414
 - bascinet バシネット → sdId 415
 - great_helm グレートヘルム → sdId 416
+- hat 帽子 → sdId 482（2026-11-21 追加）
+- turban ターバン → sdId 483（2026-11-21 追加）
+- wood_helm ウッドヘルム → sdId 484（2026-11-21 追加）
+- steel_helm スチールヘルム → sdId 485（2026-11-21 追加）
 
 ## 盾
 - buckler バックラー → sdId 417
