@@ -153,9 +153,15 @@ test('攻撃 1 回の結果（ミス・1 ゾロ・クリティカル・リトラ
     assert.deepEqual(R.resolveAttack(defs, ctx('fighter'), {}, seq(0.9, 0.5, 0.5, 0.05)), { kind: 'crit', damage: Math.floor(normal * 1.5) });
     assert.equal(R.resolveAttack(defs, ctx('fighter'), { forceCrit: true }, seq(0.5, 0.5)).kind, 'crit', '必ずクリティカル（ミスもしない）');
     // リトライ（アサシン 2 回。クリティカル率 5%＝重い武器）: 最初のクリティカル → リトライでもクリティカル → 次は外れて通常ダメージ
-    const asn = R.resolveAttack(defs, ctx('assassin'), { noMiss: true }, seq(0.5, 0.5, 0.04, 0.5, 0.5, 0.04, 0.5, 0.5, 0.9));
+    const asn = R.resolveAttack(defs, ctx('assassin'), { noMiss: true }, seq(0.5, 0.5, 0.04, 0.5, 0.5, 0.005, 0.5, 0.5, 0.9));   // リトライの率は、5% → 1%（下限）に下がる
     assert.equal(asn.kind, 'crit');
     assert.equal(asn.damage, Math.floor(normal * 1.5) * 2 + normal, 'クリティカル + クリティカル + 通常');
+    // リトライのクリティカル率は、1 回ごとに 10 ポイント下がる（最初 30% → 20% → 10%。下限 1%）
+    //   シーフ（軽い武器: 20% × 重量比なし）で、最初が 15%（< 20%）で出ても、リトライの率は 10% なので、15% は外れる
+    const dag = { id: 'dagger', dice: { n: 1, m: 6, k: 0 }, blunt: false }, dctx = { weapon: dag, weight: 3, lv: 1, job: defs.jobs.thief, str: 14, dex: 14 };
+    const dn = R.tableValue(defs, 3, 4);   // 1d6 で乱数 0.5 → 4
+    assert.equal(R.resolveAttack(defs, dctx, { noMiss: true }, seq(0.5, 0.15, 0.5, 0.15)).damage, Math.floor(dn * 1.5) + dn, 'リトライの率は 10%: 0.15 は外れて、通常ダメージを足す');
+    assert.equal(R.resolveAttack(defs, dctx, { noMiss: true }, seq(0.5, 0.15, 0.5, 0.05)).damage, Math.floor(dn * 1.5) * 2, 'リトライ 0.05（< 10%）はクリティカル');
     // リトライの回数を使い切ったら終わり（ニンジャ 3 回でも、すぐ外れれば 1 回で終わる）
     const ninja = R.resolveAttack(defs, ctx('ninja'), { noMiss: true }, seq(0.5, 0.5, 0.04, 0.5, 0.5, 0.9));
     assert.equal(ninja.damage, Math.floor(normal * 1.5) + normal);

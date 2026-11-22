@@ -10,6 +10,7 @@
   },
   "lightWeaponMaxRatio": 0.5,
   "critDamageMultiplier": 1.5,
+  "critRetryDrop": 10,
   "magicPlusCritBonus": 5,
   "equipWeightMultiplier": { "normal": 1.0, "blunt": 1.5, "_note": "装備できる重さの上限 = 筋力 × 倍率（最大50）" },
   "defense": {

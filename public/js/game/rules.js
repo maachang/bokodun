@@ -151,7 +151,7 @@ export function critRate(defs, job, weapon, weight, str, loadRatio = null, lv = 
 /**
  * 攻撃 1 回の結果（ミス → 1 ゾロ → クリティカル → リトライクリティカル の順）。{ kind: 'miss' | 'fumble' | 'normal' | 'crit', damage }
  *   ctx = { weapon, weight, lv, job, str, dex, loadRatio }。noCrit は、クリティカルにしない（ブラックダイヤモンドの追加判定）。forceCrit は、必ずクリティカル（ミスもしない。「半ずらし」は 2026-11-23 になしにしたため、ゲームからは、いまは使わない）。noMiss は、ミスの判定をしない（弓など）。
- *   クリティカルのダメージは、ダメージ判定の 1.5 倍。リトライ（職業ごとの回数）は、その都度ダメージ判定をして合算する。出なければ、通常ダメージを加えて終わる。
+ *   クリティカルのダメージは、ダメージ判定の 1.5 倍。リトライ（職業ごとの回数）は、その都度ダメージ判定をして合算する。リトライのクリティカル率は、1 回ごとに critRetryDrop ポイントずつ下がる（最初 30% なら、リトライは 20%、次は 10%。下限は 1% か、元の率の小さいほう）。出なければ、通常ダメージを加えて終わる。
  */
 export function resolveAttack(defs, ctx, { forceCrit = false, noMiss = false, noCrit = false } = {}, rng = Math.random) {
     const { weapon, weight, lv, job, str, dex, loadRatio } = ctx;
@@ -164,7 +164,8 @@ export function resolveAttack(defs, ctx, { forceCrit = false, noMiss = false, no
     let total = Math.floor(first.damage * mult);
     for (let i = 0; i < (job?.retryCrit || 0); i++) {
         const r = rollAttack(defs, weapon, weight, lv, job, rng);
-        if (!r.fumble && rng() * 100 < p) total += Math.floor(r.damage * mult);
+        const pr = Math.max(Math.min(defs.combat.critLoad?.floor ?? 1, p), p - (defs.combat.critRetryDrop ?? 0) * (i + 1));   // リトライごとに、率が下がる（1 回目 −10・2 回目 −20 ポイント。下限 1%）
+        if (!r.fumble && rng() * 100 < pr) total += Math.floor(r.damage * mult);
         else { total += r.damage; break; }
     }
     return { kind: 'crit', damage: total };
