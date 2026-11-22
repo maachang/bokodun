@@ -126,6 +126,7 @@ export const updatePlayerMethods = {
 
     updateTerrainEffects(dt, worldMoveX, worldMoveZ) {
         let playerFloorDepth = 0;
+        const floating = this.isFloating();   // 浮遊中は、床ダメージ・床の罠・バリアを受けない（accessory.js）
         let inWater = false;
         const wasInCurrent = this.player.inCurrent;
         this.player.inCurrent = false;
@@ -144,7 +145,7 @@ export const updatePlayerMethods = {
                     }
 
                     // 1. Hazard floor damage (Lava / Poison)
-                    if (t.damagePerSec && t.damagePerSec > 0) {
+                    if (!floating && t.damagePerSec && t.damagePerSec > 0) {
                         this.player.hazardTimer = (this.player.hazardTimer || 0) + dt;
                         if (this.player.hazardTimer >= 0.5) {
                             this.player.hazardTimer = 0;
@@ -169,7 +170,7 @@ export const updatePlayerMethods = {
                     }
 
                     // 3. Spike Trap
-                    if (t.isTrap && !t.triggered) {
+                    if (!floating && t.isTrap && !t.triggered) {
                         t.triggered = true;
                         this.player.hp = Math.max(0, this.player.hp - t.trapDamage);
                         this.sound.playHurt();
@@ -179,7 +180,7 @@ export const updatePlayerMethods = {
                     }
 
                     // 4. Dragon Quest Barrier Floor (Damage per step / traversal distance)
-                    if (t.isBarrier) {
+                    if (!floating && t.isBarrier) {
                         this.player.barrierDistance = (this.player.barrierDistance || 0) + (Math.hypot(worldMoveX, worldMoveZ));
                         if (this.player.barrierDistance >= 1.2) {
                             this.player.barrierDistance = 0;

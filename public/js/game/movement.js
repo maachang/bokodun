@@ -191,6 +191,7 @@ export const movementMethods = {
             if (!this.heightMap) return true;
             const cur = this.player.heightLevel ?? this.heightLevelAt(this.player.x, this.player.z);
             const diff = this.heightLevelAt(x + dirX * r, z + dirZ * r, cur) - cur;   // 吊橋のマスは、今の高さに近い層（橋の上・橋の下）へ進む
+            if (diff === CLIMB_RISE && this.isFloating()) return true;   // 浮遊中: 2 段の崖も、登る動作なしで進める（accessory.js）
             if (diff === CLIMB_RISE) this._climbBump = { dirX, dirZ };   // ちょうど 2 段高い崖: 前へ押し続けると、よじ登れる
             return diff <= 1 && diff >= -2;
         };
@@ -331,6 +332,7 @@ export const movementMethods = {
     // 高い所から落ちたときのダメージ（levels: 落ちた段の数。1 段の段差は、落下にしない）
     applyHeightFall(levels) {
         if (this.nav?.busy) return;   // マップ間の移動中は、ダメージなし
+        if (this.isFloating()) return;   // 浮遊中は、落下しない
         const dmg = Math.round((levels - 1) * this.fallDamagePerLevel);
         if (dmg <= 0) return;
         this.player.hp = Math.max(0, this.player.hp - dmg);

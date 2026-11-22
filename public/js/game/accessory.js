@@ -80,6 +80,11 @@ export const accessoryMethods = {
         return this.accEffectsOf('spellPower').reduce((v, e) => Math.max(1, Math.floor(v * e.rate)), power);
     },
 
+    // 浮遊しているか（ブルートパーズ）。床の仕掛け・落とし穴・床ダメージ・高所からの落下・地面を打つ範囲攻撃を受けず、2 段の崖は登る動作なしで進める
+    isFloating() {
+        return this.accEffectsOf('float').length > 0;
+    },
+
     // 状態異常を無効にするか（毒・麻痺。猛毒は毒の無効では防がない）
     isStatusImmune(type) {
         return this.accEffectsOf('immuneStatus').some((e) => e.status === type);

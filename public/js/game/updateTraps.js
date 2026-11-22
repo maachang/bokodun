@@ -128,7 +128,7 @@ export const updateTrapMethods = {
                     const inTrapZone = (this.player.x >= b.minX - r * 0.3 && this.player.x <= b.maxX + r * 0.3 &&
                                        this.player.z >= b.minZ - r * 0.3 && this.player.z <= b.maxZ + r * 0.3);
 
-                    if (inTrapZone && !this.player.isInvincible) {
+                    if (inTrapZone && !this.player.isInvincible && !this.isFloating()) {   // 浮遊中は、針床を受けない
                         this.sound.playHurt();
                         this.flashDamageScreen();
                         this.particles.spawnBurst(this.player.x, 0.4, this.player.z, 0xdc2626, 16, 4.0);
@@ -150,7 +150,7 @@ export const updateTrapMethods = {
                 const b = cf.bounds;
                 const r = this.player.radius || 0.6;
                 const onTile = (this.player.x >= b.minX + 0.25 && this.player.x <= b.maxX - 0.25 &&
-                                this.player.z >= b.minZ + 0.25 && this.player.z <= b.maxZ - 0.25);
+                                this.player.z >= b.minZ + 0.25 && this.player.z <= b.maxZ - 0.25) && !this.isFloating();   // 浮遊中は、床が崩れない・穴に落ちない
 
                 if (cf.state === 'intact') {
                     if (onTile && !this.player.isFalling) {

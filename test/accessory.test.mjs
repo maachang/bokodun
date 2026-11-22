@@ -150,3 +150,48 @@ test('効果（能力値・最大MP・速さ・回復・状態異常の無効・
         assert.equal(jt.g.accSpellPower(1), 1, '最低 1');
     });
 });
+
+test('ブルートパーズ（浮遊）: 床ダメージ・床の罠・バリア・落下・範囲攻撃を受けない', async (t) => {
+    const setup = async (id) => {
+        const { g } = await engine();
+        g.giveAllAccessories();
+        if (id) g.equipAccessory(id);
+        g.player.x = 5; g.player.z = 5; g.player.hp = 50; g.player.maxHp = 50;
+        g.sound = { playHurt() {}, playBarrierDamage() {}, playBigExplosion() {} };
+        g.particles = { spawnBurst() {} };
+        g.flashScreen = () => {}; g.flashDamageScreen = () => {}; g.fallDamagePerLevel = 5;
+        g.terrainGrid = [
+            { minX: 0, maxX: 10, minZ: 0, maxZ: 10, depth: 0, damagePerSec: 20, hazardType: 'fire' },
+            { minX: 0, maxX: 10, minZ: 0, maxZ: 10, depth: 0, isTrap: true, trapDamage: 7 },
+            { minX: 0, maxX: 10, minZ: 0, maxZ: 10, depth: 0, isBarrier: true, damagePerStep: 9 }
+        ];
+        return g;
+    };
+    await t.test('浮遊していなければ、床ダメージ・罠・バリアを受ける（比較）', async () => {
+        const g = await setup(null);
+        g.updateTerrainEffects(0.6, 2, 0);
+        assert.ok(g.player.hp < 50);
+    });
+    await t.test('浮遊中は、受けない', async () => {
+        const g = await setup('blue_topaz');
+        assert.equal(g.isFloating(), true);
+        g.updateTerrainEffects(0.6, 2, 0);
+        assert.equal(g.player.hp, 50);
+    });
+    await t.test('浮遊中は、高所からの落下ダメージがない', async () => {
+        const a = await setup(null); a.applyHeightFall(3);
+        assert.ok(a.player.hp < 50);
+        const g = await setup('blue_topaz'); g.applyHeightFall(3);
+        assert.equal(g.player.hp, 50);
+    });
+    await t.test('浮遊中は、地面を打つ範囲攻撃（slam）を受けない', async () => {
+        const hits = [];
+        for (const id of [null, 'blue_topaz']) {
+            const g = await setup(id);
+            g.monsterAttackValue = () => 10;
+            g.playerTakeDamage = (d) => hits.push([id, d]);
+            g.slamAttack({}, { x: 5, z: 5 }, 3, 1);
+        }
+        assert.deepEqual(hits, [[null, 10]]);
+    });
+});

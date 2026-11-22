@@ -267,7 +267,7 @@ export const combatMethods = {
         this.particles.spawnBurst(pos.x, (this.player.floorY ?? 0) + 0.3, pos.z, 0xef4444, 24, 5.0);
         this.sound.playBigExplosion?.();
         const d = Math.hypot(this.player.x - pos.x, this.player.z - pos.z);
-        if (d <= radius && !this.player.isFalling) {
+        if (d <= radius && !this.player.isFalling && !this.isFloating()) {   // 浮遊中は、地面を打つ範囲攻撃を受けない
             const dmg = Math.max(1, Math.floor(this.monsterAttackValue(owner) * mult));
             const k = d > 0.01 ? new THREE.Vector3((this.player.x - pos.x) / d, 0, (this.player.z - pos.z) / d) : new THREE.Vector3(0, 0, 0);
             this.addPopup(`範囲攻撃! -${dmg}`, '#ef4444');
