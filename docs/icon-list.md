@@ -120,3 +120,44 @@
 - unlock → sdId 466
 - trap → sdId 467
 - fly → sdId 468
+
+## アクセサリ（2026-11-22 追加。双石・三石・双守り石・三守り石は、属性の組み合わせが未決のため、まだない）
+- citrine シトリン → sdId 487
+- turquoise ターコイズ → sdId 488
+- garnet ガーネット → sdId 489
+- jade 翡翠 → sdId 490
+- lapis_lazuli ラピスラズリ → sdId 491
+- amethyst アメジスト → sdId 492
+- serpentine 蛇紋石 → sdId 493
+- bloodstone ブラッドストーン → sdId 494
+- tigers_eye タイガーアイ → sdId 495
+- moonstone ムーンストーン → sdId 496
+- coral 珊瑚 → sdId 497
+- peridot ペリドット → sdId 498
+- tourmaline トルマリン → sdId 499
+- carnelian カーネリアン → sdId 500
+- ice_quartz アイスクォーツ → sdId 501
+- labradorite ラブラドライト → sdId 502
+- white_opal ホワイトオパール → sdId 503
+- obsidian オブシディアン → sdId 504
+- malachite マラカイト → sdId 505
+- sapphire サファイア → sdId 506
+- tanzanite タンザナイト → sdId 507
+- jet ジェット → sdId 508
+- ruby ルビー → sdId 509
+- aquamarine アクアマリン → sdId 510
+- imperial_topaz インペリアルトパーズ → sdId 511
+- pearl パール → sdId 512
+- black_spinel ブラックスピネル → sdId 513
+- emerald エメラルド → sdId 514
+- alexandrite アレキサンドライト → sdId 515
+- blue_topaz ブルートパーズ → sdId 516
+- black_diamond ブラックダイヤモンド → sdId 517
+- rainbow_diamond 虹色に輝くダイヤ → sdId 518
+- carnelian_ward カーネリアンの守り石 → sdId 519
+- ice_quartz_ward アイスクォーツの守り石 → sdId 520
+- labradorite_ward ラブラドライトの守り石 → sdId 521
+- white_opal_ward ホワイトオパールの守り石 → sdId 522
+- obsidian_ward オブシディアンの守り石 → sdId 523
+- malachite_ward マラカイトの守り石 → sdId 524
+- rainbow_diamond_ward 虹色のダイヤの守り石 → sdId 525
