@@ -5,14 +5,14 @@ export const equipShopMethods = {
     equipShopInfo(m) {
         const e = this.equipDefOf(m.good.equipId), d = e.def.dice;
         const dice = `${d.n}d${d.m}${d.k ? '+' + d.k : ''}`;
-        const limit = Math.floor(this.rules ? this.player.abilities.str * (e.def.blunt ? 1.5 : 1) : 0);
+        const limit = Math.floor(this.rules ? this.effAbilities().str * (e.def.blunt ? 1.5 : 1) : 0);
         return `<div style="margin:6px 0;color:#94a3b8">${e.def.name}（${e.def.category ?? ''}）　${e.kind === 'weapon' ? '攻撃' : '防御'} ${dice}　重さ ${e.range[0]}〜${e.range[1]}　いま持てる重さ ${limit} まで${this.isOwned(m.good.equipId) ? `　（持っている: 重さ ${this.player.owned[m.good.equipId]}）` : ''}</div>`;
     },
 
     equipShopChoices(m) {
         const id = m.good.equipId, e = this.equipDefOf(id), [lo, hi] = e.range;
         const move = (d) => () => { m.weight = Math.max(lo, Math.min(hi, m.weight + d)); m.note = ''; };
-        const carry = this.player.abilities.str * (e.def.blunt ? 1.5 : 1) >= m.weight;
+        const carry = this.effAbilities().str * (e.def.blunt ? 1.5 : 1) >= m.weight;
         return [
             { label: `買う　重さ ${m.weight}　${this.equipPrice(id, m.weight)}G${carry ? '' : '　（筋力が足りず、装備はできません）'}`, act: () => { m.note = this.buyEquipment(id, m.weight).message; } },
             { label: '重さを 1 増やす（→）', act: move(1) },

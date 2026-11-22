@@ -65,7 +65,7 @@ test('保存して読み込むと、冒険者が元に戻る（能力値・職�
     assert.deepEqual(b.player.jobs, a.player.jobs);
     assert.equal(b.player.job, 'sorcerer');
     assert.equal(b.player.level, 8);
-    assert.deepEqual(b.player.equip, { armor: 'chain_mail', helm: 'iron_helm', shield: null });
+    assert.deepEqual(b.player.equip, { armor: 'chain_mail', helm: 'iron_helm', shield: null, accessory: null });
     assert.equal(b.player.stock[1], 'high_heal');
     assert.equal(b.player.maxHp, a.player.maxHp);
     assert.equal(b.player.hp, 9);

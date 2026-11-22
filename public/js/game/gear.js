@@ -13,6 +13,7 @@ export const gearMethods = {
     setGearDefs(equipment) {
         this.gearDefs = {};
         for (const k of GEAR_KINDS) this.gearDefs[k] = Object.fromEntries((equipment[LIST_KEY[k]] ?? []).map((g) => [g.id, g]));
+        this.setAccessoryDefs(equipment);   // アクセサリ（accessory.js）
     },
 
     // 種類ごとの定義の一覧（装備の選択画面用）
@@ -28,14 +29,14 @@ export const gearMethods = {
     gearWeight(def) {
         const own = this.player.owned?.[def.id];
         if (own !== undefined) return own;
-        const limit = Math.floor(R.equipWeightLimit(this.rules, this.player.abilities.str, false));
+        const limit = Math.floor(R.equipWeightLimit(this.rules, this.effAbilities().str, false));
         return Math.max(def.weight[0], Math.min(def.weight[1], limit));
     },
 
     // 筋力で持てるか。持っている防具は、選んだ重さで判定する
     canWear(def) {
         const own = this.player.owned?.[def.id];
-        return (own !== undefined ? own : def.weight[0]) <= R.equipWeightLimit(this.rules, this.player.abilities.str, false);
+        return (own !== undefined ? own : def.weight[0]) <= R.equipWeightLimit(this.rules, this.effAbilities().str, false);
     },
 
     // ---- 武器・防具の所持と購入（武器屋）----
@@ -59,7 +60,7 @@ export const gearMethods = {
     // 買うときの重さの初期値（購入で選べる範囲のうち、筋力で持てる最大。持てなければ、最小）
     defaultBuyWeight(id) {
         const [lo, hi] = this.equipDefOf(id).range;
-        const limit = Math.floor(R.equipWeightLimit(this.rules, this.player.abilities.str, !!this.equipDefOf(id).def.blunt));
+        const limit = Math.floor(R.equipWeightLimit(this.rules, this.effAbilities().str, !!this.equipDefOf(id).def.blunt));
         return Math.max(lo, Math.min(hi, limit));
     },
 
@@ -122,7 +123,7 @@ export const gearMethods = {
     },
     loadRatio() {
         if (!this.rules || !this.player.abilities) return 0.8;
-        return this.totalWeight() / R.loadLimit(this.rules, this.player.abilities.str, this.player.level);
+        return this.totalWeight() / R.loadLimit(this.rules, this.effAbilities().str, this.player.level);
     },
 
     // 敵の攻撃 1 回の値（防御前）。敵の攻撃のダイス（enemies.json の stats.attack）を振って、ダメージ表に通す。なければ、攻撃力の固定値
@@ -143,7 +144,7 @@ export const gearMethods = {
         const def = parts.length ? R.rollDefense(d, parts, job) : { defense: 0, fumble: false };
         const attack = def.fumble ? Math.floor(amount * d.combat.critDamageMultiplier) : amount;
         return R.damageTaken(d, attack, {
-            defense: def.defense, vit: p.abilities.vit, dodge: R.dodgeValue(d, p.abilities.agi, p.level, job),
+            defense: def.defense, vit: this.effAbilities().vit, dodge: R.dodgeValue(d, this.effAbilities().agi, p.level, job),
             heavy: parts.some((g) => g.heavy), heavyDodge: !!job?.heavyDodge, fumble: def.fumble
         });
     }

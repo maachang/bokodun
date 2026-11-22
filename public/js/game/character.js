@@ -17,8 +17,9 @@ export const characterMethods = {
         p.abilities = { ...def.abilities };
         p.jobs = { primary: def.jobs.primary, sub: def.jobs.sub ?? null, levels: { ...def.jobs.levels }, expStock: def.jobs.expStock ?? 0 };   // 職業（第一・サブ・レベル・経験値のストック）
         this.syncJob();   // 戦闘の式が見る player.job・player.level
-        p.equip = { armor: null, helm: null, shield: null, ...def.equip };   // 防具（鎧・兜・盾）
+        p.equip = { armor: null, helm: null, shield: null, accessory: null, ...def.equip };   // 防具（鎧・兜・盾）とアクセサリ
         p.owned = { ...(def.owned ?? {}) };   // 持っている武器・防具: ID → 購入時に決めた重さ（gear.js）
+        p.accessories = [...(def.accessories ?? [])];   // 持っているアクセサリの ID（accessory.js）
         p.inventory = { ...(def.inventory ?? {}) };   // 所持品（道具）: ID → 個数（inventory.js）
         p.magics = [...(def.magics ?? [])];   // 覚えている魔法（呪文の ID）。ストックに入れられるのは、覚えた呪文だけ
     },
@@ -28,14 +29,15 @@ export const characterMethods = {
         const p = this.player, d = this.rules;
         if (!d || !p.abilities) return;
         const job = d.jobs[p.job];
-        const hm = R.maxHpMp(d, p.race, p.abilities, p.level, job);
-        const sp = R.moveSpeed(d, p.abilities.agi);
+        const ab = this.effAbilities();   // アクセサリの補正込みの能力値（accessory.js）
+        const hm = R.maxHpMp(d, p.race, ab, p.level, job);
+        const sp = R.moveSpeed(d, ab.agi);
         p.maxHp = hm.hp;
-        p.maxMp = hm.mp;
-        p.maxStamina = R.staminaStats(d, p.abilities, p.level, 0, this.loadRatio()).max;
+        p.maxMp = this.accMaxMp(hm.mp);
+        p.maxStamina = R.staminaStats(d, ab, p.level, 0, this.loadRatio()).max;
         const slow = R.loadSlowRatio(d, this.loadRatio());   // 積載の限界を超えると、歩く速さ・ダッシュが下がる
-        p.speed = sp.walk * slow;
-        p.runSpeed = sp.run * slow * TEST_RUN_SPEED_SCALE;   // テスト用の倍率を掛けてある
+        p.speed = sp.walk * slow * this.accSpeedRate();
+        p.runSpeed = sp.run * slow * this.accSpeedRate() * TEST_RUN_SPEED_SCALE;   // テスト用の倍率を掛けてある
         if (fill) { p.hp = p.maxHp; p.mp = p.maxMp; p.stamina = p.maxStamina; }
         else { p.hp = Math.min(p.hp, p.maxHp); p.mp = Math.min(p.mp, p.maxMp); p.stamina = Math.min(p.stamina, p.maxStamina); }
     },
@@ -61,7 +63,7 @@ export const characterMethods = {
 
     // 攻撃 1 回の結果。{ kind, damage }。呪いの間は、ダメージが下がる（curse の scale）
     rollWeaponAttack(weapon, opt = {}) {
-        const p = this.player, d = this.rules, ab = p.abilities;
+        const p = this.player, d = this.rules, ab = this.effAbilities();
         const r = R.resolveAttack(d, { weapon, weight: this.weaponWeight(weapon), lv: p.level, job: d.jobs[p.job], str: ab.str, dex: ab.dex }, opt);
         const c = p.status?.curse;
         if (c?.t > 0) r.damage = Math.floor(r.damage * (c.scale ?? 0.7));
@@ -70,12 +72,12 @@ export const characterMethods = {
 
     // 魔法の消費 MP・失敗率・威力。魔法力の元は、攻撃魔法は知力、回復・補助魔法は精神力（補助は、仕様に定めがないので、回復と同じ）
     spellStat(spell) {
-        const ab = this.player.abilities;
+        const ab = this.effAbilities();
         return spell.magicKind === 'attack' ? ab.intel : ab.mnd;
     },
     spellCost(spell) {
         const p = this.player;
-        return R.magicCost(this.rules, spell, this.spellStat(spell), p.level, this.rules.jobs[p.job]);
+        return this.accSpellCost(R.magicCost(this.rules, spell, this.spellStat(spell), p.level, this.rules.jobs[p.job]));
     },
     spellFailRate(spell) {
         const p = this.player;
@@ -85,7 +87,7 @@ export const characterMethods = {
     rollSpellPower(spell) {
         const p = this.player, focus = spell.magicKind === 'attack' ? this.getFocusItem() : null;
         const rod = focus?.dice ? R.rollDice(focus.dice.n, focus.dice.m).total : 0;
-        return R.rollMagicPower(this.rules, spell, p.level, this.rules.jobs[p.job], rod);
+        return this.accSpellPower(R.rollMagicPower(this.rules, spell, p.level, this.rules.jobs[p.job], rod));
     },
 
     // 回復魔法が、使う意味のない状態（満タン）なら、その理由。使えるなら null

@@ -41,7 +41,8 @@ export const saveLoadMethods = {
             gold: Math.floor(p.gold ?? 0),
             inventory: { ...p.inventory },
             owned: { ...p.owned },
-            equipment: { armor: p.equip?.armor ?? null, helm: p.equip?.helm ?? null, shield: p.equip?.shield ?? null, accessory: null },
+            equipment: { armor: p.equip?.armor ?? null, helm: p.equip?.helm ?? null, shield: p.equip?.shield ?? null, accessory: p.equip?.accessory ?? null },
+            accessories: [...(p.accessories ?? [])],
             stock: this.buildStockSave(),
             magics: [...p.magics]
         };
@@ -71,9 +72,11 @@ export const saveLoadMethods = {
             p.owned = {};
             for (const [id, w] of Object.entries(data.owned)) { const e = this.equipDefOf(id); if (e && id !== 'fists' && isInt(w, e.range[0], e.range[1])) p.owned[id] = w; }
         }
+        p.accessories = Array.isArray(data.accessories) ? [...new Set(data.accessories)].filter((id) => this.accessoryDef(id)) : [];   // 持っているアクセサリ（定義にあるものだけ）
         this.applyStockSave(data.stock);
         const eq = data.equipment ?? {};
         p.equip = Object.fromEntries(['armor', 'helm', 'shield'].map((k) => [k, (eq[k] && this.gearDef(k, eq[k]) && this.isOwned(eq[k]) && this.canWear(this.gearDef(k, eq[k]))) ? eq[k] : null]));
+        p.equip.accessory = (eq.accessory && this.hasAccessory(eq.accessory)) ? eq.accessory : null;
         if (p.equip.shield && this.getMeleeItem()?.twoHanded) p.equip.shield = null;   // 両手武器と盾は、同時に装備できない
         this.recomputeStats(true);   // 能力値・職業・装備から、最大値を決め直す
         const v = data.vitals;

@@ -167,12 +167,17 @@ function initBodies(S) {
     const gearInfo = (def) => `防御 ${def.dice.n}d${def.dice.m}${def.dice.k ? '+' + def.dice.k : ''}　重さ ${game.gearWeight(def)}${def.heavy ? '　重装備' : ''}${game.canWear(def) ? '' : '　（筋力が足りず、装備できない）'}`;
     const equipBody = () => {
         const p = game.player, limit = Math.round(game.rules ? game.totalWeight() / (game.loadRatio() || 1) : 0);
-        return '<p class="legend">鎧・兜・盾を選びます（武器・魔法は「ストック」）。積載の限界を超えると、動きが遅くなります。</p>'
+        return '<p class="legend">鎧・兜・盾・アクセサリを選びます（武器・魔法は「ストック」）。積載の限界を超えると、動きが遅くなります。</p>'
             + GEAR_KINDS.map(k => { const def = game.gearDef(k, p.equip?.[k]); return html`<div class="pick cols" style="--c:4em 1fr 19em" data-gk="${k}"><span class="k">${GEAR_NAMES[k]}</span><span style="text-align:left">${def ? raw(iconTag(game, def.id, 40)) : raw(iconTag(game, null, 40))}${def ? def.name : '（なし）'}</span><small>${def ? gearInfo(def) : ''}</small></div>`; }).join('')
-            + html`<div class="pick cols dis" style="--c:4em 1fr 19em"><span class="k">アクセサリ</span><span>（なし）</span><small></small></div>`
+            + (() => { const a = game.accessoryDef(p.equip?.accessory); return html`<div class="pick cols" style="--c:4em 1fr 19em" data-gk="accessory"><span class="k">アクセサリ</span><span style="text-align:left">${raw(iconTag(game, a ? a.id : null, 40))}${a ? a.name : '（なし）'}</span><small>${a ? game.accessoryInfo(a) : ''}</small></div>`; })()
             + html`<div class="cols" style="--c:4em 1fr 19em;margin-top:8px"><span class="k">重量</span><span>${game.totalWeight()} / ${limit}（武器・鎧・兜・盾の合計 / 積載の限界）</span><small></small></div>`;
     };
     const gearPickBody = (kind) => {
+        if (kind === 'accessory') {   // アクセサリ（持っているものだけ。入手は未決）
+            const cur = game.player.equip?.accessory;
+            const row = (a) => html`<div class="pick cols" style="--c:1fr 5em 19em" data-gset="accessory" data-gid="${a.id}"><span style="text-align:left">${raw(iconTag(game, a.id, 32))}${a.name}</span><small>${a.id === cur ? '着けています' : ''}</small><small>${game.accessoryInfo(a)}</small></div>`;
+            return html`<p>アクセサリを選びます</p><div class="pick cols" style="--c:1fr 5em 19em" data-gset="accessory" data-gid=""><span>外す</span><small>${cur ? '' : '外しています'}</small><small></small></div>` + game.accessoryList().filter(a => game.hasAccessory(a.id)).map(row).join('');
+        }
         const cur = game.player.equip?.[kind];
         const row = (def) => html`<div class="pick cols ${game.canWear(def) ? '' : 'dis'}" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid="${def.id}"><span style="text-align:left">${raw(iconTag(game, def.id, 32))}${def.name}</span><small>${def.id === cur ? '着けています' : ''}</small><small>${gearInfo(def)}</small></div>`;
         return html`<p>${GEAR_NAMES[kind]}を選びます</p><div class="pick cols" style="--c:1fr 5em 19em" data-gset="${kind}" data-gid=""><span>外す</span><small>${cur ? '' : '外しています'}</small><small></small></div>` + game.gearList(kind).filter(def => game.isOwned(def.id)).map(row).join('');   // 持っている防具だけ（武器屋で買う）
@@ -193,7 +198,7 @@ function initBodies(S) {
     on(E.winBody, 'click', '.pick[data-slot]:not(.dis)', (e, t) => { game.setStockSlot(Number(t.dataset.slot), t.dataset.id); S.openWin('stock'); });
     on(E.winBody, 'click', '[data-keyset]', (e, t) => { S.keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
     on(E.winBody, 'click', '.pick[data-gk]:not(.dis)', (e, t) => { S.setBody('<h3>装備</h3>' + gearPickBody(t.dataset.gk)); S.setBack(() => S.openWin('equip')); });
-    on(E.winBody, 'click', '.pick[data-gset]:not(.dis)', (e, t) => { game.equipGear(t.dataset.gset, t.dataset.gid || null); S.openWin('equip'); });
+    on(E.winBody, 'click', '.pick[data-gset]:not(.dis)', (e, t) => { if (t.dataset.gset === 'accessory') game.equipAccessory(t.dataset.gid || null); else game.equipGear(t.dataset.gset, t.dataset.gid || null); S.openWin('equip'); });
 }
 
 // 道具（持ち物・詳細・使う）のダイアログ

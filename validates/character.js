@@ -44,7 +44,8 @@ function loadDefs() {
             weapon: new Set([...ids(equipment.weapons), ...Object.keys(items).filter(k => items[k].kind === 'weapon')]),
             armor: ids(equipment.armors),
             helm: ids(equipment.helms),
-            shield: ids(equipment.shields)
+            shield: ids(equipment.shields),
+            accessory: ids(equipment.accessories)
         }
     };
     return defs;
@@ -147,7 +148,7 @@ const sections = {
                 if (only(val, ['id', 'weight'], `equipment.${slot}`)) return `equipment.${slot}: 未知のキーがあります`;
                 if (val.weight !== undefined && !isInt(val.weight, 1, 50)) return `equipment.${slot}.weight: 重さは 1〜50 です`;
             }
-            if (slot !== 'accessory' && !d.equip[slot].has(id)) return `equipment.${slot}: 定義にない ID です（${id}）`;   // アクセサリの一覧は未定義（item-spec.md 8 章）
+            if (!d.equip[slot].has(id)) return `equipment.${slot}: 定義にない ID です（${id}）`;
         }
         return null;
     },
@@ -162,6 +163,12 @@ const sections = {
             if (!isInt(v[id], range[0], range[1])) return `owned: 重さが範囲外です（${id}は ${range[0]}〜${range[1]}）`;
         }
         return null;
+    },
+    accessories(v) {
+        // 持っているアクセサリ（item-spec.md 8 章）。重さはないので、ID の配列
+        const d = loadDefs();
+        if (!Array.isArray(v) || v.length > 200) return 'accessories: 配列で指定してください';
+        return v.every(id => d.equip.accessory.has(id)) && new Set(v).size === v.length ? null : 'accessories: 定義にない、または重複したアクセサリがあります';
     },
     stock(v, all) {
         // ゲームの形: slots（アイテム ID または null の 9 枠）と、選択中の枠番号 melee（近接武器）・focus（杖）・magic（呪文・弓）

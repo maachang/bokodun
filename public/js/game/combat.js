@@ -279,6 +279,7 @@ export const combatMethods = {
     applyPlayerStatus(type, opt = {}) {
         const names = { poison: '毒', burn: '火傷', slow: '鈍足', paralysis: '麻痺', silence: '沈黙', curse: '呪い' };
         const colors = { poison: '#a3e635', burn: '#fb923c', slow: '#60a5fa', paralysis: '#fde047', silence: '#a78bfa', curse: '#c084fc' };
+        if (this.isStatusImmune(type)) return false;   // アクセサリで無効（毒・麻痺。accessory.js）
         this.player.status ??= {};
         const cur = this.player.status[type];
         const t = opt.t ?? 4;
