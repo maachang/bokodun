@@ -87,6 +87,10 @@ test('攻撃（ダメージ表・1 ゾロ・レベルの加算・クリティカ
     assert.ok(Math.abs(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 0.6) - 12.5) < 1e-9, '0.6 で +2.5');
     assert.ok(Math.abs(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 0) - 20) < 1e-9, '0 で +10');
     assert.ok(Math.abs(R.critRate(defs, defs.jobs.thief, dag, 6, 14, 0) - 40) < 1e-9, 'シーフ系は倍（+20）');
+    assert.ok(Math.abs(R.critRate(defs, defs.jobs.thief, dag, 6, 14, 0, 1) - 40) < 1e-9, 'シーフ系 Lv1 は 2 倍');
+    assert.ok(Math.abs(R.critRate(defs, defs.jobs.thief, dag, 6, 14, 0, 99) - 50) < 1e-9, 'シーフ系 最大レベルは 3 倍（+30）');
+    assert.ok(R.critRate(defs, defs.jobs.thief, dag, 6, 14, 0.13, 99) > R.critRate(defs, defs.jobs.thief, dag, 6, 14, 0.13, 1), '同じ重量比なら、高レベルほど高い');
+    assert.equal(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 0, 99), 20, 'ファイター系は、レベルで変わらない');
     assert.equal(R.critRate(defs, defs.jobs.fighter, mace, 14, 14, 0.2), 1, '鈍器は上がらない（決定）');
     assert.ok(Math.abs(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 1.3) - 7) < 1e-9, '重量比 1.3 で 30% 減');
     assert.ok(Math.abs(R.critRate(defs, defs.jobs.thief, dag, 6, 14, 1.3) - 8) < 1e-9, 'シーフ系は 60% 減（20 → 8）');

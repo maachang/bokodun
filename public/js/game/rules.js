@@ -127,8 +127,8 @@ export function rollAttack(defs, weapon, weight, lv, job, rng = Math.random) {
 
 /** クリティカル率（%）。シーフ系は軽い武器（重さ ≤ 筋力 × 0.5）のとき高い。鈍器は全職業で低い。
  *  積載（loadRatio。省略は、補正なし）: 1 を超えると全職業で減る（シーフ系は倍。下限は critLoad.floor か、元の率の小さいほう）。
- *  中央値（critLoad.light.median）より軽いと上がる（重量比 0 で +maxBonus ポイント。シーフ系は倍。鈍器は対象外） */
-export function critRate(defs, job, weapon, weight, str, loadRatio = null) {
+ *  中央値（critLoad.light.median）より軽いと上がる（重量比 0 で +maxBonus ポイント。シーフ系は 2 倍（Lv1）〜 thiefMulMax 倍（最大レベル）。鈍器は対象外） */
+export function critRate(defs, job, weapon, weight, str, loadRatio = null, lv = 1) {
     const c = defs.combat.critRate;
     let base;
     if (weapon.blunt) base = c.blunt;
@@ -137,7 +137,12 @@ export function critRate(defs, job, weapon, weight, str, loadRatio = null) {
     const L = defs.combat.critLoad;
     if (!L || loadRatio == null) return base;
     const thiefMul = job?.thiefFamily ? L.thiefMul : 1;
-    if (loadRatio < L.light.median) return weapon.blunt ? base : base + L.light.maxBonus * (1 - Math.max(0, loadRatio) / L.light.median) * thiefMul;
+    if (loadRatio < L.light.median) {
+        if (weapon.blunt) return base;
+        // シーフ系の、軽いほうの倍率は、レベルで 2（Lv1）→ thiefMulMax（最大レベル）に伸びる（紙防具のシーフが、高レベルで高くなる）
+        const mul = job?.thiefFamily ? L.thiefMul + (L.light.thiefMulMax - L.thiefMul) * Math.min(1, Math.max(0, lv - 1) / (defs.combat.levelBonus.maxLevel - 1)) : 1;
+        return base + L.light.maxBonus * (1 - Math.max(0, loadRatio) / L.light.median) * mul;
+    }
     if (loadRatio <= 1) return base;
     const cut = Math.min(1, (loadRatio - 1) * L.perOver * thiefMul);
     return Math.max(Math.min(L.floor, base), base * (1 - cut));
@@ -153,7 +158,7 @@ export function resolveAttack(defs, ctx, { forceCrit = false, noMiss = false, no
     if (!forceCrit && !noMiss && rng() < missRate(defs, dex, lv)) return { kind: 'miss', damage: 0 };
     const first = rollAttack(defs, weapon, weight, lv, job, rng);
     if (first.fumble) return { kind: 'fumble', damage: first.damage };
-    const p = critRate(defs, job, weapon, weight, str, loadRatio);
+    const p = critRate(defs, job, weapon, weight, str, loadRatio, lv);
     if (noCrit || (!forceCrit && rng() * 100 >= p)) return { kind: 'normal', damage: first.damage };
     const mult = defs.combat.critDamageMultiplier;
     let total = Math.floor(first.damage * mult);
