@@ -397,7 +397,7 @@ export const combatMethods = {
     },
 
     // 突進が敵に当たったときの手応え: 打撃音・ヒットストップ・（強い一撃なら）カメラの揺れ
-    //   crit=半ずらし会心 / killed=撃破 / heavy=重い武器（大剣・メイス）
+    //   crit=クリティカル / killed=撃破 / heavy=重い武器（大剣・メイス）
     playerHitFeedback({ crit, killed, heavy }) {
         const f = HIT_FEEDBACK;
         this.sound.playEnemyHit(crit || heavy);

@@ -18,8 +18,10 @@
     "_note": "防御 = Σ(係数 × ダメージ表[部位の重さ][部位のダイス値])。ダメージ = max(1, 攻撃 − 防御 − 生命力軽減)"
   },
   "vitReductionDivisor": 5,
-  "heavyGear": {
-    "thiefCritPenalty": { "armor": 5, "helm": 5, "shield": 5, "floor": 1, "_note": "シーフ系が heavy の装備を着けると、部位ごとにクリティカル率を下げる（草案）。下限は鈍器と同じ1%。" }
+  "critLoad": {
+    "perOver": 1, "thiefMul": 2, "floor": 1,
+    "light": { "median": 0.8, "maxBonus": 10 },
+    "_note": "積載（重量比 = 重量合計 ÷ 積載の限界。限界は職業レベルを含む）が 1 を超えたとき、クリティカル率が減る（2026-11-23 ユーザー方針。数値は仮）。減る割合 = (重量比 − 1) × perOver（例: 重量比 1.3 なら 30% 減）。シーフ系は、減り方が thiefMul 倍。全職業が対象。下限は floor（%）か、元の率の小さいほう。軽いほうは light: 重量比が median（中央値）より軽いと、クリティカル率が上がる（上がる量 = maxBonus × (1 − 重量比 ÷ median) ポイント。重量比 0 で +maxBonus。median 0.6 で +2.5）。シーフ系は thiefMul 倍。鈍器は対象外（ユーザー確認済み）。重量比が median〜1 の間は、変わらない。"
   },
   "dodge": {
     "agiCoef": 0.5,

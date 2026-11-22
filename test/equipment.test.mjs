@@ -275,9 +275,11 @@ test('ストック（9 枠: 数字キー 1〜9・クリック）', async (t) => 
 test('近接武器は突進攻撃に効く', async (t) => {
     const M = await loadModules();
     // 突進で敵（スケルトン HP60・半径 0.8）に当てて、与えたダメージを返す
-    const charge = (weaponId, { x = 0, z = -1.2, rand = fixed(0.5) } = {}) => {   // 既定は、ミス・クリティカルが出ない乱数
+    const charge = (weaponId, { x = 0, z = -1.2, rand = fixed(0.5), atk = null, acc = null } = {}) => {   // 既定は、ミス・クリティカルが出ない乱数
         const { g, calls } = makeGame(M);
         if (weaponId) equip(g, weaponId);
+        if (acc) { g.giveAllAccessories(); g.equipAccessory(acc); }
+        if (atk) { const orig = g.rollWeaponAttack.bind(g); g.rollWeaponAttack = (w, o) => { const r = orig(w, o); if (o?.noCrit) return r; return { ...r, kind: atk, damage: atk === 'crit' ? Math.floor(r.damage * 1.5) : r.damage }; }; }   // atk: 攻撃の結果の種類を決める（クリティカルの出方は、rules のテスト）
         const m = spawn(M, 'skeleton', x, z);
         g.monsters.push(m);
         if (rand) withRandom(rand, () => bump(g, m)); else bump(g, m);   // rand: 攻撃の判定だけ、乱数を決める（敵の生成などには使わない）
@@ -334,13 +336,25 @@ test('近接武器は突進攻撃に効く', async (t) => {
         assert.ok(mace.knockback.length() > sword.knockback.length());
     });
 
-    await t.test('半ずらし会心にも武器が効く（プレイヤーは無傷・必ずクリティカル）', () => {
-        const { g, calls, damage } = withRandom(fixed(0.5), () => charge('claymore', { x: 0.5, z: -1.2 }));
-        assert.equal(calls.playerDamage.length, 0, '会心ではプレイヤーは被弾しない');
-        assert.ok(calls.popups.some(p => p.includes('半ずらし会心')));
-        const w = items.claymore, total = w.dice.n * (1 + Math.floor(0.5 * w.dice.m)) + w.dice.k;
-        assert.equal(damage, Math.floor(R.tableValue(rulesDefs, g.weaponWeight(w), total) * 1.5), '必ずクリティカル（1.5 倍）。ミスもしない');
-        assert.equal(calls.slashes.length, 1);
+    await t.test('ブラックダイヤモンド: 突進が当たったら、通常攻撃をもう一度判定して足す（追加分はクリティカルなし）', () => {
+        const base = charge('long_sword').damage;
+        const bd = charge('long_sword', { acc: 'black_diamond' });
+        assert.equal(bd.damage, base * 2, '乱数を固定すると、追加分は通常ダメージと同じ');
+        assert.ok(bd.calls.popups.some(p => p.includes('追加')));
+        const crit = charge('long_sword', { acc: 'black_diamond', atk: 'crit' });
+        const critOnly = charge('long_sword', { atk: 'crit' });
+        assert.equal(crit.damage, critOnly.damage + base, '追加分には、クリティカルの 1.5 倍が掛からない');
+        assert.equal(charge('long_sword', { acc: 'ruby' }).damage, base, '別のアクセサリでは、追加なし');
+    });
+
+    await t.test('半ずらしはない: 正面を少し外してぶつかっても、通常の突進（プレイヤーも被弾する）。クリティカルは、ダイスで決まる', () => {
+        const { calls, damage } = charge('claymore', { x: 0.5, z: -1.2 });
+        assert.equal(calls.playerDamage.length, 1, '無傷にならない');
+        assert.ok(!calls.popups.some(p => p.includes('半ずらし')));
+        assert.ok(damage >= 1);
+        const crit = charge('claymore', { x: 0.5, z: -1.2, atk: 'crit' });
+        assert.ok(crit.calls.popups.some(p => p.includes('クリティカル')));
+        assert.ok(crit.damage > damage, 'クリティカルは 1.5 倍');
     });
 
     await t.test('立ち止まっている間は攻撃せず、被弾する（エフェクトも出ない）', () => {
@@ -361,8 +375,8 @@ test('近接武器は突進攻撃に効く', async (t) => {
         assert.equal(normal.g.cameraShake.time, 0, '通常の突進では揺れない');
         assert.deepEqual(normal.calls.sounds.find(([n]) => n === 'playEnemyHit'), ['playEnemyHit', false]);
 
-        // 半ずらし会心: 長めのヒットストップ・揺れ・重い打撃音
-        const crit = charge('dagger', { x: 0.5, z: -1.2 });
+        // クリティカル: 長めのヒットストップ・揺れ・重い打撃音
+        const crit = charge('dagger', { atk: 'crit' });
         assert.equal(crit.g.hitStop, 0.08);
         assert.ok(crit.g.cameraShake.time > 0 && crit.g.cameraShake.amp > 0);
         assert.deepEqual(crit.calls.sounds.find(([n]) => n === 'playEnemyHit'), ['playEnemyHit', true]);
@@ -1278,18 +1292,19 @@ test('エフェクトテストボタン（武器エフェクトの確認用）',
     });
 
     await t.test('突進が当たったとき: 通常=1.0、会心=1.4、撃破=1.2 倍（会心で撃破なら 1.68）の強さで出る', () => {
-        const run = (x, hp) => {
+        const run = (crit, hp) => {
             const { g, calls } = makeGame(M);
-            const m = spawn(M, 'slime', x, -1.2);
+            const m = spawn(M, 'slime', 0, -1.2);
             if (hp) m.hp = hp;
+            if (crit) g.rollWeaponAttack = () => ({ kind: 'crit', damage: 5 });
             g.monsters.push(m);
             withRandom(fixed(0.5), () => bump(g, m));   // ミス・クリティカルが出ないように、乱数を固定
             return calls.slashes[0][3];
         };
         assert.equal(run(0), 1.0);
-        assert.equal(run(0.5), 1.4, '半ずらし会心');
+        assert.equal(run(true), 1.4, 'クリティカル');
         assert.ok(Math.abs(run(0, 1) - 1.2) < 1e-9, '通常の突進で撃破');
-        assert.ok(Math.abs(run(0.5, 1) - 1.68) < 1e-9, '会心で撃破');
+        assert.ok(Math.abs(run(true, 1) - 1.68) < 1e-9, '会心で撃破');
     });
 });
 

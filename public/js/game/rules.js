@@ -125,26 +125,36 @@ export function rollAttack(defs, weapon, weight, lv, job, rng = Math.random) {
     return { damage: tableValue(defs, weight, r.total + weapon.dice.k + levelBonus(defs, lv, job)), fumble: false };
 }
 
-/** クリティカル率（%）。シーフ系は軽い武器（重さ ≤ 筋力 × 0.5）のとき高い。鈍器は全職業で低い */
-export function critRate(defs, job, weapon, weight, str) {
+/** クリティカル率（%）。シーフ系は軽い武器（重さ ≤ 筋力 × 0.5）のとき高い。鈍器は全職業で低い。
+ *  積載（loadRatio。省略は、補正なし）: 1 を超えると全職業で減る（シーフ系は倍。下限は critLoad.floor か、元の率の小さいほう）。
+ *  中央値（critLoad.light.median）より軽いと上がる（重量比 0 で +maxBonus ポイント。シーフ系は倍。鈍器は対象外） */
+export function critRate(defs, job, weapon, weight, str, loadRatio = null) {
     const c = defs.combat.critRate;
-    if (weapon.blunt) return c.blunt;
-    if (!job?.thiefFamily) return c.normal;
-    return weight <= str * defs.combat.lightWeaponMaxRatio ? c.thiefFamily : c.normal * c.heavyThiefPenaltyFactor;
+    let base;
+    if (weapon.blunt) base = c.blunt;
+    else if (!job?.thiefFamily) base = c.normal;
+    else base = weight <= str * defs.combat.lightWeaponMaxRatio ? c.thiefFamily : c.normal * c.heavyThiefPenaltyFactor;
+    const L = defs.combat.critLoad;
+    if (!L || loadRatio == null) return base;
+    const thiefMul = job?.thiefFamily ? L.thiefMul : 1;
+    if (loadRatio < L.light.median) return weapon.blunt ? base : base + L.light.maxBonus * (1 - Math.max(0, loadRatio) / L.light.median) * thiefMul;
+    if (loadRatio <= 1) return base;
+    const cut = Math.min(1, (loadRatio - 1) * L.perOver * thiefMul);
+    return Math.max(Math.min(L.floor, base), base * (1 - cut));
 }
 
 /**
  * 攻撃 1 回の結果（ミス → 1 ゾロ → クリティカル → リトライクリティカル の順）。{ kind: 'miss' | 'fumble' | 'normal' | 'crit', damage }
- *   ctx = { weapon, weight, lv, job, str, dex }。forceCrit は、必ずクリティカル（ミスもしない。「半ずらし」の無傷クリティカル）。noMiss は、ミスの判定をしない（弓など）。
+ *   ctx = { weapon, weight, lv, job, str, dex, loadRatio }。noCrit は、クリティカルにしない（ブラックダイヤモンドの追加判定）。forceCrit は、必ずクリティカル（ミスもしない。「半ずらし」は 2026-11-23 になしにしたため、ゲームからは、いまは使わない）。noMiss は、ミスの判定をしない（弓など）。
  *   クリティカルのダメージは、ダメージ判定の 1.5 倍。リトライ（職業ごとの回数）は、その都度ダメージ判定をして合算する。出なければ、通常ダメージを加えて終わる。
  */
-export function resolveAttack(defs, ctx, { forceCrit = false, noMiss = false } = {}, rng = Math.random) {
-    const { weapon, weight, lv, job, str, dex } = ctx;
+export function resolveAttack(defs, ctx, { forceCrit = false, noMiss = false, noCrit = false } = {}, rng = Math.random) {
+    const { weapon, weight, lv, job, str, dex, loadRatio } = ctx;
     if (!forceCrit && !noMiss && rng() < missRate(defs, dex, lv)) return { kind: 'miss', damage: 0 };
     const first = rollAttack(defs, weapon, weight, lv, job, rng);
     if (first.fumble) return { kind: 'fumble', damage: first.damage };
-    const p = critRate(defs, job, weapon, weight, str);
-    if (!forceCrit && rng() * 100 >= p) return { kind: 'normal', damage: first.damage };
+    const p = critRate(defs, job, weapon, weight, str, loadRatio);
+    if (noCrit || (!forceCrit && rng() * 100 >= p)) return { kind: 'normal', damage: first.damage };
     const mult = defs.combat.critDamageMultiplier;
     let total = Math.floor(first.damage * mult);
     for (let i = 0; i < (job?.retryCrit || 0); i++) {

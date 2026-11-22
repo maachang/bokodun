@@ -80,6 +80,18 @@ test('攻撃（ダメージ表・1 ゾロ・レベルの加算・クリティカ
     assert.equal(R.critRate(defs, defs.jobs.thief, dag, 6, 14), 20);   // シーフ系 × 軽い武器
     assert.equal(R.critRate(defs, defs.jobs.thief, w, 14, 14), 5);     // シーフ系 × 重い武器
     assert.equal(R.critRate(defs, defs.jobs.fighter, mace, 14, 14), 1);   // 鈍器
+    // 積載が限界（1）を超えると、全職業でクリティカル率が減る。シーフ系は倍（仮の数値: 超えた分 × 1、シーフ系 × 2）
+    assert.equal(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 1), 10, '限界ちょうどは減らない');
+    assert.equal(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 0.8), 10, '中央値（0.8）では変わらない');
+    assert.equal(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 0.9), 10, '中央値〜1 の間は変わらない');
+    assert.ok(Math.abs(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 0.6) - 12.5) < 1e-9, '0.6 で +2.5');
+    assert.ok(Math.abs(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 0) - 20) < 1e-9, '0 で +10');
+    assert.ok(Math.abs(R.critRate(defs, defs.jobs.thief, dag, 6, 14, 0) - 40) < 1e-9, 'シーフ系は倍（+20）');
+    assert.equal(R.critRate(defs, defs.jobs.fighter, mace, 14, 14, 0.2), 1, '鈍器は上がらない（決定）');
+    assert.ok(Math.abs(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 1.3) - 7) < 1e-9, '重量比 1.3 で 30% 減');
+    assert.ok(Math.abs(R.critRate(defs, defs.jobs.thief, dag, 6, 14, 1.3) - 8) < 1e-9, 'シーフ系は 60% 減（20 → 8）');
+    assert.equal(R.critRate(defs, defs.jobs.fighter, w, 14, 14, 3), 1, '下限 1%');
+    assert.equal(R.critRate(defs, defs.jobs.fighter, mace, 14, 14, 1.5), 1, '鈍器は、もともと 1%（下限より下がらない）');
 });
 
 test('装備できる重さ・価格（仕様 8.1・8.2d の例）', () => {

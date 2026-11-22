@@ -263,16 +263,11 @@ export const movementMethods = {
         // Dot product: player facing enemy?
         const dotFront = pFwdX * nx + pFwdZ * nz;
 
-        // Cross product 2D: determine how much the player is offset from center
-        const cross = Math.abs(pFwdX * nz - pFwdZ * nx);
-
         // Player is actively pressing move key to attack/charge forward
         const isPlayerMovingForward = (this.keys.forward && !this.player.isFalling && !this.player.staminaExhausted);   // スタミナ切れは、攻撃できない（歩行・防御は可）
 
-        // Ys 1 "Half-offset" rule:
-        // Attack only occurs if player is actively moving forward!
-        // If player is standing still, player does NOT attack, and enemy gets a free hit.
-        const isHalfOffset = (isPlayerMovingForward && dotFront > 0.4 && cross >= 0.25);
+        // 攻撃は、前進キーを押して敵へ突進したときだけ出る（立ち止まっていると攻撃せず、敵に先に打たれる）。
+        //   「半ずらし」（正面を外して無傷でクリティカル）は、2026-11-23 に、なしにした。クリティカルは、ダイス（rules.js の resolveAttack）で決まる
         const isCharging = (isPlayerMovingForward && dotFront > 0.6);
 
         // 武器クラスの効果（ノックバック・スタン・斬撃エフェクト）を、突進が当たった敵に適用する
@@ -284,24 +279,16 @@ export const movementMethods = {
         const knockScale = cls ? cls.knockback : 1.0;
         const heavySound = cls ? cls.sound === 'heavy' : false;
 
-        if ((isHalfOffset || isCharging)) this.useStamina(this.staminaCost('attack', this.weaponWeight(weapon)));   // 攻撃 1 回の消費（当たっても外れても）
+        if (isCharging) this.useStamina(this.staminaCost('attack', this.weaponWeight(weapon)));   // 攻撃 1 回の消費（当たっても外れても）
 
-        if (isHalfOffset) {
-            // CRITICAL HALF-OFFSET HIT: Player takes 0 damage, monster takes full + bonus damage!
-            const damage = this.rollWeaponAttack(weapon, { forceCrit: true }).damage;   // 半ずらしは、必ずクリティカル（ミスもしない）
-            this.sound.playAttack(true);
-            const isDead = monster.takeDamage(damage, { x: nx, z: nz }, knockScale);
-            applyWeaponEffects(isDead, true);
-            this.playerHitFeedback({ crit: true, killed: isDead, heavy: heavySound });
-            this.particles.spawnBurst(monster.x, 1.2, monster.z, 0xfbbf24, 12, 4.0);
-            this.addPopup(monster.lastBlocked ? 'ガード!' : `半ずらし会心! -${damage}`, monster.lastBlocked ? '#94a3b8' : '#fbbf24', monster.x, monster.z);
-            this.notifyEnemyEngaged(monster);
-
-            if (isDead) this.gainExp(monster.exp);
-        } else if (isCharging) {
+        if (isCharging) {
             // Normal charge: Mutual damage (player takes half, enemy takes standard)
             const atk = this.rollWeaponAttack(weapon);   // ミス・1 ゾロ・クリティカルは、式（rules.js）で決まる
-            const pDmg = atk.damage;
+            let pDmg = atk.damage;
+            // ブラックダイヤモンド: 突進が当たった（ミス・ファンブルでない）とき、通常攻撃をもう一度判定して足す（クリティカルなし。ミス・1 ゾロはある）
+            let bonus = 0;
+            if (atk.kind === 'normal' || atk.kind === 'crit') for (const e of this.accEffectsOf('chargeBonusRoll')) for (let i = 0; i < e.rolls; i++) bonus += this.rollWeaponAttack(weapon, { noCrit: true }).damage;
+            pDmg += bonus;
             if (monster.isDashing) monster.dashHit = true;   // 突進が当たった（よけられていない）
             const mDmg = Math.floor(this.monsterAttackValue(monster) * 0.5 * (monster.isDashing ? 1.5 : 1) * (monster.hitScale ?? 1));
             const crit = atk.kind === 'crit';
@@ -315,8 +302,9 @@ export const movementMethods = {
             }
             this.playerTakeDamage(mDmg, new THREE.Vector3(-nx, 0, -nz), 1.0, monster);
             const label = atk.kind === 'miss' ? 'ミス!' : atk.kind === 'fumble' ? `ファンブル -${pDmg}` : crit ? `クリティカル! -${pDmg}` : `ボコッ! -${pDmg}`;
+            const label2 = bonus > 0 ? `${label}（追加 +${bonus}）` : label;
             const guarded = atk.kind !== 'miss' && monster.lastBlocked;
-            this.addPopup(guarded ? 'ガード!' : label, guarded || atk.kind === 'miss' ? '#94a3b8' : crit ? '#fbbf24' : '#ffffff', monster.x, monster.z);
+            this.addPopup(guarded ? 'ガード!' : label2, guarded || atk.kind === 'miss' ? '#94a3b8' : crit ? '#fbbf24' : '#ffffff', monster.x, monster.z);
             this.notifyEnemyEngaged(monster);
 
             if (isDead) this.gainExp(monster.exp);

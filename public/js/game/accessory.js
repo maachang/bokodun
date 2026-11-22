@@ -23,7 +23,7 @@ export function effectText(e) {
         case 'spellCost': return `呪文の消費MP ×${e.rate}`;
         case 'spellPower': return `呪文の威力 ×${e.rate}`;
         case 'float': return '絶えず浮遊（地面のダメージを受けない）';
-        case 'chargeAttackRate': return `突進攻撃が ${e.rate} 倍`;
+        case 'chargeBonusRoll': return `突進攻撃のとき、通常攻撃をもう ${e.rolls} 回判定して足す（クリティカルなし）`;
         default: return e.type;
     }
 }

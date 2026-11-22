@@ -68,7 +68,7 @@
     { "id": "kite_shield", "name": "カイトシールド", "category": "大型", "heavy": true, "weight": [12, 30], "dice": { "n": 2, "m": 6, "k": 2 } },
     { "id": "tower_shield", "name": "タワーシールド", "category": "大型", "heavy": true, "weight": [25, 50], "dice": { "n": 3, "m": 6, "k": 0 } }
   ],
-  "accessories_comment": "アクセサリ（装備 1 枠）。石の名前だけ。rank は B〜SSS（item-spec 8-1）。effects の type: stat／immuneStatus／regen／speed／attackElement／guardElement／nullElement／maxMp／spellCost／spellPower／float／chargeAttackRate。provisional は暫定の注意書き。未登録: 双石・三石・双守り石・三守り石（組み合わせ未決）、呪い、入手・価格。ゲーム側は未実装（データのみ）。",
+  "accessories_comment": "アクセサリ（装備 1 枠）。石の名前だけ。rank は B〜SSS（item-spec 8-1）。effects の type: stat／immuneStatus／regen／speed／attackElement／guardElement／nullElement／maxMp／spellCost／spellPower／float／chargeBonusRoll。provisional は暫定の注意書き。未登録: 双石・三石・双守り石・三守り石（組み合わせ未決）、呪い、入手・価格。ゲーム側は未実装（データのみ）。",
   "accessories": [
     {"id": "citrine", "name": "シトリン", "rank": "B", "effects": [{"type": "stat", "stats": {"dex": 1}}]},
     {"id": "turquoise", "name": "ターコイズ", "rank": "B", "effects": [{"type": "stat", "stats": {"agi": 1}}]},
@@ -106,7 +106,7 @@
     {"id": "jet", "name": "ジェット", "rank": "S", "effects": [{"type": "spellPower", "rate": 0.5}, {"type": "spellCost", "rate": 0.25}], "provisional": "消費MPの値は暫定（item-spec 8-2b）"},
     {"id": "alexandrite", "name": "アレキサンドライト", "rank": "SS", "effects": [{"type": "regen", "intervalSec": 3, "hpPct": 3, "mpPct": 2, "min": 1}], "provisional": "数値は暫定（item-spec 8-2b）"},
     {"id": "blue_topaz", "name": "ブルートパーズ", "rank": "SS", "effects": [{"type": "float"}], "provisional": "効果の細かい範囲は実装時に確認"},
-    {"id": "black_diamond", "name": "ブラックダイヤモンド", "rank": "SS", "effects": [{"type": "chargeAttackRate", "rate": 2}]},
+    {"id": "black_diamond", "name": "ブラックダイヤモンド", "rank": "SS", "effects": [{"type": "chargeBonusRoll", "rolls": 1}]},
     {"id": "rainbow_diamond", "name": "虹ダイヤ", "rank": "SSS", "effects": [{"type": "attackElement", "elements": ["fire", "ice", "thunder", "holy", "dark", "poison"]}], "provisional": "換算率 50% は暫定（item-spec 8-2b）"},
     {"id": "rainbow_diamond_ward", "name": "虹ダイヤの守り石", "rank": "SSS", "effects": [{"type": "guardElement", "elements": ["fire", "ice", "thunder", "holy", "dark", "poison"], "reducePct": 25}]}
   ]

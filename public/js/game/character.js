@@ -64,7 +64,7 @@ export const characterMethods = {
     // 攻撃 1 回の結果。{ kind, damage }。呪いの間は、ダメージが下がる（curse の scale）
     rollWeaponAttack(weapon, opt = {}) {
         const p = this.player, d = this.rules, ab = this.effAbilities();
-        const r = R.resolveAttack(d, { weapon, weight: this.weaponWeight(weapon), lv: p.level, job: d.jobs[p.job], str: ab.str, dex: ab.dex }, opt);
+        const r = R.resolveAttack(d, { weapon, weight: this.weaponWeight(weapon), lv: p.level, job: d.jobs[p.job], str: ab.str, dex: ab.dex, loadRatio: this.loadRatio() }, opt);
         const c = p.status?.curse;
         if (c?.t > 0) r.damage = Math.floor(r.damage * (c.scale ?? 0.7));
         return r;
