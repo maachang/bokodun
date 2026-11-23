@@ -134,6 +134,11 @@ export class Projectile {
             if (v.shape === 'crystal') {
                 coreGeo = new THREE.OctahedronGeometry(0.22);
                 auraGeo = new THREE.OctahedronGeometry(0.34);
+            } else if (v.shape === 'blade') {   // 風の刃: 進む向きに長い、薄く立った板
+                coreGeo = new THREE.BoxGeometry(0.04, 0.5, 0.9);
+                auraGeo = new THREE.BoxGeometry(0.1, 0.7, 1.15);
+                this.mesh.rotation.y = Math.atan2(-this.dirX, -this.dirZ);
+                this.noSpin = true;
             } else if (v.shape === 'bolt') {
                 coreGeo = new THREE.BoxGeometry(0.08, 0.08, 0.7);
                 auraGeo = new THREE.BoxGeometry(0.16, 0.16, 0.9);

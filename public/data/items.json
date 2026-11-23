@@ -391,5 +391,199 @@
       "type": "unlock_chest_lock"
     },
     "price": null
+  },
+  "flare": {
+    "id": "flare",
+    "name": "フレア",
+    "kind": "spell",
+    "element": "fire",
+    "type": "strike",
+    "style": "fire",
+    "cooldown": 1.2,
+    "blastRadius": 4.5,
+    "targetDistance": 7,
+    "warnTime": 0.4,
+    "pillarTime": 1.0,
+    "smokeTime": 3.0
+  },
+  "meteor_strike": {
+    "id": "meteor_strike",
+    "name": "メテオストライク",
+    "kind": "spell",
+    "element": "none",
+    "type": "strike",
+    "style": "meteor",
+    "cooldown": 1.5,
+    "blastRadius": 4.0,
+    "targetDistance": 8,
+    "warnTime": 0.7,
+    "pillarTime": 1.0,
+    "sound": "fire"
+  },
+  "thunderfall": {
+    "id": "thunderfall",
+    "name": "落雷",
+    "kind": "spell",
+    "element": "thunder",
+    "type": "strike",
+    "style": "lightning",
+    "cooldown": 1.0,
+    "blastRadius": 2.2,
+    "targetDistance": 7,
+    "warnTime": 0.35,
+    "pillarTime": 0.5,
+    "sound": "bolt"
+  },
+  "holy": {
+    "id": "holy",
+    "name": "ホーリー",
+    "kind": "spell",
+    "element": "holy",
+    "type": "strike",
+    "style": "holy",
+    "cooldown": 1.1,
+    "blastRadius": 3.5,
+    "targetDistance": 6,
+    "warnTime": 0.5,
+    "pillarTime": 1.0,
+    "sound": "bolt",
+    "popupColor": "#fff1b8"
+  },
+  "ice_javelin": {
+    "id": "ice_javelin",
+    "name": "アイスジャベリン",
+    "kind": "spell",
+    "element": "ice",
+    "type": "fireball",
+    "cooldown": 0.5,
+    "speed": 20,
+    "sound": "ice",
+    "visual": {
+      "shape": "crystal",
+      "size": 1.1,
+      "core": "#ffffff",
+      "aura": "#7dd3fc",
+      "trail": "#bae6fd",
+      "muzzle": "#bae6fd",
+      "hit": "#7dd3fc"
+    },
+    "pierce": 2,
+    "status": {
+      "type": "slow",
+      "duration": 2.5,
+      "speedScale": 0.6
+    }
+  },
+  "thunder_bolt": {
+    "id": "thunder_bolt",
+    "name": "サンダーボルト",
+    "kind": "spell",
+    "element": "thunder",
+    "type": "fireball",
+    "cooldown": 0.45,
+    "speed": 22,
+    "sound": "bolt",
+    "visual": {
+      "shape": "bolt",
+      "size": 1.2,
+      "core": "#ffffff",
+      "aura": "#facc15",
+      "trail": "#fef08a",
+      "muzzle": "#fef9c3",
+      "hit": "#fde047"
+    },
+    "pierce": 3
+  },
+  "air_cutter": {
+    "id": "air_cutter",
+    "name": "エアカッター",
+    "kind": "spell",
+    "element": "none",
+    "type": "fireball",
+    "cooldown": 0.4,
+    "speed": 18,
+    "sound": "bolt",
+    "visual": {
+      "shape": "blade",
+      "size": 1.0,
+      "core": "#f0fff5",
+      "aura": "#86efac",
+      "trail": "#d1fae5",
+      "muzzle": "#d1fae5",
+      "hit": "#86efac"
+    },
+    "pierce": 2
+  },
+  "turn_undead": {
+    "id": "turn_undead",
+    "name": "ターンアンデット",
+    "kind": "spell",
+    "element": "holy",
+    "type": "fireball",
+    "cooldown": 0.5,
+    "speed": 14,
+    "sound": "bolt",
+    "visual": {
+      "shape": "orb",
+      "size": 0.9,
+      "core": "#ffffff",
+      "aura": "#fde68a",
+      "trail": "#fff7cc",
+      "muzzle": "#fff1b8",
+      "hit": "#fde68a"
+    }
+  },
+  "ice_storm": {
+    "id": "ice_storm",
+    "name": "アイスストーム",
+    "kind": "spell",
+    "element": "ice",
+    "type": "burst",
+    "style": "ice_storm",
+    "cooldown": 1.2,
+    "blastRadius": 5.0,
+    "sound": "ice",
+    "status": {
+      "type": "slow",
+      "duration": 3,
+      "speedScale": 0.5
+    },
+    "popupColor": "#7dd3fc"
+  },
+  "air_storm": {
+    "id": "air_storm",
+    "name": "エアストーム",
+    "kind": "spell",
+    "element": "none",
+    "type": "burst",
+    "style": "air_storm",
+    "cooldown": 1.2,
+    "blastRadius": 5.0,
+    "sound": "bolt",
+    "popupColor": "#86efac"
+  },
+  "earthquake": {
+    "id": "earthquake",
+    "name": "アースクエイク",
+    "kind": "spell",
+    "element": "none",
+    "type": "burst",
+    "style": "quake",
+    "cooldown": 1.5,
+    "blastRadius": 6.0,
+    "sound": "fire",
+    "popupColor": "#d6b98a"
+  },
+  "purification": {
+    "id": "purification",
+    "name": "ピュリフィケーション",
+    "kind": "spell",
+    "element": "holy",
+    "type": "burst",
+    "style": "purify",
+    "cooldown": 1.1,
+    "blastRadius": 4.5,
+    "sound": "bolt",
+    "popupColor": "#fff1b8"
   }
 }

@@ -127,6 +127,12 @@ export const characterMethods = {
         this.sound.playHeal?.();
     },
 
+    // デバッグ・テスト用: 使える魔法を、全部覚えている状態にする
+    giveAllMagics() {
+        this.player.magics = Object.values(this.items).filter((i) => i.kind === 'spell').map((i) => i.id);
+        this.updateEquipHud();
+    },
+
     // ---- 魔法を覚える（魔法ギルドで買う／宝箱などで取得する）----
     isSpellLearned(id) {
         return this.player.magics.includes(id);

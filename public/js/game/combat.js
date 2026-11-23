@@ -37,6 +37,7 @@ export const combatMethods = {
             const power = this.rollSpellPower(item);   // 威力（ダイス ＋ 杖のダイス）
             if (item.type === 'heal' || item.type === 'support') this.castSelfSpell(item, power);   // 自分に使う（回復・補助）
             else if (item.type === 'strike') this.castStrike(item, power);
+            else if (item.type === 'burst') this.castBurst(item, power);   // 自分を中心にした範囲
             else this.shootProjectiles(item, power);
         } else {
             const cls = this.weaponClasses[item.weaponClass];
@@ -182,11 +183,43 @@ export const combatMethods = {
         this.sound.playStrikeWhistle(spell.warnTime); // 「ぴゅーーーん」（予告の間に鳴る）→ 着弾で「ばーーん」
         this.strikeEffects.schedule(tx, tz, {
             radius: spell.blastRadius,
+            style: spell.style ?? 'fire',
+            fx: this.spellEffects,
             warnTime: spell.warnTime,
             pillarTime: spell.pillarTime,
             smokeTime: spell.smokeTime ?? 0,
-            onImpact: () => this.blastAt(tx, tz, spell.blastRadius, damage, spell.element)
+            onImpact: () => (spell.style && spell.style !== 'fire') ? this.areaHit(tx, tz, spell, damage) : this.blastAt(tx, tz, spell.blastRadius, damage, spell.element)
         });
+    },
+
+    // 自分を中心にした範囲の魔法（アイスストーム・エアストーム・アースクエイク・ピュリフィケーション）: すぐに、まわりの敵へ当たり、演出を出す
+    castBurst(spell, power) {
+        const p = this.player;
+        this.sound.playSpellShoot(spell.sound);
+        this.spellEffects.play(spell.style, p.x, p.z, { radius: spell.blastRadius });
+        this.areaHit(p.x, p.z, spell, power);
+    },
+
+    // 魔法の範囲ダメージ（blastAt の、爆発の見た目と音を持たない版）: 中心から半径 blastRadius 内の敵すべてに damage。属性が効かない敵は 0。status があれば付ける
+    areaHit(x, z, spell, damage) {
+        this.sound.playSpellHit(spell.sound);
+        for (const m of this.monsters) {
+            if (!m.active) continue;
+            const dx = m.x - x, dz = m.z - z, dist = Math.hypot(dx, dz);
+            if (dist > spell.blastRadius + m.radius) continue;
+            const nx = dist > 0.001 ? dx / dist : 0, nz = dist > 0.001 ? dz / dist : 1;
+            if (m.isImmuneTo(spell.element)) {
+                this.addPopup('魔法は効かない!', '#94a3b8', m.x, m.z);
+                this.notifyEnemyEngaged(m);
+                continue;
+            }
+            const isDead = m.takeDamage(damage, { x: nx, z: nz });
+            this.requestHitStop(HIT_FEEDBACK.hitStop.blast);
+            this.addPopup(`${spell.name} -${damage}`, spell.popupColor ?? '#fde68a', m.x, m.z);
+            if (spell.status && !isDead && m.applyStatus(spell.status)) this.addPopup('鈍足!', '#7dd3fc', m.x, m.z);
+            this.notifyEnemyEngaged(m);
+            if (isDead) this.gainExp(m.exp);
+        }
     },
 
     // 着弾の範囲ダメージ: 中心から半径 radius 内の敵すべてに damage（ノックバックは中心から外向き）

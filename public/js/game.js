@@ -11,6 +11,7 @@ import { SDAssetManager } from '/js/sdAssetManager.js';
 import { ParticleSystem } from '/js/particles.js';
 import { SlashEffectSystem } from '/js/slashEffect.js';
 import { StrikeEffectSystem } from '/js/strikeEffect.js';
+import { SpellEffectSystem } from '/js/spellEffect.js';
 import { tileBuilders } from '/js/game/tiles.js';
 import { updateTrapMethods } from '/js/game/updateTraps.js';
 import { updateObjectMethods } from '/js/game/updateObjects.js';
@@ -64,6 +65,7 @@ export class GameEngine {
         this.initThree();
         this.initTextures();
         this.strikeEffects = new StrikeEffectSystem(this.scene, this.textures.firePillar, this.camera);
+        this.spellEffects = new SpellEffectSystem(this.scene, this.particles);   // 画像を使わない魔法の演出（spellEffect.js）
         this.initControls();
         this.initEffectTestEvents();
     }
@@ -300,6 +302,7 @@ export class GameEngine {
         this.particles.update(dt);
         this.slashEffects.update(dt);
         this.strikeEffects.update(dt);
+        this.spellEffects.update(dt);
 
         // Update Monsters and Ys-style "Bump Combat"
         this.updatePlayerStatus(dt);

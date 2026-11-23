@@ -107,20 +107,23 @@ export class StrikeEffectSystem {
 
     // x, z: 着弾点 / radius: 範囲の半径 / warnTime: 予告の長さ / pillarTime: 火柱の持続 / smokeTime: 火柱が消えてからの煙の長さ（0 なら煙なし）
     // onImpact: 着弾の瞬間に呼ぶ（ダメージ・効果音など）
-    schedule(x, z, { radius = 3, warnTime = 0.3, pillarTime = 0.8, smokeTime = 0, onImpact = null } = {}) {
+    schedule(x, z, { radius = 3, warnTime = 0.3, pillarTime = 0.8, smokeTime = 0, onImpact = null, style = 'fire', fx = null } = {}) {
+        // style が fire 以外（lightning・meteor・holy）は、画像の火柱の代わりに、fx（SpellEffectSystem。spellEffect.js）が、コードで描く。落下（メテオ）は、予告の間に出す
+        const warnColors = { lightning: 0x60a5fa, meteor: 0xff3300, holy: 0xffe27a };
+        if (fx && style !== 'fire') fx.playFall?.(style, x, z, warnTime);
         const warn = new THREE.Group();
         warn.position.set(x, 0.06, z);
-        const warnMat = new THREE.MeshBasicMaterial({ color: 0xff2200, transparent: true, opacity: 0.6, side: THREE.DoubleSide, depthWrite: false });
+        const warnMat = new THREE.MeshBasicMaterial({ color: warnColors[style] ?? 0xff2200, transparent: true, opacity: 0.6, side: THREE.DoubleSide, depthWrite: false });
         const ringGeo = new THREE.RingGeometry(radius * 0.9, radius, 32);
         ringGeo.rotateX(-Math.PI / 2);
         const fillGeo = new THREE.CircleGeometry(radius * 0.9, 32);
         fillGeo.rotateX(-Math.PI / 2);
-        const fillMat = new THREE.MeshBasicMaterial({ color: 0xff4400, transparent: true, opacity: 0.2, side: THREE.DoubleSide, depthWrite: false });
+        const fillMat = new THREE.MeshBasicMaterial({ color: warnColors[style] ?? 0xff4400, transparent: true, opacity: 0.2, side: THREE.DoubleSide, depthWrite: false });
         warn.add(new THREE.Mesh(ringGeo, warnMat), new THREE.Mesh(fillGeo, fillMat));
         this.scene.add(warn);
 
         this.strikes.push({
-            x, z, radius, warnTime, pillarTime, smokeTime, onImpact,
+            x, z, radius, warnTime, pillarTime, smokeTime, onImpact, style, fx,
             t: 0, impacted: false, puffs: null,
             warn, warnMat, fillMat, geometries: [ringGeo, fillGeo],
             pillar: null
@@ -134,6 +137,7 @@ export class StrikeEffectSystem {
         s.fillMat.dispose();
         s.impacted = true;
         if (s.onImpact) s.onImpact();
+        if (s.fx && s.style !== 'fire') { s.fx.play(s.style, s.x, s.z, { radius: s.radius }); return; }   // 火柱は作らない（pillar は null のまま）
 
         const height = this.ceilingHeight != null ? Math.min(5, this.ceilingHeight - CEILING_MARGIN) : 5;
         const width = s.radius * 1.1;
