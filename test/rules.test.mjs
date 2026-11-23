@@ -195,3 +195,26 @@ test('冒険者の作成: 能力値の生成・ボーナスの割り振り・検
     assert.match(R.validateCreation(defs, ok({ abilities: { ...base, str: 16.5 } })), /不正/);
     assert.match(R.validateCreation(defs, ok({ abilities: null })), /能力値/);
 });
+
+test('武器の +値（1 つにつき +5%）と、クリティカル率の上限 50%（リトライは元の率から引いて、上限で頭打ち）', () => {
+    const sword = { blunt: false, dice: { n: 1, m: 6, k: 0 } }, blunt = { blunt: true };
+    const f = defs.jobs.fighter;
+    const base = R.critRate(defs, f, sword, 10, 14);
+    assert.equal(R.critRate(defs, f, sword, 10, 14, null, 1, 3), base + 15);
+    assert.equal(R.critRate(defs, f, blunt, 10, 14, null, 1, 3), R.critRate(defs, f, blunt, 10, 14));   // 鈍器は、クリティカル率に足さない（重さに付く）
+    // 上限: 率 80% でも、乱数 0.6（60%）は外れる（上限 50%）。リトライ（忍者 3 回）は 70→60→50 でも、すべて 50% で判定
+    const high = { ...defs, combat: { ...defs.combat, critRate: { ...defs.combat.critRate, normal: 80 } } };
+    const ctx = { weapon: sword, weight: 10, lv: 1, job: f, str: 14, dex: 99 };
+    assert.equal(R.resolveAttack(high, ctx, { noMiss: true }, seq(0.5, 0.6)).kind, 'normal');
+    const nin = { ...f, retryCrit: 3 };
+    const r = R.resolveAttack(high, { ...ctx, job: nin }, { noMiss: true }, seq(0.5, 0.4, 0.5, 0.49, 0.5, 0.49, 0.5, 0.49));
+    assert.equal(r.kind, 'crit');
+});
+
+test('鈍器の +値は、ダメージ表を引く重さを +1 ごとに +10 上げる（鈍器以外は変わらない）', () => {
+    const club = { blunt: true, dice: { n: 1, m: 6, k: 0 } }, sword = { blunt: false, dice: { n: 1, m: 6, k: 0 } };
+    const run = (w, plus) => R.resolveAttack(defs, { weapon: w, weight: 20, lv: 1, job: defs.jobs.fighter, str: 14, dex: 99, plus }, { noMiss: true, noCrit: true }, seq(0.99)).damage;
+    assert.equal(run(club, 0), R.tableValue(defs, 20, 6));
+    assert.equal(run(club, 3), R.tableValue(defs, 50, 6));
+    assert.equal(run(sword, 3), run(sword, 0));
+});

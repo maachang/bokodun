@@ -128,24 +128,26 @@ export function rollAttack(defs, weapon, weight, lv, job, rng = Math.random) {
 /** クリティカル率（%）。シーフ系は軽い武器（重さ ≤ 筋力 × 0.5）のとき高い。鈍器は全職業で低い。
  *  積載（loadRatio。省略は、補正なし）: 1 を超えると全職業で減る（シーフ系は倍。下限は critLoad.floor か、元の率の小さいほう）。
  *  中央値（critLoad.light.median）より軽いと上がる（重量比 0 で +maxBonus ポイント。シーフ系は 2 倍（Lv1）〜 thiefMulMax 倍（最大レベル）。鈍器は対象外） */
-export function critRate(defs, job, weapon, weight, str, loadRatio = null, lv = 1) {
+export function critRate(defs, job, weapon, weight, str, loadRatio = null, lv = 1, plus = 0) {
     const c = defs.combat.critRate;
     let base;
     if (weapon.blunt) base = c.blunt;
     else if (!job?.thiefFamily) base = c.normal;
     else base = weight <= str * defs.combat.lightWeaponMaxRatio ? c.thiefFamily : c.normal * c.heavyThiefPenaltyFactor;
+    // 武器の +値（最大 +3）: 1 つにつき、クリティカル率 +5 ポイント（積載の補正のあと。鈍器は、クリティカル率ではなく別の性能に付く予定で、ここでは足さない）
+    const pb = weapon.blunt ? 0 : plus * (defs.combat.plusCritBonus ?? 5);
     const L = defs.combat.critLoad;
-    if (!L || loadRatio == null) return base;
+    if (!L || loadRatio == null) return base + pb;
     const thiefMul = job?.thiefFamily ? L.thiefMul : 1;
     if (loadRatio < L.light.median) {
-        if (weapon.blunt) return base;
+        if (weapon.blunt) return base + pb;
         // シーフ系の、軽いほうの倍率は、レベルで 2（Lv1）→ thiefMulMax（最大レベル）に伸びる（紙防具のシーフが、高レベルで高くなる）
         const mul = job?.thiefFamily ? L.thiefMul + (L.light.thiefMulMax - L.thiefMul) * Math.min(1, Math.max(0, lv - 1) / (defs.combat.levelBonus.maxLevel - 1)) : 1;
-        return base + L.light.maxBonus * (1 - Math.max(0, loadRatio) / L.light.median) * mul;
+        return base + pb + L.light.maxBonus * (1 - Math.max(0, loadRatio) / L.light.median) * mul;
     }
-    if (loadRatio <= 1) return base;
+    if (loadRatio <= 1) return base + pb;
     const cut = Math.min(1, (loadRatio - 1) * L.perOver * thiefMul);
-    return Math.max(Math.min(L.floor, base), base * (1 - cut));
+    return Math.max(Math.min(L.floor, base), base * (1 - cut)) + pb;
 }
 
 /**
@@ -154,17 +156,20 @@ export function critRate(defs, job, weapon, weight, str, loadRatio = null, lv = 
  *   クリティカルのダメージは、ダメージ判定の 1.5 倍。リトライ（職業ごとの回数）は、その都度ダメージ判定をして合算する。リトライのクリティカル率は、1 回ごとに critRetryDrop ポイントずつ下がる（最初 30% なら、リトライは 20%、次は 10%。下限は 1% か、元の率の小さいほう）。出なければ、通常ダメージを加えて終わる。
  */
 export function resolveAttack(defs, ctx, { forceCrit = false, noMiss = false, noCrit = false } = {}, rng = Math.random) {
-    const { weapon, weight, lv, job, str, dex, loadRatio } = ctx;
+    const { weapon, weight, lv, job, str, dex, loadRatio, plus = 0 } = ctx;
     if (!forceCrit && !noMiss && rng() < missRate(defs, dex, lv)) return { kind: 'miss', damage: 0 };
-    const first = rollAttack(defs, weapon, weight, lv, job, rng);
+    // 鈍器の +値は、ダメージ表を引く重さを上げる（+1 ごとに plusBluntWeight。実際の重さ・積載は変わらない）
+    const dw = weight + (weapon.blunt ? plus * (defs.combat.plusBluntWeight ?? 10) : 0);
+    const first = rollAttack(defs, weapon, dw, lv, job, rng);
     if (first.fumble) return { kind: 'fumble', damage: first.damage };
-    const p = critRate(defs, job, weapon, weight, str, loadRatio, lv);
-    if (noCrit || (!forceCrit && rng() * 100 >= p)) return { kind: 'normal', damage: first.damage };
+    const p = critRate(defs, job, weapon, weight, str, loadRatio, lv, plus);   // 上限（critCap）を掛ける前の率。リトライは、この値から引く
+    const cap = defs.combat.critCap ?? 100;
+    if (noCrit || (!forceCrit && rng() * 100 >= Math.min(cap, p))) return { kind: 'normal', damage: first.damage };
     const mult = defs.combat.critDamageMultiplier;
     let total = Math.floor(first.damage * mult);
     for (let i = 0; i < (job?.retryCrit || 0); i++) {
-        const r = rollAttack(defs, weapon, weight, lv, job, rng);
-        const pr = Math.max(Math.min(defs.combat.critLoad?.floor ?? 1, p), p - (defs.combat.critRetryDrop ?? 0) * (i + 1));   // リトライごとに、率が下がる（1 回目 −10・2 回目 −20 ポイント。下限 1%）
+        const r = rollAttack(defs, weapon, dw, lv, job, rng);
+        const pr = Math.min(cap, Math.max(Math.min(defs.combat.critLoad?.floor ?? 1, p), p - (defs.combat.critRetryDrop ?? 0) * (i + 1)));   // リトライごとに、率が下がる（1 回目 −10・2 回目 −20 ポイント。下限 1%）
         if (!r.fumble && rng() * 100 < pr) total += Math.floor(r.damage * mult);
         else { total += r.damage; break; }
     }

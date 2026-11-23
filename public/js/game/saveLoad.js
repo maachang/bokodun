@@ -43,6 +43,7 @@ export const saveLoadMethods = {
             owned: { ...p.owned },
             equipment: { armor: p.equip?.armor ?? null, helm: p.equip?.helm ?? null, shield: p.equip?.shield ?? null, accessory: p.equip?.accessory ?? null },
             accessories: [...(p.accessories ?? [])],
+            plus: { ...(p.plus ?? {}) },
             stock: this.buildStockSave(),
             magics: [...p.magics]
         };
@@ -72,6 +73,8 @@ export const saveLoadMethods = {
             p.owned = {};
             for (const [id, w] of Object.entries(data.owned)) { const e = this.equipDefOf(id); if (e && id !== 'fists' && isInt(w, e.range[0], e.range[1])) p.owned[id] = w; }
         }
+        p.plus = {};   // 武器の +値（持っている武器だけ。0〜plusMax）
+        if (data.plus && typeof data.plus === 'object') for (const [id, n] of Object.entries(data.plus)) if (p.owned[id] !== undefined && isInt(n, 1, this.rules.combat.plusMax ?? 3)) p.plus[id] = n;
         p.accessories = Array.isArray(data.accessories) ? [...new Set(data.accessories)].filter((id) => this.accessoryDef(id)) : [];   // 持っているアクセサリ（定義にあるものだけ）
         this.applyStockSave(data.stock);
         const eq = data.equipment ?? {};

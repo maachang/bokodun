@@ -62,9 +62,16 @@ export const characterMethods = {
     },
 
     // 攻撃 1 回の結果。{ kind, damage }。呪いの間は、ダメージが下がる（curse の scale）
+    // 武器の +値（0〜plusMax）。player.plus: 武器 ID → +値。入手は未決（いまは givePlus でデバッグ用に付ける）
+    weaponPlus(id) { return this.player.plus?.[id] ?? 0; },
+    givePlus(id, n) {
+        const max = this.rules.combat.plusMax ?? 3;
+        this.player.plus = { ...(this.player.plus ?? {}), [id]: Math.max(0, Math.min(max, n | 0)) };
+    },
+
     rollWeaponAttack(weapon, opt = {}) {
         const p = this.player, d = this.rules, ab = this.effAbilities();
-        const r = R.resolveAttack(d, { weapon, weight: this.weaponWeight(weapon), lv: p.level, job: d.jobs[p.job], str: ab.str, dex: ab.dex, loadRatio: this.loadRatio() }, opt);   // lv は ctx に入っている
+        const r = R.resolveAttack(d, { weapon, weight: this.weaponWeight(weapon), lv: p.level, job: d.jobs[p.job], str: ab.str, dex: ab.dex, loadRatio: this.loadRatio(), plus: this.weaponPlus(weapon.id) }, opt);   // lv は ctx に入っている
         const c = p.status?.curse;
         if (c?.t > 0) r.damage = Math.floor(r.damage * (c.scale ?? 0.7));
         return r;

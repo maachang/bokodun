@@ -12,6 +12,10 @@
   "critDamageMultiplier": 1.5,
   "critRetryDrop": 10,
   "magicPlusCritBonus": 5,
+  "plusCritBonus": 5,
+  "critCap": 50,
+  "plusMax": 3,
+  "plusBluntWeight": 10,
   "equipWeightMultiplier": { "normal": 1.0, "blunt": 1.5, "_note": "装備できる重さの上限 = 筋力 × 倍率（最大50）" },
   "defense": {
     "coef": { "armor": 0.6, "helm": 0.2, "shield": 0.2 },

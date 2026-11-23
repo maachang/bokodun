@@ -164,6 +164,17 @@ const sections = {
         }
         return null;
     },
+    plus(v) {
+        // 武器の +値: 武器 ID → 0〜3（持っている武器だけ）
+        if (!isObj(v)) return 'plus: オブジェクトで指定してください';
+        const keys = Object.keys(v), d = loadDefs();
+        if (keys.length > MAX_ENTRIES) return 'plus: 件数が多すぎます';
+        for (const id of keys) {
+            if (!d.gearRanges[id]) return `plus: 定義にない武器です（${id}）`;
+            if (!isInt(v[id], 0, 3)) return `plus: +値は 0〜3 です（${id}）`;
+        }
+        return null;
+    },
     accessories(v) {
         // 持っているアクセサリ（item-spec.md 8 章）。重さはないので、ID の配列
         const d = loadDefs();
