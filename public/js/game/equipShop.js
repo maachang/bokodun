@@ -6,7 +6,7 @@ export const equipShopMethods = {
         const e = this.equipDefOf(m.good.equipId), d = e.def.dice;
         const dice = `${d.n}d${d.m}${d.k ? '+' + d.k : ''}`;
         const limit = Math.floor(this.rules ? this.effAbilities().str * (e.def.blunt ? 1.5 : 1) : 0);
-        return `<div style="margin:6px 0;color:#94a3b8">${e.def.name}（${e.def.category ?? ''}）　${e.kind === 'weapon' ? '攻撃' : '防御'} ${dice}　重さ ${e.range[0]}〜${e.range[1]}　いま持てる重さ ${limit} まで${this.isOwned(m.good.equipId) ? `　（持っている: 重さ ${this.player.owned[m.good.equipId]}）` : ''}</div>`;
+        return `<div style="margin:6px 0;color:#94a3b8">${e.def.name}（${e.def.category ?? ''}）　${e.kind === 'weapon' ? '攻撃' : '防御'} ${dice}　重さ ${e.range[0]}〜${e.range[1]}　いま持てる重さ ${limit} まで${this.isOwned(m.good.equipId) ? `　（持っている: 重さ ${this.player.owned[m.good.equipId]}${this.weaponPlus(m.good.equipId) ? ` +${this.weaponPlus(m.good.equipId)}` : ''}）` : ''}</div>`;
     },
 
     equipShopChoices(m) {

@@ -67,7 +67,7 @@ function initStock(S) {
             if (!it) return html`<div class="slot empty"><span class="no">${i + 1}</span>空き</div>`;
             const lack = it.kind === 'spell' && p.mp < it.mp;   // MP が足りない魔法
             const cls = [i === p.selMelee ? 'selW' : '', i === p.selFocus ? 'selF' : '', i === p.selMagic ? 'selM' : '', lack ? 'lack' : ''].join(' ');
-            return html`<div class="slot ${cls}" data-i="${i}" title="${it.name}"><span class="no">${i + 1}</span><span class="tag">${kindLabel(game, it)}</span>${game.iconIds?.has(id) ? raw(iconTag(game, id, 28)) : it.name}</div>`;
+            return html`<div class="slot ${cls}" data-i="${i}" title="${game.itemLabel(it)}"><span class="no">${i + 1}</span><span class="tag">${kindLabel(game, it)}</span>${game.iconIds?.has(id) ? raw(iconTag(game, id, 28)) : game.itemLabel(it)}</div>`;
         }).join('');
     };
     game.onStockChange = () => { lastSig = ''; S.renderSlots(); };
@@ -144,12 +144,12 @@ function initBodies(S) {
     const { E, game } = S;
     const slotItem = (i) => { const id = game.player.stock[i]; return id ? game.items[id] : null; };
     const stockBody = () => '<p class="legend">最大 9 枠。✕ で外し、「＋追加」で武器・魔法を選んで入れます。</p><div class="grid3">' + game.player.stock.map((id, i) => id
-        ? html`<div class="cell filled" data-detail="${i}"><button class="x" data-rm="${i}">✕</button><b>${i + 1}</b> ${raw(iconTag(game, id, 32))}${game.items[id].name}<br><small>${kindLabel(game, game.items[id])}　${itemDetail(game, game.items[id])}</small></div>`
+        ? html`<div class="cell filled" data-detail="${i}"><button class="x" data-rm="${i}">✕</button><b>${i + 1}</b> ${raw(iconTag(game, id, 32))}${game.itemLabel(game.items[id])}<br><small>${kindLabel(game, game.items[id])}　${itemDetail(game, game.items[id])}</small></div>`
         : html`<div class="cell add" data-add="${i}">＋ 追加（${i + 1}）</div>`).join('') + '</div>';
     const pickBody = (slotNo) => {
         const used = new Set(game.player.stock.filter(Boolean));
         const all = Object.values(game.items).filter(it => game.isStockable(it) && (it.kind === 'spell' ? game.isSpellLearned(it.id) : it.id !== 'fists' && game.isOwned(it.id)));   // 魔法は覚えたもの、武器は持っているものだけ（武器は、武器屋で買う）
-        const row = (it) => html`<div class="pick cols ${used.has(it.id) ? 'dis' : ''}" style="--c:1fr 7em 12em" data-id="${it.id}" data-slot="${slotNo}"><span>${raw(iconTag(game, it.id))}${it.name}</span><small>${used.has(it.id) ? '入っています' : ''}</small><small>${kindLabel(game, it)}　${itemDetail(game, it)}</small></div>`;
+        const row = (it) => html`<div class="pick cols ${used.has(it.id) ? 'dis' : ''}" style="--c:1fr 7em 12em" data-id="${it.id}" data-slot="${slotNo}"><span>${raw(iconTag(game, it.id))}${game.itemLabel(it)}</span><small>${used.has(it.id) ? '入っています' : ''}</small><small>${kindLabel(game, it)}　${itemDetail(game, it)}</small></div>`;
         return '<p>枠 ' + (slotNo + 1) + ' に入れる武器・魔法</p><div class="title">武器・杖</div>' + all.filter(it => !game.isMagicItem(it)).map(row).join('') + '<div class="title" style="margin-top:8px">魔法・弓</div>' + all.filter(it => game.isMagicItem(it)).map(row).join('');
     };
     const settingBody = () => '<p class="legend">ショートカットキーの割り当て（「変更」を押して、割り当てたいキーを押す。1〜9 と Esc は使えません）</p>' + MENU.map(([id, name]) => html`<div class="cols" style="--c:110px 3em 9em;margin-bottom:4px"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd><button data-keyset="${id}">変更</button></div>`).join('') + '<div class="cols" style="--c:110px 200px;margin-top:10px"><span>音量</span><input type="range" min="0" max="100" value="60"></div>'
@@ -191,7 +191,7 @@ function initBodies(S) {
     on(E.winBody, 'click', '[data-detail]', (e, t) => {
         if (e.target.closest('[data-rm]')) return;
         const i = Number(t.dataset.detail), it = slotItem(i);
-        S.setBody(html`<h3>ストック</h3><p>枠 ${i + 1}</p><h3>${raw(iconTag(game, it.id, 48))}${it.name}</h3><p>${kindLabel(game, it)}</p><p>${itemDetail(game, it)}</p>`);
+        S.setBody(html`<h3>ストック</h3><p>枠 ${i + 1}</p><h3>${raw(iconTag(game, it.id, 48))}${game.itemLabel(it)}</h3><p>${kindLabel(game, it)}</p><p>${itemDetail(game, it)}</p>`);
         S.setBack(() => S.openWin('stock'));
     });
     on(E.winBody, 'click', '[data-add]', (e, t) => { S.setBody('<h3>ストック</h3>' + pickBody(Number(t.dataset.add))); S.setBack(() => S.openWin('stock')); });

@@ -64,6 +64,8 @@ export const characterMethods = {
     // 攻撃 1 回の結果。{ kind, damage }。呪いの間は、ダメージが下がる（curse の scale）
     // 武器の +値（0〜plusMax）。player.plus: 武器 ID → +値。入手は未決（いまは givePlus でデバッグ用に付ける）
     weaponPlus(id) { return this.player.plus?.[id] ?? 0; },
+    // 画面に出す名前。武器は +値があれば「ロングソード+2」
+    itemLabel(it) { const n = it.kind === 'weapon' ? this.weaponPlus(it.id) : 0; return n > 0 ? `${it.name}+${n}` : it.name; },
     givePlus(id, n) {
         const max = this.rules.combat.plusMax ?? 3;
         this.player.plus = { ...(this.player.plus ?? {}), [id]: Math.max(0, Math.min(max, n | 0)) };
