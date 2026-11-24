@@ -223,6 +223,10 @@ export const updatePlayerMethods = {
             const a = this.cameraShake.amp * Math.max(0, this.cameraShake.time / this.cameraShake.duration);
             this.camera.position.x += (Math.random() - 0.5) * 2 * a;
             this.camera.position.y += (Math.random() - 0.5) * 2 * a;
+            if (this.cameraShake.roll) {   // ぐらぐらする揺れ: 前後にも動き、画面が左右に傾く
+                this.camera.position.z += (Math.random() - 0.5) * a;
+                this.camera.rotateZ((Math.random() - 0.5) * 2 * this.cameraShake.roll * Math.max(0, this.cameraShake.time / this.cameraShake.duration));
+            }
         }
     },
 };

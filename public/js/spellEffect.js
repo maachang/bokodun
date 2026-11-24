@@ -162,59 +162,88 @@ export class SpellEffectSystem {
         }, [geo, coreGeo, ground.geo, ...rings.map((r) => r.geo)], [mat, coreMat, ground.mat, ...rings.map((r) => r.mat)]);
     }
 
-    // ---- アイスストーム: 氷の輪が広がり、氷片が舞って回る。地面が凍って白くなる ----
-    iceStorm(x, z, radius) {
-        const group = new THREE.Group();
-        group.position.set(x, 0, z);
-        const ring = this.ringMesh(group, 0xbfeaff, 0.5, 0.8);
-        const frostGeo = new THREE.CircleGeometry(radius, 32); frostGeo.rotateX(-Math.PI / 2);
-        const frostMat = new THREE.MeshBasicMaterial({ color: 0xcdeeff, transparent: true, opacity: 0.4, side: THREE.DoubleSide, depthWrite: false });
-        const frost = new THREE.Mesh(frostGeo, frostMat); frost.position.y = 0.05; group.add(frost);
-        const shardGeo = new THREE.OctahedronGeometry(0.22, 0);
-        const shardMat = new THREE.MeshBasicMaterial({ color: 0xe6f8ff, transparent: true, opacity: 0.95 });
-        const shards = [];
-        for (let i = 0; i < 40; i++) {
-            const m = new THREE.Mesh(shardGeo, shardMat);
-            const a = rnd(0, Math.PI * 2), d = rnd(0.3, 1) * radius;
-            const sh = { m, a, d, h: rnd(0.3, 2.8), w: rnd(1.5, 3.5) * (Math.random() < 0.5 ? -1 : 1), s: rnd(0.5, 1.4) };
-            m.scale.set(sh.s, sh.s * 2.2, sh.s);
-            group.add(m); shards.push(sh);
-        }
-        this.particles?.spawnBurst(x, 1.0, z, 0xbfeaff, 24, 5);
-        this.add(group, 1.2, (q, dt) => {
-            const fade = q > 0.7 ? 1 - (q - 0.7) / 0.3 : 1;
-            ring.mesh.scale.setScalar(1 + ease(q) * (radius / 0.8) * 1.3); ring.mat.opacity = 0.9 * (1 - q);
-            frostMat.opacity = 0.4 * fade; shardMat.opacity = 0.95 * fade;
-            for (const s of shards) { s.a += s.w * dt; s.m.position.set(Math.cos(s.a) * s.d, s.h + q * 0.8, Math.sin(s.a) * s.d); s.m.rotation.y += dt * 5; }
-        }, [ring.geo, frostGeo, shardGeo], [ring.mat, frostMat, shardMat]);
+    // ---- エアストーム: 風の竜巻。調べた作りに沿って重ねる: 芯の漏斗 + 外側の大きな漏斗（逆回り・うすい）+ 地面の砂ぼこり + 巻き上げた瓦礫（箱）。
+    //   「ハンドミキサー」のように、針金の輪が、軸のまわりを、逆向きに回る（泡立て器の形）。瓦礫は、渦に巻き込まれて、のぼり、外へ飛ぶ（破壊） ----
+    airStorm(x, z, radius) {
+        this.tornado(x, z, radius, { ring: 0xd9ffe6, funs: [0xeafff2, 0xa6e3bd, 0x8fd1a8], wire: 0xf2fff7, dust: 0xb9ad98, burst: [0xc8f5d8, 0x8a7a64], debris: 'rubble' });
     }
 
-    // ---- エアストーム: 薄い緑白の刃の板が、らせんを描いてのぼる。地面の風の輪 ----
-    airStorm(x, z, radius) {
+    // ---- アイスストーム: エアストームと同じ作りの竜巻。色は青白く、巻き込まれるのは、瓦礫ではなく、氷の刃（細長い結晶）。地面の砂ぼこりは、白い霜の粒 ----
+    iceStorm(x, z, radius) {
+        this.tornado(x, z, radius, { ring: 0xbfeaff, funs: [0xf0fbff, 0x9fd8ff, 0x7cc4f5], wire: 0xe6f8ff, dust: 0xdff3ff, burst: [0xbfeaff, 0xe6f8ff], debris: 'ice' });
+    }
+
+    // 竜巻の共通の作り（エアストーム・アイスストーム）。o: 色（ring・funs 3 色・wire・dust・burst 2 色）と、巻き込むもの debris（rubble=瓦礫の箱 / ice=氷の刃）
+    tornado(x, z, radius, o) {
         const group = new THREE.Group();
         group.position.set(x, 0, z);
-        const ring = this.ringMesh(group, 0xc8f5d8, 0.4, 0.7);
-        const geo = new THREE.PlaneGeometry(1.4, 0.12);
-        const mat = new THREE.MeshBasicMaterial({ color: 0xd9ffe6, transparent: true, opacity: 0.8, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending });
-        const bl = [];
-        for (let i = 0; i < 36; i++) {
-            const m = new THREE.Mesh(geo, mat);
-            const b = { m, a: rnd(0, Math.PI * 2), h: rnd(0, 1), sp: rnd(4, 7), s: rnd(0.8, 1.6) };
-            m.scale.setScalar(b.s);
-            group.add(m); bl.push(b);
-        }
-        this.particles?.spawnBurst(x, 0.6, z, 0xd9ffe6, 20, 4);
-        this.add(group, 1.2, (q, dt) => {
-            const fade = q > 0.7 ? 1 - (q - 0.7) / 0.3 : Math.min(1, q / 0.1);
-            mat.opacity = 0.8 * fade;
-            ring.mesh.scale.setScalar(1 + ease(q) * (radius / 0.7) * 1.2); ring.mat.opacity = 0.7 * (1 - q);
-            for (const b of bl) {
-                b.a += b.sp * dt;
-                const y = ((b.h + q * 1.2) % 1) * 3.5, r = radius * (0.25 + 0.75 * (y / 3.5));   // 上にいくほど広がる渦
-                b.m.position.set(Math.cos(b.a) * r, y, Math.sin(b.a) * r);
-                b.m.rotation.y = -b.a;
+        const H = 6.5, rTop = radius * 0.7, rAt = (h) => 0.4 + (rTop - 0.4) * Math.pow(h / H, 0.9);
+        const ring = this.ringMesh(group, o.ring, 0.4, 0.7);
+        const geos = [ring.geo], mats = [ring.mat];
+        const track = (g, m) => { geos.push(g); if (!mats.includes(m)) mats.push(m); };
+        // 漏斗: 芯（明るい）・外側 2 枚（大きく、うすい。逆回り）
+        const mkFun = (rt, rb, color, op) => {
+            const g = new THREE.CylinderGeometry(rt, rb, H, 24, 4, true);
+            const m = new THREE.MeshBasicMaterial({ color, transparent: true, opacity: op, side: THREE.DoubleSide, depthWrite: false, blending: THREE.AdditiveBlending });
+            const mesh = new THREE.Mesh(g, m); mesh.position.y = H / 2; group.add(mesh); track(g, m);
+            return { mesh, m, op };
+        };
+        const funs = [mkFun(rTop * 0.55, 0.25, o.funs[0], 0.35), mkFun(rTop, 0.4, o.funs[1], 0.2), mkFun(rTop * 1.25, 0.55, o.funs[2], 0.12)];
+        // ハンドミキサー: 針金の輪（軸を通る縦の楕円）を、角度をずらして並べた「泡立て器」。2 つが、逆向きに回る
+        const wireMat = new THREE.LineBasicMaterial({ color: o.wire, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending });
+        mats.push(wireMat);
+        const whisks = [];
+        for (let w = 0; w < 2; w++) {
+            const wg = new THREE.Group();
+            for (let k = 0; k < 6; k++) {
+                const pts = [];
+                for (let i = 0; i <= 36; i++) {
+                    const t = (i / 36) * Math.PI * 2, h = H * 0.5 * (1 - Math.cos(t)) * (0.55 + w * 0.2) + 0.2;   // 下から上へ、ふくらんで、また軸へ戻る輪
+                    pts.push(new THREE.Vector3(Math.sin(t) * rAt(Math.min(H, h)) * (0.8 + w * 0.2), h, 0));
+                }
+                const g = new THREE.BufferGeometry().setFromPoints(pts); track(g, wireMat);
+                const l = new THREE.Line(g, wireMat); l.rotation.y = (k / 6) * Math.PI; wg.add(l);
             }
-        }, [ring.geo, geo], [ring.mat, mat]);
+            group.add(wg); whisks.push({ wg, dir: w ? -1 : 1, sp: 11 + w * 3 });
+        }
+        // 地面の砂ぼこり（低く、渦のまわりを回りながら、広がる）
+        const dustGeo = new THREE.SphereGeometry(0.28, 6, 6);
+        const dustMat = new THREE.MeshBasicMaterial({ color: o.dust, transparent: true, opacity: 0.5, depthWrite: false });
+        track(dustGeo, dustMat);
+        const dust = [];
+        for (let i = 0; i < 40; i++) {
+            const m = new THREE.Mesh(dustGeo, dustMat); m.scale.setScalar(rnd(0.8, 2.2)); group.add(m);
+            dust.push({ m, a: rnd(0, Math.PI * 2), d: rnd(0.4, 1) * radius, sp: rnd(3, 6), h: rnd(0.1, 1.2) });
+        }
+        // 瓦礫（箱）: 巻き上げられて、のぼり、外へ飛ばされる
+        const ice = o.debris === 'ice';
+        const debGeo = ice ? new THREE.OctahedronGeometry(0.2, 0) : new THREE.BoxGeometry(0.28, 0.2, 0.22);
+        const debMats = (ice ? [0xf0fbff, 0xbfeaff, 0xd6f1ff] : [0x7a6a55, 0x5b5148, 0x8a7a64]).map((c) => new THREE.MeshBasicMaterial({ color: c }));
+        track(debGeo, debMats[0]); mats.push(debMats[1], debMats[2]);
+        const deb = [];
+        for (let i = 0; i < (ice ? 50 : 38); i++) {
+            const m = new THREE.Mesh(debGeo, debMats[i % 3]); if (ice) { const sc = rnd(0.7, 1.5); m.scale.set(sc * 0.5, sc * 2.6, sc * 0.9); } else m.scale.setScalar(rnd(0.7, 2)); group.add(m);
+            deb.push({ m, a: rnd(0, Math.PI * 2), h: rnd(0, 0.4), sp: rnd(6, 11), up: rnd(0.35, 0.6), fly: rnd(0.55, 0.9), rot: new THREE.Vector3(rnd(-6, 6), rnd(-6, 6), rnd(-6, 6)) });
+        }
+        this.particles?.spawnBurst(x, 0.6, z, o.burst[0], 24, 5);
+        this.particles?.spawnBurst(x, 0.5, z, o.burst[1], 24, 4);
+        this.add(group, 1.8, (q, dt) => {
+            const grow = Math.min(1, q / 0.18), fade = q > 0.75 ? 1 - (q - 0.75) / 0.25 : 1;
+            ring.mesh.scale.setScalar(1 + ease(q) * (radius / 0.7) * 1.2); ring.mat.opacity = 0.7 * (1 - q);
+            funs.forEach((f, i) => { f.mesh.scale.set(grow, 1, grow); f.mesh.rotation.y += dt * (i % 2 ? -8 : 7); f.m.opacity = f.op * fade; });
+            wireMat.opacity = 0.95 * fade;
+            for (const w of whisks) { w.wg.scale.set(grow, 1, grow); w.wg.rotation.y += dt * w.sp * w.dir; }
+            dustMat.opacity = 0.5 * fade;
+            for (const d of dust) { d.a += d.sp * dt; const r = d.d * (0.5 + q * 0.7); d.m.position.set(Math.cos(d.a) * r, d.h + q * 0.6, Math.sin(d.a) * r); }
+            for (const d of deb) {
+                d.a += d.sp * dt; d.h += d.up * dt;
+                const h = Math.min(H * 1.1, d.h * H), flung = Math.max(0, q - d.fly) / (1 - d.fly + 0.001);   // 終わりに近づくと、外へ飛ばされる
+                const r = rAt(Math.min(H, h)) * 1.05 + flung * radius * 1.4;
+                d.m.position.set(Math.cos(d.a) * r, h - flung * flung * 2, Math.sin(d.a) * r);
+                d.m.rotation.x += d.rot.x * dt; d.m.rotation.y += d.rot.y * dt; d.m.rotation.z += d.rot.z * dt;
+                d.m.visible = flung < 0.95;
+            }
+        }, geos, mats);
     }
 
     // ---- アースクエイク: 中心から、ひび割れが放射状に走る。茶色の衝撃波と砂煙 ----
@@ -246,23 +275,39 @@ export class SpellEffectSystem {
         }, [ring.geo, ring2.geo, ...geos], [ring.mat, ring2.mat, mat]);
     }
 
-    // ---- ピュリフィケーション: 金白の輪が、2 回広がる。光の粒が、のぼる ----
+    // ゲームの画面全体（3D の描画の範囲。HUD・パネルは除く）に、色の膜をかける（青透過など）。duration 秒で、入って、消える。画面（DOM）がないとき（テスト）は、何もしない
+    screenTint(color = 'rgba(110,170,255,0.38)', duration = 1.4) {
+        if (typeof document === 'undefined') return;
+        const el = document.createElement('div');
+        el.style.cssText = `position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;background:radial-gradient(ellipse at center, rgba(255,255,255,0.18) 0%, ${color} 70%);opacity:0;transition:opacity ${duration * 0.25}s ease-out`;
+        const wrap = document.getElementById('gameWrapper'), flash = document.getElementById('damageFlash');
+        if (wrap && flash) wrap.insertBefore(el, flash);   // ゲームの画面（3D の描画）だけにかける。HUD・パネルの下になる
+        else (wrap || document.body).appendChild(el);
+        requestAnimationFrame(() => { el.style.opacity = '1'; });
+        setTimeout(() => { el.style.transition = `opacity ${duration * 0.6}s ease-in`; el.style.opacity = '0'; }, duration * 400);
+        setTimeout(() => el.remove(), duration * 1100);
+    }
+
+    // ---- ピュリフィケーション: 画面全体が青く透けて、白い光の粒が、たくさん、のぼる。青白い輪が、2 回広がる ----
     purify(x, z, radius) {
+        this.screenTint();
         const group = new THREE.Group();
         group.position.set(x, 0, z);
-        const rings = [0, 1].map(() => this.ringMesh(group, 0xfff1b8, 0.6, 0.85));
+        const rings = [0, 1].map((i) => this.ringMesh(group, i ? 0xffffff : 0xa8d4ff, 0.6, 0.85));
         const dotGeo = new THREE.SphereGeometry(0.09, 6, 6);
-        const dotMat = new THREE.MeshBasicMaterial({ color: 0xfffbe0, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false });
+        const dotMat = new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0.95, blending: THREE.AdditiveBlending, depthWrite: false });
         const dots = [];
-        for (let i = 0; i < 30; i++) {
-            const m = new THREE.Mesh(dotGeo, dotMat), a = rnd(0, Math.PI * 2), d = Math.sqrt(Math.random()) * radius;
+        for (let i = 0; i < 130; i++) {   // 白い粒を増やす。範囲の外にも、ひろく散らす
+            const m = new THREE.Mesh(dotGeo, dotMat), a = rnd(0, Math.PI * 2), d = Math.sqrt(Math.random()) * radius * 1.7;
             m.position.set(Math.cos(a) * d, 0, Math.sin(a) * d);
-            group.add(m); dots.push({ m, sp: rnd(1.5, 3.2), d0: rnd(0, 0.5) });
+            m.scale.setScalar(rnd(0.6, 2.2));
+            group.add(m); dots.push({ m, sp: rnd(1.2, 3.6), d0: rnd(0, 0.6) });
         }
-        this.add(group, 1.2, (q) => {
+        this.particles?.spawnBurst(x, 1.0, z, 0xffffff, 40, 3);
+        this.add(group, 1.4, (q) => {
             rings.forEach((r, i) => { const p = Math.max(0, Math.min(1, (q - i * 0.25) / 0.6)); r.mesh.scale.setScalar(0.2 + ease(p) * (radius / 0.85)); r.mat.opacity = 0.9 * (1 - p); });
             dotMat.opacity = 0.95 * (q > 0.7 ? 1 - (q - 0.7) / 0.3 : 1);
-            for (const d of dots) d.m.position.y = Math.max(0, (q - d.d0 * 0.4) * d.sp * 1.4);
+            for (const d of dots) d.m.position.y = Math.max(0, (q - d.d0 * 0.4) * d.sp * 1.6);
         }, [...rings.map((r) => r.geo), dotGeo], [...rings.map((r) => r.mat), dotMat]);
     }
 }

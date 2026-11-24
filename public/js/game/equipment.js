@@ -136,17 +136,32 @@ export const equipmentMethods = {
         return true;
     },
 
+    // 魔法の演出のテスト（MP・クールダウンを使わず、ダメージも与えない。弾は、威力 0 で飛ぶ）
+    testSpellEffect(id) {
+        const it = this.items[id];
+        if (!it || it.kind !== 'spell') return false;
+        if (it.type === 'strike') this.castStrike(it, 0, true);
+        else if (it.type === 'burst') this.castBurst(it, 0, true);
+        else if (it.type === 'fireball' || it.type === 'spread') this.shootProjectiles(it, 0);
+        else return false;
+        return true;
+    },
+
     updateEffectTestHud() {
         const el = jhtml.$('effectTestHud');
         if (!el) return;
         const classes = Object.entries(this.weaponClasses).filter(([, c]) => c.attack === 'melee');
+        const spells = Object.values(this.items).filter((i) => i.kind === 'spell' && ['fireball', 'spread', 'strike', 'burst'].includes(i.type));
         el.innerHTML = jhtml.html`<select id="effectTestStrength"><option value="normal">通常</option><option value="crit">会心</option><option value="kill">会心＋撃破</option></select>`
-            + classes.map(([id, c]) => jhtml.html`<button class="test-btn" data-class="${id}">${c.name}</button>`).join('');
+            + classes.map(([id, c]) => jhtml.html`<button class="test-btn" data-class="${id}">${c.name}</button>`).join('')
+            + '<div style="margin-top:4px;width:100%"></div>'
+            + spells.map((s) => jhtml.html`<button class="test-btn" data-spell="${s.id}">${s.name}</button>`).join('');
     },
 
     // エフェクトテストの操作（コンストラクタから一度だけ呼ぶ）
     initEffectTestEvents() {
         jhtml.on('effectTestHud', 'click', '.test-btn', (e, el) => {
+            if (el.dataset.spell) { this.testSpellEffect(el.dataset.spell); el.blur(); return; }
             const strength = jhtml.$('effectTestStrength')?.value || 'normal';
             this.testWeaponEffect(el.dataset.class, strength);
             el.blur(); // ゲームのキー操作をボタンが奪わないようにする

@@ -161,7 +161,7 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
                 assert.ok(it.cooldown > 0 && it.weight >= 1 && it.weight <= 50 && (it.dice?.n >= 1 || it.type === 'support') && it.costType, `${id}: 呪文の項目（重さ・ダイスは magic.json）`);
                 if (it.type !== 'strike' && it.type !== 'burst') {
                     const v = it.visual;
-                    assert.ok(['orb', 'crystal', 'bolt', 'blade'].includes(v?.shape) && v.size > 0, `${id}: visual`);
+                    assert.ok(['orb', 'crystal', 'bolt', 'blade', 'arcs'].includes(v?.shape) && v.size > 0, `${id}: visual`);
                     for (const k of ['core', 'aura', 'trail', 'muzzle', 'hit']) assert.match(v[k] ?? '', /^#[0-9a-f]{6}$/i, `${id}: visual.${k}`);
                     assert.ok(['fire', 'ice', 'bolt'].includes(it.sound), `${id}: sound`);
                 }
@@ -172,8 +172,8 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
                     else assert.fail(`${id}: 未知の状態異常 ${it.status.type}`);
                 }
                 if (it.pierce !== undefined) assert.ok(Number.isInteger(it.pierce) && it.pierce >= 1, `${id}: pierce`);
-                if (it.type === 'strike') assert.ok(it.blastRadius > 0 && it.targetDistance > 0 && it.warnTime >= 0 && it.pillarTime > 0 && ['fire', 'meteor', 'lightning', 'holy'].includes(it.style ?? 'fire'), `${id}: 落下系の項目`);
-                else if (it.type === 'burst') assert.ok(it.blastRadius > 0 && ['ice_storm', 'air_storm', 'quake', 'purify'].includes(it.style) && ['fire', 'ice', 'bolt'].includes(it.sound), `${id}: 周囲系の項目`);
+                if (it.type === 'strike') assert.ok(it.blastRadius > 0 && it.targetDistance > 0 && it.warnTime >= 0 && it.pillarTime > 0 && ['fire', 'meteor', 'lightning', 'holy', 'ice_storm', 'air_storm'].includes(it.style ?? 'fire'), `${id}: 落下系の項目`);
+                else if (it.type === 'burst') assert.ok(it.blastRadius > 0 && ['quake', 'purify'].includes(it.style) && ['fire', 'ice', 'bolt'].includes(it.sound), `${id}: 周囲系の項目`);
                 else assert.ok(it.speed > 0, `${id}: speed`);
                 if (it.type === 'spread') assert.ok(it.count >= 2 && it.spreadDeg > 0);
             }

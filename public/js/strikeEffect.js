@@ -107,9 +107,9 @@ export class StrikeEffectSystem {
 
     // x, z: 着弾点 / radius: 範囲の半径 / warnTime: 予告の長さ / pillarTime: 火柱の持続 / smokeTime: 火柱が消えてからの煙の長さ（0 なら煙なし）
     // onImpact: 着弾の瞬間に呼ぶ（ダメージ・効果音など）
-    schedule(x, z, { radius = 3, warnTime = 0.3, pillarTime = 0.8, smokeTime = 0, onImpact = null, style = 'fire', fx = null } = {}) {
+    schedule(x, z, { radius = 3, warnTime = 0.3, pillarTime = 0.8, smokeTime = 0, onImpact = null, style = 'fire', fx = null, pillarScale = 1 } = {}) {   // pillarScale: 火柱・衝撃波の見た目の倍率（当たり判定の radius は変えない）
         // style が fire 以外（lightning・meteor・holy）は、画像の火柱の代わりに、fx（SpellEffectSystem。spellEffect.js）が、コードで描く。落下（メテオ）は、予告の間に出す
-        const warnColors = { lightning: 0x60a5fa, meteor: 0xff3300, holy: 0xffe27a };
+        const warnColors = { lightning: 0x60a5fa, meteor: 0xff3300, holy: 0xffe27a, ice_storm: 0x7dd3fc, air_storm: 0x86efac };
         if (fx && style !== 'fire') fx.playFall?.(style, x, z, warnTime);
         const warn = new THREE.Group();
         warn.position.set(x, 0.06, z);
@@ -123,7 +123,7 @@ export class StrikeEffectSystem {
         this.scene.add(warn);
 
         this.strikes.push({
-            x, z, radius, warnTime, pillarTime, smokeTime, onImpact, style, fx,
+            x, z, radius, warnTime, pillarTime, smokeTime, onImpact, style, fx, pillarScale,
             t: 0, impacted: false, puffs: null,
             warn, warnMat, fillMat, geometries: [ringGeo, fillGeo],
             pillar: null
@@ -139,8 +139,9 @@ export class StrikeEffectSystem {
         if (s.onImpact) s.onImpact();
         if (s.fx && s.style !== 'fire') { s.fx.play(s.style, s.x, s.z, { radius: s.radius }); return; }   // 火柱は作らない（pillar は null のまま）
 
-        const height = this.ceilingHeight != null ? Math.min(5, this.ceilingHeight - CEILING_MARGIN) : 5;
-        const width = s.radius * 1.1;
+        const baseH = 5 * s.pillarScale;
+        const height = this.ceilingHeight != null ? Math.min(baseH, this.ceilingHeight - CEILING_MARGIN) : baseH;
+        const width = s.radius * 1.1 * s.pillarScale;
         const pillar = new THREE.Group();
         pillar.position.set(s.x, 0, s.z);
 
@@ -195,7 +196,7 @@ export class StrikeEffectSystem {
             if (pl) {
                 pl.group.scale.y = Math.min(1, q / 0.25) || 0.01;
                 pl.mat.uniforms.uOpacity.value = q > 0.7 ? Math.max(0, 1 - (q - 0.7) / 0.3) : 0.85 + 0.15 * Math.sin(s.t * 50);
-                pl.ring.scale.setScalar(1 + q * (s.radius / 0.9) * 1.5);
+                pl.ring.scale.setScalar(1 + q * (s.radius / 0.9) * 1.5 * s.pillarScale);
                 pl.ringMat.opacity = 0.9 * (1 - q);
 
                 if (q >= 1) {

@@ -134,6 +134,20 @@ export class Projectile {
             if (v.shape === 'crystal') {
                 coreGeo = new THREE.OctahedronGeometry(0.22);
                 auraGeo = new THREE.OctahedronGeometry(0.34);
+            } else if (v.shape === 'arcs') {   // 風の刃の連なり「((((」: 進む向きにふくらんだ、平たい弧が、後ろへ重なる（ドルアーガの魔法使いの魔法のような見た目）
+                const arcMat = new THREE.MeshBasicMaterial({ color: hex(v.core, '#ffffff') });
+                for (let i = 0; i < 4; i++) {
+                    const arc = Math.PI * 0.62, geo = new THREE.TorusGeometry(0.6 - i * 0.07, 0.035 + (3 - i) * 0.01, 6, 20, arc);
+                    geo.rotateZ(Math.PI / 2 - arc / 2);   // 弧の真ん中が、進む向き（-Z）になる
+                    geo.rotateX(-Math.PI / 2);            // 寝かせる（地面と平行）
+                    const m = new THREE.Mesh(geo, i === 0 ? arcMat : new THREE.MeshBasicMaterial({ color: hex(v.aura, '#86efac'), transparent: true, opacity: 0.85 - i * 0.18 }));
+                    m.position.z = i * 0.42;
+                    this.mesh.add(m);
+                }
+                this.mesh.rotation.y = Math.atan2(-this.dirX, -this.dirZ);
+                this.noSpin = true;
+                if (v.size) this.mesh.scale.setScalar(v.size);
+                return;
             } else if (v.shape === 'blade') {   // 風の刃: 進む向きに長い、薄く立った板
                 coreGeo = new THREE.BoxGeometry(0.04, 0.5, 0.9);
                 auraGeo = new THREE.BoxGeometry(0.1, 0.7, 1.15);

@@ -162,7 +162,7 @@ export const combatMethods = {
     },
 
     // 落下系の魔法（ファイアーボム）: 前方 targetDistance の地面を狙い（手前に壁があればその直前）、予告の輪 → 着弾の範囲ダメージ → 火柱
-    castStrike(spell, power) {
+    castStrike(spell, power, test = false) {   // test: 演出だけ（ダメージなし。エフェクトテスト用）
         const dirX = -Math.sin(this.player.angle);
         const dirZ = -Math.cos(this.player.angle);
 
@@ -185,19 +185,21 @@ export const combatMethods = {
             radius: spell.blastRadius,
             style: spell.style ?? 'fire',
             fx: this.spellEffects,
+            pillarScale: spell.pillarScale ?? 1,
             warnTime: spell.warnTime,
             pillarTime: spell.pillarTime,
             smokeTime: spell.smokeTime ?? 0,
-            onImpact: () => (spell.style && spell.style !== 'fire') ? this.areaHit(tx, tz, spell, damage) : this.blastAt(tx, tz, spell.blastRadius, damage, spell.element)
+            onImpact: () => { if (spell.shake) this.shakeCamera(spell.shake.amp, spell.shake.duration, spell.shake.roll); if (test) return; if (spell.style && spell.style !== 'fire') this.areaHit(tx, tz, spell, damage); else this.blastAt(tx, tz, spell.blastRadius, damage, spell.element); }
         });
     },
 
     // 自分を中心にした範囲の魔法（アイスストーム・エアストーム・アースクエイク・ピュリフィケーション）: すぐに、まわりの敵へ当たり、演出を出す
-    castBurst(spell, power) {
+    castBurst(spell, power, test = false) {
         const p = this.player;
         this.sound.playSpellShoot(spell.sound);
         this.spellEffects.play(spell.style, p.x, p.z, { radius: spell.blastRadius });
-        this.areaHit(p.x, p.z, spell, power);
+        if (spell.shake) this.shakeCamera(spell.shake.amp, spell.shake.duration, spell.shake.roll);   // 画面を揺らす（アースクエイク）
+        if (!test) this.areaHit(p.x, p.z, spell, power);
     },
 
     // 魔法の範囲ダメージ（blastAt の、爆発の見た目と音を持たない版）: 中心から半径 blastRadius 内の敵すべてに damage。属性が効かない敵は 0。status があれば付ける
@@ -425,8 +427,9 @@ export const combatMethods = {
         this.hitStop = Math.max(this.hitStop, seconds);
     },
 
-    shakeCamera(amp = HIT_FEEDBACK.shake.amp, duration = HIT_FEEDBACK.shake.duration) {
-        this.cameraShake = { time: duration, duration, amp: Math.max(amp, this.cameraShake.time > 0 ? this.cameraShake.amp : 0) };
+    // roll: 画面の傾き（ラジアン。ぐらぐらする揺れ。アースクエイクなど）。省略は 0（従来の、上下左右の揺れだけ）
+    shakeCamera(amp = HIT_FEEDBACK.shake.amp, duration = HIT_FEEDBACK.shake.duration, roll = 0) {
+        this.cameraShake = { time: duration, duration, amp: Math.max(amp, this.cameraShake.time > 0 ? this.cameraShake.amp : 0), roll: Math.max(roll, this.cameraShake.time > 0 ? (this.cameraShake.roll ?? 0) : 0) };
     },
 
     // 突進が敵に当たったときの手応え: 打撃音・ヒットストップ・（強い一撃なら）カメラの揺れ
