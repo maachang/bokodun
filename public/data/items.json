@@ -482,10 +482,10 @@
     "element": "thunder",
     "type": "fireball",
     "cooldown": 0.45,
-    "speed": 22,
+    "speed": 36,
     "sound": "bolt",
     "visual": {
-      "shape": "bolt",
+      "shape": "lightning",
       "size": 1.2,
       "core": "#ffffff",
       "aura": "#facc15",

@@ -161,7 +161,7 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
                 assert.ok(it.cooldown > 0 && it.weight >= 1 && it.weight <= 50 && (it.dice?.n >= 1 || it.type === 'support') && it.costType, `${id}: 呪文の項目（重さ・ダイスは magic.json）`);
                 if (it.type !== 'strike' && it.type !== 'burst') {
                     const v = it.visual;
-                    assert.ok(['orb', 'crystal', 'bolt', 'blade', 'arcs'].includes(v?.shape) && v.size > 0, `${id}: visual`);
+                    assert.ok(['orb', 'crystal', 'bolt', 'blade', 'arcs', 'lightning'].includes(v?.shape) && v.size > 0, `${id}: visual`);
                     for (const k of ['core', 'aura', 'trail', 'muzzle', 'hit']) assert.match(v[k] ?? '', /^#[0-9a-f]{6}$/i, `${id}: visual.${k}`);
                     assert.ok(['fire', 'ice', 'bolt'].includes(it.sound), `${id}: sound`);
                 }
