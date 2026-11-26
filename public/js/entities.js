@@ -46,6 +46,7 @@ export class Monster {
         if (enemyDef.stealth in STEALTH_DRAW_MULT) this.stealth = enemyDef.stealth;
         if (enemyDef.deathColor) this.deathColor = new THREE.Color(enemyDef.deathColor).getHex();
         this.name = enemyDef.name || 'モンスター';
+        this.isBoss = !!enemyDef.boss;   // ボス（BGM がボス戦の曲になる）
         this.maxHp = enemyDef.stats?.hp ?? enemyDef.maxHp ?? 30;   // 敵の仕様書（enemy-spec）の新しい桁の値（stats）があれば、それを使う
         this.hp = this.maxHp;
         this.speed = enemyDef.speed ?? 1.5; // 0 を指定した場合は 0（動かない）として扱う

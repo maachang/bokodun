@@ -38,6 +38,7 @@ import { mapVisualMethods } from '/js/game/mapVisuals.js';
 import { mapNeighborMethods } from '/js/game/mapNeighbors.js';
 import { renderSupportMethods } from '/js/game/renderSupport.js';
 import { movementMethods } from '/js/game/movement.js';
+import { bgmMethods } from '/js/game/bgm.js';
 import { TREE_SHADOWS, TREE_SHADOW_OPACITY, TEST_RUN_SPEED_SCALE, CLIMB_RISE, CLIMB_SEC, CLIMB_HOLD_SEC, compassDirection, NEIGHBOR_TERRAIN_RANGE, NEIGHBOR_OBJECT_RANGE, NEIGHBOR_PLANT_RANGE, CULL_CHUNK, FOOTSTEP_STRIDE, effectPower, HIT_FEEDBACK, SHOP_PAGE_SIZE } from '/js/game/constants.js';
 import { mapLoadMethods } from '/js/game/mapLoad.js';
 import { stateInitMethods } from '/js/game/stateInit.js';
@@ -102,6 +103,8 @@ export class GameEngine {
             this.weaponClasses = await classRes.json();
             this.npcDefinitions = await npcRes.json();
             this.iconIds = new Set(Object.keys(await (await fetch('/data/icons.json')).json()).filter(k => !k.startsWith('_')));   // アイコンのあるアイテム ID（画像は /images/icons/<ID>.png）
+            this.bgmDef = await (await fetch('/data/bgm.json')).json();   // BGM の曲データ（草案）
+            this.sound.setBgmTracks(this.bgmDef);
             this.shops = await (await fetch('/data/shops.json')).json();   // 店の種類（店名・店主）。汎用の店マップが、入った店に応じて切り替える
             // 初期装備（装備スロットの中身と選択中のスロット）
             const playerDef = await playerRes.json();
@@ -181,6 +184,7 @@ export class GameEngine {
         this.resetMapState();
 
         const { env } = this.applyEnvironment(mapData, prevEnv);
+        this.bgmMapType = mapData.type;   // BGM の選曲に使う（屋外・屋内）
 
         const rows = mapData.layout.length;
         const cols = mapData.layout[0].length;
@@ -303,6 +307,7 @@ export class GameEngine {
         this.slashEffects.update(dt);
         this.strikeEffects.update(dt);
         this.spellEffects.update(dt);
+        this.updateBgm(dt);   // BGM（場面・ボスで、曲を切り替える）
 
         // Update Monsters and Ys-style "Bump Combat"
         this.updatePlayerStatus(dt);
@@ -346,4 +351,4 @@ export class GameEngine {
 }
 
 // 部品（public/js/game/*.js）のメソッドを、GameEngine に組み込む
-Object.assign(GameEngine.prototype, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, saveLoadMethods, characterMethods, gearMethods, accessoryMethods, jobMethods, inventoryMethods, trainingMethods, equipShopMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);
+Object.assign(GameEngine.prototype, bgmMethods, updateTrapMethods, updateObjectMethods, updateFlowMethods, updatePlayerMethods, mapTerrainMethods, mapVisualMethods, mapNeighborMethods, renderSupportMethods, movementMethods, equipmentMethods, saveLoadMethods, characterMethods, gearMethods, accessoryMethods, jobMethods, inventoryMethods, trainingMethods, equipShopMethods, combatMethods, hudMethods, interactMethods, travelMethods, controlsMethods, textureSetupMethods, mapLoadMethods, stateInitMethods);

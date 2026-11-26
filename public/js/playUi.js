@@ -152,7 +152,7 @@ function initBodies(S) {
         const row = (it) => html`<div class="pick cols ${used.has(it.id) ? 'dis' : ''}" style="--c:1fr 7em 12em" data-id="${it.id}" data-slot="${slotNo}"><span>${raw(iconTag(game, it.id))}${game.itemLabel(it)}</span><small>${used.has(it.id) ? '入っています' : ''}</small><small>${kindLabel(game, it)}　${itemDetail(game, it)}</small></div>`;
         return '<p>枠 ' + (slotNo + 1) + ' に入れる武器・魔法</p><div class="title">武器・杖</div>' + all.filter(it => !game.isMagicItem(it)).map(row).join('') + '<div class="title" style="margin-top:8px">魔法・弓</div>' + all.filter(it => game.isMagicItem(it)).map(row).join('');
     };
-    const settingBody = () => '<p class="legend">ショートカットキーの割り当て（「変更」を押して、割り当てたいキーを押す。1〜9 と Esc は使えません）</p>' + MENU.map(([id, name]) => html`<div class="cols" style="--c:110px 3em 9em;margin-bottom:4px"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd><button data-keyset="${id}">変更</button></div>`).join('') + '<div class="cols" style="--c:110px 200px;margin-top:10px"><span>音量</span><input type="range" min="0" max="100" value="60"></div>'
+    const settingBody = () => '<p class="legend">ショートカットキーの割り当て（「変更」を押して、割り当てたいキーを押す。1〜9 と Esc は使えません）</p>' + MENU.map(([id, name]) => html`<div class="cols" style="--c:110px 3em 9em;margin-bottom:4px"><span>${name}</span><kbd>${keymap[id].toUpperCase()}</kbd><button data-keyset="${id}">変更</button></div>`).join('') + '<div class="cols" style="--c:110px 200px;margin-top:10px"><span>BGM の音量</span><input type="range" min="0" max="100" value="' + Math.round((game.sound.bgmVolume ?? 0.6) * 100) + '" data-bgmvol></div>'
         + html`<div class="cols" style="--c:110px auto;margin-top:10px"><span>メッセージ文字</span><span>${jhtml.raw(Object.entries(MSG_SIZES).map(([k, v]) => html`<button data-msg="${k}" class="${prefs.msg === k ? 'on' : ''}">${v[0]}</button>`).join(' '))}</span></div>`;
     const statusBody = () => {
         const p = game.player, j = p.jobs, ab = p.abilities, r = game.rules;
@@ -196,6 +196,7 @@ function initBodies(S) {
     });
     on(E.winBody, 'click', '[data-add]', (e, t) => { S.setBody('<h3>ストック</h3>' + pickBody(Number(t.dataset.add))); S.setBack(() => S.openWin('stock')); });
     on(E.winBody, 'click', '.pick[data-slot]:not(.dis)', (e, t) => { game.setStockSlot(Number(t.dataset.slot), t.dataset.id); S.openWin('stock'); });
+    on(E.winBody, 'input', '[data-bgmvol]', (e, t) => game.sound.setBgmVolume(Number(t.value) / 100));   // BGM の音量（ブラウザに保存される）
     on(E.winBody, 'click', '[data-keyset]', (e, t) => { S.keyCapture = t.dataset.keyset; t.textContent = 'キーを押してください'; });
     on(E.winBody, 'click', '.pick[data-gk]:not(.dis)', (e, t) => { S.setBody('<h3>装備</h3>' + gearPickBody(t.dataset.gk)); S.setBack(() => S.openWin('equip')); });
     on(E.winBody, 'click', '.pick[data-gset]:not(.dis)', (e, t) => { if (t.dataset.gset === 'accessory') game.equipAccessory(t.dataset.gid || null); else game.equipGear(t.dataset.gset, t.dataset.gid || null); S.openWin('equip'); });
