@@ -140,12 +140,12 @@ export const equipmentMethods = {
     // 魔法の演出のテスト（MP・クールダウンを使わず、ダメージも与えない。弾は、威力 0 で飛ぶ）
     testSpellEffect(id) {
         const fx = PENDING_SPELL_FX[id];   // 未実装（効果が未決）の魔法は、見た目だけ
-        if (fx) { this.spellEffects.selfCast(fx.style, this.player.x, this.player.z, fx); return true; }
+        if (fx) { this.spellEffects.selfCast(fx.style, this.player.x, this.player.z, fx); this.sound.playSelfSpell?.(fx.sound); return true; }
         const it = this.items[id];
         if (!it || it.kind !== 'spell') return false;
         if (it.type === 'strike') this.castStrike(it, 0, true);
         else if (it.type === 'burst') this.castBurst(it, 0, true);
-        else if (it.type === 'heal' || it.type === 'support') this.spellEffects.selfCast(it.style, this.player.x, this.player.z, { color: it.color, scale: it.scale ?? 1, speed: it.speed ?? 1 });
+        else if (it.type === 'heal' || it.type === 'support') { this.spellEffects.selfCast(it.style, this.player.x, this.player.z, { color: it.color, scale: it.scale ?? 1, speed: it.speed ?? 1 }); this.sound.playSelfSpell?.(it.sound); }
         else if (it.type === 'fireball' || it.type === 'spread') this.shootProjectiles(it, 0);
         else return false;
         return true;

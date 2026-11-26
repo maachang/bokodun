@@ -189,7 +189,7 @@ export const combatMethods = {
             warnTime: spell.warnTime,
             pillarTime: spell.pillarTime,
             smokeTime: spell.smokeTime ?? 0,
-            onImpact: () => { if (spell.shake) this.shakeCamera(spell.shake.amp, spell.shake.duration, spell.shake.roll); if (test) return; if (spell.style && spell.style !== 'fire') this.areaHit(tx, tz, spell, damage); else this.blastAt(tx, tz, spell.blastRadius, damage, spell.element); }
+            onImpact: () => { if (spell.shake) { this.shakeCamera(spell.shake.amp, spell.shake.duration, spell.shake.roll); this.sound.playRumble?.(spell.shake.duration); } if (test) return; if (spell.style && spell.style !== 'fire') this.areaHit(tx, tz, spell, damage); else this.blastAt(tx, tz, spell.blastRadius, damage, spell.element); }
         });
     },
 
@@ -198,7 +198,7 @@ export const combatMethods = {
         const p = this.player;
         this.sound.playSpellShoot(spell.sound);
         this.spellEffects.play(spell.style, p.x, p.z, { radius: spell.blastRadius });
-        if (spell.shake) this.shakeCamera(spell.shake.amp, spell.shake.duration, spell.shake.roll);   // 画面を揺らす（アースクエイク）
+        if (spell.shake) { this.shakeCamera(spell.shake.amp, spell.shake.duration, spell.shake.roll); this.sound.playRumble?.(spell.shake.duration); }   // 画面を揺らす（アースクエイク）。地鳴りも鳴らす
         if (!test) this.areaHit(p.x, p.z, spell, power);
     },
 

@@ -132,7 +132,7 @@ export const characterMethods = {
         }
         if (spell.style && this.spellEffects) this.spellEffects.selfCast(spell.style, p.x, p.z, { color: spell.color, scale: spell.scale ?? 1, speed: spell.speed ?? 1 });   // コードで描く演出（selfSpellEffect.js）
         else this.particles.spawnBurst(p.x, 1.0, p.z, parseInt(spell.color.slice(1), 16), 14, 3.0);
-        this.sound.playHeal?.();
+        if (this.sound.playSelfSpell) this.sound.playSelfSpell(spell.sound); else this.sound.playHeal?.();   // 魔法ごとの音（audioSpellFx.js）
     },
 
     // デバッグ・テスト用: 使える魔法を、全部覚えている状態にする

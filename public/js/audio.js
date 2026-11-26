@@ -2,6 +2,7 @@ import * as THREE from '/js/three.module.js';
 import { playerSounds } from '/js/audio/audioPlayer.js';
 import { magicSounds } from '/js/audio/audioMagic.js';
 import { trapSounds } from '/js/audio/audioTraps.js';
+import { spellFxSounds } from '/js/audio/audioSpellFx.js';
 
 export class SoundFX {
     constructor() {
@@ -18,4 +19,4 @@ export class SoundFX {
 }
 
 // 部品（public/js/audio/*.js）のメソッドを、SoundFX に組み込む
-Object.assign(SoundFX.prototype, playerSounds, magicSounds, trapSounds);
+Object.assign(SoundFX.prototype, playerSounds, magicSounds, trapSounds, spellFxSounds);

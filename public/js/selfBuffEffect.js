@@ -186,6 +186,6 @@ export function playBuff(sys, style, x, z, { color = '#ffffff', scale = 1 } = {}
 
 // 効果の処理が未決（magic.json で usable:false）の魔法の演出。エフェクトテスト用（ゲームの魔法としては使わない）。色・大きさは仮
 export const PENDING_SPELL_FX = {   // 宝箱のセキュリティ装置が未実装で、まだ使えない魔法（magic.json で usable:false）の演出。エフェクトテスト用。ほかの魔法の見た目は、items.json（style・color・speed・scale）
-    unlock: { name: 'アンロック', style: 'unlock', color: '#facc15', scale: 1, speed: 1 },
-    trap: { name: 'トラップ', style: 'trap', color: '#94a3b8', scale: 1, speed: 1 },
+    unlock: { name: 'アンロック', style: 'unlock', color: '#facc15', scale: 1, speed: 1, sound: 'unlock' },
+    trap: { name: 'トラップ', style: 'trap', color: '#94a3b8', scale: 1, speed: 1, sound: 'trap' },
 };
