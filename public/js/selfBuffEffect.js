@@ -5,7 +5,7 @@ import { auraCast } from '/js/selfAuraEffect.js';
  * 自分に使う魔法のうち、補助・解除・道具系の演出（画像なし。コードで描く。草案・見た目は仮）。
  *   playBuff(sys, style, x, z, { color, scale })
  * style: buff（上向きの矢印が昇る=攻撃力アップ）/ guard（盾の板が体のまわりを回る=防御アップ）/ haste（風の筋が回る=移動速度アップ）
- *        cleanse（紫の毒の粒が抜けて、白く昇る=毒の回復）/ unlock（金の錠前が光って開く）/ trap（赤い罠の紋様が回って消える）
+ *        cleanse（紫の毒の粒が抜けて、白く昇る=毒の回復）/ unlock（金の鍵が複数、体のまわりを回りながら昇る）/ trap（赤い罠の紋様が回って消える）
  *        float（白い光が足元を持ち上げる=フライ）
  */
 const rnd = (a, b) => a + Math.random() * (b - a);
@@ -105,26 +105,54 @@ function cleanse(sys, x, z, c, s) {   // 紫の毒の粒が、体から外へ抜
     });
 }
 
-function unlock(sys, x, z, c, s) {   // 金の輪（錠）が足元で縮み、閃光とともに開いて光が散る
-    frame(sys, x, z, c, 1.4, (g, geos, mats) => {
-        const rg = new THREE.TorusGeometry(0.5 * s, 0.05, 6, 24, Math.PI * 1.7); const rm = glow(c);
-        const body = new THREE.BoxGeometry(0.7 * s, 0.5 * s, 0.12); const bm = glow(c, 0.9);
-        const sg = new THREE.OctahedronGeometry(0.07, 0); const sm = glow(0xffffff);
-        geos.push(rg, body, sg); mats.push(rm, bm, sm);
-        const shackle = new THREE.Mesh(rg, rm), box = new THREE.Mesh(body, bm);
-        shackle.position.y = 1.55 * s; box.position.y = 1.2 * s;
-        g.add(shackle, box);
-        const sparks = Array.from({ length: 16 }, () => { const m = new THREE.Mesh(sg, sm); g.add(m); return { m, a: rnd(0, 6.28), v: rnd(1.5, 3) }; });
-        return { shackle, box, sparks, s };
+let _keyTex = null;
+function keyTexture() {   // 鍵の絵（金色・黒い縁取り。大きな輪の頭・軸・歯 3 つ）を、キャンバスで 1 回だけ描く
+    if (_keyTex) return _keyTex;
+    const c = document.createElement('canvas'); c.width = c.height = 128;
+    const g = c.getContext('2d');
+    g.translate(64, 64); g.rotate(-Math.PI / 4);   // 斜めに寝かせる（右上が頭）
+    const draw = (fill, grow) => {
+        g.fillStyle = fill;
+        g.beginPath(); g.arc(-34, 0, 22 + grow, 0, Math.PI * 2); g.fill();                         // 頭（輪）
+        g.fillRect(-14, -5 - grow, 66 + grow, 10 + grow * 2);                                      // 軸
+        g.fillRect(30 - grow, 4, 9 + grow * 2, 18 + grow); g.fillRect(44 - grow, 4, 9 + grow * 2, 24 + grow);   // 歯（長さが違う）
+        g.fillRect(16 - grow, 4, 9 + grow * 2, 13 + grow);
+    };
+    draw('#3a2a05', 4); draw('#ffffff', 0);
+    g.globalCompositeOperation = 'destination-out';
+    g.beginPath(); g.arc(-34, 0, 10, 0, Math.PI * 2); g.fill();                                    // 頭の穴
+    _keyTex = new THREE.CanvasTexture(c);
+    return _keyTex;
+}
+
+function unlock(sys, x, z, c, s) {   // 金の鍵が複数、体のまわりを回りながら昇り、終わり際に火花を散らして消える（鍵は、常にこちらを向く絵）
+    frame(sys, x, z, c, 2.2, (g, geos, mats) => {
+        const sg = new THREE.OctahedronGeometry(0.06 * s, 0);
+        const sm = glow(0xffffff);
+        geos.push(sg); mats.push(sm);
+        const keyMats = [];
+        const keys = Array.from({ length: 6 }, (_, i) => {
+            const m = new THREE.SpriteMaterial({ map: keyTexture(), color: c, transparent: true, depthWrite: false, depthTest: false });
+            const sp = new THREE.Sprite(m); g.add(sp); mats.push(m); keyMats.push(m);
+            return { sp, a: (i / 6) * Math.PI * 2, r: (0.95 + (i % 2) * 0.3) * s, delay: i * 0.08, y0: 0.5 + (i % 3) * 0.35 };
+        });
+        const sparks = Array.from({ length: 18 }, () => { const m = new THREE.Mesh(sg, sm); g.add(m); return { m, a: rnd(0, 6.28), v: rnd(1.2, 2.6), y: rnd(0.6, 1.8) * s }; });
+        return { keys, sparks, keyMats, s };
     }, (q, t, ps) => {
-        const open = ease(clamp01((t - 0.5) / 0.3));
-        ps.shackle.position.y = (1.55 + open * 0.25) * ps.s;
-        ps.shackle.rotation.z = open * 0.9;
-        ps.box.material.opacity = 0.9 * (1 - clamp01((q - 0.7) / 0.3));
-        for (const p of ps.sparks) {
-            const k = clamp01((t - 0.55) / 0.8);
+        const fade = 1 - clamp01((q - 0.65) / 0.35);
+        for (const p of ps.keys) {
+            const k = clamp01((t - p.delay) / 0.7);
+            p.sp.visible = k > 0 && fade > 0;
+            const a = p.a + t * 1.3;                       // ゆっくり回る
+            p.sp.position.set(Math.cos(a) * p.r, p.y0 + k * 0.9, Math.sin(a) * p.r);
+            p.sp.material.rotation = Math.sin(t * 3 + p.a) * 0.2;
+            p.sp.scale.setScalar(0.9 * ps.s * ease(clamp01(k * 3)));
+        }
+        for (const m of ps.keyMats) m.opacity = fade;
+        for (const p of ps.sparks) {   // 終わり際に、火花が外へ散る
+            const k = clamp01((t - 1.0) / 0.6);
             p.m.visible = k > 0 && k < 1;
-            p.m.position.set(Math.cos(p.a) * k * p.v, 1.3 * ps.s + Math.sin(p.a * 3) * k, Math.sin(p.a) * k * p.v);
+            p.m.position.set(Math.cos(p.a) * k * p.v, p.y + k * 0.4, Math.sin(p.a) * k * p.v);
         }
     });
 }
@@ -185,7 +213,7 @@ export const PENDING_SPELL_FX = {   // 色は magic.json の fx.color（2026-11-
     enchant: { name: 'エンチャント', style: 'enchant', color: '#ef4444', scale: 1, speed: 2 },
     protection: { name: 'プロテクション', style: 'protect', color: '#3b82f6', scale: 1, speed: 2 },
     speedy: { name: 'スピーディー', style: 'haste', color: '#22d3ee', scale: 1, speed: 2 },
-    unlock: { name: 'アンロック', style: 'unlock', color: '#facc15', scale: 1, speed: 2 },
+    unlock: { name: 'アンロック', style: 'unlock', color: '#facc15', scale: 1, speed: 1 },
     trap: { name: 'トラップ', style: 'trap', color: '#ef4444', scale: 1, speed: 2 },
     fly: { name: 'フライ', style: 'float', color: '#bae6fd', scale: 1, speed: 2 },
 };
