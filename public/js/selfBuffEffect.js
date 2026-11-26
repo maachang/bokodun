@@ -141,27 +141,34 @@ function trapTexture() {   // 解除された罠（口を開けて平らに広�
 }
 
 let _featherTex = null;
-function featherTexture() {   // 大きな鳥の羽（白〜淡い青・細い軸・羽枝の筋・先に切れ込み）を、キャンバスで 1 回だけ描く。斜めに寝かせる
+function featherTexture() {   // 大きな鳥の羽（白。軸のゆるい曲線・先の丸い幅広の羽の面・縁の階段状の切れ込み・軸の隙間）を、キャンバスで 1 回だけ描く
     if (_featherTex) return _featherTex;
     const c = document.createElement('canvas'); c.width = c.height = 128;
     const g = c.getContext('2d');
-    g.translate(64, 64); g.rotate(-Math.PI / 4);
-    const vane = () => {   // 羽の面（先が細くとがった、ゆるやかな葉の形）
-        g.beginPath(); g.moveTo(-50, 2);
-        g.bezierCurveTo(-34, -30, 24, -30, 56, -4);
-        g.lineTo(46, 2); g.lineTo(56, 6);                                   // 先の切れ込み
-        g.bezierCurveTo(24, 26, -34, 28, -50, 2); g.closePath();
+    const P = [[10, 120], [24, 70], [56, 34], [114, 10]];                 // 軸の曲線（根元は左下、先は右上）
+    const at = (t) => { const u = 1 - t; return [u * u * u * P[0][0] + 3 * u * u * t * P[1][0] + 3 * u * t * t * P[2][0] + t * t * t * P[3][0], u * u * u * P[0][1] + 3 * u * u * t * P[1][1] + 3 * u * t * t * P[2][1] + t * t * t * P[3][1]]; };
+    const edge = (side, W) => {   // side: 1=右下の広い側 / -1=左上の狭い側。縁に、階段状の切れ込み（のこぎり刃）
+        const pts = [];
+        for (let i = 0; i <= 60; i++) {
+            const t = i / 60, u = Math.max(0, (t - 0.12) / 0.88);
+            let w = W * Math.pow(Math.sin(u * Math.PI / 2), 0.75);
+            const e = Math.max(0, (u - 0.9) / 0.1); w *= Math.sqrt(Math.max(0, 1 - e * e));            // 先は丸く
+            w *= 1 - 0.32 * ((t * (side > 0 ? 3.4 : 2.6)) % 1) * (u > 0.2 && u < 0.88 ? 1 : 0);          // 切れ込み
+            const [x0, y0] = at(Math.max(0, t - 0.01)), [x1, y1] = at(Math.min(1, t + 0.01));
+            let nx = -(y1 - y0), ny = x1 - x0; const l = Math.hypot(nx, ny) || 1; nx /= l; ny /= l;
+            const [x, y] = at(t); pts.push([x + nx * w * side * -1, y + ny * w * side * -1]);
+        }
+        return pts;
     };
-    const grad = g.createLinearGradient(-50, -20, 56, 20);
-    grad.addColorStop(0, '#ffffff'); grad.addColorStop(0.6, '#eaf6ff'); grad.addColorStop(1, '#b6dcf5');
-    g.lineJoin = 'round'; g.lineWidth = 6; g.strokeStyle = '#6f95b8'; vane(); g.stroke();   // 縁取り
-    g.fillStyle = grad; vane(); g.fill();
-    g.save(); vane(); g.clip();                                                // 羽枝の筋（軸から斜め前へ）
-    g.strokeStyle = 'rgba(111,149,184,0.55)'; g.lineWidth = 1.6;
-    for (let x = -44; x < 48; x += 6) { g.beginPath(); g.moveTo(x, 0); g.lineTo(x + 18, -28); g.moveTo(x, 0); g.lineTo(x + 18, 28); g.stroke(); }
-    g.restore();
-    g.strokeStyle = '#6f95b8'; g.lineWidth = 3; g.lineCap = 'round';           // 軸（根元が長く出る）
-    g.beginPath(); g.moveTo(-62, 4); g.lineTo(54, 0); g.stroke();
+    const right = edge(1, 27), left = edge(-1, 15);
+    const shape = () => { g.beginPath(); g.moveTo(...left[0]); for (const q of left) g.lineTo(...q); for (const q of right.slice().reverse()) g.lineTo(...q); g.closePath(); };
+    g.lineJoin = 'round'; g.lineCap = 'round';
+    g.lineWidth = 5; g.strokeStyle = '#6f8aa3'; shape(); g.stroke();                  // 縁取り（白でも見えるように）
+    const gr = g.createLinearGradient(10, 120, 114, 10); gr.addColorStop(0, '#e8eef5'); gr.addColorStop(0.5, '#ffffff'); gr.addColorStop(1, '#f4f8fc');
+    g.fillStyle = gr; shape(); g.fill();
+    g.strokeStyle = '#6f8aa3'; g.lineWidth = 2.6; g.beginPath();                         // 軸（面の中を通る隙間の線。根元は長く出る）
+    for (let i = 0; i <= 50; i++) { const [x, y] = at(i / 50 * 0.92); if (i) g.lineTo(x, y); else g.moveTo(x, y); }
+    g.stroke();
     _featherTex = new THREE.CanvasTexture(c);
     return _featherTex;
 }
@@ -187,5 +194,5 @@ export const PENDING_SPELL_FX = {   // 色は magic.json の fx.color（2026-11-
     speedy: { name: 'スピーディー', style: 'speedUp', color: '#38bdf8', scale: 1, speed: 1 },
     unlock: { name: 'アンロック', style: 'unlock', color: '#facc15', scale: 1, speed: 1 },
     trap: { name: 'トラップ', style: 'trap', color: '#94a3b8', scale: 1, speed: 1 },
-    fly: { name: 'フライ', style: 'float', color: '#bae6fd', scale: 1, speed: 1 },
+    fly: { name: 'フライ', style: 'float', color: '#ffffff', scale: 1, speed: 1 },
 };
