@@ -192,7 +192,7 @@ export const interactMethods = {
                 .map(g => g.equipId
                     ? { icon: g.equipId, label: `${this.equipDefOf(g.equipId).def.name}　重さ ${this.equipDefOf(g.equipId).range[0]}〜${this.equipDefOf(g.equipId).range[1]}${this.isOwned(g.equipId) ? '（持っている）' : ''}`, act: () => { m.screen = 'weight'; m.good = g; m.weight = this.defaultBuyWeight(g.equipId); m.index = 0; m.note = ''; } }   // 武器・防具は、重さを選んで買う（equipShop.js）
                     : g.spellId
-                    ? { icon: g.spellId, label: `${g.name}　${g.price}G${this.isSpellLearned(g.spellId) ? '（覚えた）' : ''}`, act: () => { m.note = this.buySpell(g).message; } }   // 魔法は、買って覚える
+                    ? { icon: g.spellId, label: `${g.name}　${g.price}G${this.isSpellLearned(g.spellId) ? '（覚えた）' : this.spellBuyBlock(g, shop) ? `（${shop.groupNames?.[g.requires.group] ?? '特定'}の職業のみ）` : ''}`, act: () => { m.note = this.buySpell(g, shop).message; } }   // 魔法は、買って覚える
                     : g.itemId
                         ? { icon: g.itemId, label: `${g.name}　${g.price}G（所持 ${this.itemCount(g.itemId)}）`, act: () => { m.note = this.buyItem(g).message; } }   // 道具は、買って持ち物に入れる
                         : { label: `${g.name}　${g.price}G`, act: () => { m.note = `（ダミー）${g.name}の購入は準備中です`; } });

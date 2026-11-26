@@ -132,21 +132,41 @@ export class SpellEffectSystem {
         }, [core.geometry, shell.geometry], [core.material, shell.material]);
     }
 
-    // メテオの着弾: 大きな衝撃波の輪・砂煙の輪・飛び散る岩（粒）。火の玉が立ちのぼる
+    // メテオの着弾: 大きな衝撃波の輪・砂煙の輪・飛び散る岩（粒）。火の玉が立ちのぼる。
+    //   そのあと、地震のように続く（2 秒）: 地面にひびが走り、余震の輪が 2 回広がり、砂ぼこりが舞い上がり続ける（画面の揺れは、items.json の shake）
     meteorImpact(x, z, radius) {
         const group = new THREE.Group();
         group.position.set(x, 0, z);
         const r1 = this.ringMesh(group, 0xffb347, 0.5, 0.9), r2 = this.ringMesh(group, 0xff4d00, 0.3, 0.6, 0.1);
+        const after = [0, 1].map(() => this.ringMesh(group, 0xc9a26b, 0.6, 1.0, 0.07));   // 余震の輪（茶色）
         const ballGeo = new THREE.SphereGeometry(1, 16, 12);
         const ballMat = new THREE.MeshBasicMaterial({ color: 0xff7a1a, transparent: true, opacity: 0.85, blending: THREE.AdditiveBlending, depthWrite: false });
         const ball = new THREE.Mesh(ballGeo, ballMat); group.add(ball);
+        const crackMat = new THREE.LineBasicMaterial({ color: 0x2b1b0e, transparent: true, opacity: 1 });
+        const crackGeos = [];
+        const cracks = this.makeCracks(group, radius * 1.1, crackMat, crackGeos, 14);
         this.particles?.spawnBurst(x, 0.8, z, 0xff6a00, 40, 8);
         this.particles?.spawnBurst(x, 1.2, z, 0x6b5b4a, 30, 5);   // 飛び散る岩・砂
-        this.add(group, 1.0, (q) => {
-            r1.mesh.scale.setScalar(1 + ease(q) * (radius / 0.9) * 1.6); r1.mat.opacity = 0.9 * (1 - q);
-            r2.mesh.scale.setScalar(1 + ease(q) * (radius / 0.6) * 1.1); r2.mat.opacity = 0.8 * (1 - q);
-            ball.scale.setScalar(0.4 + ease(q) * radius * 0.7); ball.position.y = 0.4 + q * 2.5; ballMat.opacity = 0.85 * (1 - q);
-        }, [r1.geo, r2.geo, ballGeo], [r1.mat, r2.mat, ballMat]);
+        const DUR = 2.0;
+        let dust = 0;
+        this.add(group, DUR, (q, dt) => {
+            const t = q * DUR, k = Math.min(1, t);   // k: 着弾直後 1 秒の進み（火の玉・衝撃波）
+            r1.mesh.scale.setScalar(1 + ease(k) * (radius / 0.9) * 1.6); r1.mat.opacity = 0.9 * (1 - k);
+            r2.mesh.scale.setScalar(1 + ease(k) * (radius / 0.6) * 1.1); r2.mat.opacity = 0.8 * (1 - k);
+            ball.scale.setScalar(0.4 + ease(k) * radius * 0.7); ball.position.y = 0.4 + k * 2.5; ballMat.opacity = 0.85 * (1 - k);
+            // 地面のひび: 0.4 秒で走り、1.4 秒から薄れる
+            for (const c of cracks) c.scale.setScalar(Math.max(0.01, Math.min(1, t / 0.4)));
+            crackMat.opacity = t < 1.4 ? 1 : Math.max(0, 1 - (t - 1.4) / 0.6);
+            // 余震の輪: 0.3 秒・0.8 秒に、1 つずつ広がる
+            after.forEach((r, i) => {
+                const kk = Math.max(0, Math.min(1, (t - (0.3 + i * 0.5)) / 0.8));
+                r.mesh.visible = kk > 0 && kk < 1;
+                r.mesh.scale.setScalar(1 + ease(kk) * (radius / 1.0) * (1.0 + i * 0.3)); r.mat.opacity = 0.8 * (1 - kk);
+            });
+            // 砂ぼこり: 揺れている間（1.5 秒まで）、地面から舞い上がり続ける
+            dust += dt;
+            if (t > 0.2 && t < 1.5 && dust > 0.1) { dust = 0; this.particles?.spawnBurst(x + rnd(-1, 1) * radius * 0.7, 0.3, z + rnd(-1, 1) * radius * 0.7, 0xb89b72, 4, 2); }
+        }, [r1.geo, r2.geo, ...after.map((r) => r.geo), ballGeo, ...crackGeos], [r1.mat, r2.mat, ...after.map((r) => r.mat), ballMat, crackMat]);
     }
 
     // ---- ホーリー: 金白の光の柱。細い光の輪が、のぼっていく ----
@@ -255,16 +275,11 @@ export class SpellEffectSystem {
         }, geos, mats);
     }
 
-    // ---- アースクエイク: 中心から、ひび割れが放射状に走る。茶色の衝撃波と砂煙 ----
-    quake(x, z, radius) {
-        const group = new THREE.Group();
-        group.position.set(x, 0, z);
-        const ring = this.ringMesh(group, 0xc9a26b, 0.6, 1.0), ring2 = this.ringMesh(group, 0x8a6a44, 0.3, 0.6, 0.1);
-        const mat = new THREE.LineBasicMaterial({ color: 0x2b1b0e, transparent: true, opacity: 1 });
-        const geos = [];
+    // 地面のひび割れ（中心から放射状に走る折れ線）を n 本、group に足して返す（アースクエイク・メテオ共通）。最初は scale 0.01（伸ばして見せる）。geos に、後で捨てるジオメトリを足す
+    makeCracks(group, radius, mat, geos, n = 12) {
         const cracks = [];
-        for (let i = 0; i < 12; i++) {
-            const a = (i / 12) * Math.PI * 2 + rnd(-0.15, 0.15), pts = [new THREE.Vector3(0, 0.1, 0)];
+        for (let i = 0; i < n; i++) {
+            const a = (i / n) * Math.PI * 2 + rnd(-0.15, 0.15), pts = [new THREE.Vector3(0, 0.1, 0)];
             let d = 0, ang = a;
             while (d < radius) { d += rnd(0.4, 0.9); ang += rnd(-0.35, 0.35); pts.push(new THREE.Vector3(Math.cos(ang) * d, 0.1, Math.sin(ang) * d)); }
             const g = new THREE.BufferGeometry().setFromPoints(pts);
@@ -273,6 +288,17 @@ export class SpellEffectSystem {
             line.scale.setScalar(0.01);
             group.add(line); cracks.push(line);
         }
+        return cracks;
+    }
+
+    // ---- アースクエイク: 中心から、ひび割れが放射状に走る。茶色の衝撃波と砂煙 ----
+    quake(x, z, radius) {
+        const group = new THREE.Group();
+        group.position.set(x, 0, z);
+        const ring = this.ringMesh(group, 0xc9a26b, 0.6, 1.0), ring2 = this.ringMesh(group, 0x8a6a44, 0.3, 0.6, 0.1);
+        const mat = new THREE.LineBasicMaterial({ color: 0x2b1b0e, transparent: true, opacity: 1 });
+        const geos = [];
+        const cracks = this.makeCracks(group, radius, mat, geos);
         this.particles?.spawnBurst(x, 0.5, z, 0x8a6a44, 40, 6);
         this.particles?.spawnBurst(x, 1.0, z, 0xb89b72, 24, 3);   // 砂煙
         this.add(group, 1.3, (q) => {

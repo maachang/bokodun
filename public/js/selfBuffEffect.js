@@ -185,14 +185,7 @@ export function playBuff(sys, style, x, z, { color = '#ffffff', scale = 1 } = {}
 }
 
 // 効果の処理が未決（magic.json で usable:false）の魔法の演出。エフェクトテスト用（ゲームの魔法としては使わない）。色・大きさは仮
-export const PENDING_SPELL_FX = {   // 色は magic.json の fx.color（2026-11-26 草案）と同じ。長さは半分（speed: 2。2026-11-26 ユーザー「長すぎるので半分ぐらい」）。形は style（heal・refresh は selfSpellEffect.js の回復系で、色違い。ほかは上の関数）
-    cure: { name: 'キュアー', style: 'heal', color: '#f8fafc', scale: 1, speed: 2 },
-    recovery: { name: 'リカバリー', style: 'refresh', color: '#f9a8d4', scale: 1.5, speed: 2 },
-    cure_poison: { name: 'キュアーポイズン', style: 'heal', color: '#c084fc', scale: 1, speed: 2 },
-    enchant: { name: 'エンチャント', style: 'enchant', color: '#ef4444', scale: 1, speed: 2 },
-    protection: { name: 'プロテクション', style: 'protect', color: '#3b82f6', scale: 1, speed: 2 },
-    speedy: { name: 'スピーディー', style: 'speedUp', color: '#38bdf8', scale: 1, speed: 1 },
+export const PENDING_SPELL_FX = {   // 宝箱のセキュリティ装置が未実装で、まだ使えない魔法（magic.json で usable:false）の演出。エフェクトテスト用。ほかの魔法の見た目は、items.json（style・color・speed・scale）
     unlock: { name: 'アンロック', style: 'unlock', color: '#facc15', scale: 1, speed: 1 },
     trap: { name: 'トラップ', style: 'trap', color: '#94a3b8', scale: 1, speed: 1 },
-    fly: { name: 'フライ', style: 'float', color: '#ffffff', scale: 1, speed: 1 },
 };

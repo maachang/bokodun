@@ -82,7 +82,7 @@ export const accessoryMethods = {
 
     // 浮遊しているか（ブルートパーズ）。床の仕掛け・落とし穴・床ダメージ・高所からの落下・地面を打つ範囲攻撃を受けず、2 段の崖は登る動作なしで進める
     isFloating() {
-        return this.accEffectsOf('float').length > 0;
+        return this.accEffectsOf('float').length > 0 || this.player.buffs?.fly?.t > 0;   // 魔法のフライ（補助魔法の効果の残り時間）も浮遊
     },
 
     // 状態異常を無効にするか（毒・麻痺。猛毒は毒の無効では防がない）

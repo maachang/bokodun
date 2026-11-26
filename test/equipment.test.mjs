@@ -154,8 +154,8 @@ test('定義ファイル（items.json / weaponClasses.json / player.json）', as
                 if (it.type === 'heal' || it.type === 'support') {   // 自分に使う魔法: 弾の項目は要らない。粒の色と、magic.json の種類がある
                     assert.match(it.color, /^#[0-9a-f]{6}$/i, `${id}: color`);
                     assert.equal(it.magicKind, it.type, `${id}: magic.json の kind と同じ`);
-                    if (it.type === 'support') assert.ok(it.effect.duration > 0 && it.effect.rate > 0 && it.effect.rate < 1, `${id}: effect`);
-                    else assert.ok(it.dice && (it.target === undefined || it.target === 'stamina'), `${id}: 回復のダイス`);
+                    if (it.type === 'support') assert.ok(it.effect.type && it.effect.duration > 0 && (it.effect.type === 'fly' || it.effect.rate > 0), `${id}: effect（倍率は、フライだけ持たない）`);
+                    else assert.ok((it.dice || it.target === 'status') && (it.target === undefined || ['stamina', 'status'].includes(it.target)), `${id}: 回復のダイス（キュアーポイズンは、状態を治すのでダイスなし）`);
                     continue;
                 }
                 assert.ok(it.cooldown > 0 && it.weight >= 1 && it.weight <= 50 && (it.dice?.n >= 1 || it.type === 'support') && it.costType, `${id}: 呪文の項目（重さ・ダイスは magic.json）`);

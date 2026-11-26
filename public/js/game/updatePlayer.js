@@ -68,7 +68,8 @@ export const updatePlayerMethods = {
             const sin = Math.sin(this.player.angle);
             const cos = Math.cos(this.player.angle);
             const baseSpeed = (this.keys.sprint && ((this.player.debugLift || 0) > 0 || this.useStamina(this.staminaCost('dash') * dt))) ? this.player.runSpeed : this.player.speed;   // 浮いている間（デバッグ）は、走ってもスタミナを使わない
-            const moveSpeed = baseSpeed * speedMod;
+            const swift = this.player.buffs?.moveSpeedRate;   // スピーディー: 移動が速くなる
+            const moveSpeed = baseSpeed * speedMod * (swift?.t > 0 ? swift.rate : 1);
             worldMoveX = (moveDir.x * cos + moveDir.z * sin) * moveSpeed * dt;
             worldMoveZ = (-moveDir.x * sin + moveDir.z * cos) * moveSpeed * dt;
 

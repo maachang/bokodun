@@ -49,32 +49,61 @@ test('初期に覚えている魔法と、ストックに入れられる魔法',
 
 test('魔法ギルドで買う: お金が足りなければ断り、足りれば払って覚える（買い切り）', async () => {
     const g = await engine();
-    const heal = shops.magic_guild.goods.find((x) => x.spellId === 'heal');
-    assert.equal(g.buySpell(heal).ok, false);
-    assert.match(g.buySpell(heal).message, /お金が足りません/);
+    g.player.job = 'priest';   // 大神殿の魔法は、プリースト系だけが買える
+    const heal = shops.temple.goods.find((x) => x.spellId === 'heal');   // ヒール系は、大神殿で売る
+    assert.equal(g.buySpell(heal, shops.temple).ok, false);
+    assert.match(g.buySpell(heal, shops.temple).message, /お金が足りません/);
     assert.equal(g.isSpellLearned('heal'), false);
     g.player.gold = 300;
-    const r = g.buySpell(heal);
+    const r = g.buySpell(heal, shops.temple);
     assert.equal(r.ok, true);
     assert.equal(g.player.gold, 300 - heal.price);
     assert.equal(g.isSpellLearned('heal'), true);
-    assert.equal(g.buySpell(heal).ok, false, '2 回は買えない');
+    assert.equal(g.buySpell(heal, shops.temple).ok, false, '2 回は買えない');
     assert.equal(g.player.gold, 300 - heal.price, 'お金は減らない');
 });
 
-test('店のメニューで、魔法を買える。品揃えは店ごとの goods で決まり、上級は店で売らない', async () => {
+test('店のメニューで、魔法を買える。品揃えは店ごとの goods で決まり、上級は、上位の魔法使い系だけが買える', async () => {
     const g = await engine();
     const m = g.shopMenu = { shopId: 'magic_guild', screen: 'buy', page: 0, index: 0, note: '' };
     g.player.gold = 1000;
     const labels = () => g.shopMenuChoices().map((c) => c.label);
-    assert.ok(labels().some((l) => l.startsWith('ヒール')));
-    assert.ok(!labels().some((l) => l.startsWith('ファイアーボム') || l.startsWith('ハイヒール') || l.startsWith('ハイ・リフレッシュ')), '上級（tier high）は、店で売らない');
-    const i = labels().findIndex((l) => l.startsWith('ヒール'));
+    assert.ok(labels().some((l) => l.startsWith('エナジーヴェール')));
+    assert.ok(!labels().some((l) => l.startsWith('ヒール') || l.startsWith('リフレッシュ')), 'ヒール系は、魔法ギルドでは売らない（大神殿）');
+    assert.ok(!labels().some((l) => l.startsWith('ファイアーボム') || l.startsWith('ハイヒール') || l.startsWith('ハイ・リフレッシュ')), 'goods に入れていない上級は、売らない');
+    const i = labels().findIndex((l) => l.startsWith('エナジーヴェール'));
     g.shopMenuChoices()[i].act();
     assert.match(m.note, /買って、覚えました/);
-    assert.ok(labels().find((l) => l.startsWith('ヒール')).includes('（覚えた）'));
+    assert.ok(labels().find((l) => l.startsWith('エナジーヴェール')).includes('（覚えた）'));
     const magic = D('magic.json').spells;
-    for (const gd of shops.magic_guild.goods) assert.notEqual(magic[gd.spellId].tier, 'high', `${gd.spellId}: 店の品は、上級ではない`);
+    for (const gd of shops.magic_guild.goods) if (magic[gd.spellId].tier === 'high') assert.equal(gd.requires?.group, 'highMage', `${gd.spellId}: 店の上級は、上位の魔法使い系の条件つき`);
+    for (const gd of shops.temple.goods) if (gd.spellId && magic[gd.spellId].tier === 'high') assert.equal(gd.requires?.group, 'highHoly', `${gd.spellId}: 大神殿の上級は、プリースト系の上位職の条件つき`);
+});
+
+test('魔法の購入条件（requires.group）: その店の jobGroups の職業でないと買えない（場所や条件で、買えるものが変わる仕組み）', async () => {
+    const g = await engine();
+    const shop = shops.magic_guild, temple = shops.temple;
+    const good = (id) => shop.goods.find((x) => x.spellId === id) ?? temple.goods.find((x) => x.spellId === id);
+    const inShop = (id) => (shop.goods.some((x) => x.spellId === id) ? shop : temple);
+    g.player.gold = 5000;
+    assert.equal(good('magic_bolt').requires, undefined, '既存の売り物は、条件なし');
+    g.player.job = 'fighter';
+    assert.match(g.buySpell(good('enchant'), inShop('enchant')).message, /魔法使い系の職業でないと買えません/);
+    assert.equal(g.isSpellLearned('enchant'), false);
+    assert.equal(g.player.gold, 5000, '買えないときは、お金は減らない');
+    assert.match(g.buySpell(good('cure'), inShop('cure')).message, /プリースト系の職業でないと買えません/, 'ヒール系は、大神殿で、プリースト系だけ');
+    g.player.job = 'sorcerer';
+    assert.equal(g.buySpell(good('enchant'), inShop('enchant')).ok, true);
+    assert.equal(g.buySpell(good('cure'), inShop('cure')).ok, false, 'ソーサラーは、プリースト系ではない');
+    g.player.job = 'priest';
+    assert.equal(g.buySpell(good('cure'), inShop('cure')).ok, true, 'プリーストは、一番低いランクで、ヒール系の初級を買える');
+    assert.match(g.buySpell(good('recovery'), inShop('recovery')).message, /プリースト系の上位職/, '上級は、プリースト系の上位職だけ');
+    g.player.job = 'bishop';
+    assert.equal(g.buySpell(good('recovery'), inShop('recovery')).ok, true);
+    // 店ごとに jobGroups を変えれば、同じ売り物でも買える職業が変わる（魔法王国など）
+    g.player.job = 'fighter';
+    assert.equal(g.buySpell(good('protection'), { ...shop, jobGroups: { ...shop.jobGroups, mage: ['fighter'] } }).ok, true);
+    for (const sh of [shop, temple]) for (const gd of sh.goods) if (gd.requires) assert.ok(sh.jobGroups[gd.requires.group] && sh.groupNames[gd.requires.group], `${gd.spellId}: 条件の group が、店に定義されている`);
 });
 
 test('宝箱などで取得する（lootTable の spell）。保存・読み込みで、覚えた魔法が戻る', async () => {
@@ -95,4 +124,14 @@ test('宝箱などで取得する（lootTable の spell）。保存・読み込�
     assert.deepEqual(c.player.magics, ['fire']);
     assert.equal(c.player.stock[1], null);
     assert.equal(c.player.stock[2], 'fire');
+});
+
+test('ヒール系（magic.json の kind が heal）は、魔法ギルドではなく、大神殿で売る', () => {
+    const magic = D('magic.json').spells;
+    const heals = Object.keys(magic).filter((k) => magic[k].kind === 'heal');
+    assert.ok(heals.length >= 7);
+    for (const id of heals) {
+        assert.ok(shops.temple.goods.some((x) => x.spellId === id), `${id}: 大神殿で売る`);
+        assert.ok(!shops.magic_guild.goods.some((x) => x.spellId === id), `${id}: 魔法ギルドでは売らない`);
+    }
 });

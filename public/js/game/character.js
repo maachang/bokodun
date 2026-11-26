@@ -76,6 +76,8 @@ export const characterMethods = {
         const r = R.resolveAttack(d, { weapon, weight: this.weaponWeight(weapon), lv: p.level, job: d.jobs[p.job], str: ab.str, dex: ab.dex, loadRatio: this.loadRatio(), plus: this.weaponPlus(weapon.id) }, opt);   // lv は ctx に入っている
         const c = p.status?.curse;
         if (c?.t > 0) r.damage = Math.floor(r.damage * (c.scale ?? 0.7));
+        const up = p.buffs?.attackRate;   // エンチャント: 武器の攻撃が強くなる（武器だけ）
+        if (up?.t > 0) r.damage = Math.floor(r.damage * up.rate);
         return r;
     },
 
@@ -96,13 +98,14 @@ export const characterMethods = {
     rollSpellPower(spell) {
         const p = this.player, focus = spell.magicKind === 'attack' ? this.getFocusItem() : null;
         const rod = focus?.dice ? R.rollDice(focus.dice.n, focus.dice.m).total : 0;
-        return this.accSpellPower(R.rollMagicPower(this.rules, spell, p.level, this.rules.jobs[p.job], rod));
+        return this.accSpellPower(R.rollMagicPower(this.rules, spell, p.level, this.rules.jobs[p.job], rod));   // エンチャントは、武器だけ（魔法の威力は上げない。ユーザー決定 2026-11-26）
     },
 
     // 回復魔法が、使う意味のない状態（満タン）なら、その理由。使えるなら null
     selfSpellUseless(spell) {
         const p = this.player;
         if (spell.type !== 'heal') return null;
+        if (spell.target === 'status') return p.status?.poison?.t > 0 ? null : '毒にかかっていません';   // キュアーポイズン
         if (spell.target === 'stamina') return (p.stamina >= p.maxStamina && !p.staminaExhausted) ? 'スタミナは満タンです' : null;
         return p.hp >= p.maxHp ? 'HPは満タンです' : null;
     },
@@ -115,13 +118,17 @@ export const characterMethods = {
             p.stamina = Math.min(p.maxStamina, p.stamina + power);
             if (p.staminaExhausted && p.stamina >= p.maxStamina * this.staminaDef.resumeRatio) p.staminaExhausted = false;
             this.addPopup(`スタミナ +${Math.round(p.stamina - before)}`, '#facc15');
+        } else if (spell.type === 'heal' && spell.target === 'status') {
+            delete p.status.poison;   // 毒と猛毒を治す（猛毒の状態は、まだ毒と同じ扱い。inventory.js の毒消しと同じ）
+            this.addPopup('毒が治った', '#c084fc');
         } else if (spell.type === 'heal') {
             const before = p.hp;
             p.hp = Math.min(p.maxHp, p.hp + power);
             this.addPopup(`HP +${Math.round(p.hp - before)}`, '#4ade80');
         } else if (spell.effect) {
-            p.buffs = { ...p.buffs, [spell.effect.type]: { t: spell.effect.duration, rate: spell.effect.rate } };   // 同じ効果は、時間をつけ直す
-            this.addPopup(`${spell.name}！ ${spell.effect.duration}秒`, '#60a5fa');
+            const sec = Math.round(spell.effect.duration + (spell.effect.perLevel ?? 0) * p.level);   // フライは、基本 30 秒に、レベルで伸びる（草案）
+            p.buffs = { ...p.buffs, [spell.effect.type]: { t: sec, rate: spell.effect.rate } };   // 同じ効果は、時間をつけ直す（重ね掛けなし）
+            this.addPopup(`${spell.name}！ ${sec}秒`, '#60a5fa');
         }
         if (spell.style && this.spellEffects) this.spellEffects.selfCast(spell.style, p.x, p.z, { color: spell.color, scale: spell.scale ?? 1, speed: spell.speed ?? 1 });   // コードで描く演出（selfSpellEffect.js）
         else this.particles.spawnBurst(p.x, 1.0, p.z, parseInt(spell.color.slice(1), 16), 14, 3.0);
@@ -149,9 +156,20 @@ export const characterMethods = {
         return { ok: true, message: `${it.name}を覚えました` };
     },
 
-    // 魔法ギルドで買う（good = shops.json の goods の 1 件。spellId と price）。買い切りで、売れない
-    buySpell(good) {
+    // 買えない理由（売り物の requires。その店の jobGroups の職業でないと買えない）。買えるなら null
+    spellBuyBlock(good, shop) {
+        const grp = good.requires?.group;
+        if (!grp) return null;
+        const jobs = shop?.jobGroups?.[grp] ?? [];
+        if (jobs.includes(this.player.job)) return null;
+        return `${good.name}は、${shop?.groupNames?.[grp] ?? '特定'}の職業でないと買えません`;
+    },
+
+    // 魔法ギルドで買う（good = shops.json の goods の 1 件。spellId と price。shop は、その店の定義で、購入条件に使う）。買い切りで、売れない
+    buySpell(good, shop) {
         const p = this.player;
+        const block = this.spellBuyBlock(good, shop);
+        if (block) return { ok: false, message: block };
         if (this.isSpellLearned(good.spellId)) return { ok: false, message: `${good.name}は、すでに覚えています` };
         if ((p.gold ?? 0) < good.price) return { ok: false, message: `お金が足りません（${good.price}G・所持 ${p.gold ?? 0}G）` };
         const r = this.learnSpell(good.spellId);

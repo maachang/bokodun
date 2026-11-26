@@ -1,5 +1,5 @@
 {
-  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。goods は販売一覧のダミー（買う処理は未実装）。道具屋は itemId で items.json と対応（名前・価格は items.json と同じ）。 魔法ギルドで買える魔法は、店ごとの goods で決まる（場所で違う）。上級（magic.json の tier が high）は、店では売らず、取得する（宝箱の spell など）。 武器屋の goods は equipId と kind（weapon・armor・helm・shield）。価格は、買うときに選ぶ重さで決まる（重さ² × 係数 × ダイスの平均 ÷ 7。combat.json の equipmentPrice）。品揃え（防具・弓を含む）は、仮。",
+  "_comment": "店の種類（汎用の店マップ shop.json が、入った店に応じて店名・店主を切り替える）。goods は販売一覧のダミー（買う処理は未実装）。道具屋は itemId で items.json と対応（名前・価格は items.json と同じ）。 魔法ギルドで買える魔法は、店ごとの goods で決まる（場所で違う）。上級（magic.json の tier が high）は、店では売らず、取得する（宝箱の spell など）。 武器屋の goods は equipId と kind（weapon・armor・helm・shield）。価格は、買うときに選ぶ重さで決まる（重さ² × 係数 × ダイスの平均 ÷ 7。combat.json の equipmentPrice）。品揃え（防具・弓を含む）は、仮。 【魔法ギルドの購入条件（草案・2026-11-26）】魔法ギルドの売り物（spellId）は、requires: { group } を持てる。group は、その店の jobGroups（職業 ID の一覧）の名前で、groupNames が表示名。その職業でないと買えない。店ごとに jobGroups・goods を変えれば、場所で買えるものが変わる（魔法王国など。あとで店を足す）。 【ヒール系（magic.json の kind が heal）は、魔法ギルドではなく、大神殿（temple）で売る（ユーザー決定 2026-11-26「ヒール系は教会で」）。職業の条件は、魔法ギルドと同じ仕組み（店ごとの jobGroups・売り物の requires）。】 【大神殿の魔法は、プリースト系の職業でないと買えない（プリーストが一番低いランク）。上級（ハイヒールなど）は、プリースト系の上位職（ビショップなど。ユーザー決定 2026-11-26）。】",
   "weapon_shop": {
     "name": "武器屋",
     "keeper": "weapon_keeper",
@@ -137,11 +137,6 @@
         "price": 120
       },
       {
-        "spellId": "heal",
-        "name": "ヒール",
-        "price": 240
-      },
-      {
         "spellId": "spread",
         "name": "拡散弾",
         "price": 290
@@ -152,16 +147,66 @@
         "price": 470
       },
       {
-        "spellId": "refresh",
-        "name": "リフレッシュ",
-        "price": 190
-      },
-      {
         "spellId": "energy_veil",
         "name": "エナジーヴェール",
         "price": 350
+      },
+      {
+        "spellId": "enchant",
+        "name": "エンチャント",
+        "price": 540,
+        "requires": {
+          "group": "mage"
+        }
+      },
+      {
+        "spellId": "protection",
+        "name": "プロテクション",
+        "price": 540,
+        "requires": {
+          "group": "mage"
+        }
+      },
+      {
+        "spellId": "speedy",
+        "name": "スピーディー",
+        "price": 410,
+        "requires": {
+          "group": "mage"
+        }
+      },
+      {
+        "spellId": "fly",
+        "name": "フライ",
+        "price": 610,
+        "requires": {
+          "group": "mage"
+        }
       }
-    ]
+    ],
+    "jobGroups": {
+      "mage": [
+        "sorcerer",
+        "priest",
+        "sage",
+        "wizard",
+        "bishop",
+        "spellsword",
+        "mystic",
+        "archsage"
+      ],
+      "highMage": [
+        "wizard",
+        "bishop",
+        "spellsword",
+        "mystic",
+        "archsage"
+      ]
+    },
+    "groupNames": {
+      "mage": "魔法使い系",
+      "highMage": "上位の魔法使い系"
+    }
   },
   "temple": {
     "name": "大神殿",
@@ -181,8 +226,81 @@
         "itemId": "venom_cure",
         "name": "猛毒消し",
         "price": 150
+      },
+      {
+        "spellId": "cure",
+        "name": "キュアー",
+        "price": 90,
+        "requires": {
+          "group": "holy"
+        }
+      },
+      {
+        "spellId": "cure_poison",
+        "name": "キュアーポイズン",
+        "price": 120,
+        "requires": {
+          "group": "holy"
+        }
+      },
+      {
+        "spellId": "heal",
+        "name": "ヒール",
+        "price": 240,
+        "requires": {
+          "group": "holy"
+        }
+      },
+      {
+        "spellId": "refresh",
+        "name": "リフレッシュ",
+        "price": 190,
+        "requires": {
+          "group": "holy"
+        }
+      },
+      {
+        "spellId": "high_heal",
+        "name": "ハイヒール",
+        "price": 960,
+        "requires": {
+          "group": "highHoly"
+        }
+      },
+      {
+        "spellId": "high_refresh",
+        "name": "ハイ・リフレッシュ",
+        "price": 780,
+        "requires": {
+          "group": "highHoly"
+        }
+      },
+      {
+        "spellId": "recovery",
+        "name": "リカバリー",
+        "price": 780,
+        "requires": {
+          "group": "highHoly"
+        }
       }
-    ]
+    ],
+    "jobGroups": {
+      "holy": [
+        "priest",
+        "bishop",
+        "paladin",
+        "mystic"
+      ],
+      "highHoly": [
+        "bishop",
+        "paladin",
+        "mystic"
+      ]
+    },
+    "groupNames": {
+      "holy": "プリースト系",
+      "highHoly": "プリースト系の上位職"
+    }
   },
   "temple_town": {
     "name": "神殿",

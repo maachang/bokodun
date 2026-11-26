@@ -142,6 +142,8 @@ export const gearMethods = {
         const job = d.jobs[p.job];
         const parts = this.gearParts();
         const def = parts.length ? R.rollDefense(d, parts, job) : { defense: 0, fumble: false };
+        const guard = p.buffs?.defenseRate;   // プロテクション: 防御値が上がる
+        if (guard?.t > 0) def.defense = Math.floor(def.defense * guard.rate);
         const attack = def.fumble ? Math.floor(amount * d.combat.critDamageMultiplier) : amount;
         return R.damageTaken(d, attack, {
             defense: def.defense, vit: this.effAbilities().vit, dodge: R.dodgeValue(d, this.effAbilities().agi, p.level, job),

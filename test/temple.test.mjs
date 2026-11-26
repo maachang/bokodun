@@ -80,7 +80,10 @@ test('神殿: 司祭は女神像の前に立って動かず、店（取引）を
     assert.equal(senior.x, statue.c, '司祭は、像の正面（同じ列）');
     assert.ok(senior.z > statue.r && senior.z - statue.r <= 3, '司祭は、像の手前（南）');
     for (const n of npcs.filter(n => n.id !== 'priest_senior')) assert.equal(n.shopId, undefined, `${n.id}: 下っ端は店を開かない`);
-    for (const g of shops.temple.goods) assert.equal(g.price, readJson('public/data/items.json')[g.itemId].price, `${g.itemId}: 価格`);
+    for (const g of shops.temple.goods) {
+        if (g.spellId) assert.equal(g.price, readJson('public/data/magic.json').spells[g.spellId].price, `${g.spellId}: 魔法の価格（ヒール系は、大神殿で売る）`);
+        else assert.equal(g.price, readJson('public/data/items.json')[g.itemId].price, `${g.itemId}: 価格`);
+    }
 });
 
 const maps = Object.fromEntries(['temple', 'temple_2f', 'temple_3f', 'temple_town', 'temple_village'].map(id => [id, readJson(`public/data/maps/${id}.json`)]));
