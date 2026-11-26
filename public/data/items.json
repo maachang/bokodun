@@ -109,6 +109,7 @@
     "sound": "heal",
     "color": "#4ade80",
     "style": "heal",
+    "speed": 2,
     "scale": 1
   },
   "high_heal": {
@@ -121,6 +122,7 @@
     "sound": "heal",
     "color": "#4ade80",
     "style": "heal",
+    "speed": 2,
     "scale": 1.5
   },
   "refresh": {
@@ -133,6 +135,7 @@
     "sound": "heal",
     "color": "#facc15",
     "style": "refresh",
+    "speed": 2,
     "scale": 1,
     "target": "stamina"
   },
@@ -146,6 +149,7 @@
     "sound": "heal",
     "color": "#facc15",
     "style": "refresh",
+    "speed": 2,
     "scale": 1.5,
     "target": "stamina"
   },

@@ -1,4 +1,5 @@
 import * as THREE from '/js/three.module.js';
+import { auraCast } from '/js/selfAuraEffect.js';
 
 /**
  * 自分に使う魔法のうち、補助・解除・道具系の演出（画像なし。コードで描く。草案・見た目は仮）。
@@ -30,7 +31,7 @@ function frame(sys, x, z, color, life, build, tick) {
 
 function buff(sys, x, z, c, s) {   // 上向きの矢印（円錐）が、体のまわりから昇る
     frame(sys, x, z, c, 1.8, (g, geos, mats) => {
-        const geo = new THREE.ConeGeometry(0.16 * s, 0.4 * s, 4); const mat = glow(c);
+        const geo = new THREE.ConeGeometry(0.16 * s, 0.4 * s, 4); const mat = glow(c, 1, { blending: THREE.NormalBlending });
         geos.push(geo); mats.push(mat);
         return Array.from({ length: 14 }, (_, i) => {
             const m = new THREE.Mesh(geo, mat); g.add(m);
@@ -48,7 +49,7 @@ function buff(sys, x, z, c, s) {   // 上向きの矢印（円錐）が、体の
 
 function guard(sys, x, z, c, s) {   // 盾の板が、体のまわりを回りながら現れ、最後に外へ散る
     frame(sys, x, z, c, 2.2, (g, geos, mats) => {
-        const geo = new THREE.BoxGeometry(0.55 * s, 0.8 * s, 0.05); const mat = glow(c, 0.85);
+        const geo = new THREE.BoxGeometry(0.55 * s, 0.8 * s, 0.05); const mat = glow(c, 0.85, { blending: THREE.NormalBlending });
         geos.push(geo); mats.push(mat);
         return Array.from({ length: 6 }, (_, i) => {
             const m = new THREE.Mesh(geo, mat); g.add(m);
@@ -67,7 +68,7 @@ function guard(sys, x, z, c, s) {   // 盾の板が、体のまわりを回り�
 
 function haste(sys, x, z, c, s) {   // 風の筋（細い線）が、らせんを描いて足元を駆け上がる
     frame(sys, x, z, c, 1.6, (g, geos, mats) => {
-        const geo = new THREE.BoxGeometry(0.03, 0.03, 0.9 * s); const mat = glow(c);
+        const geo = new THREE.BoxGeometry(0.04, 0.04, 0.9 * s); const mat = glow(c, 1, { blending: THREE.NormalBlending });
         geos.push(geo); mats.push(mat);
         return Array.from({ length: 16 }, (_, i) => {
             const m = new THREE.Mesh(geo, mat); g.add(m);
@@ -86,8 +87,8 @@ function haste(sys, x, z, c, s) {   // 風の筋（細い線）が、らせん�
 
 function cleanse(sys, x, z, c, s) {   // 紫の毒の粒が、体から外へ抜けて薄れ、そのあと白い光が昇る
     frame(sys, x, z, c, 1.8, (g, geos, mats) => {
-        const geo = new THREE.OctahedronGeometry(0.09 * s, 0);
-        const bad = glow(0x9333ea), good = glow(0xffffff);
+        const geo = new THREE.OctahedronGeometry(0.15 * s, 0);
+        const bad = glow(c, 1, { blending: THREE.NormalBlending }), good = glow(0xffffff);
         geos.push(geo); mats.push(bad, good);
         return Array.from({ length: 30 }, (_, i) => {
             const m = new THREE.Mesh(geo, i < 18 ? bad : good); g.add(m);
@@ -167,7 +168,9 @@ function float(sys, x, z, c, s) {   // 足元の輪が体を持ち上げるよ�
     });
 }
 
-const STYLES = { buff, guard, haste, cleanse, unlock, trap, float };
+const STYLES = { buff, guard, haste, cleanse, unlock, trap, float,
+    enchant: (sys, x, z, c, s) => auraCast(sys, 'enchant', x, z, c, s),     // 円柱のオーラ（selfAuraEffect.js）
+    protect: (sys, x, z, c, s) => auraCast(sys, 'protect', x, z, c, s) };
 export const BUFF_STYLES = Object.keys(STYLES);
 
 export function playBuff(sys, style, x, z, { color = '#ffffff', scale = 1 } = {}) {
@@ -175,14 +178,14 @@ export function playBuff(sys, style, x, z, { color = '#ffffff', scale = 1 } = {}
 }
 
 // 効果の処理が未決（magic.json で usable:false）の魔法の演出。エフェクトテスト用（ゲームの魔法としては使わない）。色・大きさは仮
-export const PENDING_SPELL_FX = {
-    cure: { name: 'キュアー', style: 'heal', color: '#86efac', scale: 0.8 },
-    recovery: { name: 'リカバリー', style: 'heal', color: '#a7f3d0', scale: 2 },
-    cure_poison: { name: 'キュアーポイズン', style: 'cleanse', color: '#a7f3d0', scale: 1 },
-    enchant: { name: 'エンチャント', style: 'buff', color: '#f87171', scale: 1 },
-    protection: { name: 'プロテクション', style: 'guard', color: '#fbbf24', scale: 1 },
-    speedy: { name: 'スピーディー', style: 'haste', color: '#5eead4', scale: 1 },
-    unlock: { name: 'アンロック', style: 'unlock', color: '#facc15', scale: 1 },
-    trap: { name: 'トラップ', style: 'trap', color: '#ef4444', scale: 1 },
-    fly: { name: 'フライ', style: 'float', color: '#e0f2fe', scale: 1 },
+export const PENDING_SPELL_FX = {   // 色は magic.json の fx.color（2026-11-26 草案）と同じ。長さは半分（speed: 2。2026-11-26 ユーザー「長すぎるので半分ぐらい」）。形は style（heal・refresh は selfSpellEffect.js の回復系で、色違い。ほかは上の関数）
+    cure: { name: 'キュアー', style: 'heal', color: '#f8fafc', scale: 1, speed: 2 },
+    recovery: { name: 'リカバリー', style: 'refresh', color: '#f9a8d4', scale: 1.5, speed: 2 },
+    cure_poison: { name: 'キュアーポイズン', style: 'heal', color: '#c084fc', scale: 1, speed: 2 },
+    enchant: { name: 'エンチャント', style: 'enchant', color: '#ef4444', scale: 1, speed: 2 },
+    protection: { name: 'プロテクション', style: 'protect', color: '#3b82f6', scale: 1, speed: 2 },
+    speedy: { name: 'スピーディー', style: 'haste', color: '#22d3ee', scale: 1, speed: 2 },
+    unlock: { name: 'アンロック', style: 'unlock', color: '#facc15', scale: 1, speed: 2 },
+    trap: { name: 'トラップ', style: 'trap', color: '#ef4444', scale: 1, speed: 2 },
+    fly: { name: 'フライ', style: 'float', color: '#bae6fd', scale: 1, speed: 2 },
 };

@@ -17,12 +17,13 @@ export class SpellEffectSystem {
         this.scene = scene;
         this.particles = particles;
         this.list = [];
+        this.speed = 1;   // 再生の速さ（selfCast の opt.speed。2 なら、演出の長さが半分になる）
     }
 
     // 演出 1 つを登録する。life 秒で消える。tick(q, dt): q は 0〜1 の進み。dispose は、消えるときに 1 回
     add(group, life, tick, geos = [], mats = []) {
         this.scene.add(group);
-        this.list.push({ group, life, t: 0, tick, geos, mats });
+        this.list.push({ group, life: life / this.speed, speed: this.speed, t: 0, tick, geos, mats });
     }
 
     update(dt) {
@@ -30,7 +31,7 @@ export class SpellEffectSystem {
             const e = this.list[i];
             e.t += dt;
             const q = Math.min(1, e.t / e.life);
-            e.tick(q, dt);
+            e.tick(q, dt * e.speed);   // 速く再生するときは、演出の中の時間も、同じ倍率で進める
             if (q >= 1) {
                 this.scene.remove(e.group);
                 for (const g of e.geos) g.dispose();
@@ -52,7 +53,10 @@ export class SpellEffectSystem {
     }
 
     // 自分に使う魔法（回復・補助）の演出（selfSpellEffect.js）
-    selfCast(style, x, z, opt) { if (BUFF_STYLES.includes(style)) playBuff(this, style, x, z, opt); else selfCast(this, style, x, z, opt); }
+    selfCast(style, x, z, opt) {
+        this.speed = opt?.speed > 0 ? opt.speed : 1;
+        try { if (BUFF_STYLES.includes(style)) playBuff(this, style, x, z, opt); else selfCast(this, style, x, z, opt); } finally { this.speed = 1; }
+    }
 
     play(style, x, z, { radius = 3 } = {}) {
         const fn = { lightning: this.lightning, meteor: this.meteorImpact, holy: this.holy, ice_storm: this.iceStorm, air_storm: this.airStorm, quake: this.quake, purify: this.purify }[style];

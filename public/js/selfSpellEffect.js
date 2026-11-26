@@ -14,7 +14,7 @@ const add = (mat) => { mat.transparent = true; mat.depthWrite = false; mat.blend
 // 参考: ICS MEDIA「RPG 風セーブポイント」（二重の光の柱・渦の輪・丸と十字の粒が昇る）。見た目は仮（草案）
 // テクスチャは、キャンバスで 1 回だけ作って使い回す（画像ファイルなし）
 let _tex = null;
-function textures() {
+export function textures() {
     if (_tex) return _tex;
     const mk = (w, h, draw) => { const c = document.createElement('canvas'); c.width = w; c.height = h; draw(c.getContext('2d'), w, h); const t = new THREE.CanvasTexture(c); t.wrapS = THREE.RepeatWrapping; return t; };
     _tex = {

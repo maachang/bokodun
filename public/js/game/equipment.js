@@ -145,7 +145,7 @@ export const equipmentMethods = {
         if (!it || it.kind !== 'spell') return false;
         if (it.type === 'strike') this.castStrike(it, 0, true);
         else if (it.type === 'burst') this.castBurst(it, 0, true);
-        else if (it.type === 'heal' || it.type === 'support') this.spellEffects.selfCast(it.style, this.player.x, this.player.z, { color: it.color, scale: it.scale ?? 1 });
+        else if (it.type === 'heal' || it.type === 'support') this.spellEffects.selfCast(it.style, this.player.x, this.player.z, { color: it.color, scale: it.scale ?? 1, speed: it.speed ?? 1 });
         else if (it.type === 'fireball' || it.type === 'spread') this.shootProjectiles(it, 0);
         else return false;
         return true;
