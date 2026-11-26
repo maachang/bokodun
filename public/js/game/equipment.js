@@ -1,6 +1,7 @@
 // 装備・武器スロット・魔法スロットの選択と HUD（効果のテストボタンを含む）。GameEngine のメソッド（this は GameEngine。game.js が、クラスの定義のあとで、GameEngine.prototype へ組み込む）。
 // 元は game.js の GameEngine のメソッド。移しただけで、動きは同じ（game.js が長すぎて、編集の誤りが増えるため分割した）
 import { effectPower } from '/js/game/constants.js';
+import { PENDING_SPELL_FX } from '/js/selfBuffEffect.js';
 
 export const equipmentMethods = {
     // ---- ストック（9 枠）: 武器・杖・魔法・弓を、好きに入れる。切り替えは数字キー 1〜9 かクリック ----
@@ -138,10 +139,13 @@ export const equipmentMethods = {
 
     // 魔法の演出のテスト（MP・クールダウンを使わず、ダメージも与えない。弾は、威力 0 で飛ぶ）
     testSpellEffect(id) {
+        const fx = PENDING_SPELL_FX[id];   // 未実装（効果が未決）の魔法は、見た目だけ
+        if (fx) { this.spellEffects.selfCast(fx.style, this.player.x, this.player.z, fx); return true; }
         const it = this.items[id];
         if (!it || it.kind !== 'spell') return false;
         if (it.type === 'strike') this.castStrike(it, 0, true);
         else if (it.type === 'burst') this.castBurst(it, 0, true);
+        else if (it.type === 'heal' || it.type === 'support') this.spellEffects.selfCast(it.style, this.player.x, this.player.z, { color: it.color, scale: it.scale ?? 1 });
         else if (it.type === 'fireball' || it.type === 'spread') this.shootProjectiles(it, 0);
         else return false;
         return true;
@@ -151,11 +155,13 @@ export const equipmentMethods = {
         const el = jhtml.$('effectTestHud');
         if (!el) return;
         const classes = Object.entries(this.weaponClasses).filter(([, c]) => c.attack === 'melee');
-        const spells = Object.values(this.items).filter((i) => i.kind === 'spell' && ['fireball', 'spread', 'strike', 'burst'].includes(i.type));
+        const spells = Object.values(this.items).filter((i) => i.kind === 'spell' && ['fireball', 'spread', 'strike', 'burst', 'heal', 'support'].includes(i.type));
         el.innerHTML = jhtml.html`<select id="effectTestStrength"><option value="normal">通常</option><option value="crit">会心</option><option value="kill">会心＋撃破</option></select>`
             + classes.map(([id, c]) => jhtml.html`<button class="test-btn" data-class="${id}">${c.name}</button>`).join('')
             + '<div style="margin-top:4px;width:100%"></div>'
-            + spells.map((s) => jhtml.html`<button class="test-btn" data-spell="${s.id}">${s.name}</button>`).join('');
+            + spells.map((s) => jhtml.html`<button class="test-btn" data-spell="${s.id}">${s.name}</button>`).join('')
+            + '<div style="margin-top:4px;width:100%"></div>'
+            + Object.entries(PENDING_SPELL_FX).map(([id, f]) => jhtml.html`<button class="test-btn" data-spell="${id}">${f.name}（未実装）</button>`).join('');
     },
 
     // エフェクトテストの操作（コンストラクタから一度だけ呼ぶ）

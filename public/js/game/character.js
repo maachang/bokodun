@@ -123,7 +123,8 @@ export const characterMethods = {
             p.buffs = { ...p.buffs, [spell.effect.type]: { t: spell.effect.duration, rate: spell.effect.rate } };   // 同じ効果は、時間をつけ直す
             this.addPopup(`${spell.name}！ ${spell.effect.duration}秒`, '#60a5fa');
         }
-        this.particles.spawnBurst(p.x, 1.0, p.z, parseInt(spell.color.slice(1), 16), 14, 3.0);
+        if (spell.style && this.spellEffects) this.spellEffects.selfCast(spell.style, p.x, p.z, { color: spell.color, scale: spell.scale ?? 1 });   // コードで描く演出（selfSpellEffect.js）
+        else this.particles.spawnBurst(p.x, 1.0, p.z, parseInt(spell.color.slice(1), 16), 14, 3.0);
         this.sound.playHeal?.();
     },
 

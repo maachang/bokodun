@@ -107,7 +107,9 @@
     "type": "heal",
     "cooldown": 0.9,
     "sound": "heal",
-    "color": "#4ade80"
+    "color": "#4ade80",
+    "style": "heal",
+    "scale": 1
   },
   "high_heal": {
     "id": "high_heal",
@@ -117,7 +119,9 @@
     "type": "heal",
     "cooldown": 0.9,
     "sound": "heal",
-    "color": "#4ade80"
+    "color": "#4ade80",
+    "style": "heal",
+    "scale": 1.5
   },
   "refresh": {
     "id": "refresh",
@@ -128,6 +132,8 @@
     "cooldown": 0.9,
     "sound": "heal",
     "color": "#facc15",
+    "style": "refresh",
+    "scale": 1,
     "target": "stamina"
   },
   "high_refresh": {
@@ -139,6 +145,8 @@
     "cooldown": 0.9,
     "sound": "heal",
     "color": "#facc15",
+    "style": "refresh",
+    "scale": 1.5,
     "target": "stamina"
   },
   "energy_veil": {
@@ -149,7 +157,9 @@
     "type": "support",
     "cooldown": 0.9,
     "sound": "heal",
-    "color": "#60a5fa"
+    "color": "#60a5fa",
+    "style": "veil",
+    "scale": 1
   },
   "herb": {
     "id": "herb",

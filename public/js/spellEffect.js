@@ -1,4 +1,6 @@
 import * as THREE from '/js/three.module.js';
+import { selfCast } from '/js/selfSpellEffect.js';
+import { playBuff, BUFF_STYLES } from '/js/selfBuffEffect.js';
 
 /**
  * 魔法の演出（画像を使わない。ジオメトリ・線・粒だけで、コードで描く）。
@@ -48,6 +50,9 @@ export class SpellEffectSystem {
         group.add(mesh);
         return { mesh, geo, mat };
     }
+
+    // 自分に使う魔法（回復・補助）の演出（selfSpellEffect.js）
+    selfCast(style, x, z, opt) { if (BUFF_STYLES.includes(style)) playBuff(this, style, x, z, opt); else selfCast(this, style, x, z, opt); }
 
     play(style, x, z, { radius = 3 } = {}) {
         const fn = { lightning: this.lightning, meteor: this.meteorImpact, holy: this.holy, ice_storm: this.iceStorm, air_storm: this.airStorm, quake: this.quake, purify: this.purify }[style];
