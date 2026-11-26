@@ -30,16 +30,26 @@ function textures() {
     return _tex;
 }
 
+// 強弱と種類の見分け（草案・仮）。hi: ハイ〜系（scale が大きい）。refresh: 柱なしで、光の粒がらせんに巻いて昇る
+//   ヒール（小）: 細く低い柱・粒少なめ・輪 1 つ ／ ハイヒール（大）: 太く高い柱・粒多め・輪 3 つ・長い・画面が光る
+//   リフレッシュ: 昇る輪とらせんの粒（小は 2 本・大は 3 本の帯）
+function healParams(refresh, hi) {
+    if (refresh) return hi ? { pr: 0, ph: 0, n: 48, strands: 3, rings: 4, dur: 2.6, tint: true, size: 1.3, top: 3.6 } : { pr: 0, ph: 0, n: 22, strands: 2, rings: 2, dur: 1.8, tint: false, size: 1, top: 2.4 };
+    return hi ? { pr: 0.85, ph: 4.2, n: 36, strands: 0, rings: 3, dur: 2.6, tint: true, size: 1.3, top: 3.6 } : { pr: 0.38, ph: 2.0, n: 12, strands: 0, rings: 1, dur: 1.8, tint: false, size: 1, top: 2.2 };
+}
+
 function healLike(sys, style, x, z, color, scale) {
     const T = textures();
     const group = new THREE.Group();
     group.position.set(x, 0, z);
     const geos = [], mats = [];
-    const spiral = style === 'refresh';
-    const big = scale > 1.2;
-    const DUR = 2.2;
+    const refresh = style === 'refresh';
+    const hi = scale > 1.2;
+    const P = healParams(refresh, hi);
+    const DUR = P.dur;
+    const sc0 = hi ? 1.5 : 1;
 
-    // 足元の渦の輪（回りながら広がる）と、広がって消える輪
+    // 足元の渦の輪（回りながら広がる）と、広がって消える／昇る輪
     const swGeo = new THREE.RingGeometry(0.2, 1, 48);
     const swMat = add(new THREE.MeshBasicMaterial({ color, map: T.swirl, opacity: 0.9, side: THREE.DoubleSide }));
     const swirl = new THREE.Mesh(swGeo, swMat); swirl.rotation.x = -Math.PI / 2; swirl.position.y = 0.04; group.add(swirl);
@@ -48,63 +58,70 @@ function healLike(sys, style, x, z, color, scale) {
     const swirl2 = new THREE.Mesh(swGeo2, swMat); swirl2.rotation.x = -Math.PI / 2; swirl2.position.y = 0.05; group.add(swirl2);
     geos.push(swGeo2);
     const rings = [];
-    for (let i = 0; i < 2; i++) {
-        const r = sys.ringMesh(group, i ? 0xffffff : color, 0.85 * scale, 1.0 * scale, 0.06);
-        r.mesh.visible = false; geos.push(r.geo); mats.push(r.mat); rings.push({ ...r, delay: 0.15 + i * 0.25 });
+    for (let i = 0; i < P.rings; i++) {
+        const r = sys.ringMesh(group, i % 2 ? 0xffffff : color, 0.85 * sc0, 1.0 * sc0, 0.06);
+        r.mesh.visible = false; geos.push(r.geo); mats.push(r.mat); rings.push({ ...r, delay: 0.1 + i * (refresh ? 0.28 : 0.22) });
     }
 
-    // 光の柱（外と内の二重。筋を逆向きに流す。足元から立ち上がる）
-    const radius = (spiral ? 0.5 : 0.65) * scale, height = (big ? 3.6 : 2.8);
-    const pGeo = new THREE.CylinderGeometry(radius, radius, height, 40, 1, true);
-    const outerTex = T.streak.clone(); outerTex.needsUpdate = true; outerTex.repeat.set(2, 1);
-    const innerTex = T.streak.clone(); innerTex.needsUpdate = true; innerTex.repeat.set(3, 1);
-    const outerMat = add(new THREE.MeshBasicMaterial({ color, map: outerTex, side: THREE.DoubleSide, opacity: 0 }));
-    const innerMat = add(new THREE.MeshBasicMaterial({ color: 0xffffff, map: innerTex, side: THREE.DoubleSide, opacity: 0 }));
-    const outer = new THREE.Mesh(pGeo, outerMat), inner = new THREE.Mesh(pGeo, innerMat);
-    inner.scale.set(0.9, 1, 0.9);
-    group.add(outer, inner);
-    geos.push(pGeo); mats.push(outerMat, innerMat);
+    // 光の柱（ヒール系のみ。外と内の二重。筋を逆向きに流す）
+    let outer = null, inner = null, outerMat = null, innerMat = null, outerTex = null, innerTex = null;
+    if (P.pr > 0) {
+        const pGeo = new THREE.CylinderGeometry(P.pr, P.pr, P.ph, 40, 1, true);
+        outerTex = T.streak.clone(); outerTex.needsUpdate = true; outerTex.repeat.set(2, 1);
+        innerTex = T.streak.clone(); innerTex.needsUpdate = true; innerTex.repeat.set(3, 1);
+        outerMat = add(new THREE.MeshBasicMaterial({ color, map: outerTex, side: THREE.DoubleSide, opacity: 0 }));
+        innerMat = add(new THREE.MeshBasicMaterial({ color: 0xffffff, map: innerTex, side: THREE.DoubleSide, opacity: 0 }));
+        outer = new THREE.Mesh(pGeo, outerMat); inner = new THREE.Mesh(pGeo, innerMat);
+        group.add(outer, inner);
+        geos.push(pGeo); mats.push(outerMat, innerMat);
+    }
 
-    // 昇る粒（丸と十字。昇るほど速く、出方・消え方に緩急をつける）
+    // 昇る粒（丸と十字）。リフレッシュは、帯ごとに等間隔で、らせんに巻いて昇る
     const parts = [];
-    const n = Math.round((spiral ? 26 : 22) * scale);
-    for (let i = 0; i < n; i++) {
-        const cross = i % 3 === 0;
+    for (let i = 0; i < P.n; i++) {
+        const cross = !refresh && i % 3 === 0;
         const m = add(new THREE.SpriteMaterial({ map: cross ? T.cross : T.orb, color: cross ? 0xffffff : color, opacity: 0 }));
         const sp = new THREE.Sprite(m); group.add(sp); mats.push(m);
-        parts.push({ sp, m, cross, a: rnd(0, Math.PI * 2), r: rnd(0.25, 0.95) * scale, delay: rnd(0, 0.7), life: rnd(0.9, 1.5), top: rnd(1.6, 2.8) * (big ? 1.2 : 1), spin: spiral ? rnd(4, 7) : rnd(-1.2, 1.2), size: (cross ? rnd(0.28, 0.42) : rnd(0.16, 0.3)) * scale });
+        const strand = refresh ? i % P.strands : 0;
+        parts.push({ sp, m, cross, strand, r: (refresh ? 0.75 + (hi ? 0.2 : 0) : rnd(0.25, 0.95)) * sc0,
+            a: refresh ? (strand / P.strands) * Math.PI * 2 : rnd(0, Math.PI * 2),
+            delay: refresh ? (i / P.n) * 0.9 : rnd(0, 0.7), life: refresh ? 1.1 : rnd(0.9, 1.5), top: refresh ? P.top : rnd(0.7, 1.2) * P.top,
+            spin: refresh ? 6.5 : rnd(-1.2, 1.2), size: (cross ? rnd(0.28, 0.42) : rnd(0.16, 0.3)) * P.size * (refresh ? 1.2 : 1) });
     }
 
     sys.add(group, DUR, (q, dt) => {
         const t = q * DUR;
-        // 柱: 0.35 秒で立ち上がり、終わり際に薄くなる
         const up = ease(Math.min(1, t / 0.35)), fade = q < 0.7 ? 1 : 1 - (q - 0.7) / 0.3;
-        const pulse = 0.85 + Math.sin(t * 8) * 0.15;
-        outer.scale.set(1, up, 1); inner.scale.set(0.9, up, 0.9);
-        outer.position.y = inner.position.y = height * up / 2;
-        outerTex.offset.x += dt * 0.35; innerTex.offset.x -= dt * 0.5;
-        outerMat.opacity = 0.55 * fade * pulse; innerMat.opacity = 0.7 * fade * pulse;
-        // 渦: 回りながら、少し広がって消える
-        const sc = (0.9 + ease(Math.min(1, t / 0.5)) * 0.5) * scale * (spiral ? 1.1 : 1);
+        if (outer) {
+            const pulse = 0.85 + Math.sin(t * 8) * 0.15;
+            outer.scale.set(1, up, 1); inner.scale.set(0.9, up, 0.9);
+            outer.position.y = inner.position.y = P.ph * up / 2;
+            outerTex.offset.x += dt * 0.35; innerTex.offset.x -= dt * 0.5;
+            outerMat.opacity = (hi ? 0.6 : 0.4) * fade * pulse; innerMat.opacity = (hi ? 0.8 : 0.5) * fade * pulse;
+        }
+        const sc = (0.9 + ease(Math.min(1, t / 0.5)) * 0.5) * sc0;
         swirl.scale.setScalar(sc); swirl2.scale.setScalar(sc * 0.75);
-        swirl.rotation.z -= dt * 2.2; swirl2.rotation.z += dt * 3.0;
+        swirl.rotation.z -= dt * (refresh ? 4.5 : 2.2); swirl2.rotation.z += dt * (refresh ? 6 : 3.0);
         swMat.opacity = 0.9 * fade;
         for (const r of rings) {
             const k = Math.max(0, Math.min(1, (t - r.delay) / 0.9));
             r.mesh.visible = k > 0 && k < 1;
-            r.mesh.scale.setScalar(0.4 + ease(k) * 1.4);
+            r.mesh.scale.setScalar(refresh ? 0.9 + k * 0.2 : 0.4 + ease(k) * 1.4);
+            r.mesh.position.y = refresh ? 0.06 + k * P.top : 0.06;   // リフレッシュの輪は、昇る
             r.mat.opacity = 0.9 * (1 - k);
         }
         for (const s of parts) {
             const k = Math.max(0, Math.min(1, (t - s.delay) / s.life));
             s.sp.visible = k > 0 && k < 1;
             const a = s.a + k * s.spin;
-            s.sp.position.set(Math.cos(a) * s.r * (1 - k * 0.25), 0.1 + s.top * Math.pow(k, 1.6), Math.sin(a) * s.r * (1 - k * 0.25));
+            const rr = s.r * (refresh ? 1 - k * 0.15 : 1 - k * 0.25);
+            s.sp.position.set(Math.cos(a) * rr, 0.1 + s.top * (refresh ? k : Math.pow(k, 1.6)), Math.sin(a) * rr);
             s.m.opacity = Math.min(1, k * 6) * (1 - Math.pow(k, 3)) * (s.cross ? 1 + Math.sin(t * 20 + s.a * 5) * 0.3 : 1);
             s.sp.scale.setScalar(s.size * (s.cross ? 1 : 1 - k * 0.4));
             if (s.cross) s.m.rotation = k * 3;
         }
     }, geos, mats);
+    if (P.tint) sys.screenTint?.(refresh ? 'rgba(250,204,21,0.12)' : 'rgba(74,222,128,0.14)', 0.6);   // ハイ〜系は、画面がうっすら光る
 }
 
 // 補助: 体を包む球状の防壁。足元から輪が広がり、六角の網目の殻が、まばゆく光りながら立ち上がって、脈打つ。
