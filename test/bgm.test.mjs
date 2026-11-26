@@ -110,3 +110,14 @@ test('選曲: マップの種類で曲が決まり、ボスが近くにいる間
     g.updateBgm(0.016); g.updateBgm(0.016); g.updateBgm(0.6); g.updateBgm(0.016);
     assert.deepEqual(played, ['field']);
 });
+
+test('BGM の ON / OFF: OFF の間は鳴らさず（曲は覚えておく）、ON に戻すと、いまの曲が鳴る', () => {
+    const s = engine();
+    assert.equal(s.bgmEnabled, true, '既定は ON');
+    s.playBgm('town'); assert.equal(s._bgm.name, 'town');
+    s.setBgmEnabled(false); assert.equal(s._bgm, null);
+    s.playBgm('boss'); assert.equal(s._bgm, null, 'OFF の間は、曲が変わっても鳴らさない');
+    assert.equal(s._bgmWant, 'boss');
+    s.setBgmEnabled(true); assert.equal(s._bgm.name, 'boss', 'ON に戻すと、いまの場面の曲');
+    s.stopBgm();
+});

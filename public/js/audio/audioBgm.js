@@ -4,6 +4,7 @@
 //   playBgm(name)       : その曲に切り替える（今の曲は、ゆっくり消えて、新しい曲がゆっくり入る）。同じ曲なら何もしない。ctx がまだなければ、あとで（音が使えるようになったとき）鳴らす
 //   stopBgm()           : ゆっくり消す
 //   setBgmVolume(v)     : 音量 0〜1（ブラウザに保存する）
+//   setBgmEnabled(on)   : BGM を鳴らすか（設定のチェックボックス。ブラウザに保存する）。OFF の間も、場面の曲は覚えておき、ON に戻すと、いまの曲が鳴る
 
 const NOTE_PC = { C: 0, D: 2, E: 4, F: 5, G: 7, A: 9, B: 11 };
 const CHORD_IV = { '': [0, 4, 7], m: [0, 3, 7], 7: [0, 4, 7, 10], m7: [0, 3, 7, 10], dim: [0, 3, 6], sus4: [0, 5, 7] };
@@ -26,7 +27,17 @@ export function chordNotes(name, octave = 3) {
 }
 
 export const bgmSounds = {
-    setBgmTracks(def) { this.bgmDef = def; this.bgmVolume ??= this._loadBgmVolume(def?.volume ?? 0.6); },
+    setBgmTracks(def) {
+        this.bgmDef = def; this.bgmVolume ??= this._loadBgmVolume(def?.volume ?? 0.6);
+        try { this.bgmEnabled ??= localStorage.getItem('bokodunBgmOn') !== '0'; } catch { this.bgmEnabled ??= true; }   // 既定は ON
+    },
+
+    setBgmEnabled(on) {
+        this.bgmEnabled = !!on;
+        try { localStorage.setItem('bokodunBgmOn', on ? '1' : '0'); } catch { /* 保存できなくても、切り替えは効く */ }
+        if (!on) this._bgmFadeOut();
+        else if (this._bgmWant) this.playBgm(this._bgmWant);
+    },
 
     _loadBgmVolume(def) {
         try { const v = Number(localStorage.getItem('bokodunBgmVolume')); if (localStorage.getItem('bokodunBgmVolume') !== null && v >= 0 && v <= 1) return v; } catch { /* 保存できない環境は、既定の音量 */ }
@@ -43,7 +54,7 @@ export const bgmSounds = {
     playBgm(name) {
         this._bgmWant = name;   // ctx がまだ（最初の操作の前）でも、あとで鳴らせるように覚えておく
         const def = this.bgmDef?.tracks?.[name];
-        if (!this.ctx || !def) return;
+        if (!this.ctx || !def || this.bgmEnabled === false) return;   // OFF の間は鳴らさない（曲は覚えておく）
         if (this._bgm?.name === name) return;
         this._bgmFadeOut();
         const c = this.ctx, master = c.createGain();
