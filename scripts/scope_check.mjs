@@ -7,7 +7,7 @@ import * as acorn from 'acorn';
 
 export const root = path.join(path.dirname(new URL(import.meta.url).pathname), '..');
 // ブラウザ・JS の標準の名前（宣言しなくても使える）
-export const GLOBALS = new Set(('Math Number Object Array Set Map WeakMap WeakSet Promise Symbol console document window navigator location performance localStorage sessionStorage JSON Infinity NaN undefined Date String Boolean ' +
+export const GLOBALS = new Set(('Math RegExp Number Object Array Set Map WeakMap WeakSet Promise Symbol console document window navigator location performance localStorage sessionStorage JSON Infinity NaN undefined Date String Boolean ' +
     'parseInt parseFloat isNaN isFinite setTimeout clearTimeout setInterval clearInterval requestAnimationFrame cancelAnimationFrame fetch Image URL Blob FileReader Error TypeError RangeError arguments ' +
     'Float32Array Float64Array Uint8Array Uint8ClampedArray Uint16Array Uint32Array Int8Array Int16Array Int32Array ArrayBuffer DataView KeyboardEvent MouseEvent Event CustomEvent Audio AudioContext webkitAudioContext ' +
     'jhtml alert confirm prompt btoa atob TextDecoder TextEncoder structuredClone queueMicrotask globalThis Intl Reflect Proxy Function URLSearchParams encodeURIComponent decodeURIComponent encodeURI decodeURI FormData Headers AbortController').split(' '));

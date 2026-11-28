@@ -22,8 +22,8 @@ test('音名・和音の計算', () => {
     assert.equal(chordNotes('H'), null);
 });
 
-test('曲データ: 4 つの場面の曲があり、旋律・和音・パターンが正しい', () => {
-    assert.deepEqual(Object.keys(bgm.tracks).sort(), ['boss', 'dungeon', 'field', 'town']);
+test('曲データ: 場面ごとの曲があり、旋律・和音・パターンが正しい', () => {
+    assert.deepEqual(Object.keys(bgm.tracks).sort(), ['boss', 'castle', 'castle_k', 'desert', 'dungeon', 'field', 'forest', 'guild', 'makahiki', 'mountain', 'snow', 'south', 'temple', 'town', 'town_a', 'town_b', 'town_c', 'town_e', 'town_f', 'town_g', 'town_k']);
     for (const [name, t] of Object.entries(bgm.tracks)) {
         const steps = t.chords.length * 8, mel = t.melody.trim().split(/\s+/);
         assert.equal(mel.length, steps, `${name}: 旋律は、和音 1 つにつき 8 ステップ`);
@@ -33,7 +33,7 @@ test('曲データ: 4 つの場面の曲があり、旋律・和音・パター�
         assert.ok(t.bpm >= 40 && t.bpm <= 200, `${name}: bpm`);
         const v = t.voices;
         for (const k of ['arp', 'bass']) if (v[k]) assert.equal(v[k].pattern.split(' ').length, 8, `${name}: ${k} は 8 ステップ`);
-        for (const k of ['kick', 'snare', 'hat']) if (v.drums?.[k]) assert.equal(v.drums[k].length, 8, `${name}: drums.${k} は 8 文字`);
+        for (const k of ['kick', 'snare', 'hat', 'tom', 'clap']) if (v.drums?.[k]) assert.equal(v.drums[k].length, 8, `${name}: drums.${k} は 8 文字`);
         for (const [vn, vv] of Object.entries(v)) if (vv.gain !== undefined) assert.ok(vv.gain > 0 && vv.gain <= 0.3, `${name}: ${vn} の音量が、大きすぎない`);
     }
     for (const r of bgm.rules) assert.ok(bgm.tracks[r.track], `規則の曲 ${r.track} がある`);
@@ -46,7 +46,7 @@ function fakeCtx() {
     return { log, currentTime: 0, sampleRate: 8000, destination: {},
         createOscillator: () => node({ frequency: param(), type: '', start() { log.osc++; }, stop() {} }),
         createGain: () => node({ gain: param() }),
-        createBiquadFilter: () => node({ frequency: param(), type: '' }),
+        createBiquadFilter: () => node({ frequency: param(), Q: param(), type: '' }),
         createBuffer: (c, n) => ({ getChannelData: () => new Float32Array(n) }),
         createBufferSource: () => node({ start() { log.noise++; }, stop() {} }) };
 }
@@ -90,10 +90,21 @@ test('選曲: マップの種類で曲が決まり、ボスが近くにいる間
     const g = Object.create(bgmMethods);
     g.bgmDef = bgm; g.player = { x: 0, z: 0 }; g.monsters = []; g.currentMapId = 'w_05_05'; g.bgmMapType = 'open';
     assert.equal(g.bgmChooseTrack(), 'field', '世界（屋外）は、草原');
-    for (const [id, want] of [['town_a', 'town'], ['city_noble', 'town'], ['village_pub', 'town'], ['temple_town', 'town'], ['guild_adv', 'town'], ['mansion_duke_i', 'town'], ['castle_b_2f', 'dungeon'], ['tenshu_k', 'dungeon'], ['cave', 'dungeon'], ['dungeon', 'dungeon'], ['field_x', 'field'], ['rs_3', 'field']]) {
-        g.currentMapId = id; g.bgmMapType = id.startsWith('field') || id.startsWith('rs') ? 'open' : 'indoor';
+    for (const [id, want] of [['town_d', 'town'], ['town_h', 'town'], ['city_noble', 'town'], ['village_pub', 'town'], ['castle_b_2f', 'castle'], ['mansion_duke_i', 'castle'], ['cave', 'dungeon'], ['dungeon', 'dungeon'], ['field_x', 'field'], ['rs_3', 'field'],
+        // 国ごとの町・店・宿
+        ['town_a', 'town_a'], ['shop_a', 'town_a'], ['town_b', 'town_b'], ['town_c', 'town_c'], ['town_e', 'town_e'], ['town_f', 'town_f'], ['town_g', 'town_g'], ['city_inn_2f_g', 'town_g'], ['elder_house_g', 'town_g'], ['city_inn', 'town'],
+        // ギルド全般・大神殿・マカヒキ国
+        ['guild_adv', 'guild'], ['guild_adv_a', 'guild'], ['guild_mage_master_g', 'guild'], ['guild_training_k', 'town_k'], ['temple', 'temple'], ['temple_cloister_b', 'temple'], ['temple_town', 'town_b'], ['temple_village', 'town_b'],
+        ['town_k', 'town_k'], ['shop_k', 'town_k'], ['city_inn_2f_k', 'town_k'], ['castle_k', 'castle_k'], ['castle_k_basement', 'castle_k'], ['tenshu_k_3f', 'castle_k'], ['shrine_k', 'castle_k'], ['w_12_03', 'makahiki'], ['w_13_02', 'makahiki']]) {
+        g.currentMapId = id; g.bgmMapType = ['field_x', 'rs_3', 'w_12_03', 'w_13_02', 'temple_town', 'temple_village'].includes(id) || /^town|^village|^city$|^city_noble/.test(id) ? 'open' : 'indoor'; g.bgmMapName = '';
         assert.equal(g.bgmChooseTrack(), want, `${id}: ${want}`);
     }
+    // 世界の外のマップは、地形名（マップ名）で、場面の曲が決まる
+    g.currentMapId = 'w_06_10'; g.bgmMapType = 'open';
+    for (const [name, want] of [['北の雪山 (2-8)', 'snow'], ['砂地 (7-11)', 'desert'], ['大森林 (6-5)', 'forest'], ['南国 (12-10)', 'south'], ['岩山 (9-17)', 'mountain'], ['炭鉱の山 (10-16)', 'mountain'], ['草原 (5-5)', 'field'], ['海岸 (2-9)', 'field']]) {
+        g.bgmMapName = name; assert.equal(g.bgmChooseTrack(), want, `${name}: ${want}`);
+    }
+    g.bgmMapName = '';
     g.currentMapId = 'w_05_05'; g.bgmMapType = 'open';
     g.monsters = [{ active: true, isBoss: false, hp: 10, x: 5, z: 0 }];
     assert.equal(g.bgmChooseTrack(), 'field', '普通の敵では、変わらない');

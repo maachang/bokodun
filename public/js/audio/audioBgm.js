@@ -104,6 +104,7 @@ export const bgmSounds = {
             if (m != null) {
                 const len = hold(st.melody, s) * dur;
                 this._bgmTone(st, t, len * 0.98, midiFreq(m), v.lead);
+                if (v.lead.harmony) this._bgmTone(st, t, len * 0.98, midiFreq(m + v.lead.harmony), { ...v.lead, gain: v.lead.gain * (v.lead.harmonyLevel ?? 0.6) });   // 平行の副旋律（半音の数。-4 なら長 3 度下）
                 if (v.lead.echo) this._bgmTone(st, t + v.lead.echo.steps * dur, len * 0.98, midiFreq(m), { ...v.lead, gain: v.lead.gain * v.lead.echo.level });
             }
         }
@@ -113,7 +114,12 @@ export const bgmSounds = {
             if (p !== '.' && p !== undefined) { const i = Number(p), tone = chord.tones[i % chord.tones.length] + 12 * ((v.arp.octave ?? 1) + Math.floor(i / chord.tones.length)); this._bgmTone(st, t, dur * (v.arp.len ?? 0.9), midiFreq(tone), { ...v.arp, attack: 0.005 }); }
         }
         // 和音を伸ばす（小節の頭）
-        if (v.pad && pos === 0) for (const n of chord.tones) this._bgmTone(st, t, dur * 8 * 0.98, midiFreq(n + 12 * (v.pad.octave ?? 0)), v.pad);
+        if (v.pad && pos === 0) for (const n of chord.tones) {
+            this._bgmTone(st, t, dur * 8 * 0.98, midiFreq(n + 12 * (v.pad.octave ?? 0)), v.pad);
+            if (v.pad.layer) this._bgmTone(st, t, dur * 8 * 0.98, midiFreq(n + 12 * ((v.pad.octave ?? 0) + 1)), { ...v.pad, type: v.pad.layer, gain: v.pad.gain * 0.6 });   // 厚み（オルガンや合唱のように）
+        }
+        // 風（砂漠・雪原など。ゆっくり揺れる雑音を、2 小節ごとに）
+        if (v.wind && pos === 0 && bar % 2 === 0) this._bgmWind(st, t, dur * 16, v.wind);
         // 低音
         if (v.bass) {
             const p = v.bass.pattern.split(' ')[pos];
@@ -125,10 +131,12 @@ export const bgmSounds = {
             if (d.kick?.[pos] === 'x') this._bgmKick(st, t, d.gain);
             if (d.snare?.[pos] === 'x') this._bgmNoise(st, t, 0.12, 'bandpass', 1800, d.gain * 1.2);
             if (d.hat?.[pos] === 'x') this._bgmNoise(st, t, 0.04, 'highpass', 7000, d.gain * 0.7);
+            if (d.tom?.[pos] === 'x') this._bgmTom(st, t, d.gain);
+            if (d.clap?.[pos] === 'x') this._bgmNoise(st, t, 0.07, 'bandpass', 1100, d.gain * 1.1);
         }
     },
 
-    _bgmTone(st, t, dur, freq, { type = 'sine', gain = 0.1, attack = 0.01, vibrato = 0 } = {}) {
+    _bgmTone(st, t, dur, freq, { type = 'sine', gain = 0.1, attack = 0.01, vibrato = 0, decay = 0 } = {}) {
         const c = this.ctx, o = c.createOscillator(), g = c.createGain();
         o.type = type; o.frequency.setValueAtTime(freq, t);
         let lfo = null;
@@ -140,6 +148,13 @@ export const bgmSounds = {
         const a = Math.min(attack, dur * 0.5);
         g.gain.setValueAtTime(0.0001, t);
         g.gain.linearRampToValueAtTime(gain, t + a);
+        if (decay > 0) {   // 撥弦・鐘: 鳴らした直後から、指数で減衰する（音の長さは decay 秒まで）
+            const end = Math.max(dur, decay);
+            g.gain.exponentialRampToValueAtTime(0.0001, t + a + decay);
+            o.connect(g); g.connect(st.master);
+            o.start(t); o.stop(t + end + 0.08);
+            return;
+        }
         g.gain.setValueAtTime(gain, t + Math.max(a, dur - 0.06));
         g.gain.exponentialRampToValueAtTime(0.0001, t + dur + 0.05);
         o.connect(g); g.connect(st.master);
@@ -151,6 +166,24 @@ export const bgmSounds = {
         o.type = 'sine'; o.frequency.setValueAtTime(130, t); o.frequency.exponentialRampToValueAtTime(40, t + 0.14);
         g.gain.setValueAtTime(gain * 2.2, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.18);
         o.connect(g); g.connect(st.master); o.start(t); o.stop(t + 0.2);
+    },
+
+    _bgmTom(st, t, gain) {   // 太鼓: キックより高く、長く響く
+        const c = this.ctx, o = c.createOscillator(), g = c.createGain();
+        o.type = 'sine'; o.frequency.setValueAtTime(190, t); o.frequency.exponentialRampToValueAtTime(70, t + 0.25);
+        g.gain.setValueAtTime(gain * 2.4, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.32);
+        o.connect(g); g.connect(st.master); o.start(t); o.stop(t + 0.34);
+    },
+
+    _bgmWind(st, t, dur, { freq = 500, gain = 0.05 } = {}) {   // 風: 雑音をフィルタに通し、音の高さと大きさを、ゆっくり揺らす
+        const c = this.ctx;
+        if (!this._bgmNoiseBuf) this._bgmNoise(st, t, 0.001, 'lowpass', 100, 0.0001);   // 雑音のバッファを作る（使い回す）
+        const s = c.createBufferSource(); s.buffer = this._bgmNoiseBuf; s.loop = true;
+        const f = c.createBiquadFilter(); f.type = 'bandpass'; f.Q.value = 0.8;
+        f.frequency.setValueAtTime(freq * 0.7, t); f.frequency.linearRampToValueAtTime(freq * 1.3, t + dur * 0.5); f.frequency.linearRampToValueAtTime(freq * 0.7, t + dur);
+        const g = c.createGain();
+        g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(gain, t + dur * 0.5); g.gain.linearRampToValueAtTime(0.0001, t + dur);
+        s.connect(f); f.connect(g); g.connect(st.master); s.start(t); s.stop(t + dur + 0.05);
     },
 
     _bgmNoise(st, t, dur, type, freq, gain) {

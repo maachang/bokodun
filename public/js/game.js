@@ -185,6 +185,7 @@ export class GameEngine {
 
         const { env } = this.applyEnvironment(mapData, prevEnv);
         this.bgmMapType = mapData.type;   // BGM の選曲に使う（屋外・屋内）
+        this.bgmMapName = mapData.name;   // BGM の選曲に使う（世界のマップの地形名：北の雪山・砂地など）
 
         const rows = mapData.layout.length;
         const cols = mapData.layout[0].length;
