@@ -1,0 +1,627 @@
+{
+ "_comment": "環境音のデータ（草案・仮。2026-11-28）。コードで鳴らす（public/js/audio/audioAmbience.js）。音声ファイルは使わない。beds: 流れ続ける音（ノイズ→フィルタ。filter・freq・q・gain。lfo の rate[Hz]・depth[大きさの揺れ 0〜1]・freqDepth[高さの揺れ]）。events: ときどき鳴る音（kind: chirp 小鳥・rustle 葉ずれ・gull かもめ・drip 水滴・bell 遠い鐘・crackle 炎・clink 杯や硬貨・hammer 金床・murmur 話し声・creak きしみ。every: [最短, 最長] 秒・gain: 大きさ）。rules は、BGM と同じ形式（上から順に見て、先に当たったもの。id・prefix・regex・name・type の条件は、すべて満たしたとき）。当たらなければ、default（屋外 field・屋内 room）。 level は、曲ごとの音量補正（BGM の平均音量の約 4 分の 1 になるよう、描画で測って決めた。ピークが 0.3 を超えない範囲）。",
+ "volume": 0.5,
+ "default": {
+  "open": "field",
+  "indoor": "room"
+ },
+ "rules": [
+  {
+   "id": [
+    "w_12_02",
+    "w_12_03",
+    "w_12_04",
+    "w_13_02",
+    "w_13_03"
+   ],
+   "track": "coast"
+  },
+  {
+   "prefix": [
+    "guild_smith"
+   ],
+   "track": "smithy"
+  },
+  {
+   "prefix": [
+    "guild_merchant",
+    "shop"
+   ],
+   "track": "shop"
+  },
+  {
+   "prefix": [
+    "guild_mage",
+    "guild_training"
+   ],
+   "track": "room"
+  },
+  {
+   "prefix": [
+    "guild",
+    "city_inn",
+    "village_pub",
+    "town_pub",
+    "slum_bar"
+   ],
+   "track": "tavern"
+  },
+  {
+   "id": [
+    "temple_crypt",
+    "temple_treasury",
+    "temple_treasury_b"
+   ],
+   "track": "cave"
+  },
+  {
+   "prefix": [
+    "temple"
+   ],
+   "track": "temple"
+  },
+  {
+   "prefix": [
+    "shrine_k"
+   ],
+   "track": "temple"
+  },
+  {
+   "id": [
+    "castle_prison",
+    "castle_basement",
+    "castle_a_prison",
+    "castle_a_icehouse",
+    "castle_b_cellar",
+    "castle_j_prison",
+    "castle_f_mine",
+    "castle_g_roots",
+    "castle_k_basement"
+   ],
+   "track": "cave"
+  },
+  {
+   "regex": "^mansion_.*_vault$",
+   "track": "cave"
+  },
+  {
+   "id": [
+    "castle_courtyard",
+    "castle_a_yard",
+    "castle_g_crown",
+    "castle_j_top"
+   ],
+   "track": "field"
+  },
+  {
+   "prefix": [
+    "castle",
+    "mansion",
+    "tenshu"
+   ],
+   "track": "castle"
+  },
+  {
+   "prefix": [
+    "cave",
+    "dungeon"
+   ],
+   "track": "cave"
+  },
+  {
+   "prefix": [
+    "rs_"
+   ],
+   "name": "港町",
+   "track": "port"
+  },
+  {
+   "prefix": [
+    "rs_",
+    "town",
+    "city",
+    "village",
+    "elder_house"
+   ],
+   "track": "town"
+  },
+  {
+   "type": "open",
+   "name": "砂地|砂漠",
+   "track": "desert"
+  },
+  {
+   "type": "open",
+   "name": "雪山|雪原|ツンドラ|極寒",
+   "track": "snow"
+  },
+  {
+   "type": "open",
+   "name": "森林|樹海|南国|熱帯",
+   "track": "forest"
+  },
+  {
+   "type": "open",
+   "name": "海岸|浜辺|湖畔",
+   "track": "coast"
+  },
+  {
+   "type": "open",
+   "name": "岩山|炭鉱|山道",
+   "track": "mountain"
+  }
+ ],
+ "tracks": {
+  "field": {
+   "name": "草原（風と小鳥）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 600,
+     "gain": 0.05,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.13,
+      "depth": 0.6
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "chirp",
+     "every": [
+      3,
+      9
+     ],
+     "gain": 0.04
+    },
+    {
+     "kind": "rustle",
+     "every": [
+      6,
+      14
+     ],
+     "gain": 0.04
+    }
+   ],
+   "level": 4.24
+  },
+  "desert": {
+   "name": "砂漠（乾いた風）",
+   "beds": [
+    {
+     "filter": "bandpass",
+     "freq": 500,
+     "gain": 0.07,
+     "q": 0.6,
+     "lfo": {
+      "rate": 0.1,
+      "depth": 0.7
+     }
+    },
+    {
+     "filter": "highpass",
+     "freq": 3500,
+     "gain": 0.008,
+     "q": 0.5,
+     "lfo": {
+      "rate": 0.07,
+      "depth": 0.8
+     }
+    }
+   ],
+   "events": [],
+   "level": 3.18
+  },
+  "snow": {
+   "name": "極寒（吹雪）",
+   "beds": [
+    {
+     "filter": "bandpass",
+     "freq": 350,
+     "gain": 0.1,
+     "q": 0.5,
+     "lfo": {
+      "rate": 0.08,
+      "depth": 0.8,
+      "freqDepth": 0.25
+     }
+    },
+    {
+     "filter": "highpass",
+     "freq": 2500,
+     "gain": 0.02,
+     "q": 0.5,
+     "lfo": {
+      "rate": 0.11,
+      "depth": 0.7
+     }
+    }
+   ],
+   "events": [],
+   "level": 2.12
+  },
+  "forest": {
+   "name": "大森林（葉ずれと鳥）",
+   "beds": [
+    {
+     "filter": "bandpass",
+     "freq": 2500,
+     "gain": 0.03,
+     "q": 0.4,
+     "lfo": {
+      "rate": 0.2,
+      "depth": 0.5
+     }
+    },
+    {
+     "filter": "lowpass",
+     "freq": 400,
+     "gain": 0.025,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.1,
+      "depth": 0.5
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "chirp",
+     "every": [
+      1.5,
+      5
+     ],
+     "gain": 0.04
+    },
+    {
+     "kind": "rustle",
+     "every": [
+      4,
+      10
+     ],
+     "gain": 0.04
+    }
+   ],
+   "level": 3.04
+  },
+  "coast": {
+   "name": "海岸（波とかもめ）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 700,
+     "gain": 0.1,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.11,
+      "depth": 0.9,
+      "freqDepth": 0.4
+     }
+    },
+    {
+     "filter": "highpass",
+     "freq": 2500,
+     "gain": 0.01,
+     "q": 0.5,
+     "lfo": {
+      "rate": 0.11,
+      "depth": 0.9
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "gull",
+     "every": [
+      6,
+      15
+     ],
+     "gain": 0.04
+    }
+   ],
+   "level": 2.0
+  },
+  "mountain": {
+   "name": "山（強い風）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 450,
+     "gain": 0.07,
+     "q": 0.9,
+     "lfo": {
+      "rate": 0.12,
+      "depth": 0.7,
+      "freqDepth": 0.2
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "chirp",
+     "every": [
+      10,
+      25
+     ],
+     "gain": 0.025
+    }
+   ],
+   "level": 3.59
+  },
+  "cave": {
+   "name": "洞窟・地下（水滴と反響）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 130,
+     "gain": 0.045,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.07,
+      "depth": 0.4
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "drip",
+     "every": [
+      2,
+      7
+     ],
+     "gain": 0.06
+    },
+    {
+     "kind": "creak",
+     "every": [
+      18,
+      40
+     ],
+     "gain": 0.03
+    }
+   ],
+   "level": 7.0
+  },
+  "castle": {
+   "name": "城・屋敷（松明の炎）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 220,
+     "gain": 0.02,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.06,
+      "depth": 0.3
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "crackle",
+     "every": [
+      1.2,
+      3.5
+     ],
+     "gain": 0.035
+    }
+   ],
+   "level": 12.0
+  },
+  "temple": {
+   "name": "神殿（遠い鐘）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 160,
+     "gain": 0.02,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.05,
+      "depth": 0.3
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "bell",
+     "every": [
+      14,
+      30
+     ],
+     "gain": 0.05
+    }
+   ],
+   "level": 7.0
+  },
+  "town": {
+   "name": "町・村（遠いざわめき）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 500,
+     "gain": 0.02,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.1,
+      "depth": 0.5
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "murmur",
+     "every": [
+      1.5,
+      4.5
+     ],
+     "gain": 0.03
+    },
+    {
+     "kind": "chirp",
+     "every": [
+      6,
+      14
+     ],
+     "gain": 0.03
+    }
+   ],
+   "level": 10.0
+  },
+  "tavern": {
+   "name": "酒場・宿・ギルド（にぎわい）",
+   "beds": [
+    {
+     "filter": "bandpass",
+     "freq": 700,
+     "gain": 0.035,
+     "q": 0.5,
+     "lfo": {
+      "rate": 0.2,
+      "depth": 0.4
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "murmur",
+     "every": [
+      0.8,
+      2.2
+     ],
+     "gain": 0.04
+    },
+    {
+     "kind": "clink",
+     "every": [
+      2,
+      6
+     ],
+     "gain": 0.04
+    }
+   ],
+   "level": 3.78
+  },
+  "shop": {
+   "name": "店・商人（客と硬貨）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 300,
+     "gain": 0.012,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.1,
+      "depth": 0.3
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "murmur",
+     "every": [
+      3,
+      8
+     ],
+     "gain": 0.025
+    },
+    {
+     "kind": "clink",
+     "every": [
+      4,
+      10
+     ],
+     "gain": 0.035
+    }
+   ],
+   "level": 10.71
+  },
+  "smithy": {
+   "name": "鍛冶屋（炉と金床）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 260,
+     "gain": 0.05,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.5,
+      "depth": 0.3
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "hammer",
+     "every": [
+      1.0,
+      2.4
+     ],
+     "gain": 0.07
+    },
+    {
+     "kind": "crackle",
+     "every": [
+      1.5,
+      4
+     ],
+     "gain": 0.035
+    }
+   ],
+   "level": 3.33
+  },
+  "port": {
+   "name": "港町（波・かもめ・ざわめき）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 700,
+     "gain": 0.08,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.11,
+      "depth": 0.9,
+      "freqDepth": 0.4
+     }
+    }
+   ],
+   "events": [
+    {
+     "kind": "gull",
+     "every": [
+      5,
+      12
+     ],
+     "gain": 0.035
+    },
+    {
+     "kind": "murmur",
+     "every": [
+      3,
+      8
+     ],
+     "gain": 0.025
+    }
+   ],
+   "level": 2.55
+  },
+  "room": {
+   "name": "屋内（静かな部屋）",
+   "beds": [
+    {
+     "filter": "lowpass",
+     "freq": 180,
+     "gain": 0.012,
+     "q": 0.7,
+     "lfo": {
+      "rate": 0.05,
+      "depth": 0.3
+     }
+    }
+   ],
+   "events": [],
+   "level": 8.0
+  }
+ }
+}

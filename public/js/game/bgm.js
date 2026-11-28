@@ -1,5 +1,18 @@
 // BGM（背景音楽）の選曲。マップの種類（ID の接頭辞・type）から、場面の曲を選ぶ。ボス（enemies.json の boss）が近くにいる間は、ボス戦の曲。
 //   曲の中身・選曲の規則は public/data/bgm.json（草案・仮）。鳴らす仕組みは、public/js/audio/audioBgm.js。
+// 規則（rules）から、マップに合う曲・環境音の名前を選ぶ。上から順に見て、先に当たったもの（なければ null）。BGM（bgm.json）と環境音（ambience.json）で共通
+export function pickByRules(rules, mapId, type, name = '') {
+    for (const r of rules ?? []) {
+        if (r.id && !r.id.includes(mapId)) continue;
+        if (r.prefix && !r.prefix.some((p) => mapId.startsWith(p))) continue;
+        if (r.regex && !new RegExp(r.regex).test(mapId)) continue;
+        if (r.name && !new RegExp(r.name).test(name ?? '')) continue;
+        if (r.type && r.type !== type) continue;
+        return r.track;
+    }
+    return null;
+}
+
 export const bgmMethods = {
     // マップの場面の曲。規則（bgm.json の rules）は、上から順に見て、先に当たったものを採る。
     // 1 つの規則に書いた条件は、すべて満たしたときに当たる（AND）。条件は、id（一覧のどれか）・prefix（接頭辞のどれか）・regex（ID に合う正規表現）・name（マップ名に合う正規表現）・type（open / indoor）。
@@ -7,15 +20,7 @@ export const bgmMethods = {
     bgmTrackForMap(mapId, type, name = '') {
         const def = this.bgmDef;
         if (!def) return null;
-        for (const r of def.rules ?? []) {
-            if (r.id && !r.id.includes(mapId)) continue;
-            if (r.prefix && !r.prefix.some((p) => mapId.startsWith(p))) continue;
-            if (r.regex && !new RegExp(r.regex).test(mapId)) continue;
-            if (r.name && !new RegExp(r.name).test(name ?? '')) continue;
-            if (r.type && r.type !== type) continue;
-            return r.track;
-        }
-        return type === 'indoor' ? 'dungeon' : 'field';
+        return pickByRules(def.rules, mapId, type, name) ?? (type === 'indoor' ? 'dungeon' : 'field');
     },
 
     // 今、鳴らすべき曲。ボスが近くにいるとき（一度鳴らしたら、少し遠ざかるまで続ける）は、ボス戦
