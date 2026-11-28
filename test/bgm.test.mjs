@@ -23,7 +23,7 @@ test('音名・和音の計算', () => {
 });
 
 test('曲データ: 場面ごとの曲があり、旋律・和音・パターンが正しい', () => {
-    assert.deepEqual(Object.keys(bgm.tracks).sort(), ['boss', 'castle', 'castle_k', 'desert', 'dungeon', 'field', 'forest', 'guild', 'makahiki', 'mountain', 'snow', 'south', 'temple', 'town', 'town_a', 'town_b', 'town_c', 'town_e', 'town_f', 'town_g', 'town_k']);
+    assert.deepEqual(Object.keys(bgm.tracks).sort(), ['boss', 'castle', 'castle_k', 'desert', 'dungeon', 'field', 'forest', 'guild', 'makahiki', 'mountain', 'port', 'posttown', 'snow', 'south', 'temple', 'town', 'town_a', 'town_b', 'town_c', 'town_e', 'town_f', 'town_g', 'town_k']);
     for (const [name, t] of Object.entries(bgm.tracks)) {
         const steps = t.chords.length * 8, mel = t.melody.trim().split(/\s+/);
         assert.equal(mel.length, steps, `${name}: 旋律は、和音 1 つにつき 8 ステップ`);
@@ -94,15 +94,18 @@ test('選曲: マップの種類で曲が決まり、ボスが近くにいる間
     const g = Object.create(bgmMethods);
     g.bgmDef = bgm; g.player = { x: 0, z: 0 }; g.monsters = []; g.currentMapId = 'w_05_05'; g.bgmMapType = 'open';
     assert.equal(g.bgmChooseTrack(), 'field', '世界（屋外）は、草原');
-    for (const [id, want] of [['town_d', 'town'], ['town_h', 'town'], ['city_noble', 'town'], ['village_pub', 'town'], ['castle_b_2f', 'castle'], ['mansion_duke_i', 'castle'], ['cave', 'dungeon'], ['dungeon', 'dungeon'], ['field_x', 'field'], ['rs_3', 'field'],
+    for (const [id, want] of [['town_d', 'town'], ['town_h', 'town'], ['city_noble', 'town'], ['village_pub', 'town'], ['castle_b_2f', 'castle'], ['mansion_duke_i', 'castle'], ['cave', 'dungeon'], ['dungeon', 'dungeon'], ['field_x', 'field'], ['field_grass', 'field'],
         // 国ごとの町・店・宿
         ['town_a', 'town_a'], ['shop_a', 'town_a'], ['town_b', 'town_b'], ['town_c', 'town_c'], ['town_e', 'town_e'], ['town_f', 'town_f'], ['town_g', 'town_g'], ['city_inn_2f_g', 'town_g'], ['elder_house_g', 'town_g'], ['city_inn', 'town'],
         // ギルド全般・大神殿・マカヒキ国
         ['guild_adv', 'guild'], ['guild_adv_a', 'guild'], ['guild_mage_master_g', 'guild'], ['guild_training_k', 'town_k'], ['temple', 'temple'], ['temple_cloister_b', 'temple'], ['temple_town', 'town_b'], ['temple_village', 'town_b'],
         ['town_k', 'town_k'], ['shop_k', 'town_k'], ['city_inn_2f_k', 'town_k'], ['castle_k', 'castle_k'], ['castle_k_basement', 'castle_k'], ['tenshu_k_3f', 'castle_k'], ['shrine_k', 'castle_k'], ['w_12_03', 'makahiki'], ['w_13_02', 'makahiki']]) {
-        g.currentMapId = id; g.bgmMapType = ['field_x', 'rs_3', 'w_12_03', 'w_13_02', 'temple_town', 'temple_village'].includes(id) || /^town|^village|^city$|^city_noble/.test(id) ? 'open' : 'indoor'; g.bgmMapName = '';
+        g.currentMapId = id; g.bgmMapType = ['field_x', 'field_grass', 'w_12_03', 'w_13_02', 'temple_town', 'temple_village'].includes(id) || /^town|^village|^city$|^city_noble/.test(id) ? 'open' : 'indoor'; g.bgmMapName = '';
         assert.equal(g.bgmChooseTrack(), want, `${id}: ${want}`);
     }
+    // 道沿いの町・村（rs_*）は、町の曲。港町は港の曲・宿場は宿場の曲（マップ名で決まる）
+    g.currentMapId = 'rs_01'; g.bgmMapType = 'open';
+    for (const [name, want] of [['アルマダ村', 'town'], ['ソレミア町', 'town'], ['トレヴ港町', 'port'], ['シルヴァノ宿場', 'posttown']]) { g.bgmMapName = name; assert.equal(g.bgmChooseTrack(), want, `${name}: ${want}`); }
     // 世界の外のマップは、地形名（マップ名）で、場面の曲が決まる
     g.currentMapId = 'w_06_10'; g.bgmMapType = 'open';
     for (const [name, want] of [['北の雪山 (2-8)', 'snow'], ['砂地 (7-11)', 'desert'], ['大森林 (6-5)', 'forest'], ['南国 (12-10)', 'south'], ['岩山 (9-17)', 'mountain'], ['炭鉱の山 (10-16)', 'mountain'], ['草原 (5-5)', 'field'], ['海岸 (2-9)', 'field']]) {

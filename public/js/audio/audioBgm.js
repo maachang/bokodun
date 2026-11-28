@@ -17,6 +17,11 @@ export const TIMBRES = {
     brass: { oscs: [{ type: 'sawtooth', detune: -4 }, { type: 'sawtooth', detune: 4 }], lp: [1.2, 5], swell: 0.08, attack: 0.05, release: 0.12, q: 1.1 },   // 金管（ホルン）: 音の頭は丸く、すぐ明るくなる
     flute: { oscs: [{ type: 'sine' }, { type: 'triangle', level: 0.22 }, { type: 'sine', mult: 2, level: 0.08 }], attack: 0.05, release: 0.12 },   // 笛: ほぼ正弦波＋かすかな倍音
     harp: { oscs: [{ type: 'triangle' }, { type: 'sine', mult: 2, level: 0.35 }, { type: 'sine', mult: 3, level: 0.12 }], release: 0.1 },   // ハープ・撥弦（decay と組み合わせる）
+    pluck: { oscs: [{ type: 'sawtooth' }, { type: 'triangle', mult: 2, level: 0.3 }], lp: [7, 1.6], swell: 0.22, attack: 0.004, release: 0.1, q: 1.2 },   // 撥弦（ウード・琵琶・三味線・リュート）: 音の頭は明るく、すぐ丸くなる
+    bell: { oscs: [{ type: 'sine' }, { type: 'sine', mult: 2.76, level: 0.45 }, { type: 'sine', mult: 5.4, level: 0.22 }], attack: 0.003, release: 0.25 },   // 鐘・銅鑼（ずれた倍音）（decay と組み合わせる）
+    organ: { oscs: [{ type: 'sine' }, { type: 'sine', mult: 2, level: 0.6 }, { type: 'sine', mult: 3, level: 0.35 }, { type: 'sine', mult: 4, level: 0.2 }, { type: 'sine', mult: 0.5, level: 0.5 }], attack: 0.05, release: 0.12 },   // パイプオルガン・笙
+    accordion: { oscs: [{ type: 'sawtooth', detune: -9 }, { type: 'sawtooth', detune: 9 }], lp: [3, 3], swell: 0.05, attack: 0.04, release: 0.06, q: 0.8 },   // アコーディオン（2 つの音をずらす）
+    choir: { oscs: [{ type: 'sine' }, { type: 'triangle', detune: 8, level: 0.6 }, { type: 'sine', mult: 2, level: 0.25 }], attack: 0.35, release: 0.4 },   // 合唱・声
     cello: { oscs: [{ type: 'sawtooth' }, { type: 'sine', mult: 0.5, level: 0.8 }], lp: [3, 6], swell: 0.12, attack: 0.03, release: 0.12, q: 0.9 }   // 低弦・コントラバス
 };
 
@@ -57,7 +62,7 @@ export const bgmSounds = {
         this.bgmVolume = Math.max(0, Math.min(1, v));
         try { localStorage.setItem('bokodunBgmVolume', String(this.bgmVolume)); } catch { /* 保存できなくても、音量は変わる */ }
         const cur = this._bgm;
-        if (cur && this.ctx) { cur.master.gain.cancelScheduledValues(this.ctx.currentTime); cur.master.gain.setTargetAtTime(this.bgmVolume, this.ctx.currentTime, 0.1); }
+        if (cur && this.ctx) { cur.master.gain.cancelScheduledValues(this.ctx.currentTime); cur.master.gain.setTargetAtTime(this.bgmVolume * (cur.def.level ?? 1), this.ctx.currentTime, 0.1); }
     },
 
     playBgm(name) {
@@ -68,7 +73,7 @@ export const bgmSounds = {
         this._bgmFadeOut();
         const c = this.ctx, master = c.createGain();
         master.gain.setValueAtTime(0.0001, c.currentTime);
-        master.gain.linearRampToValueAtTime(Math.max(0.0001, this.bgmVolume ?? 0.6), c.currentTime + FADE_IN);
+        master.gain.linearRampToValueAtTime(Math.max(0.0001, (this.bgmVolume ?? 0.6) * (def.level ?? 1)), c.currentTime + FADE_IN);   // level: 曲ごとの音量補正（曲同士の大きさをそろえる）
         master.connect(c.destination);
         const rev = this._bgmReverb();   // 残響（広い空間の響き）。曲が替わっても、前の曲の余韻は、自然に残る
         if (rev) master.connect(rev);
@@ -127,31 +132,33 @@ export const bgmSounds = {
         const v = st.def.voices, bar = Math.floor(s / 8), pos = s % 8, chord = st.chords[bar], dur = st.stepSec;
         if (pos === 0 && st.def.dynamics) st.bus.gain.setTargetAtTime(st.def.dynamics[bar % st.def.dynamics.length] ?? 1, t, 0.25);   // 小節ごとの音量（盛り上がり・静まり）
         const hold = (list, i) => { let n = 1; while (list[(i + n) % list.length] === '-' && n < 16) n++; return n; };   // その音が続くステップ数
-        // 旋律
+        // パートの出入り: bars: [始め, 終わり) の小節だけ鳴らす（笛だけで始まり、弦・金管・太鼓が、順に加わる編曲）。書かなければ、ずっと鳴る
+        const on = (vc) => vc && (!vc.bars || (bar >= vc.bars[0] && bar < vc.bars[1]));
+        // 旋律（lead と lead2 は同じ旋律。bars で、楽器を入れ替えられる）
         const tok = st.melody[s];
-        if (v.lead && tok !== '-' && tok !== '.') {
+        for (const ld of [v.lead, v.lead2]) {
+            if (!on(ld) || tok === '-' || tok === '.') continue;
             const m = noteMidi(tok);
-            if (m != null) {
-                const len = hold(st.melody, s) * dur;
-                this._bgmTone(st, t, len * 0.98, midiFreq(m), v.lead);
-                if (v.lead.harmony) this._bgmTone(st, t, len * 0.98, midiFreq(m + v.lead.harmony), { ...v.lead, gain: v.lead.gain * (v.lead.harmonyLevel ?? 0.6) });   // 平行の副旋律（半音の数。-4 なら長 3 度下）
-                if (v.lead.echo) this._bgmTone(st, t + v.lead.echo.steps * dur, len * 0.98, midiFreq(m), { ...v.lead, gain: v.lead.gain * v.lead.echo.level });
-            }
+            if (m == null) continue;
+            const len = hold(st.melody, s) * dur;
+            this._bgmTone(st, t, len * 0.98, midiFreq(m), ld);
+            if (ld.harmony) this._bgmTone(st, t, len * 0.98, midiFreq(m + ld.harmony), { ...ld, gain: ld.gain * (ld.harmonyLevel ?? 0.6) });   // 平行の副旋律（半音の数。-4 なら長 3 度下）
+            if (ld.echo) this._bgmTone(st, t + ld.echo.steps * dur, len * 0.98, midiFreq(m), { ...ld, gain: ld.gain * ld.echo.level });
         }
         // 分散和音（pattern: 0〜3 が和音の何番目か。2 を超えたら、1 オクターブ上へ）
-        if (v.arp) {
+        if (on(v.arp)) {
             const p = v.arp.pattern.split(' ')[pos];
             if (p !== '.' && p !== undefined) { const i = Number(p), tone = chord.tones[i % chord.tones.length] + 12 * ((v.arp.octave ?? 1) + Math.floor(i / chord.tones.length)); this._bgmTone(st, t, dur * (v.arp.len ?? 0.9), midiFreq(tone), { ...v.arp, attack: 0.005 }); }
         }
         // 和音を伸ばす（小節の頭）
-        if (v.pad && pos === 0) for (const n of chord.tones) {
+        if (on(v.pad) && pos === 0) for (const n of chord.tones) {
             this._bgmTone(st, t, dur * 8 * 0.98, midiFreq(n + 12 * (v.pad.octave ?? 0)), v.pad);
             if (v.pad.layer) this._bgmTone(st, t, dur * 8 * 0.98, midiFreq(n + 12 * ((v.pad.octave ?? 0) + 1)), { ...v.pad, type: v.pad.layer, gain: v.pad.gain * 0.6 });   // 厚み（オルガンや合唱のように）
         }
         // 風（砂漠・雪原など。ゆっくり揺れる雑音を、2 小節ごとに）
-        if (v.wind && pos === 0 && bar % 2 === 0) this._bgmWind(st, t, dur * 16, v.wind);
+        if (on(v.wind) && pos === 0 && bar % 2 === 0) this._bgmWind(st, t, dur * 16, v.wind);
         // 低音（R: 根音・5: 5 度上・3: 3 度上・8: 1 オクターブ上）
-        if (v.bass) {
+        if (on(v.bass)) {
             const p = v.bass.pattern.split(' ')[pos];
             if (p === 'R' || p === '5' || p === '3' || p === '8') {
                 const root = chord.root - 12;
@@ -159,7 +166,7 @@ export const bgmSounds = {
             }
         }
         // ドラム
-        const d = v.drums;
+        const d = on(v.drums) ? v.drums : null;
         if (d) {
             if (d.kick?.[pos] === 'x') this._bgmKick(st, t, d.gain);
             if (d.snare?.[pos] === 'x') this._bgmNoise(st, t, 0.12, 'bandpass', 1800, d.gain * 1.2);

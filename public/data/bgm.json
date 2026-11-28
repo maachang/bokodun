@@ -1,5 +1,5 @@
 {
- "_comment": "BGM の曲データ（草案・仮。2026-11-26）。コードで鳴らす（public/js/audio/audioBgm.js）。音声ファイルは使わない。1 ステップ＝ 8 分音符。chords は 1 小節（8 ステップ）に 1 つ（C・Am・Bb・G#・E7・Cdim など）。melody は、ステップごとの音名（E5・G#5・Bb5）で、「-」は前の音を伸ばす、「.」は休み。voices: lead（旋律）・arp（和音の分散。pattern は、0〜3 が和音の何番目か）・pad（和音を伸ばす）・bass（pattern の R は根音・5 は 5 度。len は長さ[ステップ]）・drums（kick・snare・hat。8 文字で、x が鳴らす）。gain は音量。rules は、上から順に見て、先に当たったもので曲を選ぶ。1 つの規則の条件は、すべて満たしたときに当たる（id＝マップ ID の一覧／prefix＝接頭辞／regex＝ID の正規表現／name＝マップ名の正規表現／type＝open か indoor）。当たらなければ、type が open なら field・indoor なら dungeon。曲を足した 17 曲（砂漠・極寒・大森林・南国・岩山・マカヒキ島と町と城・A〜G の町・ギルド・大神殿・城）は 2026-11-28 の草案・仮。voices には、ほかに lead.harmony（平行の副旋律・半音の数）・lead / arp の decay（撥弦や鐘のように減衰）・pad.layer（厚み）・wind（風）・drums.tom（太鼓）・drums.clap（手拍子）がある。ボス（enemies.json の boss）が近くにいる間は、boss。 【2026-11-28 第 2 版】各曲は、旋律を場面ごとに書き下ろし、和音は旋律に合わせて自動で選んだ（草案・仮）。dynamics は、小節ごとの音量の起伏（静かに始まり、盛り上がり、静まる）。bass の pattern には、3（3 度上）・8（1 オクターブ上）も使える。drums.fill は、4 小節ごとの終わりの連打（snare か tom）。field は、最後の 4 小節で、全音上に転調する。",
+ "_comment": "BGM の曲データ（草案・仮。2026-11-26）。コードで鳴らす（public/js/audio/audioBgm.js）。音声ファイルは使わない。1 ステップ＝ 8 分音符。chords は 1 小節（8 ステップ）に 1 つ（C・Am・Bb・G#・E7・Cdim など）。melody は、ステップごとの音名（E5・G#5・Bb5）で、「-」は前の音を伸ばす、「.」は休み。voices: lead（旋律）・arp（和音の分散。pattern は、0〜3 が和音の何番目か）・pad（和音を伸ばす）・bass（pattern の R は根音・5 は 5 度。len は長さ[ステップ]）・drums（kick・snare・hat。8 文字で、x が鳴らす）。gain は音量。rules は、上から順に見て、先に当たったもので曲を選ぶ。1 つの規則の条件は、すべて満たしたときに当たる（id＝マップ ID の一覧／prefix＝接頭辞／regex＝ID の正規表現／name＝マップ名の正規表現／type＝open か indoor）。当たらなければ、type が open なら field・indoor なら dungeon。曲を足した 17 曲（砂漠・極寒・大森林・南国・岩山・マカヒキ島と町と城・A〜G の町・ギルド・大神殿・城）は 2026-11-28 の草案・仮。voices には、ほかに lead.harmony（平行の副旋律・半音の数）・lead / arp の decay（撥弦や鐘のように減衰）・pad.layer（厚み）・wind（風）・drums.tom（太鼓）・drums.clap（手拍子）がある。ボス（enemies.json の boss）が近くにいる間は、boss。 【2026-11-28 第 2 版】各曲は、旋律を場面ごとに書き下ろし、和音は旋律に合わせて自動で選んだ（草案・仮）。dynamics は、小節ごとの音量の起伏（静かに始まり、盛り上がり、静まる）。bass の pattern には、3（3 度上）・8（1 オクターブ上）も使える。drums.fill は、4 小節ごとの終わりの連打（snare か tom）。field は、最後の 4 小節で、全音上に転調する。 level は、曲ごとの音量補正（曲同士の平均音量をそろえた。peak が 0.6 を超えない範囲）。",
  "volume": 0.6,
  "rules": [
   {
@@ -19,6 +19,26 @@
   {
    "regex": "(^|_)k(_|$)",
    "track": "town_k"
+  },
+  {
+   "prefix": [
+    "rs_"
+   ],
+   "name": "港町",
+   "track": "port"
+  },
+  {
+   "prefix": [
+    "rs_"
+   ],
+   "name": "宿場",
+   "track": "posttown"
+  },
+  {
+   "prefix": [
+    "rs_"
+   ],
+   "track": "town"
   },
   {
    "prefix": [
@@ -120,77 +140,110 @@
  "tracks": {
   "field": {
    "name": "草原・外のマップ（旅の始まり）",
-   "bpm": 112,
+   "bpm": 92,
    "dynamics": [
+    0.6,
+    0.65,
+    0.7,
+    0.7,
+    0.75,
     0.8,
-    0.8,
-    0.8,
-    0.8,
-    0.9,
-    0.9,
-    0.9,
-    0.9,
-    1.0,
+    0.85,
+    0.85,
+    0.95,
     1.0,
     1.0,
     1.0,
     1.1,
     1.1,
-    1.1,
-    1.1
+    1.05,
+    0.9
    ],
    "chords": [
     "C",
-    "G",
-    "F",
     "Em",
+    "Dm",
+    "G",
     "C",
+    "G",
+    "Dm",
     "G",
     "Am",
-    "G",
-    "C",
-    "F",
-    "C",
+    "Am",
+    "Dm",
     "G",
     "D",
-    "Em",
+    "G",
     "A",
     "D"
    ],
-   "melody": "G4 - C5 - E5 - D5 C5 B4 - G4 - D5 - - - F4 - A4 - C5 - B4 A4 G4 - - - E4 F4 G4 - G4 - C5 - E5 - D5 C5 B4 - G4 - B4 - D5 - A4 - C5 - E5 - D5 C5 B4 - - - G4 - . . E5 - - G5 F5 E5 D5 E5 C5 - - - G4 - A4 B4 C5 - E5 - G5 - F5 E5 D5 - - - - - C5 D5 F#5 - A5 - F#5 - D5 - G5 - B5 - G5 - E5 - A5 - G5 - F#5 - E5 - D5 - - - - - - -",
+   "melody": "G4 - - - C5 - E5 - G5 - - - E5 - - - F5 - - E5 D5 - C5 - B4 - - - G4 - - - G4 - - - C5 - E5 - A5 - - - G5 - - - F5 - E5 - D5 - F5 - E5 - - - D5 - - - A4 - - - C5 - E5 - A5 - - - G5 - E5 - F5 - - - D5 - F5 - G5 - - - F5 - E5 D5 A4 - - - D5 - F#5 - B5 - - - A5 - - - G5 - F#5 - E5 - C#5 - D5 - - - - - - -",
    "voices": {
     "lead": {
+     "type": "flute",
+     "gain": 0.13,
+     "attack": 0.06,
+     "vibrato": 5,
+     "bars": [
+      0,
+      8
+     ]
+    },
+    "lead2": {
      "type": "brass",
      "gain": 0.1,
-     "attack": 0.04,
+     "attack": 0.05,
      "vibrato": 5,
      "harmony": -12,
-     "harmonyLevel": 0.45
+     "harmonyLevel": 0.45,
+     "bars": [
+      8,
+      16
+     ]
     },
     "arp": {
-     "pattern": "0 1 2 1 0 1 2 1",
+     "pattern": "0 1 2 1 2 1 0 1",
      "type": "harp",
-     "gain": 0.075,
+     "gain": 0.06,
      "decay": 0.9,
      "octave": 1
     },
     "pad": {
      "type": "strings",
      "gain": 0.05,
-     "attack": 0.4,
-     "octave": 0
+     "attack": 0.5,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
     },
     "bass": {
-     "pattern": "R . 5 . 8 . 5 .",
+     "pattern": "R . . . 5 . . .",
      "type": "cello",
-     "gain": 0.17,
-     "len": 0.8
+     "gain": 0.15,
+     "len": 3.5,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "wind": {
+     "freq": 900,
+     "gain": 0.02,
+     "bars": [
+      0,
+      4
+     ]
     },
     "drums": {
      "tom": "x...x...",
-     "snare": "..x...x.",
      "fill": "tom",
-     "gain": 0.06
+     "gain": 0.06,
+     "bars": [
+      8,
+      16
+     ]
     }
    }
   },
@@ -236,27 +289,46 @@
    "melody": "F4 - A4 - C5 - A4 - D5 - C5 - A4 - G4 - F4 - A4 - C5 - D5 - C5 - - - . . . . F4 - A4 - C5 - A4 - D5 - C5 - A4 - G4 - A#4 - A4 - G4 - E4 - F4 - - - . . . . D5 - F5 - D5 - C5 - A#4 - C5 - D5 - - - D5 - F5 - A5 - G5 - F5 - - - . . . . A5 - G5 - F5 - D5 - A#4 - C5 - D5 - C5 - A#4 - A4 - G4 - E4 - F4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "sine",
-     "gain": 0.15,
-     "attack": 0.04,
+     "type": "flute",
+     "gain": 0.13,
+     "attack": 0.06,
      "vibrato": 5.5
     },
+    "lead2": {
+     "type": "strings",
+     "gain": 0.06,
+     "attack": 0.2,
+     "bars": [
+      8,
+      16
+     ]
+    },
     "arp": {
+     "type": "harp",
+     "gain": 0.055,
      "pattern": "0 2 1 2 0 2 1 2",
-     "type": "triangle",
-     "gain": 0.07,
-     "len": 0.8,
+     "decay": 0.8,
      "octave": 1
     },
-    "bass": {
-     "pattern": "R . . . 5 . . .",
-     "type": "sine",
-     "gain": 0.15,
-     "len": 3.5
+    "pad": {
+     "type": "strings",
+     "gain": 0.035,
+     "attack": 0.5,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
     },
-    "drums": {
-     "hat": "..x...x.",
-     "gain": 0.025
+    "bass": {
+     "type": "cello",
+     "gain": 0.13,
+     "pattern": "R . . . 5 . . .",
+     "len": 3,
+     "bars": [
+      4,
+      16
+     ]
     }
    }
   },
@@ -302,31 +374,49 @@
    "melody": "A3 - - - - - . . . . A#3 - A3 - - - C4 - - - A#3 - - - A3 - - - . . E3 - A3 - - - - - . . . . A#3 - A3 - - - F4 - - - E4 - - - E4 - - - - - - - D4 - - C4 D4 - E4 - F4 - - - E4 - - - D4 - - C4 D4 - A#3 - A3 - - - - - - - A4 - - - G4 - E4 - F4 - E4 - D4 - C4 - A#3 - - - A3 - - - E3 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "sine",
-     "gain": 0.11,
-     "attack": 0.08,
+     "type": "choir",
+     "gain": 0.1,
+     "attack": 0.12,
      "vibrato": 4,
      "echo": {
       "steps": 3,
       "level": 0.5
      }
     },
+    "arp": {
+     "type": "bell",
+     "gain": 0.05,
+     "pattern": ". . . 2 . . . .",
+     "decay": 1.4,
+     "octave": 2,
+     "bars": [
+      4,
+      16
+     ]
+    },
     "pad": {
-     "type": "sawtooth",
-     "gain": 0.035,
+     "type": "strings",
+     "gain": 0.03,
      "attack": 1.2,
-     "octave": 0,
-     "layer": "sine"
+     "octave": 0
     },
     "bass": {
+     "type": "cello",
+     "gain": 0.13,
      "pattern": "R . . . . . . .",
-     "type": "triangle",
-     "gain": 0.14,
      "len": 7
+    },
+    "wind": {
+     "freq": 300,
+     "gain": 0.03
     },
     "drums": {
      "tom": "x.......",
-     "gain": 0.08
+     "gain": 0.08,
+     "bars": [
+      4,
+      16
+     ]
     }
    }
   },
@@ -372,30 +462,35 @@
    "melody": "A4 - - G#4 A4 - C5 - B4 - - A4 G#4 - E4 - F4 - - E4 F4 - A4 - G#4 - - F4 E4 - G#4 - A4 - - G#4 A4 - C5 - E5 - - D5 C5 - A4 - F5 - E5 - D5 - B4 - G#4 - - - G#4 . G#4 G#4 C5 - C5 C5 E5 - C5 - D5 - D5 D5 F5 - D5 - E5 - E5 E5 G#5 - E5 - F5 - E5 - C5 - A4 - B4 - - A4 G#4 - E4 - F4 - - E4 F4 - A4 - D5 - C5 - B4 - A4 G#4 A4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "sawtooth",
-     "gain": 0.085,
-     "attack": 0.005,
+     "type": "brass",
+     "gain": 0.09,
+     "attack": 0.03,
+     "vibrato": 4,
      "harmony": -12,
-     "harmonyLevel": 0.45
+     "harmonyLevel": 0.5
+    },
+    "lead2": {
+     "type": "strings",
+     "gain": 0.05,
+     "attack": 0.05
     },
     "pad": {
-     "type": "sawtooth",
+     "type": "strings",
      "gain": 0.04,
      "attack": 0.05,
      "octave": 0
     },
     "bass": {
+     "type": "cello",
+     "gain": 0.15,
      "pattern": "R R 8 R R R 8 R",
-     "type": "sawtooth",
-     "gain": 0.14,
      "len": 0.8
     },
     "drums": {
-     "kick": "x.x.x.x.",
+     "tom": "x.x.x.x.",
      "snare": "..x...x.",
-     "hat": "xxxxxxxx",
      "fill": "snare",
-     "gain": 0.16
+     "gain": 0.12
     }
    }
   },
@@ -441,33 +536,45 @@
    "melody": "E4 - G#4 - A4 - G#4 F4 E4 - - - . . . . G#4 - A4 - B4 - A4 G#4 F4 - - - E4 - - - E4 - G#4 - A4 - G#4 F4 E4 - . . B3 - C4 - D4 - C4 - B3 - E4 - E4 - - - - - . . B4 - - C5 B4 - A4 - G#4 - A4 - B4 - - - C5 - - D5 C5 - B4 - A4 - G#4 - F4 - - - E5 - - D5 C5 - B4 - A4 - G#4 - A4 - B4 - G#4 - F4 - E4 - D4 - E4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "triangle",
+     "type": "flute",
      "gain": 0.12,
-     "attack": 0.03,
+     "attack": 0.06,
      "vibrato": 5.5,
      "echo": {
       "steps": 3,
-      "level": 0.35
-     }
+      "level": 0.3
+     },
+     "bars": [
+      2,
+      16
+     ]
     },
     "arp": {
-     "pattern": "0 . 1 . 2 . 1 .",
-     "type": "triangle",
+     "type": "pluck",
      "gain": 0.06,
-     "decay": 0.35,
-     "octave": 1
+     "pattern": "0 . 1 . 2 . 1 .",
+     "decay": 0.5,
+     "octave": 1,
+     "bars": [
+      0,
+      16
+     ]
     },
     "pad": {
-     "type": "sine",
-     "gain": 0.04,
+     "type": "strings",
+     "gain": 0.035,
      "attack": 0.9,
-     "octave": 0
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
     },
     "bass": {
-     "pattern": "R . . . R . 5 .",
-     "type": "sine",
-     "gain": 0.14,
-     "len": 2
+     "type": "cello",
+     "gain": 0.13,
+     "pattern": "R . . . . . . .",
+     "len": 7
     },
     "wind": {
      "freq": 700,
@@ -475,8 +582,11 @@
     },
     "drums": {
      "tom": "x..x..x.",
-     "hat": "..x...x.",
-     "gain": 0.06
+     "gain": 0.06,
+     "bars": [
+      8,
+      16
+     ]
     }
    }
   },
@@ -522,7 +632,7 @@
    "melody": "A4 - - - F4 - D4 - E4 - - - F4 - - - A4 - - - B4 - A4 - F4 - - - - - . . A4 - - - F4 - D4 - E4 - - - G4 - - - F4 - E4 - D4 - C4 - D4 - - - - - . . D5 - - - C5 - A4 - B4 - - - A4 - - - G4 - - - A4 - B4 - A4 - - - - - . . F5 - - - E5 - D5 - C5 - - - B4 - A4 - G4 - F4 - E4 - F4 - D4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "sine",
+     "type": "bell",
      "gain": 0.12,
      "attack": 0.004,
      "decay": 1.8,
@@ -530,17 +640,24 @@
      "harmonyLevel": 0.3
     },
     "pad": {
-     "type": "triangle",
+     "type": "choir",
      "gain": 0.045,
      "attack": 1.2,
      "octave": 0,
-     "layer": "sine"
+     "bars": [
+      4,
+      16
+     ]
     },
     "bass": {
+     "type": "cello",
+     "gain": 0.12,
      "pattern": "R . . . . . . .",
-     "type": "sine",
-     "gain": 0.13,
-     "len": 6
+     "len": 6,
+     "bars": [
+      8,
+      16
+     ]
     },
     "wind": {
      "freq": 420,
@@ -590,29 +707,50 @@
    "melody": "G4 - A4 B4 D5 - B4 - E5 - D5 - B4 - A4 - G4 - A4 B4 D5 - E5 - F#5 - - - D5 - . . E5 - D5 B4 A4 - B4 - D5 - B4 - A4 - G4 - A4 - B4 D5 E5 - D5 - B4 - - - G4 - . . D5 - E5 F#5 G5 - F#5 - E5 - D5 - B4 - D5 - E5 - F#5 G5 A5 - G5 - F#5 - - - D5 - . . B5 - A5 G5 F#5 - E5 - D5 - E5 F#5 G5 - A5 - B5 - A5 - G5 - F#5 - G5 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "triangle",
+     "type": "flute",
      "gain": 0.14,
-     "attack": 0.06,
-     "vibrato": 5.5
+     "attack": 0.07,
+     "vibrato": 5.5,
+     "bars": [
+      0,
+      16
+     ]
+    },
+    "lead2": {
+     "type": "choir",
+     "gain": 0.07,
+     "attack": 0.3,
+     "bars": [
+      8,
+      16
+     ]
     },
     "arp": {
-     "pattern": "0 1 2 1 2 1 0 1",
-     "type": "triangle",
+     "type": "harp",
      "gain": 0.06,
+     "pattern": "0 1 2 1 2 1 0 1",
      "decay": 0.5,
      "octave": 1
     },
     "pad": {
-     "type": "sine",
-     "gain": 0.04,
+     "type": "strings",
+     "gain": 0.035,
      "attack": 1.0,
-     "octave": 0
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
     },
     "bass": {
+     "type": "cello",
+     "gain": 0.13,
      "pattern": "R . . . 5 . . .",
-     "type": "sine",
-     "gain": 0.14,
-     "len": 3
+     "len": 3,
+     "bars": [
+      8,
+      16
+     ]
     }
    }
   },
@@ -658,27 +796,48 @@
    "melody": "C4 - E4 G4 - E4 G4 A4 G4 - - E4 - C4 - . D4 - F4 A4 - F4 A4 C5 B4 - G4 - B4 - . . C4 - E4 G4 - E4 G4 A4 G4 - - E4 - C4 - . F4 - A4 C5 - A4 F4 D4 C4 - - - . . . . E5 - - E5 D5 C5 - E5 G5 - - E5 - C5 - . F5 - - F5 E5 D5 - F5 E5 - D5 - C5 - . . E5 - C5 E5 - G5 E5 C5 D5 - B4 D5 - F5 D5 B4 C5 - E5 - G5 - E5 - C5 - - - - - - .",
    "voices": {
     "lead": {
-     "type": "triangle",
+     "type": "harp",
      "gain": 0.12,
-     "attack": 0.01
+     "decay": 0.35,
+     "attack": 0.004
+    },
+    "lead2": {
+     "type": "flute",
+     "gain": 0.08,
+     "attack": 0.05,
+     "vibrato": 5,
+     "harmony": 12,
+     "harmonyLevel": 0.6,
+     "bars": [
+      8,
+      16
+     ]
     },
     "arp": {
+     "type": "pluck",
+     "gain": 0.05,
      "pattern": ". 0 . 1 . 2 . 1",
-     "type": "triangle",
-     "gain": 0.06,
-     "decay": 0.25,
+     "decay": 0.22,
      "octave": 1
     },
     "bass": {
-     "pattern": "R . 5 . R . 5 .",
-     "type": "sine",
+     "type": "cello",
      "gain": 0.15,
-     "len": 1
+     "pattern": "R . 5 . R . 5 .",
+     "len": 0.8,
+     "bars": [
+      4,
+      16
+     ]
     },
     "drums": {
      "hat": "xxxxxxxx",
      "clap": "..x...x.",
-     "gain": 0.025
+     "gain": 0.025,
+     "bars": [
+      4,
+      16
+     ]
     }
    }
   },
@@ -724,30 +883,34 @@
    "melody": "D4 - - D4 F4 - A4 - A#4 - A4 - F4 - D4 - D4 - - D4 F4 - A4 - C5 - A#4 - A4 - - - D5 - - C5 A#4 - A4 - G4 - A4 - A#4 - C5 - D5 - C5 - A#4 - A4 - A4 - - - - - . . F5 - - F5 E5 - D5 - C5 - D5 - E5 - F5 - A5 - G5 - F5 - E5 - D5 - - - A4 - . . D4 - - D4 F4 - A4 - A#4 - C5 - D5 - E5 - F5 - E5 - D5 - C5 - D5 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "square",
-     "gain": 0.08,
-     "attack": 0.01,
-     "harmony": -5,
+     "type": "brass",
+     "gain": 0.1,
+     "attack": 0.05,
+     "vibrato": 4,
+     "harmony": -12,
      "harmonyLevel": 0.5
     },
     "pad": {
-     "type": "sawtooth",
-     "gain": 0.03,
-     "attack": 0.2,
+     "type": "strings",
+     "gain": 0.04,
+     "attack": 0.3,
      "octave": 0
     },
     "bass": {
+     "type": "cello",
+     "gain": 0.16,
      "pattern": "R . R . R . 5 .",
-     "type": "triangle",
-     "gain": 0.17,
      "len": 0.8
     },
     "drums": {
-     "kick": "x...x.x.",
-     "tom": "..x...x.",
-     "hat": "x.x.x.x.",
-     "gain": 0.1,
-     "fill": "tom"
+     "tom": "x...x...",
+     "snare": "....x...",
+     "fill": "tom",
+     "gain": 0.08,
+     "bars": [
+      4,
+      16
+     ]
     }
    }
   },
@@ -793,34 +956,60 @@
    "melody": "A4 - - - E5 - D5 - A#4 - A4 - - - . . A4 - - D5 E5 - F5 - E5 - - - D5 - . . A4 - - - E5 - D5 - A#4 - A4 - F4 - A4 - D5 - E5 - F5 - E5 - A4 - - - - - . . A5 - - - F5 - E5 - D5 - - E5 F5 - A5 - A#5 - A5 - F5 - E5 - D5 - - - . . . . E5 - F5 - A5 - A#5 - D6 - A#5 - A5 - F5 - E5 - D5 - A#4 - A4 - A4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "triangle",
-     "gain": 0.13,
-     "attack": 0.003,
+     "type": "pluck",
+     "gain": 0.12,
+     "attack": 0.004,
      "decay": 0.9
     },
+    "lead2": {
+     "type": "flute",
+     "gain": 0.1,
+     "attack": 0.08,
+     "vibrato": 4.5,
+     "bars": [
+      8,
+      16
+     ]
+    },
     "arp": {
+     "type": "harp",
+     "gain": 0.05,
      "pattern": "0 . . 2 . . 1 .",
-     "type": "triangle",
-     "gain": 0.06,
-     "decay": 0.3,
-     "octave": 1
+     "decay": 0.35,
+     "octave": 1,
+     "bars": [
+      4,
+      16
+     ]
     },
     "pad": {
-     "type": "sine",
-     "gain": 0.025,
-     "attack": 1.5,
-     "octave": 0
+     "type": "organ",
+     "gain": 0.03,
+     "attack": 1.0,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
     },
     "bass": {
-     "pattern": "R . . . . . . .",
-     "type": "sine",
+     "type": "cello",
      "gain": 0.13,
-     "len": 3
+     "pattern": "R . . . . . . .",
+     "len": 3,
+     "bars": [
+      8,
+      16
+     ]
     },
     "drums": {
      "tom": "x.......",
-     "hat": ".....x..",
-     "gain": 0.06
+     "fill": "tom",
+     "gain": 0.07,
+     "bars": [
+      8,
+      16
+     ]
     }
    }
   },
@@ -866,29 +1055,46 @@
    "melody": "D5 - E5 - G5 - E5 D5 A5 - G5 - E5 - - - D5 - E5 - G5 - A5 B5 A5 - G5 - E5 - D5 - D5 - E5 - G5 - E5 D5 A5 - G5 - E5 - - - B4 - D5 - E5 - G5 - E5 - - - D5 - . . G5 - A5 - B5 - A5 G5 E5 - G5 - A5 - - - B5 - A5 - G5 - E5 - D5 - - - . . . . D6 - B5 - A5 - G5 - E5 - G5 - A5 - G5 E5 D5 - E5 - G5 - E5 - D5 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "triangle",
-     "gain": 0.13,
-     "attack": 0.003,
+     "type": "pluck",
+     "gain": 0.12,
+     "attack": 0.004,
      "decay": 0.5
     },
+    "lead2": {
+     "type": "flute",
+     "gain": 0.08,
+     "attack": 0.06,
+     "vibrato": 4.5,
+     "bars": [
+      8,
+      16
+     ]
+    },
     "arp": {
+     "type": "harp",
+     "gain": 0.045,
      "pattern": "0 . 1 . 2 . 1 .",
-     "type": "sine",
-     "gain": 0.05,
-     "decay": 0.22,
+     "decay": 0.25,
      "octave": 1
     },
     "bass": {
+     "type": "cello",
+     "gain": 0.13,
      "pattern": "R . 5 . R . 5 .",
-     "type": "sine",
-     "gain": 0.14,
-     "len": 1
+     "len": 1,
+     "bars": [
+      4,
+      16
+     ]
     },
     "drums": {
      "tom": "x.......",
-     "hat": "..x...x.",
      "clap": ".x...x..",
-     "gain": 0.04
+     "gain": 0.04,
+     "bars": [
+      8,
+      16
+     ]
     }
    }
   },
@@ -934,26 +1140,34 @@
    "melody": "E4 - - - - - - - . . F4 - E4 - - - A4 - - - B4 - - - A4 - - - F4 - E4 - E4 - - - - - - - . . F4 - E4 - - - C5 - - - B4 - A4 - F4 - - - E4 - . . A4 - - B4 C5 - B4 - A4 - - - F4 - - - A4 - - B4 C5 - E5 - C5 - - - - - . . E5 - - C5 B4 - A4 - F4 - - - E4 - - - C4 - E4 - F4 - A4 - F4 - - - E4 - - -",
    "voices": {
     "lead": {
-     "type": "sine",
-     "gain": 0.13,
+     "type": "bell",
+     "gain": 0.12,
      "attack": 0.004,
      "decay": 1.3
     },
     "pad": {
-     "type": "sawtooth",
+     "type": "organ",
      "gain": 0.03,
      "attack": 1.0,
      "octave": 0,
-     "layer": "sine"
+     "bars": [
+      2,
+      16
+     ]
     },
     "bass": {
+     "type": "cello",
+     "gain": 0.14,
      "pattern": "R . . . . . . .",
-     "type": "sine",
-     "gain": 0.15,
-     "len": 6
+     "len": 6,
+     "bars": [
+      4,
+      16
+     ]
     },
     "drums": {
      "tom": "x.....x.",
+     "fill": "tom",
      "gain": 0.1
     }
    }
@@ -1000,30 +1214,41 @@
    "melody": "A3 - C4 - E4 - C4 A3 B3 - D4 - F4 - D4 B3 C4 - E4 - G#4 - E4 C4 A4 - - - G#4 - E4 - A3 - C4 - E4 - C4 A3 B3 - D4 - F4 - D4 B3 G#4 - E4 - C4 - B3 - A3 - - - . . . . E4 - F4 - G#4 - A4 - B4 - A4 - G#4 - F4 - E4 - F4 - G#4 - A4 - C5 - - - . . . . D5 - C5 - B4 - A4 - G#4 - F4 - E4 - D4 - C4 - E4 - G#4 - B4 - A4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "triangle",
-     "gain": 0.12,
-     "attack": 0.02,
-     "vibrato": 4.5,
-     "harmony": -3,
-     "harmonyLevel": 0.45
+     "type": "accordion",
+     "gain": 0.1,
+     "attack": 0.04,
+     "vibrato": 4.5
     },
     "arp": {
+     "type": "pluck",
+     "gain": 0.05,
      "pattern": "0 . 1 . 2 . 1 .",
-     "type": "triangle",
-     "gain": 0.055,
-     "len": 0.8,
+     "decay": 0.3,
      "octave": 1
     },
+    "pad": {
+     "type": "strings",
+     "gain": 0.03,
+     "attack": 0.6,
+     "octave": 0,
+     "bars": [
+      8,
+      16
+     ]
+    },
     "bass": {
+     "type": "cello",
+     "gain": 0.14,
      "pattern": "R . 5 . R . 5 .",
-     "type": "sine",
-     "gain": 0.15,
      "len": 1
     },
     "drums": {
      "kick": "x...x...",
-     "hat": ".x.x.x.x",
-     "gain": 0.03
+     "gain": 0.03,
+     "bars": [
+      4,
+      16
+     ]
     }
    }
   },
@@ -1069,23 +1294,35 @@
    "melody": "D4 - - - F4 - - - A4 - - - G4 - - - F4 - - - E4 - - - D4 - - - . . . . D4 - - - F4 - - - A4 - - - A#4 - - - A4 - - - G4 - E4 - A4 - - - - - . . A#4 - - - A4 - - - G4 - - - A4 - - - F4 - - - E4 - - - A4 - - - - - . . D5 - - - C5 - - - A#4 - - - A4 - - - G4 - - - E4 - - - D4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "triangle",
-     "gain": 0.12,
+     "type": "bell",
+     "gain": 0.1,
      "attack": 0.02,
      "decay": 1.4
     },
+    "lead2": {
+     "type": "choir",
+     "gain": 0.08,
+     "attack": 0.3,
+     "bars": [
+      4,
+      16
+     ]
+    },
     "pad": {
-     "type": "sine",
+     "type": "organ",
      "gain": 0.05,
      "attack": 1.0,
-     "octave": 0,
-     "layer": "sawtooth"
+     "octave": 0
     },
     "bass": {
+     "type": "cello",
+     "gain": 0.12,
      "pattern": "R . . . . . . .",
-     "type": "sine",
-     "gain": 0.14,
-     "len": 6
+     "len": 6,
+     "bars": [
+      8,
+      16
+     ]
     }
    }
   },
@@ -1131,30 +1368,50 @@
    "melody": "D4 - D#4 D4 F#4 - D#4 D4 F#4 - G4 - F#4 - D#4 - D4 - D#4 D4 F#4 - D#4 D4 C4 - A#3 - A3 - D4 - A4 - G4 F#4 - D#4 D4 D#4 F#4 - - D#4 D4 - C4 - D4 - D#4 F#4 G4 - F#4 D#4 D4 - - - . . . . A4 - A#4 A4 G4 - F#4 G4 A4 - - - F#4 - D#4 - A4 - A#4 A4 G4 - F#4 G4 F#4 - - D#4 D4 - - - D5 - C5 A#4 A4 - G4 F#4 D#4 - F#4 G4 A4 - G4 - F#4 - D#4 - D4 - C4 - D4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "triangle",
+     "type": "pluck",
      "gain": 0.12,
-     "attack": 0.01,
-     "vibrato": 6
+     "attack": 0.004,
+     "decay": 0.35
+    },
+    "lead2": {
+     "type": "flute",
+     "gain": 0.08,
+     "attack": 0.05,
+     "vibrato": 6,
+     "harmony": 12,
+     "harmonyLevel": 0.5,
+     "bars": [
+      8,
+      16
+     ]
     },
     "arp": {
+     "type": "pluck",
+     "gain": 0.05,
      "pattern": "0 . 1 2 . 1 2 .",
-     "type": "triangle",
-     "gain": 0.06,
-     "decay": 0.22,
+     "decay": 0.2,
      "octave": 1
     },
     "bass": {
-     "pattern": "R . R . 5 . R .",
-     "type": "sine",
+     "type": "cello",
      "gain": 0.15,
-     "len": 0.9
+     "pattern": "R . R . 5 . R .",
+     "len": 0.9,
+     "bars": [
+      4,
+      16
+     ]
     },
     "drums": {
-     "kick": "x..x..x.",
+     "tom": "x..x..x.",
      "clap": "..x...x.",
      "hat": "x.x.x.x.",
-     "gain": 0.07,
-     "fill": "tom"
+     "fill": "tom",
+     "gain": 0.05,
+     "bars": [
+      4,
+      16
+     ]
     }
    }
   },
@@ -1200,31 +1457,34 @@
    "melody": "G4 - G4 - C5 - G4 - A4 - A4 - F4 - - - G4 - G4 - C5 - E5 - D5 - C5 - A#4 - . . G4 - G4 - C5 - G4 - A4 - A4 - F4 - - - E4 - G4 - A#4 - A4 - G4 - - - . . . . C5 - D5 - E5 - G5 - F5 - E5 - D5 - - - C5 - D5 - E5 - D5 - C5 - - - . . . . G4 - A4 - A#4 - C5 - A4 - F4 - A4 - C5 - G4 - E4 - D4 - A#4 - C4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "triangle",
-     "gain": 0.12,
-     "attack": 0.015,
+     "type": "accordion",
+     "gain": 0.1,
+     "attack": 0.03,
      "harmony": -4,
-     "harmonyLevel": 0.5
+     "harmonyLevel": 0.4
     },
     "arp": {
+     "type": "pluck",
+     "gain": 0.05,
      "pattern": "0 . 2 . 1 . 2 .",
-     "type": "triangle",
-     "gain": 0.055,
-     "len": 0.8,
+     "decay": 0.25,
      "octave": 1
     },
     "bass": {
+     "type": "cello",
+     "gain": 0.15,
      "pattern": "R . 5 . R . 5 .",
-     "type": "sine",
-     "gain": 0.16,
      "len": 1
     },
     "drums": {
      "kick": "x...x...",
      "clap": "..x...x.",
      "hat": "x.x.x.x.",
-     "gain": 0.06,
-     "fill": "snare"
+     "gain": 0.05,
+     "bars": [
+      4,
+      16
+     ]
     }
    }
   },
@@ -1270,24 +1530,32 @@
    "melody": "E4 - E4 - A4 - B4 - D5 - - - A4 - E4 - E4 - E4 - A4 - B4 - D5 - B4 - A4 - - - E4 - E4 - A4 - B4 - D5 - B4 - D5 - E5 - D5 - B4 - A4 - E4 - G4 - - - E4 - . . E5 - - E5 D5 - E5 - G5 - - G5 E5 - D5 - A5 - - A5 G5 - E5 - D5 - - - A4 - . . E5 - D5 - B4 - A4 - G4 - A4 - B4 - D5 - B4 - A4 - G4 - E4 - E4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "square",
-     "gain": 0.08,
-     "attack": 0.01,
+     "type": "brass",
+     "gain": 0.09,
+     "attack": 0.04,
      "harmony": -7,
      "harmonyLevel": 0.5
     },
+    "pad": {
+     "type": "strings",
+     "gain": 0.03,
+     "attack": 0.5,
+     "octave": 0,
+     "bars": [
+      8,
+      16
+     ]
+    },
     "bass": {
+     "type": "cello",
+     "gain": 0.16,
      "pattern": "R . R . R . 5 .",
-     "type": "triangle",
-     "gain": 0.17,
      "len": 0.8
     },
     "drums": {
-     "kick": "x..x..x.",
-     "tom": "..x.x.x.",
-     "hat": "x.x.x.x.",
-     "gain": 0.09,
-     "fill": "tom"
+     "tom": "x..x..x.",
+     "fill": "tom",
+     "gain": 0.1
     }
    }
   },
@@ -1333,7 +1601,7 @@
    "melody": "D4 - F#4 - A4 - B4 - A4 - F#4 - E4 - D4 - F#4 - A4 - C#5 - B4 - A4 - - - - - . . D4 - F#4 - A4 - B4 - C#5 - B4 - A4 - F#4 - G#4 - F#4 - E4 - F#4 - D4 - - - . . . . A4 - B4 - C#5 - D5 - E5 - D5 - C#5 - B4 - A4 - B4 - C#5 - D5 - F#5 - - - . . . . G#5 - F#5 - E5 - D5 - C#5 - A4 - B4 - C#5 - F#5 - E5 - D5 - C#5 - D5 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "sine",
+     "type": "flute",
      "gain": 0.13,
      "attack": 0.08,
      "vibrato": 5,
@@ -1343,24 +1611,31 @@
      }
     },
     "arp": {
-     "pattern": "0 1 2 0 1 2 1 0",
-     "type": "triangle",
+     "type": "harp",
      "gain": 0.06,
+     "pattern": "0 1 2 0 1 2 1 0",
      "decay": 0.6,
      "octave": 1
     },
     "pad": {
-     "type": "sine",
+     "type": "choir",
      "gain": 0.04,
-     "attack": 1.0,
+     "attack": 0.8,
      "octave": 0,
-     "layer": "triangle"
+     "bars": [
+      4,
+      16
+     ]
     },
     "bass": {
+     "type": "cello",
+     "gain": 0.12,
      "pattern": "R . . . . . 5 .",
-     "type": "sine",
-     "gain": 0.13,
-     "len": 3
+     "len": 3,
+     "bars": [
+      8,
+      16
+     ]
     }
    }
   },
@@ -1406,29 +1681,41 @@
    "melody": "G4 - A4 B4 D5 - B4 A4 G4 - A4 B4 G4 - D4 - C5 - D5 E5 G5 - E5 D5 C5 - B4 - A4 - . . G4 - A4 B4 D5 - B4 A4 G4 - A4 B4 D5 - G5 - E5 - D5 - C5 - A4 - G4 - - - . . D4 D4 D5 - D5 E5 D5 - B4 - C5 - C5 D5 C5 - A4 - B4 - B4 C5 B4 - G4 - A4 - B4 - D5 - . . G5 - F#5 E5 D5 - B4 - C5 - D5 E5 G5 - E5 - D5 - C5 - A4 - F#4 - G4 - - - . . . .",
    "voices": {
     "lead": {
-     "type": "square",
-     "gain": 0.07,
-     "attack": 0.005
+     "type": "accordion",
+     "gain": 0.1,
+     "attack": 0.02
+    },
+    "lead2": {
+     "type": "flute",
+     "gain": 0.08,
+     "attack": 0.03,
+     "vibrato": 5,
+     "harmony": 12,
+     "harmonyLevel": 0.5,
+     "bars": [
+      8,
+      16
+     ]
     },
     "arp": {
-     "pattern": "0 . 1 . 2 . 1 .",
-     "type": "triangle",
+     "type": "pluck",
      "gain": 0.05,
-     "len": 0.7,
+     "pattern": "0 . 1 . 2 . 1 .",
+     "decay": 0.25,
      "octave": 1
     },
     "bass": {
-     "pattern": "R . 5 . R . 5 .",
-     "type": "triangle",
+     "type": "cello",
      "gain": 0.16,
+     "pattern": "R . 5 . R . 5 .",
      "len": 0.9
     },
     "drums": {
-     "kick": "x...x...",
+     "tom": "x...x...",
      "clap": "..x...x.",
      "hat": "x.x.x.x.",
-     "gain": 0.07,
-     "fill": "snare"
+     "fill": "tom",
+     "gain": 0.05
     }
    }
   },
@@ -1474,23 +1761,31 @@
    "melody": "G4 - - - A#4 - - - D5 - - - - - C5 - A#4 - - - G4 - - - A4 - - - - - . . G4 - - - A#4 - - - D5 - - - D#5 - - - D5 - - - C5 - A4 - D5 - - - - - . . D#5 - - - D5 - - - C5 - - - A#4 - - - A4 - - - C5 - - - D5 - - - - - . . A#4 - - - C5 - D5 - D#5 - - - D5 - - - C5 - - - A4 - - - G4 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "sine",
-     "gain": 0.11,
-     "attack": 0.2,
+     "type": "organ",
+     "gain": 0.09,
+     "attack": 0.15,
      "harmony": -12,
-     "harmonyLevel": 0.45
+     "harmonyLevel": 0.4
+    },
+    "lead2": {
+     "type": "choir",
+     "gain": 0.07,
+     "attack": 0.4,
+     "bars": [
+      8,
+      16
+     ]
     },
     "pad": {
-     "type": "sine",
-     "gain": 0.07,
+     "type": "organ",
+     "gain": 0.05,
      "attack": 1.4,
-     "octave": 0,
-     "layer": "triangle"
+     "octave": 0
     },
     "bass": {
+     "type": "organ",
+     "gain": 0.1,
      "pattern": "R . . . . . . .",
-     "type": "sine",
-     "gain": 0.14,
      "len": 7
     }
    }
@@ -1537,32 +1832,209 @@
    "melody": "D4 - - D4 F4 - A4 - A4 - - A4 A#4 - A4 - G4 - - G4 A#4 - D5 - C5 - A#4 - A4 - . . D4 - - D4 F4 - A4 - A#4 - - A#4 D5 - A#4 - C5 - A#4 - A4 - G4 - A4 - - - . . . . F5 - - D5 F5 - A5 - G5 - - E5 G5 - A#5 - A5 - G5 - F5 - E5 - D5 - - - . . . . A#4 - - A#4 D5 - A#4 - C5 - D5 - E5 - G5 - F5 - E5 - D5 - C5 - D5 - - - - - - -",
    "voices": {
     "lead": {
-     "type": "sawtooth",
-     "gain": 0.07,
-     "attack": 0.03,
+     "type": "brass",
+     "gain": 0.09,
+     "attack": 0.05,
+     "vibrato": 4,
      "harmony": -12,
      "harmonyLevel": 0.5
     },
     "pad": {
-     "type": "triangle",
+     "type": "strings",
      "gain": 0.05,
      "attack": 0.6,
-     "octave": 0,
-     "layer": "sine"
+     "octave": 0
     },
     "bass": {
-     "pattern": "R . . . R . 5 .",
-     "type": "triangle",
+     "type": "cello",
      "gain": 0.16,
+     "pattern": "R . . . R . 5 .",
      "len": 1.5
     },
     "drums": {
      "tom": "x...x...",
      "snare": "....x...",
-     "gain": 0.08,
-     "fill": "tom"
+     "fill": "tom",
+     "gain": 0.06,
+     "bars": [
+      4,
+      16
+     ]
     }
    }
+  },
+  "port": {
+   "name": "港町（潮風と船乗り）",
+   "bpm": 112,
+   "dynamics": [
+    0.85,
+    0.85,
+    0.85,
+    0.85,
+    0.9,
+    0.9,
+    0.9,
+    0.9,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.95,
+    0.95,
+    0.95,
+    0.95
+   ],
+   "chords": [
+    "Dm",
+    "F",
+    "Dm",
+    "Am",
+    "Dm",
+    "F",
+    "C",
+    "G",
+    "F",
+    "G",
+    "F",
+    "C",
+    "F",
+    "Am",
+    "C",
+    "Dm"
+   ],
+   "melody": "D4 - E4 F4 A4 - F4 - B4 - A4 - F4 - E4 - D4 - E4 F4 A4 - B4 - C5 - - - A4 - . . D4 - E4 F4 A4 - F4 - B4 - A4 - F4 - A4 - G4 - F4 - E4 - F4 - D4 - - - . . . . A4 - A4 B4 C5 - B4 A4 B4 - B4 C5 D5 - C5 B4 A4 - B4 - C5 - D5 - E5 - - - D5 - . . F5 - E5 D5 C5 - B4 - A4 - B4 - C5 - A4 - G4 - A4 - F4 - E4 - D4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "accordion",
+     "gain": 0.1,
+     "attack": 0.03
+    },
+    "lead2": {
+     "type": "flute",
+     "gain": 0.08,
+     "attack": 0.03,
+     "vibrato": 5,
+     "harmony": 12,
+     "harmonyLevel": 0.5,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "pluck",
+     "gain": 0.05,
+     "pattern": "0 . 2 . 1 . 2 .",
+     "decay": 0.25,
+     "octave": 1
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.15,
+     "pattern": "R . 5 . R . 5 .",
+     "len": 1
+    },
+    "wind": {
+     "freq": 500,
+     "gain": 0.03
+    },
+    "drums": {
+     "kick": "x...x...",
+     "clap": "..x...x.",
+     "hat": "x.x.x.x.",
+     "fill": "tom",
+     "gain": 0.05,
+     "bars": [
+      4,
+      16
+     ]
+    }
+   },
+   "level": 1.18
+  },
+  "posttown": {
+   "name": "宿場（街道の旅人の休み処）",
+   "bpm": 84,
+   "dynamics": [
+    0.85,
+    0.85,
+    0.85,
+    0.85,
+    0.9,
+    0.9,
+    0.9,
+    0.9,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.95,
+    0.95,
+    0.95,
+    0.95
+   ],
+   "chords": [
+    "E",
+    "C#m",
+    "F#m",
+    "B",
+    "E",
+    "C#m",
+    "E",
+    "A",
+    "C#m",
+    "B",
+    "E",
+    "C#m",
+    "E",
+    "B",
+    "B",
+    "E"
+   ],
+   "melody": "G#4 - B4 - E5 - B4 - C#5 - B4 - G#4 - - - F#4 - G#4 - B4 - C#5 - B4 - - - . . . . G#4 - B4 - E5 - B4 - C#5 - B4 - G#4 - F#4 - E4 - F#4 - G#4 - A4 - E4 - - - . . . . C#5 - E5 - G#5 - E5 - D#5 - C#5 - B4 - - - C#5 - E5 - G#5 - B5 - G#5 - - - . . . . B5 - G#5 - E5 - C#5 - B4 - C#5 - D#5 - E5 - F#5 - E5 - D#5 - B4 - E4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "flute",
+     "gain": 0.12,
+     "attack": 0.06,
+     "vibrato": 5
+    },
+    "lead2": {
+     "type": "accordion",
+     "gain": 0.07,
+     "attack": 0.05,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "pluck",
+     "gain": 0.05,
+     "pattern": "0 . 1 . 2 . 1 .",
+     "decay": 0.3,
+     "octave": 1
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.13,
+     "pattern": "R . . . 5 . . .",
+     "len": 3,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "drums": {
+     "tom": "x...x...",
+     "gain": 0.03,
+     "bars": [
+      4,
+      16
+     ]
+    }
+   },
+   "level": 1.0
   }
  }
 }
