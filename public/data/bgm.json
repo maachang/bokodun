@@ -13,7 +13,11 @@
    "track": "makahiki"
   },
   {
-   "regex": "^(castle|tenshu|shrine)_k",
+   "regex": "^shrine_k",
+   "track": "shrine_k"
+  },
+  {
+   "regex": "^(castle|tenshu)_k",
    "track": "castle_k"
   },
   {
@@ -47,12 +51,51 @@
    "track": "guild"
   },
   {
+   "id": [
+    "temple_3f"
+   ],
+   "track": "temple_cardinal"
+  },
+  {
+   "id": [
+    "temple_b",
+    "temple_cloister_b",
+    "temple_treasury_b"
+   ],
+   "track": "temple_b"
+  },
+  {
+   "id": [
+    "temple_crypt",
+    "temple_treasury"
+   ],
+   "track": "temple_crypt"
+  },
+  {
    "prefix": [
-    "temple_town",
+    "temple_cloister"
+   ],
+   "track": "temple_cloister"
+  },
+  {
+   "id": [
+    "temple_almonry",
+    "temple_chapter_house",
+    "temple_confession",
+    "temple_guesthouse",
+    "temple_infirmary",
+    "temple_kitchen",
+    "temple_library",
+    "temple_refectory",
+    "temple_sacristy"
+   ],
+   "track": "temple_life"
+  },
+  {
+   "prefix": [
     "temple_village"
    ],
-   "type": "open",
-   "track": "town_b"
+   "track": "temple_village"
   },
   {
    "prefix": [
@@ -1949,8 +1992,7 @@
       16
      ]
     }
-   },
-   "level": 1.18
+   }
   },
   "posttown": {
    "name": "宿場（街道の旅人の休み処）",
@@ -2033,8 +2075,581 @@
       16
      ]
     }
+   }
+  },
+  "temple_cardinal": {
+   "name": "大神殿 3F・枢機卿の間（重く厳か）",
+   "bpm": 46,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "Gm",
+    "Bb",
+    "Gm",
+    "D",
+    "Cm",
+    "Gm",
+    "Adim",
+    "Cm",
+    "Gm",
+    "Cm",
+    "Gm",
+    "Cm",
+    "Gm",
+    "D",
+    "Adim",
+    "Gm"
+   ],
+   "melody": "G3 - - - - - - - A#3 - - - - - A3 - G3 - - - - - - - D3 - - - - - . . G3 - - - - - - - A#3 - - - D4 - - - C4 - - - A#3 - A3 - G3 - - - - - . . D4 - - - - - D#4 - D4 - - - C4 - - - A#3 - - - A3 - - - G3 - - - - - . . A#3 - - - D4 - - - D#4 - - - D4 - - - C4 - - - A3 - - - G3 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "choir",
+     "gain": 0.09,
+     "attack": 0.4
+    },
+    "lead2": {
+     "type": "organ",
+     "gain": 0.06,
+     "attack": 0.2,
+     "harmony": -12,
+     "harmonyLevel": 0.7,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "arp": {
+     "type": "bell",
+     "gain": 0.04,
+     "pattern": ". . . . . . . 0",
+     "decay": 2.0,
+     "octave": 1
+    },
+    "pad": {
+     "type": "organ",
+     "gain": 0.06,
+     "attack": 1.6,
+     "octave": 0
+    },
+    "bass": {
+     "type": "organ",
+     "gain": 0.1,
+     "pattern": "R . . . . . . .",
+     "len": 7
+    },
+    "drums": {
+     "tom": "x.......",
+     "gain": 0.07,
+     "bars": [
+      8,
+      16
+     ]
+    }
+   },
+   "level": 0.61
+  },
+  "temple_b": {
+   "name": "B フランケル聖国の大教会（荘厳だが不穏）",
+   "bpm": 54,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "Dm",
+    "Adim",
+    "Dm",
+    "A",
+    "Dm",
+    "Gm",
+    "Dm",
+    "Gm",
+    "Dm",
+    "Gm",
+    "Cm",
+    "A",
+    "Gm",
+    "Dm",
+    "Gm",
+    "Dm"
+   ],
+   "melody": "D4 - - - D#4 - D4 - F4 - - - D#4 - - - D4 - - - A3 - - - A#3 - - - A3 - . . D4 - - - D#4 - D4 - F4 - - - G4 - - - A4 - - - G4 - F4 - D#4 - - - D4 - . . A4 - - - A#4 - A4 - G4 - - - F4 - - - D#4 - - - F4 - G4 - A4 - - - . . . . A#4 - - - A4 - G4 - F4 - - - D#4 - - - D4 - - - D#4 - D4 - D4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "bell",
+     "gain": 0.1,
+     "attack": 0.02,
+     "decay": 1.6
+    },
+    "lead2": {
+     "type": "choir",
+     "gain": 0.08,
+     "attack": 0.3,
+     "vibrato": 3.5,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "pad": {
+     "type": "organ",
+     "gain": 0.05,
+     "attack": 1.2,
+     "octave": 0
+    },
+    "bass": {
+     "type": "organ",
+     "gain": 0.1,
+     "pattern": "R . . . . . . .",
+     "len": 7
+    },
+    "wind": {
+     "freq": 250,
+     "gain": 0.02
+    }
+   },
+   "level": 0.86
+  },
+  "temple_crypt": {
+   "name": "神殿の地下納骨堂・宝物庫（暗く静か）",
+   "bpm": 50,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "Am",
+    "Bb",
+    "G",
+    "Dm",
+    "F",
+    "Bb",
+    "G",
+    "C",
+    "F",
+    "Bb",
+    "F",
+    "Bb",
+    "C",
+    "F",
+    "C",
+    "Am"
+   ],
+   "melody": "A3 - - - - - - - . . . . A#3 - A3 - D4 - - - - - C4 - A3 - - - . . . . A3 - - - - - - - . . . . A#3 - A3 - E4 - - - D4 - - - E4 - - - . . . . F4 - - - E4 - - - D4 - - - C4 - A#3 - A3 - - - - - - - A#3 - - - A3 - . . C4 - - - A#3 - - - A3 - - - . . . . G3 - - - E3 - - - A3 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "choir",
+     "gain": 0.08,
+     "attack": 0.3,
+     "vibrato": 3.5,
+     "echo": {
+      "steps": 4,
+      "level": 0.5
+     }
+    },
+    "arp": {
+     "type": "bell",
+     "gain": 0.05,
+     "pattern": ". . . . . . 2 .",
+     "decay": 1.8,
+     "octave": 2,
+     "bars": [
+      2,
+      16
+     ]
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.03,
+     "attack": 1.5,
+     "octave": 0
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.13,
+     "pattern": "R . . . . . . .",
+     "len": 7
+    },
+    "wind": {
+     "freq": 200,
+     "gain": 0.025
+    },
+    "drums": {
+     "tom": "x.......",
+     "gain": 0.05,
+     "bars": [
+      8,
+      16
+     ]
+    }
    },
    "level": 1.0
+  },
+  "temple_cloister": {
+   "name": "神殿の回廊（穏やかな中庭）",
+   "bpm": 80,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "C",
+    "G",
+    "Am",
+    "F",
+    "C",
+    "F",
+    "G",
+    "C",
+    "Am",
+    "F",
+    "Dm",
+    "G",
+    "Am",
+    "Dm",
+    "G",
+    "C"
+   ],
+   "melody": "E4 - G4 - C5 - E5 - D5 - - - C5 - - - A4 - C5 - E5 - D5 - C5 - - - . . . . E4 - G4 - C5 - E5 - F5 - - - E5 - - - D5 - C5 - B4 - G4 - C5 - - - . . . . A4 - C5 - A4 - G4 - F4 - G4 - A4 - - - D4 - F4 - A4 - C5 - B4 - - - G4 - . . E5 - D5 - C5 - A4 - F4 - G4 - A4 - B4 - D5 - C5 - B4 - G4 - C5 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "flute",
+     "gain": 0.12,
+     "attack": 0.06,
+     "vibrato": 5
+    },
+    "arp": {
+     "type": "harp",
+     "gain": 0.06,
+     "pattern": "0 1 2 1 2 1 0 1",
+     "decay": 0.9,
+     "octave": 1
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.03,
+     "attack": 0.8,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.12,
+     "pattern": "R . . . 5 . . .",
+     "len": 3,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "wind": {
+     "freq": 900,
+     "gain": 0.02,
+     "bars": [
+      0,
+      4
+     ]
+    }
+   },
+   "level": 1.1
+  },
+  "temple_life": {
+   "name": "神殿の生活の場（厨房・食堂・客室・図書室など。素朴で温かい）",
+   "bpm": 76,
+   "dynamics": [
+    0.85,
+    0.85,
+    0.85,
+    0.85,
+    0.9,
+    0.9,
+    0.9,
+    0.9,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.95,
+    0.95,
+    0.95,
+    0.95
+   ],
+   "chords": [
+    "F",
+    "Dm",
+    "Gm",
+    "C",
+    "F",
+    "Dm",
+    "Gm",
+    "F",
+    "Bb",
+    "F",
+    "Bb",
+    "C",
+    "F",
+    "Bb",
+    "Gm",
+    "F"
+   ],
+   "melody": "F4 - A4 - C5 - A4 - D5 - C5 - A4 - - - A#4 - A4 - G4 - F4 - G4 - - - . . . . F4 - A4 - C5 - A4 - D5 - C5 - A4 - G4 - A#4 - C5 - D5 - A#4 - F4 - - - . . . . C5 - D5 - F5 - D5 - C5 - A4 - C5 - - - D5 - F5 - G5 - F5 - C5 - - - . . . . A4 - C5 - F5 - C5 - D5 - C5 - A#4 - A4 - G4 - A4 - A#4 - G4 - F4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "flute",
+     "gain": 0.11,
+     "attack": 0.06,
+     "vibrato": 4.5
+    },
+    "lead2": {
+     "type": "strings",
+     "gain": 0.05,
+     "attack": 0.2,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "pluck",
+     "gain": 0.05,
+     "pattern": "0 . 1 . 2 . 1 .",
+     "decay": 0.35,
+     "octave": 1
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.12,
+     "pattern": "R . . . 5 . . .",
+     "len": 3,
+     "bars": [
+      4,
+      16
+     ]
+    }
+   },
+   "level": 1.08
+  },
+  "temple_village": {
+   "name": "村の小さな神殿（狭い木造の質素な礼拝堂）",
+   "bpm": 66,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "G",
+    "C",
+    "G",
+    "G",
+    "Em",
+    "G",
+    "Em",
+    "D",
+    "Em",
+    "D",
+    "G",
+    "C",
+    "Em",
+    "G",
+    "D",
+    "G"
+   ],
+   "melody": "G4 - - - B4 - A4 - G4 - - - . . . . B4 - - - D5 - E5 - D5 - - - B4 - . . G4 - - - B4 - A4 - G4 - - - . . . . E5 - - - D5 - B4 - A4 - - - G4 - . . B4 - - - E5 - D5 - B4 - - - A4 - . . B4 - - - D5 - E5 - G5 - - - . . . . E5 - - - D5 - B4 - B4 - - - A4 - . . A4 - - - G4 - . . G4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "flute",
+     "gain": 0.1,
+     "attack": 0.08,
+     "vibrato": 4
+    },
+    "arp": {
+     "type": "bell",
+     "gain": 0.05,
+     "pattern": "0 . . . . . . .",
+     "decay": 1.2,
+     "octave": 1
+    },
+    "pad": {
+     "type": "organ",
+     "gain": 0.03,
+     "attack": 0.6,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.1,
+     "pattern": "R . . . . . . .",
+     "len": 4,
+     "bars": [
+      8,
+      16
+     ]
+    }
+   },
+   "level": 1.38
+  },
+  "shrine_k": {
+   "name": "マカヒキ国の神社（雅楽ふうの神聖な曲）",
+   "bpm": 56,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "Dm",
+    "C",
+    "Dm",
+    "Am",
+    "Dm",
+    "C",
+    "Am",
+    "Dm",
+    "Am",
+    "Dm",
+    "Gm",
+    "Dm",
+    "Am",
+    "Dm",
+    "Am",
+    "Dm"
+   ],
+   "melody": "D4 - - - A4 - - - G4 - - - E4 - - - D4 - - - A4 - - - C5 - - - A4 - . . D4 - - - A4 - - - G4 - - - C5 - - - A4 - - - G4 - E4 - D4 - - - - - . . A4 - - - C5 - - - D5 - - - C5 - A4 - G4 - - - A4 - - - E4 - - - D4 - . . A4 - - - C5 - D5 - E5 - - - D5 - - - C5 - - - A4 - G4 - D4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "flute",
+     "gain": 0.12,
+     "attack": 0.08,
+     "vibrato": 4.5
+    },
+    "lead2": {
+     "type": "accordion",
+     "gain": 0.05,
+     "attack": 0.1,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "bell",
+     "gain": 0.04,
+     "pattern": ". . . . . . . 0",
+     "decay": 1.5,
+     "octave": 2,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "pad": {
+     "type": "organ",
+     "gain": 0.05,
+     "attack": 1.2,
+     "octave": 0
+    },
+    "drums": {
+     "tom": "x.......",
+     "gain": 0.08,
+     "bars": [
+      4,
+      16
+     ]
+    }
+   },
+   "level": 0.93
   }
  }
 }

@@ -23,7 +23,7 @@ test('音名・和音の計算', () => {
 });
 
 test('曲データ: 場面ごとの曲があり、旋律・和音・パターンが正しい', () => {
-    assert.deepEqual(Object.keys(bgm.tracks).sort(), ['boss', 'castle', 'castle_k', 'desert', 'dungeon', 'field', 'forest', 'guild', 'makahiki', 'mountain', 'port', 'posttown', 'snow', 'south', 'temple', 'town', 'town_a', 'town_b', 'town_c', 'town_e', 'town_f', 'town_g', 'town_k']);
+    assert.deepEqual(Object.keys(bgm.tracks).sort(), ['boss', 'castle', 'castle_k', 'desert', 'dungeon', 'field', 'forest', 'guild', 'makahiki', 'mountain', 'port', 'posttown', 'shrine_k', 'snow', 'south', 'temple', 'temple_b', 'temple_cardinal', 'temple_cloister', 'temple_crypt', 'temple_life', 'temple_village', 'town', 'town_a', 'town_b', 'town_c', 'town_e', 'town_f', 'town_g', 'town_k']);
     for (const [name, t] of Object.entries(bgm.tracks)) {
         const steps = t.chords.length * 8, mel = t.melody.trim().split(/\s+/);
         assert.equal(mel.length, steps, `${name}: 旋律は、和音 1 つにつき 8 ステップ`);
@@ -98,9 +98,11 @@ test('選曲: マップの種類で曲が決まり、ボスが近くにいる間
         // 国ごとの町・店・宿
         ['town_a', 'town_a'], ['shop_a', 'town_a'], ['town_b', 'town_b'], ['town_c', 'town_c'], ['town_e', 'town_e'], ['town_f', 'town_f'], ['town_g', 'town_g'], ['city_inn_2f_g', 'town_g'], ['elder_house_g', 'town_g'], ['city_inn', 'town'],
         // ギルド全般・大神殿・マカヒキ国
-        ['guild_adv', 'guild'], ['guild_adv_a', 'guild'], ['guild_mage_master_g', 'guild'], ['guild_training_k', 'town_k'], ['temple', 'temple'], ['temple_cloister_b', 'temple'], ['temple_town', 'town_b'], ['temple_village', 'town_b'],
-        ['town_k', 'town_k'], ['shop_k', 'town_k'], ['city_inn_2f_k', 'town_k'], ['castle_k', 'castle_k'], ['castle_k_basement', 'castle_k'], ['tenshu_k_3f', 'castle_k'], ['shrine_k', 'castle_k'], ['w_12_03', 'makahiki'], ['w_13_02', 'makahiki']]) {
-        g.currentMapId = id; g.bgmMapType = ['field_x', 'field_grass', 'w_12_03', 'w_13_02', 'temple_town', 'temple_village'].includes(id) || /^town|^village|^city$|^city_noble/.test(id) ? 'open' : 'indoor'; g.bgmMapName = '';
+        ['guild_adv', 'guild'], ['guild_adv_a', 'guild'], ['guild_mage_master_g', 'guild'], ['guild_training_k', 'town_k'], ['temple', 'temple'], ['temple_2f', 'temple'], ['temple_town', 'temple'], ['temple_town_2f', 'temple'], ['temple_town_dining', 'temple'],
+        ['temple_3f', 'temple_cardinal'], ['temple_b', 'temple_b'], ['temple_cloister_b', 'temple_b'], ['temple_treasury_b', 'temple_b'], ['temple_crypt', 'temple_crypt'], ['temple_treasury', 'temple_crypt'], ['temple_cloister', 'temple_cloister'],
+        ['temple_library', 'temple_life'], ['temple_kitchen', 'temple_life'], ['temple_infirmary', 'temple_life'], ['temple_village', 'temple_village'], ['temple_village_kitchen', 'temple_village'], ['temple_village_bedroom', 'temple_village'],
+        ['town_k', 'town_k'], ['shop_k', 'town_k'], ['city_inn_2f_k', 'town_k'], ['castle_k', 'castle_k'], ['castle_k_basement', 'castle_k'], ['tenshu_k_3f', 'castle_k'], ['shrine_k', 'shrine_k'], ['shrine_k_2f', 'shrine_k'], ['shrine_k_dining', 'shrine_k'], ['w_12_03', 'makahiki'], ['w_13_02', 'makahiki']]) {
+        g.currentMapId = id; g.bgmMapType = ['field_x', 'field_grass', 'w_12_03', 'w_13_02', 'temple_cloister', 'temple_cloister_b'].includes(id) || /^town|^village|^city$|^city_noble/.test(id) ? 'open' : 'indoor'; g.bgmMapName = '';
         assert.equal(g.bgmChooseTrack(), want, `${id}: ${want}`);
     }
     // 道沿いの町・村（rs_*）は、町の曲。港町は港の曲・宿場は宿場の曲（マップ名で決まる）
