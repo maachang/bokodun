@@ -128,9 +128,97 @@
    "track": "town_g"
   },
   {
+   "id": [
+    "castle_prison",
+    "castle_basement",
+    "castle_a_prison",
+    "castle_a_icehouse",
+    "castle_b_cellar",
+    "castle_j_prison"
+   ],
+   "track": "prison"
+  },
+  {
+   "id": [
+    "castle_f_mine",
+    "castle_g_roots"
+   ],
+   "track": "dungeon"
+  },
+  {
+   "regex": "^mansion_.*_vault$",
+   "track": "temple_crypt"
+  },
+  {
+   "id": [
+    "castle_bakehouse",
+    "castle_guardroom",
+    "castle_smithy",
+    "mansion_pantry",
+    "mansion_steward",
+    "mansion_armoury",
+    "mansion_cellar"
+   ],
+   "track": "castle_life"
+  },
+  {
+   "id": [
+    "castle_chapel",
+    "mansion_chapel"
+   ],
+   "track": "temple_cloister"
+  },
+  {
+   "id": [
+    "castle_courtyard"
+   ],
+   "track": "castle_court"
+  },
+  {
+   "regex": "^castle_a(_|$)",
+   "track": "castle_a"
+  },
+  {
+   "regex": "^castle_b(_|$)",
+   "track": "castle_b"
+  },
+  {
+   "regex": "^castle_f(_|$)",
+   "track": "castle_f"
+  },
+  {
+   "regex": "^castle_g(_|$)",
+   "track": "castle_g"
+  },
+  {
+   "regex": "^castle_j(_|$)",
+   "track": "castle_j"
+  },
+  {
+   "regex": "^mansion_chairman_c",
+   "track": "mansion_c"
+  },
+  {
+   "regex": "^mansion_chairman_e",
+   "track": "mansion_e"
+  },
+  {
+   "regex": "^mansion_lord_h",
+   "track": "mansion_h"
+  },
+  {
+   "regex": "^mansion_duke_i",
+   "track": "mansion_i"
+  },
+  {
    "prefix": [
-    "castle",
     "mansion"
+   ],
+   "track": "mansion"
+  },
+  {
+   "prefix": [
+    "castle"
    ],
    "track": "castle"
   },
@@ -2161,8 +2249,7 @@
       16
      ]
     }
-   },
-   "level": 0.61
+   }
   },
   "temple_b": {
    "name": "B フランケル聖国の大教会（荘厳だが不穏）",
@@ -2237,8 +2324,7 @@
      "freq": 250,
      "gain": 0.02
     }
-   },
-   "level": 0.86
+   }
   },
   "temple_crypt": {
    "name": "神殿の地下納骨堂・宝物庫（暗く静か）",
@@ -2326,8 +2412,7 @@
       16
      ]
     }
-   },
-   "level": 1.0
+   }
   },
   "temple_cloister": {
    "name": "神殿の回廊（穏やかな中庭）",
@@ -2411,8 +2496,7 @@
       4
      ]
     }
-   },
-   "level": 1.1
+   }
   },
   "temple_life": {
    "name": "神殿の生活の場（厨房・食堂・客室・図書室など。素朴で温かい）",
@@ -2487,8 +2571,7 @@
       16
      ]
     }
-   },
-   "level": 1.08
+   }
   },
   "temple_village": {
    "name": "村の小さな神殿（狭い木造の質素な礼拝堂）",
@@ -2564,8 +2647,7 @@
       16
      ]
     }
-   },
-   "level": 1.38
+   }
   },
   "shrine_k": {
    "name": "マカヒキ国の神社（雅楽ふうの神聖な曲）",
@@ -2648,8 +2730,1103 @@
       16
      ]
     }
+   }
+  },
+  "castle_a": {
+   "name": "A 帝王の城（雪国の重厚な城）",
+   "bpm": 72,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "Am",
+    "Dm",
+    "G",
+    "Dm",
+    "Am",
+    "Dm",
+    "E",
+    "Am",
+    "F",
+    "Dm",
+    "E7",
+    "E",
+    "Am",
+    "Dm",
+    "E7",
+    "Am"
+   ],
+   "melody": "A3 - - - C4 - E4 - F4 - - - E4 - - - D4 - - - C4 - B3 - A3 - - - . . . . A3 - - - C4 - E4 - F4 - - - G#4 - A4 - B4 - - - A4 - G#4 - E4 - - - - - . . A4 - - G#4 F4 - E4 - D4 - - - F4 - - - E4 - - - D4 - C4 - B3 - - - A3 - . . C4 - - - E4 - A4 - F5 - - - E5 - - - D5 - C5 - B4 - G#4 - A3 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "brass",
+     "gain": 0.09,
+     "attack": 0.06,
+     "vibrato": 4,
+     "harmony": -12,
+     "harmonyLevel": 0.6
+    },
+    "lead2": {
+     "type": "choir",
+     "gain": 0.07,
+     "attack": 0.3,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "bell",
+     "gain": 0.04,
+     "pattern": ". . . . . . . 0",
+     "decay": 1.6,
+     "octave": 1,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.05,
+     "attack": 0.6,
+     "octave": 0
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.15,
+     "pattern": "R . . . R . 5 .",
+     "len": 1.5
+    },
+    "drums": {
+     "tom": "x...x...",
+     "fill": "tom",
+     "gain": 0.08,
+     "bars": [
+      4,
+      16
+     ]
+    }
    },
-   "level": 0.93
+   "level": 1.02
+  },
+  "castle_b": {
+   "name": "B 王の城（聖国の狭い王城。格式ばっているが中身がない）",
+   "bpm": 76,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "Dm",
+    "Gm",
+    "Eb",
+    "A",
+    "Dm",
+    "Gm",
+    "Cm",
+    "Gm",
+    "Dm",
+    "F",
+    "Bb",
+    "Gm",
+    "Dm",
+    "Gm",
+    "Cm",
+    "Dm"
+   ],
+   "melody": "D4 - F4 - A4 - F4 - A#4 - A4 - G4 - F4 - D#4 - G4 - A#4 - G4 - A4 - - - . . . . D4 - F4 - A4 - F4 - A#4 - A4 - G4 - F4 - D#4 - F4 - G4 - D#4 - D4 - - - . . . . A4 - A#4 - D5 - A#4 - A4 - G4 - F4 - - - A#4 - D5 - D#5 - D5 - A#4 - A4 - G4 - . . D5 - A#4 - A4 - F4 - G4 - A4 - A#4 - A4 - G4 - F4 - D#4 - G4 - D4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "pluck",
+     "gain": 0.11,
+     "attack": 0.004,
+     "decay": 0.6
+    },
+    "lead2": {
+     "type": "organ",
+     "gain": 0.05,
+     "attack": 0.2,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "pluck",
+     "gain": 0.04,
+     "pattern": "0 . 1 . 2 . 1 .",
+     "decay": 0.3,
+     "octave": 1
+    },
+    "pad": {
+     "type": "organ",
+     "gain": 0.03,
+     "attack": 0.8,
+     "octave": 0
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.13,
+     "pattern": "R . 5 . R . 5 .",
+     "len": 1
+    }
+   },
+   "level": 1.51
+  },
+  "castle_f": {
+   "name": "F 獣王の城（力強い太鼓と角笛）",
+   "bpm": 92,
+   "dynamics": [
+    0.8,
+    0.8,
+    0.8,
+    0.8,
+    0.9,
+    0.9,
+    0.9,
+    0.9,
+    1.05,
+    1.05,
+    1.05,
+    1.05,
+    1.0,
+    1.0,
+    1.0,
+    1.0
+   ],
+   "chords": [
+    "Am",
+    "D",
+    "Am",
+    "D",
+    "Am",
+    "D",
+    "Em",
+    "Am",
+    "C",
+    "Em",
+    "Am",
+    "D",
+    "Em",
+    "G",
+    "Em",
+    "Em"
+   ],
+   "melody": "E3 - - E3 A3 - B3 - D4 - - - A3 - E3 - E3 - - E3 A3 - B3 - D4 - B3 - A3 - - - E3 - - E3 A3 - B3 - D4 - - D4 E4 - D4 - B3 - A3 - E3 - G3 - E3 - - - . . . . E4 - - E4 D4 - E4 - G4 - - G4 E4 - D4 - A4 - - A4 G4 - E4 - D4 - - - . . . . E4 - D4 - B3 - A3 - G3 - A3 - B3 - D4 - B3 - A3 - G3 - E3 - E3 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "brass",
+     "gain": 0.09,
+     "attack": 0.04,
+     "harmony": -7,
+     "harmonyLevel": 0.5
+    },
+    "lead2": {
+     "type": "choir",
+     "gain": 0.07,
+     "attack": 0.3,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.035,
+     "attack": 0.5,
+     "octave": 0,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.16,
+     "pattern": "R . R . R . 5 .",
+     "len": 0.8
+    },
+    "drums": {
+     "tom": "x..x..x.",
+     "snare": "....x...",
+     "fill": "tom",
+     "gain": 0.1
+    }
+   },
+   "level": 1.18
+  },
+  "castle_g": {
+   "name": "G 女王の城（世界樹の中。精霊の光）",
+   "bpm": 66,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "D",
+    "A",
+    "D",
+    "A",
+    "D",
+    "A",
+    "D",
+    "A",
+    "F#m",
+    "Bm",
+    "A",
+    "D",
+    "A",
+    "F#m",
+    "A",
+    "D"
+   ],
+   "melody": "D4 - - - A4 - B4 - C#5 - - - B4 - A4 - F#4 - - - A4 - B4 - A4 - - - - - . . D4 - - - A4 - B4 - C#5 - - - D5 - E5 - F#5 - - - E5 - D5 - B4 - - - A4 - . . F#4 - A4 - C#5 - A4 - B4 - D5 - F#5 - D5 - C#5 - E5 - G#5 - E5 - F#5 - - - . . . . G#5 - F#5 - E5 - D5 - C#5 - B4 - A4 - F#4 - G#4 - F#4 - E4 - D4 - D4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "flute",
+     "gain": 0.12,
+     "attack": 0.08,
+     "vibrato": 5,
+     "echo": {
+      "steps": 4,
+      "level": 0.5
+     }
+    },
+    "lead2": {
+     "type": "choir",
+     "gain": 0.07,
+     "attack": 0.3,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "harp",
+     "gain": 0.06,
+     "pattern": "0 1 2 0 1 2 1 0",
+     "decay": 0.7,
+     "octave": 1
+    },
+    "pad": {
+     "type": "choir",
+     "gain": 0.04,
+     "attack": 1.0,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.11,
+     "pattern": "R . . . . . 5 .",
+     "len": 3,
+     "bars": [
+      8,
+      16
+     ]
+    }
+   },
+   "level": 0.84
+  },
+  "castle_j": {
+   "name": "J 魔導王の城（魔法の塔。研究と星）",
+   "bpm": 100,
+   "dynamics": [
+    0.85,
+    0.85,
+    0.85,
+    0.85,
+    0.9,
+    0.9,
+    0.9,
+    0.9,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.95,
+    0.95,
+    0.95,
+    0.95
+   ],
+   "chords": [
+    "A",
+    "E",
+    "B",
+    "F#m",
+    "A",
+    "E",
+    "B",
+    "E",
+    "F#m",
+    "B",
+    "A",
+    "F#m",
+    "B",
+    "A",
+    "E",
+    "A"
+   ],
+   "melody": "A3 - C#4 - E4 - C#4 - G4 - F#4 - E4 - - - D#4 - E4 - F#4 - G4 - A4 - - - . . . . A3 - C#4 - E4 - C#4 - G4 - F#4 - E4 - - - B3 - D#4 - F#4 - D#4 - E4 - - - . . . . F#4 - G4 - A4 - G4 - F#4 - E4 - D#4 - E4 - C#4 - E4 - G4 - E4 - F#4 - - - . . . . D#5 - C#5 - B4 - A4 - G4 - F#4 - E4 - D#4 - C#4 - D#4 - E4 - B3 - A3 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "bell",
+     "gain": 0.1,
+     "attack": 0.004,
+     "decay": 1.0
+    },
+    "lead2": {
+     "type": "flute",
+     "gain": 0.07,
+     "attack": 0.05,
+     "vibrato": 5,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "bell",
+     "gain": 0.04,
+     "pattern": "0 2 1 3 2 1 3 2",
+     "decay": 0.5,
+     "octave": 2,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.035,
+     "attack": 0.8,
+     "octave": 0
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.12,
+     "pattern": "R . . . . . 5 .",
+     "len": 3
+    }
+   },
+   "level": 1.1
+  },
+  "castle_court": {
+   "name": "城の中庭（明るく穏やか）",
+   "bpm": 88,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "C",
+    "Dm",
+    "F",
+    "G",
+    "C",
+    "F",
+    "C",
+    "F",
+    "Am",
+    "Dm",
+    "G",
+    "C",
+    "Am",
+    "Dm",
+    "G",
+    "C"
+   ],
+   "melody": "G4 - C5 - E5 - G5 - F5 - E5 - D5 - - - C5 - A4 - F4 - A4 - G4 - - - . . . . G4 - C5 - E5 - G5 - A5 - G5 - F5 - - - E5 - D5 - C5 - B4 - C5 - - - . . . . A4 - C5 - E5 - C5 - B4 - D5 - F5 - D5 - G4 - B4 - D5 - B4 - C5 - - - . . . . E5 - D5 - C5 - A4 - F4 - G4 - A4 - B4 - D5 - C5 - B4 - G4 - C5 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "flute",
+     "gain": 0.12,
+     "attack": 0.06,
+     "vibrato": 5
+    },
+    "lead2": {
+     "type": "strings",
+     "gain": 0.05,
+     "attack": 0.2,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "harp",
+     "gain": 0.06,
+     "pattern": "0 1 2 1 2 1 0 1",
+     "decay": 0.9,
+     "octave": 1
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.03,
+     "attack": 0.8,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.12,
+     "pattern": "R . . . 5 . . .",
+     "len": 3,
+     "bars": [
+      4,
+      16
+     ]
+    }
+   },
+   "level": 1.12
+  },
+  "castle_life": {
+   "name": "城・屋敷の裏方（鍛冶場・パン焼き所・詰所・食料庫。働く人のにぎわい）",
+   "bpm": 112,
+   "dynamics": [
+    0.85,
+    0.85,
+    0.85,
+    0.85,
+    0.9,
+    0.9,
+    0.9,
+    0.9,
+    1.0,
+    1.0,
+    1.0,
+    1.0,
+    0.95,
+    0.95,
+    0.95,
+    0.95
+   ],
+   "chords": [
+    "D",
+    "Bm",
+    "Em",
+    "A",
+    "D",
+    "Em",
+    "D",
+    "G",
+    "D",
+    "A",
+    "Em",
+    "A",
+    "D",
+    "Bm",
+    "A",
+    "D"
+   ],
+   "melody": "A4 - B4 A4 F#4 - D4 - E4 - F#4 E4 D4 - - - G4 - A4 G4 B4 - A4 - F#4 - - - E4 - . . A4 - B4 A4 F#4 - D4 - E4 - F#4 E4 G4 - F#4 - A4 - G4 - F#4 - E4 - D4 - - - . . . . D5 - C#5 D5 F#5 - D5 - C#5 - B4 C#5 A4 - - - B4 - A4 B4 G4 - B4 - A4 - - - . . . . D5 - C#5 B4 A4 - G4 - F#4 - G4 A4 B4 - A4 - G4 - F#4 - E4 - C#4 - D4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "accordion",
+     "gain": 0.09,
+     "attack": 0.03
+    },
+    "arp": {
+     "type": "pluck",
+     "gain": 0.05,
+     "pattern": "0 . 1 . 2 . 1 .",
+     "decay": 0.25,
+     "octave": 1
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.15,
+     "pattern": "R . 5 . R . 5 .",
+     "len": 0.9
+    },
+    "drums": {
+     "tom": "x...x...",
+     "clap": "..x...x.",
+     "fill": "tom",
+     "gain": 0.045,
+     "bars": [
+      4,
+      16
+     ]
+    }
+   },
+   "level": 1.44
+  },
+  "prison": {
+   "name": "牢・地下牢・氷室（暗く重い）",
+   "bpm": 58,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "Em",
+    "Dm",
+    "Gm",
+    "Dm",
+    "Am",
+    "Dm",
+    "Gm",
+    "C",
+    "Gm",
+    "Dm",
+    "Gm",
+    "Dm",
+    "Am",
+    "Dm",
+    "Gm",
+    "Em"
+   ],
+   "melody": "E3 - - - - - - - . . . . F3 - E3 - A#3 - - - . . . . A3 - - - G3 - - - E3 - - - - - - - . . . . F3 - E3 - C4 - - - A#3 - - - E3 - - - . . . . G3 - - - A3 - G3 - F3 - - - E3 - - - A#3 - - - C4 - A#3 - A3 - - - G3 - . . E3 - - - F3 - E3 - D3 - - - C3 - - - A#2 - - - . . . . E3 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "choir",
+     "gain": 0.07,
+     "attack": 0.3,
+     "vibrato": 3,
+     "echo": {
+      "steps": 4,
+      "level": 0.5
+     }
+    },
+    "arp": {
+     "type": "bell",
+     "gain": 0.05,
+     "pattern": ". . . . . 2 . .",
+     "decay": 1.6,
+     "octave": 1,
+     "bars": [
+      2,
+      16
+     ]
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.03,
+     "attack": 1.5,
+     "octave": 0
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.13,
+     "pattern": "R . . . . . . .",
+     "len": 7
+    },
+    "wind": {
+     "freq": 220,
+     "gain": 0.03
+    },
+    "drums": {
+     "tom": "x.......",
+     "gain": 0.06,
+     "bars": [
+      4,
+      16
+     ]
+    }
+   },
+   "level": 1.07
+  },
+  "mansion": {
+   "name": "貴族の屋敷（上品な室内楽）",
+   "bpm": 84,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "G",
+    "D",
+    "Em",
+    "C",
+    "G",
+    "D",
+    "G",
+    "C",
+    "G",
+    "D",
+    "G",
+    "D",
+    "C",
+    "D",
+    "C",
+    "G"
+   ],
+   "melody": "D5 - G5 - B5 - G5 - A5 - G5 - F#5 - D5 - E5 - G5 - B5 - A5 - G5 - - - . . . . D5 - G5 - B5 - G5 - A5 - G5 - F#5 - E5 - D5 - C5 - B4 - A4 - G4 - - - . . . . B5 - - D6 C6 - B5 - A5 - - C6 B5 - A5 - G5 - B5 - D6 - B5 - E5 - - - D5 - . . C5 - E5 - G5 - E5 - D5 - F#5 - A5 - F#5 - G5 - F#5 - E5 - D5 - G4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "flute",
+     "gain": 0.11,
+     "attack": 0.06,
+     "vibrato": 5
+    },
+    "lead2": {
+     "type": "strings",
+     "gain": 0.05,
+     "attack": 0.2,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "harp",
+     "gain": 0.055,
+     "pattern": "0 1 2 1 0 1 2 1",
+     "decay": 0.7,
+     "octave": 1
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.03,
+     "attack": 0.6,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.12,
+     "pattern": "R . . . 5 . . .",
+     "len": 3
+    }
+   },
+   "level": 1.07
+  },
+  "mansion_c": {
+   "name": "C 議長の館（自由都市の富と商い）",
+   "bpm": 92,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "D",
+    "Gm",
+    "D",
+    "Gm",
+    "D",
+    "Cm",
+    "D",
+    "A",
+    "Gm",
+    "Cm",
+    "A",
+    "D",
+    "Gm",
+    "Cm",
+    "D",
+    "D"
+   ],
+   "melody": "D4 - - D#4 F#4 - D#4 - D4 - - - C4 - - - A3 - A#3 - C4 - D4 - D#4 - - - D4 - . . D4 - - D#4 F#4 - D#4 - G4 - - - F#4 - D#4 - D4 - D#4 - F#4 - G4 - A4 - - - . . . . A#4 - - A4 G4 - F#4 - D#4 - - - F#4 - G4 - A4 - - A#4 A4 - G4 - F#4 - - - D#4 - . . D5 - - C5 A#4 - A4 - G4 - - - F#4 - D#4 - F#4 - D#4 - D4 - C4 - D4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "pluck",
+     "gain": 0.11,
+     "attack": 0.004,
+     "decay": 0.6
+    },
+    "lead2": {
+     "type": "flute",
+     "gain": 0.07,
+     "attack": 0.05,
+     "vibrato": 6,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "harp",
+     "gain": 0.05,
+     "pattern": "0 1 2 1 2 1 0 1",
+     "decay": 0.6,
+     "octave": 1
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.03,
+     "attack": 0.6,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.12,
+     "pattern": "R . . . 5 . . .",
+     "len": 3
+    },
+    "drums": {
+     "tom": "x..x....",
+     "gain": 0.03,
+     "bars": [
+      8,
+      16
+     ]
+    }
+   },
+   "level": 1.35
+  },
+  "mansion_e": {
+   "name": "E 議長の館（連盟の議場。潮風と気品）",
+   "bpm": 92,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "C",
+    "F",
+    "C",
+    "G",
+    "C",
+    "F",
+    "C",
+    "G",
+    "C",
+    "Bb",
+    "C",
+    "F",
+    "C",
+    "F",
+    "G",
+    "C"
+   ],
+   "melody": "G4 - - - C5 - G4 - A4 - - - F4 - - - G4 - - - C5 - E5 - D5 - - - C5 - . . G4 - - - C5 - G4 - A4 - - - F4 - - - E4 - G4 - A#4 - A4 - G4 - - - . . . . C5 - - D5 E5 - G5 - F5 - - - E5 - D5 - C5 - - D5 E5 - D5 - C5 - - - . . . . G4 - A4 - A#4 - C5 - A4 - F4 - A4 - C5 - G4 - E4 - D4 - A#4 - C4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "harp",
+     "gain": 0.11,
+     "attack": 0.004,
+     "decay": 0.7
+    },
+    "lead2": {
+     "type": "flute",
+     "gain": 0.08,
+     "attack": 0.05,
+     "vibrato": 5,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "pluck",
+     "gain": 0.045,
+     "pattern": "0 . 2 . 1 . 2 .",
+     "decay": 0.3,
+     "octave": 1
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.03,
+     "attack": 0.6,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.12,
+     "pattern": "R . . . 5 . . .",
+     "len": 3
+    },
+    "wind": {
+     "freq": 500,
+     "gain": 0.015
+    }
+   },
+   "level": 1.33
+  },
+  "mansion_h": {
+   "name": "H 自治領主の館（辺境の素朴な館）",
+   "bpm": 88,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "Em",
+    "D",
+    "Em",
+    "A",
+    "Em",
+    "Bm",
+    "A",
+    "Em",
+    "Bm",
+    "Em",
+    "A",
+    "Bm",
+    "Em",
+    "A",
+    "D",
+    "Em"
+   ],
+   "melody": "E4 - - - G4 - B4 - A4 - - - G4 - F#4 - E4 - - - G4 - B4 - C#5 - - - B4 - . . E4 - - - G4 - B4 - D5 - - - C#5 - B4 - A4 - B4 - C#5 - A4 - E4 - - - . . . . B4 - - C#5 D5 - C#5 - B4 - - - G4 - B4 - C#5 - - D5 E5 - D5 - B4 - - - . . . . G5 - F#5 - E5 - D5 - C#5 - B4 - A4 - G4 - F#4 - G4 - A4 - F#4 - E4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "accordion",
+     "gain": 0.09,
+     "attack": 0.04,
+     "vibrato": 4
+    },
+    "arp": {
+     "type": "pluck",
+     "gain": 0.05,
+     "pattern": "0 . 1 . 2 . 1 .",
+     "decay": 0.3,
+     "octave": 1
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.03,
+     "attack": 0.6,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.13,
+     "pattern": "R . 5 . R . 5 .",
+     "len": 1
+    },
+    "drums": {
+     "tom": "x...x...",
+     "gain": 0.04,
+     "bars": [
+      8,
+      16
+     ]
+    }
+   },
+   "level": 1.44
+  },
+  "mansion_i": {
+   "name": "I 女王の館（カナロア公国。優雅で気高い）",
+   "bpm": 88,
+   "dynamics": [
+    0.7,
+    0.75,
+    0.8,
+    0.8,
+    0.75,
+    0.8,
+    0.85,
+    0.85,
+    0.9,
+    0.95,
+    1.0,
+    1.0,
+    0.9,
+    0.85,
+    0.8,
+    0.7
+   ],
+   "chords": [
+    "F",
+    "F",
+    "Gm",
+    "C",
+    "F",
+    "Bb",
+    "Gm",
+    "Bb",
+    "F",
+    "Bb",
+    "F",
+    "Bb",
+    "Dm",
+    "Gm",
+    "C",
+    "F"
+   ],
+   "melody": "F4 - A4 - C5 - D5 - C5 - - - A4 - F4 - G4 - A#4 - D5 - F5 - E5 - - - C5 - . . F4 - A4 - C5 - D5 - F5 - - - D5 - C5 - A#4 - A4 - G4 - A#4 - F4 - - - . . . . A5 - - F5 A5 - C6 - A#5 - - G5 A#5 - D6 - C6 - A#5 - A5 - G5 - F5 - - - . . . . D5 - F5 - D5 - C5 - A#4 - C5 - D5 - E5 - G5 - F5 - E5 - C5 - F4 - - - - - - -",
+   "voices": {
+    "lead": {
+     "type": "flute",
+     "gain": 0.11,
+     "attack": 0.06,
+     "vibrato": 5
+    },
+    "lead2": {
+     "type": "strings",
+     "gain": 0.05,
+     "attack": 0.2,
+     "bars": [
+      8,
+      16
+     ]
+    },
+    "arp": {
+     "type": "harp",
+     "gain": 0.055,
+     "pattern": "0 1 2 1 0 1 2 1",
+     "decay": 0.8,
+     "octave": 1
+    },
+    "pad": {
+     "type": "strings",
+     "gain": 0.035,
+     "attack": 0.6,
+     "octave": 0,
+     "bars": [
+      4,
+      16
+     ]
+    },
+    "bass": {
+     "type": "cello",
+     "gain": 0.12,
+     "pattern": "R . . . 5 . . .",
+     "len": 3
+    }
+   },
+   "level": 1.05
   }
  }
 }

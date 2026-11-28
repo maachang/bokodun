@@ -23,7 +23,7 @@ test('音名・和音の計算', () => {
 });
 
 test('曲データ: 場面ごとの曲があり、旋律・和音・パターンが正しい', () => {
-    assert.deepEqual(Object.keys(bgm.tracks).sort(), ['boss', 'castle', 'castle_k', 'desert', 'dungeon', 'field', 'forest', 'guild', 'makahiki', 'mountain', 'port', 'posttown', 'shrine_k', 'snow', 'south', 'temple', 'temple_b', 'temple_cardinal', 'temple_cloister', 'temple_crypt', 'temple_life', 'temple_village', 'town', 'town_a', 'town_b', 'town_c', 'town_e', 'town_f', 'town_g', 'town_k']);
+    assert.deepEqual(Object.keys(bgm.tracks).sort(), ['boss', 'castle', 'castle_a', 'castle_b', 'castle_court', 'castle_f', 'castle_g', 'castle_j', 'castle_k', 'castle_life', 'desert', 'dungeon', 'field', 'forest', 'guild', 'makahiki', 'mansion', 'mansion_c', 'mansion_e', 'mansion_h', 'mansion_i', 'mountain', 'port', 'posttown', 'prison', 'shrine_k', 'snow', 'south', 'temple', 'temple_b', 'temple_cardinal', 'temple_cloister', 'temple_crypt', 'temple_life', 'temple_village', 'town', 'town_a', 'town_b', 'town_c', 'town_e', 'town_f', 'town_g', 'town_k']);
     for (const [name, t] of Object.entries(bgm.tracks)) {
         const steps = t.chords.length * 8, mel = t.melody.trim().split(/\s+/);
         assert.equal(mel.length, steps, `${name}: 旋律は、和音 1 つにつき 8 ステップ`);
@@ -94,7 +94,9 @@ test('選曲: マップの種類で曲が決まり、ボスが近くにいる間
     const g = Object.create(bgmMethods);
     g.bgmDef = bgm; g.player = { x: 0, z: 0 }; g.monsters = []; g.currentMapId = 'w_05_05'; g.bgmMapType = 'open';
     assert.equal(g.bgmChooseTrack(), 'field', '世界（屋外）は、草原');
-    for (const [id, want] of [['town_d', 'town'], ['town_h', 'town'], ['city_noble', 'town'], ['village_pub', 'town'], ['castle_b_2f', 'castle'], ['mansion_duke_i', 'castle'], ['cave', 'dungeon'], ['dungeon', 'dungeon'], ['field_x', 'field'], ['field_grass', 'field'],
+    for (const [id, want] of [['town_d', 'town'], ['town_h', 'town'], ['city_noble', 'town'], ['village_pub', 'town'], ['castle_2f', 'castle'], ['castle_guest_wing', 'castle'], ['castle_4f', 'castle'], ['castle_a', 'castle_a'], ['castle_a_bell', 'castle_a'], ['castle_a_icehouse', 'prison'], ['castle_b_2f', 'castle_b'], ['castle_b_cellar', 'prison'], ['castle_f_2f', 'castle_f'], ['castle_f_arena', 'castle_f'], ['castle_f_mine', 'dungeon'], ['castle_g_crown', 'castle_g'], ['castle_g_roots', 'dungeon'],
+        ['castle_j_lab', 'castle_j'], ['castle_j_prison', 'prison'], ['castle_prison', 'prison'], ['castle_basement', 'prison'], ['castle_courtyard', 'castle_court'], ['castle_smithy', 'castle_life'], ['castle_bakehouse', 'castle_life'], ['castle_guardroom', 'castle_life'], ['castle_chapel', 'temple_cloister'],
+        ['mansion', 'mansion'], ['mansion_baron', 'mansion'], ['mansion_marquis_2f', 'mansion'], ['mansion_pantry', 'castle_life'], ['mansion_cellar', 'castle_life'], ['mansion_chapel', 'temple_cloister'], ['mansion_chairman_c_2f', 'mansion_c'], ['mansion_chairman_e', 'mansion_e'], ['mansion_lord_h_2f', 'mansion_h'], ['mansion_duke_i', 'mansion_i'], ['mansion_duke_i_vault', 'temple_crypt'], ['mansion_chairman_c_vault', 'temple_crypt'], ['cave', 'dungeon'], ['dungeon', 'dungeon'], ['field_x', 'field'], ['field_grass', 'field'],
         // 国ごとの町・店・宿
         ['town_a', 'town_a'], ['shop_a', 'town_a'], ['town_b', 'town_b'], ['town_c', 'town_c'], ['town_e', 'town_e'], ['town_f', 'town_f'], ['town_g', 'town_g'], ['city_inn_2f_g', 'town_g'], ['elder_house_g', 'town_g'], ['city_inn', 'town'],
         // ギルド全般・大神殿・マカヒキ国
