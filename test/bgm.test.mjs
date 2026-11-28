@@ -34,6 +34,9 @@ test('曲データ: 場面ごとの曲があり、旋律・和音・パターン
         const v = t.voices;
         for (const k of ['arp', 'bass']) if (v[k]) assert.equal(v[k].pattern.split(' ').length, 8, `${name}: ${k} は 8 ステップ`);
         for (const k of ['kick', 'snare', 'hat', 'tom', 'clap']) if (v.drums?.[k]) assert.equal(v.drums[k].length, 8, `${name}: drums.${k} は 8 文字`);
+        if (t.dynamics) { assert.equal(t.dynamics.length, t.chords.length, `${name}: 起伏は、小節ごと`); for (const x of t.dynamics) assert.ok(x > 0 && x <= 1.2, `${name}: 起伏の値`); }
+        if (v.bass) for (const tok of v.bass.pattern.split(' ')) assert.ok(['R', '5', '3', '8', '.'].includes(tok), `${name}: 低音の記号 ${tok}`);
+        if (v.drums?.fill) assert.ok(['snare', 'tom'].includes(v.drums.fill), `${name}: フィル`);
         for (const [vn, vv] of Object.entries(v)) if (vv.gain !== undefined) assert.ok(vv.gain > 0 && vv.gain <= 0.3, `${name}: ${vn} の音量が、大きすぎない`);
     }
     for (const r of bgm.rules) assert.ok(bgm.tracks[r.track], `規則の曲 ${r.track} がある`);
@@ -44,9 +47,10 @@ function fakeCtx() {
     const node = (x = {}) => ({ connect() {}, disconnect() {}, ...x });
     const log = { osc: 0, noise: 0 };
     return { log, currentTime: 0, sampleRate: 8000, destination: {},
-        createOscillator: () => node({ frequency: param(), type: '', start() { log.osc++; }, stop() {} }),
+        createOscillator: () => node({ frequency: param(), detune: param(), type: '', start() { log.osc++; }, stop() {} }),
         createGain: () => node({ gain: param() }),
         createBiquadFilter: () => node({ frequency: param(), Q: param(), type: '' }),
+        createConvolver: () => node({ buffer: null }),
         createBuffer: (c, n) => ({ getChannelData: () => new Float32Array(n) }),
         createBufferSource: () => node({ start() { log.noise++; }, stop() {} }) };
 }
