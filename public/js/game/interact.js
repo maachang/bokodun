@@ -48,12 +48,21 @@ export const interactMethods = {
         }
     },
 
-    // 近くの村人のセリフ（いなければ null）
+    // 近くの村人のセリフ（いなければ null）。話し始めた（人かセリフが変わった）ときに、話し声の効果音（1 文字ごとのピッ）を鳴らす。話し終わったら止める
     nearbyNpcSpeech() {
-        let found = null;
+        let found = null, foundNpc = null;
         for (const n of this.npcs ?? []) {
             const s = n.speechFor(this.player);   // 離れた村人のセリフも、ここでリセットされる
-            if (s !== null && found === null) found = n.shopId ? `${s}\n${this.shops?.[n.shopId]?.routes ? '【Eキー】乗船の受付' : this.shops?.[n.shopId]?.training ? '【Eキー】訓練所のメニュー' : '【Eキー】取引メニューを表示'}` : s;   // 店主には、最下行に操作の案内を添える
+            if (s !== null && found === null) { foundNpc = n; found = n.shopId ? `${s}\n${this.shops?.[n.shopId]?.routes ? '【Eキー】乗船の受付' : this.shops?.[n.shopId]?.training ? '【Eキー】訓練所のメニュー' : '【Eキー】取引メニューを表示'}` : s; }   // 店主には、最下行に操作の案内を添える
+        }
+        if (foundNpc) {
+            if (this._talkNpc !== foundNpc || this._talkLine !== foundNpc.currentLine) {
+                this._talkNpc = foundNpc; this._talkLine = foundNpc.currentLine;
+                this.sound?.playTalk?.(foundNpc.currentLine, foundNpc.name);
+            }
+        } else if (this._talkNpc) {
+            this._talkNpc = null; this._talkLine = null;
+            this.sound?.stopTalk?.();
         }
         return found;
     },
